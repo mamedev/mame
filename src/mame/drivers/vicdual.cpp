@@ -2458,9 +2458,8 @@ READ_LINE_MEMBER(vicdual_state::samurai_protection_r)
 
 void vicdual_state::samurai_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
+	if (offset & 0x02) { palette_bank_w(data); /* samurai_audio_w(0, data >> 4) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(data);
 }
 
 

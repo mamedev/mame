@@ -240,15 +240,20 @@
 #include "emu.h"
 #include "includes/pc8801.h"
 
+#include "softlist_dev.h"
 
 
 #define IRQ_DEBUG       (0)
 #define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
-#define MASTER_CLOCK XTAL(4'000'000)
+#define PC8801FH_OSC1	XTAL(28'636'363)
+#define PC8801FH_OSC2	XTAL(42'105'200)
+#define PC8801FH_OSC3	XTAL(31'948'800)	// called OSC1 on PC-8801FE board
+
+#define MASTER_CLOCK (PC8801FH_OSC3 / 8)
 // TODO: exact clocks
-#define PIXEL_CLOCK_15KHz XTAL(14'318'181)
-#define PIXEL_CLOCK_24KHz XTAL(21'477'272)
+#define PIXEL_CLOCK_15KHz (PC8801FH_OSC1 / 2)
+#define PIXEL_CLOCK_24KHz XTAL(21'477'272)	// should be (PC8801FH_OSC2 / 2)?
 
 
 /*
@@ -2161,7 +2166,7 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_has_clock_speed = 1;
 	m_clock_setting = ioport("CFG")->read() & 0x80;
 
-	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
+	m_maincpu->set_unscaled_clock(m_clock_setting ? (PC8801FH_OSC3 / 8) : (PC8801FH_OSC3 / 4));
 	// TODO: FDC board shouldn't be connected to the clock setting, verify
 //  m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
 	m_baudrate_val = 0;

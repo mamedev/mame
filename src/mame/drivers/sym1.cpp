@@ -30,6 +30,7 @@ TODO:
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "sym1.lh"

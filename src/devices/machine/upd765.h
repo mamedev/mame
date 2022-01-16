@@ -512,6 +512,9 @@ public:
 	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+
+protected:
+	virtual void soft_reset() override;
 };
 
 class pc8477a_device : public ps2_fdc_device {

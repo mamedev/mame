@@ -106,7 +106,7 @@ the Neogeo Pocket.
 #include "sound/dac.h"
 #include "video/k1ge.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 enum flash_state

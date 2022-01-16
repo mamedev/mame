@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Pachinko Controller
+    Nintendo Family Computer Coconuts Japan CJPC-102 Pachinko Controller
 
 **********************************************************************/
 
@@ -13,19 +13,11 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device, "nes_pachinko", "Famicom Pachinko Controller")
+DEFINE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device, "nes_pachinko", "Coconuts Japan Pachinko Controller")
 
 
 static INPUT_PORTS_START( nes_pachinko )
-	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_INCLUDE( nes_joypad )
 
 	PORT_START("TRIGGER")
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0, 0x63) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -48,33 +40,10 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //  nes_pachinko_device - constructor
 //-------------------------------------------------
 
-nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NES_PACHINKO, tag, owner, clock),
-	device_nes_control_port_interface(mconfig, *this),
-	m_joypad(*this, "JOYPAD"),
-	m_trigger(*this, "TRIGGER"),
-	m_latch(0)
+nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock)
+	, m_trigger(*this, "TRIGGER")
 {
-}
-
-
-//-------------------------------------------------
-//  device_start
-//-------------------------------------------------
-
-void nes_pachinko_device::device_start()
-{
-	save_item(NAME(m_latch));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_pachinko_device::device_reset()
-{
-	m_latch = 0;
 }
 
 
@@ -82,13 +51,15 @@ void nes_pachinko_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_pachinko_device::read_exp(offs_t offset)
+u8 nes_pachinko_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 	// this controller behaves like a standard P3 joypad, with longer stream of inputs
 	if (offset == 0)    //$4016
 	{
-		ret |= (m_latch & 1) << 1;
+		if (m_strobe)
+			set_latch();
+		ret = (m_latch & 1) << 1;
 		m_latch >>= 1;
 	}
 	return ret;
@@ -98,12 +69,14 @@ uint8_t nes_pachinko_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_pachinko_device::write(uint8_t data)
+void nes_pachinko_device::write(u8 data)
 {
-	if (data & 0x01)
-		return;
+	if (write_strobe(data))
+		set_latch();
+}
 
+void nes_pachinko_device::set_latch()
+{
 	m_latch = m_joypad->read();
-	m_latch |= ((m_trigger->read() ^ 0xff) & 0xff) << 8;
-	m_latch |= 0xff0000;
+	m_latch |= ~bitswap<8>(m_trigger->read(), 0, 1, 2, 3, 4, 5, 6, 7) << 8;
 }

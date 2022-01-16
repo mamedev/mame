@@ -138,16 +138,16 @@ private:
 	void machine_start() override;
 	void do_int();
 
-	u8 m_port04;
-	u8 m_port06;
-	u8 m_port08;
-	u8 m_port09;
-	u8 m_port0a;
-	u8 m_term_data;
-	bool m_drq;
-	//bool m_intrq;
-	bool m_hsync;
-	bool m_vsync;
+	u8 m_port04 = 0U;
+	u8 m_port06 = 0U;
+	u8 m_port08 = 0U;
+	u8 m_port09 = 0U;
+	u8 m_port0a = 0U;
+	u8 m_term_data = 0U;
+	bool m_drq = 0;
+	//bool m_intrq = 0;
+	bool m_hsync = 0;
+	bool m_vsync = 0;
 	std::unique_ptr<u8[]> m_vram;
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<palette_device> m_palette;

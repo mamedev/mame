@@ -16,6 +16,7 @@
 #include "cpu/mcs51/axc51-core.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

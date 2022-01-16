@@ -47,18 +47,11 @@
 #define MAME_EMU_RENDER_H
 
 #include "rendertypes.h"
-#include "screen.h"
 
-#include <array>
 #include <cmath>
-#include <functional>
-#include <map>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -586,7 +579,7 @@ private:
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
 
 	// config callbacks
-	void config_load(util::xml::data_node const &targetnode);
+	void config_load(util::xml::data_node const *targetnode);
 	bool config_save(util::xml::data_node &targetnode);
 
 	// view lookups

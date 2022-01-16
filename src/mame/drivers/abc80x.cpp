@@ -149,6 +149,7 @@ Notes:
 
 #include "emu.h"
 #include "includes/abc80x.h"
+#include "softlist_dev.h"
 
 #define LOG 0
 

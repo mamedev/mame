@@ -2,11 +2,19 @@
 // copyright-holders:Robbbert
 /**************************************************************
 
-    PINBALL
-    Bally MPU AS-2518-133
-    Baby Pacman
-    Granny & the Gators
-    A blend of arcade video game, and pinball.
+PINBALL
+Bally MPU AS-2518-133
+A blend of arcade video game and pinball. It has the shape of
+ an upright arcade game. The vertical part contains the video
+ screen, while the flat part is a small pinball machine. The
+ ball is injected from between the flippers; there's no shooter.
+ There's flipper buttons on the sides, and a joystick on the
+ control panel.
+
+
+Games:
+- Baby Pacman (#1299)
+- Granny & the Gators (#1369)
 
 Babypac uses a MPU4 board containing the main cpu, and a Vidiot
 board containing the video and sound cpus, and the video controller
@@ -14,22 +22,17 @@ and the sound DAC and amp.
 
 Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
 video, and a Cheap Squeek sound board. The manual incorrectly
-describes the babypac vidiot board, which is of little use.
+describes the babypac vidiot board. Unable to locate a schematic.
 
+Status:
+- All machines are playable.
 
-ToDo (babypac):
-- No sound
-- Mechanical
-- Artwork
-- Beeper needs to be replaced by a red LED when artwork is done.
+ToDo: (all)
+- Sound. It gets stuck waiting for "input capture interrupt".
+- Beeper needs to be replaced by a red LED.
 
 ToDo (granny):
-- No sound
-- Playfield inputs
-- Mechanical
-- Artwork
-- Beeper needs to be replaced by a red LED when artwork is done.
-- Video CPU type and clock needs verification.
+- Video CPU clock needs verification.
 - Screen blending needs improvement
 - No schematic found.
 
@@ -38,10 +41,10 @@ ToDo (granny):
 
 
 #include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
@@ -51,11 +54,11 @@ ToDo (granny):
 
 namespace {
 
-class by133_state : public driver_device
+class by133_state : public genpin_class
 {
 public:
 	by133_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videocpu(*this, "videocpu")
 		, m_audiocpu(*this, "audiocpu")
@@ -76,6 +79,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
@@ -86,21 +90,21 @@ public:
 	void babypac(machine_config &config);
 	void granny(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	uint8_t m_mpu_to_vid;
-	uint8_t m_vid_to_mpu;
-	uint8_t m_u7_a;
-	uint8_t m_u7_b;
-	uint8_t m_u10_a;
-	uint8_t m_u10_b;
-	bool m_u10_cb2;
-	uint8_t m_u11_a;
-	uint8_t m_u11_b;
-	bool m_u10_timer;
-	bool m_u11_timer;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	u8 m_mpu_to_vid = 0U;
+	u8 m_vid_to_mpu = 0U;
+	u8 m_u7_a = 0U;
+	u8 m_u7_b = 0U;
+	bool m_u7_cb2 = 0;
+	u8 m_u10_a = 0U;
+	u8 m_u10_b = 0U;
+	bool m_u10_cb2 = 0;
+	u8 m_u11_a = 0U;
+	u8 m_u11_b = 0U;
+	bool m_u10_timer = 0;
+	bool m_u11_timer = 0;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<mc6809_device> m_videocpu;
 	required_device<m6803_cpu_device> m_audiocpu;
@@ -121,23 +125,24 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4; // Granny
+	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
 
-	uint8_t sound_data_r();
-	void sound_data_w(uint8_t data);
-	uint8_t m6803_port2_r();
-	void m6803_port2_w(uint8_t data);
-	uint8_t u7_a_r();
-	void u7_a_w(uint8_t data);
-	uint8_t u7_b_r();
-	void u7_b_w(uint8_t data);
-	uint8_t u10_a_r();
-	void u10_a_w(uint8_t data);
-	uint8_t u10_b_r();
-	void u10_b_w(uint8_t data);
-	uint8_t u11_a_r();
-	void u11_a_w(uint8_t data);
-	uint8_t u11_b_r();
-	void u11_b_w(uint8_t data);
+	u8 sound_data_r();
+	void sound_data_w(u8 data);
+	u8 m6803_port2_r();
+	void m6803_port2_w(u8 data);
+	u8 u7_a_r();
+	void u7_a_w(u8 data);
+	u8 u7_b_r();
+	void u7_b_w(u8 data);
+	u8 u10_a_r();
+	void u10_a_w(u8 data);
+	u8 u10_b_r();
+	void u10_b_w(u8 data);
+	u8 u11_a_r();
+	void u11_a_w(u8 data);
+	u8 u11_b_r();
+	void u11_b_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
@@ -146,11 +151,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	void granny_crtc_w(offs_t offset, uint8_t data);
+	void granny_crtc_w(offs_t offset, u8 data);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void audio_map(address_map &map);
 	void video_map(address_map &map);
 };
 
@@ -162,11 +167,11 @@ void by133_state::main_map(address_map &map)
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U10 MPU
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U11 MPU
 	map(0x0200, 0x03ff).ram().share("nvram"); // 256x4 in 5101L U8 MPU, battery backed (D4-7 are data, A4-8 are address)
-	map(0x1000, 0x17ff).rom().region("roms", 0x0000);
-	map(0x1800, 0x1fff).rom().region("roms", 0x1000);
-	map(0x5000, 0x57ff).rom().region("roms", 0x0800);
-	map(0x5800, 0x5fff).rom().region("roms", 0x1800);
-	map(0x7000, 0x7fff).rom().region("roms", 0x1000);
+	map(0x1000, 0x17ff).rom().region("maincpu", 0x0000);
+	map(0x1800, 0x1fff).rom().region("maincpu", 0x1000);
+	map(0x5000, 0x57ff).rom().region("maincpu", 0x0800);
+	map(0x5800, 0x5fff).rom().region("maincpu", 0x1800);
+	map(0x7000, 0x7fff).rom().region("maincpu", 0x1000);
 }
 
 void by133_state::video_map(address_map &map)
@@ -186,11 +191,11 @@ void by133_state::granny_map(address_map &map)
 	map(0x0006, 0x0007).w(FUNC(by133_state::granny_crtc_w)); // can write to both at once
 	map(0x0008, 0x000b).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x27ff).ram();
-	map(0x2801, 0x2801).nopr(); // The '9' test reads this location constantly and throws away the result
+	map(0x2801, 0x2801).nopr();
 	map(0x4000, 0xffff).rom();
 }
 
-void by133_state::sound_map(address_map &map)
+void by133_state::audio_map(address_map &map)
 { // U27 Vidiot
 	map(0xc000, 0xffff).rom();
 }
@@ -221,10 +226,10 @@ INPUT_CHANGED_MEMBER( by133_state::self_test )
 
 static INPUT_PORTS_START( babypac )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
@@ -335,51 +340,50 @@ static INPUT_PORTS_START( babypac )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper EOS") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Flipper EOS") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Rebounds") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Rebounds") PORT_CODE(KEYCODE_A) // press to start pinball game
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Spinner") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Spinner") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Spinner") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Spinner") PORT_CODE(KEYCODE_C)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Top Loop Lane") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Top Loop Lane") PORT_CODE(KEYCODE_D) // energiser 1
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Top Loop Lane") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Tunnel Outlane") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fruits Outlane") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Inside Outlane") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Inside Outlane") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Top Loop Lane") PORT_CODE(KEYCODE_E) // energiser 4
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Tunnel Outlane") PORT_CODE(KEYCODE_F)   // tunnel speed
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Fruits Outlane") PORT_CODE(KEYCODE_G)   // increase fruit bonus
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Inside Outlane") PORT_CODE(KEYCODE_H) // energiser 3
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Inside Outlane") PORT_CODE(KEYCODE_I) // energiser 2
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#5 Drop Target (R.)") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#4 Drop Target") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#3 Drop Target") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#2 Drop Target") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#1 Drop Target (L.)") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Maze Saucer") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Maze Saucer") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("#5 Drop Target (R.)") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("#4 Drop Target") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("#3 Drop Target") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("#2 Drop Target") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("#1 Drop Target (L.)") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Maze Saucer") PORT_CODE(KEYCODE_O) // return to video game
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Maze Saucer") PORT_CODE(KEYCODE_P) // return to video game
 
 	PORT_START("X4")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( granny )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Power")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Power")  // Also 2P start
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
@@ -492,75 +496,76 @@ static INPUT_PORTS_START( granny )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 1") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 2") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 3") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 4") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 5") PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 6") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 7") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 8") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 2") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 4") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 5") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 7") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Canoe Rollover Button 8") PORT_CODE(KEYCODE_H)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 
 	PORT_START("X2")
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top R. Gate") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Rollover Buttons") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Return Lane") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Return Lane") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Drop Target R") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Top R. Gate") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Rollover Buttons") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Return Lane") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Return Lane") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target R") PORT_CODE(KEYCODE_M)
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top Saucer") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Lane Kickback") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Top Saucer") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Lane Kickback") PORT_CODE(KEYCODE_O) // Gold
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ammo Target O") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd Ammo Target M") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1st Ammo Target M") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ammo Target A") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Ammo Target O") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("2nd Ammo Target M") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("1st Ammo Target M") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Ammo Target A") PORT_CODE(KEYCODE_S)
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Back Target T") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Back Target I") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Back Target X") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Back Target E") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Drop Target P") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Drop Target O") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Drop Target W") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Drop Target E") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Back Target T") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Back Target I") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Back Target X") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Back Target E") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target P") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target O") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target W") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target E") PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
 
-void by133_state::granny_crtc_w(offs_t offset, uint8_t data)
+void by133_state::granny_crtc_w(offs_t offset, u8 data)
 {
 	m_crtc->write(offset, data);
 	m_crtc2->write(offset, data);
 }
 
-uint8_t by133_state::sound_data_r()
+u8 by133_state::sound_data_r()
 {
 	return m_mpu_to_vid;
 }
 
-void by133_state::sound_data_w(uint8_t data)
+void by133_state::sound_data_w(u8 data)
 {
 	m_vid_to_mpu = data;
 }
 
-uint8_t by133_state::m6803_port2_r()
+u8 by133_state::m6803_port2_r()
 {
-	//machine().scheduler().synchronize();
-	return (m_u7_b << 1) | 0;
+	u8 data = ((m_u7_b << 1) & 0x1f) | 0x40 | m_u7_cb2;
+	m_u7_cb2 = false;
+	return data;
 }
 
-void by133_state::m6803_port2_w(uint8_t data)
+void by133_state::m6803_port2_w(u8 data)
 {
 	//m_u7_b = data >> 1;
 	m_beep->set_clock(600);
@@ -587,6 +592,8 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	// red led
 	m_beep->set_clock(950);
 	m_beep->set_state(state);
+	if (state)
+		m_u7_cb2 = true;
 }
 
 WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
@@ -600,17 +607,17 @@ WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
 	// solenoid-sound selector
 }
 
-uint8_t by133_state::u7_a_r()
+u8 by133_state::u7_a_r()
 {
 	return m_u7_a;
 }
 
-void by133_state::u7_a_w(uint8_t data)
+void by133_state::u7_a_w(u8 data)
 {
 	m_u7_a = data;
 }
 
-uint8_t by133_state::u7_b_r()
+u8 by133_state::u7_b_r()
 {
 	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
 		m_u7_b |= m_io_joy->read();
@@ -621,25 +628,35 @@ uint8_t by133_state::u7_b_r()
 	return m_u7_b;
 }
 
-void by133_state::u7_b_w(uint8_t data)
+void by133_state::u7_b_w(u8 data)
 {
 	//machine().scheduler().synchronize();
 	m_u7_b = data;
 }
 
-uint8_t by133_state::u10_a_r()
+u8 by133_state::u10_a_r()
 {
 	return m_u10_a;
 }
 
-void by133_state::u10_a_w(uint8_t data)
+void by133_state::u10_a_w(u8 data)
 {
 	m_u10_a = data;
 	if (BIT(m_u11_a, 2) == 0)
 		m_mpu_to_vid = data ^ 0x0f;
+	// Lamps
+	if (!m_u10_cb2)
+	{
+		if (!BIT(m_u10_a, 6))
+			for (u8 i = 0; i < 16; i++)
+				m_io_outputs[16+u8(m_u10_timer)*16+i] = ((m_u10_a & 15) == i);
+		if (!BIT(m_u10_a, 7))
+			for (u8 i = 0; i < 16; i++)
+				m_io_outputs[48+u8(m_u10_timer)*16+i] = ((m_u10_a & 15) == i);
+	}
 }
 
-uint8_t by133_state::u10_b_r()
+u8 by133_state::u10_b_r()
 {
 	if (BIT(m_u11_a, 3) == 0)
 		return ~m_u7_a & 0x03;
@@ -647,7 +664,7 @@ uint8_t by133_state::u10_b_r()
 	if (BIT(m_u11_a, 1) == 0)
 		return m_vid_to_mpu;
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	if (BIT(m_u10_a, 0))
 		data |= m_io_x0->read();
@@ -679,31 +696,40 @@ uint8_t by133_state::u10_b_r()
 	return data;
 }
 
-void by133_state::u10_b_w(uint8_t data)
+void by133_state::u10_b_w(u8 data)
 {
 	m_u10_b = data;
 }
 
-uint8_t by133_state::u11_a_r()
+u8 by133_state::u11_a_r()
 {
 	return m_u11_a;
 }
 
-void by133_state::u11_a_w(uint8_t data)
+void by133_state::u11_a_w(u8 data)
 {
 	m_u11_a = data;
 	m_pia_u7->ca1_w(BIT(data, 1));
 	m_pia_u7->ca2_w(BIT(data, 2));
 }
 
-uint8_t by133_state::u11_b_r()
+u8 by133_state::u11_b_r()
 {
 	return m_u11_b;
 }
 
-void by133_state::u11_b_w(uint8_t data)
+void by133_state::u11_b_w(u8 data)
 {
 	m_u11_b = data;
+	if (data == 0xB1)
+		m_samples->start(5, 5); // outhole
+	// Bits 0,1,2 go to 74LS138 to select one solenoid
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = ((data & 7) == i);
+	// Bits 4,5,6 do a solenoid each
+	for (u8 i = 4; i < 7; i++)
+		m_io_outputs[i+8] = BIT(data, i);
+	// Bits 3,7 not shown
 }
 
 // zero-cross detection
@@ -720,10 +746,33 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
+void by133_state::machine_start()
+{
+	genpin_class::machine_start();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_mpu_to_vid));
+	save_item(NAME(m_vid_to_mpu));
+	save_item(NAME(m_u7_a));
+	save_item(NAME(m_u7_b));
+	save_item(NAME(m_u7_cb2));
+	save_item(NAME(m_u10_a));
+	save_item(NAME(m_u10_b));
+	save_item(NAME(m_u10_cb2));
+	save_item(NAME(m_u11_a));
+	save_item(NAME(m_u11_b));
+	save_item(NAME(m_u10_timer));
+	save_item(NAME(m_u11_timer));
+}
+
 void by133_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_u7_a = 0;
-	m_u7_b = 1; // select mode 2 of mc6803 on /reset
+	m_u7_b = 1; // select mode 2 of mc6803 on /reset (not emulated yet by the cpu)
 	m_u10_a = 0;
 	m_u10_b = 0;
 	m_u10_cb2 = 0;
@@ -754,7 +803,7 @@ void by133_state::babypac(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &by133_state::video_map);
 
 	M6803(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::audio_map);
 	m_audiocpu->out_p1_cb().set("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
 	m_audiocpu->in_p2_cb().set(FUNC(by133_state::m6803_port2_r)); // P20-P24 sound command in
 	m_audiocpu->out_p2_cb().set(FUNC(by133_state::m6803_port2_w));
@@ -800,6 +849,7 @@ void by133_state::babypac(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
+	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
 	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // U32 (Vidiot) or U6 (Cheap Squeak)
 
@@ -823,10 +873,10 @@ void by133_state::granny(machine_config &config)
 
 
 /*-----------------------------------------------------
-/ Baby Pacman (Video/Pinball Combo) (BY133-891:  10/82)
+/ Baby Pacman (Video/Pinball Combo) (BY133-891:  10/82) (Game #1299)
 /-----------------------------------------------------*/
 ROM_START(babypac)
-	ROM_REGION(0x2000, "roms", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "891-u2.732", 0x0000, 0x1000, CRC(7f7242d1) SHA1(213a697bb7fc69f93ea04621f0fcfdd796f35196))
 	ROM_LOAD( "891-u6.732", 0x1000, 0x1000, CRC(6136d636) SHA1(c01a0a2fcad3bdabd649128e012ab558b1c90cd3) )
 
@@ -841,7 +891,7 @@ ROM_START(babypac)
 ROM_END
 
 ROM_START(babypac2)
-	ROM_REGION(0x2000, "roms", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "891-u2.732", 0x0000, 0x1000, CRC(7f7242d1) SHA1(213a697bb7fc69f93ea04621f0fcfdd796f35196))
 	ROM_LOAD( "891-u6.732", 0x1000, 0x1000, CRC(6136d636) SHA1(c01a0a2fcad3bdabd649128e012ab558b1c90cd3) )
 
@@ -856,10 +906,10 @@ ROM_START(babypac2)
 ROM_END
 
 /*-----------------------------------------------------------------
-/ Granny and the Gators (Video/Pinball Combo) - (BY35-???: 01/84)
+/ Granny and the Gators (Video/Pinball Combo) - (BY35-???: 01/84) (Game #1369)
 /----------------------------------------------------------------*/
 ROM_START(granny)
-	ROM_REGION(0x2000, "roms", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.532", 0x0000, 0x1000, CRC(d45bb956) SHA1(86a6942ff9fe38fa109ecde40dc2dd19adf938a9))
 	ROM_LOAD( "cpu_u6.532", 0x1000, 0x1000, CRC(306aa673) SHA1(422c3d9decf9214a18edb536c2077bf52b272e7d) )
 
@@ -878,6 +928,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1982, babypac,  0,       babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1982, babypac2, babypac, babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac,  0,       babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982, babypac2, babypac, babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_IS_SKELETON_MECHANICAL )

@@ -113,6 +113,7 @@ To Do / Status:
 #include "machine/i8255.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "softlist_dev.h"
 #define MASTER_XTAL 12164800
 
 

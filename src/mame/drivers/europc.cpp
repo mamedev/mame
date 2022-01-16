@@ -37,6 +37,7 @@
 #include "machine/m3002.h"
 #include "machine/pckeybrd.h"
 #include "machine/ram.h"
+#include "softlist_dev.h"
 
 
 class europc_pc_state : public driver_device

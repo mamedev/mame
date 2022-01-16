@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2021-11-19 09:46+0800\n"
+"PO-Revision-Date: 2021-12-09 14:25+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -287,7 +287,7 @@ msgstr "搜寻： %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr "软体列表/项目： %1$s:%2$s"
+msgstr "软件列表/项目： %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:161
 msgid "Sound Options"
@@ -385,11 +385,11 @@ msgstr "显示鼠标指标"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "确认离开模拟"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "略过系统信息画面"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -573,7 +573,7 @@ msgstr "自然键盘"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "允许摇杆输入的对立状况"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -1474,7 +1474,7 @@ msgstr "包含克隆版"
 #: src/frontend/mame/ui/utils.cpp:2048 src/frontend/mame/ui/inifile.cpp:272
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr "软体列表/项目"
+msgstr "软件列表/项目"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2707
 msgid "Software List Info"
@@ -1788,7 +1788,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
-"选定的软体缺少一个或多个必要的 ROM 或 CHD 映像档\n"
+"选定的软件缺少一个或多个必要的 ROM 或 CHD 映像档\n"
 "请取得正确的档案或选择不同的档案。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:146
@@ -2170,6 +2170,8 @@ msgid ""
 "Auditing media for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"正在校验供机械 %2$u 的 %3$u 媒体...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
@@ -2187,12 +2189,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit media for %1$u machines marked unavailable"
-msgstr ""
+msgstr "校验标记为不可用的 %1$u 机械媒体"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit media for all %1$u machines"
-msgstr ""
+msgstr "校验所有 %1$u 机械的媒体"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
@@ -2580,7 +2582,7 @@ msgstr "磁带控制"
 
 #: src/frontend/mame/ui/mainmenu.cpp:155
 msgid "Pseudo Terminals"
-msgstr ""
+msgstr "伪终端"
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
@@ -2804,8 +2806,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"选定软体所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
-"请取得正确的档案或选择不同的软体项目。\n"
+"选定软件所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
+"请取得正确的档案或选择不同的软件项目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2592
@@ -3116,11 +3118,11 @@ msgstr "需要 CHD\t否\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "媒体校验结果\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "媒体校验结果\t错误\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3139,6 +3141,8 @@ msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"媒体校验\t停用\n"
+"样本档校验\t停用\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
@@ -3376,7 +3380,7 @@ msgstr "P%1$u"
 #: src/emu/ioport.cpp:1924
 msgctxt "input-name"
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
 #: src/emu/inpttype.ipp:255 src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:323
@@ -5012,7 +5016,7 @@ msgstr "重新启动机台"
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr "软体重新启动"
+msgstr "软件重新启动"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
@@ -6107,43 +6111,5 @@ msgstr ""
 "输入序列或按下 %s 取消\n"
 "%s"
 
-#~ msgid "Confirm quit from machines"
-#~ msgstr "确认离开机台"
-
-#~ msgid "Skip information screen at startup"
-#~ msgstr "略过起始的信息画面"
-
 #~ msgid "Skip software parts selection menu"
 #~ msgstr "略过软件部分选择菜单"
-
-#~ msgid "Simultaneous contradictory"
-#~ msgstr "同时发生的对立状况"
-
-#, c-format
-#~ msgid ""
-#~ "Auditing ROMs for machine %2$u of %3$u...\n"
-#~ "%1$s"
-#~ msgstr ""
-#~ "正在校验供机台 %2$u 的 %3$u ROM 档案...\n"
-#~ "%1$s"
-
-#, c-format
-#~ msgid "Audit ROMs for %1$u machines marked unavailable"
-#~ msgstr "校验标记为不可用的 %1$u 机台的 ROM 档案"
-
-#, c-format
-#~ msgid "Audit ROMs for all %1$u machines"
-#~ msgstr "校验所有 %1$u 机台的 ROM 档案"
-
-#~ msgid "ROM Audit Result\tOK\n"
-#~ msgstr "ROM 校验结果\tOK\n"
-
-#~ msgid "ROM Audit Result\tBAD\n"
-#~ msgstr "ROM 校验结果\t错误\n"
-
-#~ msgid ""
-#~ "ROM Audit \tDisabled\n"
-#~ "Samples Audit \tDisabled\n"
-#~ msgstr ""
-#~ "ROM 验证 \t停用\n"
-#~ "采样文件验证 \t停用\n"

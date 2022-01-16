@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "wafa.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

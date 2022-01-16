@@ -152,7 +152,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "formats/tzx_cas.h"
 

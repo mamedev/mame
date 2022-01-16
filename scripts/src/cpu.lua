@@ -2223,20 +2223,23 @@ end
 if CPUS["SM510"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/sm510/sm510base.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510base.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm510core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm511core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm500core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm5acore.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm590.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm590core.cpp",
 	}
 end
 
@@ -3399,6 +3402,7 @@ end
 --@src/devices/cpu/upd78k/upd78k0.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k2.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k3.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k4.h,CPUS["UPD78K"] = true
 --------------------------------------------------
 
 if CPUS["UPD78K"] then
@@ -3409,6 +3413,8 @@ if CPUS["UPD78K"] then
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.h",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.cpp",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.h",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.h",
 	}
 end
 
@@ -3423,6 +3429,8 @@ if opt_tool(CPUS, "UPD78K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.h")
 end
 
 --------------------------------------------------

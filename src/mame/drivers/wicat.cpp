@@ -35,6 +35,7 @@ Wicat - various systems.
 #include "video/i8275.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "wicat.lh"
 

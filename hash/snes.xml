@@ -2301,9 +2301,9 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="nightbst">
 		<!-- DuoFan -->
-		<description>Nightmare Busters (Jpn, prototype)</description>
+		<description>Nightmare Busters (Japan, prototype)</description>
 		<year>1995</year>
-		<publisher>Arcade Zone</publisher> <!-- cancelled -->
+		<publisher>Nichibutsu</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-4PV5B-01" />
 			<feature name="u1" value="U1 EPROM" />
@@ -19149,7 +19149,7 @@ more investigation needed...
 
 	<software name="madara2">
 		<description>Mouryou Senki Madara 2 (Jpn)</description>
-		<year>1999</year>
+		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-M2" />
 		<info name="release" value="19930716" />
@@ -48188,6 +48188,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="merwars">
+		<description>Mer Wars (prototype)</description>
+		<year>199?</year>
+		<publisher>Synergistic</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="mer wars (prototype).sfc" size="524288" crc="63bfc034" sha1="75ebb4df85bc4f79a8c01b552f7563f1038e1728" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="metalcomu" cloneof="metalcom">
 		<description>Metal Combat - Falcon's Revenge (USA)</description>
 		<year>1993</year>
@@ -49026,6 +49038,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="mr. tuff (europe) (en,fr,de,es,it) (proto) (1994-12-05).sfc" size="1572864" crc="83f87bb7" sha1="17efa7bf116a462abedd3ea2cb59ddd1b8f9c327" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrtuffb" cloneof="mrtuff">
+		<description>Mr. Tuff (Euro, prototype 19940621)</description>
+		<year>1994</year>
+		<publisher>Sales Curve Interactive</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mr. tuff (jun 21, 1994 prototype).sfc" size="2097152" crc="53dff1bb" sha1="f27ee028b82c594b61ad258118685344ea4a971f" />
 			</dataarea>
 		</part>
 	</software>
@@ -50102,6 +50126,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nigel mansell's world championship racing (europe).sfc" size="1048576" crc="fc23e228" sha1="19a6e24dab124523ae6242337d2470839a7713b8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightbsta" cloneof="nightbst">
+		<description>Nightmare Busters (Japan, prototype 19940409)</description>
+		<year>1994</year>
+		<publisher>Nichibutsu</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="nightmare busters (apr 9, 1994 prototype).sfc" size="1048576" crc="32ea8a0a" sha1="b146bb6c02bedf733d36be063cbd5ebc221ed776" />
 			</dataarea>
 		</part>
 	</software>
@@ -53229,6 +53265,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="realm (usa).sfc" size="1048576" crc="0744ba5b" sha1="7ef55367809cf62d63bbff60bb633a76992f560d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reactor">
+		<!-- Notes: Prototype has no sound -->
+		<description>Reactor (prototype)</description>
+		<year>1991</year>
+		<publisher>Argonaut Software</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="reactor (prototype).sfc" size="524288" crc="de765ad2" sha1="5fc2795b42fb92be44eaa0dc09ff848a6a536cbb" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -58268,6 +58317,42 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="super formation soccer 96 - world club edition (japan).sfc" size="1572864" crc="f42272cb" sha1="b99319c282b1674b818e1274723f474459470b84" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfulmetlb" cloneof="sfulmetl">
+		<description>Super Full Metal Planet (prototype B)</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="super full metal (prototype b).sfc" size="524288" crc="acc3e8f3" sha1="81be71905afb0fd0479416002b39bea329b9e1b3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfulmetlc" cloneof="sfulmetl">
+		<description>Super Full Metal Planet (prototype C)</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="super full metal (prototype c).sfc" size="524288" crc="eaee3a83" sha1="fb1090878a360881968a6802826f388e87884c89" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfulmetld" cloneof="sfulmetl">
+		<description>Super Full Metal Planet (prototype D)</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="super full metal (prototype d).sfc" size="524288" crc="2300fba8" sha1="c3d3ff08a2430d6958dc1a64f296a074e2b4ddae" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

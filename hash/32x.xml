@@ -9,9 +9,6 @@ license:CC0
       a -5x appended to the end, depending on the country/language (generic English titles have a -50)
 
 
-    Known undumped prototypes:
-     - Spot Goes to Hollywood
-
 -->
 <softwarelist name="32x" description="Sega 32X cartridges">
 
@@ -1871,6 +1868,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="spotgo">
+		<description>Spot Goes to Hollywood (prototype)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="spot goes to hollywood 32x (prototype).bin" size="3145728" crc="ce6c4b99" sha1="f233175e65928727a789b89850702af43fa8d4a4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stsfleet">
 		<description>Star Trek - Starfleet Academy - Starship Bridge Simulator (USA)</description>
 		<year>1995</year>
@@ -2234,6 +2242,17 @@ license:CC0
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="tempo (prototype - dec 29, 1994).bin" size="3145728" crc="7bfe49a3" sha1="017ee73e0f582893ef3deebfbe74af4babd532a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twcmd" supported="no">
+		<description>Time Warner 32X CMD Download Cartridge</description>
+		<year>199?</year>
+		<publisher>Time Warner Interactive</publisher>
+		<part name="cart" interface="_32x_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="time warner 32x cmd download cartridge.bin" size="262144" crc="6c2176ca" sha1="460439b83ce50021339acf5fca4a63b45c0c1c0b" />
 			</dataarea>
 		</part>
 	</software>

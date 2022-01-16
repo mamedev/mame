@@ -118,11 +118,11 @@ private:
 	void mycom_map(address_map &map);
 
 	std::unique_ptr<u8[]> m_vram;
-	u8 m_port0a;
-	u8 m_keyb_press;
-	u8 m_sn_we;
-	u16 m_i_videoram;
-	bool m_keyb_press_flag;
+	u8 m_port0a = 0U;
+	u8 m_keyb_press = 0U;
+	u8 m_sn_we = 0U;
+	u16 m_i_videoram = 0U;
+	bool m_keyb_press_flag = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;

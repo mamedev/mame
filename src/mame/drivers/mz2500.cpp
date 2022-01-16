@@ -39,6 +39,8 @@
 #include "emu.h"
 #include "includes/mz2500.h"
 
+#include "softlist_dev.h"
+
 
 /* machine stuff */
 

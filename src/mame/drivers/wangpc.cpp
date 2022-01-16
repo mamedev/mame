@@ -20,7 +20,7 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "bus/wangpc/wangpc.h"

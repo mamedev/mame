@@ -20,6 +20,7 @@
 #include "includes/comx35.h"
 #include "formats/imageutl.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 /***************************************************************************
     PARAMETERS

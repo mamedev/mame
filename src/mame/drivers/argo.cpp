@@ -55,7 +55,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
-		, m_io_keyboard(*this, "X%d", 0)
+		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void argo(machine_config &config);
@@ -88,11 +88,11 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_ioport_array<11> m_io_keyboard;
-	u8 m_framecnt;
-	bool m_ram_ctrl;
-	u8 m_scroll_ctrl;
-	bool m_txe, m_txd, m_rts, m_casspol;
-	u8 m_cass_data[4];
+	u8 m_framecnt = 0U;
+	bool m_ram_ctrl = 0;
+	u8 m_scroll_ctrl = 0U;
+	bool m_txe = 0, m_txd = 0, m_rts = 0, m_casspol = 0;
+	u8 m_cass_data[4]{};
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_eram;
 };

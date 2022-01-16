@@ -28,6 +28,7 @@ too slow.
 #include "formats/rk_cas.h"
 #include "ut88mini.lh"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

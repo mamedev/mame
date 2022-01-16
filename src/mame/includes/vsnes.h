@@ -36,7 +36,7 @@ public:
 	void init_vsvram();
 	void init_bnglngby();
 	void init_drmario();
-	void init_MMC3();
+	void init_vs108();
 	void init_vsfdf();
 	void init_tkoboxng();
 	void init_vsgun();
@@ -84,7 +84,7 @@ private:
 	void vsgshoe_gun_in0_w(uint8_t data);
 	void drmario_rom_banking(offs_t offset, uint8_t data);
 	void vsvram_rom_banking(uint8_t data);
-	void mapper4_w(offs_t offset, uint8_t data);
+	void vs108_rom_banking(offs_t offset, uint8_t data);
 	uint8_t rbi_hack_r(offs_t offset);
 	uint8_t supxevs_read_prot_1_r();
 	uint8_t supxevs_read_prot_2_r();
@@ -105,9 +105,6 @@ private:
 	DECLARE_MACHINE_RESET(vsdual);
 	DECLARE_MACHINE_START(bootleg);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
-	void mapper4_set_prg(  );
-	void mapper4_set_chr(  );
-	void mapper4_irq( int scanline, int vblank, int blanked );
 
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
@@ -140,13 +137,8 @@ private:
 	int m_size16k;
 	int m_switchlow;
 	int m_vrom4k;
-	int m_MMC3_cmd;
-	int m_MMC3_prg_bank[4];
-	int m_MMC3_chr_bank[6];
-	int m_MMC3_prg_mask;
-	int m_IRQ_enable;
-	int m_IRQ_count;
-	int m_IRQ_count_latch;
+	int m_108_reg;
+	int m_108_prg_mask;
 	int m_VSindex;
 	int m_supxevs_prot_index;
 	int m_security_counter;

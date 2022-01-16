@@ -118,7 +118,7 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 
 sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_sega8_cart_interface>(mconfig, *this)
 	, m_type(SEGA8_BASE_ROM)
 	, m_is_card(is_card)

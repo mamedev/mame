@@ -48,7 +48,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -105,9 +105,9 @@ private:
 	void pegasus_mem(address_map &map);
 	void pegasusm_mem(address_map &map);
 
-	u8 m_kbd_row;
-	bool m_kbd_irq;
-	u8 m_control_bits;
+	u8 m_kbd_row = 0U;
+	bool m_kbd_irq = 0;
+	u8 m_control_bits = 0U;
 	std::unique_ptr<u8[]> m_pcg;
 	void pegasus_decrypt_rom(u8 *ROM);
 	required_device<cpu_device> m_maincpu;
