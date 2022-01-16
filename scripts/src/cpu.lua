@@ -3402,6 +3402,7 @@ end
 --@src/devices/cpu/upd78k/upd78k0.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k2.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k3.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k4.h,CPUS["UPD78K"] = true
 --------------------------------------------------
 
 if CPUS["UPD78K"] then
@@ -3412,6 +3413,8 @@ if CPUS["UPD78K"] then
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.h",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.cpp",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.h",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.h",
 	}
 end
 
@@ -3426,6 +3429,8 @@ if opt_tool(CPUS, "UPD78K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.h")
 end
 
 --------------------------------------------------
