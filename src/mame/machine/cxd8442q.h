@@ -15,47 +15,7 @@
 
 class cxd8442q_device : public device_t
 {
-public:
-	cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void map(address_map &map);
-	void map_fifo_ram(address_map &map);
-
-	auto out_int_callback() { return out_irq.bind(); }
-
-	// FIFO channels
-	enum fifo_channel_number
-	{
-		CH0 = 0,
-		CH1 = 1,
-		CH2 = 2,
-		CH3 = 3
-	};
-
-	// DMA emulation
-	template <fifo_channel_number ChannelNumber>
-	void drq_w(int state) { fifo_channels[ChannelNumber].drq_w(state); };
-	template <fifo_channel_number ChannelNumber>
-	auto dma_r_cb() { return fifo_channels[ChannelNumber].dma_r_cb(); };
-	template <fifo_channel_number ChannelNumber>
-	auto dma_w_cb() { return fifo_channels[ChannelNumber].dma_w_cb(); };
-
 protected:
-	std::unique_ptr<uint32_t[]> fifo_ram;
-
-	emu_timer *fifo_timer;
-	TIMER_CALLBACK_MEMBER(fifo_dma_execute);
-
-	// Interrupts
-	devcb_write_line out_irq;
-	void device_resolve_objects() override { out_irq.resolve_safe(); }
-	void irq_check();
-
-	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	// Class that represents a single FIFO channel. Each instance of the FIFOQ chip has 4 of these.
 	class apfifo_channel
 	{
@@ -134,6 +94,47 @@ protected:
 		uint32_t fifo_w_position = 0;
 		uint32_t fifo_r_position = 0;
 	};
+
+public:
+	cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void map(address_map &map);
+	void map_fifo_ram(address_map &map);
+
+	auto out_int_callback() { return out_irq.bind(); }
+
+	// FIFO channels
+	enum fifo_channel_number
+	{
+		CH0 = 0,
+		CH1 = 1,
+		CH2 = 2,
+		CH3 = 3
+	};
+
+	// DMA emulation
+	template <fifo_channel_number ChannelNumber>
+	void drq_w(int state) { fifo_channels[ChannelNumber].drq_w(state); };
+	template <fifo_channel_number ChannelNumber>
+	auto dma_r_cb() { return fifo_channels[ChannelNumber].dma_r_cb(); };
+	template <fifo_channel_number ChannelNumber>
+	auto dma_w_cb() { return fifo_channels[ChannelNumber].dma_w_cb(); };
+
+protected:
+	std::unique_ptr<uint32_t[]> fifo_ram;
+
+	emu_timer *fifo_timer;
+	TIMER_CALLBACK_MEMBER(fifo_dma_execute);
+
+	// Interrupts
+	devcb_write_line out_irq;
+	void device_resolve_objects() override { out_irq.resolve_safe(); }
+	void irq_check();
+
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	static constexpr int FIFO_CH_TOTAL = 4;
 	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
