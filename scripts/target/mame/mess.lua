@@ -2471,7 +2471,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "falco")
 files {
-	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
+	MAME_DIR .. "src/mame/drivers/falco500.cpp",
+	MAME_DIR .. "src/mame/machine/f5220_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/f5220_kbd.h",
 	MAME_DIR .. "src/mame/drivers/falcots.cpp",
 	MAME_DIR .. "src/mame/drivers/falcots28.cpp",
 }

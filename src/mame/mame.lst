@@ -13744,8 +13744,9 @@ f387x                           // (c) 1979 Fairchild
 @source:facit4440.cpp
 facit4440                       // 1984
 
-@source:falco5220.cpp
+@source:falco500.cpp
 falco5220e                      // 1987
+falco500e                       // 1991
 falco5220s                      // 1989
 
 @source:falcots.cpp
