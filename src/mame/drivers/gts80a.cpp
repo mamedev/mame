@@ -19,30 +19,30 @@ Sound is wrong in all games.
 
 Note: If DIP28 is set to Novelty, then Match doesn't work.
 
-Here are the key codes to enable play:
+Here are the key codes to enable play: (may need to hit X to start a ball)
 
-Game                 NUM  Start game                                       End ball
---------------------------------------------------------------------------------------------------
+Game                 NUM  Start game                                       End ball (X often works, even when not connected)
+-----------------------------------------------------------------------------------------------------------------
 Devil's Dare         670  1, then hold .enter hit pad-                     .enter hit pad-
 Rocky                672  1                                                X
-Spirit               673  unknown                                          unknown
-Punk!                674  unknown                                          unknown
-Striker              675  unknown                                          unknown
+Spirit               673  1, then Y and \                                  X then \ (wait for sound)
+Punk!                674  1, then - and num*                               - then num* (wait for sound)
+Striker              675  1, then S and num2                               X
 Krull                676  1, then jiggle X and Y until you hear a sound    X
-Qbert's Quest        677  1                                                X
+Qbert's Quest        677  1, then X (wait for sound), then Z               X
 Super Orbit          680  1                                                X
 Royal Flush Deluxe   681  1                                                X
-Going Nuts           682  unknown                                          unknown
+Going Nuts           682  1 then num- then num*                            num- then num*
 Amazon Hunt          684  1                                                X
-Rack 'Em Up          685  unknown                                          unknown (should be like Rocky, but doesn't work)
+Rack 'Em Up          685  1 then hold num-enter, hit X                     X
 Ready Aim Fire       686  1                                                X
 Jacks to Open        687  1                                                X
 Touchdown            688  1                                                X
-Alien Star           689  unknown                                          unknown
+Alien Star           689  1, then K and \                                  \ then K
 The Games            691  1                                                X
 El Dorado            692  1                                                X
-Ice Fever            695  unknown                                          unknown
-Caveman              810  unknown                                          unknown
+Ice Fever            695  1 then unknown                                   X
+Caveman            PV810  1 then unknown                                   X
 
 *****************************************************************************************************************/
 
@@ -325,7 +325,7 @@ u8 gts80a_state::port1a_r()
 	if ((m_lamprow < 4) && BIT(m_segment, 7))
 		data = m_io_dips[m_lamprow]->read();
 
-	for (u8 i = 0; i < 7; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (!BIT(m_swrow, i))
 			data &= m_io_keyboard[i]->read();
 
@@ -383,7 +383,7 @@ void gts80a_state::port3a_w(u8 data)
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board
-	if (m_r0_sound && (sndcmd & 15))
+	if (m_r0_sound)
 		m_r0_sound->write(sndcmd);
 	else
 	if (m_r1_sound)
