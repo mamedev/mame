@@ -28456,6 +28456,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="robocop">
+		<description>Robocop (prototype)</description>
+		<year>2002</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="robocop (prototype).bin" size="8388608" crc="282e6408" sha1="0c6b28da8ad9b889d765e65e081848e410095406"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robopn2c">
 		<description>Robopon 2 - Cross Version (USA)</description>
 		<year>2002</year>
