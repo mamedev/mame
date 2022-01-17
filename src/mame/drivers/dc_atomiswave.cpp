@@ -875,9 +875,12 @@ void atomiswave_state::init_atomiswave()
 	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
 
 	// patch out long startup delay
+	// (Sammy logo on -bios 0 before "ALL BACKUP DATA WAS CLEARED" msg)
+	// Notice that you also need to zap NVRAM contents in order to boot without this patch.
 	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffffU) | (uint64_t)0x0009<<48;
 
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0001ffff, true, ROM);
+	m_maincpu->sh2drc_add_fastram(0xa0000000, 0xa001ffff, true, ROM);
 }
 
 ROM_START( fotns )
