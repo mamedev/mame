@@ -30,7 +30,7 @@
  |..  | EEPROM    |  | EEPROM    |  |_74LS04N_|  SN74LS374AN  |SN74LS86N|  | EEPROM      |              |_7408N___|            |
  |..  |___________|  |___________|   __________   __________   __________  |_____________|  __________   __________            |
  |..   ___________________________  |SN74LS32N|  |SN74LS273N  SN74LS163AN   ______________ |_GD74LS00|  |_7406N___|   ____     |
- |..  | Motorola 68000           |   __________   __________   __________  | EEPROM      |  __________   __________  LM358AN   |
+ |..  | Motorola MC68000P8       |   __________   __________   __________  | EEPROM      |  __________   __________  LM358AN   |
  |..  |                          |  |_74LS20N_|  SN74LS163AN  SN74LS163AN  |_____________| |SN74LS32N|  |SN74LS74AN            |
  |..  |__________________________|                __________   __________   ______________  __________                         |
  |..                                             |SN74LS273N  SN74LS163AN  | EEPROM      | |SN74LS74AN                         |
@@ -39,7 +39,7 @@
 
     Main PCB marked Atari Games @ 90 Gumball Rally Main
     Main components:
-    1 x M68000 or compatible (exact type unknown as it's covered by a sticker)
+    1 x MC68000P8
     2 x M27512FI main CPU ROMs
     4 x TMS 27C512 OKI ROMs
     2 x HY6264LP RAMs
