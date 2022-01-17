@@ -437,31 +437,6 @@ Premier Eleven
 #include "screen.h"
 #include "speaker.h"
 
-uint64_t atomiswave_state::aw_flash_r(offs_t offset)
-{
-	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
-			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
-}
-
-void atomiswave_state::aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	int i;
-	uint32_t addr = offset * 8;
-
-	for (i = 0; i < 8; i++)
-	{
-		if (mem_mask & ((uint64_t)0xff)<< (i*8))
-		{
-			addr += i;
-			break;
-		}
-	}
-
-	data >>= (i*8);
-
-	m_awflash->write(addr, data);
-}
-
 /*
     0x00600280 r  0000dcba
     a/b - 1P/2P coin inputs (JAMMA), active low
@@ -527,8 +502,8 @@ void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 void atomiswave_state::aw_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x0001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w));
-	map(0xa0000000, 0xa001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w));
+	map(0x00000000, 0x0001ffff).rw(m_awflash, FUNC(macronix_29l001mc_device::read), FUNC(macronix_29l001mc_device::write));
+	map(0xa0000000, 0xa001ffff).rw(m_awflash, FUNC(macronix_29l001mc_device::read), FUNC(macronix_29l001mc_device::write));
 
 	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
 	map(0x005f6800, 0x005f69ff).rw(FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));

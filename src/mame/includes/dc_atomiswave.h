@@ -46,8 +46,6 @@ private:
 	optional_ioport m_exid_in;
 	optional_ioport m_exid_out;
 
-	uint64_t aw_flash_r(offs_t offset);
-	void aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
