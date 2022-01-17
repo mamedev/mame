@@ -2004,10 +2004,10 @@ ROM_START( mtrap )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl_11d.11d", 0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
-	ROM_REGION( 0x140, "proms", 0 ) // h14 taken from bootleg, very likely same and matches teetert, but marked bad dump until verification - same note applies to mtrap clone sets
-	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
-	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h.h14",  0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+	ROM_LOAD( "vel5c-11.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 742S97 - 6301 according to the Mouse Trap manual
+	ROM_LOAD( "hrl6d.d6",    0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrap4 )
@@ -2034,9 +2034,38 @@ ROM_START( mtrap4 )
 	ROM_LOAD( "mtl_11d.11d", 0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
-	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "hrl14h.h14",  0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+	ROM_LOAD( "vel5c-11.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 742S97 - 6301 according to the Mouse Trap manual
+	ROM_LOAD( "hrl6d.d6",    0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+ROM_END
+
+ROM_START( mtrap4g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gmtl-4_11a.11a", 0xa000, 0x1000, CRC(d84aa55e) SHA1(e13fe6cd027f1afa751d4914e50fac8a02d90bd0) )
+	ROM_LOAD( "gmtl-4_10a.10a", 0xb000, 0x1000, CRC(c4a83a69) SHA1(8b904fb7b6416e668b400475f6491af8ac66c49d) )
+	ROM_LOAD( "gmtl-4_9a.9a",   0xc000, 0x1000, CRC(9b7e5e7a) SHA1(6c63f118c24cdce9bb1343e778eeb524296dd3e0) )
+	ROM_LOAD( "gmtl-4_8a.8a",   0xd000, 0x1000, CRC(fbcf1572) SHA1(c5e9a7427544a61389b489542e8e12a5bc7b6741) )
+	ROM_LOAD( "gmtl-4_7a.7a",   0xe000, 0x1000, CRC(7786e51b) SHA1(08535122b84898cd91bc39d65996f6030807e0bf) )
+	ROM_LOAD( "gmtl-4_6a.6a",   0xf000, 0x1000, CRC(bbb535cd) SHA1(db24015170951c1c8dba68261d948214c7ec805d) )
+
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
+	ROM_LOAD( "mta-1_5a.5a", 0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) ) // Same data as other sets, but explicitly labeled  MTA-1
+	ROM_LOAD( "mta-1_6a.6a", 0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
+	ROM_LOAD( "mta-1_7a.7a", 0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
+
+	ROM_REGION( 0x4000, "soundbd:cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_LOAD( "mta-1_2a.2a", 0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) ) // Same data as other sets, but explicitly labeled  MTA-1
+	ROM_LOAD( "mta-1_3a.3a", 0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
+	ROM_LOAD( "mta-1_4a.4a", 0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
+	ROM_LOAD( "mta-1_1a.1a", 0x3000, 0x1000, CRC(658482a6) SHA1(c0d770fbeaa7cb3e0eef47d8caa0f8a78841692e) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "mtl-1_11d.11d", 0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h.h14",  0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+	ROM_LOAD( "vel5c-11.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 742S97 - 6301 according to the Mouse Trap manual
+	ROM_LOAD( "hrl6d.d6",    0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrap3 )
@@ -2063,9 +2092,9 @@ ROM_START( mtrap3 )
 	ROM_LOAD( "mtl_11d.11d", 0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
-	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "hrl14h.h14",  0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+	ROM_LOAD( "vel5c-11.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 742S97 - 6301 according to the Mouse Trap manual
+	ROM_LOAD( "hrl6d.d6",    0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrap2 )
@@ -2092,9 +2121,9 @@ ROM_START( mtrap2 )
 	ROM_LOAD( "mtl_11d.11d", 0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "74s288.h14", 0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
-	ROM_LOAD( "vel5c_1.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
-	ROM_LOAD( "74s288.d6",  0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "hrl14h.h14",  0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
+	ROM_LOAD( "vel5c-11.c5", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 742S97 - 6301 according to the Mouse Trap manual
+	ROM_LOAD( "hrl6d.d6",    0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 74S288 or 7603 - 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrapb )
@@ -2528,6 +2557,7 @@ GAME( 1980, phantom,   spectar, phantoma, phantoma,  spectar_state, init_spectar
 
 GAME( 1981, mtrap,     0,       mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrap4,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap4g,   mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (German, version 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrap2,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrapb,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )

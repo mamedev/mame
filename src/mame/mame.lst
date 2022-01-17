@@ -13590,6 +13590,7 @@ mtrap                           // (c) 1981
 mtrap2                          // (c) 1981
 mtrap3                          // (c) 1981
 mtrap4                          // (c) 1981
+mtrap4g                         // (c) 1981
 mtrapb                          // bootleg
 mtrapb2                         // bootleg
 panzer                          // (c) 1980 Proel (bootleg)
@@ -22941,6 +22942,7 @@ rodland                         // (c) 1990
 rodlanda                        // (c) 1990
 rodlandj                        // (c) 1990 (Japan)
 rodlandjb                       // bootleg
+rodlandjb2                      // bootleg
 soldam                          // (c) 1992
 soldamj                         // (c) 1992 (Japan)
 stdragon                        // (c) 1989
@@ -31665,6 +31667,7 @@ machbrkr                        // (c) 1995 (World)
 machbrkrj                       // (c) 1995 (Japan)
 nebulray                        // (c) 1994 (World)
 nebulrayj                       // (c) 1994 (Japan)
+nebulrayp                       // prototype
 outfxies                        // (c) 1994 (World)
 outfxiesa                       // (c) 1994 (Korea?)
 outfxiesj                       // (c) 1994 (Japan)
@@ -40053,7 +40056,8 @@ cyvernj                         // 1998.02 (c) 1998 Kaneko (Japan)
 galpani4                        // 1996.09 (c) 1996 Kaneko (Europe)
 galpani4j                       // 1996.09 (c) 1996 Kaneko (Japan)
 galpani4k                       // 1996.09 (c) 1996 Kaneko (Korea)
-galpanidx                       // 1996.09 (c) 1996 Kaneko (Asia)
+galpanidx                       // 2001
+galpaniex                       // 2000
 galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisa                       // 1997.04 (c) 1997 Kaneko (Asia)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)

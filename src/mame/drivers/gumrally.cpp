@@ -37,7 +37,7 @@
  |                                                                         |_____________|                                     |
  |_____________________________________________________________________________________________________________________________|
 
-    Main PCB marked Atari Games Gumball Rally Main (possibly hinting at a missing second PCB)
+    Main PCB marked Atari Games @ 90 Gumball Rally Main
     Main components:
     1 x M68000 or compatible (exact type unknown as it's covered by a sticker)
     2 x M27512FI main CPU ROMs
@@ -51,6 +51,13 @@
     1 x 14.318MHz Osc (near sound chips)
     1 x selftest switch
     no dips
+
+    The manual also lists the following PCBs:
+    Bar Graph Display PCB with 16 x 7-segment displays
+    Score Display PCB with 16 x 7-segment displays
+    Display Blanking PCB
+    APB Triac PCB
+    Steering Wheel PCB
 
     TODO:
     - everything.
