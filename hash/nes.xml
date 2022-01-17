@@ -49553,7 +49553,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
+				<rom name="mike ditka's big play football (prototype).chr" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
