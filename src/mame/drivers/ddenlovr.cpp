@@ -2745,8 +2745,8 @@ void hanakanz_state::hanakanz_rombank_w(uint8_t data)
 void ddenlovr_state::hanakanz_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                 // ROM
-	map(0x6000, 0x6fff).ram();                 // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");    // RAM (Banked)
+	map(0x6000, 0x6fff).ram().share("nvram1"); // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");   // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");    // ROM (Banked)
 }
 
@@ -9714,6 +9714,7 @@ MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &rom[0x90000], 0x1000);
+	subdevice<nvram_device>("nvram2")->set_base(&rom[0x90000], 0x1000 * 0x10);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -10062,6 +10063,9 @@ void hanakanz_state::hanakanz(machine_config &config)
 	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
 	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
+
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
@@ -10112,6 +10116,9 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
 	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
 	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
+
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10522,6 +10529,9 @@ void hanakanz_state::jongtei(machine_config &config)
 	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
 	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
+
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
@@ -10742,7 +10752,10 @@ void hanakanz_state::daimyojn(machine_config &config)
 	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
 	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
-	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
+
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
 	/* video hardware */
