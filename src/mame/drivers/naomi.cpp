@@ -2065,7 +2065,7 @@ INPUT_PORTS_END
 
 template <int P> CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 {
-	for(int i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		uint32_t row;
 
@@ -2073,9 +2073,9 @@ template <int P> CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 		row = ((P == 0) ? m_p1_kb : m_p2_kb)[i]->read();
 
 		// if anything is pressed, convert the 32-bit raw value to keycode
-		if(row != 0)
+		if (row != 0)
 		{
-			for(int j = 0; j < 32; j++)
+			for (int j = 0; j < 32; j++)
 			{
 				if(row & 1 << j)
 				{

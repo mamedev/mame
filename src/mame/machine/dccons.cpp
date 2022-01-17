@@ -32,8 +32,8 @@
 // TODO: fine grain this value
 #define ATAPI_CYCLES_PER_SECTOR (5000)
 
-#define LOG_WARN    (1U << 0)
-#define LOG_XFER    (1U << 1) // log ATAPI transfers
+#define LOG_WARN    (1U << 1)
+#define LOG_XFER    (1U << 2) // log ATAPI transfers
 
 #define VERBOSE (LOG_WARN)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -88,7 +88,6 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		ddtdata.channel = 0;
 		ddtdata.mode = -1;       // copy from/to buffer
 		LOGXFER("G1 I/F ATAPI: DMA one sector to %x, %x remaining\n",
-			machine().describe_context(),
 			atapi_xferbase, atapi_xferlen
 		);
 		m_maincpu->sh4_dma_ddt(&ddtdata);

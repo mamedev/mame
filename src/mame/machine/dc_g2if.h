@@ -63,31 +63,31 @@ private:
 		u32 top_addr;
 	} m_g2apro;
 
-	template <u8 ch> void channel_map(address_map &map);
+	template <u8 Channel> void channel_map(address_map &map);
 
-	template <u8 ch> u32 stag_r();
-	template <u8 ch> void stag_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 stag_r();
+	template <u8 Channel> void stag_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 star_r();
-	template <u8 ch> void star_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 star_r();
+	template <u8 Channel> void star_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 len_r();
-	template <u8 ch> void len_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 len_r();
+	template <u8 Channel> void len_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 dir_r();
-	template <u8 ch> void dir_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 dir_r();
+	template <u8 Channel> void dir_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 tsel_r();
-	template <u8 ch> void tsel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 tsel_r();
+	template <u8 Channel> void tsel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 en_r();
-	template <u8 ch> void en_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 en_r();
+	template <u8 Channel> void en_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 st_r();
-	template <u8 ch> void st_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 st_r();
+	template <u8 Channel> void st_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template <u8 ch> u32 susp_r();
-	template <u8 ch> void susp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template <u8 Channel> u32 susp_r();
+	template <u8 Channel> void susp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void dma_execute(u8 channel);
 	bool root_address_check(u32 offset);

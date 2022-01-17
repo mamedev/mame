@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "gdrom.h"
 
-#define LOG_WARN    (1U << 0)
-#define LOG_CMD     (1U << 1)
-#define LOG_XFER    (1U << 2)
+#define LOG_WARN    (1U << 1)
+#define LOG_CMD     (1U << 2)
+#define LOG_XFER    (1U << 3)
 
 #define VERBOSE (LOG_WARN | LOG_CMD)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -174,8 +174,7 @@ void gdrom_device::ExecCommand()
 		case 0x11: // REQ_MODE
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
-			LOGCMD("%s: REQ_MODE %02x %02x %02x %02x %02x %02x\n",
-				tag(),
+			LOGCMD("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
 				command[0], command[1],
 				command[2], command[3],
 				command[4], command[5]
@@ -190,7 +189,7 @@ void gdrom_device::ExecCommand()
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			//transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
-			LOGCMD("%s: SET_MODE %02x %02x\n", tag(), command[2], command[4]);
+			LOGCMD("SET_MODE %02x %02x\n", command[2], command[4]);
 			break;
 
 		case 0x30: // CD_READ
@@ -217,10 +216,9 @@ void gdrom_device::ExecCommand()
 					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
-				LOGCMD("%s: CD_READ %02x %02x\n", tag(), command[2], command[4]);
-
-				LOGCMD("%s: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
-					tag(), m_lba, m_blocks,
+				LOGCMD("CD_READ %02x %02x\n", command[2], command[4]);
+				LOGCMD("   LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba, m_blocks,
 					m_blocks * m_sector_bytes, read_type, data_select
 				);
 
@@ -305,7 +303,7 @@ void gdrom_device::ExecCommand()
 			}
 			else
 			{
-				LOGWARN("%s: command 0x40: unhandled subchannel request\n", tag());
+				LOGWARN("command 0x40: unhandled subchannel request\n");
 			}
 			break;
 
@@ -327,12 +325,12 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 	switch ( command[0] )
 	{
 		case 0x11: // REQ_MODE
-			LOGCMD("%s: REQ_MODE dataLength %d\n", tag(), dataLength);
+			LOGCMD("REQ_MODE dataLength %d\n", dataLength);
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		case 0x30: // CD_READ
-			LOGCMD("%s: CD_READ read %x dataLength,\n", tag(), dataLength);
+			LOGCMD("CD_READ read %x dataLength,\n", dataLength);
 			if ((m_cdrom) && (m_blocks))
 			{
 				while (dataLength > 0)
@@ -369,8 +367,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			    our internal routines for tracks use "0" as track 1.  That probably
 			    should be fixed...
 			*/
-			LOGCMD("%s: READ TOC format = %d time=%d\n",
-				tag(),
+			LOGCMD("READ TOC format = %d time=%d\n",
 				command[2] & 0xf, (command[1] >> 1) & 1
 			);
 			switch (command[2] & 0x0f)
@@ -438,12 +435,13 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					break;
 				}
 				default:
-					LOGWARN("%s: Unhandled READ TOC format %d\n", tag(), command[2]&0xf);
+					LOGWARN("Unhandled READ TOC format %d\n", command[2]&0xf);
 					break;
 			}
 			break;
 
 		case 0x71:
+			LOGCMD("SYS_REQ_SECU\n");
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
 			if (is_real_gdrom_disc)
 				data[10] = 0x1f; // needed by dimm board firmware

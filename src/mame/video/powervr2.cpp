@@ -982,11 +982,11 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	COMBINE_DATA(&softreset);
 	if (softreset & 1) {
-		LOGTACMD("%s: TA soft reset\n", tag());
+		LOGTACMD("TA soft reset\n");
 		listtype_used=0;
 	}
 	if (softreset & 2) {
-		LOGTACMD("%s: Core Pipeline soft reset\n", tag());
+		LOGTACMD("Core Pipeline soft reset\n");
 
 		if (start_render_received == 1) {
 			for (int a=0;a < NUM_BUFFERS;a++)
@@ -997,7 +997,7 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		}
 	}
 	if (softreset & 4) {
-		LOGTACMD("%s: sdram I/F soft reset\n", tag());
+		LOGTACMD("sdram I/F soft reset\n");
 	}
 }
 
@@ -1006,7 +1006,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
 
-	LOGTACMD("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
+	LOGTACMD("Start render, region=%08x, params=%08x\n", region_base, param_base);
 
 	// select buffer to draw using param_base
 	for (int a=0;a < NUM_BUFFERS;a++) {
@@ -1080,8 +1080,8 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			// in order to have enough time to execute logic stuff in the meantime.
 //          const u64 isp_completion = sanitycount * 25 + 500000;
 			const u64 isp_completion = sanitycount * 25 + 2000000;
-			LOGIRQ("%s: [%d] ISP end of render start %d in %d cycles\n",
-				tag(), screen().frame_number(), screen().vpos(), isp_completion
+			LOGIRQ("[%d] ISP end of render start %d in %d cycles\n",
+				screen().frame_number(), screen().vpos(), isp_completion
 			);
 			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(isp_completion));
 			break;
@@ -1475,8 +1475,7 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 		tafifo_vertexwords=8;
 		tafifo_listtype= DISPLAY_LIST_NONE;
 
-		LOGTACMD("%s: list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
-			tag(),
+		LOGTACMD("list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
 			ta_ol_base, ta_ol_limit,
 			ta_isp_base, ta_isp_limit,
 			ta_alloc_ctrl,
@@ -1568,7 +1567,7 @@ void powervr2_device::ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t m
 uint32_t powervr2_device::ta_yuv_tex_cnt_r()
 {
 	if (!machine().side_effects_disabled())
-		LOGWARN("%s: yuv_tex_cnt read!", tag());
+		LOGWARN("%s yuv_tex_cnt read!", machine().describe_context());
 	return ta_yuv_tex_cnt;
 }
 
@@ -1744,35 +1743,35 @@ void powervr2_device::sb_pdapro_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
-	LOGIRQ("%s: [%d] EOXFER OPLST %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] EOXFER OPLST %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
-	LOGIRQ("%s: [%d] EOXFER OPMV %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] EOXFER OPMV %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
-	LOGIRQ("%s: [%d] EOXFER TRLST %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] EOXFER TRLST %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
-	LOGIRQ("%s: [%d] EOXFER TRMV %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] EOXFER TRMV %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
-	LOGIRQ("%s: [%d] EOXFER PTLST %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] EOXFER PTLST %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_PTLST_IRQ);
 }
@@ -1898,7 +1897,7 @@ void powervr2_device::process_ta_fifo()
 	// for now, just interpret their meaning
 	if (paratype == 0)
 	{
-		LOGTATILE("%s: Para Type 0 End of List\n", tag());
+		LOGTATILE("Para Type 0 End of List\n");
 
 		/* Process transfer FIFO done irqs here */
 		//printf("%d %d\n",tafifo_listtype,screen().vpos());
@@ -1926,21 +1925,21 @@ void powervr2_device::process_ta_fifo()
 	}
 	else if (paratype == 1)
 	{
-		LOGTATILE("%s: Para Type 1 User Tile Clip\n", tag());
+		LOGTATILE("Para Type 1 User Tile Clip\n");
 		LOGTATILE(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 	}
 	else if (paratype == 2)
 	{
-		LOGTATILE("%s: Para Type 2 Object List Set at %08x\n", tag(), tafifo_buff[1]);
+		LOGTATILE("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
 		LOGTATILE(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 	}
 	else if (paratype == 3)
 	{
-		LOGWARN("%s: Para Type %x Unknown!\n", tag(), tafifo_buff[0]);
+		LOGWARN("Para Type %x Unknown!\n", tafifo_buff[0]);
 	}
 	else
 	{ // global parameter or vertex parameter
-		LOGTATILE("%s: Para Type %d", tag(), paratype);
+		LOGTATILE("Para Type %d", paratype);
 		if (paratype == 7)
 			LOGTATILE(" End of Strip %d", endofstrip);
 		if (listtype_used & 3)
@@ -2010,7 +2009,7 @@ void powervr2_device::process_ta_fifo()
 		if (paratype == 7)
 		{ // vertex
 			if (tafifo_listtype < 0 || tafifo_listtype >= DISPLAY_LIST_COUNT) {
-				LOGWARN("%s: unrecognized list type %d\n", tag(), tafifo_listtype);
+				LOGWARN("unrecognized list type %d\n", tafifo_listtype);
 				return;
 			}
 			struct poly_group *grp = rd->groups + tafifo_listtype;
@@ -3698,7 +3697,7 @@ void powervr2_device::pvr_build_parameterconfig()
 // TODO: these two are currently unused
 TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 {
-	LOGIRQ("%s: [%d] VBL IN %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] VBL IN %d\n", screen().frame_number(), screen().vpos());
 	LOGIRQ("    VII %d VOI %d VI %d VO %d VS %d\n",
 		spg_vblank_int & 0x3ff, (spg_vblank_int >> 16) & 0x3ff,
 		spg_vblank & 0x3ff, (spg_vblank >> 16) & 0x3ff, (spg_load >> 16) & 0x3ff
@@ -3711,7 +3710,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
-	LOGIRQ("%s: [%d] VBL OUT %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] VBL OUT %d\n", screen().frame_number(), screen().vpos());
 
 	irq_cb(VBL_OUT_IRQ);
 
@@ -3724,8 +3723,8 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 	{
 		if(scanline == next_y)
 		{
-			LOGIRQ("%s: [%d] HBL IN %d - (%08x)\n",
-				tag(), screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
+			LOGIRQ("[%d] HBL IN %d - (%08x)\n",
+				screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
 			);
 			irq_cb(HBL_IN_IRQ);
 			next_y += spg_hblank_int & 0x3ff;
@@ -3733,8 +3732,8 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 	}
 	else if((scanline == (spg_hblank_int & 0x3ff)) || (spg_hblank_int & 0x2000))
 	{
-		LOGIRQ("%s: [%d] HBL IN %d - (%08x)\n",
-			tag(), screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
+		LOGIRQ("[%d] HBL IN %d - (%08x)\n",
+			screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
 		);
 		irq_cb(HBL_IN_IRQ);
 	}
@@ -3753,13 +3752,13 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 // TODO: these two aren't really called atm
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
-	LOGIRQ("%s: [%d] VIDEO END %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] VIDEO END %d\n", screen().frame_number(), screen().vpos());
 //  endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 {
-	LOGIRQ("%s: [%d] TSP END %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] TSP END %d\n", screen().frame_number(), screen().vpos());
 
 //  endofrender_timer_tsp->adjust(attotime::never);
 //  endofrender_timer_video->adjust(attotime::from_usec(500) );
@@ -3771,7 +3770,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
 	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
 
-	LOGIRQ("%s: [%d] ISP END %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] ISP END %d\n", screen().frame_number(), screen().vpos());
 
 	endofrender_timer_isp->adjust(attotime::never);
 //  endofrender_timer_tsp->adjust(attotime::from_usec(500) );
@@ -3824,7 +3823,7 @@ uint32_t powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 {
-	LOGIRQ("%s: [%d] PVR DMA %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("[%d] PVR DMA %d\n", screen().frame_number(), screen().vpos());
 
 	m_pvr_dma.start = sb_pdst = 0;
 	irq_cb(DMA_PVR_IRQ);
@@ -4098,7 +4097,7 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 
 	if(vbin_line == vpos)
 	{
-		LOGIRQ("%s: [%d] VBL IN %d\n", tag(), screen().frame_number(), screen().vpos());
+		LOGIRQ("[%d] VBL IN %d\n", screen().frame_number(), screen().vpos());
 		LOGIRQ("    VII %d VOI %d VI %d VO %d VS %d\n",
 			spg_vblank_int & 0x3ff, (spg_vblank_int >> 16) & 0x3ff,
 			spg_vblank & 0x3ff, (spg_vblank >> 16) & 0x3ff, (spg_load >> 16) & 0x3ff
@@ -4108,7 +4107,7 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 
 	if(vbout_line == vpos)
 	{
-		LOGIRQ("%s: [%d] VBL OUT %d\n", tag(), screen().frame_number(), screen().vpos());
+		LOGIRQ("[%d] VBL OUT %d\n", screen().frame_number(), screen().vpos());
 		irq_cb(VBL_OUT_IRQ);
 	}
 }
