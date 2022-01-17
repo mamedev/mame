@@ -9,6 +9,10 @@ class powervr2_device : public device_t,
 						public device_video_interface
 {
 public:
+	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	auto irq_callback() { return irq_cb.bind(); }
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	enum { NUM_BUFFERS = 4 };
 	enum {
 		EOXFER_YUV_IRQ,
@@ -193,9 +197,6 @@ public:
 	uint32_t tafifo_buff[32];
 	int scanline;
 	int next_y;
-
-	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	auto irq_callback() { return irq_cb.bind(); }
 
 	uint32_t id_r();
 	uint32_t revision_r();

@@ -17,9 +17,8 @@ Notes:
 QA Notes (Update January 2022):
     - Roadmap: https://github.com/mamedev/mame/projects/2
     - Testing functional notes: https://github.com/angelosa/mame_qa/blob/main/mame_qa/naomi.md
-    - Games that are known to be completed and have no functional bugs in audio/video/input
-	  portions are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise
-	  given the non-trivial host PC requirements;
+    - We currently don't promote anything out of this driver due of lacking important features
+      in PowerVR and AICA devices. Performance is also a concern.
     - Manufacturers needs to be overhauled, also
       cfr. MT#08143 about a necessity to at least log Sega divisions somehow.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
@@ -1406,15 +1405,15 @@ void naomi2_state::naomi2_map(address_map &map)
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
-	map(0x05000000, 0x05ffffff).ram().share("frameram"); 
+	map(0x05000000, 0x05ffffff).ram().share("frameram");
 	map(0x06000000, 0x06ffffff).ram().share("textureram2");   // 64 bit access 2nd PVR RAM
 	map(0x07000000, 0x07ffffff).ram().share("frameram2");   // 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
 	// TODO: writes to BOTH PVRs
-	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); 
+	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w));
 	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
-	map(0x08800000, 0x088000ff).rw(FUNC(naomi2_state::elan_regs_r), FUNC(naomi2_state::elan_regs_w)); 
+	map(0x08800000, 0x088000ff).rw(FUNC(naomi2_state::elan_regs_r), FUNC(naomi2_state::elan_regs_w));
 //  map(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
@@ -1450,7 +1449,7 @@ void dc_state::dc_audio_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x007fffff).rw(FUNC(naomi_state::soundram_r), FUNC(naomi_state::soundram_w));                /* shared with SH-4 */
 	map(0x00800000, 0x00807fff).rw(FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
-//	map(0x00810000, 0x0081000b) accessed by spkrbtl, RTC? AICA mirror?
+//  map(0x00810000, 0x0081000b) accessed by spkrbtl, RTC? AICA mirror?
 }
 
 void dc_state::aica_map(address_map &map)
@@ -10637,7 +10636,7 @@ void naomi_state::init_hotd2()
 /* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
 /* 0010    */ GAME( 1999, vs2_2ko,   vs2_2k,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000", GAME_FLAGS ) // revision is not known, might be Rev A or B instead of no Rev
 /* 0010    */ GAME( 1999, vs2_2k,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (Rev C)", GAME_FLAGS )
-/* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Anchor Inc.", "Toy Fighter", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+/* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Anchor Inc.", "Toy Fighter", GAME_FLAGS )
 /* 0012 -01*/ GAME( 1999, smlg99,    naomi,    naomim2, dybbnao, naomi_state, init_naomi,   ROT0, "Sega", "World Series 99 / Super Major League 99", GAME_FLAGS )
 /* 0013    */ GAME( 1999, jambo,     naomi,    naomim2, jambo,   naomi_state, init_naomi,   ROT0, "Sega", "Jambo! Safari (Rev A)", GAME_FLAGS )
 /* 0015    */ GAME( 1999, vtennis,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis / Power Smash", GAME_FLAGS )
@@ -10774,7 +10773,7 @@ void naomi_state::init_hotd2()
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */       GAME( 1999, pstone,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )
-/* 0002 */       GAME( 1999, suchie3,   naomi,    naomim2, suchie3, naomi_state,init_naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+/* 0002 */       GAME( 1999, suchie3,   naomi,    naomim2, suchie3, naomi_state,init_naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (Japan)", GAME_FLAGS )
 /* 0003 */       GAME( 1999, doa2a,     doa2m,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
 /* 0003-01 */    GAME( 1999, doa2,      doa2m,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2", GAME_FLAGS )
 /* 0003 */       GAME( 2000, doa2m,     naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
@@ -10854,7 +10853,7 @@ void naomi_state::init_hotd2()
 // 0015  Virtua Tennis 2 / Power Smash 2 (GDS-0015)
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )
 /* 0016  */ GAME( 2001, shaktamb, naomigd, naomigd, shaktamb, naomi_state, init_naomigd, ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (2K1 AUT) (GDS-0016)", GAME_FLAGS )
-/* 0017  */ GAME( 2001, keyboard, naomigd, naomigd_kb,  naomi_kb,   naomi_state, init_naomigd, ROT0, "Sega / G.Rev", "La Keyboard (GDS-0017)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // spelled as "G.rev" in ending screen
+/* 0017  */ GAME( 2001, keyboard, naomigd, naomigd_kb,  naomi_kb,   naomi_state, init_naomigd, ROT0, "Sega / G.Rev", "La Keyboard (GDS-0017)", GAME_FLAGS ) // spelled as "G.rev" in ending screen
 /* 0018  */ GAME( 2001, lupinshoo,lupinsho,naomigd,  hotd2,   naomi_state, init_naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
 /* 0018A */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, init_naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (Rev A) (GDS-0018A)", GAME_FLAGS )
 /* 0019  */ GAME( 2001, vathlete, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_FLAGS )
@@ -10921,8 +10920,8 @@ void naomi_state::init_hotd2()
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
 /* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
 // 0003
-/* 0004  */ GAME( 2001, cvsgd,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (Japan) (GDL-0004)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-/* 0005  */ GAME( 2001, starseek,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0004  */ GAME( 2001, cvsgd,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (Japan) (GDL-0004)", GAME_FLAGS )
+/* 0005  */ GAME( 2001, starseek,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", GAME_FLAGS )
 /* 0006  */ GAME( 2001, gundmxgd,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon DX (USA, Japan) (GDL-0006)", GAME_FLAGS )
 // 0007  Capcom Vs. SNK 2 (Japan) (GDL-0007)
 /* 0007A */ GAME( 2001, cvs2mf,    cvs2,    naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Japan, Rev A) (GDL-0007A)", GAME_FLAGS )
@@ -10930,7 +10929,7 @@ void naomi_state::init_hotd2()
 // 0009  Capcom Vs. SNK 2 (Export)
 /* 0010  */ GAME( 2001, ikaruga,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_FLAGS )
 /* 0011  */ GAME( 2002, ggxx,      naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX (GDL-0011)", GAME_FLAGS )
-/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", GAME_FLAGS )
 /* 0013  */ GAME( 2002, moeru,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron",       "Moeru Casinyo (Japan) (GDL-0013)", GAME_FLAGS )
 // 0014  Musapey's Choco Marker (GDL-0014)
 /* 0014A */ GAME( 2002, chocomk,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_FLAGS )
@@ -10972,7 +10971,7 @@ void naomi_state::init_hotd2()
 /* 0039A */ GAME( 2006, meltyb,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software",   "Melty Blood Act Cadenza Version B2 (Japan) (GDL-0039A)", GAME_FLAGS )
 /* 0040  */ GAME( 2006, karous,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",      "Karous (Japan) (GDL-0040)", GAME_FLAGS )
 /* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works",  "Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
-/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
 
 /* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
