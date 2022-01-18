@@ -38,19 +38,6 @@ constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
 
 } // anonymous namespace
 
-
-
-/* PAL16R6CN used for protection. The game doesn't clear the screen
-   if a read from this address doesn't return the value it expects. */
-uint8_t mrdo_state::mrdo_SECRE_r()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-
-	return RAM[m_maincpu->state_int(Z80_HL)];
-}
-
-
-
 void mrdo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -60,7 +47,7 @@ void mrdo_state::main_map(address_map &map)
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w)); // screen flip + playfield priority
 	map(0x9801, 0x9801).w("sn1", FUNC(sn76489_device::write));
 	map(0x9802, 0x9802).w("sn2", FUNC(sn76489_device::write));
-	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
+	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_secre_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("DSW1");
@@ -197,6 +184,17 @@ void mrdo_state::mrdo(machine_config &config)
 
 	SN76489(config, "sn1", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // Verified
 	SN76489(config, "sn2", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // Verified
+}
+
+void mrdo_state::machine_start()
+{
+	save_item(NAME(m_pal_u001));
+}
+
+void mrdo_state::machine_reset()
+{
+    // initial outputs are high on power-up
+    m_pal_u001 = 0xff;
 }
 
 void mrdo_state::mrlo(machine_config &config)

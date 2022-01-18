@@ -185,13 +185,59 @@ void mrdo_state::mrdo_bgvideoram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
+/* PAL16R6CN used for protection. The game doesn't clear the screen
+   if a read from this address doesn't return the value it expects. */
+uint8_t mrdo_state::mrdo_secre_r()
+{
+	return m_pal_u001;
+}
+
 void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+
+	// protection.  each write latches a new value on IC u001 (PAL16R6)
+	const uint8_t i9 = BIT(data,0);
+	const uint8_t i8 = BIT(data,1);
+//	const uint8_t i7 = BIT(data,2); pin 7 not used in equations
+	const uint8_t i6 = BIT(data,3);
+	const uint8_t i5 = BIT(data,4);
+	const uint8_t i4 = BIT(data,5);
+	const uint8_t i3 = BIT(data,6);
+	const uint8_t i2 = BIT(data,7);
+
+	// equations extracted from dump using jedutil
+	const uint8_t t1 =    i2  & (1^i3) &    i4  & (1^i5) & (1^i6) & (1^i8) &    i9;
+	const uint8_t t2 = (1^i2) & (1^i3) &    i4  &    i5  & (1^i6) &    i8  & (1^i9);
+	const uint8_t t3 =    i2  &    i3  & (1^i4) & (1^i5) &    i6  & (1^i8) &    i9;
+	const uint8_t t4 = (1^i2) &    i3  &    i4  & (1^i5) &    i6  &    i8  &    i9;
+
+	const uint8_t r12 = 0;
+	const uint8_t r13 = (1^( t1 ))      << 1 ;
+	const uint8_t r14 = (1^( t1 | t2 )) << 2 ;
+	const uint8_t r15 = (1^( t1 | t3 )) << 3 ;
+	const uint8_t r16 = (1^( t1 ))      << 4 ;
+	const uint8_t r17 = (1^( t1 | t3 )) << 5 ;
+	const uint8_t r18 = (1^( t3 | t4 )) << 6 ;
+	const uint8_t r19 = 0;
+
+	m_pal_u001 = r19 | r18 | r17 | r16 | r15 | r14 | r13 | r12  ;
 }
 
+/*
+/rf13 :=                                             i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t1
 
+/rf14 := /i2 & /i3 & i4 & i5 & /i6 & i8 & /i9   +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t2 | t1
+
+/rf15 := i2 & i3 & /i4 & /i5 & i6 & /i8 & i9    +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t3 | t1
+
+/rf16 :=                                             i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t1
+
+/rf17 := i2 & i3 & /i4 & /i5 & i6 & /i8 & i9    +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t3 | t1
+
+/rf18 := /i2 & i3 & i4 & /i5 & i6 & i8 & i9     +    i2 & i3 & /i4 & /i5 & i6 & /i8 & i9   t4 | t2
+*/
 void mrdo_state::mrdo_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
