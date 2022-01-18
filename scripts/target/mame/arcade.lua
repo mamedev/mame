@@ -1439,11 +1439,9 @@ files {
 
 createMAMEProjects(_target, _subtarget, "atlus")
 files {
-	MAME_DIR .. "src/mame/drivers/ohmygod.cpp",
-	MAME_DIR .. "src/mame/includes/ohmygod.h",
-	MAME_DIR .. "src/mame/video/ohmygod.cpp",
-	MAME_DIR .. "src/mame/drivers/patapata.cpp",
 	MAME_DIR .. "src/mame/drivers/bowltry.cpp",
+	MAME_DIR .. "src/mame/drivers/ohmygod.cpp",
+	MAME_DIR .. "src/mame/drivers/patapata.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "barcrest")
