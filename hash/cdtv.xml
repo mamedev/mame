@@ -5,12 +5,41 @@ license:CC0
 -->
 <softwarelist name="cdtv" description="Commodore Amiga CDTV CD-ROMs">
 
-	<!-- Below titles were read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
+    <!-- A Bun for Barney -->
+    <software name="barneybu" supported="no">
+        <description>A Bun for Barney</description>
+        <year>1991</year>
+        <publisher>MultiMedia Corporation</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="a bun for barney (1991)(multimedia corporation)" sha1="b9f66a4274d98e5b56bd91a847ace3d56c783c36" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- A Long Hard Day at the Ranch -->
+    <software name="lngranch" supported="no">
+        <description>A Long, Hard Day at the Ranch</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="a long hard day at the ranch (1991)(discis)(en-es)" sha1="0305d4ce28b7387199f37712fba679c3fad2c340" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
 
 	<software name="advmisys" supported="no">
 		<description>Advanced Military Systems</description>
 		<year>1991</year>
 		<publisher>Dominion</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd" status="baddump" />
@@ -18,21 +47,223 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Advanced Military Systems -->
+    <software name="advmisysa" cloneof="advmisys" supported="no">
+        <description>Advanced Military Systems (alt)</description>
+        <year>1991</year>
+        <publisher>Dominion Software &amp; Design</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="advanced military systems (1991)(dominion software &amp; design)" sha1="60bcd9222d8bbd07cfb10f9755255b5181fd47f3" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- All Dogs Go To Heaven -->
+    <software name="dgheaven" supported="no">
+        <description>All Dogs Go to Heaven</description>
+        <year>1991</year>
+        <publisher>Merit Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="all dogs go to heaven (1991)(merit software)" sha1="7284563156b5b1d8035eae2108df85339b807cfa" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- American Heritage - Illustrated Encyclopedic Dictionary - 1991a Edition -->
+    <software name="amerdict" supported="no">
+        <description>American Heritage Illustrated Encyclopedic Dictionary</description>
+        <year>1991</year>
+        <publisher>Xiphias</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="american heritage - illustrated encyclopedic dictionary - 1991a edition (1991)(xiphias)" sha1="04746e67a4992460b8917536f2dd1156e13fa749" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Animals in Motion - Eadweard Muybridge -->
+    <software name="animot" supported="no">
+        <description>Animals in Motion</description>
+        <year>1991</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="animals in motion - eadweard muybridge (1991)(on-line)" sha1="5e1860ee342226f0089ac88e0ff0a700dec8e94b" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Apprenez L'Anglais Avec Asterix - Asterix and Son - Disque 1 -->
+    <software name="asterix1" supported="no">
+        <description>Apprenez l'Anglais Avec Asterix - Asterix and Son</description>
+        <year>1991</year>
+        <publisher>EuroTalk</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="apprenez l'anglais avec asterix - asterix and son - disque 1 (1991)(eurotalk)(fr)" sha1="71a9d4130ea8fb8d693befc8d3766df5befcced0" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+	
+    <!-- Read with Asterix - Asterix and Son -->
+    <software name="asterix1a" cloneof="asterix1" supported="no">
+        <description>Read with Asterix - Asterix and Son</description>
+        <year>1991</year>
+        <publisher>EuroTalk</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="read with asterix - asterix and son (1991)(eurotalk)" sha1="5357aadbd94ee9c7610f858bc8131b9b82e082fd" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Barney Bear Goes Camping -->
+    <software name="barneycp" supported="no">
+        <description>Barney Bear Goes Camping</description>
+        <year>1991</year>
+        <publisher>Free Spirit Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="barney bear goes camping (1991)(free spirit software)" sha1="985517e4ec27d4b4a23f364652c2ac8ee9d4b319" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Barney Bear Goes to School -->
+    <software name="barneysc" supported="no">
+        <description>Barney Bear Goes to School</description>
+        <year>1990</year>
+        <publisher>Free Spirit Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="barney bear goes to school (1990)(free spirit software)" sha1="b19cd02836b065967b807019427eb719f1c5963d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Battle Chess -->
+    <software name="btlchess" supported="no">
+        <description>Battle Chess</description>
+        <year>1994</year>
+        <publisher>Interplay</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="battle chess (1994)(interplay)" sha1="9b19451fb6a6b8a4cb50a64a2dbfcee50b852e9d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Battlestorm -->
+    <software name="btlstorm" supported="no">
+        <description>Battlestorm</description>
+        <year>1991</year>
+        <publisher>Titus</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="battlestorm (1991)(titus)" sha1="0d4b1a414e3284e12f3002db11c30555227a3e66" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Black Viper -->
+    <software name="blkviper" supported="no">
+        <description>Black Viper (CDTV)</description>
+        <year>1996</year>
+        <publisher>Neo</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="black viper (1996)(neo)" sha1="8fed0ebdf54f749d8099560ef2423fbc1493a054" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Casino Games CDTV -->
+    <software name="casigams" supported="no">
+        <description>Casino Games</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="casino games cdtv" sha1="1f02c705e57aff330fc393696e6fae96ed8e61d2" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- CD Remix - The D.J. in a box -->
+    <software name="cdremix" supported="no">
+        <description>CD Remix - The D.J. in a Box</description>
+        <year>1991</year>
+        <publisher>Microdeal</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cd remix - the d.j. in a box (1991)(microdeal)" sha1="96ef9c8b676b0c3a56760c27a3be61689d0e1a07" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="cdremix2" supported="no">
 		<description>CD Remix Version II</description>
 		<year>1991</year>
 		<publisher>Microdeal</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
+	
+    <!-- CD Remix Version II -->
+    <software name="cdremix2a" cloneof="cdremix2" supported="no">
+        <description>CD Remix Version II (alt)</description>
+        <year>1991</year>
+        <publisher>Microdeal</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cd remix version ii (1991)(microdeal)" sha1="cc625b863c8e60c1870f3ccd0b6b7e4eab43f242" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
 
 	<software name="chaosand" supported="no">
 		<description>Chaos in Andromeda - Eyes of the Eagle</description>
 		<year>1992</year>
 		<publisher>On-Line</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e" status="baddump" />
@@ -40,10 +271,97 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Chaos in Andromeda - Eyes of the Eagle -->
+    <software name="chaosanda" cloneof="chaosand" supported="no">
+        <description>Chaos in Andromeda - Eyes of the Eagle (alt)</description>
+        <year>1992</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="chaos in andromeda - eyes of the eagle (1992)(on-line)[1122-094-0321]" sha1="a16daf7f0fb59983246eb5a72353d5c2a016a176" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Cinderella - The Original Fairy Tale -->
+    <software name="cinderel" supported="no">
+        <description>Cinderella - The Original Fairy Tale</description>
+        <year>1992</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cinderella - the original fairy tale (1992)(discis)(m5)[cdrm-735100 1]" sha1="5207abcbeb84decc39cd8c8136004735b05880cf" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Classic Board Games -->
+    <software name="clsbg" supported="no">
+        <description>Classic Board Games</description>
+        <year>1991</year>
+        <publisher>Merit Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="classic board games (1991)(merit software)(m6)[compilation]" sha1="73520972cd58c86f6d875512144b14b81aba4b85" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc -->
+    <software name="cdtvd1" supported="no">
+        <description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 1</description>
+        <year>1992</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="commodore amiga cdtv, amiga 600, amiga 600hd demo disc (1992)(commodore)" sha1="34a84c121ea7ea622f863e0325a4f19206df644e" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 2 -->
+    <software name="cdtvd2" supported="no">
+        <description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 2</description>
+        <year>1992</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="commodore amiga cdtv, amiga 600, amiga 600hd demo disc 2 (1992)(commodore)" sha1="e66302b72b31d28328d669ebd70424ac0f04b5cb" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- CoverGirlStripPoker -->
+    <software name="covgrlsp" supported="no">
+        <description>Cover Girl Strip Poker</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="covergirlstrippoker" sha1="773d750c9d580e17a1f40c1ed05fe3daadeae919" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="cubulus" supported="no">
 		<description>Cubulus &amp; Magic Serpent</description>
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2" status="baddump" />
@@ -51,10 +369,521 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Cubulus &amp; Magic Serpent -->
+    <software name="cubulusa" cloneof="cubulus" supported="no">
+        <description>Cubulus &amp; Magic Serpent (alt)</description>
+        <year>1991</year>
+        <publisher>Software 2000</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cubulus &amp; magic serpent (1991)(software 2000)(de)(en)[compilation]" sha1="1451b1fc9f3a36208c5ed87d70469f810126d01f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Defender of the Crown -->
+    <software name="defcrown" supported="no">
+        <description>Defender of the Crown</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="defender of the crown (1991)(cdtv publishing)" sha1="a5ad782790e1c5ab09cd638befae5061fc2af148" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Demo II - Amiga Public Domain Collection -->
+    <software name="demo2pd" supported="no">
+        <description>Demo II - Amiga Public Domain Collection</description>
+        <year>1993</year>
+        <publisher>Almathera</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="demo ii - amiga public domain collection (1993)(almathera)[amiga-cd32-cdtv][80034 demo cd ii cd tv 01]" sha1="991491977f9c3f110204f330f572cf45d1cdec6a" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Dinosaurs for Hire -->
+    <software name="dinohire" supported="no">
+        <description>Dinosaurs for Hire</description>
+        <year>1992</year>
+        <publisher>Wright Works III</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="dinosaurs for hire (1992)(wright works iii)" sha1="7cd03f4e0b33462ac5c9358be7dca46481e95a9b" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Dr. Wellman - A Guide to Good Health for You &amp; Your Family -->
+    <software name="drwellm" supported="no">
+        <description>Dr. Wellman - A Guide to Good Health for You and Your Family</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="dr. wellman - a guide to good health for you &amp; your family (1991)(cdtv publishing)" sha1="13e6ab09a6ca7bde28d2f1af1b77ee3d4fbb7b0c" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- DuneCDTV (ONLY REAL CDTV) -->
+    <software name="dunep" supported="no">
+        <description>Dune (Prototype)</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="dunecdtv (only real cdtv)" sha1="7ca35c174377b0110045450c0999ea0b75213999" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- E.S.S. Mega -->
+    <software name="essmega" supported="no">
+        <description>E.S.S. Mega</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="e.s.s. mega" sha1="dfd5d80325c4fadf7deee11b33d24fa42189e325" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- FALCON -->
+    <software name="falcon" supported="no">
+        <description>Falcon</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="falcon" sha1="bc359735a14b1d2c561fca5800346f81cefe0e24" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Fantastic Voyage -->
+    <software name="fantvoya" supported="no">
+        <description>Fantastic Voyage</description>
+        <year>1992</year>
+        <publisher>Centaur</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="fantastic voyage (1992)(centaur)" sha1="43d213dbcff35f03dd16c88aedc2668d7c4a3704" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Fractal Universe -->
+    <software name="fractuni" supported="no">
+        <description>Fractal Universe</description>
+        <year>1992</year>
+        <publisher>Almathera</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="fractal universe (1992)(almathera)" sha1="255787428bcc560a8e62c094007c9eec2aecbb3c" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Fun School 3 - for 5 to 7 year olds -->
+    <software name="funsch31" supported="no">
+        <description>Fun School 3 for 5 to 7 Year Olds</description>
+        <year>1991</year>
+        <publisher>Europress Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="fun school 3 - for 5 to 7 year olds (1991)(europress software)" sha1="b5aee2f21709bd372836ce25cc411271b49025a6" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Fun School 3 - for the over 7s -->
+    <software name="funsch32" supported="no">
+        <description>Fun School 3 for the Over 7s</description>
+        <year>1991</year>
+        <publisher>Europress Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="fun school 3 - for the over 7s (1991)(europress software)" sha1="4d5806a120acbba0d837e95588a759a8901390e7" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Fun School 3 - for the under 5s -->
+    <software name="funsch30" supported="no">
+        <description>Fun School 3 for the Under 5s</description>
+        <year>1991</year>
+        <publisher>Database Educational Software</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="fun school 3 - for the under 5s (1991)(database educational software)" sha1="55d4e3d5e73f4e7aada7ffb27bad2f2c60e3a9d6" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Galaga_Deluxe_CDTV -->
+    <software name="dxgalaga" supported="no">
+        <description>Galaga Deluxe</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="galaga_deluxe_cdtv" sha1="03d6c459b152b45350629bb57edf78a01c6a36aa" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Gamers' Delight -->
+    <software name="gamerdel" supported="no">
+        <description>Gamers' Delight</description>
+        <year>1994</year>
+        <publisher>GTI - Schatztruhe</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="gamers' delight (1994)(gti - schatztruhe)(en-de)[amiga-cd32-cdtv]" sha1="3fa256584eed79c90ce7067dd29acf9e3df73878" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Garden Fax - Fruits, Vegetables &amp; Herbs -->
+    <software name="gardfaxf" supported="no">
+        <description>Garden Fax - Fruits, Vegetables, and Herbs</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="garden fax - fruits, vegetables &amp; herbs (1991)(cdtv publishing)" sha1="7285ea7ff32302ee71776e6c0cf70b2952f035a1" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Garden Fax - Indoor Plants -->
+    <software name="gardfaxi" supported="no">
+        <description>Garden Fax - Indoor Plants</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="garden fax - indoor plants (1991)(cdtv publishing)" sha1="04b14bd447f957da395b09e9fcc52418c2900db0" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Garden Fax - Trees, Shrubs, Roses &amp; Conifers -->
+    <software name="gardfaxt" supported="no">
+        <description>Garden Fax - Trees, Shrubs, Roses, and Conifers</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="garden fax - trees, shrubs, roses &amp; conifers (1991)(cdtv publishing)" sha1="87438263d03ee033cd79ef493a49d1c6e48de10d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- CDTV Genlock Demo v1.0 -->
+    <software name="genlockd" supported="no">
+        <description>Genlock Demo</description>
+        <year>1991</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cdtv genlock demo v1.0 (1991)(commodore)" sha1="d52a2e17577beb091c093992842dc1852998f760" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Global Chaos -->
+    <software name="globalch" supported="no">
+        <description>Global Chaos</description>
+        <year>1992</year>
+        <publisher>Hex</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="global chaos (1992)(hex)" sha1="6cb32f1649ee415958392b8a3b748a83fa28f0b6" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Guy Spy and the Crystals of Armageddon v1.0 -->
+    <software name="guyspy" supported="no">
+        <description>Guy Spy and the Crystals of Armageddon</description>
+        <year>1992</year>
+        <publisher>ReadySoft</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="guy spy and the crystals of armageddon v1.0 (1992)(readysoft)[cdtv-pc]" sha1="210ae3c14d99ee64e1bc93fa7801343968f40eae" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Heather Hits Her First Home Run -->
+    <software name="heathr" supported="no">
+        <description>Heather Hits Her First Home Run</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="heather hits her first home run (1991)(discis)(en-es)" sha1="7c40e1b1b6c13f413da6b980bdcb36b6a39a587c" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Heroic Age of Spaceflight - NASA... The 25th Year -->
+    <software name="nasa25" supported="no">
+        <description>Heroic Age of Spaceflight - NASA - The 25th Year</description>
+        <year>1991</year>
+        <publisher>Troika Multimedia</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="heroic age of spaceflight - nasa... the 25th year (1991)(troika multimedia)" sha1="0cfd2f4ad2c502670fd16dc0374d5dd94f82ad44" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Insight Dinosaurs v1.0 -->
+    <software name="insidino" supported="no">
+        <description>Insight - Dinosaurs</description>
+        <year>1994</year>
+        <publisher>Optonica</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="insight dinosaurs v1.0 (1994)(optonica)[cd32-cdtv]" sha1="460ea3865a821b47d51446acacf39e7aaee2cbb7" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Insight Technology -->
+    <software name="insitech" supported="no">
+        <description>Insight - Technology</description>
+        <year>1993</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="insight technology (1993)(commodore)[cd32-cdtv]" sha1="f57c5302abe85c79be6812dba74a5afb767680c7" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- It Came from the Desert -->
+    <software name="itcame" supported="no">
+        <description>It Came from the Desert</description>
+        <year>1989</year>
+        <publisher>Cinemaware</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="it came from the desert (1989)(cinemaware)[m]" sha1="025f9b2f5d2e15bff135fd7c33ee95151697ae30" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Karaoke Hits 1 -->
+    <software name="karaoke1" supported="no">
+        <description>Karaoke Hits 1</description>
+        <year>1992</year>
+        <publisher>Music Machine Marketing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="karaoke hits 1 (1992)(music machine marketing)" sha1="9df8176ab0a47b475eae1ca32bfc3a100e8f2168" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Language TV - English -->
+    <software name="langtv" supported="no">
+        <description>Language TV - English</description>
+        <year>1991</year>
+        <publisher>Jeriko</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="language tv - english (1991)(jeriko)(fr)" sha1="aab2606c886a2140bf6430af8b1396a30bee3a66" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Lemmings -->
+    <software name="lemmings" supported="no">
+        <description>Lemmings</description>
+        <year>1994</year>
+        <publisher>Psygnosis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="lemmings (1994)(psygnosis)" sha1="c92f1efdd4955de668e21e7ac4b3a7bface5a4f2" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Log!cal -->
+    <software name="logical" supported="no">
+        <description>Log!cal</description>
+        <year>1992</year>
+        <publisher>Rainbow Arts</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="logical (1992)(rainbow arts)" sha1="ca3e1769ed62cae0e9a401f50baf91608de58eb4" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Monopoly -->
+    <software name="monopoly" supported="no">
+        <description>Monopoly</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="monopoly" sha1="8b62145a8f5ed6b9585250523f31b998d803f1af" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Moving Gives Me A Stomach Ache -->
+    <software name="movstoma" supported="no">
+        <description>Moving Gives Me a Stomach Ache</description>
+        <year>1992</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="moving gives me a stomach ache (1992)(discis)(m5)[cdrm-734800 3]" sha1="0553e4da3a2afe545daf2999522f3c470fe9d9d6" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Mud Puddle -->
+    <software name="mudpuddl" supported="no">
+        <description>Mud Puddle</description>
+        <year>1992</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="mud puddle (1992)(discis)(m5)[cdrm-735000 2]" sha1="86660090904f5909b56cc33d0991ff6cb1af1d66" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+	
+    <software name="musicolr" supported="no">
+        <description>Musicolor</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom1" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="musicolor cdtv (disc 1 of 2) cdtv" sha1="65a49c63d995c6761607670979059b39c1313428" status="baddump" />
+            </diskarea>
+        </part>
+        <part name="cdrom2" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="musicolor cdtv (disc 2 of 2) cdtv" sha1="db332703aba92c10b118798d0d8a805dec406651" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- My Paint - The Paint Program Just for Kids! -->
+    <software name="mypaint" supported="no">
+        <description>My Paint - The Paint Program Just for Kids!</description>
+        <year>1991</year>
+        <publisher>Saddleback Graphics</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="my paint - the paint program just for kids (1991)(saddleback graphics)" sha1="8da1a3c8762e5f6c326e69dfb6c4c13fd79cf18d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- North Polar Expedition -->
+    <software name="northpol" supported="no">
+        <description>North Polar Expedition</description>
+        <year>1992</year>
+        <publisher>Virgin Multimedia</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="north polar expedition (1992)(virgin multimedia)" sha1="3373de60a4421058748616b90d5ec9a489b35045" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="pandora" supported="no">
 		<description>Pandora's CD v1.0</description>
 		<year>1993</year>
 		<publisher>Optonica</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699" status="baddump" />
@@ -62,11 +891,154 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Likely a good dump, gave the same result when reading multiple times -->
+    <!-- Pandora's CD v1.0 -->
+    <software name="pandoras" cloneof="pandora" supported="no">
+        <description>Pandora's CD v1.0 (alt)</description>
+        <year>1993</year>
+        <publisher>Optonica</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="pandora's cd v1.0 (1993)(optonica)(pal)" sha1="eb1d5a9808224576fd5ae0b1ac5fa5e9730ddfa5" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Pinocchio -->
+    <software name="pinoc" supported="no">
+        <description>Pinocchio</description>
+        <year>1993</year>
+        <publisher>Giunti Multimedia</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="pinocchio (1993)(giunti multimedia)(m6)[amiga-cd32-cdtv]" sha1="1a512bc6e55433db8c5582901c7e21ef9a294e7f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Power Pinball -->
+    <software name="powerpin" supported="no">
+        <description>Power Pinball</description>
+        <year>1990</year>
+        <publisher>KarmaSoft</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="power pinball (1990)(karmasoft)" sha1="d39f2eaeabf3174f9b71fbed0b8dfc3a9df9ca4c" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Prehistorik -->
+    <software name="prehisto" supported="no">
+        <description>Prehistorik</description>
+        <year>1991</year>
+        <publisher>Titus</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="prehistorik (1991)(titus)" sha1="657061e0c27c4384860a2cf1f7a286a4a072b939" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Psycho Killer -->
+    <software name="psychoki" supported="no">
+        <description>Psycho Killer</description>
+        <year>1992</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="psycho killer (1992)(on-line)[u2a2030ub]" sha1="7a2c52133b9d3ed4164a90513b1722f7b9f55a27" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Psygnosis Demo -->
+    <software name="psygnod" supported="no">
+        <description>Psygnosis Demo</description>
+        <year>1992</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="psygnosis demo (1992)(commodore)" sha1="c85e6829e08d224beab37f09d9d5fe140fe226a9" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Raffles -->
+    <software name="raffles" supported="no">
+        <description>Raffles</description>
+        <year>1991</year>
+        <publisher>Edge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="raffles (1991)(edge)[amiga-cdtv]" sha1="c3c7c28e062d0daa019ce949e0751aaf8edd2fbb" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- RiseOfTheDragon(CDTV) -->
+    <software name="rotd" supported="no">
+        <description>Rise of the Dragon</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="riseofthedragon(cdtv)" sha1="deb6de7f1b3cd9b97c563e8f2d8ab717191cb101" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Scary Poems for Rotten Kids -->
+    <software name="scarpoem" supported="no">
+        <description>Scary Poems for Rotten Kids</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="scary poems for rotten kids (1991)(discis)(en-es)" sha1="84673e933254b0cd6f2b1d8af154e26616666aa2" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Sherlock Holmes on a Disc - Illustrated Sherlock Holmes -->
+    <software name="holmes" supported="no">
+        <description>Sherlock Holmes on a Disc</description>
+        <year>1991</year>
+        <publisher>Animated Pixels</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="sherlock holmes on a disc - illustrated sherlock holmes (1991)(animated pixels)(cdtv-pc)" sha1="473239f89f5148db815ed0c73fb290da5861824d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="shiftrix" supported="no">
 		<description>Shiftrix &amp; Lettrix</description>
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+Likely a good dump, gave the same result when reading multiple times
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d" status="baddump" />
@@ -74,10 +1046,391 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Shiftrix &amp; Lettrix -->
+    <software name="shiftrixa" cloneof="shiftrix" supported="no">
+        <description>Shiftrix &amp; Lettrix (alt)</description>
+        <year>1991</year>
+        <publisher>Software 2000</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="shiftrix &amp; lettrix (1991)(software 2000)(de)" sha1="dce97e3440cf678ad2a4fbd2fc4a927ca7989088" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Sim City -->
+    <software name="simcity" supported="no">
+        <description>Sim City</description>
+        <year>1991</year>
+        <publisher>Infogrames</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="sim city (1991)(infogrames)(m5)" sha1="17a2b267b98f189f1b2c23df67df41ca118601f5" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Snoopy - The Case of the Missing Blanket -->
+    <software name="snoopy" supported="no">
+        <description>Snoopy - The Case of the Missing Blanket</description>
+        <year>1991</year>
+        <publisher>Edge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="snoopy - the case of the missing blanket (1991)(edge)" sha1="56e4564e0bc19a282910c0ccb7ffc678ef838492" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Space Wars CDTV -->
+    <software name="spacewar" supported="no">
+        <description>Space Wars</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="space wars cdtv" sha1="dd93fa052a9f8e0d717cbf3955a0b4d90baccce1" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Spirit of Excalibur -->
+    <software name="spirexa" supported="no">
+        <description>Spirit of Excalibur</description>
+        <year>1991</year>
+        <publisher>Virgin</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="spirit of excalibur (1991)(virgin)[ntsc]" sha1="968a6929276ccf0cbd3f09e9115cdd8c83167028" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Super Games Pak -->
+    <software name="suprgams" supported="no">
+        <description>Super Games Pak</description>
+        <year>1991</year>
+        <publisher>Odyssey</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="super games pak (1991)(odyssey)[compilation]" sha1="1266dc0c5dcfba4603e82ebd3c7b301e87f4ca81" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Assassins 3 - The Ultimate Games CD -->
+    <software name="assass3" supported="no">
+        <description>The Assassins CD 3</description>
+        <year>1997</year>
+        <publisher>Weird Science</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="assassins 3 - the ultimate games cd (1997)(weird science)[amiga-cd32-cdtv]" sha1="9324ddf7392421d3bb74cbc199c7cd148fd462c6" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Assassins 4 -->
+    <software name="assass4" supported="no">
+        <description>The Assassins CD 4</description>
+        <year>1999</year>
+        <publisher>Weird Science</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="assassins 4 (1999)(weird science)" sha1="d096be854362bb7053ea9406ffb5f30bc685426e" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Assassins -->
+    <software name="assass1" supported="no">
+        <description>The Assassins Ultimate CD Games Collection</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="assassins" sha1="8d6d2d865c9e3b36c802b480ce8295695f2e47b9" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Assassins 2 -->
+    <software name="assass2" supported="no">
+        <description>The Assassins Ultimate Games Volume 2</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="assassins 2" sha1="7387d976e96d04fc208493641c56fcfb0c3868ff" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Case of the Cautious Condor, The -->
+    <software name="cautcond" supported="no">
+        <description>The Case of the Cautious Condor</description>
+        <year>1990</year>
+        <publisher>Tiger Media</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="case of the cautious condor, the (1990)(tiger media)" sha1="8b8a7476112b8632ef73be74350de430c34761cc" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- CDTV Interactive Point of Sale Compact Disc, The -->
+    <software name="cdtvsale" supported="no">
+        <description>The CDTV Interactive Point of Sale Compact Disc</description>
+        <year>1991</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="cdtv interactive point of sale compact disc, the (1991)(commodore)(us)" sha1="03ae3eab31fdd7bc9e85551de56d00c532ff5b07" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Connoisseur, The - Fine Art Collection -->
+    <software name="connoiss" supported="no">
+        <description>The Connoisseur - Fine Art Collection</description>
+        <year>1992</year>
+        <publisher>Lascelles Productions</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="connoisseur, the - fine art collection (1992)(lascelles productions)" sha1="e49faf8b0fab8f06700e1caebe1522236eacd4c9" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Curse of RA, The -->
+    <software name="cursera" supported="no">
+        <description>The Curse of Ra</description>
+        <year>1992</year>
+        <publisher>Rainbow Arts</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="curse of ra, the (1992)(rainbow arts)" sha1="4d30779890775bf81769563f52e23063a9e42d5b" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Demo Collection for Amiga CDTV, The -->
+    <software name="democdtv" supported="no">
+        <description>The Demo Collection for Amiga CDTV</description>
+        <year>1992</year>
+        <publisher>Almathera</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="demo collection for amiga cdtv, the (1992)(almathera)[amiga-cdtv][h-2059]" sha1="7d0bb66eded3a8f449822dbe551218ef6de1b9b5" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Guinness CDTV Disc of Records, The - 1991 Edition -->
+    <software name="guinness" supported="no">
+        <description>The Guinness CDTV Disc of Records (1991 Edition)</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="guinness cdtv disc of records, the - 1991 edition (1991)(cdtv publishing)" sha1="70f0d929c2510f077aec81b901995e7be3ff6002" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Hound of the Baskervilles, The -->
+    <software name="houndbas" supported="no">
+        <description>The Hound of the Baskervilles</description>
+        <year>1991</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="hound of the baskervilles, the (1991)(on-line)" sha1="c31e68bd565f7c9b6407757486e5cc83a07a65bd" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Hutchinson Encyclopedia, The - PAL Version -->
+    <software name="hutchins" supported="no">
+        <description>The Hutchinson Encyclopedia</description>
+        <year>1991</year>
+        <publisher>Attica Cybernetics</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="hutchinson encyclopedia, the - pal version (1991)(attica cybernetics)(pal)" sha1="a5f0b8d560cf06716d33b2f631ea8c82ae4eafa3" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Illustrated Holy Bible, The -->
+    <software name="illbible" supported="no">
+        <description>The Illustrated Holy Bible</description>
+        <year>1991</year>
+        <publisher>Animated Pixels</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="illustrated holy bible, the (1991)(animated pixels)[cdtv-pc]" sha1="5a593d17bcdb3b47f7c2db7f38030e523b247b50" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Illustrated Works of Shakespeare, The -->
+    <software name="illshake" supported="no">
+        <description>The Illustrated Works of Shakespeare</description>
+        <year>1990</year>
+        <publisher>Animated Pixels</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="illustrated works of shakespeare, the (1990)(animated pixels)[cdtv-pc]" sha1="7e88243ab23ece0c50a20ab16c2923e9a8c3906a" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Labyrinth of Time, The -->
+    <software name="labytime" supported="no">
+        <description>The Labyrinth of Time</description>
+        <year>1994</year>
+        <publisher>Electronic Arts</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="labyrinth of time, the (1994)(electronic arts)[amiga-cd32-cdtv]" sha1="82003a6e2d5bfd2b0a9e6573dc89d526849395b8" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- New Basics Electronic Cookbook, The - 1991a Edition -->
+    <software name="newbasic" supported="no">
+        <description>The New Basics Electronic Cookbook</description>
+        <year>1991</year>
+        <publisher>Xiphias</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="new basics electronic cookbook, the - 1991a edition (1991)(xiphias)" sha1="419c0def85223b1047d691bfdfb84f68918247a3" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- New Grolier Electronic Encyclopedia, The -->
+    <software name="newgroli" supported="no">
+        <description>The New Grolier Electronic Encyclopedia</description>
+        <year>1991</year>
+        <publisher>CDTV Publishing</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="new grolier electronic encyclopedia, the (1991)(cdtv publishing)" sha1="5316ab2211c731e6af7f735593a35c85c5719da5" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Night Before Christmas, The -->
+    <software name="nbxmas" supported="no">
+        <description>The Night Before Christmas</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="night before christmas, the (1991)(discis)(en-es)" sha1="16fa7fdcb8dab59b8ab7b5acb17be786fc47443f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Paper Bag Princess, The -->
+    <software name="paperbag" supported="no">
+        <description>The Paper Bag Princess</description>
+        <year>1992</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="paper bag princess, the (1992)(discis)(m5)[cdrm-734700 3]" sha1="8c6a7cb96f8edaf7aee912c131ed57caee37d6cd" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Tale of Benjamin Bunny, The -->
+    <software name="talbenjb" supported="no">
+        <description>The Tale of Benjamin Bunny</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="tale of benjamin bunny, the (1991)(discis)(en-es)" sha1="453aec25e283a30a9493d34db1a914f9c248e818" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Tale of Peter Rabbit, The -->
+    <software name="talpeter" supported="no">
+        <description>The Tale of Peter Rabbit</description>
+        <year>1992</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="tale of peter rabbit, the (1992)(discis)(m5)[cdrm-734900 1]" sha1="94c7cfe32a3fa78e0cd2e7d8d0f8256708b9ac8d" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="townona" supported="no">
 		<description>Town With No Name</description>
 		<year>1992</year>
 		<publisher>On-Line</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861" status="baddump" />
@@ -85,11 +1438,102 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controls are a bit odd to figure out, but these both appear to work -->
+    <!-- Town With No Name -->
+    <software name="townonaa" cloneof="townona" supported="no">
+        <description>The Town with No Name (alt)</description>
+        <year>1992</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="town with no name (1992)(on-line)(m6)[cdtv-towns]" sha1="ac3ffe88d88300277e4edf7aa217b54fa7a6c777" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Thomas' Snowsuit -->
+    <software name="thomsnow" supported="no">
+        <description>Thomas' Snowsuit</description>
+        <year>1991</year>
+        <publisher>Discis</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="thomas' snowsuit (1991)(discis)(en-es)" sha1="605b89e18d745235d09fabcf7f7d11cfc1924aa5" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Tie Break -->
+    <software name="tiebreak" supported="no">
+        <description>Tie Break</description>
+        <year>1991</year>
+        <publisher>Starbyte</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="tie break (1991)(starbyte)" sha1="e61de9dceb6be3af0dd81a13d5b9a8d1e58bb69f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Time Table of History - Business, Politics &amp; Media - 1991a Edition -->
+    <software name="ttohbusi" supported="no">
+        <description>Time Table of History - Business, Politics, and Media</description>
+        <year>1991</year>
+        <publisher>Xiphias</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="time table of history - business, politics &amp; media - 1991a edition (1991)(xiphias)" sha1="8d7cf4cf2e99280d8014f8703b5d89b881a434b7" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Time Table of History - Science and Innovation - 1991a Edition -->
+    <software name="ttohsci" supported="no">
+        <description>Time Table of History - Science and Innovation</description>
+        <year>1991</year>
+        <publisher>Xiphias</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="time table of history - science and innovation - 1991a edition (1991)(xiphias)" sha1="17b7c982a74fd4b58aaafd0411170652e17a4771" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<software name="trivcdtv" supported="no">
+        <description>Trivial Pursuit - The CDTV Edition (v1.0a)</description>
+        <year>1991</year>
+        <publisher>Domark</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom1" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="trivial pursuit - the cdtv edition v1.0a (1991)(domark)(pal)(disc 1 of 2)[amiga-cdtv]" sha1="f1c389fbfc310518c8ac87b72bfa4bc238b935fe" status="baddump" />
+            </diskarea>
+        </part>
+        <part name="cdrom2" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="trivial pursuit - the cdtv edition v1.0a (1991)(domark)(pal)(disc 1 of 2)[amiga-cdtv]" sha1="7d065af4d67679f82a1b14da6f253a49620cfb46" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="turrican">
 		<description>Turrican</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+Controls are a bit odd to figure out, but this appear to work
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3" status="baddump" />
@@ -97,10 +1541,27 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Turrican -->
+    <software name="turricana" cloneof="turrican" supported="no">
+        <description>Turrican (alt)</description>
+        <year>1992</year>
+        <publisher>Rainbow Arts</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="turrican (1992)(rainbow arts)" sha1="38d911db66da22a2f04f932f65381c85857a4903" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
 	<software name="turricn2">
 		<description>Turrican II</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Read with the cdrdao options "-read-raw -read-subchan rw_raw"
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e" status="baddump" />
@@ -108,4 +1569,175 @@ license:CC0
 		</part>
 	</software>
 
+    <!-- Turrican 2 CDTV -->
+    <software name="turricn2a" cloneof="turricn2" supported="no">
+        <description>Turrican 2 (alt)</description>
+        <year>1991</year>
+        <publisher>Rainbow Arts</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="turrican 2 cdtv" sha1="a72ad3b03aab30be71388c163588949b66dc943f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Ultimate Basketball! -->
+    <software name="ultbball" supported="no">
+        <description>Ultimate Basketball</description>
+        <year>1991</year>
+        <publisher>Context Systems</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="ultimate basketball (1991)(context systems)" sha1="460ebb7f1ad5322778c34eb227f71e8d2cf0904b" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Welcome to CDTV Multimedia -->
+    <software name="welcdtvm" supported="no">
+        <description>Welcome to CDTV Multimedia</description>
+        <year>1991</year>
+        <publisher>Commodore</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="welcome to cdtv multimedia (1991)(commodore)[367808-01 33]" sha1="bc1a0ea3f0b776f5e73fadd434eb96b8ccf306e9" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<!-- According to Hall of Light following Will Bridge CD-ROMs are all standalone -->
+	<!-- Our description is based off the spine printouts -->
+
+	<software name="willbdg1" supported="no">
+		<!-- https://hol.abime.net/5801 -->
+        <description>Will Bridge - Introduction to Bidding</description>
+        <year>1991</year>
+        <publisher>Will Bridge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="will bridge - practice 1 - introduction to bidding (1991)(will bridge)" sha1="1f0fd9443b3c5215a60ab8fded04e94b56a38e0f" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<software name="willbdg2" supported="no">
+		<!-- https://hol.abime.net/4346 -->
+        <description>Will Bridge - Intermediate</description>
+        <year>1991</year>
+        <publisher>Will Bridge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="will bridge - practice 2 - intermediate (1991)(will bridge)" sha1="285dff0e4595efee49a44bcdfd6d516e0a9afc81" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<software name="willbdg3" supported="no">
+		<!-- https://hol.abime.net/5803 -->
+        <description>Will Bridge - Standard (Fra?)</description>
+        <year>1991</year>
+        <publisher>Will Bridge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="will bridge - practice 3 - standard (1991)(will bridge)(fr)" sha1="b011272893cf8c1e703d8e210ae1684a5466c882" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<software name="willbdg4" supported="no">
+		<!-- https://hol.abime.net/1716 -->
+        <description>Will Bridge - Competition</description>
+        <year>1991</year>
+        <publisher>Will Bridge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="will bridge - practice 4 - competition (1991)(will bridge)" sha1="56fb85419b20d7940227e8fc167aeeec605cc425" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+	<software name="willbdg5" supported="no">
+		<!-- https://hol.abime.net/4346 -->
+		<!-- "Advanced Competition" -->
+        <description>Will Bridge - Haute Competition (Fra?)</description>
+        <year>1991</year>
+        <publisher>Will Bridge</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="will bridge - practice 5 - haute competition (1991)(will bridge)(fr)" sha1="efa6a451b520ee334c20b74a58a11cf2bf1119ee" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Women in Motion - Eadweard Muybridge -->
+    <software name="womenmot" supported="no">
+        <description>Women in Motion</description>
+        <year>1991</year>
+        <publisher>On-line</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="women in motion - eadweard muybridge (1991)(on-line)[u29y010ua]" sha1="6919ffc83496fce3c3f820f8cafe8ee33c5046e4" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- World Vista -->
+    <software name="worldvis" supported="no">
+        <description>World Vista</description>
+        <year>1991</year>
+        <publisher>Applied Optical Media Corporation</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="world vista (1991)(applied optical media corporation)" sha1="7619ea13c744eebe6a2d6dbe32cf605f88da67ca" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Wrath of the Demon -->
+    <software name="wrdemon" supported="no">
+        <description>Wrath of the Demon</description>
+        <year>1990</year>
+        <publisher>ReadySoft</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="wrath of the demon (1990)(readysoft)" sha1="91f1571d9339f54490a6bdf8524e99d12cb380b0" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
+
+    <!-- Xenon2Megablast -->
+    <software name="xenon2" supported="no">
+        <description>Xenon 2 - Megablast</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+]]></notes>
+        <part name="cdrom" interface="cdrom">
+            <diskarea name="cdrom">
+                <disk name="xenon2megablast" sha1="ff43333f6aa0500aeaca5df54019daceb4ef370b" status="baddump" />
+            </diskarea>
+        </part>
+    </software>
 </softwarelist>

@@ -2166,8 +2166,9 @@ void cd32_state::cd32(machine_config &config)
 	m_cia_0->pa_wr_callback().set(FUNC(cd32_state::akiko_cia_0_port_a_write));
 	m_cia_0->sp_wr_callback().set_nop();
 
-	CDROM(config, "cdrom").set_interface("cd32_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_original("cd32");
+	CDROM(config, "cdrom").set_interface("cdrom");
+	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
+	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 }
 
 void cd32_state::cd32n(machine_config &config)
