@@ -177,7 +177,10 @@ const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V7_INT
 };
 
 const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::SPARCLITE_INT_OP_DESC[] = {
-	{ 0x1d, { false, "divscc"   } }, { 0x22, { false, "scan"     } }
+	{ 0x0a, { false, "umul"     } }, { 0x1a, { false, "umulcc"   } },
+	{ 0x0b, { false, "smul"     } }, { 0x1b, { false, "smulcc"   } },
+	{ 0x1d, { false, "divscc"   } },
+	{ 0x2c, { false, "scan"     } }
 };
 
 const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V8_INT_OP_DESC[] = {

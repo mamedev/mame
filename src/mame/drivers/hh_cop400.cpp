@@ -13,6 +13,9 @@ TODO:
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
   timer to IN.3 to score +100)
+- solution release year, most chips on the PCB were from 1984, but this one
+  was dumped from a licensed product branded for the VWR company, so it
+  could be later than the initial release
 
 ***************************************************************************/
 
@@ -41,6 +44,7 @@ TODO:
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
 #include "qkracer.lh"
+#include "scat.lh"
 #include "unkeinv.lh"
 #include "vidchal.lh"
 
@@ -1770,13 +1774,13 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.2") // G1 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.3") // G2 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
@@ -1816,6 +1820,152 @@ void qkracer_state::qkracer(machine_config &config)
 ROM_START( qkracer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  SCAT specialist calculators
+  * COP404LSN-5 MCU (no internal ROM)
+  * 2KB EPROM (ETC2716Q)
+  * 8-digit 7seg led display
+
+  SCAT = aka South Carolina(SC) Applied Technology, Inc.
+
+  Known products, assumed to be all on the same hardware:
+  - The Dimension (aka Feet & Inch Calculator)
+  - The Solution
+  - Metalmate
+
+  CKI was measured ~1.469MHz, but D0 was measured ~77.44Hz so that means real
+  clock speed is a bit higher than CKI measurement, and the clock divider is 32.
+
+***************************************************************************/
+
+class scat_state : public hh_cop400_state
+{
+public:
+	scat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u8 data);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_in();
+	void main_map(address_map &map);
+	void scat(machine_config &config);
+};
+
+// handlers
+
+void scat_state::update_display()
+{
+	m_display->matrix(~(m_d | m_g << 4), bitswap<8>(m_l,0,1,2,3,4,5,6,7));
+}
+
+void scat_state::write_d(u8 data)
+{
+	// D: select digit, input mux (low)
+	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
+	m_d = data & 0xf;
+	update_display();
+}
+
+void scat_state::write_g(u8 data)
+{
+	// G: select digit, input mux (high)
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
+	m_g = data & 0xf;
+	update_display();
+}
+
+void scat_state::write_l(u8 data)
+{
+	// L: digit segment data
+	m_l = data;
+	update_display();
+}
+
+u8 scat_state::read_in()
+{
+	// IN: multiplexed inputs
+	return read_inputs(6, 0xf);
+}
+
+void scat_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
+
+// config
+
+static INPUT_PORTS_START( solution )
+	PORT_START("IN.0") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / Enter")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / ppm")
+
+	PORT_START("IN.1") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Atoms / Mole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Atomic Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / %")
+
+	PORT_START("IN.2") // D2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Density Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Orig. Density")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Eq. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / Normal")
+
+	PORT_START("IN.3") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Conc. Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / Orig. Conc.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Fmla. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / Molar")
+
+	PORT_START("IN.4") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Milli.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Micro.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Gram")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Liter")
+
+	PORT_START("IN.5") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Known Vol.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Known Wt.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Dil. Wntd.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+INPUT_PORTS_END
+
+void scat_state::scat(machine_config &config)
+{
+	/* basic machine hardware */
+	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
+	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
+	m_maincpu->write_d().set(FUNC(scat_state::write_d));
+	m_maincpu->write_g().set(FUNC(scat_state::write_g));
+	m_maincpu->write_l().set(FUNC(scat_state::write_l));
+	m_maincpu->read_in().set(FUNC(scat_state::read_in));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
+	config.set_default_layout(layout_scat);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( solution )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "etc2716q", 0x0000, 0x0800, CRC(cf990f88) SHA1(6d505fdc94028cbdf6445df9e9451156a9d5f372) ) // no custom label
 ROM_END
 
 
@@ -1952,6 +2102,8 @@ CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  e
 CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+CONS( 1984, solution,   0,         0, scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

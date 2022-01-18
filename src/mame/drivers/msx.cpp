@@ -535,7 +535,7 @@ PCB Layouts missing
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

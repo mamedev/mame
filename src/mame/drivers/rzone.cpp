@@ -40,6 +40,9 @@
 // internal artwork
 #include "rzone.lh"
 
+
+namespace {
+
 class rzone_state : public hh_sm510_state
 {
 public:
@@ -52,6 +55,9 @@ public:
 	void rzbatfor(machine_config &config);
 	void rztoshden(machine_config &config);
 	void rzindy500(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	output_finder<> m_led_out;
@@ -75,8 +81,6 @@ private:
 	void t2_update_audio();
 	void t2_write_r(u8 data);
 	void t2_write_s(u8 data);
-
-	virtual void machine_start() override;
 };
 
 
@@ -102,9 +106,7 @@ void rzone_state::machine_start()
 
 
 /***************************************************************************
-
-  I/O
-
+    I/O
 ***************************************************************************/
 
 // console
@@ -214,47 +216,43 @@ void rzone_state::t2_write_s(u8 data)
 
 
 /***************************************************************************
-
-  Inputs
-
+    Inputs
 ***************************************************************************/
 
 static INPUT_PORTS_START( rzone )
 	PORT_START("IN.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, 0)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // A
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // B
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // C
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // D
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SELECT )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // A
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) // B
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) // C
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) // D
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed)
 INPUT_PORTS_END
 
 
 
 /***************************************************************************
-
-  Machine Config
-
+    Machine Configs
 ***************************************************************************/
 
 void rzone_state::rzbatfor(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	SM512(config, m_maincpu); // no external XTAL
 	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t2_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1368, 1080);
@@ -263,14 +261,14 @@ void rzone_state::rzbatfor(machine_config &config)
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void rzone_state::rztoshden(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
 	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
@@ -278,7 +276,7 @@ void rzone_state::rztoshden(machine_config &config)
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1392, 1080);
@@ -287,14 +285,14 @@ void rzone_state::rztoshden(machine_config &config)
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void rzone_state::rzindy500(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	SM510(config, m_maincpu); // no external XTAL
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
 	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
@@ -302,7 +300,7 @@ void rzone_state::rzindy500(machine_config &config)
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1425, 1080);
@@ -311,7 +309,7 @@ void rzone_state::rzindy500(machine_config &config)
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -319,9 +317,7 @@ void rzone_state::rzindy500(machine_config &config)
 
 
 /***************************************************************************
-
-  Game driver(s)
-
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START( rzbatfor )
@@ -351,6 +347,13 @@ ROM_START( rzindy500 )
 	ROM_LOAD( "rzindy500.svg", 0, 533411, CRC(cfc85677) SHA1(014b9123d81fba1488b4a22a6b6fd0c09e22c1ea) )
 ROM_END
 
+} // anonymous namespace
+
+
+
+/***************************************************************************
+    Drivers
+***************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )

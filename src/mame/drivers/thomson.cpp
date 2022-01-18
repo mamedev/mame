@@ -91,7 +91,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/basicdsk.h"

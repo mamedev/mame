@@ -50,10 +50,10 @@ Dip-switch 8 x1
 
 ------------------------
 
-This ROMset comes from a bootleg PCB.The game is a coin-op conversion of the one developed for the Megadrive
-console.I cannot know gameplay differences since PCB is faulty.
+This ROMset comes from a bootleg PCB. The game is a coin-op conversion of the one developed for the Mega Drive
+console. I cannot know gameplay differences since PCB is faulty.
 
-However,hardware is totally different.It seems to be based on Sega Mega Drive hardware with CPU clock increased,
+However, hardware is totally different. It seems to be based on Sega Mega Drive hardware with CPU clock increased,
 and since exists an "unlicensed" porting of the game for this system probably the "producers" are the same.
 
 
@@ -99,11 +99,11 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 4) Controls notes
 
-  - This game is a one player only game (same as the MegaDrive version);
+  - This game is a one player only game (same as the Mega Drive version);
     that's why I've "blanked" player 2 inputs which are never read.
   - I've labelled the buttons the same way as in 'g_aladj' with default options.
 
-5) MegaDrive comparison ('g_aladj' in HazeMD)
+5) Mega Drive comparison ('g_aladj' in HazeMD)
 
   - There is no "OPTIONS" menu as the difficulty is handled via the MCU / Dip Switches.
     Some code has been patched but most is still there (see the texts in the ROM ares);
@@ -143,7 +143,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 Sunset Riders info
 ====================
 
- - title raster effect is broken (bug in megadrive code, happens with normal set too)
+ - title raster effect is broken (bug in Mega Drive code, happens with normal set too)
 
 ****************************************************************************
 
@@ -264,7 +264,7 @@ connector, but of course, I can be wrong.
 #include "includes/megadriv_acbl.h"
 
 
-/************************************ Megadrive Bootlegs *************************************/
+/************************************ Mega Drive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
 void md_boot_state::md_bootleg_map(address_map &map)
@@ -1534,20 +1534,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)",                                       0 )
-GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)",                                        0 )
-GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_6button_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0 )
-GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)",                                          0 )
-GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter",                                                                           0 )
-GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Megadrive clone hardware)",                            0 )
-GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
-GAME( 1993, sonic3mb, 0, md_bootleg,   twinktmb, md_boot_state, init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Megadrive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
-GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)",                                       0 )
-GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
-GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
-GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",           "Aladdin (bootleg of Japanese Mega Drive version)",                                       0 )
+GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Mega Drive version)",                                        0 )
+GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_6button_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
+GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami",         "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
+GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",               "Top Shooter",                                                                            0 )
+GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",               "Super Bubble Bobble (Sun Mixing, Mega Drive clone hardware)",                            0 )
+GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",           "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
+GAME( 1993, sonic3mb, 0, md_bootleg,   twinktmb, md_boot_state, init_sonic3mb, ROT0, "bootleg / Sega",           "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",           "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
+GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",           "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
+GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
+GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",           "Twinkle Tale (bootleg of Mega Drive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",           "Jurassic Park (bootleg of Mega Drive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 
 // Chinese bootlegs. Very clean looking with custom chips marked TA-04, TA-05 and TA-06.
-GAME( 1994, barekch,  0, megadrvb_6b,  barekch,  md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Megadrive version)",                           0 )
-GAME( 1994, barek2ch, 0, md_bootleg,   barek2ch, md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Megadrive version)",                        0 )
+GAME( 1994, barekch,  0, megadrvb_6b,  barekch,  md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Mega Drive version)",                                   0 )
+GAME( 1994, barek2ch, 0, md_bootleg,   barek2ch, md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Mega Drive version)",                                0 )

@@ -184,7 +184,7 @@ private:
 	void io_map(address_map &map);
 	void machine_reset() override;
 	void port_f1_w(u8 data);
-	u8 m_f1;
+	u8 m_f1 = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart0;

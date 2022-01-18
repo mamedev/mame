@@ -127,7 +127,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	u8 m_term_data;
+	u8 m_term_data = 0U;
 	void machine_start() override;
 	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

@@ -126,11 +126,11 @@ private:
 
 	void mem_map(address_map &map);
 
-	u8 m_size_store = 0;
+	u8 m_size_store = 0U;
 	bool m_fdc_drq = 0;
 	bool m_fdc_int = 0;
 	bool m_allow_nmi = 0;
-	u8 m_mode = 0;
+	u8 m_mode = 0U;
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;

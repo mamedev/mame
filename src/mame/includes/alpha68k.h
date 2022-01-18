@@ -322,6 +322,7 @@ public:
 
 	void jongbou(machine_config &config);
 	void init_jongbou();
+	void init_jongbou2();
 
 private:
 	void main_map(address_map &map);

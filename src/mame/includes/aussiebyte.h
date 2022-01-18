@@ -116,19 +116,19 @@ private:
 	void mem_map(address_map &map);
 
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs);
-	bool m_port15; // rom switched in (0), out (1)
-	u8 m_port17;
-	u8 m_port17_rdy;
-	u8 m_port19;
-	u8 m_port1a; // bank to switch to when write to port 15 happens
-	u8 m_port28;
-	u8 m_port34;
-	u8 m_port35; // byte to be written to vram or aram
-	u8 m_video_index;
-	u16 m_cnt;
-	u16 m_alpha_address;
-	u16 m_graph_address;
-	bool m_centronics_busy;
+	bool m_port15 = 0; // rom switched in (0), out (1)
+	u8 m_port17 = 0U;
+	u8 m_port17_rdy = 0U;
+	u8 m_port19 = 0U;
+	u8 m_port1a = 0U; // bank to switch to when write to port 15 happens
+	u8 m_port28 = 0U;
+	u8 m_port34 = 0U;
+	u8 m_port35 = 0U; // byte to be written to vram or aram
+	u8 m_video_index = 0U;
+	u16 m_cnt = 0U;
+	u16 m_alpha_address = 0U;
+	u16 m_graph_address = 0U;
+	bool m_centronics_busy = 0;
 	std::unique_ptr<u8[]> m_vram; // video ram, 64k dynamic
 	std::unique_ptr<u8[]> m_aram; // attribute ram, 2k static
 	std::unique_ptr<u8[]> m_ram;  // main ram, 256k dynamic

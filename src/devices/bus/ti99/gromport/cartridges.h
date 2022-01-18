@@ -10,11 +10,11 @@
 
 #include "gromport.h"
 
+#include "imagedev/cartrom.h"
 #include "machine/tmc0430.h"
 #include "formats/rpk.h"
 
 #include "emuopts.h"
-#include "softlist_dev.h"
 
 #include "utilfwd.h"
 
@@ -23,7 +23,7 @@ namespace bus::ti99::gromport {
 
 class ti99_cartridge_pcb;
 
-class ti99_cartridge_device : public device_t, public device_image_interface
+class ti99_cartridge_device : public device_t, public device_cartrom_image_interface
 {
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -53,16 +53,10 @@ protected:
 	// Image handling: implementation of methods which are abstract in the parent
 	image_init_result call_load() override;
 	void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	void prepare_cartridge();
 
 	// device_image_interface
-	iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	bool is_readable()  const noexcept override           { return true; }
-	bool is_writeable() const noexcept override           { return false; }
-	bool is_creatable() const noexcept override           { return false; }
-	bool must_be_loaded() const noexcept override         { return false; }
 	bool is_reset_on_load() const noexcept override       { return false; }
 	const char *image_interface() const noexcept override { return "ti99_cart"; }
 	const char *file_extensions() const noexcept override { return "rpk"; }

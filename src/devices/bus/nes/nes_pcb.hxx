@@ -108,7 +108,6 @@ static const nes_pcb pcb_list[] =
 	{ "cne_shlz",         CNE_SHLZ },
 	{ "cocoma",           COCOMA_BOARD },
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
-	{ "ntdec_2746",       NTDEC_2746 },
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
 	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
@@ -160,6 +159,7 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_sh2",      WAIXING_SH2 },
 	{ "fs304",            WAIXING_FS304 },   // used in Zelda 3 by Waixing
 	{ "cony",             CONY_BOARD },
+	{ "cony1k",           CONY1K_BOARD },
 	{ "yoko",             YOKO_BOARD },
 	{ "hengg_srich",      HENGG_SRICH },
 	{ "hengg_xhzs",       HENGG_XHZS },
@@ -268,11 +268,13 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
 	{ "bmc_970630c",      BMC_970630C },
+	{ "bmc_jy012005",     BMC_JY012005 },
 	{ "bmc_jy820845c",    BMC_JY820845C },
 	{ "srpg_5in1",        BMC_SRPG_5IN1 },
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
+	{ "bmc_fam250",       BMC_FAM250 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
@@ -284,6 +286,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
 	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tf2740",       BMC_TF2740 },
 	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
@@ -385,10 +388,11 @@ static const nes_pcb pcb_list[] =
 	{ "action53",         UNL_ACTION53 },
 	{ "batmap_000",       BATMAP_000 },
 	{ "batmap_srrx",      BATMAP_SRRX },
-	{ "cufrom",           UNL_CUFROM },
-	{ "unrom512",         UNL_UNROM512 },
+	{ "8bitxmas",         SEALIE_8BITXMAS },
+	{ "cufrom",           SEALIE_CUFROM },
+	{ "dpcmcart",         SEALIE_DPCMCART },
+	{ "unrom512",         SEALIE_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
-	{ "dpcmcart",         UNL_DPCMCART },
 	{ "farid_slrom8in1",  FARID_SLROM8IN1 },
 	{ "farid_unrom8in1",  FARID_UNROM8IN1 },
 	{ "ffe3",             FFE3_BOARD },

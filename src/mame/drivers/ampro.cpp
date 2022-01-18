@@ -30,7 +30,7 @@ of a hard drive of up to 88MB.
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class ampro_state : public driver_device
 {

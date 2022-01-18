@@ -69771,6 +69771,120 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
+	<!-- The game works fine on 9801 but hangs on 9821 -->
+	<software name="kuronoda" supported="no">
+		<description>Kuro no Danshou - The Literary Fragment</description>
+		<year>1995</year>
+		<publisher>アボガドパワーズ (Abogado Powers)</publisher>
+		<info name="alt_title" value="黒の断章 - The Literary Fragment" />
+		<info name="release" value="19950714" />
+		<info name="usage" value="Start DOS, insert the System disk in drive 1 and disk A in drive 2 and run AUTOEXEC.BAT from the System disk" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Kuro no Danshou - The Literary Fragment (System disk).hdm" size="1261568" crc="ee9c72a7" sha1="b5164b66242a942b9328c90d437e6adc38f15feb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Kuro no Danshou - The Literary Fragment (Disk A).hdm" size="1261568" crc="5d1f0b77" sha1="73c98fdc08d804bc4681c93cfcb2caaec45d545b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Kuro no Danshou - The Literary Fragment (Disk B).hdm" size="1261568" crc="74441140" sha1="de8732198cea1ee5e79a47b0a45f128e9328b09b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Kuro no Danshou - The Literary Fragment (Disk C).hdm" size="1261568" crc="a9808040" sha1="e2bdf9990a95229d75f717b8f91cd9549b928771" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Kuro no Danshou - The Literary Fragment (Disk D).hdm" size="1261568" crc="a0509730" sha1="4e8fe2c10de9896f538d2a918238fa91f43ac2e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is a Mindbender port for the PC98. Mindbender was a DOS PC game produced by Gremlin Interactive in 1989  -->
+	<!-- Roman-Tech Ltd. made the port and Acclaim Japan published it for the PC98 on December 17, 1991 -->
+	<!-- The game runs fine in PC-9801, but the emulations is too fast in PC9821 -->
+	<software name="migrain" supported="yes">
+		<description>Migrain</description>
+		<year>1991</year>
+		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
+		<info name="alt_title" value="ミグレイン" />
+		<info name="release" value="19911217" />
+		<info name="usage" value="Run MIGRAIN.EXE from DOS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="Migrain.hdm" size="1261568" crc="c85fa8bb" sha1="149500ffd50734c6f39b93392e9695b8a42e8a35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momoirom" supported="yes">
+		<description>Momoiro Mahjong</description>
+		<year>1995</year>
+		<publisher>R-Rate</publisher>
+		<info name="alt_title" value="桃色麻雀" />
+		<info name="release" value="1995xxxx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="Momoiro Mahjong - System Disk.fdi" size="1265664" crc="a93afa80" sha1="0923c8ba47749b68d5e3c2aeea8e252584c202ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="Momoiro Mahjong - Disk A.fdi" size="1265664" crc="7b9d4e68" sha1="cf18ea209392363cc5781ed2591e02e38b7734d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="Momoiro Mahjong - Disk B.fdi" size="1265664" crc="10268036" sha1="2b29422dce2def3bffdd72bf04fe5a132312d734" offset="0" />
+			</dataarea>
+		</part> 
+	</software>
+
+	<!-- The company Kao used to add a bonus disk in Kao's 10-pack of floppy disks with trial versions of -->
+	<!-- the game and graphics collections as an extra. Eventually, they made the full version of the game -->
+	<!-- available in the bonus disk. This game was not available for sale in regular computer game stores. -->
+	<!-- The label in the floppy disk indicates the game is for PC-9800 series (PC-9801 V or later) -->
+	<software name="route246" supported="yes">
+		<description>Kao Floppy Gekijou - Route 246 Satsujin Annai</description>
+		<year>1991</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<info name="alt_title" value="花王フロッピー劇場 ルート246殺人案内" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1423360">
+				<rom name="ROUTE_246.fdi" size="1423360" crc="599a082e" sha1="3bd50e646c8f22efc88fa74e00b7ed6521f3d8df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- There is no sound when run on PC-9821 -->
+	<!-- PC-9801 has sound but every now and then the game crashes -->
+	<software name="3takun" supported="no">
+		<description>Santa-kun</description>
+		<year>1991</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="3太くん" />
+		<info name="release" value="19910719" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="3ta-kun (Santa-kun).hdm" size="1261568" crc="d8bacb05" sha1="3803f16656048e86db82728a9d084fd75cdfa267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--    <software name="">
         <description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>
         <year>19??</year>

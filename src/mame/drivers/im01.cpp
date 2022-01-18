@@ -1,41 +1,60 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Radon17, Berger
+// thanks-to:Radon17, RCgoff, Berger
 /******************************************************************************
 
 Электроника ИМ-01 (Elektronika IM-01)
 
 Soviet chess computer, produced by Svetana from 1986-1992.
 ИМ-01Т is the same hardware, improved program and has 1 more difficulty level.
+ИМ-05 is also on similar hardware, it was released after the Soviet dissolution.
 
 TODO:
-- emulate К1801ВМ1, using T11 for now and I hope it works ok
+- emulate К1801ВМ1/2, using T11 for now and I hope it works ok
 - emulate K1809BB1, IRQ is from here too (measured 177.4Hz)
-- It's running a bit too fast?: XTAL was measured 9.22MHz, CPU clock was
-  measured 4.61MHz, beeper frequency 3.73KHz and beeper duration 34.2ms.
-  In MAME, beeper frequency is 4.15KHz and duration is 31ms, meaning it's
-  around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
-  and/or T11 core timing itself is not 100% accurate. There's a big "but":
-  these measurements are from the older ИМ-01.
-- verify actual XTAL, the label couldn't be seen
-- dump/add im01 (rom serial 106/107)
+- emulate К1573ХМ1
+- It's running a bit too fast?: CPU clock was measured 4.61MHz, beeper
+  frequency 3.73kHz and beeper duration 34.2ms. In MAME, beeper frequency is
+  4.15kHz and duration is 31ms, meaning it's around 1.1 times faster, maybe
+  К1801ВМ1 internal timing differs from T11, and/or MAME's T11 core timing
+  itself is not 100% accurate.
+- Is im01t/im05 extra RAM chip used at all? Even when trying to solve mate
+  problems (level 7, and overclocked CPU), there are no writes to it.
+- What is im01 0x6000-0x7fff for? it will test for both RAM and ROM in this
+  area if no bus error was triggered, and will fail to boot up.
+- verify im05 XTAL and IRQ
+- verify im05 button functions
 
-*******************************************************************************
+===============================================================================
 
 Hardware notes:
-- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
+
+ИМ-01:
+- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz (9216 кгц XTAL)
 - 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
 - K1809BB1 (I/O, counter)
 - 4-digit VFD 7seg panel(cyan, green window overlay), beeper
 
-Keypad legend (excluding A1-H8 and black/white):
+ИМ-01Т:
+- 4KB RAM (2*К1809РУ1), but also seen with 1 К1809РУ1 like ИМ-01
+- rest is same as ИМ-01
+
+ИМ-05:
+- КМ1801ВМ2 CPU (similar to К1801ВМ1)
+- 24KB ROM (3*К1809РЕ1), 4KB RAM (2*КР573РУ10)
+- К1573ХМ1 (I/O controller)
+- rest is same as ИМ-01
+
+===============================================================================
+
+ИМ-01 keypad legend (excluding A1-H8 and black/white):
 
 Фиг: префиксная клавиша для ввода кода шахматной фигуры, - Prefix Key (hold)
      а также для установки фигур в начальную позицию,
      сброса фигур с доски и изменения очередности хода
 
-НП:  установка фигур в начальную позицию                 - Reset Board
-СД:  сброс всех фигур с доски                            - Clear Board
+НП:  установка фигур в начальную позицию                 - Reset Board*
+СД:  сброс всех фигур с доски                            - Clear Board*
 ↓:   ввод в компьютер Вашего хода,                       - Enter
      а также фигуры при установке позиции
 
@@ -50,7 +69,20 @@ CИ:  сброс информации на индикаторе                 
 ↺:   ход назад                                           - Take Back
 И:   индикация анализируемого хода                       - Show Analyzed Move
 N:   чксло ходов                                         - Show Moves
-РЗ:  установка режима решения шахматных задач            - Position Mode
+РЗ:  установка режима решения шахматных задач            - Solve Mate / Set Up*
+
+* note: hold Фиг
+
+ИМ-05 keypad legend (differences shown, preliminary):
+
+Реж: режима                                              - Mode (no hold)
+НП:  -                                                   - Reset
+СД:  -                                                   - Cancel?
+↓:   -                                                   - Confirm (level/piece)
+→:   -                                                   - Forward
+CТА: -                                                   - Enter Move
+ПХ:  -                                                   - Hint
+Р:   -                                                   - Promotion (hold)
 
 ******************************************************************************/
 
@@ -64,9 +96,12 @@ N:   чксло ходов                                         - Show Moves
 
 // internal artwork
 #include "im01.lh" // clickable
+#include "im05.lh" // clickable
 
 
 namespace {
+
+// ИМ-01 / shared
 
 class im01_state : public driver_device
 {
@@ -80,29 +115,34 @@ public:
 	{ }
 
 	void im01(machine_config &config);
+	void im01t(machine_config &config);
+	void im05(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
-private:
 	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<6> m_inputs;
 
-	void main_map(address_map &map);
+	void im01_map(address_map &map);
+	void im01t_map(address_map &map);
+	void im05_map(address_map &map);
 
 	u8 irq_callback(offs_t offset);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// I/O handlers
-	void update_display();
 	u16 mux_r(offs_t offset, u16 mem_mask);
 	void mux_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 digit_r(offs_t offset, u16 mem_mask);
 	void digit_w(offs_t offset, u16 data, u16 mem_mask);
+	void digita_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 input_r(offs_t offset, u16 mem_mask);
+	u16 inputa_r(offs_t offset, u16 mem_mask);
+	void error_w(offs_t offset, u16 data, u16 mem_mask);
 
 	u16 m_inp_mux = 0;
 	u16 m_digit_data = 0;
@@ -143,10 +183,7 @@ INTERRUPT_GEN_MEMBER(im01_state::interrupt)
     I/O
 ******************************************************************************/
 
-void im01_state::update_display()
-{
-	m_display->matrix(m_inp_mux, bitswap<8>(m_digit_data,0,1,2,3,4,5,6,7));
-}
+// ИМ-01 / shared
 
 u16 im01_state::mux_r(offs_t offset, u16 mem_mask)
 {
@@ -157,7 +194,7 @@ void im01_state::mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// d0-d5: input mux, digit select
 	COMBINE_DATA(&m_inp_mux);
-	update_display();
+	m_display->write_my(m_inp_mux);
 
 	// d7: speaker out
 	m_dac->write(BIT(m_inp_mux, 7));
@@ -172,7 +209,7 @@ void im01_state::digit_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// d1-d7: digit segment data
 	COMBINE_DATA(&m_digit_data);
-	update_display();
+	m_display->write_mx(bitswap<8>(m_digit_data,0,1,2,3,4,5,6,7));
 }
 
 u16 im01_state::input_r(offs_t offset, u16 mem_mask)
@@ -187,19 +224,57 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 	return data << 8;
 }
 
+void im01_state::error_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// unmapped port, it expects a bus error
+	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
+}
+
+
+// ИМ-05 specific
+
+void im01_state::digita_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// digit segment data is in a different order
+	digit_w(offset, data, mem_mask);
+	m_display->write_mx(bitswap<8>(m_digit_data,0,1,6,4,2,3,5,7));
+}
+
+u16 im01_state::inputa_r(offs_t offset, u16 mem_mask)
+{
+	// inputs are reversed
+	u16 data = input_r(offset, mem_mask);
+	return (data & 0xf0ff) | (bitswap<4>(data,8,9,10,11) << 8);
+}
+
 
 
 /******************************************************************************
     Address Maps
 ******************************************************************************/
 
-void im01_state::main_map(address_map &map)
+void im01_state::im01_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x5fff).rom();
-	map(0xe830, 0xe831).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
-	map(0xe83c, 0xe83d).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
-	map(0xe83e, 0xe83f).r(FUNC(im01_state::input_r));
+	map(0xe030, 0xe031).mirror(0x1800).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
+	map(0xe03c, 0xe03d).mirror(0x1800).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
+	map(0xe03e, 0xe03f).mirror(0x1800).r(FUNC(im01_state::input_r));
+	map(0xffe8, 0xffe9).w(FUNC(im01_state::error_w)).nopr();
+}
+
+void im01_state::im01t_map(address_map &map)
+{
+	im01_map(map);
+	map(0x0800, 0x0fff).ram();
+}
+
+void im01_state::im05_map(address_map &map)
+{
+	im01t_map(map);
+	map(0x6000, 0x7fff).rom();
+	map(0xe03c, 0xe03d).mirror(0x1800).w(FUNC(im01_state::digita_w));
+	map(0xe03e, 0xe03f).mirror(0x1800).r(FUNC(im01_state::inputa_r));
 }
 
 
@@ -219,7 +294,7 @@ static INPUT_PORTS_START( im01 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME(u8"Вар (Enter Variant)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("? (Verify Position)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Show Depth")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Show Depth")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
@@ -234,16 +309,39 @@ static INPUT_PORTS_START( im01 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("E 5 / Queen")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME(u8"Фиг (Prefix Key)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME(u8"Фиг (Prefix Key)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME(u8"И (Show Analyzed Move)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"РЗ (Position Mode)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"РЗ (Solve Mate / Set Up)")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset Board)") // hold Фиг
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Clear Board)") // hold Фиг
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset Board)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Clear Board)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Set Level")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( im05 )
+	PORT_INCLUDE( im01 )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME(u8"ПХ (Hint)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"Р (Promotion)")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Confirm")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME(u8"CТА (Enter Move)")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"Реж (Mode)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White / 9")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Cancel)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black / 0")
 INPUT_PORTS_END
 
 
@@ -257,9 +355,9 @@ void im01_state::im01(machine_config &config)
 	// basic machine hardware
 	T11(config, m_maincpu, 9.216_MHz_XTAL / 2); // actually К1801ВМ1
 	m_maincpu->set_initial_mode(3 << 13);
-	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::im01_map);
 	m_maincpu->in_iack().set(FUNC(im01_state::irq_callback));
-	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(177));
+	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(177)); // measured
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5, 7);
@@ -271,16 +369,49 @@ void im01_state::im01(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void im01_state::im01t(machine_config &config)
+{
+	im01(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::im01t_map);
+}
+
+void im01_state::im05(machine_config &config)
+{
+	im01(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::im05_map);
+	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(512)); // approximation
+
+	// video hardware
+	config.set_default_layout(layout_im05);
+}
+
 
 
 /******************************************************************************
     ROM Definitions
 ******************************************************************************/
 
+ROM_START( im01 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
+	ROM_LOAD("0000107", 0x2000, 0x2000, CRC(2318e85b) SHA1(6a92f6464af69ad0175f323f01dd067b91d345d3) )
+	ROM_LOAD("0000106", 0x4000, 0x2000, CRC(b0ab8808) SHA1(b682e9e8a5e52cd8fee5ae45277ae658bf5c32f1) )
+ROM_END
+
 ROM_START( im01t )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
 	ROM_LOAD("0000148", 0x2000, 0x2000, CRC(327c6055) SHA1(b90b3b1261d677eb93014ea9e809e45b3b25152a) )
 	ROM_LOAD("0000149", 0x4000, 0x2000, CRC(43b14589) SHA1(b083b631f38a26a335226bc474669ef7f332f541) )
+ROM_END
+
+ROM_START( im05 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
+	ROM_LOAD("0000205", 0x2000, 0x2000, CRC(8aa51bcb) SHA1(211a3fa22627e828841121a735b4625a4bbff4da) )
+	ROM_LOAD("0000206", 0x4000, 0x2000, CRC(3d3ecea6) SHA1(045abe1c935a8748b5a20a11f10f34c835c54156) )
+	ROM_LOAD("0000207", 0x6000, 0x2000, CRC(3323378a) SHA1(94a890bff34699c8b8c516fb446872089778cf97) )
 ROM_END
 
 } // anonymous namespace
@@ -292,4 +423,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1991, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, im01,  0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, im01t, im01,   0, im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1993, im05,  0,      0, im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -375,6 +375,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
 	i7220.set_data_size(3); // 3 1-Mbit MBM's
+	i7220.set_must_be_loaded(true);
 	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 

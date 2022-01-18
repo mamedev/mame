@@ -45,9 +45,9 @@ public:
 	inderp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_io_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void inderp(machine_config &config);
@@ -55,9 +55,9 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
-	u8 m_key_row = 0;
-	u16 m_t_c = 0;
-	u8 m_segment[5];
+	u8 m_key_row = 0U;
+	u16 m_t_c = 0U;
+	u8 m_segment[5]{};
 	bool m_1player = false;
 	void inputs_w(offs_t offset, u8 data);
 	u8 inputs_r();

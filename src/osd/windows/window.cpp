@@ -304,6 +304,7 @@ win_window_info::win_window_info(
 	, m_targetview(0)
 	, m_targetorient(0)
 	, m_targetvismask(0)
+	, m_targetscalemode(0)
 	, m_lastclicktime(std::chrono::steady_clock::time_point::min())
 	, m_lastclickx(0)
 	, m_lastclicky(0)
@@ -783,12 +784,14 @@ void win_window_info::update()
 	int const targetorient = target()->orientation();
 	render_layer_config const targetlayerconfig = target()->layer_config();
 	u32 const targetvismask = target()->visibility_mask();
-	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
+	int const targetscalemode = target()->scale_mode();
+	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask || targetscalemode != m_targetscalemode)
 	{
 		m_targetview = targetview;
 		m_targetorient = targetorient;
 		m_targetlayerconfig = targetlayerconfig;
 		m_targetvismask = targetvismask;
+		m_targetscalemode = targetscalemode;
 
 		// in window mode, reminimize/maximize
 		if (!fullscreen())

@@ -9,10 +9,6 @@ Same as system 80, except that the displays are 20-digit alphanumeric driven by 
 
 Some games start up and will accept credits, and the test mode works.
 
-Most games are multiball, and therefore may not respond further to inputs.
-
-Sound is missing/wrong in all games. Most sound boards need to be emulated.
-
 The test rom says U4 is faulty. Using MOS6532_NEW fixes this error, but the games ramdomly slam-tilt instead.
 
 'Master' has a different memory map, and there's jumps to apparently unused parts of the rom. (See @ 2020).
@@ -21,6 +17,49 @@ The test rom says U4 is faulty. Using MOS6532_NEW fixes this error, but the game
 PinMAME used for the display character generator.
 
 When asked to enter your initials, use the Advance buttons to select a letter, and the Start button to enter it.
+
+Here are the key codes to enable play: (may need to hit X to start a ball)
+
+Game                 NUM  Start game                                       End ball
+--------------------------------------------------------------------------------------------------
+Amazon Hunt II       684C 1                                                X
+Amazon Hunt III      684D 1                                                X
+Bounty Hunter        694  1                                                X
+Chicago Cubs         696  1                                                X
+Rock                 697  1                                                X
+Tag Team Wrestling   698  1 then End and F1                                X
+Raven                702  1                                                X
+Hollywood Heat       703  1 then jiggle F4 and Del until sound is heard    X (wait for score to count up) then Del
+Rock Encore          704  1                                                X
+Genesis              705  1 then jiggle F1 and num-                        X then num-
+Spring Break         706  1 then F2 and num- and End and Del               X then Del
+Gold Wings           707  1 then quote and del and pad+                    Del and quote and num+
+Monte Carlo          708  1 then jiggle [ and End                          End
+Arena                709  1 then jiggle M and Del                          Del
+Victory              710  1 then Del (wait for sound) then num+            Del (wait for sound) then num+
+Diamond Lady         711  1 then Del and Quote                             Del then Quote
+TX-Sector            712  1 then Del and num+                              Del and num+
+Big House            713  1 then jiggle Del and minus                      Del
+Robo-War             714  1 then Del and mun+                              Del
+Excalibur            715  1 then hold F4 and hit Del                       Del
+Bad Girls            717  1 then hold F2 and X, hit End, get a message     End
+Hot Shots            718  1 then hold F4 and hit Del                       Del
+Bone Busters Inc     719  1 then num- and num+                             num+
+Night Moves         C101  unknown                                          unknown
+Master               ---  mnw
+Top Sound            ---  no inputs
+
+ManilaMatic Games:
+- Defender (not dumped)
+- Master (not working)
+- Out Law (not dumped)
+- Pinball Shop (not dumped, unknown hw)
+- Star King (not dumped, gts80a)
+- Top Sound (not working)
+
+ToDo:
+- Electronic sounds
+- Most sound boards to be emulated
 
 *****************************************************************************************************************/
 
@@ -46,12 +85,12 @@ public:
 		, m_riot1(*this, "riot1")
 		, m_riot2(*this, "riot2")
 		, m_riot3(*this, "riot3")
-		, m_io_dips(*this, "DSW%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0U)
+		, m_io_dips(*this, "DSW%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void gts80b_s2(machine_config &config);
@@ -73,14 +112,14 @@ private:
 	void port3b_w(u8 data);
 	void gts80b_map(address_map &map);
 
-	u8 m_segment = 0;
-	u8 m_lamprow = 0;
-	u8 m_swrow = 0;
-	u8 m_soundex = 0;
-	u8 m_sol_state[9][2];
-	u8 m_dispcmd;
-	bool m_in_cmd_mode[2];
-	u8 m_digit[2];
+	u8 m_segment = 0U;
+	u8 m_lamprow = 0U;
+	u8 m_swrow = 0U;
+	u8 m_soundex = 0U;
+	u8 m_sol_state[9][2]{};
+	u8 m_dispcmd = 0U;
+	bool m_in_cmd_mode[2]{};
+	u8 m_digit[2]{};
 	bool m_slam_low = false;
 
 	virtual void machine_reset() override;
@@ -333,7 +372,7 @@ u8 gts80b_state::port1a_r()
 	if ((m_lamprow < 4) && BIT(m_segment, 7))
 		data = m_io_dips[m_lamprow]->read();
 
-	for (u8 i = 0; i < 7; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (!BIT(m_swrow, i))
 			data &= m_io_keyboard[i]->read();
 
@@ -401,11 +440,11 @@ void gts80b_state::port3a_w(u8 data)
 	data ^= 0x1f;   // Z27 inverter
 	// Sound
 	u8 sndcmd = data & 15;
-	if (BIT(data, 4))  // Z31
+	if (!BIT(data, 4))  // Z31
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board
-	if (m_r0_sound && (sndcmd & 15))
+	if (m_r0_sound)
 		m_r0_sound->write(sndcmd);
 	else
 	if (m_r1_sound)
@@ -517,6 +556,9 @@ void gts80b_state::machine_start()
 void gts80b_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_lamprow = 0;
 	m_swrow = 0;
 	m_segment = 0;
@@ -1624,7 +1666,8 @@ ROM_START(mntecrlo2)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Night Moves C-103
+/ Night Moves (#C101)
+/ One-sided cocktail designed and built by Gottlieb for International Concepts
 /-------------------------------------------------------------------*/
 ROM_START(nmoves)
 	ROM_REGION(0x10000, "maincpu", 0)

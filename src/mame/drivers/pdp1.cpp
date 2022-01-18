@@ -61,6 +61,7 @@ To load and play a game:
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*
@@ -610,8 +611,7 @@ void pdp1_state::machine_start()
 DEFINE_DEVICE_TYPE(PDP1_READTAPE, pdp1_readtape_image_device, "pdp1_readtape_image", "PDP-1 Tape Reader")
 
 pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_READTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_reader_device(mconfig, PDP1_READTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptr(*this)
 	, m_timer(nullptr)
@@ -634,8 +634,7 @@ void pdp1_readtape_image_device::device_start()
 DEFINE_DEVICE_TYPE(PDP1_PUNCHTAPE, pdp1_punchtape_image_device, "pdp1_punchtape_image_device", "PDP-1 Tape Puncher")
 
 pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_punch_device(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptp(*this)
 	, m_timer(nullptr)

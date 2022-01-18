@@ -104,11 +104,11 @@ private:
 	void machine_reset() override;
 	void machine_start() override;
 
-	u8 m_pio_b;
-	u8 m_term_data;
-	u8 m_protection[0x100];
-	u8 m_cass_data[4];
-	bool m_cassold, m_cassinbit, m_cassoutbit;
+	u8 m_pio_b = 0U;
+	u8 m_term_data = 0U;
+	u8 m_protection[0x100]{};
+	u8 m_cass_data[4]{};
+	bool m_cassold = 0, m_cassinbit = 0, m_cassoutbit = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;

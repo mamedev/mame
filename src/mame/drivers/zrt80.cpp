@@ -55,7 +55,7 @@ private:
 	void mem_map(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;

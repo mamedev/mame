@@ -251,7 +251,6 @@ protected:
 	bool m_no_annul;
 	bool m_hold_bus;
 	int m_icount;
-	int m_stashed_icount;
 	int m_insn_space;
 	int m_data_space;
 

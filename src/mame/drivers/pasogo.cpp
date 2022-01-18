@@ -111,7 +111,7 @@ TODO:
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 /*
   rtc interrupt irq 2

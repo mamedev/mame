@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(MC10CART_SLOT, mc10cart_slot_device, "mc10cart_slot", "MC-10 
 mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MC10CART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_mc10cart_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_nmi_callback(*this),
 	m_cart(nullptr),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1)

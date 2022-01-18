@@ -1367,11 +1367,7 @@ void isa8_cga_pc1512_device::device_reset()
 void isa8_wyse700_device::change_resolution(uint8_t mode)
 {
 	int width = 0, height = 0;
-	if (mode & 2) {
-		machine().root_device().membank("bank_wy1")->set_base(&m_vram[0x10000]);
-	} else {
-		machine().root_device().membank("bank_wy1")->set_base(&m_vram[0x00000]);
-	}
+	m_vrambank->set_entry((mode >> 1) & 1);
 	if ((m_control & 0xf0) == (mode & 0xf0)) return;
 
 	switch(mode & 0xf0) {
@@ -1441,7 +1437,7 @@ DEFINE_DEVICE_TYPE(ISA8_WYSE700, isa8_wyse700_device, "wyse700", "Wyse 700")
 //-------------------------------------------------
 
 isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_cga_device(mconfig, ISA8_WYSE700, tag, owner, clock), m_bank_offset(0), m_bank_base(0), m_control(0)
+	isa8_cga_device(mconfig, ISA8_WYSE700, tag, owner, clock), m_vrambank(*this, "wy1"), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
 	m_start_offset = 0x18000;
@@ -1480,7 +1476,8 @@ void isa8_wyse700_device::device_start()
 	isa8_cga_device::device_start();
 
 	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_wyse700_device::io_read)), write8sm_delegate(*this, FUNC(isa8_wyse700_device::io_write)));
-	m_isa->install_bank(0xa0000, 0xaffff, &m_vram[0x00000]);
+	m_vrambank->configure_entries(0, 2, m_vram.data(), 0x10000);
+	m_isa->install_bank(0xa0000, 0xaffff, m_vrambank);
 	m_isa->install_bank(0xb0000, 0xbffff, &m_vram[0x10000]);
 }
 
@@ -1490,6 +1487,9 @@ void isa8_wyse700_device::device_reset()
 	m_control = 0;
 	m_bank_offset = 0;
 	m_bank_base = 0;
+	int width = 640, height = 400;
+	rectangle visarea(0, width-1, 0, height-1);
+	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(60));
 }
 
 uint32_t isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -938,7 +938,7 @@ void xbox_base_state::xbox_base_map(address_map &map)
 
 void xbox_base_state::xbox_base_map_io(address_map &map)
 {
-	map(0x01f0, 0x01f7).rw(":pci:09.0:ide1", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("pci:09.0:ide1", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 	map(0x002e, 0x002f).rw(FUNC(xbox_base_state::superio_read), FUNC(xbox_base_state::superio_write));
 	map(0x03f8, 0x03ff).rw(FUNC(xbox_base_state::superiors232_read), FUNC(xbox_base_state::superiors232_write));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
@@ -960,25 +960,25 @@ void xbox_base_state::xbox_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	PCI_ROOT(config,        ":pci", 0);
-	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);
-	NV2A_RAM(config,        ":pci:00.3", 0, 128); // 128 megabytes
-	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
-	XBOX_SUPERIO(config,    ":pci:01.0:0", 0);
-	MCPX_SMBUS(config,      ":pci:01.1", 0, 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq11)); //.set(FUNC(xbox_base_state::smbus_interrupt_changed));
-	XBOX_PIC16LC(config,    ":pci:01.1:110", 0); // these 3 are on smbus number 1
-	XBOX_CX25871(config,    ":pci:01.1:145", 0);
-	XBOX_EEPROM(config,     ":pci:01.1:154", 0);
-	MCPX_OHCI(config,       ":pci:02.0", 0, 0).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq1));  //.set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
-	MCPX_OHCI(config,       ":pci:03.0", 0, 0);
-	MCPX_ETH(config,        ":pci:04.0", 0);
-	MCPX_APU(config,        ":pci:05.0", 0, 0, m_maincpu);
-	MCPX_AC97_AUDIO(config, ":pci:06.0", 0, 0);
-	MCPX_AC97_MODEM(config, ":pci:06.1", 0);
-	PCI_BRIDGE(config,      ":pci:08.0", 0, 0x10de01b8, 0);
-	MCPX_IDE(config,        ":pci:09.0", 0, 0).pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));  //.set(FUNC(xbox_base_state::ide_interrupt_changed));
-	NV2A_AGP(config,        ":pci:1e.0", 0, 0x10de01b7, 0);
-	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq3)); //.set(FUNC(xbox_base_state::nv2a_interrupt_changed));
+	PCI_ROOT(config,        "pci", 0);
+	NV2A_HOST(config,       "pci:00.0", 0, m_maincpu);
+	NV2A_RAM(config,        "pci:00.3", 0, 128); // 128 megabytes
+	MCPX_ISALPC(config,     "pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
+	XBOX_SUPERIO(config,    "pci:01.0:0", 0);
+	MCPX_SMBUS(config,      "pci:01.1", 0, 0).interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq11)); //.set(FUNC(xbox_base_state::smbus_interrupt_changed));
+	XBOX_PIC16LC(config,    "pci:01.1:110", 0); // these 3 are on smbus number 1
+	XBOX_CX25871(config,    "pci:01.1:145", 0);
+	XBOX_EEPROM(config,     "pci:01.1:154", 0);
+	MCPX_OHCI(config,       "pci:02.0", 0, 0).interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq1));  //.set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
+	MCPX_OHCI(config,       "pci:03.0", 0, 0);
+	MCPX_ETH(config,        "pci:04.0", 0);
+	MCPX_APU(config,        "pci:05.0", 0, 0, m_maincpu);
+	MCPX_AC97_AUDIO(config, "pci:06.0", 0, 0);
+	MCPX_AC97_MODEM(config, "pci:06.1", 0);
+	PCI_BRIDGE(config,      "pci:08.0", 0, 0x10de01b8, 0);
+	MCPX_IDE(config,        "pci:09.0", 0, 0).pri_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq14));  //.set(FUNC(xbox_base_state::ide_interrupt_changed));
+	NV2A_AGP(config,        "pci:1e.0", 0, 0x10de01b7, 0);
+	NV2A_GPU(config,        "pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq3)); //.set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

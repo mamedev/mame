@@ -133,12 +133,13 @@ class ti_rs232_attached_device : public device_t, public device_image_interface
 public:
 	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	iodevice_t image_type() const noexcept override { return IO_SERIAL; }
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }
 	bool is_creatable() const noexcept override           { return true; }
-	bool must_be_loaded() const noexcept override         { return false; }
 	bool is_reset_on_load() const noexcept override       { return false; }
+	bool support_command_line_image_creation() const noexcept override { return true; }
+	const char *image_type_name() const noexcept override { return "serial"; }
+	const char *image_brief_type_name() const noexcept override { return "serl"; }
 	const char *image_interface() const noexcept override { return ""; }
 	const char *file_extensions() const noexcept override { return ""; }
 	void connect(tms9902_device *dev) { m_uart = dev; }
@@ -161,12 +162,13 @@ class ti_pio_attached_device : public device_t, public device_image_interface
 public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	iodevice_t image_type() const noexcept override { return IO_PARALLEL; }
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }
 	bool is_creatable() const noexcept override           { return true; }
-	bool must_be_loaded() const noexcept override         { return false; }
 	bool is_reset_on_load() const noexcept override       { return false; }
+	bool support_command_line_image_creation() const noexcept override { return true; }
+	const char *image_type_name() const noexcept override { return "parallel"; }
+	const char *image_brief_type_name() const noexcept override { return "parl"; }
 	const char *image_interface() const noexcept override { return ""; }
 	const char *file_extensions() const noexcept override { return ""; }
 

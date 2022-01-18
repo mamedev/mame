@@ -188,7 +188,7 @@ http://blog.system11.org/?p=1943
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 namespace

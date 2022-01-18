@@ -257,7 +257,7 @@ ROM_START( rfsantafeg )
 	ROM_REGION(0x4000, "pics", 0)
 
 	/*
-	PCB counters (contadores) R.F. 53430106	
+	PCB counters (contadores) R.F. 53430106
 	-PIC18F2580
 	-Xtal 12.00 MHz
 	-SEEPROM 82C251

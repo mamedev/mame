@@ -1912,12 +1912,12 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>("pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));

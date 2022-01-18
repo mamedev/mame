@@ -47,8 +47,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_term_data;
-	u8 m_port08;
+	u8 m_term_data = 0U;
+	u8 m_port08 = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;

@@ -210,7 +210,7 @@ ToDo:
 #include "includes/super80.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "super80.lh"

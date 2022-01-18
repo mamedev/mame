@@ -55,7 +55,7 @@
 #include "bus/a800/a8sio.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /******************************************************************************

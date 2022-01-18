@@ -29,7 +29,7 @@ Cart sizes: 1MB, 2MB, 4MB
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace {

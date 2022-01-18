@@ -736,8 +736,9 @@ license:CC0
 		</part>
 	</software>
 
+<!-- TODO: This is alleged to be a 3-byte hack of the actual dump to make it run. Original proto doesn't work on hardware? Investigate... -->
 	<software name="drfrankn">
-		<description>The Adventures of Dr. Franken (USA, Prototype)</description>
+		<description>The Adventures of Dr. Franken (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="nes_cart">
@@ -1946,6 +1947,7 @@ license:CC0
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="TAITO-74*161/161/32" />
 			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="65536">
 				<rom name="0.prg" size="65536" crc="6267fbd1" sha1="4094905bbb6aabad2db67d6641504a43682a4757" offset="00000" />
 			</dataarea>
@@ -3901,6 +3903,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="hsp-46-1 prg" size="131072" crc="9c94a0ec" sha1="f5650471a1b3121e7bab77df2399cce157c1d91c" offset="00000" />
 			</dataarea>
@@ -3975,6 +3978,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-36-0 prg" size="262144" crc="974e8840" sha1="8f228f38437423388a2e0860c05b1798e20cfe95" offset="00000" />
 			</dataarea>
@@ -3999,6 +4003,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-33-0 prg" size="262144" crc="c2ef3422" sha1="ce103fe6971e2f97b82f13b8011c592039f46265" offset="00000" />
 			</dataarea>
@@ -4023,6 +4028,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SXROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-bs-1 prg" size="262144" crc="c3de7c69" sha1="e847474c0576d394125245695d7e3a49d66f7956" offset="00000" />
 			</dataarea>
@@ -5902,6 +5908,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="131072">
 				<rom name="yzw-kd-0 prg" size="131072" crc="e44001d8" sha1="a7800f88af4d5c8be68dc194acaee60c6e82d3c6" offset="00000" />
 			</dataarea>
@@ -5998,6 +6005,7 @@ license:CC0
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="32768">
 				<rom name="hsp-05-0 prg" size="32768" crc="9fa1c11f" sha1="099b3b7e1b3f335abcd29cd3aa013894d745beb2" offset="00000" />
 			</dataarea>
@@ -9557,6 +9565,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="tjc-dn-0 prg" size="131072" crc="728c3d98" sha1="dd6069c0827d60682bc97723750946ce89ab4630" offset="00000" />
 			</dataarea>
@@ -12502,8 +12511,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fantzonej" cloneof="fantzone">
-		<description>Fantasy Zone (Jpn)</description>
+	<software name="fantzonej">
+		<description>Fantasy Zone (Japan)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-FZ-5300 (SS8)"/>
@@ -14720,6 +14729,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
 			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="262144">
 				<rom name="yzw-qp-0 prg" size="262144" crc="1545bd13" sha1="ddebe86096daf3b6dcd714c33a91e912f91da7ce" offset="00000" />
@@ -16963,7 +16973,7 @@ license:CC0
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-12"/>
 		<info name="release" value="19890428"/>
-		<info name="alt_title" value="ホーリーダイヴァー"/>
+		<info name="alt_title" value="ホーリー・ダイヴァー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="holydivr" />
 			<feature name="pcb" value="IREM-HOLYDIVER" />
@@ -17562,7 +17572,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="ff6621ce" sha1="33be02be4ba014b45394c18255f3885c13253690" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17583,6 +17593,7 @@ license:CC0
 			<feature name="slot" value="discrete_74x139" />
 			<feature name="pcb" value="KONAMI-74*139/74" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000"  />
 			</dataarea>
@@ -17603,7 +17614,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="806j0p" size="16384" crc="ac98cd70" sha1="191ede32665ddc042126e90e48805846f76fbe7b" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17625,7 +17636,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.1.prg" size="16384" crc="ba5c8a54" sha1="f4fd4f13078c4aa758a5501d8270785c03018aba" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17725,7 +17736,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj1" cloneof="ideyumj">
+	<software name="ideyomj1" cloneof="ideyomj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
@@ -17747,7 +17758,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj">
+	<software name="ideyomj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
@@ -17769,7 +17780,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj2">
+	<software name="ideyomj2">
 		<description>Ide Yousuke Meijin no Jissen Mahjong II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
@@ -17781,6 +17792,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="mjcontroller" />
 			<dataarea name="prg" size="262144">
 				<rom name="cap-2q-0 prg" size="262144" crc="7b44fb2a" sha1="5f04d72eb14a0014e44c2875f705c62913538e42" offset="00000" />
 			</dataarea>
@@ -23302,8 +23314,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mmansionj" cloneof="mmansion">
-		<description>Maniac Mansion (Jpn)</description>
+<!-- Earlier separate port that doesn't use SCUMM -->
+	<software name="mmansionj">
+		<description>Maniac Mansion (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-18"/>
@@ -24571,10 +24584,10 @@ license:CC0
 
 	<software name="metroidu" cloneof="metroid">
 		<description>Metroid (USA)</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MT-USA"/>
-		<info name="release" value="198608xx"/>
+		<info name="release" value="198708xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
@@ -25160,14 +25173,13 @@ license:CC0
 		</part>
 	</software>
 
-<!-- FIXME: This game works, but it depends on RAM at byte 0x11 being non-zero at power-up -->
-	<software name="minnatab" supported="no">
-		<description>Minna no Taabou no Nakayoshi Daisakusen (Jpn)</description>
+	<software name="minnatab">
+		<description>Minna no Taabou no Nakayoshi Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-9N"/>
 		<info name="release" value="19911122"/>
-		<info name="alt_title" value="みんなのた坊のなかよし大作戦"/>
+		<info name="alt_title" value="みんなのたあ坊のなかよし大作戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
@@ -25703,6 +25715,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="sfl-zm-0 prg" size="131072" crc="ea79cc19" sha1="682ce64b60645d5d76bd15deeb254ae8f7537015" offset="00000" />
 			</dataarea>
@@ -27184,6 +27197,7 @@ license:CC0
 		<description>Nintendo World Championships 1990 (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
+		<info name="usage" value="To play, press start on controller 2."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nes_event" />
 			<feature name="pcb" value="NES-EVENT" />
@@ -28228,6 +28242,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLRROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="131072">
 				<rom name="cds-81-0 prg" size="131072" crc="41f87a9b" sha1="bd6709f785e9c8e96fc7b0b55f2c26c76fe3f17e" offset="00000" />
 			</dataarea>
@@ -28248,6 +28263,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="131072">
 				<rom name="cds-82-0 prg" size="131072" crc="1644c162" sha1="17f1a1ec7456291122aaeb5431cd4c1c11fe29e3" offset="00000" />
 			</dataarea>
@@ -28312,6 +28328,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TNROM" />
 			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="524288">
 				<rom name="cds-84-0 prg" size="524288" crc="e08c8a60" sha1="baf3a4e0423a86e53234e806843149ef7d0974a9" offset="00000" />
 			</dataarea>
@@ -28336,11 +28353,16 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="262144">
 				<rom name="cds-pe-0 prg" size="262144" crc="9525fa38" sha1="20b5b83fac09a42bbc7e2b5f3deb9835fa14b650" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="cds-pe-0 chr" size="131072" crc="45fd2145" sha1="a1fbb3f96e68ab4d98f2737d63204aee91612ccb" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -29987,7 +30009,7 @@ license:CC0
 	</software>
 
 	<software name="qbscramb">
-		<description>Quarter Back Scramble (Jpn)</description>
+		<description>QuarterBack Scramble (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QS (R59V5925)"/>
@@ -32057,8 +32079,9 @@ license:CC0
 			<dataarea name="chr" size="262144">
 				<rom name="koe-iu-0 chr" size="262144" crc="44b22b3d" sha1="bfdb1a89f403b7deea2e29addf1d18e745442771" offset="00000" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
 			<dataarea name="mapper_ram" size="1024">
@@ -37845,6 +37868,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TL1ROM" />
 			<feature name="mmc3_type" value="MMC3A" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="131072">
 				<rom name="dtf-h9-0 prg" size="131072" crc="ecfd3c69" sha1="a9e3d812ed897fda80de5a1672f8ed4aa19d3da3" offset="00000" />
 			</dataarea>
@@ -39102,8 +39126,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisja" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. A)</description>
+	<software name="tetrisja" cloneof="tetrisj">
+		<description>Tetris (Japan, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -39122,8 +39146,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisj" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. B)</description>
+	<software name="tetrisj">
+		<description>Tetris (Japan, Rev. B)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -41530,6 +41554,10 @@ license:CC0
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -42746,6 +42774,7 @@ license:CC0
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
 				<rom name="ath-xw-0 prg" size="131072" crc="b1b16b8a" sha1="bb40175966f18efad8d82bebea3d4d8444a133e6" offset="00000" />
 			</dataarea>
@@ -45096,6 +45125,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="best keiba - derby stallion (japan).prg" size="131072" crc="41482da3" sha1="7545769a31a1623b6947ec412dda569aae9190f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -45119,6 +45149,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="best play pro yakyuu special (japan).prg" size="262144" crc="b8747abf" sha1="340f507cfc3f3827ee0b7269814e08d634b807f4" offset="00000" status="baddump" />
 			</dataarea>
@@ -45150,7 +45181,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="bioforce">
-		<description>Bio Force Ape (Jpn, Prototype)</description>
+		<description>Bio Force Ape (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bio force ape (us prototype).prg" size="131072" crc="46ba306d" sha1="196ce06860227b16767d88b7f7c3a22d3cd6978d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bio force ape (us prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioforcej" cloneof="bioforce">
+		<description>Bio Force Ape (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46585,6 +46632,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="chr" size="131072">
 				<rom name="famicom shougi - ryuuousen (japan).chr" size="131072" crc="30989ad9" sha1="6d96e346713547af01adea39751327f8b924e41d" offset="00000" status="baddump" />
 			</dataarea>
@@ -47069,6 +47117,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
+			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="524288">
 				<rom name="gorilla man, the (japan).prg" size="524288" crc="9fd718fd" sha1="d477320dc99b294b5d26995f1527eca0233f2f46" offset="00000" status="baddump" />
 			</dataarea>
@@ -47184,6 +47233,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="heroqstg" cloneof="heroqst">
+		<description>Hero Quest (Germany, prototype)</description>
+		<year>1992</year>
+		<publisher>Gremlin Interactive</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="NES-UNEPROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<!-- not verified: anonymous dumper claims this is from the same cart auctioned on 2021/9/29 -->
+				<rom name="herog 5-5-92" size="131072" crc="d91cf3dc" sha1="1eace77232f2d7d49a9bf40c772a933f182081f2" status="baddump" /> <!-- real label: HEROG 5/5/92 -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heroqstu" cloneof="heroqst">
 		<description>Hero Quest (USA, Prototype)</description>
 		<year>1991</year>
@@ -47213,6 +47280,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="hokuto no ken (japan) (beta).prg" size="32768" crc="48d83fb0" sha1="43b6e926ddfbdce0468e89e2a0b96c412d9f0d26" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holydivrce" cloneof="holydivr">
+		<description>Holy Diver Collector's Edition</description>
+		<year>2018</year>
+		<publisher>retro-bit</publisher>
+		<info name="alt_title" value="ホーリー・ダイヴァー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="holy diver (2018).prg" size="524288" crc="b14969c8" sha1="500e06626c2c59acd319d2a287daf23916cfa95e" status="baddump" /> <!-- TODO: is there missing undumped, albeit unused, data on the cartridge? -->
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -49370,7 +49454,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="プロジェクトＱ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb" value="HVC-TNROM" />
+			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="262144">
 				<rom name="project q (japan).prg" size="262144" crc="c1ba8bb9" sha1="390443f9b8a69fee3cff5f234a3e92aae8b48102" offset="00000" status="baddump" />
 			</dataarea>
@@ -49452,6 +49537,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="puzznic (japan).prg" size="32768" crc="4468ca43" sha1="4e9c5d3864474b4c47a9fa319444eaa19071076a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbscrambp" cloneof="qbscramb">
+		<description>QuarterBack Scramble (USA, prototype)</description>
+		<year>19??</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="Mike Ditka's Big Play Football"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -50117,7 +50219,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
-			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="chr" size="131072">
 				<rom name="space shadow (japan).chr" size="131072" crc="6690e5c1" sha1="f05cc0478786a5e6d153c2f85c00c14afa0e61b0" offset="00000" status="baddump" />
@@ -50155,6 +50257,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
+			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
 				<rom name="spot - the video game (japan).prg" size="131072" crc="0abdd5ca" sha1="8b62b3fc95957f52d146e7bc3c90ab33c4005aec" offset="00000" status="baddump" />
 			</dataarea>
@@ -50850,8 +50953,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tetrisjb" cloneof="tetris">
-		<description>Tetris (Jpn)</description>
+	<software name="tetrisjb" cloneof="tetrisj">
+		<description>Tetris (Japan)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -52092,6 +52195,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-021).chr" size="524288" crc="4a797d16" sha1="e7cf3951f727913aa94dd702e1d5c48e19976bb9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j21b">
+		<description>1998 Super HiK 8 in 1 (JY-021B)</description>
+		<year>1998</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy012005" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).prg" size="1048576" crc="aa1aeece" sha1="c1fe5436d90619106e898a53d33201ca1e00dd16" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).chr" size="1048576" crc="36ea5a43" sha1="bec2c0ba847d3b67d5c3e2b9b669093b7389cd38" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55001,7 +55119,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated. Operation Wolf currently only works with joypad but not zapper. -->
+<!-- Operation Wolf currently only works with joypad but not zapper -->
 	<software name="2uzilght" supported="partial">
 		<description>2 in 1 Uzi Lightgun</description>
 		<year>199?</year>
@@ -55009,6 +55127,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="MGC-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_22110" />
+			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="prg" size="262144">
 				<rom name="2-in-1 uzi lightgun (mgc-002).prg" size="262144" crc="7349c91a" sha1="00d0c7a423b9c8c18974022c619d9f3084c4fd8d" status="baddump" />
 			</dataarea>
@@ -56545,8 +56664,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguo2" cloneof="sango2ht" supported="partial">
-		<description>San Guo Zhi II - Zhong Wen (Chi, Hacked)</description>
+<!-- This should be unimplemented mapper 558. nes20db also flags it as a bad dump (with graffiti?). Good dump available? -->
+	<software name="sanguo2" cloneof="sango2ht" supported="no">
+		<description>Sānguózhì II - Zhōngwén (China, hacked)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1084"/>
@@ -63429,7 +63549,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Dragon Ball Party?"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="1048576">
 				<rom name="dragon ball party [p1].chr" size="1048576" crc="1f817045" sha1="5a66a033046ceec9f98a3b6fef5f108e840e6fc8" offset="00000" status="baddump" />
@@ -63437,9 +63557,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="1048576">
 				<rom name="dragon ball party [p1].prg" size="1048576" crc="5721089a" sha1="af8df8dd9449d512c34deddee2a758ca46677bd5" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -65275,9 +65395,6 @@ We don't include these hacks because they were not burned into real carts nor so
 			<dataarea name="prg" size="262144">
 				<rom name="super lion king 2, the (unl).prg" size="262144" crc="39d36377" sha1="edbc091d7e954793ce466d4f2122e07771f0d1a0" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
 		</part>
 	</software>
 
@@ -66152,7 +66269,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="crayon2" cloneof="biomirac">
-		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
+		<description>Crayon Shin-chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
 		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66169,10 +66286,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="crayonc">
-		<description>La Bi Xiao Xin - Crayon Shin-Chan (Chi)</description>
+	<software name="crayonc" supported="partial">
+		<description>Làbǐ Xiǎo Xīn - Crayon Shin-chan (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="蠟筆小新"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
@@ -67284,9 +67402,10 @@ All musics were removed in this game.
 	</software>
 
 	<software name="sanguo4" supported="partial">
-		<description>San Guo Zhi 4 - Chi Bi Feng Yun (Chi)</description>
+		<description>Sānguózhì 4 - Chìbì Fēngyún (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="三國誌IV: 赤璧風雲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
@@ -77324,12 +77443,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garou2" cloneof="fatfury2" supported="partial">
+	<software name="garou2" cloneof="fatfury2">
 		<description>Garou Densetsu 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2 (unl) [a1].chr" size="262144" crc="4d37e840" sha1="692e8929ef7bc6356b518f4150f3453c2bfe5223" offset="00000" status="baddump" />
@@ -77340,12 +77459,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfury2" supported="partial">
+	<software name="fatfury2">
 		<description>Fatal Fury 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2 (unl).chr" size="262144" crc="d0aa6ce8" sha1="d78b8f163a452bae5e2e9fdcc513a80a4b6b3e71" offset="00000" status="baddump" />
@@ -77360,12 +77479,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfury2a" cloneof="fatfury2" supported="partial">
+	<software name="fatfury2a" cloneof="fatfury2">
 		<description>Fatal Fury 2' (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2' (unl).chr" size="262144" crc="58acf414" sha1="d5a2eb44b0f50554cd5daa39a82eaaf95f3ae53d" offset="00000" status="baddump" />
@@ -77376,7 +77495,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="kof96" supported="no">
+	<software name="kof96">
 		<description>The King of Fighters 96 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77570,7 +77689,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mstrfgt6" supported="partial">
+	<software name="mstrfgt6">
 		<description>Master Fighter VI' (Asia)</description>
 		<year>1993</year>
 		<publisher>Yoko</publisher>
@@ -77716,7 +77835,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk6">
+	<software name="mk6" supported="partial">
 		<description>Mortal Kombat 6 (Asia)</description>
 		<year>1997</year>
 		<publisher>N.T</publisher>
@@ -77728,9 +77847,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="mortal kombat 6 (unl).prg" size="131072" crc="e99f996d" sha1="f14c9d79f4b33f833a6a8256455cb060e2a73ed2" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -77968,7 +78084,7 @@ be better to redump them properly. -->
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street blaster ii pro (unl).chr" size="262144" crc="0f4ec1ae" sha1="f500133af4ae4988a5f2b2859f46afca97df43ea" offset="00000" status="baddump" />
@@ -77979,12 +78095,29 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="strblst4">
+		<description>Street Blaster IV Pro 10 (Asia)</description>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cony1k" />
+			<feature name="pcb" value="UNL-CONY" />
+			<dataarea name="prg" size="131072">
+				<rom name="street blaster iv pro 10 (ymh-sn2) (unl).prg" size="131072" crc="0af8c9fd" sha1="184af79064c078101de8c09b3d76d0babf182818" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="street blaster iv pro 10 (ymh-sn2) (unl).chr" size="262144" crc="73c30ae1" sha1="da0c88cf43da96812949820ee3e7315ab5aa4b1e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FIXME: Title screen gfx corruption is due to unimplemented jumper setting -->
 	<software name="strblst5" supported="partial">
 		<description>Street Blaster V Turbo 20 (Asia, 20 characters)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street blaster v turbo 20 (unl).chr" size="262144" crc="27a81888" sha1="5cdb53c0f88032895157a61b53fa7a658062207f" offset="00000" status="baddump" />
@@ -78175,9 +78308,9 @@ be better to redump them properly. -->
 	<software name="sfxt">
 		<description>Street Fighter X Turbo 40 (Asia)</description>
 		<year>1993</year>
-		<publisher>Cony</publisher>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street fighter x turbo 40 (unl).chr" size="262144" crc="8b7a77fc" sha1="bbe096be5e65fb16252c2e16973fbe1d4e3c6e48" offset="00000" status="baddump" />
@@ -78223,8 +78356,8 @@ be better to redump them properly. -->
 
 	<software name="supblst7">
 		<description>Super Blaster VII Turbo 28 (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
 			<feature name="pcb" value="UNL-CONY" />
@@ -78281,9 +78414,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super real bout 97 (unl).prg" size="131072" crc="7977530c" sha1="6b23129444a5a6d1a7c8f4a7bbdf319337124376" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78546,7 +78676,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3">
+	<software name="umk3" supported="partial">
 		<description>Ultimate Mortal Kombat 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78558,9 +78688,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="ultimate mortal kombat 3 (unl).prg" size="131072" crc="8e7f85bd" sha1="69c45c46cb5a0faca02ebb76c808ad8cdbd2b5f7" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78641,7 +78768,7 @@ be better to redump them properly. -->
 
 	<software name="wh2">
 		<description>World Heroes 2 (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
@@ -78659,9 +78786,9 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="wh2pro">
+	<software name="wh2pro" cloneof="wh2">
 		<description>World Heroes 2 Pro (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
@@ -78741,9 +78868,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="yuu yuu hakusho 97 v (unl).prg" size="131072" crc="5191fb3e" sha1="7aa09e3ac055b8b9436a29d2495720b2e6ce915b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78845,6 +78969,244 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- 8-bit Xmas 2008-2011 are not really NROM, but an NROM-like board with flashing LEDs -->
+	<software name="xmas08" supported="partial">
+		<description>8-bit Xmas 2008</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas08demo.prg" size="32768" crc="3ae2a150" sha1="5ce021bebb9049604434af45d6c397e6dd7b84c4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas09" supported="partial">
+		<description>8-bit Xmas 2009</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas09demo.prg" size="32768" crc="851cea10" sha1="88ed2741e88144eda26366985d216f27629cf3f8" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas10" supported="partial">
+		<description>8-bit Xmas 2010</description>
+		<year>2010</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas10demo.prg" size="32768" crc="a6e02975" sha1="a3a81cc6fdb7a68efbb061ba44dd52407a978e26" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas11" supported="partial">
+		<description>8-bit Xmas 2011</description>
+		<year>2011</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas11demo.prg" size="32768" crc="d0d0c932" sha1="067bbd99c5f9ccaf66ef484e024b9c98e4893d6d" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This will crash if left on the title screen. The mini-game seems fine, however. -->
+	<software name="xmas12" supported="partial">
+		<description>8-bit Xmas 2012</description>
+		<year>2012</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas12demo.prg" size="131072" crc="feab08f1" sha1="4834a8bea6df40c9566b97412de775de2ffde492" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas13" supported="partial">
+		<description>8-bit Xmas 2013</description>
+		<year>2013</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas13demo.prg" size="131072" crc="f8d04aa0" sha1="98e57ebca93689042d254fe205c357cdc4d84b0a" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas14" supported="partial">
+		<description>8-bit Xmas 2014</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas14demo.prg" size="131072" crc="900ca825" sha1="9e7a881a5c1e643b1327a7c4434e2623eefb95e5" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas15" supported="partial">
+		<description>8-bit Xmas 2015</description>
+		<year>2015</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas15demo.prg" size="131072" crc="376c9fcc" sha1="658929d3377e30469c82b3bf8a66c7d2fbcd0b57" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas16" supported="no">
+		<description>8-bit Xmas 2016</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas16demo.prg" size="131072" crc="19eb1773" sha1="9a22cb50f0b7d26f81dd0b9f8e3f05e07c3b4834" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas18" supported="partial">
+		<description>8-bit Xmas 2018</description>
+		<year>2018</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas18demo.prg" size="131072" crc="38431bf6" sha1="cb5a7ee17b4a4a7a30d4c98073d107561d903641" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas19" supported="partial">
+		<description>8-bit Xmas 2019</description>
+		<year>2019</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas19demo.prg" size="131072" crc="3e03466b" sha1="a8cceadd892a8fb4c43ccc660a2073c2d8b2d69e" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas20" supported="partial">
+		<description>8-bit Xmas 2020</description>
+		<year>2020</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas20demo.prg" size="131072" crc="bad62c7b" sha1="b0d4a83d71e571ab7ba5ba95784498f17b527606" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas21" supported="partial">
+		<description>8-bit Xmas 2021</description>
+		<year>2021</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas21demo.prg" size="131072" crc="d8ab6288" sha1="8b15b9eff1bcb128ff4969de7a5d4d47b3b2b62f" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicpow">
+		<description>8Bit Music Power</description>
+		<year>2016</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-8M"/>
+		<info name="release" value="20160130"/>
+		<info name="alt_title" value="8ビットミュージックパワー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87D" />
+			<dataarea name="prg" size="524288">
+				<rom name="8bit music power.prg" size="524288" crc="104e9410" sha1="2861b2fa673b785b66bf46814735104da9cc61be" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="8bit music power.chr" size="262144" crc="16f15eb6" sha1="09a4204edb35dd742fb3110e68b533661e8ba35e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicpwf">
+		<description>8Bit Music Power Final</description>
+		<year>2017</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-8F"/>
+		<info name="release" value="20170406"/>
+		<info name="alt_title" value="8ビットミュージックパワーファイナル"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87G" />
+			<dataarea name="prg" size="524288">
+				<rom name="8bit music power final.prg" size="524288" crc="c2856b5d" sha1="c97581829fa9738a8ce6eae9b6140b4b81510f66" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="8bit music power final.chr" size="262144" crc="a8c9290a" sha1="11101ef07c2e7d66421e9ca7e7df34a8c300107f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This release is nearly identical to the prototype 1 set but with rebranding -->
 	<software name="airballr" cloneof="airball">
 		<description>Airball (RetroZone)</description>
@@ -78858,6 +79220,78 @@ be better to redump them properly. -->
 				<rom name="airball (retrousb) (2007).prg" size="131072" crc="3e9d567b" sha1="76c9d4a9b9c1a4b587dd15661e39c68f125628c4" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkid">
+		<description>Battle Kid - Fortress of Peril (v1.100)</description>
+		<year>2010</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-BK-GBL"/>
+		<info name="release" value="20100702"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="aef464ce" sha1="1f5832a163313f930893151a30efb1ebb853b0db" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkida" cloneof="batlkid">
+		<description>Battle Kid - Fortress of Peril (v1.000)</description>
+		<year>2010</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-BK-GBL"/>
+		<info name="release" value="20100222"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="battle kid - fortress of peril (v1.000).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkidj" cloneof="batlkid">
+		<description>Battle Kid - Kiken no Wana (Japan, v2.000)</description>
+		<year>2018</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="release" value="20181018"/>
+		<info name="alt_title" value="バトルキッド 危険の罠"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="524288">
+				<rom name="battle kid - fortress of peril (japan) (v2.000).prg" size="524288" crc="fa5d5a4d" sha1="7f142f448bee7972b5cf4feeb427a7f19d78f2e3" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkid2">
+		<description>Battle Kid 2 - Mountain of Torment (v1.000)</description>
+		<year>2012</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-B2-GBL"/>
+		<info name="release" value="20121215"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="524288">
+				<rom name="battle kid 2 - mountain of torment (v1.000).prg" size="524288" crc="74b823a1" sha1="dcd6870e0d5a79899dce11b975c8a16652fc7143" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -78897,6 +79331,29 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kirastar">
+		<description>Kira Kira Star Night DX</description>
+		<year>2016</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-KS"/>
+		<info name="release" value="20161006"/>
+		<info name="alt_title" value="キラキラスターナイトDX"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87G" />
+			<dataarea name="prg" size="262144">
+				<rom name="kira kira star night dx.prg" size="262144" crc="35f72799" sha1="a865787e66b5e3c604b895ba92ef16f509bd79d3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="kira kira star night dx.chr" size="262144" crc="baeb2c47" sha1="3a9f35bfaa920633ca96eb7df5a26b25688f6984" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -78964,6 +79421,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoheian">
+		<description>Neo Heiankyo Alien</description>
+		<year>2017</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="release" value="20170907"/>
+		<info name="alt_title" value="NEO平安京エイリアン"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="neo heiankyo alien.prg" size="524288" crc="b0fc6145" sha1="a8178c5293aafc2c6dc6d78c5fe4239edfff8395" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="neo heiankyo alien.chr" size="131072" crc="3f726765" sha1="879cb8c5a38295008aa08a79c69388d55292a249" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79264,6 +79738,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_10m46">
+		<description>10000000 in 1 (KB46)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tf2740" />
+			<dataarea name="prg" size="131072">
+				<rom name="10000000-in-1 (kb46).prg" size="131072" crc="5af12a03" sha1="49c9515d8ea45ebd9569b727d673cb618fed054a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="10000000-in-1 (kb46).chr" size="65536" crc="6ccfb6ed" sha1="8cc3c5dbc66756e8777a504c90e5203dc58c7144" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_101">
 		<description>101 in 1 Games</description>
 		<year>19??</year>
@@ -79534,12 +80023,27 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_14fl">
+		<description>14 in 1 (FL-14A)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tf2740" />
+			<dataarea name="prg" size="131072">
+				<rom name="14-in-1 (fl-14a).prg" size="131072" crc="b825146b" sha1="f153f2b1be761682b5032ec1b48798874e66b1b9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="14-in-1 (fl-14a).chr" size="65536" crc="264d407b" sha1="96fbd9d9cdd2249c82a8d59e292e1dbc905b7caa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_14ntd">
 		<description>14 in 1 (NTDEC)</description>
 		<year>1988</year>
 		<publisher>NTDEC</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ntdec_2746" />
+			<feature name="slot" value="bmc_810544c" />
 			<feature name="pcb_model" value="2746" />
 			<dataarea name="prg" size="262144">
 				<rom name="14-in-1 (ntdec).prg" size="262144" crc="24aebe85" sha1="ba0d04564c4e95b997426815b7cda88e76f4239d" status="baddump" />
@@ -79690,6 +80194,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_158ab">
+		<description>158 in 1 (AB-5027)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tf2740" />
+			<dataarea name="prg" size="131072">
+				<rom name="158-in-1 (ab-5027).prg" size="131072" crc="df56036e" sha1="77feb7afe43d34001728977cd50539067880c687" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="158-in-1 (ab-5027).chr" size="65536" crc="e4e4a50c" sha1="c6f74ffe692b221edca127f417769c711f3587c3" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80216,6 +80735,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_250">
+		<description>250 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_fam250" />
+			<feature name="pcb_model" value="FAM250" />
+			<dataarea name="prg" size="524288">
+				<rom name="g4-3" size="524288" crc="416ed0bc" sha1="4958d75a445150ad6a73c1309db3af708912f8a1" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -81533,6 +82068,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 digital adventure (unl)[u].prg" size="524288" crc="21786899" sha1="2461ae3bfddf905b1a829e5a6f3bb838eee2611c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_40">
+		<description>40 in 1 (110-05)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tf2740" />
+			<dataarea name="prg" size="131072">
+				<rom name="40-in-1 (110-05).prg" size="131072" crc="c40779e7" sha1="893003a83ce9974367c9c6f2d87777747754cecf" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="40-in-1 (110-05).chr" size="65536" crc="21fa8301" sha1="66b74888809375b2c18ce8836cdd47924e476471" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -82964,6 +83514,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Arkanoid does not have the second half of its CHR data. Bad graphics on the final boss and game over screens are BTANB. -->
+	<software name="mc_9999d">
+		<description>9999 in 1 (108-03)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tf2740" />
+			<dataarea name="prg" size="131072">
+				<rom name="9999-in-1 (108-03).prg" size="131072" crc="fb99ebe0" sha1="8534b881c63c7154ccb5f26137a6c6aebc180fe0" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="9999-in-1 (108-03).chr" size="65536" crc="ba602a48" sha1="3c287bd6518961b7055b6485fa017b17af5a8d81" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_9x7">
 		<description>9999999 in 1</description>
 		<year>19??</year>
@@ -83717,7 +84283,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3a" supported="no">
+	<software name="mc_s3a">
 		<description>Super 3 in 1 (NT-934)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>

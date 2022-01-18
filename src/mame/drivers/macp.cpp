@@ -44,10 +44,10 @@ public:
 	macp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ay8910(*this, "ay%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_ay8910(*this, "ay%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void mac16k(machine_config &config);
@@ -68,11 +68,11 @@ private:
 	void ay1_b_w(u8);
 	u8 ay1_b_r();
 	u8 kbd_r();
-	u8 m_t_c = 0;
-	u8 m_digit = 0;
-	u8 m_ay1_b = 0;
-	u8 m_ay1_a = 0;
-	u8 m_relay_ctrl = 0;
+	u8 m_t_c = 0U;
+	u8 m_digit = 0U;
+	u8 m_ay1_b = 0U;
+	u8 m_ay1_a = 0U;
+	u8 m_relay_ctrl = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;

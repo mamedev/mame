@@ -535,7 +535,7 @@ void mystwarr_state::gaiapols_map(address_map &map)
 	map(0x48e000, 0x48e001).portr("IN0_P1");             // bit 3 (0x8) is test switch
 	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x660000, 0x66003f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
 	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));

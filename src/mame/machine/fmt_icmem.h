@@ -13,23 +13,19 @@
 
 #pragma once
 
+#include "imagedev/memcard.h"
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-class fmt_icmem_device : public device_t, public device_image_interface
+class fmt_icmem_device : public device_t, public device_memcard_image_interface
 {
 public:
 	// construction/destruction
 	fmt_icmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "icm"; }
 
