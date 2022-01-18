@@ -731,44 +731,46 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 		logerror("TEA set to %08x\n", data);
 		break;
 
+	/*
+		LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
 
+		L = LRUI = Least recently used ITLB
+		B = URB = UTLB replace boundary
+		C = URC = UTLB replace counter
+		Q = SQMD = Store Queue Mode Bit
+		V = SV = Single Virtual Mode Bit
+		T = TI = TLB invalidate
+		A = AT = Address translation bit (enable)
+	*/
 	case MMUCR: // MMU Control
-		logerror("%s: MMUCR %08x\n", machine().describe_context(), data);
 		m_m[MMUCR] &= 0xffffffff;
-		/*
-		    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+		// MMUCR_AT
+		m_sh4_mmu_enabled = bool(BIT(data, 0));
+		logerror("%s: MMUCR %08x (enable: %d)\n", machine().describe_context(), data, m_sh4_mmu_enabled);
 
-		    L = LRUI = Least recently used ITLB
-		    B = URB = UTLB replace boundary
-		    C = URC = UTLB replace counter
-		    Q = SQMD = Store Queue Mode Bit
-		    V = SV = Single Virtual Mode Bit
-		    T = TI = TLB invaldiate
-		    A = AT = Address translation bit (enable)
-		*/
-
-
-
-		if (data & MMUCR_AT)
+		if (m_sh4_mmu_enabled)
 		{
-			m_sh4_mmu_enabled = 1;
-
-
+			// Newer versions of the Dreamcast Katana SDK use MMU to remap the SQ write-back space (cfr. ikaruga and several later NAOMI GD-ROM releases)
+			// Anything beyond that is bound to fail,
+			// i.e. DC WinCE games, DC Linux distros, v2 Sega checkers, aristmk6.cpp
+#if 0
 			if (m_mmuhack == 1)
 			{
 				printf("SH4 MMU Enabled\n");
 				printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
 				printf("The MMU emulation is a hack specific to that system\n");
 			}
-
+#endif
 
 			if (m_mmuhack == 2)
 			{
-				for (int i = 0;i < 64;i++)
+				for (int i = 0; i < 64; i++)
 				{
 					if (m_utlb[i].V)
 					{
-						printf("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
+						// FIXME: potentially verbose, move to logmacro.h pattern
+						// cfr. MMU Check_4 in v2.xx DC CHECKER
+						logerror("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
 							i,
 							m_utlb[i].ASID,
 							m_utlb[i].VPN << 10,
@@ -785,12 +787,6 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 					}
 				}
 			}
-
-
-		}
-		else
-		{
-			m_sh4_mmu_enabled = 0;
 		}
 
 		break;

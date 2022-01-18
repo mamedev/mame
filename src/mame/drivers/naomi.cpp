@@ -1,94 +1,30 @@
 // license:LGPL-2.1+
 // copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
-/*
+// thanks-to: CaH4e3, Deunan Knute, Stefanos Kornilios Mitsis Poiiitidis, Guru, Psyman, ZeZu
+/**************************************************************************************************
 
-  Sega Naomi / Naomi 2 / Atomiswave
-  Sega, 1998-2005
+    NAOMI (c) 1998 Sega
+    NAOMI2 (c) 2000 Sega
 
-  Driver by Samuele Zannoli, R. Belmont, ElSemi,
-            David Haywood, Angelo Salese and Olivier Galibert
-  Special thanks to CaH4e3, Deunan Knute, drkIIRaziel, Guru, Psyman and ZeZu for the help given.
+Notes:
+    - The later revision games (released after GD-ROM had been discontinued) require the 'h'
+      revision bios, which checks the SH-4 ID register.
 
- Notes:
-  Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
-   revision of the graphic chip.  Attempting to run these games on the later board results in graphical glitches and/or
-   other problems.
+    - List of boot error codes can be seen at https://wiki.arcadeotaku.com/w/Sega_NAOMI_Error_Codes
 
-  Naomi 2 is backwards compatible with Naomi 1
+    - NAOMI2 is backwards compatible with regular NAOMI.
 
-  The later revision games (released after GD-ROM had been discontinued) require the 'h' revision bios, which checks the SH-4 ID register.
+QA Notes (Update January 2022):
+    - Roadmap: https://github.com/mamedev/mame/projects/2
+    - Testing functional notes: https://github.com/angelosa/mame_qa/blob/main/mame_qa/naomi.md
+    - We currently don't promote anything out of this driver due of lacking important features
+      in PowerVR and AICA devices. Performance is also a concern.
+    - Manufacturers needs to be overhauled, also
+      cfr. MT#08143 about a necessity to at least log Sega divisions somehow.
+    - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
 
-  Error 51 means that you need to change the cabinet to a different player arrangement in main test mode (usually 1p)
+===================================================================================================
 
-Sega Naomi is Dreamcast based Arcade hardware.
-
-
-TODO (general):
-    - all games that uses YUV just updates one frame then dies, why?
-    - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
-    - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
-
-    - Following games don't boot, any attempt makes it to return to the system test mode (note these are also "m4" type games)
-    * Akatsuki Blitzkampf Ausf. Achse
-
-    - Boots and accepts coin, but won't accept start button
-    * Usagi Yamashiro Hen
-
-    - missing inputs (needs rotary channels):
-    * Crakin' DJ
-    * Dynamic Golf
-    * Inu no Osampo
-
-    - wrong JVS I/O specs, doesn't boot because of it:
-    * Derby Owners Club II
-    * Kick '4' Cash (hopper)
-    * Sega Marine Fishing
-    * Wave Runner GP
-    * Shootout Pool
-    * Shootout Pool Medal
-    * Shootout Pool Prize
-
-    - other issues:
-    * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to freeze the game)
-    * La Keyboard (boots fine & attract mode looks OK, but no keyboard)
-
-TODO (game-specific):
-    - 18 Wheeler (deluxe): "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
-    - Airline Pilots (deluxe): returns error 03
-    - Capcom vs. SNK Pro: doesn't accept start input (REGRESSION)
-    - Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
-    - Ferrari 355 Challenge: dies at the network check;
-    - Giant Gram 2: no VMU emulation;
-    - Gun Survivor 2: crashes during game loading;
-    - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - marstv: temporary lock ups during anchor talking (does same in Demul);
-    - marstv: missing graphics at stage select, renderer fault or something else?
-    - monkeyba: CPU jumps to la la land when attempts to load a stage (bp c09e950, uses FPU opcodes for calculating the return address?);
-    - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
-    - OutTrigger: crashes on naomibd_r();
-    - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
-    - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
-    - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
-    - sfz3ugd: currently dies at disclaimer screen (regression);
-    - shangril: swapped mahjong inputs (M -> N, C -> B etc.);
-    - sprtjam: garbage on initial attract mode screen (regression).
-    - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
-    - vtennisg: crashes after stage screen or the attract mode (PVR or SH-4 bug, most likely);
-    - World Kicks (both sets): "NAOMIM2: unhandled board write a0800600, 0000" after Naomi logo
-    - sl2007:
-        0C04697A: MOV.L   @($28,R14),R0 ;8c167734
-        0C04697C: TST     R0,R0
-        0C04697E: BT      $0C046998
-        0C046980: BRA     $0C046990
-        0C04698E: BT      $0C046998
-        0C046990: MOV.L   @($28,R14),R3
-        0C046992: MOV     #$FD,R5
-        0C046994: JSR     R3
-        0C046608: NOP
-        0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
-        0C046608: NOP
-
----------------------------------------------------------------------------------------------------------------------------------------------------
 Guru's Readmes
 --------------
 
@@ -1241,436 +1177,13 @@ key matrix is shown in below
 
 * LST = Last chance, F/F = Flip flop, STR = Start
 
-
----------------------------------------------------------------------------------------------------------------------------------------------------
-
-Guru's Readme
--------------
-
-Sammy Atomiswave (codename SYSTEM X) system overview
-(high likely) developed by SI Electroncs Ltd, former Sammy subsidiary
-released April 2003
-
-The Atomiswave System is basically just a Sega Dreamcast using ROM carts.
-
-PCB Layout
-----------
-
-Sammy AM3AGA-04 Main PCB 2002 (top side)
-1111-00006701 (bottom side)
-   |--------------------------------------------|
-  |-      TA8210AH               D4721   3V_BATT|
-  |VGA                              BS62LV1023TC|
-  |VOL                                          |
-  |SER      |-----|               PCM1725U      |
-  |-        |ROMEO|       D4516161              |
-   |CN3     |     |                    BIOS.IC23|
-|--|SW1     |-----|                             |
-|                     |-----|           |-----| |
-|           33.8688MHz|315- |           |ROMEO| |
-|           |-----|   |6232 |           |     | |
-|           |315- |   |-----|           |-----| |
-|           |6258 |  32.768kHz                  |
-|J          |-----|                             |
-|A                 |-------------|    D4564323  |
-|M                 |             |              |
-|M                 |             |  |--------|  |
-|A        D4516161 |  315-6267   |  |        |  |
-|                  |             |  |  SH4   |  |
-|                  |             |  |        |  |
-|  TD62064         |             |  |        |  |
-|         D4516161 |             |  |--------|  |
-|                  |-------------|              |
-|                                     D4564323  |
-|--|             D4516161  D4516161             |
-   |                             W129AG  13.5MHz|
-   |--------------------------------------------|
-Notes:
-------
-BS62LV1023TC-70 - Brilliance Semiconductor Low Power 128k x8 CMOS SRAM (TSOP32)
-TA8210AH        - Toshiba 19W x 2 Channel Power Amplifier
-D4516161AG5     - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
-D4564323        - NEC uPD4564323G5-A10 512K x 32 x 4 (64MBit) SDRAM (SSOP86)
-D4721           - NEC uPD4721 RS232 Line Driver Receiver IC (SSOP20)
-PCM1725U        - Burr-Brown PCM1725U 16Bit Digital to Analog Converter (SOIC14)
-2100            - New Japan Radio Co. Ltd. NJM2100 Dual Op Amp (SOIC8)
-ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 rebadged Fujitsu MBCG61723P-102 TP2H50 - CG61P series CMOS Gate Array ASIC (TQFP100)
-315-6232        - SEGA 315-6232 custom ASIC (QFP100)
-315-6258        - SEGA 315-6258 custom ASIC (QFP56)
-315-6267        - SEGA 315-6267 custom ASIC (BGAxxx)
-TD62064         - Toshiba TD62064 NPN 50V 1.5A Quad Darlington Driver (SOIC16)
-SH4             - Hitachi SH-4 HD6417091RA CPU (BGA256)
-BIOS.IC23       - Macronix 29L001MC-10 3.3volt (1MBit) FlashROM (SOP44, byte mode, reverse pinout: use reverse adapter or "dead bug" method, pinout equivalent to reversed MX29LV160 with four high address lines unused)
-W129AG          - IC Works W129AG Programmable Clock Frequency Generator, clock input of 13.5MHz (SOIC16)
-SW1             - 2-position Dip Switch
-VGA             - 15 pin VGA out connector @ 31.5kHz
-SER             - 9 pin Serial connector  \
-VOL             - Volume pot              / These are on a small daughterboard that plugs into the main PCB via a multi-wire cable.
-CN3             - 10 pin Speaker output & Extension serial connector
-3V_BATT         - Panasonic ML2020 3 Volt Coin Battery
-
-Sega 837-14624R
-later PCB revision from Sega, mostly same as above, notable differences:
-ROMEO           - SEGA 315-6434
-315-6232        - SEGA 315-6232A
-315-6258        - SEGA 315-6258A
-315-6267        - SEGA 315-6318A
-SH4             - Hitachi HD6417091T
-BIOS.IC48       - Amic A29L004A 4MBit flash ROM (TSOP40) labeled FPR-24363
-
-CN3 Pinout
-Pin     Function    I/O    Pin   Function  I/O
-----------------------------------------------
- 1    Stereo L (+)  Out  |  2      TXD     Out
- 3    Stereo L (-)  Out  |  4      RXD      In
- 5    Stereo R (+)  Out  |  6      GND      -
- 7    Stereo R (-)  Out  |  8      +5V     Out
- 9      No Connection    | 10  No Connection
-
-The bottom of the PCB contains nothing significant except some connectors. One for the game cart, one for special controls
-or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
-
-
-Atomiswave cart PCB layout and game usage (revision 1.0 26/2/2011 5:59pm)
------------------------------------------
-
-Type 1 ROM Board:
-
-AM3AGB-04
-MROM PCB
-2002
-|----------------------------|
-| XC9536                     |
-|         IC18 IC17*   IC10  |
-|                            |
-|                            |
-|              IC16*   IC11  |
-|                            |
-|                            |
-||-|           IC15*   IC12  |
-|| |                         |
-|| |                         |
-|| |CN1        IC14*   IC13  |
-|| |                         |
-||-|                         |
-|----------------------------|
-Notes:
-           * - Denotes those devices are on the other side of the PCB
-         CN1 - This connector plugs into the main board.
-      XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
-               game code. This code is different for each different game.
-               The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = mask ROM
-
-               Game (sorted by code)                 Code
-               -----------------------------------------------
-               Sports Shooting USA                   AX0101F01
-               Dolphin Blue                          AX0401F01
-               Maximum Speed                         AX0501F01
-               Demolish Fist                         AX0601F01
-               Guilty Gear X Ver. 1.5                AX0801F01
-               Guilt Gear Isuka                      AX1201F01
-               Knights Of Valour Seven Spirits       AX1301F01
-               Salaryman Kintaro                     AX1401F01
-               Ranger Mission                        AX1601F01
-               Faster Than Speed                     AX1701F01
-               Rumble Fish                           AX1801F01
-               Fist Of The North Star                AX1901F01
-               Victory Furlong : Horse Racing        AX2001F01
-               King Of Fighters NEOWAVE              AX2201F01
-               Extreme Hunting                       AX2401F01
-
-        IC18 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
-               The name in the archive has been devised purely for convenience.
-               This ROM holds the main program.
-
-IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs.
-               IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
-               IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
-               IC12 - ROM 02 (or ROM 03 if 8 ROMs are populated)
-               IC13 - ROM 03 (or ROM 04 if 8 ROMs are populated)
-               IC14 - ROM 04 (or ROM 05 if 8 ROMs are populated)
-               IC15 - ROM 05 (or ROM 06 if 8 ROMs are populated)
-               IC16 - ROM 06 (or ROM 07 if 8 ROMs are populated)
-               IC17 - ROM 07 (or ROM 08 if 8 ROMs are populated)
-
-               ROM Codes
-               ---------
-                                                                               Number
-               Game (sorted by code)                 Code                      of ROMs
-               -----------------------------------------------------------------------
-               Sports Shooting USA                   AX0101M01 to AX0104M01    4
-               Dolphin Blue                          AX0401M01 to AX0405M01    5
-               Maximum Speed                         AX0501M01 to AX0505M01    5
-               Demolish Fist                         AX0601M01 to AX0607M01    7
-               Guilty Gear X Ver. 1.5                AX0801M01 to AX0807M01    7
-               Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
-               Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
-               Salaryman Kintaro                     AX1401M01 to AX1407M01    7
-               Ranger Mission                        AX1601M01 to AX1605M01    5
-               Faster Than Speed                     AX1701M01 to AX1706M01    6
-               Rumble Fish                           AX1801M01 to AX1807M01    7
-               Fist Of The North Star                AX1901M01 to AX1907M01    7
-               Victory Furlong : Horse Racing        AX2001M01 to AX2007M01    7
-               King Of Fighters NEOWAVE              AX2201M01 to AX2206M01    6
-               Extreme Hunting                       AX2401M01 to AX2406M01    6
-
-
-Type 2 ROM Board:
-
-AM3ALW-02
-MROM2 PCB
-2005
-|----------------------------|
-|     FMEM1                  |
-|     FMEM2*   MROM12        |
-|              MROM11*       |
-|                      MROM9 |
-|              MROM10  MROM8*|
-| XCR3128XL*   MROM7*        |
-|                            |
-||-|           MROM6         |
-|| |           MROM3*  MROM4 |
-|| |                   MROM5*|
-|| |CN1        MROM2         |
-|| |           MROM1*        |
-||-|                         |
-|----------------------------|
-Notes:
-           * - Denotes those devices are on the other side of the PCB
-         CN1 - This connector plugs into the main board.
-   XCR3128XL - Xilinx XCR3128XL in-system programmable 128 Macro-cell CPLD (TQFP100)
-               stamped with a game code. This code is different for each different game.
-               The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = mask ROM
-
-               Game (sorted by code)                 Code
-               -----------------------------------------------
-               Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
-               Metal Slug 6                          AX3001F01
-               The King Of Fighters XI               AX3201F01
-               Neogeo Battle Coliseum                AX3301F01
-               Rumble Fish 2                         AX3401F01
-
- FMEM1/FMEM2 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
-               The name in the archive has been devised purely for convenience.
-               This ROM holds the main program.
-               This location is wired to accept TSOP56 ROMs, however the actual chip populated
-               is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
-               are not connected to anything.
-
-       MROM* - Custom-badged 256M SSOP70 mask ROMs
-
-               ROM Codes
-               ---------
-                                                                               Number
-               Game (sorted by code)                 Code                      of ROMs
-               -----------------------------------------------------------------------
-               Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
-               Metal Slug 6                          AX3001M01 to AX3004M01    4
-               The King Of Fighters XI               AX3201M01 to AX3207M01    7
-               Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
-               Rumble Fish 2                         AX3401M01 to AX3405M01    5
-
-
-Type 3 ROM Board:
-
-This type is manufactured by Sega when Sammy merged with Sega.
-
-171-8355A
-PC BD A/W 128M FLASH
-837-14608 (sticker for Extreme Hunting 2 Tournament Edition, Sega Bass Fishing Challenge, Sega Clay Challenge)
-837-14695 (sticker for Dirty Pigskin Football)
-|----------------------------|
-| XC9536*         U16   U2*  |
-|                            |
-|J2                          |
-|                            |
-|                 U4*   U14  |
-|                            |
-|                            |
-||-|                         |
-|| |              U17   U1*  |
-|| |                         |
-|| |J1*                      |
-|| |                         |
-||-|              U3*   U15  |
-|----------------------------|
-Notes:
-           * - Denotes those parts are on the other side of the PCB
-          J1 - This connector plugs into the main board.
-          J2 - 6 pin connector for programming the XC9536 CPLD and/or the flash ROMs
-      XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
-               Sega 315-xxxx part number with a sticker over the top of it.
-               all known games on this type ROM BD have the same part# and decryption key.
-
-               Game                                  Part#      Sticker
-               ---------------------------------------------------------
-               Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
-               Dirty Pigskin Football                315-6248   -
-               Sega Bass Fishing Challenge           315-6248   -
-               Sega Bass Fishing Challenge Version A 315-6248   -
-               Sega Clay Challenge                   315-6248   -
-               Animal Basket                         VM2001F01  -
-               Block Pong-Pong                       VM2001F01  -
-               WaiWai Drive                          VM2001F01  -
-               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
-
-          U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
-               (configured as 16Mbytes x8bit or 8Mwords x16bit)
-               This ROM has no additional custom markings. The name in the archive has been devised
-               purely for convenience using the Sega 837- sticker number. The number of ROMs may vary
-               between games. So far all 8 positions have been seen populated. It's also possible all
-               positions are present when manufactured, each board is programmed to requirements and
-               depending on the total data length, some ROMs may be empty.
-
-
-Development ROM board:
-
-There are a few unreleased and many prototype game versions known to exist on this ROM board.
-Currently Rumble Fish 1, Rumble Fish 2 prototypes and Sushi Bar are dumped.
-
-PC BD SYSTEMX 3MODE FLASH Rev.B
-1111-00001402
-|--------------------------------------------|
-|    CN3                                     |
-|                                            |
-||-|           IC14 IC17 IC20 IC23           |
-|| | XC9536                                  |
-|| |                                         |
-|| |                                         |
-||CN1          IC12 IC15 IC18 IC21 IC24 IC26 |
-|| |                                         |
-|| |                                         |
-|| | XC2S30                                  |
-||-|           IC13 IC16 IC19 IC22 IC25 IC27 |
-|    17S30                                   |
-| CN2                                        |
-|--------------------------------------------|
-Notes:
-         CN1 - This connector plugs into the main board through 'PC RELAY BD SX CRTG V1' adapter.
-         CN2 - 8 pin connector
-         CN3 - 6 pin connector for programming the XC9536 CPLD
-      XC9536 - Xilinx XC9536XL in-system programmable CPLD (PLCC44), stamped JULIE_DEV on RF2 proto
-      XC2S30 - Xilinx XC2S30 Spartan-II FPGA (TQFP144), Rumble Fish 2 have printed sticker A08
-      17S30  - Xilinx 17S30APC OTP Configuration PROM, stamped SXFLS
-   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs
-
-
-Network Board
--------------
-
-This board is required for Extreme Hunting 2 Tournament Edition (and possibly some other Sega-made Atomiswave carts)
-although it doesn't need to be connected to a network or another Atomiswave unit to boot up. However it must be
-plugged into the PCB in the communication slot or the game will not go in-game. It will boot but then displays
-NETWORK BOARD ERROR if not present. Externally there's a hole for an RJ45 network cable and a slot for a
-PIC16C621/PIC16C622 PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This
-board probably acts like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
-
-837-14508R
-171-8324C
-(C) SEGA 2005
-|-----------------------------------|
-| RJ45    24LC0241* IC2       CN3   |
-|LLLL        K4S643232*       IC14  |
-|  RTL8201 LLLL                     |
-|25MHz                              |
-|       6417710          IC4S*      |
-|                        XC3S200    |
-|MAX3221        JP1     XCF01S*     |
-|CN5  33.333MHz JP2             CN2*|
-|-----------------------------------|
-Notes:
-      *        - Denotes those parts are on the other side of the PCB
-      L        - LED
-      RJ45     - RJ45 network connector
-      24LC0241 - EEPROM (SOIC8)
-      K4S643232- Samsung K4S643232 512k x 32bit x 4 banks synchronous DRAM (TSOPII-86)
-      RTL8201  - Realtek RTL8201 Single Port 10/100M Fast Ethernet IC (QFP48)
-      6417710  - Renesas HD6417710BPV SH3-DSP 32-Bit RISC Microcomputer SuperHTM RISC engine Family / SH7700 Series (BGA256)
-      XC3S200  - Xilinx Spartan XC3S200 FPGA (QFP100)
-      XCF01S   - Xilinx XCF01S In-System Programmable 1Mbit PROM for Configuration of Xilinx FPGAs (TSSOP20)
-      MAX3221  - Maxim MAX3221 3.0V to 5.5V, 250kbps, RS-232 Transceivers with Auto Shutdown (TSSOP16)
-      JP1/2    - Jumpers, both set to 1-2
-      CN2      - This connector plugs into the main board
-      CN3      - 6 pin connector
-      CN5      - 3 position connector
-      IC2      - ST M29DW324DB 32M flash ROM (TSOP48)
-      IC4S     - Spartan S29GL128N10TFIO1 128M flash ROM (TSOP56)
-      IC14     - socket for PIC16C621 mounted in a plastic plug-in case
-                 PIC Usage:
-                           Game                                   Sega Part#
-                           ---------------------------------------------------
-                           Extreme Hunting 2 Tournament Edition   317-0445-COM
-
-
-AW-NET Network Board
---------------------
-
-Sammy
-AM3AJG-01
-LAN PCB
-2003
-SAMLAN Rev: D
-|-----------------------------------|
-| RJ45                              |
-|PULSE                              |
-|        25Mz                       |
-|                                   |
-|      RTL8139CL+*           CN*    |
-|                  315-6310*        |
-|                                   |
-|       L46R                        |
-|-----------------------------------|
-Notes:
-      *          - Denotes those parts are on the other side of the PCB
-      RJ45       - RJ45 network connector
-      PULSE      - Pulse H0011 10/100 LAN Magnetics Module (SOIC16)
-      L46R       - 93C46 compatible 128x8 EEPROM (SOIC8)
-      RTL8139CL+ - Realtek RTL8139CL+ 3.3 volt Single Chip Fast Ethernet Controller with Power Management (QFP120)
-      315-6310   - Sega 315-6310 Custom IC (QFP100)
-      CN         - This connector plugs into the main board
-
-
-Gun Sub Board
--------------
-
-AM3AGT-02 GUN SUB PCB
-|------------------|
-|CN5  CN4  CN3  CN2|
-|       74HC74     |
-|                  |
-| 74HC74    7CHC74 |
-|      74HC74      |
-|                  |
-|       CN1        |
-|------------------|
-Notes:
-      CN1 - 8 pin connector joining to I/O Expansion Module (which is plugged into main board)
-      CN2 - Gun connection for player 2 trigger and optical
-      CN3 - Gun connection for player 2 pump switch
-      CN4 - Gun connection for player 1 trigger and optical
-      CN5 - Gun connection for player 1 pump switch
-
-
-Other games not dumped
-----------------------
-Miracle Stadium
-
-Cancelled, prototypes known to exists
-----------------------
-Chase 1929
-Force Five
-Kenju
-Premier Eleven
-
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/naomi.h"
 
 #include "machine/gunsense.h"
-#include "emupal.h"
+//#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1756,18 +1269,13 @@ void naomi_state::eeprom_93c46a_w(uint64_t data)
 */
 
 /*
- * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
- */
-
-
-/*
  * Naomi 1 address map
  */
 
 void naomi_state::naomi_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x001fffff).rom().region("maincpu", 0); // BIOS
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).nopw(); // BIOS
 
 	map(0x00200000, 0x00207fff).ram().share("sram");
 	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
@@ -1775,7 +1283,7 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7018, 0x005f702f).mirror(0x02000000).rw("comm_board", FUNC(m3comm_device::naomi_r), FUNC(m3comm_device::naomi_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).m(m_g2if, FUNC(dc_g2if_device::amap));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
@@ -1820,30 +1328,74 @@ void naomi_state::naomi_map(address_map &map)
 // example hookup for accessing both PVRs, to be extended to everything else.
 void naomi2_state::both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	space.write_dword(0x005f8000|offset*4,data,mem_mask);
-	space.write_dword(0x025f8000|offset*4,data,mem_mask);
+	space.write_dword(0x005f8000|offset*4, data, mem_mask);
+	space.write_dword(0x025f8000|offset*4, data, mem_mask);
+}
+
+// 315-6289 "ELAN" T&L chip registers
+// Stands between the two PVRs and mixes their output, applies T&L via commands at 0x09000000.
+// It's also responsible of enable/disable broadcast mode (i.e. writes to both PVRs)
+// and "macro tiler" config (?)
+// TODO: move to specific device once we have enough information about the inner workings
+uint32_t naomi2_state::elan_regs_r(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x00/4: // ID chip
+			// TODO: BIOS gives a black screen with this as per now
+			// It boots to NAOMI2 logo if this is zeroed, which should be a debug mode.
+			// Is it expecting an irq from the macro tiler enabling?
+			// Also BIOS attempts to write on this reg, why?
+			return 0xe1ad0000;
+
+		case 0x04/4: // REVISION
+			return 0x12; //or 0x01?
+
+		case 0x10/4: // SH4 interface control (???)
+			/* ---- -x-- enable second PVR */
+			/* ---- --x- elan has channel 2 */
+			/* ---- ---x broadcast on cs1 (?) */
+			return 6;
+
+		case 0x14/4: // SDRAM refresh register
+			return 0x2029; //default 0x1429
+
+		case 0x1c/4: // SDRAM CFG
+			return 0xa7320961; //default 0xa7320961
+
+		case 0x30/4: // Macro tiler configuration, bit 0 is enable
+			return 0;
+
+		case 0x74/4: // IRQ STAT
+			return 0;
+
+		case 0x78/4: // IRQ MASK
+			// enables 0x3f on boot
+			return 0;
+
+		default:
+			logerror("%s: ELAN read %08x\n", machine().describe_context(),offset*4);
+			break;
+	}
+
+	return 0;
+}
+
+void naomi2_state::elan_regs_w(offs_t offset, uint32_t data)
+{
+	switch(offset)
+	{
+		default:
+			logerror("%s: ELAN write %08x %08x W\n", machine().describe_context(), offset*4, data);
+			break;
+	}
 }
 
 void naomi2_state::naomi2_map(address_map &map)
 {
-	/* Area 0 */
-	map(0x00000000, 0x001fffff).rom().region("maincpu", 0); // BIOS
-
-	map(0x00200000, 0x00207fff).ram().share("sram");
-	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
-	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
-	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
-	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
+	naomi_map(map);
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
-	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi2_state::soundram_r), FUNC(naomi2_state::soundram_w));           // sound RAM (8 MB)
-
-	/* External Device */
-	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi2_state::naomi_g2bus_r));
 
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
@@ -1853,14 +1405,15 @@ void naomi2_state::naomi2_map(address_map &map)
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
-	map(0x05000000, 0x05ffffff).ram().share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x05000000, 0x05ffffff).ram().share("frameram");
 	map(0x06000000, 0x06ffffff).ram().share("textureram2");   // 64 bit access 2nd PVR RAM
-	map(0x07000000, 0x07ffffff).ram().share("frameram2");// 32 bit access 2nd PVR RAM
+	map(0x07000000, 0x07ffffff).ram().share("frameram2");   // 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
+	// TODO: writes to BOTH PVRs
+	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w));
 	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
-	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
+	map(0x08800000, 0x088000ff).rw(FUNC(naomi2_state::elan_regs_r), FUNC(naomi2_state::elan_regs_w));
 //  map(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
@@ -1868,11 +1421,12 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
+	// TODO: second PVR access for these
 	map(0x10000000, 0x107fffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
 	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
-	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory
 
 	/* Area 5 */
 	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
@@ -1890,179 +1444,12 @@ void naomi_state::naomi_port(address_map &map)
 	map(0x00, 0x0f).rw(FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
 }
 
-/*
- * Atomiswave address map, almost identical to Dreamcast
- */
-
-uint64_t atomiswave_state::aw_flash_r(offs_t offset)
-{
-	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
-			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
-}
-
-void atomiswave_state::aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	int i;
-	uint32_t addr = offset * 8;
-
-	for (i = 0; i < 8; i++)
-	{
-		if (mem_mask & ((uint64_t)0xff)<< (i*8))
-		{
-			addr += i;
-			break;
-		}
-	}
-
-	data >>= (i*8);
-
-	m_awflash->write(addr, data);
-}
-
-// TODO: don't we have a common function for this?
-inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
-{
-	int reg = offset * 2;
-
-	*shift = 0;
-
-	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
-	{
-		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
-		//machine().debug_break();
-	}
-
-	if (mem_mask == 0xffffffff00000000U)
-	{
-		reg++;
-		*shift = 32;
-	}
-
-	return reg;
-}
-
-uint64_t atomiswave_state::aw_modem_r(offs_t offset, uint64_t mem_mask)
-{
-	int reg;
-	uint64_t shift;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-
-	if (reg == 0x280/4)
-	{
-	/*
-	         0x00600280 r  0000dcba
-	             a/b - 1P/2P coin inputs (JAMMA), active low
-	             c/d - 3P/4P coin inputs (EX. IO board), active low
-
-	             (ab == 0) -> BIOS skip RAM test
-	    */
-		return 0xffffffff00000000U | (ioport("COINS")->read() & 0x0F);
-	} else
-		if (reg == 0x284/4)
-			return 0xffffffff00000000U | aw_ctrl_type;
-
-
-	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
-	return 0;
-}
-
-void atomiswave_state::aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	int reg;
-	uint64_t shift;
-	uint32_t dat;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (uint32_t)(data >> shift);
-	if (reg == 0x284/4)
-	{
-		aw_ctrl_type = dat & 0xF0;
-	}
-	/*
-	        0x00600284 rw ddcc0000
-	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
-	        0 - regular Atomiswave controller
-	        1 - DC lightgun
-	        2,3 - DC mouse/trackball
-	        TODO: hook this then MAME have such devices emulated
-
-	        0x00600288 rw 0000dcba
-	            a - 1P coin counter
-	            b - 2P coin counter
-	            c - 1P coin lockout
-	            d - 2P coin lockout
-
-	        0x0060028C rw POUT CN304 (EX. IO board)
-	*/
-
-	osd_printf_verbose("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
-}
-
-void atomiswave_state::aw_map(address_map &map)
-{
-	/* Area 0 */
-	map(0x00000000, 0x0001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w));
-	map(0xa0000000, 0xa001ffff).rw(FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w));
-
-	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
-	map(0x005f6800, 0x005f69ff).rw(FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
-	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
-	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
-	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).rw(FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
-	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
-	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
-	map(0x00700000, 0x00707fff).rw(FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
-	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::soundram_r), FUNC(atomiswave_state::soundram_w));           // sound RAM (8 MB)
-
-	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
-	map(0x05000000, 0x057fffff).ram().mirror(0x00800000).share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
-
-	/* Area 2*/
-	map(0x08000000, 0x0bffffff).noprw(); // 'Unassigned'
-
-	/* Area 3 */
-	map(0x0c000000, 0x0cffffff).ram().share("dc_ram");
-	map(0x0d000000, 0x0dffffff).ram().share("dc_ram"); // extra ram on Naomi (mirror on DC)
-	map(0x0e000000, 0x0effffff).ram().share("dc_ram"); // mirror
-	map(0x0f000000, 0x0fffffff).ram().share("dc_ram"); // mirror
-
-	map(0x8c000000, 0x8cffffff).ram().share("dc_ram"); // RAM access through cache
-	map(0x8d000000, 0x8dffffff).ram().share("dc_ram"); // RAM access through cache
-
-	/* Area 4 - half the texture memory, like dreamcast, not naomi */
-	map(0x10000000, 0x107fffff).mirror(0x02000000).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
-	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
-	map(0x11000000, 0x117fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)).mirror(0x00800000);  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
-	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	map(0x13000000, 0x137fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)).mirror(0x00800000); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
-
-
-	/* Area 5 */
-	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
-
-	/* Area 6 */
-	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
-
-	/* Area 7 */
-	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
-}
-
-void atomiswave_state::aw_port(address_map &map)
-{
-//  ???
-}
-
 void dc_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x007fffff).rw(FUNC(naomi_state::soundram_r), FUNC(naomi_state::soundram_w));                /* shared with SH-4 */
 	map(0x00800000, 0x00807fff).rw(FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
+//  map(0x00810000, 0x0081000b) accessed by spkrbtl, RTC? AICA mirror?
 }
 
 void dc_state::aica_map(address_map &map)
@@ -2074,16 +1461,6 @@ void dc_state::aica_map(address_map &map)
 /*
 * Input ports
 */
-
-INPUT_PORTS_START( naomi_debug )
-	PORT_START("MAMEDEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
 	PORT_START("MIE.3")
@@ -2106,14 +1483,14 @@ static INPUT_PORTS_START( naomi_mie )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	// TODO: truly another service button or just left-over?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
 static INPUT_PORTS_START( naomi )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2147,7 +1524,7 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x400f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	/* Dummy so we can easily get the analog ch # */
+	/* Dummy high bytes so we can easily get the analog ch # */
 	PORT_START("A0")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2196,12 +1573,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotd2 )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	// TODO: reloads should trigger when shoot outside of the screen
+	// (in our case, on border area)
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger") PORT_PLAYER(1)
@@ -2233,7 +1611,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crzytaxi )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2263,7 +1640,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dybbnao )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2306,9 +1682,9 @@ static INPUT_PORTS_START( dybbnao )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// TODO: optional digital inputs (in service mode)
 static INPUT_PORTS_START( zombrvn )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2347,7 +1723,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jambo )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2377,7 +1752,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( 18wheelr )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2412,7 +1786,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpilota )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
+
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2421,43 +1799,51 @@ static INPUT_PORTS_START( alpilota )
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Landing Gear Switch") PORT_TOGGLE
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("View Change")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Flap Switch") PORT_TOGGLE
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("View Change")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Flap Switch") PORT_TOGGLE
 	PORT_BIT( 0x7c7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	// game offers two modes: training mode and flight mode.
+	// In training mode toggle switches and thrust levers are disabled and controlled automatically
+	// by the game: those stands on the right of control wheel and can be seen in-game by selecting flight mode.
+	// Below the Control Wheel stands the Rudder Pedal: volume setting suggests having a neutral position
+	// and most likely controllable by both feet on real cab.
+	// TODO: volume min/max default settings in service mode are quite diverging, needs user setup for now
+	// 0x41-0x78-0xaf for control wheel aileron
+	// 0x26-0x84-0xe1 for control wheel elevator
+	// 0x36-0x80-0xce for rudder pedal
+	// 0x31-0xca for thrust lever L
+	// 0x2b-0xbe for thrust level R
+	// (are those even valid?)
 	PORT_START("A0")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Elevator Wheel")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Control Wheel (Elevator)")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A1")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Aileron Wheel") PORT_PLAYER(2)
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Control Wheel (Aileron)")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A3")
-	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
+	PORT_BIT( 0xff00, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A4")
-	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever L")
+	PORT_BIT( 0xff00, 0x8000, IPT_POSITIONAL_V ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_NAME("Thrust Lever L") PORT_POSITIONS(256)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A5")
-	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever R") PORT_PLAYER(2)
+	PORT_BIT( 0xff00, 0x8000, IPT_POSITIONAL_V ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_NAME("Thrust Lever R") PORT_POSITIONS(256)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sstrkfgt )
-	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
+	// minor modifications, definitely derived I/O design
+	PORT_INCLUDE( alpilota )
 
-	PORT_START("TILT")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("P1")
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Missile Button")
@@ -2465,30 +1851,27 @@ static INPUT_PORTS_START( sstrkfgt )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("View Change")
 	PORT_BIT( 0x7c3f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P2")
+	// TODO: again expects different min/maxes as default
+	// 0x40-0x80-0xc0 for control wheel
+	// 0x50-0x80-0xb0 for rudder pedal
+	// 0x40-0x90-0xd0 for thrust lever
+	// Tested lever with a PORT_MINMAX of 0x4000, 0xd000: it can cause a COM. ERROR too ...
+	// Regardless this has a neutral compared to alpilot correlated thrusts,
+	// and tutorial shows it as a regular 2-way ad stick that autocenters.
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0000, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Thrust Lever")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("A4")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("A0")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Elevator Wheel")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A1")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Aileron Wheel") PORT_PLAYER(2)
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A2")
-	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A3")
-	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("A5")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( crackndj )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2508,7 +1891,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( monkeyba )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2532,7 +1914,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( shaktamb )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -2577,9 +1958,27 @@ INPUT_PORTS_END
 
 
 /* JVS mahjong panel */
+
+INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
+{
+	m_mp_mux = newval;
+}
+
+CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+			retval |= m_mp[port].read_safe(0);
+	}
+	return retval;
+}
+
 static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, 0)
@@ -2635,15 +2034,62 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 INPUT_PORTS_END
 
+CUSTOM_INPUT_MEMBER(naomi_state::suchie3_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+		{
+			// KEY1 and KEY5 are swapped
+			// FIXME: should really be mapped in input struct instead
+			if (port == 0)
+				retval |= m_mp[4].read_safe(0);
+			else if (port == 4)
+				retval |= m_mp[0].read_safe(0);
+			else
+				retval |= m_mp[port].read_safe(0);
+		}
+	}
+	return retval;
+}
+
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
 
+template <int P> CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		uint32_t row;
+
+		// read the current row
+		row = ((P == 0) ? m_p1_kb : m_p2_kb)[i]->read();
+
+		// if anything is pressed, convert the 32-bit raw value to keycode
+		if (row != 0)
+		{
+			for (int j = 0; j < 32; j++)
+			{
+				if(row & 1 << j)
+				{
+					// base value x20
+					return i * 0x20 + j;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
 static INPUT_PORTS_START( naomi_kb )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("P1.M")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("P1 Left Control") PORT_PLAYER(1)
@@ -2660,13 +2106,13 @@ static INPUT_PORTS_START( naomi_kb )
 	// x--- ---- shift
 	// -x-- ---- power
 	// --x- ---- kana
-	// ---x x--- reserved
+	// ---x x--- <reserved>
 	// ---- -x-- scroll lock
 	// ---- --x- caps lock
 	// ---- ---x num lock
 
 	PORT_START("P1.KC1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r<0>)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2787,61 +2233,27 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P1 Kanji Muhenkan")
 	PORT_BIT(0xfffff000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	// TODO: keyboard for player 2
+	// p2 input defs
+
+	// At the time of this writing a keyboard PORT_PLAYER(2) with PORT_CODE will default map to
+	// p1 keyboard, no matter if -multikeyboard is enabled or not.
+	// In order to avoid to control both ends with one keyboard as default we just intentionally
+	// default with everything unmapped on p2 side for the time being ...
 	PORT_START("P2.M")
-	PORT_DIPNAME( 0x01, 0x00, "P2.ROW0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_LCONTROL)*/ PORT_NAME("P2 Left Control") PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_LSHIFT)*/   PORT_NAME("P2 Left Shift") PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_LALT)*/     PORT_NAME("P2 Left Alt") PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_LWIN)*/     PORT_NAME("P2 S1") PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_RCONTROL)*/ PORT_NAME("P2 Right Control") PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_RSHIFT)*/   PORT_NAME("P2 Right Shift") PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_RALT)*/     PORT_NAME("P2 Right Alt") PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) /*PORT_CODE(KEYCODE_RWIN)*/     PORT_NAME("P2 S2") PORT_PLAYER(2)
 
 	PORT_START("P2.LD")
-	// TODO: same as above
+	// TODO: LED information, same as above
 
 	PORT_START("P2.KC1")
-	PORT_DIPNAME( 0x01, 0x00, "P2.ROW2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r<1>)
 
 	PORT_START("P2.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2857,111 +2269,110 @@ static INPUT_PORTS_START( naomi_kb )
 
 	PORT_START("P2.KC6")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
 
-// Atomiswave - inputs are read as standard Dreamcast controllers.
-// Controller bit patterns:
-//
-// SHOT3   (1<<0)
-// SHOT2   (1<<1)
-// SHOT1   (1<<2)
-// START   (1<<3)
-// UP      (1<<4)
-// DOWN    (1<<5)
-// LEFT    (1<<6)
-// RIGHT   (1<<7)
-// SHOT5   (1<<9)
-// SHOT4   (1<<10)
-// SERVICE (1<<13)
-// TEST    (1<<14)
+	PORT_START("P2.ROW0")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED ) // no operation
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // rollover error
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // POST error
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Undefined error
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_A)*/ PORT_NAME("P2 a / A")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_B)*/ PORT_NAME("P2 b / B")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_C)*/ PORT_NAME("P2 c / C")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_D)*/ PORT_NAME("P2 d / D")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_E)*/ PORT_NAME("P2 e / E")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F)*/ PORT_NAME("P2 f / F")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_G)*/ PORT_NAME("P2 g / G")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_H)*/ PORT_NAME("P2 h / H")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_I)*/ PORT_NAME("P2 i / i")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_J)*/ PORT_NAME("P2 j / J")
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_K)*/ PORT_NAME("P2 k / K")
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_L)*/ PORT_NAME("P2 l / L")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_M)*/ PORT_NAME("P2 m / M")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_N)*/ PORT_NAME("P2 n / N")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_O)*/ PORT_NAME("P2 o / O")
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_P)*/ PORT_NAME("P2 p / P")
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_Q)*/ PORT_NAME("P2 q / Q")
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_R)*/ PORT_NAME("P2 r / R")
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_S)*/ PORT_NAME("P2 s / S")
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_T)*/ PORT_NAME("P2 t / T")
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_U)*/ PORT_NAME("P2 u / U")
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_V)*/ PORT_NAME("P2 v / V")
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_W)*/ PORT_NAME("P2 w / W")
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_X)*/ PORT_NAME("P2 x / X")
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_Y)*/ PORT_NAME("P2 y / Y")
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_Z)*/ PORT_NAME("P2 z / Z")
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_1)*/ PORT_NAME("P2 1 / !")
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_2)*/ PORT_NAME("P2 2 / \"")
 
-// 2 joysticks variant
-static INPUT_PORTS_START( aw2c )
-	PORT_START("P1.0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_START("P2.ROW1")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_3)*/ PORT_NAME("P2 3 / #")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_4)*/ PORT_NAME("P2 4 / $")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_5)*/ PORT_NAME("P2 5 / %")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_6)*/ PORT_NAME("P2 6 / &")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_7)*/ PORT_NAME("P2 7 / '")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_8)*/ PORT_NAME("P2 8 / (")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_9)*/ PORT_NAME("P2 9 / )")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_0)*/ PORT_NAME("P2 0 / ~")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_ENTER)*/ PORT_NAME("P2 Enter")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_ESC)*/ PORT_NAME("P2 ESC")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_BACKSPACE)*/ PORT_NAME("P2 BackSpace")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 TAB")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_SPACE)*/ PORT_NAME("P2 Space")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_MINUS)*/ PORT_NAME("P2 - / =")
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 ^ / ¯")
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 @ / `")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_OPENBRACE)*/ PORT_NAME("P2 [ / {")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_UNUSED ) // unused for jp keyboard
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_CLOSEBRACE)*/ PORT_NAME("P2 ] / }")
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 ; / +")
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 : / *")
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Hankaku/Zenkaku")
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 , / <")
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 . / >")
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2  / / ?")
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_CAPSLOCK)*/ PORT_NAME("P2 Caps Lock")
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F1)*/ PORT_NAME("P2 F1")
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F2)*/ PORT_NAME("P2 F2")
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F3)*/ PORT_NAME("P2 F3")
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F4)*/ PORT_NAME("P2 F4")
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F5)*/ PORT_NAME("P2 F5")
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F6)*/ PORT_NAME("P2 F6")
 
-	PORT_START("P1.1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_START("P2.ROW2")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F7)*/ PORT_NAME("P2 F7")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F8)*/ PORT_NAME("P2 F8")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F9)*/ PORT_NAME("P2 F9")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F10)*/ PORT_NAME("P2 F10")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F11)*/ PORT_NAME("P2 F11")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F12)*/ PORT_NAME("P2 F12")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Print Screen")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Scroll Lock")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Pause")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_INSERT)*/ PORT_NAME("P2 Insert")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_HOME)*/ PORT_NAME("P2 Home")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Page Up")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Delete Forward")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 End")
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Page Down")
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_RIGHT)*/ PORT_NAME("P2 Right")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_LEFT)*/ PORT_NAME("P2 Left")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_DOWN)*/ PORT_NAME("P2 Down")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_UP)*/ PORT_NAME("P2 Up")
+	PORT_BIT(0xfff80000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P2.0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_START("P2.ROW3")
+	PORT_BIT(0x0000001f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_F1)*/ PORT_NAME("P2 S3")
+	PORT_BIT(0xffffffc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P2.1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0C, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( naomi_debug )
-INPUT_PORTS_END
-
-// Single-player wheel variant
-static INPUT_PORTS_START( aw1w )
-	PORT_START("P1.0")
-	PORT_BIT( 0xf1, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-
-	PORT_START("P1.1")
-	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P2.A0") /* steering */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-
-	PORT_START("P2.A1") /* gas pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
-
-	PORT_START("P2.A2") /* brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
-
-	PORT_START("P2.A3") /* steering */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-
-	PORT_START("P2.A4") /* gas pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
-
-	PORT_START("P2.A5") /* brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0C, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( naomi_debug )
+	PORT_START("P2.ROW4")
+	PORT_BIT(0x0000007f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Kanji \\ / _")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Kanji Katakana / Hiragana")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Kanji \xC2\xA5 / |")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Kanji Henkan")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(2) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P2 Kanji Muhenkan")
+	PORT_BIT(0xfffff000, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(naomi_state,naomi)
@@ -2978,6 +2389,7 @@ WRITE_LINE_MEMBER(naomi_state::external_reset)
 	// it will probably need to be adjusted
 	m_aica->reset();
 	m_soundcpu->reset();
+	m_g2if->reset();
 }
 
 /*
@@ -3002,6 +2414,8 @@ void dc_state::naomi_aw_base(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
+	system_bus_config(config, "maincpu");
+
 	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);
 
@@ -3010,9 +2424,10 @@ void dc_state::naomi_aw_base(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480); /* TODO: where does pclk actually come from? */
+	// TODO: hook up PVR SPG pclk source
+	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
-	PALETTE(config, "palette").set_entries(0x1000);
+
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -3232,45 +2647,8 @@ void naomi2_state::naomi2m4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
 }
 
-/*
- * Atomiswave
- */
-
-void atomiswave_state::aw_base(machine_config &config)
-{
-	naomi_aw_base(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
-	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
-	MACRONIX_29L001MC(config, "awflash");
-	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0));
-	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
-
-	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
-	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-}
-
-void atomiswave_state::aw1c(machine_config &config)
-{
-	aw_base(config);
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
-	// TODO: isn't it supposed to be just one controller?
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
-}
-
-void atomiswave_state::aw2c(machine_config &config)
-{
-	aw_base(config);
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
-}
-
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
+	ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
@@ -3417,8 +2795,8 @@ ON   ON   OFF  Korea
 OFF  OFF  ON   Australia
 
 */
-// game specific bios roms quite clearly don't belong in here.
-// Japan bios is default, because most games require it.
+// game specific BIOS roms quite clearly don't belong in here.
+// Japan BIOS is default, because most games require it.
 #define NAOMI_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0",   "epr-21576h (Japan)" ) \
@@ -3636,16 +3014,6 @@ Region byte encoding is as follows:
    fpr-24363.ic48 - BOOT ROM from Sega 837-14624R PCB, in comparison with Sammy's BOOT contain minor code change to keep video output disabled during Sammy logo display routine.
                     Only last 128KB of whole 512KB ROM actually used (2 high address pins tied to Vcc).
 */
-#define AW_BIOS \
-	ROM_REGION64_LE( 0x200000, "awflash", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Sammy BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "Sega BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "fpr-24363.ic48", 0x000000, 0x020000, CRC(82a105f0) SHA1(5128fe2ddcced77332bdcab691c09958051fa564) ) \
-	ROM_CONTINUE( 0x000000, 0x020000 ) \
-	ROM_CONTINUE( 0x000000, 0x020000 ) \
-	ROM_CONTINUE( 0x000000, 0x020000 )
 
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
@@ -3707,13 +3075,6 @@ ROM_START( naomi2 )
 
 	ROM_REGION( 0x8400000, "rom_board", ROMREGION_ERASE)
 ROM_END
-
-ROM_START( awbios )
-	AW_BIOS
-
-	ROM_REGION( 0x8400000, "rom_board", ROMREGION_ERASE)
-ROM_END
-
 
 /**********************************************
  *
@@ -11041,692 +10402,186 @@ ROM_START( wccf420e )
 	ROM_LOAD("317-0456-exp.pic", 0x00, 0x4000, CRC(fb7dd592) SHA1(25e4927c83afc7ae26092ec192c40588a74a39b0) )
 ROM_END
 
-/**********************************************
- *
- * Atomiswave cart defines
- *
- *********************************************/
-
-// note: games with AW-NET features, i.e. NGBC or KOF NW, have "CUSTOMER ID" data (shown in NETWORK SETTINGS) in ROM @ 7FE000 (not encrypted, 8 bytes of data followed by 2 bytes of bytesumm)
-// EN cartridges have this area empty (FF-filled), i.e. AW-NET features not used.
-// JP cartridges have it filled with unique ID, which also means dumps of several JP cartridges will differ by this few bytes.
-
-void atomiswave_state::init_atomiswave()
+uint8_t naomi_state::asciihex_to_dec(uint8_t in)
 {
-	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
-
-	// patch out long startup delay
-	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffffU) | (uint64_t)0x0009<<48;
-
-	aw_ctrl_type = 0;
-
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
-}
-
-/*
- ALL.Net board
- -------------
- Block diagram:
-                       GPIO Port A - Jumpers, LEDs
-             PIC16     GPIO Port B - I2C EEPROM
-              |        |
-  G2 Bus <-> FPGA <-> SH-3 <-> Ethernet PHY <-> Ethernet
-                       |
-                       |--- boot flash ROM 4MB
-                       |--- SDRAM 8MB
-                       |--- data buffer flash ROM 16MB
-
- SH-3 external address space
-  00000000 - 003fffff boot flash ROM (IC2)
-  0c000000 - 0c7fffff SDRAM
-  10000000 - 10ffffff data buffer flash ROM (IC4)
-  16000000 rw FPGA_INT_OUT  interrupt to host, bit 0 active low
-  16000004 rw FPGA_INT_IN   interrupt from host (SH-3 IRQ0 line), bit 0 active low
-  16000008 rw FPGA_INT_MASK enable interrupt from host, bit 0 active low
-  1600000c rw FPGA_READY    bit 0 active high
-  16000010 r  FPGA_REVISION 8bit value
-  16002000 - 16007fff shared RAM (FPGA internal)
-
- SH-3 GPIO PortA bits
-  2-3 - jumpers x2 (inputs, active low)
-  4-7 - LEDs x4 (outputs, active low)
-
- SH-3 GPIO PortB bits (24LC024 I2C EEPROM)
-  0 - I2C SCL
-  6 - unknown, set to output 1
-  7 - I2C SDA
-
- SH-4 address space
-  01000000 r  ID "G2IFSOJ AM"
-  01000020  w interrupt to net board, bit 0 active low
-  01000024  w interrupt from net board (HOLLY EXT IRQ line), bit 0 active low
-  01000028  w enable interrupt from net board, bit 0 active low
-  0100002c  w net board reset?, bit 0 active high
-  01000030 r  FPGA_READY?
-  01000100 - 01000114 protection registers, probably mirror of 010000xx
-  01010000 - 01016000 shared RAM (FPGA internal)
-
-  protection registers (16bit):
-  00-09 r  ID mirror? (unused)
-  0a    r  some ID? value (unused)
-  0c     w RNG seed?, game write here random value during init
-  0e     w data offset/index (0-3 in xtrmhnt2)
-  10    r  data read, xtrmhnt2 expecting: 1f9f, 1f03, 1f1c, 1f57
-  12    rw control reg?, write 0001 after offset set, wait for bit1=1 before data read
-  14    rw PIC detect/init reg, game check if bit0=1 (probably means if PIC present), then write RNG register, then write 0003, then wait for bit2=1 (probably means PIC initialised OK)
-*/
-
-uint64_t atomiswave_state::xtrmhnt2_hack_r()
-{
-	// disable ALL.Net board check
-	if (m_maincpu->pc() == 0xc03cb30)
+	if (in>=0x30 && in<=0x39)
 	{
-		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
-		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
-		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
-		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
+		return in - 0x30;
 	}
-	if (m_maincpu->pc() == 0xc108240)
-		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
-	return 0;
+	else
+	if (in>=0x41 && in<=0x46)
+	{
+		return in - 0x37;
+	}
+	/*
+	else
+	if (in>=0x61 && in<=0x66)
+	{
+	    return in - 0x57;
+	}
+	*/
+	else
+	{
+		fatalerror("unexpected value in asciihex_to_dec\n");
+	}
 }
 
-void atomiswave_state::init_xtrmhnt2()
+// development helper function
+void naomi_state::create_pic_from_retdat()
 {
-	init_atomiswave();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64smo_delegate(*this, FUNC(atomiswave_state::xtrmhnt2_hack_r)));
+	{
+		memory_region * rgn_hexregion = memregion("pichex");
+		memory_region * rgn_retregion = memregion("picreturn");
+		memory_region * rgn_newregion = memregion("pic");
+		int outcount = 0;
+
+		if (rgn_hexregion && rgn_newregion)
+		{
+			uint8_t* hexregion = rgn_hexregion->base();
+			uint8_t* newregion = rgn_newregion->base();
+
+
+			int hexoffs = 0;
+			int line;
+
+			hexoffs += 0x11; // skip first line  // :020000040000FA
+
+			for (line=0;line<0x200;line++)
+			{
+				int offs2;
+
+				hexoffs+= 0x1; // skip :
+				hexoffs+= 0x8; // skip line #  (:20xxxxxx incrementing in 0x2000)
+
+				for (offs2=0;offs2<0x20;offs2++)
+				{
+					uint8_t ascii1 = hexregion[hexoffs+0];
+					uint8_t ascii2 = hexregion[hexoffs+1];
+					uint8_t dec1 = asciihex_to_dec(ascii1);
+					uint8_t dec2 = asciihex_to_dec(ascii2);
+					uint8_t val = dec1 << 4 | dec2;
+
+					//printf("%02x%02x", ascii1, ascii2);
+
+					printf("%02x", val);
+
+					newregion[outcount] = val;
+
+					hexoffs+=2;
+					outcount++;
+				}
+
+				hexoffs+=0x4; // skip running checksum + newline
+
+				printf("\n");
+			}
+
+			if (rgn_retregion && rgn_newregion)
+			{
+				uint8_t* retregion = rgn_retregion->base();
+				uint8_t* newregion = rgn_newregion->base();
+
+				int i;
+				printf("string 1 (key1)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x780+i*2], retregion[0x31+i]);
+
+					newregion[0x780+i*2] = retregion[0x31+i]; // patch with extracted data
+				}
+
+				printf("string 2 (key2)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7a0+i*2], retregion[0x29+i]);
+
+					newregion[0x7a0+i*2] = retregion[0x29+i]; // patch with extracted data
+				}
+
+				printf("string 3 (filename)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7c0+i*2], retregion[0x21+i]);
+
+					newregion[0x7c0+i*2] = retregion[0x21+i]; // patch with extracted data
+				}
+
+				printf("string 4 (filename?)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7e0+i*2], retregion[0x19+i]);
+
+					newregion[0x7e0+i*2] = retregion[0x19+i]; // patch with extracted data
+				}
+			}
+
+			if (rgn_newregion)
+			{
+				uint8_t* newregion = rgn_newregion->base();
+
+				FILE *fp;
+				char filename[256];
+				sprintf(filename,"picbin_%s", machine().system().name);
+				fp=fopen(filename, "w+b");
+				if (fp)
+				{
+					fwrite(newregion, outcount, 1, fp);
+					fclose(fp);
+				}
+
+				printf("wrote %04x bytes\n", outcount);
+			}
+
+			// hex dumps end with
+			//:10400000000000000000000000000000000082002E
+			//:00000001FF
+		}
+	}
 }
 
-ROM_START( fotns )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1901p01.ic18", 0x0000000, 0x0800000,  CRC(a06998b0) SHA1(d617691db5170f6db176e40fc732966d523fd8cf) )
-	ROM_LOAD( "ax1901m01.ic11", 0x1000000, 0x1000000,  CRC(ff5a1642) SHA1(49cefcce173f9a811fe9c0c07bee53aeba2bc3a8) )
-	ROM_LOAD( "ax1902m01.ic12", 0x2000000, 0x1000000,  CRC(d9aae8a9) SHA1(bf87034088be0847b6e297b7665e0ea4d8cba631) )
-	ROM_LOAD( "ax1903m01.ic13", 0x3000000, 0x1000000,  CRC(1711b23d) SHA1(ab628b2ec678839c75245e245297818ef1592d3b) )
-	ROM_LOAD( "ax1904m01.ic14", 0x4000000, 0x1000000,  CRC(443bfb26) SHA1(6f7751afa0ca55dd0679758b27bed92b31c1b050) )
-	ROM_LOAD( "ax1905m01.ic15", 0x5000000, 0x1000000,  CRC(eb1cada0) SHA1(459d21d622c72606f1d3095e8a25b6c4adccf8ab) )
-	ROM_LOAD( "ax1906m01.ic16", 0x6000000, 0x1000000,  CRC(fe6da168) SHA1(d4ab6443383469bb5a4337005de917627a2e21cc) )
-	ROM_LOAD( "ax1907m01.ic17", 0x7000000, 0x1000000,  CRC(9d3a0520) SHA1(78583fd171b34439f77a04a97ebe3c9d1bab61cc) )
-
-	ROM_PARAMETER(":rom_board:key", "c2") // ax1901f01
-ROM_END
-
-ROM_START( rangrmsn )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1601p01.ic18", 0x0000000, 0x0800000, CRC(00a74fbb) SHA1(57cc1eedd22d1f553956a825e69a597309ee2bef) )
-	ROM_LOAD( "ax1601m01.ic11", 0x1000000, 0x1000000, CRC(f34eed33) SHA1(1c171fb8aa95877f81ed78652d4a9ff80f7713ff) )
-	ROM_LOAD( "ax1602m01.ic12", 0x2000000, 0x1000000, CRC(a7d59efb) SHA1(a40938ce1399babefc8cf02f579a86cf08e211ef) )
-	ROM_LOAD( "ax1603m01.ic13", 0x3000000, 0x1000000, CRC(7c0aa241) SHA1(3e0e5ff3307dcfa52998fb9b4b14bf54bd056a99) )
-	ROM_LOAD( "ax1604m01.ic14", 0x4000000, 0x1000000, CRC(d2369144) SHA1(da1eae9957d27d1682c4191780cf51b32dfe6659) )
-	ROM_LOAD( "ax1605m01.ic15", 0x5000000, 0x1000000, CRC(0c11c1f9) SHA1(0585db60618c5b97f9b7c203baf7e5ac90883ca6) )
-
-	ROM_PARAMETER(":rom_board:key", "88") // ax1601f01
-ROM_END
-
-ROM_START( sprtshot )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax0101p01.ic18", 0x0000000, 0x0800000, CRC(b3642b5d) SHA1(85eabd9551aefb825ae8eb6422092fb5a58d60f6) )
-	ROM_LOAD( "ax0101m01.ic11", 0x1000000, 0x1000000, CRC(1e39184d) SHA1(663e0cb9f43a0f89d9841e04b3d009f6c5e88d5e) )
-	ROM_LOAD( "ax0102m01.ic12", 0x2000000, 0x1000000, CRC(700764d1) SHA1(310f1606f7bbed1012c119f1ef5d89d231d8489e) )
-	ROM_LOAD( "ax0103m01.ic13", 0x3000000, 0x1000000, CRC(6144e7a8) SHA1(4d4341082f008dfd93ef5bf32a44c80869ef02a8) )
-	ROM_LOAD( "ax0104m01.ic14", 0x4000000, 0x1000000, CRC(ccb72150) SHA1(a1032d321c27f9ff43da41f20b8687bf1958ddc9) )
-
-	ROM_PARAMETER(":rom_board:key", "64") // ax0101f01
-ROM_END
-
-ROM_START( xtrmhunt )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2401p01.ic18", 0x0000000, 0x0800000,  CRC(8e2a11f5) SHA1(b5106314fb8d4483254e83ac3982039bb60a78e8) )
-	ROM_LOAD( "ax2401m01.ic11", 0x1000000, 0x1000000,  CRC(76dbc286) SHA1(8f36ca94b8e67c76e0f90b21debc5ac7890f0da1) )
-	ROM_LOAD( "ax2402m01.ic12", 0x2000000, 0x1000000,  CRC(cd590ea2) SHA1(ee5e38bf68e95da665be478ebba9cc5ffed52bb7) )
-	ROM_LOAD( "ax2403m01.ic13", 0x3000000, 0x1000000,  CRC(06f62eb5) SHA1(f7e8d1dda6bb59ca2bc7cfa1105889b9e8e6d55d) )
-	ROM_LOAD( "ax2404m01.ic14", 0x4000000, 0x1000000,  CRC(759ef5cb) SHA1(27ac2d12c6fb358b3d631c017c7b693e5ad95fd7) )
-	ROM_LOAD( "ax2405m01.ic15", 0x5000000, 0x1000000,  CRC(940d77f1) SHA1(eefdfcb92873032dc7d9ff9310bf5ed715c8bf4f) )
-	ROM_LOAD( "ax2406m01.ic16", 0x6000000, 0x1000000,  CRC(cbcf2c5d) SHA1(61362fabcbb3bfc01c996748a7ca65f8a0e02f2f) )
-
-	ROM_PARAMETER(":rom_board:key", "e4") // ax2401f01
-ROM_END
-
-ROM_START( xtrmhnt2 )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "610-0752.u3",  0x0000000, 0x1000000, CRC(bab6182e) SHA1(4d25256c81941316887cbb4524a203922f5b7104) )
-	ROM_LOAD( "610-0752.u1",  0x1000000, 0x1000000, CRC(3086bc47) SHA1(eb7b04db90d296985528f0cfdd4545f184c40b64) )
-	ROM_LOAD( "610-0752.u4",  0x2000000, 0x1000000, CRC(9787f145) SHA1(8445ede0477f70fbdc113810b80356945ce498d2) )
-	ROM_LOAD( "610-0752.u2",  0x3000000, 0x1000000, CRC(d3a88b31) SHA1(ccf14367e4e7efbc2cc835f3b001fd6d64302a5e) )
-	ROM_LOAD( "610-0752.u15", 0x4000000, 0x1000000, CRC(864a6342) SHA1(fb97532d5dd00f8520fdaf68dfcd1ea627bdf90a) )
-	ROM_LOAD( "610-0752.u17", 0x5000000, 0x1000000, CRC(a79fb1fa) SHA1(f75c5b574fd79677b926c595b369e95605a3c848) )
-	ROM_LOAD( "610-0752.u14", 0x6000000, 0x1000000, CRC(ce83bcc7) SHA1(e2d324a5a7eacbec7b0df9a4b9e276521bb9ab80) )
-	ROM_LOAD( "610-0752.u16", 0x7000000, 0x1000000, CRC(8ac71c76) SHA1(080e41e633bf082fc536781541c6031d1ac81939) )
-
-	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
-
-	ROM_REGION( 0x1400000, "network", 0)    // network board
-	ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )
-	ROM_LOAD( "flash128.ic4s", 0x400000, 0x1000000, CRC(866ed675) SHA1(2c4c06935b7ab1876e640cede51713b841833567) )
-ROM_END
-
-// Sammy AM3AHC-01 type board
-// Build:Jan 24 2005 14:12:29
-ROM_START( anmlbskt )
-	AW_BIOS
-
-	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "vm2001f01.u3",  0x0000000, 0x800000, CRC(4fb33380) SHA1(9070990515544e6e9a1d24b1e0597cdea926a4c9) )
-	// U1 Populated, Empty
-	ROM_LOAD( "vm2001f01.u4",  0x1000000, 0x800000, CRC(7cb2e7c3) SHA1(8b4e46cf19fbc1d613af75c52faebefb2776280b) )
-	ROM_LOAD( "vm2001f01.u2",  0x1800000, 0x800000, CRC(386070a1) SHA1(bf46980ea822b4cfe67c622f0104bf793031f4ad) )
-	ROM_LOAD( "vm2001f01.u15", 0x2000000, 0x800000, CRC(2bb1be28) SHA1(fda7967d6c0341a608c52087ae3d461554760435) ) // data not belongs to this game, possible some other game data leftovers
-	// U17 Populated, Empty
-	// U14 Populated, Empty
-	// U16 Populated, Empty
-
-	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
-ROM_END
-
-// no case, Sega 171-8355A type board, stickers: VM20-6101-1 V20T0069
-// Build:Jan 19 2005 13:09:07
-ROM_START( anmlbskta )
-	AW_BIOS
-
-	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "u3",  0x0000000, 0x1000000, CRC(cd082af3) SHA1(d0bcce79fc9bdce04ebfe57fe8b5f7c59ef5fdf3) )
-	ROM_LOAD( "u1",  0x1000000, 0x1000000, CRC(4a2a01d3) SHA1(20d98b137efec539451c0573b2928c3a92be5743) ) // identical to parent set U4+U2
-	ROM_LOAD( "u4",  0x2000000, 0x1000000, CRC(646e9773) SHA1(dd081a9a42edca956f96124545772d4687ca2113) ) // data not belongs to this game, more looks like random trash
-	ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // data not belongs to this game, more looks like random trash
-	// U14-U17 not populated
-
-	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
-ROM_END
-
-// game have 2 sets of graphics switched via "LOCATION" setting: SC (Shopping Center) kids oriented, and NORMAL
-// since this version SC by default, possible it is special SC ver and there also was earlier regular game version
-// no case, Sega 171-8355A type board, stickers: VM20-6101-1 V20T0004
-ROM_START( blokpong )
-	AW_BIOS
-
-	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "u3",  0x0000000, 0x1000000, CRC(debaf8bd) SHA1(8f007e48828697ff7371998f04b2fdd84329fa22) )
-	ROM_LOAD( "u1",  0x1000000, 0x1000000, CRC(ca097a3f) SHA1(280fc0c9c36fc988b2ab57c229bbec760d09d5eb) )
-	ROM_LOAD( "u4",  0x2000000, 0x1000000, CRC(d235dd29) SHA1(bdd2318a7975fd985b4731700e290a4d0d9cde74) ) // 1st half is game data, 2nd half is garbage
-	//ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // garbage data not used by this game, match anmlbskta U2
-	// U14-U17 not populated
-
-	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
-ROM_END
-
-ROM_START( dolphin )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax0401p01.ic18", 0x0000000, 0x0800000, CRC(195d6328) SHA1(cf3b5699f81235919dd3b1974d2ecb0376cb4552) )
-	ROM_LOAD( "ax0401m01.ic11", 0x1000000, 0x1000000, CRC(5e5dca57) SHA1(e0623c84f66cada37d4c9399a7a8fc6866933144) )
-	ROM_LOAD( "ax0402m01.ic12", 0x2000000, 0x1000000, CRC(77dd4771) SHA1(dcd23b8ddc82eab2f325266ffd7ed3fbc1bcdf71) )
-	ROM_LOAD( "ax0403m01.ic13", 0x3000000, 0x1000000, CRC(911d0674) SHA1(eec35badcfbfe412b7104a86c2111f5a1b5fb5cd) )
-	ROM_LOAD( "ax0404m01.ic14", 0x4000000, 0x1000000, CRC(f82a4ca3) SHA1(da686d86e176a9f24874d2916b1932f03a99a52d) )
-	ROM_LOAD( "ax0405m01.ic15", 0x5000000, 0x1000000, CRC(b88298d7) SHA1(490c3ec471018895b7268ee33498dddaccbbfd5a) )
-
-	ROM_PARAMETER(":rom_board:key", "40") // ax0401f01
-ROM_END
-
-ROM_START( demofist )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax0601p01.ic18", 0x0000000, 0x0800000, CRC(0efb38ad) SHA1(9400e37efe3e936474d74400ebdf28ad0869b67b) )
-	ROM_LOAD( "ax0601m01.ic11", 0x1000000, 0x1000000, CRC(12fda2c7) SHA1(3afbac221ffe249386e4cb50b4edd013d9a40062) )
-	ROM_LOAD( "ax0602m01.ic12", 0x2000000, 0x1000000, CRC(aea61fdf) SHA1(0a088848bbf7a47df8b44b69bf72ed0d4a1088f8) )
-	ROM_LOAD( "ax0603m01.ic13", 0x3000000, 0x1000000, CRC(d5879d35) SHA1(977cd3b373c6f94eb21ffb24ff564971d3d633e5) )
-	ROM_LOAD( "ax0604m01.ic14", 0x4000000, 0x1000000, CRC(a7b09048) SHA1(229fa2332b58fec2a712c3ebd672662f35a9485a) )
-	ROM_LOAD( "ax0605m01.ic15", 0x5000000, 0x1000000, CRC(18d8437e) SHA1(fe2e189e40a89141335e754268d29d46e3eb3bb8) )
-	ROM_LOAD( "ax0606m01.ic16", 0x6000000, 0x1000000, CRC(42c81617) SHA1(1cc686af5e3fc56143836e3dcc0067893f82fcf9) )
-	ROM_LOAD( "ax0607m01.ic17", 0x7000000, 0x1000000, CRC(96e5aa84) SHA1(e9841f550f2ef409d97004542bcadabb6b9e84af) )
-
-	ROM_PARAMETER(":rom_board:key", "90") // ax0601f01
-ROM_END
-
-// (C)Dimps Wed Mar 10 19:08:51 2004 TANAKA (build 0028)
-ROM_START( rumblef )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1801p01.ic18", 0x0000000, 0x0800000, CRC(2f7fb163) SHA1(bf819d798d9a3a7bc754e111a3f53b9db6d6042a) )
-	ROM_LOAD( "ax1801m01.ic11", 0x1000000, 0x1000000, CRC(c38aa61c) SHA1(e2f688a0aa8b0119f5fd3d53c8904e035d43a4b1) )
-	ROM_LOAD( "ax1802m01.ic12", 0x2000000, 0x1000000, CRC(72e0ebc8) SHA1(e85300a405ea14c4c9d857eb9685c93faaca1d56) )
-	ROM_LOAD( "ax1803m01.ic13", 0x3000000, 0x1000000, CRC(d0f59d98) SHA1(b854796087e9f76a13a21da8249f7224e451e129) )
-	ROM_LOAD( "ax1804m01.ic14", 0x4000000, 0x1000000, CRC(15595cba) SHA1(8dd06d1f986cd21a58d20b662b11ed7ba8a6ff7a) )
-	ROM_LOAD( "ax1805m01.ic15", 0x5000000, 0x1000000, CRC(3d3f8e0d) SHA1(364a0bda890722b9fb72171f96c742b8f3fef23e) )
-	ROM_LOAD( "ax1806m01.ic16", 0x6000000, 0x1000000, CRC(ac2751bb) SHA1(5070fa12bf109ab87e8f7ea46ac4ae78a73105da) )
-	ROM_LOAD( "ax1807m01.ic17", 0x7000000, 0x1000000, CRC(3b2fbdb0) SHA1(f9f7e06785d3a07282247aaedd9999aa7c2670b9) )
-
-	ROM_PARAMETER(":rom_board:key", "aa") // ax1801f01
-ROM_END
-
-// Prototype, (C)Dimps Fri Feb 20 11:00:43 2004 TANAKA (build 0028)
-ROM_START( rumblefp )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("ic12", 0x00000000, 0x00800000, CRC(79866072) SHA1(aa9decd8878ab5a21fe72afb96ee841e94ee07b5) )
-	ROM_LOAD("ic13", 0x00800000, 0x00800000, CRC(5630bc83) SHA1(46848b58a55c180d9a92df6914a1a8b9af35cc57) )
-	ROM_LOAD("ic14", 0x01000000, 0x00800000, CRC(bcd49846) SHA1(d8ab1253a2904ec4f7126880a55c780986cefd66) )
-	ROM_LOAD("ic15", 0x01800000, 0x00800000, CRC(61257cfb) SHA1(bbb8cdd265a55a9d4c9b133b68aa0434de9e0f5b) )
-	ROM_LOAD("ic16", 0x02000000, 0x00800000, CRC(c2eb7c61) SHA1(6284ff0fb670011ca9b6ade5acb33211b60cbe43) )
-	ROM_LOAD("ic17", 0x02800000, 0x00800000, CRC(dcf673d3) SHA1(0abb2087bd35221cd5ec5f4d6b2f03a2234b5634) )
-	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(72c066bb) SHA1(a9d457b17d9dd79f54b71bdab24096ec3fbd00ea) )
-	ROM_LOAD("ic19", 0x03800000, 0x00800000, CRC(b20bf301) SHA1(3f5754b11f4b621703a21ddbf4762d6ada9f3ca3) )
-	ROM_LOAD("ic20", 0x04000000, 0x00800000, CRC(d27e7393) SHA1(62b9a880550067829f26ee120fad330257d349ff) )
-	ROM_LOAD("ic21", 0x04800000, 0x00800000, CRC(c2da1ecf) SHA1(26d14843c256eaf7196e59463adb6581a25e9cca) )
-	ROM_LOAD("ic22", 0x05000000, 0x00800000, CRC(730e0e1c) SHA1(469a2b34c492408aa70b60c1293481d218b76086) )
-	ROM_LOAD("ic23", 0x05800000, 0x00800000, CRC(d93afcac) SHA1(69e2d873e5a384d1e14ef47d6f6a3cbcbe782eec) )
-	ROM_LOAD("ic24", 0x06000000, 0x00800000, CRC(262d97b9) SHA1(1ae41ebea41035d21e174a03532dbaff9fe1ece2) )
-	ROM_LOAD("ic25", 0x06800000, 0x00800000, CRC(e45cf169) SHA1(3b080d6306262db36c6857e11b8ec506fa20f0f5) )
-	ROM_LOAD("ic26", 0x07000000, 0x00800000, CRC(6421720d) SHA1(6eaeb93d462542c3cf3e815d5fb309c337a8673b) )
-	// IC27 populated, empty
-
-	ROM_PARAMETER(":rom_board:key", "25") // Julie
-ROM_END
-
-// Build:Jun 25 2005 17:00:38
-ROM_START( ngbc )
-	AW_BIOS
-
-	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ax3301en_p01.fmem1", 0x00000000, 0x0800000, CRC(f7e24e67) SHA1(8eef26d44b294faa509304b1b04f4d801337bc99) )
-	ROM_LOAD( "ax3301m01.mrom1", 0x02000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
-	ROM_LOAD( "ax3302m01.mrom2", 0x04000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
-	ROM_LOAD( "ax3303m01.mrom3", 0x06000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
-	ROM_LOAD( "ax3304m01.mrom4", 0x0a000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
-	ROM_LOAD( "ax3305m01.mrom5", 0x0c000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
-	ROM_LOAD( "ax3306m01.mrom6", 0x0e000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
-	ROM_LOAD( "ax3307m01.mrom7", 0x12000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
-
-	ROM_PARAMETER(":rom_board:key", "a0") // ax3301f01
-ROM_END
-
-// same as above EN-dump, but CustomerID not FF-filled
-// Build:Jun 25 2005 17:00:38
-ROM_START( ngbcj )
-	AW_BIOS
-
-	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ax3301p01.fmem1", 0x00000000, 0x0800000, CRC(6dd78275) SHA1(72d4cab58dbcebd666db21aeef190378ef447580) )
-	ROM_LOAD( "ax3301m01.mrom1", 0x02000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
-	ROM_LOAD( "ax3302m01.mrom2", 0x04000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
-	ROM_LOAD( "ax3303m01.mrom3", 0x06000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
-	ROM_LOAD( "ax3304m01.mrom4", 0x0a000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
-	ROM_LOAD( "ax3305m01.mrom5", 0x0c000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
-	ROM_LOAD( "ax3306m01.mrom6", 0x0e000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
-	ROM_LOAD( "ax3307m01.mrom7", 0x12000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
-
-	ROM_PARAMETER(":rom_board:key", "a0") // ax3301f01
-ROM_END
-
-// Build:Jul 09 2004 15:05:53
-ROM_START( kofnw )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2201en_p01.ic18", 0x0000000, 0x0800000, CRC(27aab918) SHA1(41c5ddd8bd4c91481750606ab44aa115b5fe01d0) )
-	ROM_LOAD( "ax2201m01.ic11", 0x1000000, 0x1000000, CRC(22ea665b) SHA1(292c92c9ae43eea2d1c27cedfb89c3956b8dea32) )
-	ROM_LOAD( "ax2202m01.ic12", 0x2000000, 0x1000000, CRC(7fad1bea) SHA1(89f3f88af48973a4685955d86ef97a1487b8e7a8) )
-	ROM_LOAD( "ax2203m01.ic13", 0x3000000, 0x1000000, CRC(78986ca4) SHA1(5a6c8c12955573f33361d2c6f20f85de35ac7bae) )
-	ROM_LOAD( "ax2204m01.ic14", 0x4000000, 0x1000000, CRC(6ffbeb04) SHA1(975062cf364589dbdd5c5cb5ca945f76d87fc120) )
-	ROM_LOAD( "ax2205m01.ic15", 0x5000000, 0x1000000, CRC(2851b791) SHA1(566ef95ea066b7bf548986085670242be217befc) )
-	ROM_LOAD( "ax2206m01.ic16", 0x6000000, 0x1000000, CRC(e53eb965) SHA1(f50cd53a5859f081d8a278d24a519c9d9b49ab96) )
-
-	ROM_PARAMETER(":rom_board:key", "99") // ax2201f01
-ROM_END
-
-// Build:Sep 10 2004 12:05:34
-ROM_START( kofnwj )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2201jp_p01.ic18", 0x0000000, 0x0800000, CRC(ecc4a5c7) SHA1(97c2ef2be95b39bc978474a8243740df50255a8b) )
-
-	/* these are taken from the above set, game *seems* to work fine with these ... */
-	ROM_LOAD( "ax2201m01.ic11", 0x1000000, 0x1000000, CRC(22ea665b) SHA1(292c92c9ae43eea2d1c27cedfb89c3956b8dea32) )
-	ROM_LOAD( "ax2202m01.ic12", 0x2000000, 0x1000000, CRC(7fad1bea) SHA1(89f3f88af48973a4685955d86ef97a1487b8e7a8) )
-	ROM_LOAD( "ax2203m01.ic13", 0x3000000, 0x1000000, CRC(78986ca4) SHA1(5a6c8c12955573f33361d2c6f20f85de35ac7bae) )
-	ROM_LOAD( "ax2204m01.ic14", 0x4000000, 0x1000000, CRC(6ffbeb04) SHA1(975062cf364589dbdd5c5cb5ca945f76d87fc120) )
-	ROM_LOAD( "ax2205m01.ic15", 0x5000000, 0x1000000, CRC(2851b791) SHA1(566ef95ea066b7bf548986085670242be217befc) )
-	ROM_LOAD( "ax2206m01.ic16", 0x6000000, 0x1000000, CRC(e53eb965) SHA1(f50cd53a5859f081d8a278d24a519c9d9b49ab96) )
-
-	ROM_PARAMETER(":rom_board:key", "99") // ax2201f01
-ROM_END
-
-ROM_START( kov7sprt )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1301p01.ic18", 0x0000000, 0x0800000, CRC(6833a334) SHA1(646aaa578e09ad23bc9c7f4fbdfb3c1486916fd3) )
-	ROM_LOAD( "ax1301m01.ic11", 0x1000000, 0x1000000, CRC(58ae7ca1) SHA1(e91975697b797ea05488ace649cbb9964b4cd500) )
-	ROM_LOAD( "ax1301m02.ic12", 0x2000000, 0x1000000, CRC(871ea03f) SHA1(6806910832ca271a9240aca8e91279556e5b0cb7) )
-	ROM_LOAD( "ax1301m03.ic13", 0x3000000, 0x1000000, CRC(abc328bc) SHA1(d9271d4e5abe76d31de0f60a5c106260338d42e9) )
-	ROM_LOAD( "ax1301m04.ic14", 0x4000000, 0x1000000, CRC(25a176d1) SHA1(6d815bf6acb645fead060733660e24fb0d44282d) )
-	ROM_LOAD( "ax1301m05.ic15", 0x5000000, 0x1000000, CRC(e6573a93) SHA1(0666e52d0088263f28938e4c8aae201e604ec1f2) )
-	ROM_LOAD( "ax1301m06.ic16", 0x6000000, 0x1000000, CRC(cb8cacb4) SHA1(5d008e8a934451b9bfa33fedfd492c86d9226ef5) )
-	ROM_LOAD( "ax1301m07.ic17", 0x7000000, 0x1000000, CRC(0ca92213) SHA1(115c50fa55e6de3439de23e74621695510c6a7ba) )
-
-	ROM_PARAMETER(":rom_board:key", "35") // ax1301f01
-ROM_END
-
-ROM_START( ggisuka )
-	AW_BIOS
-
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1201p01.ic18", 0x0000000, 0x0800000, CRC(0a78d52c) SHA1(e9006dc43cd11d5ba49a092a1dff31dc10700c28) )
-	ROM_LOAD( "ax1201m01.ic10", 0x0800000, 0x1000000, CRC(df96ce30) SHA1(25a9f743b1c2b11896d0c7a2dc1c198fc977aaca) )    // 2x mirrored 8MB data, TODO: check if IC10 mask ROM not 16MB but 8MB
-	ROM_LOAD( "ax1202m01.ic11", 0x1000000, 0x1000000, CRC(dfc6fd67) SHA1(f9d35b18a03d22f70feda42d314b0f9dd54eea55) )
-	ROM_LOAD( "ax1203m01.ic12", 0x2000000, 0x1000000, CRC(bf623df9) SHA1(8b9a8e8100ff6d2ce9a982ab8eb1d542f1c7af03) )
-	ROM_LOAD( "ax1204m01.ic13", 0x3000000, 0x1000000, CRC(c80c3930) SHA1(5c39fde36e2ebbfe72967d7d0202eb454a8d3bbe) )
-	ROM_LOAD( "ax1205m01.ic14", 0x4000000, 0x1000000, CRC(e99a269d) SHA1(a52148b82b0338b8bad8b52985302eaf81a4cfde) )
-	ROM_LOAD( "ax1206m01.ic15", 0x5000000, 0x1000000, CRC(807ab795) SHA1(17c86b1a56333c05b68ff84f83e964d013c1819c) )
-	ROM_LOAD( "ax1207m01.ic16", 0x6000000, 0x1000000, CRC(6636d1b8) SHA1(9bd8fc114557f6fbe772f85eeb246f7336d4255e) )
-	ROM_LOAD( "ax1208m01.ic17", 0x7000000, 0x1000000, CRC(38bda476) SHA1(0234a6f5fbaf5e958b3ba0db311dff157f80addc) )
-
-	ROM_PARAMETER(":rom_board:key", "ed") // ax1201f01
-/*
-  Sammy AM3AHT/AWMPSYSTEM
-    4-cabinet splitter device, likely was used in GG Isuka, and maybe in 2-player AW-NET games too.
-
-  Case contains 3x PCB stack:
-    AM3AHT-01:
-      Renesas 12363VTE33 H8S/2363 MCU
-      ROM
-      HM62V8512CLFP-5 512K x8bit SRAM
-      33MHz OSC
-      LEDs 4x
-      DIPSW 4x
-    AM3AHW-01: 1-to-4 Video-splitter
-      DSUB connectors 4x
-    AM3AHU-01:
-      Card reader connectors 4x
-*/
-	ROM_REGION( 0x80000, "awmpsystem", 0 )
-	// AM3AHT AWMPSYSTEM
-	// WA0101E03
-	// U1 SUM:A17C Sammy
-	ROM_LOAD("am3aht.u1", 0, 0x80000, CRC(c4a21dbf) SHA1(3200fdf209f8a6c8c9acdb60a2bc1d70af28fc5b) ) // H8S/2363 code
-ROM_END
-
-ROM_START( maxspeed )
-	AW_BIOS
-
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax0501p01.ic18", 0x0000000, 0x0800000, CRC(e1651867) SHA1(49caf82f4b111da312b14bb0a9c31e3732b4b24e) )
-	ROM_LOAD( "ax0501m01.ic11", 0x1000000, 0x1000000, CRC(4a847a59) SHA1(7808bcd357b85861082b426dbe34a20ae7016f6a) )
-	ROM_LOAD( "ax0502m01.ic12", 0x2000000, 0x1000000, CRC(2580237f) SHA1(2e92c940f95edae33d6a7e8a071544a9083a0fd6) )
-	ROM_LOAD( "ax0503m01.ic13", 0x3000000, 0x1000000, CRC(e5a3766b) SHA1(1fe6e072adad27ac43c0bff04e3c448678aabc18) )
-	ROM_LOAD( "ax0504m01.ic14", 0x4000000, 0x1000000, CRC(7955b55a) SHA1(927f58d6961e702c2a8afce79bac5e5cff3dfed6) )
-	ROM_LOAD( "ax0505m01.ic15", 0x5000000, 0x1000000, CRC(e8ccc660) SHA1(a5f414f200a0d41e958430d0fc2d4e1fda1cc67c) )
-
-	ROM_PARAMETER(":rom_board:key", "55") // ax0501f01
-ROM_END
-
-ROM_START( vfurlong )
-	AW_BIOS
-
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2001p01.ic18", 0x0000000, 0x0800000, CRC(17ea9aa9) SHA1(c68500e9b3407a9d4b20f2678718ce475f179f7d) )
-	ROM_LOAD( "ax2001p01_alt.ic18", 0x0000000, 0x0800000, CRC(845399dd) SHA1(21565b13292cead2b532861d2998e381df2672d5) ) // same as above except for Customer ID, included for reference
-	ROM_LOAD( "ax2001m01.ic11", 0x1000000, 0x1000000, CRC(64460b24) SHA1(044857d6593897d303622e005a63ca7b3acd7453) )
-	ROM_LOAD( "ax2002m01.ic12", 0x2000000, 0x1000000, CRC(d4da357f) SHA1(c462cddec9a369a1a5595676de76499d56683ea9) )
-	ROM_LOAD( "ax2003m01.ic13", 0x3000000, 0x1000000, CRC(aa1e1246) SHA1(788cc9c070f82aeff1704361e3c72116fd5c4c9d) )
-	ROM_LOAD( "ax2004m01.ic14", 0x4000000, 0x1000000, CRC(4d555d7c) SHA1(a5eccc920bdb7ad9cf57c0e1ef6a905c6b9eee45) )
-	ROM_LOAD( "ax2005m01.ic15", 0x5000000, 0x1000000, CRC(785208e2) SHA1(6ba5bd3901c5b1d71abcc8d833a011bd4abae6b6) )
-	ROM_LOAD( "ax2006m01.ic16", 0x6000000, 0x1000000, CRC(8134ec55) SHA1(843e473d4f99237ded641cce9515b7802cfe3742) )
-	ROM_LOAD( "ax2007m01.ic17", 0x7000000, 0x1000000, CRC(d0557e8a) SHA1(df8057597eb690bd18c5d26736f5d4f86e3b1225) )
-
-	ROM_PARAMETER(":rom_board:key", "db") // ax2001f01
-ROM_END
-
-ROM_START( salmankt )
-	AW_BIOS
-
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1401p01.ic18", 0x0000000, 0x0800000, CRC(28d779e0) SHA1(dab785a595de5f474c18c713e672949176a5b1b5) )
-	ROM_LOAD( "ax1401m01.ic11", 0x1000000, 0x1000000, CRC(fd7af845) SHA1(0c8f5a91662e46d5c187a0758af95082183cdf69) )
-	ROM_LOAD( "ax1402m01.ic12", 0x2000000, 0x1000000, CRC(f6006f85) SHA1(9275603673c663f73b977d0d14ed1d2a7002c627) )
-	ROM_LOAD( "ax1403m01.ic13", 0x3000000, 0x1000000, CRC(074f7c4b) SHA1(4955e4f333d15d5d9cc69bb9658f29a37e912012) )
-	ROM_LOAD( "ax1404m01.ic14", 0x4000000, 0x1000000, CRC(af4e3829) SHA1(18d9e8a8d8e930ad697b686a98f31ea175f5fd4a) )
-	ROM_LOAD( "ax1405m01.ic15", 0x5000000, 0x1000000, CRC(b548446f) SHA1(8b4661e601e36c067dff2530aff4f7ea76e1c21e) )
-	ROM_LOAD( "ax1406m01.ic16", 0x6000000, 0x1000000, CRC(437673e6) SHA1(66f7e5f246ebbb1bdbf074da41ec16bf32720a82) )
-	ROM_LOAD( "ax1407m01.ic17", 0x7000000, 0x1000000, CRC(6b6acc0a) SHA1(a8c692c875271a0806460caa79c67fd756231273) )
-
-	ROM_PARAMETER(":rom_board:key", "77") // ax1401f01
-ROM_END
-
-ROM_START( ftspeed )
-	AW_BIOS
-
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax1701p01.ic18", 0x0000000, 0x0800000, CRC(480cade7) SHA1(487d4b27d7e5196d8321c5a80175ec7b1b32c1e8) )
-	ROM_LOAD( "ax1701m01.ic11", 0x1000000, 0x1000000, CRC(7dcdc784) SHA1(5eeef9a760a0b090ed5aad8b7bdee2baa69a088b) )
-	ROM_LOAD( "ax1702m01.ic12", 0x2000000, 0x1000000, CRC(06c9bf85) SHA1(636262dca7140397436646754fb204b97aa08ce9) )
-	ROM_LOAD( "ax1703m01.ic13", 0x3000000, 0x1000000, CRC(8f8e0224) SHA1(2a9a17ed726913c00bf1c6a94bdd4fb32e800868) )
-	ROM_LOAD( "ax1704m01.ic14", 0x4000000, 0x1000000, CRC(fbb4bb16) SHA1(b582680a880166c5bbdd2ad77b7903fedf9b01ad) )
-	ROM_LOAD( "ax1705m01.ic15", 0x5000000, 0x1000000, CRC(996f68e1) SHA1(3fa505c641127d9027bfc7ec0ab16905344a4e2c) )
-	ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) )
-
-	ROM_PARAMETER(":rom_board:key", "6b") // ax1701f01
-ROM_END
-
-// contents of cartridges labeled as JP and EN is the same
-// Build:Aug 07 2005 18:11:25
-ROM_START( kofxi )
-	AW_BIOS
-
-	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ax3201p01.fmem1", 0x00000000, 0x0800000, CRC(6dbdd71b) SHA1(cce3897b104f5d923d8136485fc80eb9717ff4b5) )
-	ROM_LOAD( "ax3201m01.mrom1", 0x02000000, 0x2000000, CRC(7f9d6af9) SHA1(001064ad1b8c3408efe799dc766c2728dc6512a9) )
-	ROM_LOAD( "ax3202m01.mrom2", 0x04000000, 0x2000000, CRC(1ae40afa) SHA1(9ee7957c86cc3a71e6971ddcd906a82c5b1e16f1) )
-	ROM_LOAD( "ax3203m01.mrom3", 0x06000000, 0x2000000, CRC(8c5e3bfd) SHA1(b5443e2a1b88642cc57c5287a3122376c2d48de9) )
-	ROM_LOAD( "ax3204m01.mrom4", 0x0a000000, 0x2000000, CRC(ba97f80c) SHA1(36f672fe833e13f0bab036b02c39123066327e20) )
-	ROM_LOAD( "ax3205m01.mrom5", 0x0c000000, 0x2000000, CRC(3c747067) SHA1(54b7ff73d618e2e4e40c125c6cfe99016e69ad1a) )
-	ROM_LOAD( "ax3206m01.mrom6", 0x0e000000, 0x2000000, CRC(cb81e5f5) SHA1(07faee02a58ac9c600ab3cdd525d22c16b35222d) )
-	ROM_LOAD( "ax3207m01.mrom7", 0x12000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
-
-	ROM_PARAMETER(":rom_board:key", "d3") // ax3201f01
-ROM_END
-
-ROM_START( dirtypig )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "695-0014.u3",  0x0000000, 0x1000000, CRC(9fdd7d07) SHA1(56d580dda116823ea5dc5e1bd5154463a476866a) )
-	ROM_LOAD( "695-0014.u1",  0x1000000, 0x1000000, CRC(a91d2fcb) SHA1(8414386c09ba36ea581c8161f6cf2a13cc5ae516) )
-	ROM_LOAD( "695-0014.u4",  0x2000000, 0x1000000, CRC(3342f237) SHA1(e617b0e1f8d8da9783c58ab98eb91de2363ec36f) )
-	ROM_LOAD( "695-0014.u2",  0x3000000, 0x1000000, CRC(4d82152f) SHA1(a448983d4e81eb6485b62f23a6c99d1112a20c21) )
-	ROM_LOAD( "695-0014.u15", 0x4000000, 0x1000000, CRC(d239a549) SHA1(71f3c1c2ae2a9b6f09f30e7be3bb11ba111276ae) )
-	ROM_LOAD( "695-0014.u17", 0x5000000, 0x1000000, CRC(16bb5992) SHA1(18772587272aba1d50a48d384f472276c3b48d96) )
-	ROM_LOAD( "695-0014.u14", 0x6000000, 0x1000000, CRC(55470242) SHA1(789036189ae5488a9da565774bdf91b49cd8264e) )
-	ROM_LOAD( "695-0014.u16", 0x7000000, 0x1000000, CRC(730180a4) SHA1(017b82e2d2744695e3e521d35a8511ecc1c8ab43) )
-
-	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
-ROM_END
-
-// Ver 2005/12/16
-// Build:Jan 13 2006 00:49:12
-ROM_START( mslug6 )
-	AW_BIOS
-
-	ROM_REGION( 0xc000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ax3001p01.fmem1", 0x0000000, 0x0800000, CRC(af67dbce) SHA1(5aba108caf3e4ced6994bc26e752d4e225c231e8) )
-	ROM_LOAD( "ax3001m01.mrom1", 0x2000000, 0x2000000, CRC(e56417ee) SHA1(27692ad5c1093aff0973d2aafd01a5e30c7bfbbe) )
-	ROM_LOAD( "ax3002m01.mrom2", 0x4000000, 0x2000000, CRC(1be3bbc1) SHA1(d75ce5c855c9c4eeacdbf84d440c73a94de060fe) )
-	ROM_LOAD( "ax3003m01.mrom3", 0x6000000, 0x2000000, CRC(4fe37370) SHA1(85d51db94c3e34265e37b636d6545ed2801ba5a6) )
-	ROM_LOAD( "ax3004m01.mrom4", 0xa000000, 0x2000000, CRC(2f4c4c6f) SHA1(5815c28fdaf0429003986e725c0015fe4c08721f) )
-
-	ROM_PARAMETER(":rom_board:key", "82") // ax3001f01
-ROM_END
-
-// Build:Aug 05 2005 16:43:48
-ROM_START( samsptk )
-	AW_BIOS
-
-	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ax2901p01.fmem1", 0x00000000, 0x0800000, CRC(58e0030b) SHA1(ed8a66833beeb56d83770123eff28df0f25221d1) )
-	ROM_LOAD( "ax2901m01.mrom1", 0x02000000, 0x2000000, CRC(dbbbd90d) SHA1(102ee0b249a3e0ca2f659b6c515816c522ad78d0) )
-	ROM_LOAD( "ax2902m01.mrom2", 0x04000000, 0x2000000, CRC(a3bd7890) SHA1(9b8d934d6ebc3ef688cd8a6de47657a0663fea10) )
-	ROM_LOAD( "ax2903m01.mrom3", 0x06000000, 0x2000000, CRC(56f50fdd) SHA1(8a5a4a99108c0279056998046c7b332e80121dee) )
-	ROM_LOAD( "ax2904m01.mrom4", 0x0a000000, 0x2000000, CRC(8a3ae175) SHA1(966f527a92e24c8eb770344697f2edf6140cf971) )
-	ROM_LOAD( "ax2905m01.mrom5", 0x0c000000, 0x2000000, CRC(429877ba) SHA1(88e1f3bc682b18d331e328ef8754065109cf9bda) )
-	ROM_LOAD( "ax2906m01.mrom6", 0x0e000000, 0x2000000, CRC(cb95298d) SHA1(5fb5d5a0d6801df61101a1b23de0c14ff29ef654) )
-	ROM_LOAD( "ax2907m01.mrom7", 0x12000000, 0x2000000, CRC(48015081) SHA1(3c0a0a6dc9ab7bf889579477699e612c3092f9bf) )
-
-	ROM_PARAMETER(":rom_board:key", "1d") // ax2901f01
-ROM_END
-
-ROM_START( ggx15 )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) )
-	ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) )
-	ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) )
-	ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) )
-	ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) )
-	ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) )
-	ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) )
-	ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) )
-
-	ROM_PARAMETER(":rom_board:key", "c9") // ax0801f01
-ROM_END
-
-// (C)Dimps Fri Mar 4 19:27:57 2005 NONAME (build 2319)
-ROM_START( rumblef2 )
-	AW_BIOS
-
-	ROM_REGION( 0xe000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) )
-	ROM_LOAD( "ax3401m01.mrom1", 0x2000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) )
-	ROM_LOAD( "ax3402m01.mrom2", 0x4000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) )
-	ROM_LOAD( "ax3403m01.mrom3", 0x6000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) )
-	ROM_LOAD( "ax3404m01.mrom4", 0xa000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
-	ROM_LOAD( "ax3405m01.mrom5", 0xc000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
-
-	ROM_PARAMETER(":rom_board:key", "07") // ax3401f01
-ROM_END
-
-// Prototype ROM board
-// (C)Dimps Tue Jan 11 14:32:45 2005 NONAME (build 0001)
-ROM_START( rumblf2p )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("ic12", 0x00000000, 0x00800000, CRC(1a0e74ab) SHA1(679787e5fcc0e197f97a00544c1f277d3695df80) )
-	ROM_LOAD("ic13", 0x00800000, 0x00800000, CRC(5630bc83) SHA1(46848b58a55c180d9a92df6914a1a8b9af35cc57) )
-	ROM_LOAD("ic14", 0x01000000, 0x00800000, CRC(7fcfc59c) SHA1(ca2b71fe6dd959d89a7e30363090d38032c3697a) )
-	ROM_LOAD("ic15", 0x01800000, 0x00800000, CRC(eee00692) SHA1(ee630a77c130e64435be544b13cd885ecc7bfeb4) )
-	ROM_LOAD("ic16", 0x02000000, 0x00800000, CRC(cd029db9) SHA1(d5d70dbb3822538afc67efa1e905c520b63cc978) )
-	ROM_LOAD("ic17", 0x02800000, 0x00800000, CRC(223a5b58) SHA1(ab540c994598f5cbe34ec8a62fa96181cd2be6e2) )
-	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(5e2d2f67) SHA1(fe348e8e342d0d642a21cd24c57387384f20fa0e) )
-	ROM_LOAD("ic19", 0x03800000, 0x00800000, CRC(3cfb2adc) SHA1(d731674d80e924c250fe3519aef1392d38167aa3) )
-	ROM_LOAD("ic20", 0x04000000, 0x00800000, CRC(2c216a05) SHA1(0677146ecf5abe00368e205fd7da19234a997dd2) )
-	ROM_LOAD("ic21", 0x04800000, 0x00800000, CRC(79540865) SHA1(8ad7b789f25df5405949fef96d0db35ca8e424c3) )
-	ROM_LOAD("ic22", 0x05000000, 0x00800000, CRC(c91d95a0) SHA1(a50e4fffa3cf70459d9bb36f0155e768d4281f39) )
-	ROM_LOAD("ic23", 0x05800000, 0x00800000, CRC(5c39ca18) SHA1(6a29c4b1dd6b8eca5824687a1b501594a6676606) )
-	ROM_LOAD("ic24", 0x06000000, 0x00800000, CRC(858d2775) SHA1(34ca97f348a810c6f950840ef2390334011c6034) )
-	ROM_LOAD("ic25", 0x06800000, 0x00800000, CRC(975d35fb) SHA1(a4cf97a05cbeb830090426915067b3dd15224939) )
-	ROM_LOAD("ic26", 0x07000000, 0x00800000, CRC(ff9a2c4c) SHA1(81ac8fb41d7af605da0dcd92104cef0f045777bf) )
-	// IC27 populated, empty
-
-	ROM_PARAMETER(":rom_board:key", "25") // Julie
-ROM_END
-
-ROM_START( claychal )
-	AW_BIOS
-
-	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "608-2161.u3",  0x0000000, 0x1000100, CRC(5bb65194) SHA1(5fa8c38e6aadf5d999e260da24b001c0c7805d48) )
-	ROM_LOAD( "608-2161.u1",  0x1000000, 0x1000100, CRC(526fc1af) SHA1(dd8a37fa73a9ef193b6f4fb962345bdfc4854b5d) )
-	ROM_LOAD( "608-2161.u4",  0x2000000, 0x1000100, CRC(55f4e762) SHA1(a11f7d69458e647dd2b8d86c98a54f309b1f1bbc) )
-	ROM_LOAD( "608-2161.u2",  0x3000000, 0x1000100, CRC(c40dae68) SHA1(29ec47c76373eeaa686684f10907d551de7d9c59) )
-	ROM_LOAD( "608-2161.u15", 0x4000000, 0x1000100, CRC(b82dcb0a) SHA1(36dc89a388ac0c7e0a0e72428c8149cbda12805a) )
-	ROM_LOAD( "608-2161.u17", 0x5000000, 0x1000100, CRC(2f973eb4) SHA1(45409b5517cda119315f198892224889ac3a0f53) )
-	ROM_LOAD( "608-2161.u14", 0x6000000, 0x1000100, CRC(2e7d966f) SHA1(3304fd0c5140a13f6fe2ea9aaa74d7885e1505e1) )
-	ROM_LOAD( "608-2161.u16", 0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) )
-
-	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
-ROM_END
-
-// Build:Feb 08 2009 22:35:34
-ROM_START( basschalo )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD("610-0811.u3",  0x00000000, 0x01000000, CRC(ef31abe7) SHA1(bf8a66da4ceead350c200626792af55b7f258db4) )
-	ROM_LOAD("610-0811.u1",  0x01000000, 0x01000000, CRC(44c3cf90) SHA1(620a55f8f971f86fd65a3e3e9f0784fed5ca891e) )
-	ROM_LOAD("vera.u4",      0x02000000, 0x01000000, CRC(bd1f13aa) SHA1(1ef9a7e684418baf8a61fef2610839fd72887d4c) )
-	ROM_LOAD("610-0811.u2",  0x03000000, 0x01000000, CRC(1c61ed69) SHA1(e5a53362ea3e285a05d69d0fb56e1f8625272c18) )
-	ROM_LOAD("610-0811.u15", 0x04000000, 0x01000000, CRC(e8f02238) SHA1(f762a0a93e80899f71af6d2e0126a3fe9586815a) )
-	ROM_LOAD("610-0811.u17", 0x05000000, 0x01000000, CRC(db799f5a) SHA1(f85f35388ffb4399382b676773314f9a651e38df) )
-	ROM_LOAD("610-0811.u14", 0x06000000, 0x01000000, CRC(f2769383) SHA1(c580577df9d140bb6ecce192efafb0284d22c32d) )
-	ROM_LOAD("vera.u16",     0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
-
-	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
-ROM_END
-
-// Version A
-// Build:Jul 15 2009 16:27:40
-ROM_START( basschal )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD("vera.u3",  0x00000000, 0x01000000, CRC(8cbec9d7) SHA1(080f5edd817993946b1008ebe8ba489f818d3f99) )
-	ROM_LOAD("vera.u1",  0x01000000, 0x01000000, CRC(cfef27e5) SHA1(e0e27adc1b3635a310c50c6374d85572db608675) )
-	ROM_LOAD("vera.u4",  0x02000000, 0x01000000, CRC(bd1f13aa) SHA1(1ef9a7e684418baf8a61fef2610839fd72887d4c) )
-	ROM_LOAD("vera.u2",  0x03000000, 0x01000000, CRC(0a463c37) SHA1(630ad98d2f80fd458729bd56e8d665a88263da28) )
-	ROM_LOAD("vera.u15", 0x04000000, 0x01000000, CRC(e588afd1) SHA1(0ce3aeb2bcea66beaec2410d1df6857c4365aecf) )
-	ROM_LOAD("vera.u17", 0x05000000, 0x01000000, CRC(d78389a4) SHA1(50babfe3d58929a26a69dd4a4120fd87f507a95e) )
-	ROM_LOAD("vera.u14", 0x06000000, 0x01000000, CRC(35df044f) SHA1(eeac6c4062f697205558846d6ac262cb5c1b10cf) )
-	ROM_LOAD("vera.u16", 0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
-
-	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
-ROM_END
-
-// no case, Sega 171-8355A type board, stickers: VM20-6101-1 V20T0031
-ROM_START( waidrive )
-	AW_BIOS
-
-	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "u3",  0x0000000, 0x1000000, CRC(7acfb499) SHA1(002a0a84dd7f55e1630e1ec2530d0760b0c12b4e) )
-	ROM_LOAD( "u1",  0x1000000, 0x1000000, CRC(b3c1c3bb) SHA1(bda9b1e214a733cb1716ab130ecd986709ac136e) )
-	//ROM_LOAD( "u4",  0x2000000, 0x1000000, CRC(646e9773) SHA1(dd081a9a42edca956f96124545772d4687ca2113) ) // garbage data not used by this game, match anmlbskta U4
-	//ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // garbage data not used by this game, match anmlbskta U2
-	// U14-U17 not populated
-
-	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
-ROM_END
-
-// Prototype ROM board
-// Build:May 23 2003 14:40:15
-ROM_START( sushibar )
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("ic12", 0x00000000, 0x00800000, CRC(06a2ed58) SHA1(a807fa8c1c83cb8b18595c210479d5f1dd6be4ca) )
-	// IC 13 populated, empty
-	ROM_LOAD("ic14", 0x01000000, 0x00800000, CRC(4860f944) SHA1(55c75630c33cba35512a1349650f28fd56757f9f) )
-	ROM_LOAD("ic15", 0x01800000, 0x00800000, CRC(7113506c) SHA1(0548d67b3a1c0b8f17fcafd4fe5c1e6b0e91b6e7) )
-	ROM_LOAD("ic16", 0x02000000, 0x00800000, CRC(77e8e39e) SHA1(1286010cdba5c3c0ad5cbe19718fd0f8e5f579db) )
-	ROM_LOAD("ic17", 0x02800000, 0x00800000, CRC(0eba54ea) SHA1(51842ec326a5ba65bd280e652e7d9b395a2586c6) )
-	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(b9957c76) SHA1(6d72c7ac8e1e0cbed7eb01b66f71bedf46a833e1) )
-	// IC19 - IC27 populated, empty
-
-	ROM_PARAMETER(":rom_board:key", "25") // Julie
-ROM_END
+void naomi_state::set_drc_options()
+{
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, dc_ram);
+}
+
+// TODO: intentional repetition, to allow possible future extensions
+void naomi_state::init_naomi()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+void naomi2_state::init_naomi2()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+void naomi_state::init_naomigd()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+// TODO: do we really need these two extra inits to initialize the panel muxer variable?
+void naomi_state::init_naomi_mp()
+{
+	naomi_state::init_naomi();
+	m_mp_mux = 0;
+}
+
+void naomi_state::init_naomigd_mp()
+{
+	naomi_state::init_naomigd();
+	m_mp_mux = 0;
+}
+
+void naomi_state::init_hotd2()
+{
+	set_drc_options();
+}
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
@@ -11748,20 +10603,20 @@ ROM_END
 #define GAME_FLAGS (MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING)
 
 /* Main board and game specific BIOS */
-/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi The House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin/deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "NAOMI BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI The House of the Dead 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (twin/deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Airline Pilots (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "NAOMI GD-ROM BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
 /* 13636-01 */ GAME( 1998, hotd2,    hod2bios, naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (USA)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* 13636    */ GAME( 1998, hotd2o,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* ?????    */ GAME( 1998, hotd2e,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (Export)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* none     */ GAME( 1998, hotd2p,   hotd2,    naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
-/* 13763-01 */ GAME( 1999, alpilot,  airlbios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Airline Pilots (World, Rev B)", GAME_FLAGS ) // have "Sega Airlines" texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
+/* 13763-01 */ GAME( 1999, alpilot,  airlbios, naomim2,     alpilota, naomi_state, empty_init, ROT0, "Sega", "Airline Pilots (World, Rev B)", GAME_FLAGS ) // have "Sega Airlines" texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
 /* none     */ GAME( 1999, f355p,    f355,     naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (private show version)", GAME_FLAGS ) /* specific BIOS epr-21862p or epr-21864p needed */
 /* 13950    */ GAME( 1999, f355twin, f355bios, naomim2,     naomi, naomi_state, empty_init, ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
@@ -11781,7 +10636,7 @@ ROM_END
 /* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
 /* 0010    */ GAME( 1999, vs2_2ko,   vs2_2k,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000", GAME_FLAGS ) // revision is not known, might be Rev A or B instead of no Rev
 /* 0010    */ GAME( 1999, vs2_2k,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (Rev C)", GAME_FLAGS )
-/* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Toy Fighter", GAME_FLAGS )
+/* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Anchor Inc.", "Toy Fighter", GAME_FLAGS )
 /* 0012 -01*/ GAME( 1999, smlg99,    naomi,    naomim2, dybbnao, naomi_state, init_naomi,   ROT0, "Sega", "World Series 99 / Super Major League 99", GAME_FLAGS )
 /* 0013    */ GAME( 1999, jambo,     naomi,    naomim2, jambo,   naomi_state, init_naomi,   ROT0, "Sega", "Jambo! Safari (Rev A)", GAME_FLAGS )
 /* 0015    */ GAME( 1999, vtennis,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis / Power Smash", GAME_FLAGS )
@@ -11806,7 +10661,7 @@ ROM_END
 /* 0027    */ GAME( 2000, smarinef,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028    */ GAME( 2000, vonot,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
 // 0029 Derby Owners Club 2000
-/* 0030    */ GAME( 2000, qmegamis,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Quiz Ah Megamisama", GAME_FLAGS )
+/* 0030    */ GAME( 2000, qmegamis,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Quiz Aa! Megami-sama ~Tatakau Tsubasa to Tomoni~ (Japan)", GAME_FLAGS ) // クイズ ああっ女神さまっ ～闘う翼とともに～
 /* 0034    */ GAME( 2000, shorsepb,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (backup data)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgt,  naomi,    naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
@@ -11918,7 +10773,7 @@ ROM_END
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */       GAME( 1999, pstone,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )
-/* 0002 */       GAME( 1999, suchie3,   naomi,    naomim2, suchie3, naomi_state,init_naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0002 */       GAME( 1999, suchie3,   naomi,    naomim2, suchie3, naomi_state,init_naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (Japan)", GAME_FLAGS )
 /* 0003 */       GAME( 1999, doa2a,     doa2m,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
 /* 0003-01 */    GAME( 1999, doa2,      doa2m,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2", GAME_FLAGS )
 /* 0003 */       GAME( 2000, doa2m,     naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
@@ -11936,9 +10791,9 @@ ROM_END
 /* 0013 */       GAME( 2000, ggx,       naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Arc System Works","Guilty Gear X", GAME_FLAGS )
 /* 0014 */       GAME( 2000, gwing2,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Takumi / Capcom", "Giga Wing 2", GAME_FLAGS )
 /* 0015 */       GAME( 2000, pjustic,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Project Justice / Moero! Justice Gakuen (Rev A)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcoxo, deathcox, naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcoxj, deathcox, naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan, Rev A)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcox,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (USA)", GAME_FLAGS ) // possible location test or limited release
+/* 0016 */       GAME( 2000, deathcoxo, deathcox, naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan)", GAME_FLAGS )
+/* 0016 */       GAME( 2000, deathcoxj, deathcox, naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan, Rev A)", GAME_FLAGS )
+/* 0016 */       GAME( 2000, deathcox,  naomi,    naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (USA)", GAME_FLAGS ) // possible location test or limited release
 /* 0017 */       GAME( 2001, gundmct,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Banpresto / Capcom","Mobile Suit Gundam: Federation Vs. Zeon", GAME_FLAGS )
 /* 0020 */       GAME( 2001, zerogu2,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Psikyo",          "Zero Gunner 2", GAME_FLAGS )
 /* 0057 */       GAME( 2007, sl2007,    naomi,    naomim4, naomi,   naomi_state, init_naomi,  ROT270,"Triangle Service","Shooting Love 2007 (Japan)", GAME_FLAGS )
@@ -11998,7 +10853,7 @@ ROM_END
 // 0015  Virtua Tennis 2 / Power Smash 2 (GDS-0015)
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )
 /* 0016  */ GAME( 2001, shaktamb, naomigd, naomigd, shaktamb, naomi_state, init_naomigd, ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (2K1 AUT) (GDS-0016)", GAME_FLAGS )
-/* 0017  */ GAME( 2001, keyboard, naomigd, naomigd_kb,  naomi_kb,   naomi_state, init_naomigd, ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_FLAGS )
+/* 0017  */ GAME( 2001, keyboard, naomigd, naomigd_kb,  naomi_kb,   naomi_state, init_naomigd, ROT0, "Sega / G.Rev", "La Keyboard (GDS-0017)", GAME_FLAGS ) // spelled as "G.rev" in ending screen
 /* 0018  */ GAME( 2001, lupinshoo,lupinsho,naomigd,  hotd2,   naomi_state, init_naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
 /* 0018A */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, init_naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (Rev A) (GDS-0018A)", GAME_FLAGS )
 /* 0019  */ GAME( 2001, vathlete, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_FLAGS )
@@ -12063,18 +10918,18 @@ ROM_END
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
-/* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
+/* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
 // 0003
-/* 0004  */ GAME( 2001, cvsgd,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (Japan) (GDL-0004)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-/* 0005  */ GAME( 2001, starseek,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0004  */ GAME( 2001, cvsgd,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (Japan) (GDL-0004)", GAME_FLAGS )
+/* 0005  */ GAME( 2001, starseek,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", GAME_FLAGS )
 /* 0006  */ GAME( 2001, gundmxgd,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon DX (USA, Japan) (GDL-0006)", GAME_FLAGS )
 // 0007  Capcom Vs. SNK 2 (Japan) (GDL-0007)
 /* 0007A */ GAME( 2001, cvs2mf,    cvs2,    naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Japan, Rev A) (GDL-0007A)", GAME_FLAGS )
 /* 0008  */ GAME( 2001, cvs2,      naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Mark Of The Millennium 2001 (USA) (GDL-0008)", GAME_FLAGS )
 // 0009  Capcom Vs. SNK 2 (Export)
 /* 0010  */ GAME( 2001, ikaruga,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_FLAGS )
-/* 0011  */ GAME( 2002, ggxx,      naomigd, naomigd, naomi, naomi_state,  init_ggxx,     ROT0,"Arc System Works","Guilty Gear XX (GDL-0011)", GAME_FLAGS )
-/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0011  */ GAME( 2002, ggxx,      naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX (GDL-0011)", GAME_FLAGS )
+/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", GAME_FLAGS )
 /* 0013  */ GAME( 2002, moeru,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron",       "Moeru Casinyo (Japan) (GDL-0013)", GAME_FLAGS )
 // 0014  Musapey's Choco Marker (GDL-0014)
 /* 0014A */ GAME( 2002, chocomk,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_FLAGS )
@@ -12082,41 +10937,41 @@ ROM_END
 // 0016  GD SOFT POCHI (Pochinya ?)
 /* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
 /* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
-/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
-/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
+/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
+/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami no Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
-/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
+/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", GAME_FLAGS )
 // 0023  Border Down (GDL-0023)
 /* 0023A */ GAME( 2003, bdrdown,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_FLAGS )
 /* 0024  */ GAME( 2003, psyvar2,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Success",      "Psyvariar 2 - The Will To Fabricate (Japan) (GDL-0024)", GAME_FLAGS )
 /* 0025  */ GAME( 2004, cfield,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",         "Chaos Field (Japan) (GDL-0025)", GAME_FLAGS )
-/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Triangle Service",  "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
+/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Triangle Service", "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
 // 0027  Chaos Field (Export)
-/* 0028  */ GAME( 2005, meltyblo,  meltybld,naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza (Japan) (GDL-0028)", GAME_FLAGS )
+/* 0028  */ GAME( 2005, meltyblo,  meltybld,naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Ecole Software", "Melty Blood Act Cadenza (Japan) (GDL-0028)", GAME_FLAGS )
 // 0028A Melty Blood Act Cadenza (Rev A) (GDL-0028A)
 // 0028B Melty Blood Act Cadenza (Rev B) (GDL-0028B)
-/* 0028C */ GAME( 2005, meltybld,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Ver. A (Japan) (GDL-0028C)", GAME_FLAGS )
+/* 0028C */ GAME( 2005, meltybld,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Ecole Software", "Melty Blood Act Cadenza Ver. A (Japan) (GDL-0028C)", GAME_FLAGS )
 // 0029  ExZeus - game was planned as GD-ROM release but was canceled, no GD discs was manufactured, only few prototype cartridges owned by game developer(s) known to exists
-/* 0030  */ GAME( 2005, senkoo,    senko,   naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde (Japan) (GDL-0030)", GAME_FLAGS )
-/* 0030A */ GAME( 2005, senko,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde (Japan, Rev A) (GDL-0030A)", GAME_FLAGS )
-/* 0031  */ GAME( 2005, ss2005o,   ss2005,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (Japan) (GDL-0031)", GAME_FLAGS )
-/* 0031A */ GAME( 2005, ss2005,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (Japan, Rev A) (GDL-0031A)", GAME_FLAGS )
-/* 0032  */ GAME( 2005, radirgyo,  radirgy, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Radirgy (Japan) (GDL-0032)", GAME_FLAGS )
-/* 0032A */ GAME( 2005, radirgy,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Radirgy (Japan, Rev A) (GDL-0032A)", GAME_FLAGS )
+/* 0030  */ GAME( 2005, senkoo,    senko,   naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",          "Senko no Ronde (Japan) (GDL-0030)", GAME_FLAGS )
+/* 0030A */ GAME( 2005, senko,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",          "Senko no Ronde (Japan, Rev A) (GDL-0030A)", GAME_FLAGS )
+/* 0031  */ GAME( 2005, ss2005o,   ss2005,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",       "Super Shanghai 2005 (Japan) (GDL-0031)", GAME_FLAGS )
+/* 0031A */ GAME( 2005, ss2005,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",       "Super Shanghai 2005 (Japan, Rev A) (GDL-0031A)", GAME_FLAGS )
+/* 0032  */ GAME( 2005, radirgyo,  radirgy, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",      "Radirgy (Japan) (GDL-0032)", GAME_FLAGS )
+/* 0032A */ GAME( 2005, radirgy,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",      "Radirgy (Japan, Rev A) (GDL-0032A)", GAME_FLAGS )
 // 0033  Guilty Gear XX Slash (GDL-0033)
-/* 0033A */ GAME( 2005, ggxxsla,   naomigd, naomigd, naomi, naomi_state,  init_ggxxsla,  ROT0,"Arc System Works","Guilty Gear XX Slash (Japan, Rev A) (GDL-0033A)", GAME_FLAGS )
-/* 0034  */ GAME( 2006, kurucham,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",         "Kurukuru Chameleon (Japan) (GDL-0034)", GAME_FLAGS )
-/* 0035  */ GAME( 2005, undefeat,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "G.Rev",        "Under Defeat (Japan) (GDL-0035)", GAME_FLAGS )
-/* 0036  */ GAME( 2006, trghearto, trgheart,naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",      "Trigger Heart Exelica (Japan) (GDL-0036)", GAME_FLAGS )
-/* 0036A */ GAME( 2006, trgheart,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",      "Trigger Heart Exelica Ver.A (Japan) (GDL-0036A)", GAME_FLAGS )
-/* 0037  */ GAME( 2006, jingystm,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Atrativa Japan", "Jingi Storm - The Arcade (Japan) (GDL-0037)", GAME_FLAGS )
-/* 0038  */ GAME( 2006, senkosp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde Special (Export, Japan) (GDL-0038)", GAME_FLAGS )
-/* 0039  */ GAME( 2006, meltybo,   meltyb,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Version B (Japan) (GDL-0039)", GAME_FLAGS )
-/* 0039A */ GAME( 2006, meltyb,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Version B2 (Japan) (GDL-0039A)", GAME_FLAGS )
-/* 0040  */ GAME( 2006, karous,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Karous (Japan) (GDL-0040)", GAME_FLAGS )
-/* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works","Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
-/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile",      "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
+/* 0033A */ GAME( 2005, ggxxsla,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works", "Guilty Gear XX Slash (Japan, Rev A) (GDL-0033A)", GAME_FLAGS )
+/* 0034  */ GAME( 2006, kurucham,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",           "Kurukuru Chameleon (Japan) (GDL-0034)", GAME_FLAGS )
+/* 0035  */ GAME( 2005, undefeat,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "G.Rev",          "Under Defeat (Japan) (GDL-0035)", GAME_FLAGS )
+/* 0036  */ GAME( 2006, trghearto, trgheart,naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",        "Trigger Heart Exelica (Japan) (GDL-0036)", GAME_FLAGS )
+/* 0036A */ GAME( 2006, trgheart,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",        "Trigger Heart Exelica Ver.A (Japan) (GDL-0036A)", GAME_FLAGS )
+/* 0037  */ GAME( 2006, jingystm,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Atrativa Japan",   "Jingi Storm - The Arcade (Japan) (GDL-0037)", GAME_FLAGS )
+/* 0038  */ GAME( 2006, senkosp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",          "Senko no Ronde Special (Export, Japan) (GDL-0038)", GAME_FLAGS )
+/* 0039  */ GAME( 2006, meltybo,   meltyb,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software",   "Melty Blood Act Cadenza Version B (Japan) (GDL-0039)", GAME_FLAGS )
+/* 0039A */ GAME( 2006, meltyb,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software",   "Melty Blood Act Cadenza Version B2 (Japan) (GDL-0039A)", GAME_FLAGS )
+/* 0040  */ GAME( 2006, karous,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",      "Karous (Japan) (GDL-0040)", GAME_FLAGS )
+/* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works",  "Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
+/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
 
 /* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
@@ -12146,42 +11001,3 @@ ROM_END
 // 0003 - Initial D Arcade Stage Ver. 1 (Export) (GDS-0025A)
 // 0005 - Initial D Arcade Stage Ver. 2 (Export) (GDS-0027)
 // 0007 - Initial D Arcade Stage Ver. 3 (Export) (GDS-0033)
-
-
-/* Atomiswave */
-GAME( 2001, awbios,    0,        aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-																																									// game "exe" build timestamps, shown in SYSTEM MENU -> TEST MODE
-GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS)                            // none
-GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )                              // May 02 2003 09:40:31
-GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )// May 23 2003 14:40:15
-GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )                                    // Jun 02 2003 16:45:35
-GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS )                                    // Jun 09 2003 10:20:37
-GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS)                                      // Jun 27 2003 09:00:03
-GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_FLAGS)             // Nov 24 2003 16:56:01
-GAME( 2004, ggisuka,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS)                                 // Jan 14 2004 10:04:24
-GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS)                       // Feb 20 2004 09:15:34
-GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS )                                   // Mar 01 2004 19:08:15
-GAME( 2004, rumblef,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_FLAGS)                                   // Mar 10 2004 19:07:43
-GAME( 2004, salmankt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Yuki Enterprise / Sammy",  "Net@Select: Salaryman Kintaro", GAME_FLAGS )                    // Jun 14 2004 22:50:03
-GAME( 2004, kofnw,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )                     // Jul 09 2004 15:05:53
-GAME( 2004, kofnwj,    kofnw,    aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )             // Jul 09 2004 15:05:53
-GAME( 2004, ftspeed,   awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )                                // Aug 24 2004 18:40:24
-GAME( 2004, xtrmhunt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )                                  // Nov 23 2004 10:14:14
-GAME( 2004, blokpong,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "Block Pong-Pong", GAME_FLAGS )                                  // Dec 22 2004 12:32:52
-GAME( 2005, rumblf2p,  rumblef2, aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2 (prototype)", GAME_FLAGS )                    // Jan 11 2005 14:31:05
-GAME( 2005, anmlbskta, anmlbskt, aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (19 Jan 2005)", GAME_FLAGS )                      // Jan 19 2005 13:09:07
-GAME( 2005, anmlbskt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (24 Jan 2005)", GAME_FLAGS )                      // Jan 24 2005 14:12:29
-GAME( 2005, waidrive,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT270, "MOSS / Sammy",             "WaiWai Drive", GAME_FLAGS )                                     // Jan 27 2005 16:21:21
-GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Progress / Sammy",         "Net@Select: Horse Racing - Victory Furlong", GAME_FLAGS )       // Mar 02 2005 22:10:33
-GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS )                                // Mar 04 2005 19:26:32
-GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum", GAME_FLAGS )                           // Jun 25 2005 17:00:38
-GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS )                   // Jun 25 2005 17:00:38
-GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )             // Aug 05 2005 16:43:48
-GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )                          // Aug 07 2005 18:11:25
-GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star / Hokuto no Ken", GAME_FLAGS )           // Nov 28 2005 21:04:40
-GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS)                                      // Jan 13 2006 00:49:12
-GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_state, init_xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )                                // May 26 2006 14:03:22
-GAME( 2006, dirtypig,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_FLAGS)                            // Sep 10 2006 20:24:14
-GAME( 2008, claychal,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )                              // Oct 15 2008 16:08:20
-GAME( 2009, basschalo, basschal, aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )                      // Feb 08 2009 22:35:34
-GAME( 2009, basschal,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge Version A", GAME_FLAGS )            // Jul 25 2009 16:27:40
