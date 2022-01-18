@@ -90,6 +90,7 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
+	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols());
 	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
 	tileinfo.set(TM_TILES0 + Layer, tile, pal, TILE_FLIPYX(BIT(hi, 6, 2)));
 	tileinfo.category = tile == 0 ? 2 : 1;
@@ -161,20 +162,16 @@ static const gfx_layout tsconf_charlayout =
 
 static const gfx_layout tsconf_tile_16cpp_layout =
 {
-	8, 8,
-	64 * 64,
+	8,
+	8,
+	64 * 64 * 8,
 	4,
 	{STEP4(0, 1)},
 	{STEP8(0, 4)},
-	{STEP8(0, 256 * 8)}
+	{STEP8(0, 256 * 8)},
+	// Much more tiles when needed. Because tiles are in RAW formut but we don't know region properties.
+	8 * 4
 };
-
-static LAYOUT_CHAR_OFFSET_FUNC(layout_tile_offset)
-{
-	u32 col = code % 64;
-	u32 row = code / 64;
-	return (width * planes) * (row * height * 8 * 8 + col);
-}
 
 static GFXDECODE_START(gfx_tsconf)
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)		  // TM_TS_CHAR : TXT
@@ -190,17 +187,12 @@ void tsconf_state::video_start()
 
 	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
-	m_gfxdecode->gfx(TM_TILES0)->set_layout_char_offset_func(layout_tile_offset);
-	m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer());
 	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES0]->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(TM_TILES1)->set_layout_char_offset_func(layout_tile_offset);
-	m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer());
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(TM_SPRITES)->set_layout_char_offset_func(layout_tile_offset);
 	m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer());
 }
 

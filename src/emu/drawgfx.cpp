@@ -122,8 +122,7 @@ gfx_element::gfx_element(device_palette_interface *palette, const gfx_layout &gl
 		m_layout_is_raw(false),
 		m_layout_planes(0),
 		m_layout_xormask(xormask),
-		m_layout_charincrement(0),
-		m_layout_char_offset(nullptr)
+		m_layout_charincrement(0)
 {
 	// set the layout
 	set_layout(gl, srcdata);
@@ -282,6 +281,7 @@ void gfx_element::set_source_clip(u32 xoffs, u32 width, u32 yoffs, u32 height)
 	m_starty = yoffs;
 }
 
+
 //-------------------------------------------------
 //  decode - decode a single character
 //-------------------------------------------------
@@ -301,9 +301,7 @@ void gfx_element::decode(u32 code)
 				plane < m_layout_planes;
 				plane++, planebit >>= 1)
 		{
-			int planeoffs = m_layout_planeoffset[plane] + (m_layout_char_offset == nullptr
-				? code * m_layout_charincrement
-				: m_layout_char_offset(code, m_width, m_height, m_layout_planes, m_layout_charincrement));
+			int planeoffs = code * m_layout_charincrement + m_layout_planeoffset[plane];
 
 			// iterate over rows
 			for (int y = 0; y < m_origheight; y++)
