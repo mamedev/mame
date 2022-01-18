@@ -301,7 +301,7 @@ void falco500_state::asic_mode_w(uint8_t data)
 	// -------0  80/132 columns
 
 	// timing wrong
-	rectangle visarea(0, (BIT(data, 0) ? 132 * 10 : 80 * 10) - 1, 0, 400 - 1);
+	rectangle visarea(0, (BIT(data, 0) ? 1320 : 1120) - 1, 0, 400 - 1);
 	m_screen->configure(1500, 422, visarea, HZ_TO_ATTOSECONDS(60));
 }
 
@@ -340,20 +340,24 @@ uint32_t falco500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		// ----3210  offset for double-height lines
 
 		// la2 layout
-		// 7654----  line address bank (multiply by 2 to get the address)
+		// 7-------  line address highest bit (only for graphics mode?)
+		// -654----  line address bank (multiply by 2 to get the address)
 		// ----3210  line address offset high bytes
 
 		// la3 layout
 		// 7-------  unknown
 		// -6------  set on the line between windows
 		// --5-----  80 columns/132 columns
-		// ---43---  unknown
+		// ---4----  graphics/alphanumeric
+		// ----3---  unknown
 		// -----2--  double width
 		// ------1-  double height first half
 		// -------0  double height second half (but not working for line modes 26 and 44?)
 
 		uint16_t line_addr = (la2 << 8) | la0;
-		line_addr = ((line_addr & 0xf000) << 1) | (line_addr & 0x0fff);
+
+		// move address highest bit to its place, shift bank left
+		line_addr = bitswap<16>(line_addr, 14, 13, 12, 15, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
 		//uint8_t unk_code = m_ram[0x0000 + line_addr]; // ?
 		//uint8_t unk_attr = m_ram[0x1000 + line_addr]; // ?
@@ -364,92 +368,121 @@ uint32_t falco500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		uint8_t line_height = la1 >> 4;
 		line_height++;
 
-		// figure out number of columns
-		int cols = BIT(la3, 5) ? 80 : 132;
-
-		if (BIT(la3, 2))
-			cols /= 2;
-
 		// safety check to prevent writing out of bounds
 		if (y + line_height > (cliprect.max_y + 1))
 			return 0;
 
-		for (int col = 0; col < cols; col++)
+		if (BIT(la3, 4))
 		{
-			uint16_t char_addr = line_addr + col;
-
-			uint8_t code = m_ram[0x0000 + char_addr];
-			uint8_t attr = m_ram[0x1000 + char_addr];
-
-			// code layout
-			// 7-------  unknown
-			// -6543210  chargen address
-
-			// attr layout
-			// 7-------  unknown
-			// -6------  chargen address high bit
-			// --5-----  unknown
-			// ---4----  normal/bold
-			// ----3---  unknown
-			// -----2--  reverse
-			// ------1-  blink
-			// -------0  underline
-
-			for (int y_char = 0; y_char < line_height; y_char++)
+			// horizontal resolution 560 pixels
+			for (int col = 0; col < 560; col++)
 			{
-				bool blink = bool(m_screen->frame_number() & 0x10); // timing?
-				bool underline = bool(y_char == (m_asic_settings & 0x0f));
-
-				int y_chargen = y_char;
-
-				// double height enabled?
-				if (la3 & 0x03)
-					y_chargen /= 2;
-
-				// double-height, first half
-				if (BIT(la3, 1))
-					y_chargen += 0;
-
-				// double height, second half
-				if (BIT(la3, 0))
-					y_chargen += ((la1 & 0x0f) + 1);
-
-				uint16_t gfx = m_charram[(BIT(attr, 6) << 12) | ((code & 0x7f) << 4) | y_chargen];
-
-				if (BIT(attr, 0) && underline)
-					gfx = 0x3ff;
-
-				if (BIT(attr, 1) && blink)
-					gfx = 0x000;
-
-				if (BIT(attr, 2))
-					gfx ^= 0x3ff;
-
-				// cursor
-				if (BIT(m_asic_settings, 4) && (m_asic_cursor_addr == char_addr))
-				{
-					if ((BIT(m_asic_settings, 5) == 1 && BIT(m_asic_settings, 6) == 0) || // block
-						(BIT(m_asic_settings, 5) == 1 && BIT(m_asic_settings, 6) == 1 && blink) || // block-blink
-						(BIT(m_asic_settings, 5) == 0 && underline && BIT(m_asic_settings, 6) == 0) || // underline
-						(BIT(m_asic_settings, 5) == 0 && underline && BIT(m_asic_settings, 6) == 1 && blink)) // underline-blink
-						gfx ^= 0x3ff; // might be solid instead
-				}
+				uint16_t char_addr = line_addr + col;
+				uint8_t code = m_ram[0x0000 + char_addr];
 
 				// foreground/background colors
-				rgb_t fg = BIT(attr, 4) ? pen[1] : pen[2];
+				rgb_t fg = pen[1];
 				rgb_t bg = pen[0];
 
-				for (int x = 0; x < 10; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					if (BIT(la3, 2))
 					{
-						// double-width
-						bitmap.pix(y + y_char, col * 2 * 10 + x * 2 + 0) = BIT(gfx, x) ? fg : bg;
-						bitmap.pix(y + y_char, col * 2 * 10 + x * 2 + 1) = BIT(gfx, x) ? fg : bg;
+						bitmap.pix(y + (col / 70), (((col % 70) * 8) * 2) + (x * 2) + 0) = BIT(code, x) ? fg : bg;
+						bitmap.pix(y + (col / 70), (((col % 70) * 8) * 2) + (x * 2) + 1) = BIT(code, x) ? fg : bg;
 					}
 					else
 					{
-						bitmap.pix(y + y_char, col * 10 + x) = BIT(gfx, x) ? fg : bg;
+						bitmap.pix(y + (col / 70), ((col % 70) * 8) + x) = BIT(code, x) ? fg : bg;
+					}
+				}
+			}
+		}
+		else
+		{
+			// figure out number of columns
+			int cols = BIT(la3, 5) ? 80 : 132;
+
+			if (BIT(la3, 2))
+				cols /= 2;
+
+			for (int col = 0; col < cols; col++)
+			{
+				uint16_t char_addr = line_addr + col;
+
+				uint8_t code = m_ram[0x0000 + char_addr];
+				uint8_t attr = m_ram[0x1000 + char_addr];
+
+				// code layout
+				// 7-------  unknown
+				// -6543210  chargen address
+
+				// attr layout
+				// 7-------  unknown
+				// -6------  chargen address high bit
+				// --5-----  unknown
+				// ---4----  normal/bold
+				// ----3---  unknown
+				// -----2--  reverse
+				// ------1-  blink
+				// -------0  underline
+
+				for (int y_char = 0; y_char < line_height; y_char++)
+				{
+					bool blink = bool(m_screen->frame_number() & 0x10); // timing?
+					bool underline = bool(y_char == (m_asic_settings & 0x0f));
+
+					int y_chargen = y_char;
+
+					// double height enabled?
+					if (la3 & 0x03)
+						y_chargen /= 2;
+
+					// double-height, first half
+					if (BIT(la3, 1))
+						y_chargen += 0;
+
+					// double height, second half
+					if (BIT(la3, 0))
+						y_chargen += ((la1 & 0x0f) + 1);
+
+					uint16_t gfx = m_charram[(BIT(attr, 6) << 12) | ((code & 0x7f) << 4) | y_chargen];
+
+					if (BIT(attr, 0) && underline)
+						gfx = 0x3ff;
+
+					if (BIT(attr, 1) && blink)
+						gfx = 0x000;
+
+					if (BIT(attr, 2))
+						gfx ^= 0x3ff;
+
+					// cursor
+					if (BIT(m_asic_settings, 4) && (m_asic_cursor_addr == char_addr))
+					{
+						if ((BIT(m_asic_settings, 5) == 1 && BIT(m_asic_settings, 6) == 0) || // block
+							(BIT(m_asic_settings, 5) == 1 && BIT(m_asic_settings, 6) == 1 && blink) || // block-blink
+							(BIT(m_asic_settings, 5) == 0 && underline && BIT(m_asic_settings, 6) == 0) || // underline
+							(BIT(m_asic_settings, 5) == 0 && underline && BIT(m_asic_settings, 6) == 1 && blink)) // underline-blink
+							gfx ^= 0x3ff; // might be solid instead
+					}
+
+					// foreground/background colors
+					rgb_t fg = BIT(attr, 4) ? pen[1] : pen[2];
+					rgb_t bg = pen[0];
+
+					for (int x = 0; x < 10; x++)
+					{
+						if (BIT(la3, 2))
+						{
+							// double-width
+							bitmap.pix(y + y_char, col * 2 * 10 + x * 2 + 0) = BIT(gfx, x) ? fg : bg;
+							bitmap.pix(y + y_char, col * 2 * 10 + x * 2 + 1) = BIT(gfx, x) ? fg : bg;
+						}
+						else
+						{
+							bitmap.pix(y + y_char, col * 10 + x) = BIT(gfx, x) ? fg : bg;
+						}
 					}
 				}
 			}

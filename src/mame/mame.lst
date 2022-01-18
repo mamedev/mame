@@ -11540,6 +11540,7 @@ crospuzl                        //
 @source:crshrace.cpp
 crshrace                        // (c) 1993 Video System Co.
 crshrace2                       // (c) 1993 Video System Co.
+crshrace2a                      // (c) 1993 Video System Co.
 
 @source:crvision.cpp
 crvisio2                        //
@@ -17132,6 +17133,7 @@ xymg                            // (c) 1996
 @source:igs017.cpp
 genius6                         // (c) 1998
 genius6a                        // (c) 1997
+genius6b                        // (c) 1997
 happyskl                        // (c) 2001?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
