@@ -43822,8 +43822,8 @@ magixb                          // bootleg
 rocktris                        // (c) 1994? Yun Sung
 
 @source:yuvomz80.cpp
-hexapres                        // 1995 Yubis
-hexaprez                        // 1995 Yubis
+goldhexa                        // Yuvo / Yubis
+hexapres                        //
 
 @source:z100.cpp
 z100                            //
