@@ -3119,6 +3119,7 @@ atetrisb                        // (bootleg)
 atetrisb2                       // (bootleg)
 atetrisb3                       // (bootleg)
 atetrisb4                       // (bootleg)
+atetrisb5                       // (bootleg)
 atetb3482                       // (bootleg, with UM3482)
 atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
@@ -36223,7 +36224,7 @@ ravens                          //
 ravens2                         //
 
 @source:rawthrillspc.cpp
-fnf                             // (c) 2014 Raw Thrills
+fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
 @source:rbisland.cpp
