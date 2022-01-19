@@ -43822,8 +43822,8 @@ magixb                          // bootleg
 rocktris                        // (c) 1994? Yun Sung
 
 @source:yuvomz80.cpp
-goldhexa                        // Yuvo / Yubis
-hexapres                        //
+hexaprs                         // 1995 Yuvo / Yubis - Hexa President (YM2610 set)
+hexaprsz                        // 1995 Yuvo / Yubis - Hexa President (YMZ280B set)
 
 @source:z100.cpp
 z100                            //
