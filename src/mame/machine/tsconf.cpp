@@ -28,7 +28,7 @@ enum v_mode : u8
 	VM_TXT
 };
 
-static constexpr u16 tmp_tile_oversized_to_code (u16 code)
+static constexpr u16 tmp_tile_oversized_to_code(u16 code)
 {
 	return code / 64 * 64 * 8 + (code % 64);
 }
@@ -338,19 +338,16 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 
 			u32 pmask = layer ? (layer == 1 ? GFX_PMASK_2 : 0) : (GFX_PMASK_1 | GFX_PMASK_2);
 
-			code += flipy * height8 * 64;
-			for (auto iy = 0; iy <= height8; iy++)
+			u8 tile_row = code / 64 + flipy * height8;
+			for (auto iy = y; iy <= y + height8 * 8; iy = iy + 8)
 			{
-				auto code_x = code + flipx * width8;
-				auto x0 = x;
-				for (auto ix = 0; ix <= width8; ix++)
+				u8 tile_col = (code % 64) + flipx * width8;
+				for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
 				{
-					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(m_screen_bitmap, cliprect, tmp_tile_oversized_to_code(code_x), pal, flipx, flipy, x0, y, m_screen->priority(), pmask, 0);
-					code_x += flipx ? -1 : 1;
-					x0 += 8;
+					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(m_screen_bitmap, cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)), pal, flipx, flipy, ix, iy, m_screen->priority(), pmask, 0);
+					tile_col += flipx ? -1 : 1;
 				}
-				code += flipy ? -64 : 64;
-				y += 8;
+				tile_row += flipy ? -1 : 1;
 			}
 		}
 	}
@@ -774,7 +771,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 	case TIMER_IRQ_SCANLINE:
 	{
-		if(BIT(m_regs[INT_MASK], 1))
+		if (BIT(m_regs[INT_MASK], 1))
 		{
 			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 		}
