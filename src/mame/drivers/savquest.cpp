@@ -972,4 +972,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_UNEMULATED_PROTECTION)
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_NOT_WORKING)
