@@ -1482,7 +1482,7 @@ GAME( 2001, awbios,    0,        aw2c, aw2c, atomiswave_state, init_atomiswave, 
 // game "exe" build timestamps, shown in SYSTEM MENU -> TEST MODE
 GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS ) // none
 GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS ) // May 02 2003 09:40:31
-GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar", GAME_FLAGS ) // May 23 2003 14:40:15
+GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar / Toretore! Sushi", GAME_FLAGS ) // May 23 2003 14:40:15
 GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS ) // Jun 02 2003 16:45:35
 GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS ) // Jun 09 2003 10:20:37
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS ) // Jun 27 2003 09:00:03

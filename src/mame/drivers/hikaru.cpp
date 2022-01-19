@@ -15,7 +15,7 @@ The games on this system include....
 Air Trix                     (C) Sega, 2001
 Brave Fire Fighters          (C) Sega, 1999
 *Cyber Troopers Virtual On 4 (C) Sega, 2001
-Nascar Racing                (C) Sega, 2000
+Nascar Arcade                (C) Sega, 2000
 Planet Harriers              (C) Sega, 2001
 Star Wars Racer Arcade       (C) Sega, 2000
 
@@ -877,7 +877,7 @@ GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0,
 GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, hikcheck,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
