@@ -134,7 +134,7 @@ Game ID  Year    Game
 GK922    2000    Code One Dispatch
 G????    2001    ParaParaParadise 2nd Mix
 GM941    2001    GTI Club 2
-G?A00    2001    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24ji (Asia/Japan/Korea)
+G?A00    2001    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24-ji (Asia/Japan/Korea)
 GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
 G?A29    2001    Mocap Boxing
 G?A30    2002    Tsurugi
