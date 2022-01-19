@@ -78692,10 +78692,10 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3a" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Asia, 14 Characters)</description>
+	<software name="umk3a" supported="partial">
+		<description>Ultimate Mortal Kombat 3 (Asia, 14 characters)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="h2288" />
 			<feature name="pcb" value="UNL-H2288" />
