@@ -21976,8 +21976,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2091752">
-				<rom name="payne stewart pro golf (prototype a).bin" size="2091752" crc="1ee27e49" sha1="84744e8f4fb5da36057fe0318ca9e0f035d47a99"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="payne stewart pro golf (prototype a).bin" size="2097152" crc="1ee27e49" sha1="84744e8f4fb5da36057fe0318ca9e0f035d47a99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21987,8 +21987,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2091752">
-				<rom name="payne stewart pro golf (prototype b).bin" size="2091752" crc="602f556a" sha1="f778e6052f9627fe18109fd650a42bdaed278492"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="payne stewart pro golf (prototype b).bin" size="2097152" crc="602f556a" sha1="f778e6052f9627fe18109fd650a42bdaed278492"/>
 			</dataarea>
 		</part>
 	</software>
