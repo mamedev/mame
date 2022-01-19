@@ -134,13 +134,13 @@ Game ID  Year    Game
 GK922    2000    Code One Dispatch
 G????    2001    ParaParaParadise 2nd Mix
 GM941    2001    GTI Club 2
-G?A00    2001    Police 911 (USA) / Police 24/7 (World) / Keisatsukan Shinjuku 24ji (Japan)
+G?A00    2001    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24ji (Asia/Japan/Korea)
 GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
 G?A29    2001    Mocap Boxing
 G?A30    2002    Tsurugi
 GMA41    2001    Thrill Drive 2
 G?A45    2001    Boxing Mania
-G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
+G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / The Keisatsukan: Shinjuku 24-ji 2 (Japan)
 G?B33    2001    Mocap Golf
 G?B41    2001    Jurassic Park 3
 G?B4x    2002    Xtrial Racing
