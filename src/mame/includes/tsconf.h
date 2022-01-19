@@ -45,8 +45,15 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	enum timer_id : u8
+	{
+		TIMER_IRQ_FRAME = TIMER_SCANLINE + 1,
+		TIMER_IRQ_SCANLINE
+	};
+
 	enum gluk_ext : u8
 	{
 		CONF_VERSION = 0x00,
@@ -123,8 +130,10 @@ private:
 		T1_Y_OFFSER_H = 0x47
 	};
 
+	emu_timer *m_frame_irq_timer;
+	emu_timer *m_line_irq_timer;
+
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(tsconf_line_interrupt);
 
 	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);

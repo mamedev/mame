@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
-	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols());
+	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols()); // same as: tmp_tile_oversized_to_code()
 	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
 	tileinfo.set(TM_TILES0 + Layer, tile, pal, TILE_FLIPYX(BIT(hi, 6, 2)));
 	tileinfo.category = tile == 0 ? 2 : 1;
@@ -193,14 +193,15 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer());
+	m_frame_irq_timer = timer_alloc(TIMER_IRQ_FRAME);
+	m_line_irq_timer = timer_alloc(TIMER_IRQ_SCANLINE);
 }
 
 void tsconf_state::machine_start()
 {
-	m_banks[1]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
-	m_banks[2]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
-	m_banks[3]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
+	m_banks[1]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+	m_banks[2]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+	m_banks[3]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	save_item(NAME(m_regs));
 	// TODO save'm'all!
@@ -252,22 +253,22 @@ void tsconf_state::machine_reset()
 void tsconf_state::tsconf(machine_config &config)
 {
 	spectrum_128(config);
+	m_maincpu->set_clock(3.5_MHz_XTAL);
+
 	config.device_remove("exp");
 	config.device_remove("palette");
 
-	//m_maincpu->set_clock(XTAL(14'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
-	m_maincpu->set_periodic_int(FUNC(tsconf_state::tsconf_line_interrupt), m_maincpu->clocks_to_attotime(224)); // 448 screen clocks
 
 	m_ram->set_default_size("4096K");
 
 	GLUKRS(config, m_glukrs);
 
-	TSCONF_DMA(config, m_dma, XTAL(14'000'000) / 2);
+	TSCONF_DMA(config, m_dma, 7_MHz_XTAL);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
@@ -281,14 +282,14 @@ void tsconf_state::tsconf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	AY8912(config.replace(), "ay8912", XTAL(14'000'000) / 8)
+	AY8912(config.replace(), "ay8912", 14_MHz_XTAL / 8)
 		.add_route(0, "lspeaker", 0.50)
 		.add_route(1, "lspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
-	m_screen->set_raw(X1 / 4, 448 / 2, TSCONF_SCREEN_HBLANK / 2, 448 / 2, 320, TSCONF_SCREEN_VBLANK, 320);
+	m_screen->set_raw(7_MHz_XTAL, 448, TSCONF_SCREEN_HBLANK, 448, 320, TSCONF_SCREEN_VBLANK, 320);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

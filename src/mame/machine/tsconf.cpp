@@ -28,6 +28,11 @@ enum v_mode : u8
 	VM_TXT
 };
 
+static constexpr u16 tmp_tile_oversized_to_code (u16 code)
+{
+	return code / 64 * 64 * 8 + (code % 64);
+}
+
 // https://github.com/tslabs/zx-evo/blob/master/pentevo/vdac/vdac1/cpld/top.v
 static constexpr u8 pwm_to_rgb[32] = {
 	0, 10, 21, 31, 42, 53, 63, 74,
@@ -72,12 +77,14 @@ void tsconf_state::tsconf_update_bank0()
 
 	if (W0_RAM)
 	{
-		m_banks[0]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
+		m_banks[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 		m_banks[0]->set_entry(m_ROMSelection);
 	}
 	else
 	{
-		m_banks[0]->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x4000);
+		memory_region *rom = memregion("maincpu");
+		u8 rom_banks = (rom->bytes() - 0x10000) / 0x4000;
+		m_banks[0]->configure_entries(0, rom_banks, rom->base() + 0x10000, 0x4000);
 		m_banks[0]->set_entry(m_ROMSelection & 0x1f);
 	}
 }
@@ -136,6 +143,16 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+/*
+Layered as:
+ + Border
+ + Graphics
+ + Sprites 0
+ + Tiles 0
+ + Sprites 1
+ + Tiles 1
+ + Sprites 2
+*/
 void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 {
 	rectangle resolution = get_screen_area();
@@ -152,7 +169,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 			m_previous_screen_y = m_screen->vpos();
 			if (y >= 0 && y < resolution.height())
 			{
-				//assert(!m_screen->vblank());
+				//assert(!m_screen->vblank()); // possibly something wrong with vblank() - occasionally 32 reported as blank!
 				u8 pal_offset = m_regs[PAL_SEL] << 4;
 				u16 *bm = &m_screen_bitmap.pix(y + resolution.top(), resolution.left());
 				if (VM == VM_TXT)
@@ -231,7 +248,9 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		}
 		else if (m_screen->vpos() <= resolution.bottom() + TSCONF_SCREEN_VBLANK)
 		{
+			// Update unrendered above excluding current line.
 			resolution.sety(m_previous_tsu_vpos - TSCONF_SCREEN_VBLANK, m_screen->vpos() - TSCONF_SCREEN_VBLANK - 1);
+			// Too expencive to draw every line. Batch 8+ for now.
 			draw = resolution.height() > 7;
 			if (!draw && (resolution.bottom() + 1) == get_screen_area().bottom())
 			{
@@ -283,6 +302,7 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 	u8 layer = 0;
 	u8 *sinfo = m_sfile->pointer() + 1;
 	u8 sid = 1;
+	// Higher Sprite draws on top. Prepare to iterate backwards.
 	for (; sid < 85 && layer < 3; sid++)
 	{
 		if (BIT(*sinfo, 6))
@@ -325,7 +345,7 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 				auto x0 = x;
 				for (auto ix = 0; ix <= width8; ix++)
 				{
-					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(m_screen_bitmap, cliprect, code_x, pal, flipx, flipy, x0, y, m_screen->priority(), pmask, 0);
+					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(m_screen_bitmap, cliprect, tmp_tile_oversized_to_code(code_x), pal, flipx, flipy, x0, y, m_screen->priority(), pmask, 0);
 					code_x += flipx ? -1 : 1;
 					x0 += 8;
 				}
@@ -602,7 +622,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case SYS_CONFIG:
 		// 0 - 3.5MHz, 1 - 7MHz, 2 - 14MHz, 3 - reserved
-		m_maincpu->set_clock(X1 / 4 * ((data & 0x03) + 1));
+		m_maincpu->set_clock(3.5_MHz_XTAL * (1 << (data & 0x03)));
 		break;
 
 	case FMAPS:
@@ -666,7 +686,7 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				{
 					strcpy((char *)m_fx, "M.A.M.E.");
 					PAIR16 m_ver;
-					m_ver.w = ((21 << 9) | (12 << 5) | 15);
+					m_ver.w = ((22 << 9) | (01 << 5) | 19); // y.m.d
 					m_fx[0x0c] = m_ver.b.l;
 					m_fx[0x0d] = m_ver.b.h;
 					break;
@@ -729,15 +749,40 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
-	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
+	u16 hpos = m_regs[HS_INT];
+	if (vpos <= 319 && hpos <= 223)
+	{
+		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
+	}
+	m_line_irq_timer->adjust(m_screen->time_until_pos(0));
 }
 
-INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_line_interrupt)
+void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (BIT(m_regs[INT_MASK], 1) && !m_maincpu->input_state(0))
+	switch (id)
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
+	// That's not the way it desired, looking for any suggestions...
+	case TIMER_IRQ_FRAME:
+	{
+		if (BIT(m_regs[INT_MASK], 0))
+		{
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+		}
+		break;
+	}
+	case TIMER_IRQ_SCANLINE:
+	{
+		if(BIT(m_regs[INT_MASK], 1))
+		{
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		}
+		m_line_irq_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1));
+		break;
+	}
+	default:
+		spectrum_state::device_timer(timer, id, param, ptr);
 	}
 }
 
