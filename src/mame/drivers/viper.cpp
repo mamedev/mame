@@ -134,7 +134,7 @@ Game ID  Year    Game
 GK922    2000    Code One Dispatch
 G????    2001    ParaParaParadise 2nd Mix
 GM941    2001    GTI Club 2
-G?A00    2001    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24-Ji (Asia/Japan/Korea)
+G?A00    2001    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24-ji (Asia/Japan/Korea)
 GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
 G?A29    2001    Mocap Boxing
 G?A30    2002    Tsurugi
@@ -3424,14 +3424,14 @@ GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_viperc
 GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-Ji (ver AAE)", MACHINE_NOT_WORKING)
-GAME(2001, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-Ji (ver KAE)", MACHINE_NOT_WORKING)
-GAME(2001, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-Ji (ver AAC)", MACHINE_NOT_WORKING)
-GAME(2001, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-Ji (ver KAC)", MACHINE_NOT_WORKING)
+GAME(2001, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
+GAME(2001, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
+GAME(2001, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
+GAME(2001, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
 GAME(2001, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
 GAME(2001, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
 GAME(2001, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
-GAME(2001, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-Ji (ver JAE)", MACHINE_NOT_WORKING)
+GAME(2001, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
