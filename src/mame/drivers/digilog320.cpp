@@ -47,6 +47,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
+#include "machine/mc68681.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -65,7 +66,11 @@ public:
 	digilog320_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu")
+		m_subcpu(*this, "subcpu"),
+		m_crtc(*this, "crtc"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram"),
+		m_chargen(*this, "chargen")
 	{ }
 
 	void digilog320(machine_config &config);
@@ -77,11 +82,17 @@ protected:
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<z80_device> m_subcpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint16_t> m_vram;
+	required_region_ptr<uint8_t> m_chargen;
 
 	void main_mem_map(address_map &map);
 	void main_io_map(address_map &map);
 	void sub_mem_map(address_map &map);
 	void sub_io_map(address_map &map);
+
+	MC6845_UPDATE_ROW(update_row);
 };
 
 
@@ -92,12 +103,15 @@ private:
 void digilog320_state::main_mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
-	map(0x80000, 0x83fff).ram(); // vram
+	map(0x80000, 0x83fff).ram().share("vram");
 	map(0xa0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void digilog320_state::main_io_map(address_map &map)
 {
+	map(0x080, 0x09f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x180, 0x180).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x182, 0x182).w(m_crtc, FUNC(mc6845_device::register_w));
 }
 
 void digilog320_state::sub_mem_map(address_map &map)
@@ -115,6 +129,21 @@ void digilog320_state::sub_io_map(address_map &map)
 //**************************************************************************
 //  VIDEO EMULATION
 //**************************************************************************
+
+MC6845_UPDATE_ROW( digilog320_state::update_row )
+{
+	pen_t const *const pen = m_palette->pens();
+
+	for (int x = 0; x < x_count; x++)
+	{
+		uint16_t const data = (m_vram[ma + x]);
+		uint8_t gfx = m_chargen[((data & 0xff) << 4) | ra];
+
+		// draw 8 pixels of the character
+		for (int i = 0; i < 8; i++)
+			bitmap.pix(y, x * 8 + i) = pen[BIT(gfx, i)];
+	}
+}
 
 static const gfx_layout char_layout =
 {
@@ -159,9 +188,20 @@ void digilog320_state::digilog320(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &digilog320_state::sub_mem_map);
 	m_subcpu->set_addrmap(AS_IO, &digilog320_state::sub_io_map);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(5.6592_MHz_XTAL, 320, 0, 256, 262, 0, 192);
+	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "palette", chars);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+
+	GFXDECODE(config, "gfxdecode", m_palette, chars);
+
+	MC6845(config, m_crtc, 5.6592_MHz_XTAL / 8); // HD46505SP-2
+	m_crtc->set_char_width(8);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_update_row_callback(FUNC(digilog320_state::update_row));
+
+	SCN2681(config, "duart", 3.6864_MHz_XTAL);
 }
 
 
