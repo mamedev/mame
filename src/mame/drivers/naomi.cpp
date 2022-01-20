@@ -341,7 +341,7 @@ Game                                            on cart      IC22#   # of SOP44 
 ------------------------------------------------------------------------------------------------------------------------------
 18 Wheeler American Pro Trucker (deluxe)        ?            22185   20 (64Mb)   ?           ?         ?
 /18 Wheeler American Pro Trucker                840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
-\(deluxe, Rev A) 
+\(deluxe, Rev A)
 /18 Wheeler American Pro Trucker                ?            22185T  20 (64Mb)   ?           ?         ?
 \(deluxe, Rev T)
 18 Wheeler American Pro Trucker (standard)      840-0036C    23298   20 (64Mb)   present     315-6213  317-0273-COM
