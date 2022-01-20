@@ -339,11 +339,13 @@ Games known to use this PCB include....
                                                 Sticker      EPROM   mask ROMs   X76F100     XC9536    315-5881
 Game                                            on cart      IC22#   # of SOP44  IC37#       IC41#     IC42#          Notes
 ------------------------------------------------------------------------------------------------------------------------------
-18 Wheeler (deluxe)                             ?            22185   20 (64Mb)   ?           ?         ?
-18 Wheeler (deluxe, Rev A)                      840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
-18 Wheeler (deluxe, Rev T)                      ?            22185T  20 (64Mb)   ?           ?         ?
-18 Wheeler (standard)                           840-0036C    23298   20 (64Mb)   present     315-6213  317-0273-COM
-18 Wheeler (upright)                            840-0037C    23299   20 (64Mb)   present     315-6213  317-0273-COM
+18 Wheeler American Pro Trucker (deluxe)        ?            22185   20 (64Mb)   ?           ?         ?
+/18 Wheeler American Pro Trucker                840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
+\(deluxe, Rev A) 
+/18 Wheeler American Pro Trucker                ?            22185T  20 (64Mb)   ?           ?         ?
+\(deluxe, Rev T)
+18 Wheeler American Pro Trucker (standard)      840-0036C    23298   20 (64Mb)   present     315-6213  317-0273-COM
+18 Wheeler American Pro Trucker (upright)       840-0037C    23299   20 (64Mb)   present     315-6213  317-0273-COM
 Airline Pilots (World, Rev B)                   840-0005C*   21787B  11 (64Mb)   present     315-6213  317-0251-COM   * no cart case if 3-screen multi-board setup, 834-13763(-01) ROM PCB. 2 known BIOS 21801 (USA), 21802 (EXP)
 Airline Pilots (Japan, Rev A)                   840-0005C*   21739A  11 (64Mb)   present     315-6213  317-0251-COM   * same as above
 Cosmic Smash                                    840-0044C    23428    8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
@@ -5085,7 +5087,7 @@ ROM_START( jambo )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fab95" )
 ROM_END
 
-/* 18 Wheeler (deluxe) (no Rev) */
+/* 18 Wheeler American Pro Trucker (deluxe) (no Rev) */
 ROM_START( 18wheelro )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -5131,7 +5133,7 @@ ROM_START( 18wheelro )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
-/* 18 Wheeler (deluxe, Rev A) */
+/* 18 Wheeler American Pro Trucker (deluxe, Rev A) */
 ROM_START( 18wheelr )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -5177,7 +5179,7 @@ ROM_START( 18wheelr )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
-/* 18 Wheeler (deluxe, Rev T) */
+/* 18 Wheeler American Pro Trucker (deluxe, Rev T) */
 ROM_START( 18wheelrt )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -5223,7 +5225,7 @@ ROM_START( 18wheelrt )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
-/* 18 Wheeler (standard) */
+/* 18 Wheeler American Pro Trucker (standard) */
 ROM_START( 18wheels )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -5269,7 +5271,7 @@ ROM_START( 18wheels )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
-/* 18 Wheeler (upright) */
+/* 18 Wheeler American Pro Trucker (upright) */
 ROM_START( 18wheelu )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -10652,9 +10654,9 @@ void naomi_state::init_hotd2()
 /* 0021    */ GAME( 2000, virnbao,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA", GAME_FLAGS )
 /* 0021-01 */ GAME( 2000, virnba,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (USA)", GAME_FLAGS )
 /* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
-/* 0023    */ GAME( 2000, 18wheelro, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (deluxe)", GAME_FLAGS )
-/* 0023    */ GAME( 2000, 18wheelr,  naomi,    naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (deluxe, Rev A)", GAME_FLAGS )
-/* 0023    */ GAME( 2000, 18wheelrt, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (deluxe, Rev T)", GAME_FLAGS )
+/* 0023    */ GAME( 2000, 18wheelro, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler American Pro Trucker (deluxe)", GAME_FLAGS )
+/* 0023    */ GAME( 2000, 18wheelr,  naomi,    naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler American Pro Trucker (deluxe, Rev A)", GAME_FLAGS )
+/* 0023    */ GAME( 2000, 18wheelrt, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler American Pro Trucker (deluxe, Rev T)", GAME_FLAGS )
 /* 0025    */ GAME( 1999, marstv,    naomi,    naomim2, marstv,  naomi_state, init_naomi,   ROT0, "Sega", "Mars TV (Japan)", GAME_FLAGS )
 /* 0026    */ GAME( 2000, totdo,     totd,     naomim2_kb, naomi_kb,   naomi_state, init_naomi,   ROT0, "Sega", "The Typing of the Dead", GAME_FLAGS )
 /* 0026    */ GAME( 2000, totd,      naomi,    naomim2_kb, naomi_kb,   naomi_state, init_naomi,   ROT0, "Sega", "The Typing of the Dead (Rev A)", GAME_FLAGS )
@@ -10665,8 +10667,8 @@ void naomi_state::init_hotd2()
 /* 0034    */ GAME( 2000, shorsepb,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (backup data)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgt,  naomi,    naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
-/* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (standard)", GAME_FLAGS )
-/* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (upright)", GAME_FLAGS )
+/* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler American Pro Trucker (standard)", GAME_FLAGS )
+/* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler American Pro Trucker (upright)", GAME_FLAGS )
 // 0038 日テレ式未来予想スタジオ / NTV Future Forecast Studio
 /* 0039    */ GAME( 2000, gram2000,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040    */ GAME( 2000, wwfroyal,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
