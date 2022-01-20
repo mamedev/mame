@@ -1474,6 +1474,7 @@ witch.cpp
 wiz.cpp
 wmg.cpp
 wms.cpp
+wms_shuffle.cpp
 wolfpack.cpp
 wpc_95.cpp
 wpc_an.cpp

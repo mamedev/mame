@@ -54,13 +54,16 @@ public:
 	s4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_mainirq(*this, "mainirq")
+		, m_pias(*this, "pias")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_4020(*this, "4020")
 		, m_io_keyboard(*this, "X%d", 0U)
+		, m_io_snd(*this, "SND")
 		, m_dips(*this, "DS%d", 1U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
@@ -70,8 +73,9 @@ public:
 	void s4(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -80,15 +84,18 @@ protected:
 	void lamp0_w(u8 data);
 	void lamp1_w(u8 data);
 	void sol0_w(u8 data);
-	u8 dips_r();
-	u8 switch_r();
+	void sol1_w(u8 data);
 	void switch_w(u8 data);
 	void clockcnt_w(u16 data);
+	u8 dips_r();
+	u8 sound_r();
+	u8 switch_r();
 	u8 m_strobe = 0;
 	u8 m_row = 0;
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
+	u8 m_sound_data = 0;
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
@@ -99,51 +106,24 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	void main_map(address_map &map);
+	void audio_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<input_merger_device> m_mainirq;
+	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	required_device<ripple_counter_device> m_4020;
 	required_ioport_array<8> m_io_keyboard;
+	required_ioport m_io_snd;
 	required_ioport_array<2> m_dips;
 	output_finder<32> m_digits;
 	output_finder<2> m_leds;
 	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
-
-private:
-	void sol1_w(u8 data);
 };
-
-
-class s4a_state : public s4_state
-{
-public:
-	s4a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s4_state(mconfig, type, tag)
-		, m_audiocpu(*this, "audiocpu")
-		, m_pias(*this, "pias")
-		, m_io_snd(*this, "SND")
-	{
-	}
-
-	void s4a(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-
-private:
-	virtual void machine_start() override;
-	u8 sound_r();
-	void s4a_sol1_w(u8 data);
-	u8 m_sound_data = 0;
-	void audio_map(address_map &map);
-	required_device<cpu_device> m_audiocpu;
-	required_device<pia6821_device> m_pias;
-	required_ioport m_io_snd;
-};
-
 
 void s4_state::main_map(address_map &map)
 {
@@ -157,7 +137,7 @@ void s4_state::main_map(address_map &map)
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
 }
 
-void s4a_state::audio_map(address_map &map)
+void s4_state::audio_map(address_map &map)
 {
 	map.global_mask(0x0fff);
 	map(0x0000, 0x00ff).ram();
@@ -294,20 +274,16 @@ static INPUT_PORTS_START( s4 )
 	PORT_DIPSETTING(    0x47, "29" )
 	PORT_DIPSETTING(    0x87, "30" )
 	PORT_DIPSETTING(    0x07, "31" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( s4a )
-	PORT_INCLUDE(s4)
 
 	PORT_START("SND")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Music") PORT_CODE(KEYCODE_8_PAD) PORT_TOGGLE
 
 	PORT_MODIFY("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s4a_state, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s4_state, audio_nmi, 1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( flash )
-	PORT_INCLUDE(s4a)
+	PORT_INCLUDE(s4)
 	PORT_MODIFY("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
 	PORT_MODIFY("X5")
@@ -316,7 +292,7 @@ static INPUT_PORTS_START( flash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trizn )
-	PORT_INCLUDE(s4a)
+	PORT_INCLUDE(s4)
 	PORT_MODIFY("X4")
 	PORT_BIT( 0xfa, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_MODIFY("X5")
@@ -324,13 +300,13 @@ static INPUT_PORTS_START( trizn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmwrp )
-	PORT_INCLUDE(s4a)
+	PORT_INCLUDE(s4)
 	PORT_MODIFY("X5")
 	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stlwr )
-	PORT_INCLUDE(s4a)
+	PORT_INCLUDE(s4)
 	PORT_MODIFY("X1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_MODIFY("X4")
@@ -365,11 +341,6 @@ void s4_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-}
-
-void s4a_state::machine_start()
-{
-	s4_state::machine_start();
 	save_item(NAME(m_sound_data));
 }
 
@@ -389,7 +360,7 @@ INPUT_CHANGED_MEMBER( s4_state::main_nmi )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INPUT_CHANGED_MEMBER( s4a_state::audio_nmi )
+INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
@@ -406,27 +377,6 @@ void s4_state::sol0_w(u8 data)
 }
 
 void s4_state::sol1_w(u8 data)
-{
-	if (BIT(data, 0))
-		m_samples->start(4, 4); // 10 chime
-
-	if (BIT(data, 1))
-		m_samples->start(1, 1); // 100 chime
-
-	if (BIT(data, 2))
-		m_samples->start(2, 2); // 1000 chime
-
-	if (BIT(data, 3))
-		m_samples->start(3, 3); // 10k chime
-
-	if (BIT(data, 5))
-		m_samples->start(0, 6); // knocker
-
-	for (u8 i = 0; i < 8; i++)
-		m_io_outputs[8U+i] = BIT(data, i);
-}
-
-void s4a_state::s4a_sol1_w(u8 data)
 {
 	u8 sound_data = m_io_snd->read() | (data & 0x1f);
 
@@ -502,7 +452,7 @@ void s4_state::switch_w(u8 data)
 	m_row = data;
 }
 
-u8 s4a_state::sound_r()
+u8 s4_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -572,23 +522,16 @@ void s4_state::s4(machine_config &config)
 	m_4020->count_out_cb().set(FUNC(s4_state::clockcnt_w));
 
 	CLOCK(config, "rclock", 3580000/4).signal_handler().set(m_4020, FUNC(ripple_counter_device::clock_w));
-}
-
-void s4a_state::s4a(machine_config &config)
-{
-	s4(config);
-
-	m_pia22->writepb_handler().set(FUNC(s4a_state::s4a_sol1_w));
 
 	// Add the soundcard
 	M6808(config, m_audiocpu, 3580000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s4a_state::audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s4_state::audio_map);
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	PIA6821(config, m_pias, 0);
-	m_pias->readpb_handler().set(FUNC(s4a_state::sound_r));
+	m_pias->readpb_handler().set(FUNC(s4_state::sound_r));
 	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 	m_pias->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
@@ -702,12 +645,12 @@ ROM_END
 } // Anonymous namespace
 
 // Pinball
-GAME( 1979, flash_l2, 0,        s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, flash_l1, flash_l2, s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, flash_t1, flash_l2, s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, trizn_l1, 0,        s4a, trizn, s4a_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, trizn_t1, trizn_l1, s4a, trizn, s4a_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, tmwrp_l3, 0,        s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-3)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, stlwr_l2, 0,        s4a, stlwr, s4a_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, flash_l2, 0,        s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, flash_l1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, flash_t1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, trizn_l1, 0,        s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, trizn_t1, trizn_l1, s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, tmwrp_l3, 0,        s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-3)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, tmwrp_l2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, tmwrp_t2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, stlwr_l2, 0,        s4, stlwr, s4_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
