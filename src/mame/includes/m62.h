@@ -12,24 +12,24 @@
 class m62_state : public driver_device
 {
 public:
-	m62_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_m62_tileram(*this, "m62_tileram"),
-		m_m62_textram(*this, "m62_textram"),
-		m_scrollram(*this, "scrollram"),
-		m_sprite_height_prom(*this, "spr_height_prom"),
-		m_sprite_color_proms(*this, "spr_color_proms"),
-		m_chr_color_proms(*this, "chr_color_proms"),
-		m_fg_color_proms(*this, "fg_color_proms"),
-		m_maincpu(*this, "maincpu"),
-		m_fg_decode(*this, "fg_decode"),
-		m_spr_decode(*this, "spr_decode"),
-		m_chr_decode(*this, "chr_decode"),
-		m_fg_palette(*this, "fg_palette"),
-		m_spr_palette(*this, "spr_palette"),
-		m_chr_palette(*this, "chr_palette"),
-		m_audio(*this, "irem_audio")
+	m62_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audio(*this, "irem_audio")
+		, m_spriteram(*this, "spriteram")
+		, m_m62_tileram(*this, "m62_tileram")
+		, m_m62_textram(*this, "m62_textram")
+		, m_scrollram(*this, "scrollram")
+		, m_sprite_height_prom(*this, "spr_height_prom")
+		, m_sprite_color_proms(*this, "spr_color_proms")
+		, m_chr_color_proms(*this, "chr_color_proms")
+		, m_fg_color_proms(*this, "fg_color_proms")
+		, m_fg_decode(*this, "fg_decode")
+		, m_spr_decode(*this, "spr_decode")
+		, m_chr_decode(*this, "chr_decode")
+		, m_fg_palette(*this, "fg_palette")
+		, m_spr_palette(*this, "spr_palette")
+		, m_chr_palette(*this, "chr_palette")
 	{ }
 
 	void ldrun2(machine_config &config);
@@ -53,16 +53,24 @@ public:
 	void init_kidniki();
 	void init_battroad();
 
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<irem_audio_device> m_audio;
+	tilemap_t*             m_bg_tilemap;
+	void m62_flipscreen_w(uint8_t data);
+	void m62_hscroll_low_w(uint8_t data);
+	void m62_hscroll_high_w(uint8_t data);
+	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	required_shared_ptr<uint8_t> m_m62_tileram;
+	optional_shared_ptr<uint8_t> m_m62_tileram;
 	optional_shared_ptr<uint8_t> m_m62_textram;
 	optional_shared_ptr<uint8_t> m_scrollram;
 
 	/* video-related */
-	tilemap_t*             m_bg_tilemap;
 	tilemap_t*             m_fg_tilemap;
 	int                  m_flipscreen;
 	required_region_ptr<uint8_t> m_sprite_height_prom;
@@ -88,9 +96,6 @@ private:
 	void spelunkr_bankswitch_w(uint8_t data);
 	void spelunk2_bankswitch_w(uint8_t data);
 	void youjyudn_bankswitch_w(uint8_t data);
-	void m62_flipscreen_w(uint8_t data);
-	void m62_hscroll_low_w(uint8_t data);
-	void m62_hscroll_high_w(uint8_t data);
 	void m62_vscroll_low_w(uint8_t data);
 	void m62_vscroll_high_w(uint8_t data);
 	void m62_tileram_w(offs_t offset, uint8_t data);
@@ -153,16 +158,13 @@ private:
 	void m62_amplify_contrast(bool include_fg);
 	void register_savestate();
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority);
-	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 	void m62_textlayer(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
-	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_fg_decode;
 	required_device<gfxdecode_device> m_spr_decode;
 	required_device<gfxdecode_device> m_chr_decode;
 	optional_device<palette_device> m_fg_palette;
 	required_device<palette_device> m_spr_palette;
 	required_device<palette_device> m_chr_palette;
-	required_device<irem_audio_device> m_audio;
 
 	void battroad_io_map(address_map &map);
 	void battroad_map(address_map &map);

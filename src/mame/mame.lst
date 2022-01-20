@@ -19821,6 +19821,9 @@ sys573                          //
 @source:ktm3.cpp
 ktm3                            // (c) 1980 Synertek Systems Corp.
 
+@source:kungfum2.cpp
+kungfum2                        // (c) 1986 Irem
+
 @source:kungfur.cpp
 kungfur                         // (c) 1987
 
