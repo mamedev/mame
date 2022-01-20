@@ -4724,6 +4724,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/whitestar.cpp",
 	MAME_DIR .. "src/mame/drivers/white_mod.cpp",
 	MAME_DIR .. "src/mame/drivers/wico.cpp",
+	MAME_DIR .. "src/mame/drivers/wms_shuffle.cpp",
 	MAME_DIR .. "src/mame/drivers/wpc_95.cpp",
 	MAME_DIR .. "src/mame/drivers/wpc_an.cpp",
 	MAME_DIR .. "src/mame/drivers/wpc_dcs.cpp",

@@ -15,35 +15,20 @@ Games:
 - Trizone (#487)
 - Time Warp (#489)
 - Stellar Wars (#490)
-- Pompei
-- Aristocrat
-- Topaz
-- Taurus
-- King Tut
-- Omni
-- Big Strike
-- Triple Strike
 
-The first time run, the pinballs will display will show the model number, while
- the shuffle games show 0200 and 419. Press F3 to clear this.
+The first time run, the machine will display will show the model number.
+ Press F3 to clear this.
 
 Phoenix and Pokerino are listed as System 4, but use System 3 ROMs.
  They have been moved to s3.cpp, and are working there.
 
-The "Shuffle" games consist of a flat board with an air-driven puck and 10
- bowling pins. You must push the puck as if it was a bowling ball, and score
- strikes and spares. Since the maximum score is 300, the displays have 4 digits
- and 6 can play. They will most likely be split off to a separate driver.
-
 Pressing NUM-8 will select a different set of sounds.
 
 Status:
-- Pinballs are playable.
+- All machines are playable.
 
 ToDo:
-- Shuffle games: need a layout, and no manuals found. Press 6 to insert coin,
-   press 9 to start. Some keys make noises. / key steps to next frame.
-
+- Nothing
 
 ************************************************************************************/
 
@@ -714,108 +699,6 @@ ROM_START(stlwr_l2)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
-
-
-/* From here, are NOT pinball machines */
-
-/*----------------------------
-/ Pompeii (Shuffle)
-/----------------------------*/
-ROM_START(pomp_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
-ROM_END
-
-/*----------------------------
-/ Aristocrat (Shuffle) same roms as Pompeii
-/----------------------------*/
-ROM_START(arist_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
-ROM_END
-
-/*----------------------------
-/ Topaz (Shuffle)
-/----------------------------*/
-ROM_START(topaz_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(cb287b10) SHA1(7fb6b6a26237cf85d5e02cf35271231267f90fc1))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-/*----------------------------
-/ Taurus (Shuffle)
-/----------------------------*/
-ROM_START(taurs_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(3246e285) SHA1(4f76784ecb5063a49c24795ae61db043a51e2c89))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
-ROM_END
-
-/*----------------------------
-/ King Tut
-/----------------------------*/
-ROM_START(kingt_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(54d3280a) SHA1(ca74636e35d2c3e0b3133f89b1ff1233d5d72a5c))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
-ROM_END
-
-/*----------------------------
-/ Omni (Shuffle)
-/----------------------------*/
-ROM_START(omni_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("omni-1a.u21",  0x0000, 0x0800, CRC(443bd170) SHA1(cc1ebd72d77ec2014cbd84534380e5ea1f12c022))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-
-	ROM_REGION(0x0800, "audiocpu", 0)
-	ROM_LOAD("sound.716",    0x0000, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
-ROM_END
-
-/*----------------------------
-/ Big Strike (Shuffle)
-/----------------------------*/
-ROM_START(bstrk_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(323dbcde) SHA1(a75cbb5de97cb9afc1d36e9b6ff593bb482fcf8b))
-	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-ROM_END
-
-/*----------------------------
-/ Triple Strike (Shuffle)
-/----------------------------*/
-ROM_START(tstrk_l1)
-	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(b034c059) SHA1(76b3926b87b3c137fcaf33021a586827e3c030af))
-	ROM_LOAD("ic20.716",     0x1000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
-	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
-ROM_END
-
 } // Anonymous namespace
 
 // Pinball
@@ -828,13 +711,3 @@ GAME( 1979, tmwrp_l3, 0,        s4a, tmwrp, s4a_state, empty_init, ROT0, "Willia
 GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",       MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, stlwr_l2, 0,        s4a, stlwr, s4a_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-
-// Shuffle
-GAME( 1978, pomp_l1,  0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, arist_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, topaz_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, taurs_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, kingt_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "King Tut (Shuffle) (L-1)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, omni_l1,  0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Omni (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, bstrk_l1, 0,        s4,  s4,    s4_state,  empty_init, ROT0, "Williams", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, tstrk_l1, 0,        s4,  s4,    s4_state,  empty_init, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL )

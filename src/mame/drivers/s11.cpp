@@ -2,18 +2,13 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /****************************************************************************************
 
-    Pinball
-    Williams System 11
+PINBALL
+Williams System 11
 
-    Status of games:
+Status:
 
 
 ToDo:
-- tic-tac-strike belongs in s11a.cpp
-- gold mine belongs in s11b.cpp
-- top dawg belongs in s11b.cpp
-- shuffle inn belongs in s11b.cpp
-
     Known keys necessary to get games to start (so the proper number of balls are detected):
     - Grand Lizard: Press S, D, F, and press "1" after inserting 1 or more credits.
     - Road Kings: press 'Up' (the direction key) and 'Delete', and press "1" after inserting 1 or more credits.
@@ -653,82 +648,6 @@ ROM_START(rdkng_l4)
 	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
-/************************ From here, not pinball machines **************************************/
-
-/*------------------------------
-/ Alley Cats (Shuffle) (#918)
-/-------------------------------*/
-ROM_START(alcat_l7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u26_rev7.rom", 0xd000, 0x1000, CRC(4d274dd3) SHA1(80d72bd0f85ce2cac04f6d9f59dc1fcccc86d402))
-	ROM_LOAD("u27_rev7.rom", 0xe000, 0x2000, CRC(9c7faf8a) SHA1(dc1a561948b9a303f7924d7bebcd972db766827b))
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("acs_u21.bin", 0x18000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
-	ROM_LOAD("acs_u22.bin", 0x10000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
-ROM_END
-
-/*--------------------
-/ Tic-Tac-Strike (#919)
-/--------------------*/
-ROM_START(tts_l2)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u27_l2.128", 0x8000, 0x4000, CRC(edbcab92) SHA1(0f6b2dc01874984f9a17ee873f2fa0b6c9bba5be))
-	ROM_RELOAD( 0xc000, 0x4000)
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-ROM_END
-
-ROM_START(tts_l1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u27.128", 0x8000, 0x4000, CRC(f540c53c) SHA1(1c7a318278ad1afdcbe6aaf81f9b774882b069d6))
-	ROM_RELOAD( 0xc000, 0x4000)
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-ROM_END
-
-/*-------------------------------
-/ Gold Mine (Shuffle) (#920) s11b
-/--------------------------------*/
-ROM_START(gmine_l2)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u27.128", 0x8000, 0x4000, CRC(99c6e049) SHA1(356faec0598a54892050a28857e9eb5cdbf35833))
-	ROM_RELOAD( 0xc000, 0x4000)
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21.256", 0x18000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
-	ROM_LOAD("u22.256", 0x10000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
-ROM_END
-
-/*-------------------------
-/ Top Dawg (Shuffle) (#921)
-/--------------------------*/
-ROM_START(tdawg_l1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tdu27r1.128", 0x8000, 0x4000, CRC(0b4bb586) SHA1(a927ebf7167609cc84b38c22aa35d0c4d259dd8b))
-	ROM_RELOAD( 0xc000, 0x4000)
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tdsu21r1.256", 0x18000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
-	ROM_LOAD("tdsu22r1.256", 0x10000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
-ROM_END
-
-/*----------------------------
-/ Shuffle Inn (Shuffle) (#922)
-/-----------------------------*/
-ROM_START(shfin_l1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u27rom-1.rv1", 0x8000, 0x4000, CRC(40cfb74a) SHA1(8cee4212ea8bb6b360060391df3208e1e129d7e5))
-	ROM_RELOAD( 0xc000, 0x4000)
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21snd-2.rv1", 0x18000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
-	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
-ROM_END
 
 // Pinball
 GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_IS_SKELETON_MECHANICAL )
@@ -739,11 +658,3 @@ GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Willi
 GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",               MACHINE_IS_SKELETON_MECHANICAL )
-
-// Shuffle
-GAME( 1985, alcat_l7, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l2,   0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l1,   tts_l2,   s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, gmine_l2, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, tdawg_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, shfin_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_IS_SKELETON_MECHANICAL )

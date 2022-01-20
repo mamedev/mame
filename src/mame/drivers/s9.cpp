@@ -16,7 +16,6 @@ Games:
 - Comet (#540)
 - Rat Race (#527)
 - Rat Race II (#533)
-- Strike Zone (#916)
 
 The first time run, the display will show the model number. Press F3 to clear this.
 
@@ -41,8 +40,6 @@ Status:
 
 ToDo:
 - Rat Race: need a manual, playboard contacts are unknown/don't respond.
-- Strike Zone (Shuffle): need a manual, need a layout. Press 5 to insert coin,
-   press 1 to start. Some keys make noises.
 - Mechanical sounds
 
 *****************************************************************************************/
@@ -568,27 +565,6 @@ ROM_START(comet_l5)
 	ROM_LOAD("cpu_u49.128", 0x4000, 0x4000, CRC(f1db0cbe) SHA1(59b7f36fb2003b90b288abeff56df62ce50f10c6))
 ROM_END
 
-/*--------------------------------
-/ Strike Zone (Shuffle) (#916)
-/---------------------------------*/
-ROM_START(szone_l5)
-	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("sz_u19r5.732", 0x1000, 0x1000, CRC(c79c46cb) SHA1(422ba74ae67bebbe02f85a9a8df0e3072f3cebc0))
-	ROM_LOAD("sz_u20r5.764", 0x2000, 0x2000, CRC(9b5b3be2) SHA1(fce051a60b6eecd9bc07273892b14046b251b372))
-
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
-ROM_END
-
-ROM_START(szone_l2)
-	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("sz_u19r2.732", 0x1000, 0x1000, CRC(c0e4238b) SHA1(eae60ccd5b5001671cd6d2685fd588494d052d1e))
-	ROM_LOAD("sz_u20r2.764", 0x2000, 0x2000, CRC(91c08137) SHA1(86da08f346f85810fceceaa7b9824ab76a68da54))
-
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
-ROM_END
-
 } // Anonymous namespace
 
 // Novelty
@@ -601,7 +577,3 @@ GAME( 1984, sshtl_l7, 0,        s9, sshtl, s9_state, empty_init, ROT0, "Williams
 GAME( 1984, sshtl_l3, sshtl_l7, s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, comet_l4, comet_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-4)",                 MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, comet_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-5)",                 MACHINE_IS_SKELETON_MECHANICAL )
-
-// Shuffle
-GAME( 1984, szone_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, szone_l2, szone_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", MACHINE_IS_SKELETON_MECHANICAL )
