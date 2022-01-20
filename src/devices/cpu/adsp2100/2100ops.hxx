@@ -337,6 +337,12 @@ inline void adsp21xx_device::update_l(int which)
 	m_base[which] = m_i[which] & m_lmask[which];
 }
 
+inline void adsp21xx_device::update_dmovlay()
+{
+	if (!m_dmovlay_cb.isnull())
+		m_dmovlay_cb(m_dmovlay);
+}
+
 void adsp21xx_device::write_reg0(int regnum, int32_t val)
 {
 	switch (regnum)
@@ -380,9 +386,23 @@ void adsp21xx_device::write_reg1(int regnum, int32_t val)
 			break;
 
 		case 3:
-			// Check for DMOVLAY instruction callback
-			if (regnum == 0xf && !m_dmovlay_cb.isnull())
-				m_dmovlay_cb(val & 0x3fff);
+			if (m_chip_type == CHIP_TYPE_ADSP2181) // ADSP2181 Overlay register
+			{
+				switch (index)
+				{
+					case 2:
+						m_pmovlay = val & 0x3fff;
+						//update_pmovlay();
+						break;
+					case 3:
+						m_dmovlay = val & 0x3fff;
+						update_dmovlay();
+						break;
+					default:
+						logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
+						break;
+				}
+			}
 			else
 				logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
 			break;
@@ -486,7 +506,19 @@ int32_t adsp21xx_device::read_reg0(int regnum)
 
 int32_t adsp21xx_device::read_reg1(int regnum)
 {
-	return *m_read1_ptr[regnum];
+	int32_t ret = *m_read1_ptr[regnum];
+	// ADSP2181 Overlay register
+	if ((m_chip_type == CHIP_TYPE_ADSP2181) && (regnum >= 0xe))
+	{
+		switch (regnum)
+		{
+			case 0xe: ret = m_pmovlay; break;
+			case 0xf: ret = m_dmovlay; break;
+			default:                   break;
+		}
+	}
+
+	return ret;
 }
 
 int32_t adsp21xx_device::read_reg2(int regnum)
