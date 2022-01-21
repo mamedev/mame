@@ -113,7 +113,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (ui().found_machine_warnings())
 		item_append(_("Warning Information"), 0, (void *)WARN_INFO);
 
-	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+	/*for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		if (image.user_loadable())
 		{
@@ -123,7 +123,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 			break;
 		}
-	}
+	}*/
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Tape Control"), 0, (void *)TAPE_CONTROL);

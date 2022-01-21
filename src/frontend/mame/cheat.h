@@ -96,6 +96,7 @@ public:
 	bool is_minimum() const { return (m_itemlist.empty() ? m_minval : m_itemlist.front().value()) == m_value; }
 	bool is_maximum() const { return (m_itemlist.empty() ? m_maxval : m_itemlist.back().value()) == m_value; }
 
+	bool set_value(int64_t value);
 	// state setters
 	bool set_minimum_state();
 	bool set_prev_state();
@@ -139,6 +140,25 @@ private:
 	uint64_t            m_value;        // live value of the parameter
 	std::string         m_curtext;      // holding for a value string
 	std::vector<item>   m_itemlist;     // list of items
+
+public:
+	inline uint64_t get_current_value() const {
+		return m_value;
+	}
+	inline uint64_t get_max_value() const {
+		return m_maxval;
+	}
+	inline uint64_t get_min_value() const {
+		return m_minval;
+	}
+	inline uint64_t get_step_value() const {
+		return m_stepval;
+	}
+
+public:
+	std::vector<item>& get_itemlist() {
+		return m_itemlist;
+	}
 };
 
 
@@ -246,6 +266,9 @@ public:
 	bool has_on_script() const { return (m_on_script != nullptr); }
 	bool has_off_script() const { return (m_off_script != nullptr); }
 	bool has_change_script() const { return (m_change_script != nullptr); }
+	std::unique_ptr<cheat_parameter>& get_parameter() {
+		return m_parameter;
+	}
 
 	// script execution
 	void execute_off_script() { if (has_off_script()) m_off_script->execute(m_manager, m_argindex); }
@@ -264,6 +287,7 @@ public:
 
 	// actions
 	bool activate();
+	bool select_value(int64_t value);
 	bool select_default_state();
 	bool select_previous_state();
 	bool select_next_state();

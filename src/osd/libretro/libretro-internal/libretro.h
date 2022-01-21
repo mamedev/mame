@@ -77,6 +77,71 @@ extern "C" {
 #  endif
 #endif
 
+
+#define RETRO_MAME_CARD_INTERFACE_SET 0x0013ff75
+
+	struct card_status {
+		const char* instance_name;
+		const char* brief_instance_name;
+		const char* basename;
+		const char* filename;
+	};
+	//card
+	typedef int32_t(RETRO_CALLCONV* core_do_mame_create_card)(const char* cardpath, const char* instance_name, const char* brief_instance_name);
+	typedef int32_t(RETRO_CALLCONV* core_do_unload_mame_card)(const char* instance_name, const char* brief_instance_name);
+	typedef int32_t(RETRO_CALLCONV* core_do_load_mame_card)(const char* path, const char* instance_name, const char* brief_instance_name);
+	typedef void(RETRO_CALLCONV* core_load_mane_cardstatus)(void* output);
+	//cheat
+	typedef void(RETRO_CALLCONV* core_load_mame_cheats_info)(void* output);
+	typedef bool(RETRO_CALLCONV* core_reload_mame_cheats)();
+	typedef bool(RETRO_CALLCONV* core_mame_active_cheat)(void* output);
+	typedef bool(RETRO_CALLCONV* core_select_default_state)(void* output);
+	typedef bool(RETRO_CALLCONV* core_select_previous_state)(void* output);
+	typedef bool(RETRO_CALLCONV* core_select_next_state)(void* output);
+	typedef bool(RETRO_CALLCONV* core_mame_cheats_save_all)(const char * path);
+	typedef bool(RETRO_CALLCONV* core_mame_cheats_set_value)(int64_t value,void* output);
+
+	struct mame_cheat_info {
+		bool is_text_only;
+		bool is_oneshot;
+		bool is_onoff;
+		bool is_itemlist_parameter;
+		bool is_oneshot_parameter;
+		bool is_duplicate;
+		const char* parameters_current;
+		void* cheat_parameters;
+		void* cheat_parameters_values;
+		void* entity;
+		const char* description;
+		const char* comment;
+		uint64_t m_value;
+		uint64_t m_minval;
+		uint64_t m_maxval;
+		uint64_t m_stepval;
+		uint32_t m_status;
+
+	};
+
+
+	struct mame_card_callback {
+		core_do_mame_create_card create_card;
+		core_do_unload_mame_card unload_card;
+		core_do_load_mame_card load_card;
+		core_load_mane_cardstatus load_status;
+
+		core_load_mame_cheats_info load_cheat_info;
+		core_reload_mame_cheats reload_cheats;
+		core_mame_active_cheat active_cheat;
+		core_select_default_state select_default_cheat;
+		core_select_previous_state select_previous_cheat;
+		core_select_next_state select_next_cheta;
+		core_mame_cheats_save_all save_all_cheat;
+		core_mame_cheats_set_value set_cheat_value;
+
+	};
+
+
+
 /* Used for checking API/ABI mismatches that can break libretro
  * implementations.
  * It is not incremented for compatible changes to the API.

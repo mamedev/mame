@@ -344,9 +344,9 @@ void retro_osd_interface::customize_input_type_list(std::vector<input_type_entry
 				break;
 
 			// Retro:  Select + Start => CANCEL
-			case IPT_UI_CANCEL:
+		/*	case IPT_UI_CANCEL:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
-				break;
+				break;*/
 
 			// leave everything else alone
 			default:

@@ -665,8 +665,8 @@ void mame_ui_manager::update_and_render(render_container &container)
 	}
 
 	// render any cheat stuff at the bottom
-	if (machine().phase() >= machine_phase::RESET)
-		mame_machine_manager::instance()->cheat().render_text(*this, container);
+	if (machine().phase() >= machine_phase::RESET&& mame_machine_manager::instance()->cheat()!=NULL)
+		mame_machine_manager::instance()->cheat()->render_text(*this, container);
 
 	// call the current UI handler
 	m_handler_param = m_handler_callback(container);
@@ -1403,8 +1403,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		machine().rewind_step();
 
 	// handle a toggle cheats request
-	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
+	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT)&& mame_machine_manager::instance()->cheat()!=NULL)
+		mame_machine_manager::instance()->cheat()->set_enable(!mame_machine_manager::instance()->cheat()->enabled());
 
 	// toggle MNG recording
 	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))

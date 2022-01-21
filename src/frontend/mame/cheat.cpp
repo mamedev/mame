@@ -230,6 +230,12 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	}
 }
 
+bool cheat_parameter::set_value(int64_t value) {
+	uint64_t const origvalue(m_value);
+
+	m_value = value;
+	return m_value != origvalue;
+}
 
 //-------------------------------------------------
 //  set_minimum_state - set the minimum state
@@ -826,6 +832,7 @@ bool cheat_entry::activate()
 }
 
 
+
 //-------------------------------------------------
 //  select_default_state - select the default
 //  state for a cheat, or activate a oneshot cheat
@@ -843,6 +850,40 @@ bool cheat_entry::select_default_state()
 	{
 		// all other types switch to the "off" state
 		changed = set_state(SCRIPT_STATE_OFF);
+	}
+
+	return changed;
+}
+
+
+
+bool cheat_entry::select_value(int64_t value) {
+	bool changed(false);
+
+	if (is_oneshot()) {
+
+	}
+	else if (is_onoff())
+	{
+
+	}
+	else if(m_parameter != nullptr)
+	{
+		if (value== m_parameter->get_min_value())
+		{
+			m_parameter->set_value(value);
+			changed = set_state(SCRIPT_STATE_OFF);
+		}
+		else
+		{
+			changed = m_parameter->set_value(value);
+			if (changed)
+			{
+				set_state(SCRIPT_STATE_RUN);
+				if (!is_oneshot_parameter())
+					execute_change_script();
+			}
+		}
 	}
 
 	return changed;

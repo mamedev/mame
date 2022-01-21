@@ -59,7 +59,12 @@ public:
 	void start_luaengine();
 	void schedule_new_driver(const game_driver &driver);
 	mame_ui_manager& ui() const { assert(m_ui != nullptr); return *m_ui; }
-	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
+	cheat_manager *cheat() const {
+		if (m_cheat == nullptr) {
+			return NULL;
+		}
+		 return m_cheat.get();
+	}
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 
