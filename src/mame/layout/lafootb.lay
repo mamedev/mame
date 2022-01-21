@@ -8,9 +8,9 @@ license:CC0
 
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
-	<element name="yellow"><rect><color red="0.6" green="0.5" blue="0.1" /></rect></element>
-	<element name="yellowd"><disk><color red="0.6" green="0.5" blue="0.1" /></disk></element>
-	<element name="text_r"><text string="R"><color red="0.6" green="0.5" blue="0.1" /></text></element>
+	<element name="yellow"><rect><color red="0.65" green="0.55" blue="0.15" /></rect></element>
+	<element name="yellowd"><disk><color red="0.65" green="0.55" blue="0.15" /></disk></element>
+	<element name="text_r"><text string="R" align="1"><color red="0.65" green="0.55" blue="0.15" /></text></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
@@ -66,22 +66,23 @@ license:CC0
 		</repeat>
 
 		<repeat count="24">
-			<param name="x" start="80" increment="-1.5" />
+			<param name="x" start="80" increment="-1.57" />
 			<param name="y" start="51" increment="3.4" />
 			<element ref="white"><bounds x="~x~" y="~y~" width="2" height="0.3" /></element>
 		</repeat>
 
 		<repeat count="24">
-			<param name="x" start="118" increment="1.5" />
+			<param name="x" start="118" increment="1.57" />
 			<param name="y" start="51" increment="3.4" />
 			<element ref="white"><bounds x="~x~" y="~y~" width="2" height="0.3" /></element>
 		</repeat>
 
-		<element ref="white"><bounds x="99.5" y="40" width="1" height="9.5" /></element>
+		<element ref="white"><bounds x="99.5" y="40" width="1" height="9.0" /></element>
 		<element ref="white"><bounds x="92.5" y="34" width="15" height="11" /></element>
 		<element ref="black"><bounds x="93.5" y="33" width="13" height="11" /></element>
 
 		<element ref="white"><bounds x="74" y="48" width="52.5" height="0.2" /></element>
+		<element ref="white"><bounds x="72.5" y="49.8" width="55.5" height="0.25" /></element>
 		<element ref="white"><bounds x="63.3" y="58.8" width="74.1" height="0.3" /></element>
 		<element ref="white"><bounds x="55.4" y="66.7" width="89.8" height="0.45" /></element>
 		<element ref="white"><bounds x="42.6" y="79.5" width="115.3" height="0.6" /></element>
@@ -90,11 +91,11 @@ license:CC0
 		<element ref="black"><bounds x="0" y="70" width="25" height="50" /></element>
 		<element ref="black"><bounds x="175" y="70" width="25" height="50" /></element>
 
-		<element ref="text_r"><bounds x="100" y="60" width="10" height="10" /></element>
+		<element ref="text_r"><bounds x="102" y="60" width="5" height="10" /></element>
 
 		<element ref="yellowd"><bounds x="95" y="107" width="9" height="9" /></element>
 		<element ref="yellow"><bounds x="88.5" y="114.5" width="22" height="17.5" /></element>
-		<element ref="black"><bounds x="89.3" y="115.3" width="20.4" height="17.5" /></element>
+		<element ref="black"><bounds x="89.5" y="115.5" width="20" height="17.5" /></element>
 
 		<element name="digit2" ref="digit"><bounds x="91.5" y="117.5" width="8" height="12" /></element>
 		<element name="digit3" ref="digit"><bounds x="99.5" y="117.5" width="8" height="12" /></element>

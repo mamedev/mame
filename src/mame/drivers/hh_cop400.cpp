@@ -1175,8 +1175,8 @@ ROM_END
   * COP421L MCU bonded directly to PCB (rom serial HCJ)
   * 2 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
-  1st-person view versions for Baseball and Basketball were also announced,
-  but not released.
+  For a detailed description, see patent US4582323. 1st-person view versions
+  for Baseball and Basketball were also announced, but not released.
 
 ***************************************************************************/
 
