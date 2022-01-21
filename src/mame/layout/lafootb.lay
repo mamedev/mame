@@ -12,6 +12,14 @@ license:CC0
 	<element name="yellowd"><disk><color red="0.65" green="0.55" blue="0.15" /></disk></element>
 	<element name="text_r"><text string="R" align="1"><color red="0.65" green="0.55" blue="0.15" /></text></element>
 
+	<element name="line45">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="500">
+				<rect width="1000" height="7" x="0" y="0" transform="rotate(45.0)" fill="#cccccc" />
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
@@ -53,17 +61,8 @@ license:CC0
 		<bounds left="25" right="175" top="34" bottom="132" />
 		<group ref="leds"><bounds x="50" y="50" width="100" height="45" /></group>
 
-		<repeat count="250">
-			<param name="x" start="74" increment="-0.2" />
-			<param name="y" start="48" increment="0.2" />
-			<element ref="white"><bounds x="~x~" y="~y~" width="0.5" height="0.5" /></element>
-		</repeat>
-
-		<repeat count="250">
-			<param name="x" start="126" increment="0.2" />
-			<param name="y" start="48" increment="0.2" />
-			<element ref="white"><bounds x="~x~" y="~y~" width="0.5" height="0.5" /></element>
-		</repeat>
+		<element ref="line45"><bounds x="23" y="47" width="52" height="52" /><orientation rotate="270" /></element>
+		<element ref="line45"><bounds x="125.5" y="47" width="52" height="52" /></element>
 
 		<repeat count="24">
 			<param name="x" start="80" increment="-1.57" />
@@ -77,19 +76,20 @@ license:CC0
 			<element ref="white"><bounds x="~x~" y="~y~" width="2" height="0.3" /></element>
 		</repeat>
 
-		<element ref="white"><bounds x="99.5" y="40" width="1" height="9.0" /></element>
-		<element ref="white"><bounds x="92.5" y="34" width="15" height="11" /></element>
-		<element ref="black"><bounds x="93.5" y="33" width="13" height="11" /></element>
+		<element ref="white"><bounds x="74" y="48" width="52.5" height="0.5" /></element>
+		<element ref="white"><bounds x="72.8" y="49.8" width="55.1" height="0.25" /></element>
+		<element ref="white"><bounds x="63.6" y="58.8" width="73.5" height="0.3" /></element>
+		<element ref="white"><bounds x="55.8" y="66.7" width="89.2" height="0.45" /></element>
+		<element ref="white"><bounds x="42.8" y="79.5" width="114.9" height="0.6" /></element>
+		<element ref="white"><bounds x="20.4" y="102" width="160.4" height="0.9" /></element>
 
-		<element ref="white"><bounds x="74" y="48" width="52.5" height="0.2" /></element>
-		<element ref="white"><bounds x="72.5" y="49.8" width="55.5" height="0.25" /></element>
-		<element ref="white"><bounds x="63.3" y="58.8" width="74.1" height="0.3" /></element>
-		<element ref="white"><bounds x="55.4" y="66.7" width="89.8" height="0.45" /></element>
-		<element ref="white"><bounds x="42.6" y="79.5" width="115.3" height="0.6" /></element>
-		<element ref="white"><bounds x="20.0" y="102" width="160.4" height="0.9" /></element>
-
+		<element ref="black"><bounds x="70" y="45" width="70" height="3.3" /></element>
 		<element ref="black"><bounds x="0" y="70" width="25" height="50" /></element>
 		<element ref="black"><bounds x="175" y="70" width="25" height="50" /></element>
+
+		<element ref="white"><bounds x="99.5" y="40" width="1" height="9.2" /></element>
+		<element ref="white"><bounds x="92.5" y="34" width="15" height="11" /></element>
+		<element ref="black"><bounds x="93.5" y="33" width="13" height="11" /></element>
 
 		<element ref="text_r"><bounds x="102" y="60" width="5" height="10" /></element>
 
