@@ -233,6 +233,178 @@ private:
 };
 
 
+/// \brief A single item in a view
+///
+/// Each view has a list of item structures describing the visual
+/// elements to draw, where they are located, additional blending modes,
+/// and bindings for inputs and outputs.
+class layout_view_item
+{
+	friend class layout_view;
+
+public:
+	using view_environment = emu::render::detail::view_environment;
+	using element_map = std::unordered_map<std::string, layout_element>;
+	using state_delegate = delegate<int ()>;
+	using bounds_delegate = delegate<render_bounds ()>;
+	using color_delegate = delegate<render_color ()>;
+	using scroll_size_delegate = delegate<float ()>;
+	using scroll_pos_delegate = delegate<float ()>;
+
+	// construction/destruction
+	layout_view_item(
+			view_environment &env,
+			util::xml::data_node const &itemnode,
+			element_map &elemmap,
+			int orientation,
+			layout_group::transform const &trans,
+			render_color const &color);
+	~layout_view_item();
+
+	// getters
+	std::string const &id() const { return m_id; }
+	layout_element *element() const { return m_element; }
+	screen_device *screen() const { return m_screen; }
+	bool bounds_animated() const { return m_bounds.size() > 1U; }
+	bool color_animated() const { return m_color.size() > 1U; }
+	render_bounds bounds() const { return m_get_bounds(); }
+	render_color color() const { return m_get_color(); }
+	bool scroll_wrap_x() const { return m_scrollwrapx; }
+	bool scroll_wrap_y() const { return m_scrollwrapy; }
+	float scroll_size_x() const { return m_get_scroll_size_x(); }
+	float scroll_size_y() const { return m_get_scroll_size_y(); }
+	float scroll_pos_x() const { return m_get_scroll_pos_x(); }
+	float scroll_pos_y() const { return m_get_scroll_pos_y(); }
+	int blend_mode() const { return m_blend_mode; }
+	u32 visibility_mask() const { return m_visibility_mask; }
+	int orientation() const { return m_orientation; }
+	render_container *screen_container() const { return m_screen ? &m_screen->container() : nullptr; }
+
+	// interactivity
+	bool has_input() const { return bool(m_input_port); }
+	std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
+	bool clickthrough() const { return m_clickthrough; }
+
+	// fetch state based on configured source
+	int element_state() const { return m_get_elem_state(); }
+	int animation_state() const { return m_get_anim_state(); }
+
+	// set state
+	void set_state(int state) { m_elem_state = state; }
+	void set_scroll_size_x(float size) { m_scrollsizex = std::clamp(size, 0.01f, 1.0f); }
+	void set_scroll_size_y(float size) { m_scrollsizey = std::clamp(size, 0.01f, 1.0f); }
+	void set_scroll_pos_x(float pos) { m_scrollposx = pos; }
+	void set_scroll_pos_y(float pos) { m_scrollposy = pos; }
+
+	// set handlers
+	void set_element_state_callback(state_delegate &&handler);
+	void set_animation_state_callback(state_delegate &&handler);
+	void set_bounds_callback(bounds_delegate &&handler);
+	void set_color_callback(color_delegate &&handler);
+	void set_scroll_size_x_callback(scroll_size_delegate &&handler);
+	void set_scroll_size_y_callback(scroll_size_delegate &&handler);
+	void set_scroll_pos_x_callback(scroll_pos_delegate &&handler);
+	void set_scroll_pos_y_callback(scroll_pos_delegate &&handler);
+
+	// resolve tags, if any
+	void resolve_tags();
+
+private:
+	using bounds_vector = emu::render::detail::bounds_vector;
+	using color_vector = emu::render::detail::color_vector;
+
+	state_delegate default_get_elem_state();
+	state_delegate default_get_anim_state();
+	bounds_delegate default_get_bounds();
+	color_delegate default_get_color();
+	scroll_size_delegate default_get_scroll_size_x();
+	scroll_size_delegate default_get_scroll_size_y();
+	scroll_pos_delegate default_get_scroll_pos_x();
+	scroll_pos_delegate default_get_scroll_pos_y();
+	int get_state() const;
+	int get_output() const;
+	int get_input_raw() const;
+	int get_input_field_cached() const;
+	int get_input_field_conditional() const;
+	int get_anim_output() const;
+	int get_anim_input() const;
+	float get_scrollsizex() const;
+	float get_scrollsizey() const;
+	float get_scrollposx() const;
+	float get_scrollposy() const;
+	template <bool Wrap> float get_scrollx_output() const;
+	template <bool Wrap> float get_scrolly_output() const;
+	template <bool Wrap> float get_scrollx_input() const;
+	template <bool Wrap> float get_scrolly_input() const;
+	render_bounds get_interpolated_bounds() const;
+	render_color get_interpolated_color() const;
+
+	static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
+	static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+	static color_vector make_color(view_environment &env, util::xml::data_node const &itemnode, render_color const &mult);
+
+	// internal state
+	layout_element *const   m_element;              // pointer to the associated element (non-screens only)
+	state_delegate          m_get_elem_state;       // resolved element state function
+	state_delegate          m_get_anim_state;       // resolved animation state function
+	bounds_delegate         m_get_bounds;           // resolved bounds function
+	color_delegate          m_get_color;            // resolved color function
+	scroll_size_delegate    m_get_scroll_size_x;    // resolved horizontal scroll window size function
+	scroll_size_delegate    m_get_scroll_size_y;    // resolved vertical scroll window size function
+	scroll_pos_delegate     m_get_scroll_pos_x;     // resolved horizontal scroll position function
+	scroll_pos_delegate     m_get_scroll_pos_y;     // resolved vertical scroll position function
+	output_finder<>         m_output;               // associated output
+	output_finder<>         m_animoutput;           // associated output for animation if different
+	output_finder<>         m_scrollxoutput;        // associated output for horizontal scroll position
+	output_finder<>         m_scrollyoutput;        // associated output for vertical scroll position
+	ioport_port *           m_animinput_port;       // input port used for animation
+	ioport_port *           m_scrollxinput_port;    // input port used for horizontal scrolling
+	ioport_port *           m_scrollyinput_port;    // input port used for vertical scrolling
+	bool const              m_scrollwrapx;          // whether horizontal scrolling works like a loop
+	bool const              m_scrollwrapy;          // whether vertical scrolling works like a loop
+	int                     m_elem_state;           // element state used in absence of bindings
+	float                   m_scrollsizex;          // horizontal scroll window size used in absence of bindings
+	float                   m_scrollsizey;          // vertical scroll window size used in absence of bindings
+	float                   m_scrollposx;           // horizontal scroll position used in absence of bindings
+	float                   m_scrollposy;           // vertical scroll position used in absence of bindings
+	ioport_value const      m_animmask;             // mask for animation state
+	ioport_value const      m_scrollxmask;          // mask for horizontal scroll position
+	ioport_value const      m_scrollymask;          // mask for vertical scroll position
+	ioport_value const      m_scrollxmin;           // minimum value for horizontal scroll position
+	ioport_value const      m_scrollymin;           // minimum value for vertical scroll position
+	ioport_value const      m_scrollxmax;           // maximum value for horizontal scroll position
+	ioport_value const      m_scrollymax;           // maximum value for vertical scroll position
+	u8 const                m_animshift;            // shift for animation state
+	u8 const                m_scrollxshift;         // shift for horizontal scroll position
+	u8 const                m_scrollyshift;         // shift for vertical scroll position
+	ioport_port *           m_input_port;           // input port of this item
+	ioport_field const *    m_input_field;          // input port field of this item
+	ioport_value const      m_input_mask;           // input mask of this item
+	u8 const                m_input_shift;          // input mask rightshift for raw (trailing 0s)
+	bool                    m_clickthrough;         // should click pass through to lower elements
+	screen_device *         m_screen;               // pointer to screen
+	int const               m_orientation;          // orientation of this item
+	bounds_vector           m_bounds;               // bounds of the item
+	color_vector const      m_color;                // color of the item
+	int                     m_blend_mode;           // blending mode to use when drawing
+	u32                     m_visibility_mask;      // combined mask of parent visibility groups
+
+	// cold items
+	std::string const       m_id;                   // optional unique item identifier
+	std::string const       m_input_tag;            // input tag of this item
+	std::string const       m_animinput_tag;        // tag of input port for animation state
+	std::string const       m_scrollxinput_tag;     // tag of input port for horizontal scroll position
+	std::string const       m_scrollyinput_tag;     // tag of input port for vertical scroll position
+	bounds_vector const     m_rawbounds;            // raw (original) bounds of the item
+	bool const              m_have_output;          // whether we actually have an output
+	bool const              m_input_raw;            // get raw data from input port
+	bool const              m_have_animoutput;      // whether we actually have an output for animation
+	bool const              m_have_scrollxoutput;   // whether we actually have an output for horizontal scroll
+	bool const              m_have_scrollyoutput;   // whether we actually have an output for vertical scroll
+	bool const              m_has_clickthrough;     // whether clickthrough was explicitly configured
+};
+
+
 /// \brief A single view within a #layout_file
 ///
 /// The view is described using arbitrary coordinates that are scaled to
@@ -243,133 +415,14 @@ class layout_view
 public:
 	using layout_environment = emu::render::detail::layout_environment;
 	using view_environment = emu::render::detail::view_environment;
-	using element_map = std::unordered_map<std::string, layout_element>;
+	using element_map = layout_view_item::element_map;
 	using group_map = std::unordered_map<std::string, layout_group>;
 	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device const>>;
 	using prepare_items_delegate = delegate<void ()>;
 	using preload_delegate = delegate<void ()>;
 	using recomputed_delegate = delegate<void ()>;
 
-	/// \brief A single item in a view
-	///
-	/// Each view has a list of item structures describing the visual
-	/// elements to draw, where they are located, additional blending
-	/// modes, and bindings for inputs and outputs.
-	class item
-	{
-		friend class layout_view;
-
-	public:
-		using state_delegate = delegate<int ()>;
-		using bounds_delegate = delegate<render_bounds ()>;
-		using color_delegate = delegate<render_color ()>;
-
-		// construction/destruction
-		item(
-				view_environment &env,
-				util::xml::data_node const &itemnode,
-				element_map &elemmap,
-				int orientation,
-				layout_group::transform const &trans,
-				render_color const &color);
-		~item();
-
-		// getters
-		std::string const &id() const { return m_id; }
-		layout_element *element() const { return m_element; }
-		screen_device *screen() const { return m_screen; }
-		bool bounds_animated() const { return m_bounds.size() > 1U; }
-		bool color_animated() const { return m_color.size() > 1U; }
-		render_bounds bounds() const { return m_get_bounds(); }
-		render_color color() const { return m_get_color(); }
-		int blend_mode() const { return m_blend_mode; }
-		u32 visibility_mask() const { return m_visibility_mask; }
-		int orientation() const { return m_orientation; }
-		render_container *screen_container() const { return m_screen ? &m_screen->container() : nullptr; }
-
-		// interactivity
-		bool has_input() const { return bool(m_input_port); }
-		std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
-		bool clickthrough() const { return m_clickthrough; }
-
-		// fetch state based on configured source
-		int element_state() const { return m_get_elem_state(); }
-		int animation_state() const { return m_get_anim_state(); }
-
-		// set state
-		void set_state(int state) { m_elem_state = state; }
-
-		// set handlers
-		void set_element_state_callback(state_delegate &&handler);
-		void set_animation_state_callback(state_delegate &&handler);
-		void set_bounds_callback(bounds_delegate &&handler);
-		void set_color_callback(color_delegate &&handler);
-
-		// resolve tags, if any
-		void resolve_tags();
-
-	private:
-		using bounds_vector = emu::render::detail::bounds_vector;
-		using color_vector = emu::render::detail::color_vector;
-
-		state_delegate default_get_elem_state();
-		state_delegate default_get_anim_state();
-		bounds_delegate default_get_bounds();
-		color_delegate default_get_color();
-		int get_state() const;
-		int get_output() const;
-		int get_input_raw() const;
-		int get_input_field_cached() const;
-		int get_input_field_conditional() const;
-		int get_anim_output() const;
-		int get_anim_input() const;
-		render_bounds get_interpolated_bounds() const;
-		render_color get_interpolated_color() const;
-
-		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
-		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
-		static color_vector make_color(view_environment &env, util::xml::data_node const &itemnode, render_color const &mult);
-		static std::string make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode);
-		static std::string make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode);
-		static ioport_value make_animmask(view_environment &env, util::xml::data_node const &itemnode);
-		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
-		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
-		static unsigned get_state_shift(ioport_value mask);
-
-		// internal state
-		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
-		state_delegate          m_get_elem_state;   // resolved element state function
-		state_delegate          m_get_anim_state;   // resolved animation state function
-		bounds_delegate         m_get_bounds;       // resolved bounds function
-		color_delegate          m_get_color;        // resolved color function
-		output_finder<>         m_output;           // associated output
-		output_finder<>         m_animoutput;       // associated output for animation if different
-		ioport_port *           m_animinput_port;   // input port used for animation
-		int                     m_elem_state;       // element state used in absence of bindings
-		ioport_value const      m_animmask;         // mask for animation state
-		u8 const                m_animshift;        // shift for animation state
-		ioport_port *           m_input_port;       // input port of this item
-		ioport_field const *    m_input_field;      // input port field of this item
-		ioport_value const      m_input_mask;       // input mask of this item
-		u8 const                m_input_shift;      // input mask rightshift for raw (trailing 0s)
-		bool                    m_clickthrough;     // should click pass through to lower elements
-		screen_device *         m_screen;           // pointer to screen
-		int const               m_orientation;      // orientation of this item
-		bounds_vector           m_bounds;           // bounds of the item
-		color_vector const      m_color;            // color of the item
-		int                     m_blend_mode;       // blending mode to use when drawing
-		u32                     m_visibility_mask;  // combined mask of parent visibility groups
-
-		// cold items
-		std::string const       m_id;               // optional unique item identifier
-		std::string const       m_input_tag;        // input tag of this item
-		std::string const       m_animinput_tag;    // tag of input port for animation state
-		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
-		bool const              m_have_output;      // whether we actually have an output
-		bool const              m_input_raw;        // get raw data from input port
-		bool const              m_have_animoutput;  // whether we actually have an output for animation
-		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
-	};
+	using item = layout_view_item;
 	using item_list = std::list<item>;
 	using item_ref_vector = std::vector<std::reference_wrapper<item> >;
 

@@ -17,8 +17,9 @@ issues, developing software to run on vintage systems, creating cheats,
 ROM hacking, or just investigating how software works.
 
 Use the ``-debug`` command line option to start MAME with the debugger
-activated.  By default, pressing the tilde (**~**) during emulation
-breaks into the debugger.
+activated.  By default, pressing the backtick/tilde (**~**) during
+emulation breaks into the debugger (this can by changed by reassigning
+the **Break in Debugger** input).
 
 The exact appearance of the debugger depends on your operating system
 and the options MAME was built with.  All variants of the debugger

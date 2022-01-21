@@ -65,8 +65,11 @@
  *
  */
  /*
+  * https://ardent-tool.com/615x/rt_loadable_post.html
+  *
   * WIP
-  *  - diagnostic disk 1 fails with code 67
+  *  - diagnostic disk 1 fails with alternating code a6/13
+  *      exception at 0x16824: lcs r2,0x4(r9)  # r9=40435c9c
   *  - aix vrm disk 1 fails with alternating code a6/13
   */
 
@@ -147,6 +150,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void iocc_mem_map(address_map &map) { map.unmap_value_high(); }
 	template <bool SCC> void iocc_pio_map(address_map &map);
 
 	void common(machine_config &config);
@@ -233,6 +237,8 @@ void rtpc_state::init_common()
 
 template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 {
+	map(0x00'01e8, 0x00'01ef).noprw(); // FIXME: silence streaming tape drive adapter probes
+
 	if (SCC)
 	{
 		map(0x00'8000, 0x00'8003).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w));
@@ -265,6 +271,10 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	// memory config reg (cc=2x8M, dd=2x2M, 88=2x4M)
 	map(0x00'8c80, 0x00'8c80).mirror(0x03).lr8([]() { return 0xf8; }, "mcr");
 	map(0x00'8ca0, 0x00'8ca0).mirror(0x03).w(FUNC(rtpc_state::dia_w));
+
+	// 8c82 diag dma mode?
+	// 8c84 diag dma exit?
+	map(0x00'8ce0, 0x00'8ce1).nopw(); // FIXME: hex display register?
 
 	map(0x01'0000, 0x01'07ff).rw(m_iocc, FUNC(rtpc_iocc_device::tcw_r), FUNC(rtpc_iocc_device::tcw_w));
 	map(0x01'0800, 0x01'0801).mirror(0x7fc).rw(m_iocc, FUNC(rtpc_iocc_device::csr_r<1>), FUNC(rtpc_iocc_device::csr_w));
@@ -506,6 +516,7 @@ void rtpc_state::common(machine_config &config)
 	TIMER(config, "mcu_timer").configure_periodic(FUNC(rtpc_state::mcu_timer), attotime::from_hz(32768));
 
 	RTPC_IOCC(config, m_iocc, 0);
+	m_iocc->set_addrmap(0, &rtpc_state::iocc_mem_map);
 	m_iocc->out_int().set(reqi2, FUNC(input_merger_device::in_w<1>));
 	m_iocc->out_rst().set_inputline(m_dma[0], INPUT_LINE_RESET);
 	m_iocc->out_rst().append_inputline(m_dma[1], INPUT_LINE_RESET);
@@ -520,40 +531,61 @@ void rtpc_state::common(machine_config &config)
 	// D8237AC-5
 	// 8903HV101
 	AM9517A(config, m_dma[0], m_isa->clock());
-	// chan  usage
-	//  0    serial port A
-	//  1    serial port B
-	//  2    diskette drive, serial port A
-	//  3    pc network, serial port B
-	m_isa->drq0_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<0>));
-	m_isa->drq1_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<1>));
-	m_isa->drq2_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<2>));
-	m_isa->drq3_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<3>));
-	m_dma[0]->out_hreq_callback().set(m_dma[0], FUNC(am9517a_device::hack_w));
+
+	// dma0 channel 0 == isa channel 2 (diskette drive, serial port A)
+	m_isa->drq2_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<0>));
+	m_dma[0]->in_ior_callback<0>().set([this]() { return m_isa->dack_r(2); });
+	m_dma[0]->out_iow_callback<0>().set([this](u8 data) { m_isa->dack_w(2, data); });
 	m_dma[0]->out_dack_callback<0>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<2>));
+
+	// dma0 channel 1 == isa channel 1 (serial port B)
+	m_isa->drq1_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<1>));
+	m_dma[0]->in_ior_callback<1>().set([this]() { return m_isa->dack_r(1); });
+	m_dma[0]->out_iow_callback<1>().set([this](u8 data) { m_isa->dack_w(1, data); });
 	m_dma[0]->out_dack_callback<1>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<1>));
+
+	// dma0 channel 2 == isa channel 0 (serial port A)
+	m_isa->drq0_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<2>));
+	m_dma[0]->in_ior_callback<2>().set([this]() { return m_isa->dack_r(0); });
+	m_dma[0]->out_iow_callback<2>().set([this](u8 data) { m_isa->dack_w(0, data); });
 	m_dma[0]->out_dack_callback<2>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<0>));
+
+	// dma0 channel 3 == isa channel 3 (pc network, serial port B)
+	m_isa->drq3_callback().set(m_dma[0], FUNC(am9517a_device::dreq_w<3>));
+	m_dma[0]->in_ior_callback<3>().set([this]() { return m_isa->dack_r(3); });
+	m_dma[0]->out_iow_callback<3>().set([this](u8 data) { m_isa->dack_w(3, data); });
 	m_dma[0]->out_dack_callback<3>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<3>));
+
+	m_dma[0]->out_hreq_callback().set(m_dma[0], FUNC(am9517a_device::hack_w));
 	m_dma[0]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_b_r));
 	m_dma[0]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_b_w));
+	m_dma[0]->out_eop_callback().set(m_pic[0], FUNC(pic8259_device::ir0_w));
+
+	// FIXME: eop should be asserted on the bus and tested by the device
+	// when transferring data, not routed to a specific card like this
+	m_dma[0]->out_eop_callback().append([this](int state) { m_isa->eop_w(m_iocc->adc_r(), state); });
 
 	// NEC
 	// D8237AC-5
 	// 8903HV101
 	AM9517A(config, m_dma[1], m_isa->clock());
-	// chan  usage
-	//  5    reserved
-	//  6    reserved
-	//  7    reserved
-	//  8    286 coprocessor
-	m_isa->drq5_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<1>));
-	m_isa->drq6_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<2>));
-	m_isa->drq7_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<3>));
-	m_dma[1]->out_hreq_callback().set(m_dma[1], FUNC(am9517a_device::hack_w));
+
+	// dma1 channel 0 == coprocessor channel 8?
 	m_dma[1]->out_dack_callback<0>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<4>));
+
+	// dma1 channel 1 == isa channel 5
+	m_isa->drq5_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<1>));
 	m_dma[1]->out_dack_callback<1>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<5>));
+
+	// dma1 channel 2 == isa channel 6
+	m_isa->drq6_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<2>));
 	m_dma[1]->out_dack_callback<2>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<6>));
+
+	// dma1 channel 3 == isa channel 7
+	m_isa->drq7_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<3>));
 	m_dma[1]->out_dack_callback<3>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<7>));
+
+	m_dma[1]->out_hreq_callback().set(m_dma[1], FUNC(am9517a_device::hack_w));
 	m_dma[1]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w_r));
 	m_dma[1]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w_w));
 
@@ -716,7 +748,7 @@ void rtpc_state::ibm6151(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
 	ISA16_SLOT(config, "isa4", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
 	ISA16_SLOT(config, "isa5", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, "isa6", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 6: disk/diskette adapter
+	ISA16_SLOT(config, "isa6", 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

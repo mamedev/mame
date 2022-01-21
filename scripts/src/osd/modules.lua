@@ -104,7 +104,6 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
-		MAME_DIR .. "src/osd/modules/input/input_uwp.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_mac.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
@@ -122,6 +121,12 @@ function osdmodulesbuild()
 	includedirs {
 		ext_includedir("asio"),
 	}
+
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions {
+			"-Wno-unused-private-field",
+		}
+	end
 
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {

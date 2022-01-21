@@ -23,7 +23,7 @@
  *     'Hardware Check' with an error
  *   - rodent should be correctly decrypted but expects something different
        from the CPLD (probably)
- *   - 19in1, 48in1, 48in1a, 48in1b, 60in1 have more conditional XORs,
+ *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c,60in1 have more conditional XORs,
  *     encryption isn't completely beaten yet
  *
  * 39in1 notes:
@@ -63,6 +63,7 @@ public:
 	void init_39in1();
 	void init_48in1();
 	void init_48in1a();
+	void init_48in1c();
 	void init_60in1();
 	void init_rodent();
 
@@ -341,6 +342,7 @@ void _39in1_state::init_4in1b()  { driver_init(); decrypt(0x43, 0x80, 0x04, 0x40
 void _39in1_state::init_19in1()  { driver_init(); decrypt(0x00, 0x04, 0x01, 0x80, 0x40, 2, 1, 7, 4, 5, 0, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: 0x4000, 0x8000, 0x10000, 0x20000, 0x40000 conditional XORs?
 void _39in1_state::init_48in1()  { driver_init(); decrypt(0x00, 0x01, 0x40, 0x00, 0x20, 5, 3, 2, 1, 4, 6, 0, 7); further_decrypt(0x00, 0x01, 0x20, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
 void _39in1_state::init_48in1a() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
+void _39in1_state::init_48in1c() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_rodent() { init_4in1b(); /*m_mcu_ipt_pc = 0x?????;*/ } // same encryption as 4in1b, thus good, but doesn't boot because of different CPLD calls
 void _39in1_state::init_60in1()  { driver_init(); decrypt(0x00, 0x40, 0x10, 0x80, 0x20, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
 
@@ -405,6 +407,21 @@ ROM_START( 48in1a )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "ver302.u2",    0x000000, 0x080000, CRC(5ea25870) SHA1(66edc59a3d355bc3462e98d2062ada721c371af6) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+
+ROM_START( 48in1c )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "48in1_hph_ver308.u2", 0x000000, 0x080000, CRC(5d42beb0) SHA1(f21d1923b588cca1a6cd48a8ea6f3b5b996ebc1a) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
@@ -485,12 +502,13 @@ ROM_START( rodent )
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_4in1a,  ROT90, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00, PLZ-V014)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_4in1b,  ROT90, "bootleg", "4 in 1 MAME bootleg (set 2, PLZ-V001)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_19in1,  ROT90, "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1,  ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                             MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, HPH-V000, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_48in1a, ROT90, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, _39in1, 39in1, _39in1_state, init_60in1,  ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, init_rodent, ROT0,  "The Game Room", "Rodent Exterminator",                                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_4in1a,  ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_4in1b,  ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_19in1,  ROT90, "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1,  ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_48in1a, ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.02, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1c, 39in1, _39in1, 39in1, _39in1_state, init_48in1c, ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.08, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, _39in1, 39in1, _39in1_state, init_60in1,  ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, init_rodent, ROT0,  "The Game Room", "Rodent Exterminator",                            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

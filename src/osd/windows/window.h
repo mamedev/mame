@@ -62,22 +62,14 @@ public:
 
 	virtual bool win_has_menu() override
 	{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 		return GetMenu(platform_window()) ? true : false;
-#else
-		return false;
-#endif
 	}
 
 	virtual osd_dim get_size() override
 	{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 		RECT client;
 		GetClientRect(platform_window(), &client);
 		return osd_dim(client.right - client.left, client.bottom - client.top);
-#else
-		throw ref new Platform::NotImplementedException();
-#endif
 	}
 
 	void capture_pointer() override;
@@ -106,8 +98,8 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
-	int                                m_fullscreen_safe;
-	float                              m_aspect;
+	int                 m_fullscreen_safe;
+	float               m_aspect;
 
 	// rendering info
 	std::mutex          m_render_lock;
@@ -118,8 +110,9 @@ public:
 
 	// input info
 	std::chrono::steady_clock::time_point  m_lastclicktime;
-	int                                    m_lastclickx;
-	int                                    m_lastclicky;
+	int                 m_lastclickx;
+	int                 m_lastclicky;
+	char16_t            m_last_surrogate;
 
 private:
 	void draw_video_contents(HDC dc, bool update);
@@ -136,10 +129,6 @@ private:
 	void set_fullscreen(int fullscreen);
 
 	static POINT        s_saved_cursor_pos;
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	static Windows::UI::Core::CoreCursor^ s_cursor;
-#endif
 
 	bool                m_attached_mode;
 };

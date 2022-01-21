@@ -136,11 +136,33 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="ディープフォレスト"/>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1118866">
+				<rom name="deep_forest_disk_a.mfm" size="1118866" crc="4eba4d10" sha1="ee18846cba07e38de307e270041d742b99d4d587"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1118341">
+				<rom name="deep_forest_disk_b.mfm" size="1118341" crc="61df8f31" sha1="e2208d466d3c6b1fefa52d248d851a971b90c5bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dforestc" cloneof="dforest">
+		<description>Deep Forest (cracked)</description>
+		<year>1987</year>
+		<publisher>ザインソフト (Xain Soft)</publisher>
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="ディープフォレスト"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="348848">
 				<rom name="dforst_a.d77" size="348848" crc="3077a74a" sha1="88a8d8e0dd189612356ae80b70d2d1e4448e0a5f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">
 				<rom name="dforst_b.d77" size="348848" crc="1f7ffa3f" sha1="cfa6d67a16bb7b0ceb5f260bba9ed2772eeb33df"/>
 			</dataarea>

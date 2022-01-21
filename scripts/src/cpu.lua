@@ -160,6 +160,8 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.h",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",

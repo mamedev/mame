@@ -385,6 +385,7 @@ private:
 			, m_handler(std::move(handler))
 			, m_added(false)
 		{
+			set_process_flags(PROCESS_LR_REPEAT);
 		}
 
 		virtual ~menu_configure() override { m_handler(m_parent); }
@@ -412,7 +413,7 @@ private:
 		};
 
 		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle() override;
+		virtual void handle(event const *ev) override;
 
 		bool set_filter_type(unsigned pos, typename Base::type n)
 		{
@@ -567,15 +568,14 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 }
 
 template <class Impl, class Base, typename Base::type Type>
-void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle()
+void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event const *ev)
 {
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
 		m_added = false;
 		bool changed(false);
-		uintptr_t const ref(reinterpret_cast<uintptr_t>(menu_event->itemref));
-		switch (menu_event->iptkey)
+		uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
+		switch (ev->iptkey)
 		{
 		case IPT_UI_LEFT:
 		case IPT_UI_RIGHT:
@@ -584,7 +584,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle()
 				// change filter type
 				unsigned const pos(ref - FILTER_FIRST);
 				typename Base::type const current(m_parent.m_filters[pos]->get_type());
-				if (IPT_UI_LEFT == menu_event->iptkey)
+				if (IPT_UI_LEFT == ev->iptkey)
 				{
 					typename Base::type n(current);
 					while ((Base::FIRST < n) && !changed)
@@ -607,7 +607,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle()
 			{
 				// change filter value
 				Base &pos(*m_parent.m_filters[ref - ADJUST_FIRST]);
-				changed = (IPT_UI_LEFT == menu_event->iptkey) ? pos.adjust_left() : pos.adjust_right();
+				changed = (IPT_UI_LEFT == ev->iptkey) ? pos.adjust_left() : pos.adjust_right();
 			}
 			break;
 
@@ -971,6 +971,7 @@ private:
 			, m_state(std::make_unique<std::pair<unsigned, bool> []>(mame_machine_manager::instance()->inifile().get_file_count()))
 			, m_ini(parent.m_ini)
 		{
+			set_process_flags(PROCESS_LR_REPEAT);
 			inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 			for (size_t i = 0; mgr.get_file_count() > i; ++i)
 			{
@@ -1015,7 +1016,7 @@ private:
 		};
 
 		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle() override;
+		virtual void handle(event const *ev) override;
 
 		category_machine_filter &m_parent;
 		std::function<void (machine_filter &)> m_handler;
@@ -1093,15 +1094,14 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
-void category_machine_filter::menu_configure::handle()
+void category_machine_filter::menu_configure::handle(event const *ev)
 {
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
 		bool changed(false);
-		uintptr_t const ref(reinterpret_cast<uintptr_t>(menu_event->itemref));
+		uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
 		inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_LEFT:
 			if ((INI_FILE == ref) && m_ini)

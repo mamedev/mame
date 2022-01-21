@@ -74,26 +74,27 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 	{
 		machine().popmessage("Error: %s\n", m_image.error());
 		stack_pop();
-		return;
 	}
-
-	bool can_in_place = input_format->supports_save();
-	if(can_in_place) {
-		std::string tmp_path;
-		util::core_file::ptr tmp_file;
-		// attempt to open the file for writing but *without* create
-		std::error_condition const filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
-		if(!filerr)
-			tmp_file.reset();
-		else
-			can_in_place = false;
+	else
+	{
+		bool can_in_place = input_format->supports_save();
+		if(can_in_place) {
+			std::string tmp_path;
+			util::core_file::ptr tmp_file;
+			// attempt to open the file for writing but *without* create
+			std::error_condition const filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
+			if(!filerr)
+				tmp_file.reset();
+			else
+				can_in_place = false;
+		}
+		m_submenu_result.rw = menu_select_rw::result::INVALID;
+		menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, m_submenu_result.rw);
+		m_state = SELECT_RW;
 	}
-	m_submenu_result.rw = menu_select_rw::result::INVALID;
-	menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, m_submenu_result.rw);
-	m_state = SELECT_RW;
 }
 
-void menu_control_floppy_image::handle()
+void menu_control_floppy_image::menu_activated()
 {
 	switch (m_state) {
 	case DO_CREATE: {
@@ -121,7 +122,7 @@ void menu_control_floppy_image::handle()
 	case SELECT_FORMAT:
 		if(!output_format) {
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 		} else {
 			const auto &fs = fd.get_create_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
@@ -140,7 +141,7 @@ void menu_control_floppy_image::handle()
 	case SELECT_INIT:
 		if(m_submenu_result.i == -1) {
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 		} else {
 			create_fs = &fd.get_create_fs()[m_submenu_result.i];
 			do_load_create();
@@ -174,12 +175,13 @@ void menu_control_floppy_image::handle()
 
 		case menu_select_rw::result::INVALID:
 			m_state = START_FILE;
+			menu_activated();
 			break;
 		}
 		break;
 
 	default:
-		menu_control_device_image::handle();
+		menu_control_device_image::menu_activated();
 	}
 }
 

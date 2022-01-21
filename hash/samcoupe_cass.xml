@@ -11,7 +11,7 @@ license:CC0
    The Sam Coupe will recognize most Spectrum tapes but isn't actually directly compatible with the majority of them due to different memory mapping
 -->
 
-<softwarelist name="samcoupe_cass" description="Sam Coupe cassettes">
+<softwarelist name="samcoupe_cass" description="SAM Coupé cassettes">
 
 	<!-- it loads, includes the SAM specific title screen, but the game doesn't boot -->
 	<software name="snare" supported="no">

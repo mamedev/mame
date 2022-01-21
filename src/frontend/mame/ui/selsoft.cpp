@@ -394,27 +394,25 @@ menu_select_software::~menu_select_software()
 //  handle
 //-------------------------------------------------
 
-void menu_select_software::handle()
+void menu_select_software::handle(event const *ev)
 {
 	if (m_prev_selected == nullptr)
-		m_prev_selected = item(0).ref;
+		m_prev_selected = item(0).ref();
 
-	// ignore pause keys by swallowing them before we process the menu
-	machine().ui_input().pressed(IPT_UI_PAUSE);
+	// FIXME: everything above here used run before events were processed
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event)
+	if (ev)
 	{
 		if (dismiss_error())
 		{
-			// reset the error on any future event
+			// reset the error on any subsequent menu event
 		}
-		else switch (menu_event->iptkey)
+		else switch (ev->iptkey)
 		{
 		case IPT_UI_SELECT:
-			if ((get_focus() == focused_menu::MAIN) && menu_event->itemref)
-				inkey_select(menu_event);
+			if ((get_focus() == focused_menu::MAIN) && ev->itemref)
+				inkey_select(ev);
 			break;
 
 		case IPT_UI_LEFT:
@@ -470,12 +468,12 @@ void menu_select_software::handle()
 			break;
 
 		default:
-			if (menu_event->itemref)
+			if (ev->itemref)
 			{
-				if (menu_event->iptkey == IPT_UI_FAVORITES)
+				if (ev->iptkey == IPT_UI_FAVORITES)
 				{
 					// handle UI_FAVORITES
-					ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
+					ui_software_info *swinfo = (ui_software_info *)ev->itemref;
 
 					if ((uintptr_t)swinfo > 2)
 					{
@@ -510,7 +508,6 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	for (auto &icon : m_data->icons()) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
 
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	int old_software = -1;
 
 	// start with an empty list
@@ -523,7 +520,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		// add an item to start empty or let the user use the file manager
 		item_append(
 				m_data->has_empty_start() ? _("[Start empty]") : _("[Use file manager]"),
-				flags_ui,
+				0,
 				(void *)&m_data->swinfo()[0]);
 
 		if (!flt)
@@ -563,7 +560,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 		item_append(
 				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
-				m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
+				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
 	}
 
 	// configure the custom rendering
@@ -744,7 +741,7 @@ void menu_select_software::filter_selected()
 						}
 					}
 					m_data->set_filter_type(new_type);
-					reset(reset_options::SELECT_FIRST);
+					reset(reset_options::REMEMBER_REF);
 				});
 	}
 }

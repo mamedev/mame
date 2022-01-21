@@ -42,7 +42,7 @@ function portname.startplugin()
 
 	local function parse_names(ctable, depth)
 		if depth >= 5 then
-			emu.print_error("portname: max import depth exceeded\n")
+			emu.print_error("portname: max import depth exceeded")
 			return
 		end
 		if ctable.import then
@@ -132,12 +132,12 @@ function portname.startplugin()
 					lfs.mkdir(path)
 					if not lfs.attributes(path) then
 						manager.machine:popmessage(_("Failed to save input name file"))
-						emu.print_verbose("portname: unable to create path " .. path .. "\n")
+						emu.print_verbose("portname: unable to create path " .. path)
 						return false
 				end
 				elseif attr.mode ~= "directory" then
 					manager.machine:popmessage(_("Failed to save input name file"))
-					emu.print_verbose("portname: path exists but isn't directory " .. path .. "\n")
+					emu.print_verbose("portname: path exists but isn't directory " .. path)
 					return false
 				end
 				return true
@@ -151,7 +151,7 @@ function portname.startplugin()
 			local filename = get_filename()
 			local file = io.open(ctrlrpath .. "/portname/" .. filename, "r")
 			if file then
-				emu.print_verbose("portname: input name file exists " .. filename .. "\n")
+				emu.print_verbose("portname: input name file exists " .. filename)
 				manager.machine:popmessage(_("Failed to save input name file"))
 				file:close()
 				return false

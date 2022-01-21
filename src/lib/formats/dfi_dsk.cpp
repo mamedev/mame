@@ -85,7 +85,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	std::vector<uint8_t> data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
-	int rpm=360; // drive rpm
+	[[maybe_unused]] int rpm=360; // drive rpm
 	while(pos < size) {
 		uint8_t h[10];
 		io.read_at(pos, h, 10, actual);
@@ -160,8 +160,6 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				osd_printf_warning("dfi_dsk: WARNING: Cannot Guess Speed! Assuming 360rpm, 100Mhz clock!\n");
 			osd_printf_verbose("dfi_dsk: Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
 		}
-
-		rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
 
 		if(!index_time)
 			index_time = total_time;

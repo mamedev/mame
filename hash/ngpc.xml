@@ -693,6 +693,18 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
+	<software name="mslug1stp" cloneof="mslug1st">
+		<description>Metal Slug - 1st Mission (prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="メタルスラッグ ファーストミッション" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="METALSLUG1STP.ngp" size="2097152" crc="c44d7a40" sha1="8ff881940ea6e44414f034a214c5de735b34861a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developer: Ukiyotei - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00617) -->
 	<software name="mslug2nd">
 		<!-- NGPC only -->

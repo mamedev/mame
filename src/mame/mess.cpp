@@ -13,7 +13,7 @@
 #define APPNAME                 "MESS"
 #define APPNAME_LOWER           "mess"
 #define CONFIGNAME              "mess"
-#define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
+#define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttps://mamedev.org"
 #define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME team"
 
 const char * emulator_info::get_appname() { return APPNAME;}

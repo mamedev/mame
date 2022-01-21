@@ -92,7 +92,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mr_w);
 
 	void index_callback(floppy_image_device *floppy, int state);
-
 protected:
 	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -242,6 +241,8 @@ private:
 		WRITE_SECTOR_PRE_BYTE
 	};
 
+
+
 	struct live_info {
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
 
@@ -303,6 +304,8 @@ private:
 	uint8_t format_last_byte;
 	int format_last_byte_count;
 	std::string format_description_string;
+
+	bool delay_int;
 
 	void delay_cycles(emu_timer *tm, int cycles);
 

@@ -344,6 +344,7 @@ dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
+dmainevent.cpp
 dmndrby.cpp
 docastle.cpp
 dogfgt.cpp
@@ -557,6 +558,7 @@ homerun.cpp
 hornet.cpp
 hotblock.cpp
 hotstuff.cpp
+houseball.cpp
 hshavoc.cpp
 hvyunit.cpp
 hyhoo.cpp
@@ -1041,8 +1043,10 @@ rampart.cpp
 ramtek.cpp
 rastan.cpp
 rastersp.cpp
+rawthrillspc.cpp
 rbisland.cpp
 rbmk.cpp
+rbowlorama.cpp
 rcorsair.cpp
 re900.cpp
 realbrk.cpp
@@ -1256,6 +1260,7 @@ statriv2.cpp
 stellafr.cpp
 stfight.cpp
 stlforce.cpp
+stop.cpp
 strkzn.cpp
 stuntair.cpp
 stv.cpp

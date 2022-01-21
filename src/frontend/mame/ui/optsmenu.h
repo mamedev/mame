@@ -29,7 +29,7 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 	virtual void populate(float &customtop, float &custombottom) override;
 
 	void handle_item_event(event const &menu_event);
@@ -62,7 +62,7 @@ public:
 	virtual ~menu_game_options() override;
 
 protected:
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 	virtual void populate(float &customtop, float &custombottom) override;
 
 	void handle_item_event(event const &menu_event);

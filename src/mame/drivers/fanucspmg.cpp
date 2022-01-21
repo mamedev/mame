@@ -112,7 +112,7 @@ Note: To initiate booting from the floppy drive hold down the LOAD key for 3-5 s
 
 The software for the Fanuc System P-Model G is extremely rare now and very difficult to find.
 If you do have any of these wanted software titles or any manuals listed below and want to help
-please contact me (Guru) via http://mamedev.org/contact.html
+please contact me (Guru) via http://members.iinet.net.au/~lantra9jp1_nbn/gurudumps/comments.html
 
 The following is a complete list of manuals available for the first edition of the
 Fanuc System P-Model G released in 1983. The info is taken from a glossy sales brochure

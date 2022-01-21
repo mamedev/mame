@@ -25,15 +25,10 @@ public:
 		m_tc0080vco(*this, "tc0080vco"),
 		m_tc0040ioc(*this, "tc0040ioc"),
 		m_palette(*this, "palette"),
-		m_z80bank(*this, "z80bank"),
-		m_io_p1x(*this, "P1X"),
-		m_io_p1y(*this, "P1Y"),
-		m_io_p2x(*this, "P2X"),
-		m_io_p2y(*this, "P2Y")
+		m_z80bank(*this, "z80bank")
 	{ }
 
 	void recordbr(machine_config &config);
-	void syvalion(machine_config &config);
 	void dleague(machine_config &config);
 	void tetristh(machine_config &config);
 
@@ -41,8 +36,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<tc0080vco_device> m_tc0080vco;
@@ -51,26 +45,43 @@ private:
 
 	required_memory_bank m_z80bank;
 
-	optional_ioport m_io_p1x;
-	optional_ioport m_io_p1y;
-	optional_ioport m_io_p2x;
-	optional_ioport m_io_p2y;
+	void taitoh_base(machine_config &config);
 
 	void coin_control_w(u8 data);
-	u8 syvalion_input_bypass_r();
+	void taitoh_log_vram();
+
+private:
 	void sound_bankswitch_w(u8 data);
-	u32 screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void recordbr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void dleague_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void taitoh_log_vram();
+
 	void dleague_map(address_map &map);
 	void recordbr_map(address_map &map);
 	void sound_map(address_map &map);
-	void syvalion_map(address_map &map);
 	void tetristh_map(address_map &map);
+};
+
+
+class syvalion_state : public taitoh_state
+{
+public:
+	syvalion_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taitoh_state(mconfig, type, tag),
+		m_io_track(*this, { "P2Y", "P2X", "P1Y", "P1X" })
+	{ }
+
+	void syvalion(machine_config &config);
+
+private:
+	required_ioport_array<4> m_io_track;
+
+	u8 syvalion_input_bypass_r();
+
+	u32 screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void syvalion_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TAITO_H_H

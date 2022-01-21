@@ -75,6 +75,7 @@ enum input_item_class
 enum input_item_modifier
 {
 	ITEM_MODIFIER_NONE,
+	ITEM_MODIFIER_REVERSE,
 	ITEM_MODIFIER_POS,
 	ITEM_MODIFIER_NEG,
 	ITEM_MODIFIER_LEFT,

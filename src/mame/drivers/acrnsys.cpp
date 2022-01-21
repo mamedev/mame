@@ -131,8 +131,8 @@ void acrnsys_state::a6809_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0900, 0x090f).mirror(0xf0).m(m_via6522, FUNC(via6522_device::map));
-	map(0xf800, 0xffff).rom().region("maincpu", 0);
+	map(0x0980, 0x098f).mirror(0x70).m(m_via6522, FUNC(via6522_device::map));
+	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
 void acrnsys_state::a6502a_mem(address_map &map)
@@ -425,6 +425,29 @@ void acrnsys_state::a6809(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put_pb));
 }
 
+/***************************************************************************
+    DEFAULT CARD SETTINGS
+***************************************************************************/
+
+static DEVICE_INPUT_DEFAULTS_START(8k_def_ram0000)
+	DEVICE_INPUT_DEFAULTS("LINKS", 0x07, 0x00)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(8k_def_ram2000)
+	DEVICE_INPUT_DEFAULTS("LINKS", 0x07, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(8k_def_ramc000)
+	DEVICE_INPUT_DEFAULTS("LINKS", 0x07, 0x06)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(32k_def_ram32k)
+	DEVICE_INPUT_DEFAULTS("LINKS", 0x01, 0x00)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(32k_def_ram16k)
+	DEVICE_INPUT_DEFAULTS("LINKS", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -440,7 +463,7 @@ void acrnsys_state::acrnsys2(machine_config &config)
 	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
-	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
+	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ram2000)); // 0x2000-0x3fff
 	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "vdu40");
 	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "cass");
 	ACORN_BUS_SLOT(config, "bus4", m_bus, acorn_bus_devices, nullptr);
@@ -464,8 +487,8 @@ void acrnsys_state::acrnsys3(machine_config &config)
 	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
-	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
-	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k"); // 0xc000-0xdfff
+	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ram2000)); // 0x2000-0x3fff
+	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ramc000)); // 0xc000-0xdfff
 	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "vdu40");
 	ACORN_BUS_SLOT(config, "bus4", m_bus, acorn_bus_devices, "fdc");
 	ACORN_BUS_SLOT(config, "bus5", m_bus, acorn_bus_devices, nullptr);
@@ -488,9 +511,9 @@ void acrnsys_state::acrnsys3_6809(machine_config &config)
 	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
-	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x0000-0x1fff
-	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
-	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "8k"); // 0xc000-0xdfff
+	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ram0000)); // 0x0000-0x1fff
+	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ram2000)); // 0x2000-0x3fff
+	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ramc000)); // 0xc000-0xdfff
 	ACORN_BUS_SLOT(config, "bus4", m_bus, acorn_bus_devices, "vdu40");
 	ACORN_BUS_SLOT(config, "bus5", m_bus, acorn_bus_devices, "cass");
 	ACORN_BUS_SLOT(config, "bus6", m_bus, acorn_bus_devices, "fdc");
@@ -511,8 +534,8 @@ void acrnsys_state::acrnsys4(machine_config &config)
 	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
-	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
-	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k"); // 0xc000-0xdfff
+	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ram2000)); // 0x2000-0x3fff
+	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_def_ramc000)); // 0xc000-0xdfff
 	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "vdu40");
 	ACORN_BUS_SLOT(config, "bus4", m_bus, acorn_bus_devices, "fdc");
 	ACORN_BUS_SLOT(config, "bus5", m_bus, acorn_bus_devices, nullptr);
@@ -541,8 +564,8 @@ void acrnsys_state::acrnsys5(machine_config &config)
 	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
-	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "32k"); // 32K
-	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "32k"); // 16K
+	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "32k").set_option_device_input_defaults("32k", DEVICE_INPUT_DEFAULTS_NAME(32k_def_ram32k)); // 32K
+	ACORN_BUS_SLOT(config, "bus2", m_bus, acorn_bus_devices, "32k").set_option_device_input_defaults("32k", DEVICE_INPUT_DEFAULTS_NAME(32k_def_ram16k)); // 16K
 	ACORN_BUS_SLOT(config, "bus3", m_bus, acorn_bus_devices, "vdu80");
 	ACORN_BUS_SLOT(config, "bus4", m_bus, acorn_bus_devices, "fdc");
 	ACORN_BUS_SLOT(config, "bus5", m_bus, acorn_bus_devices, "econet");
@@ -570,7 +593,7 @@ ROM_END
 
 ROM_START( acrnsys3_6809 )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("acorn6809.ic4", 0x0000, 0x0800, CRC(5fa5b632) SHA1(b14a884bf82a7a8c23bc03c2e112728dd1a74896))
+	ROM_LOAD("acorn6809.ic4", 0x0800, 0x0800, CRC(5fa5b632) SHA1(b14a884bf82a7a8c23bc03c2e112728dd1a74896))
 
 	ROM_REGION(0x100, "proms", 0)
 	ROM_LOAD("acorn6809.ic11", 0x0000, 0x0100, CRC(7908317d) SHA1(e0f1e5bd3a8598d3b62bc432dd1f3892ed7e66d8)) // address decoder
@@ -587,9 +610,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME           PARENT    COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY  FULLNAME                     FLAGS */
-COMP( 1980, acrnsys2,      acrnsys3, 0,      acrnsys2,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 2",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, acrnsys3,      0,        0,      acrnsys3,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6502 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, acrnsys3_6809, acrnsys3, 0,      acrnsys3_6809, acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 3 (6809 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, acrnsys4,      acrnsys3, 0,      acrnsys4,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 4",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, acrnsys5,      0,        0,      acrnsys5,      acrnsys, acrnsys_state, empty_init, "Acorn", "Acorn System 5",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME           PARENT    COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY            FULLNAME                     FLAGS */
+COMP( 1980, acrnsys2,      acrnsys3, 0,      acrnsys2,      acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 2",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys3,      0,        0,      acrnsys3,      acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 3 (6502 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys3_6809, acrnsys3, 0,      acrnsys3_6809, acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 3 (6809 CPU)", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, acrnsys4,      acrnsys3, 0,      acrnsys4,      acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 4",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, acrnsys5,      0,        0,      acrnsys5,      acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 5",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
