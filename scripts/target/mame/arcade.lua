@@ -5035,6 +5035,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/multfish_boot.cpp",
 	MAME_DIR .. "src/mame/drivers/murogem.cpp",
 	MAME_DIR .. "src/mame/drivers/murogmbl.cpp",
+	MAME_DIR .. "src/mame/drivers/neomania.cpp",
 	MAME_DIR .. "src/mame/drivers/neoprint.cpp",
 	MAME_DIR .. "src/mame/drivers/news.cpp",
 	MAME_DIR .. "src/mame/includes/news.h",

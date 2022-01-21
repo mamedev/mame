@@ -32909,6 +32909,9 @@ zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
 
+@source:neomania.cpp
+neomania                        // bootleg
+
 @source:neopcb.cpp
 kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
 ms5pcb                          // 0268 (c) 2003 Playmore - JAMMA PCB
