@@ -2,33 +2,38 @@
 // copyright-holders:Robbbert
 /******************************************************************************************
 
-    PINBALL
-    Valley Spectra IV
+PINBALL
+Valley Spectra IV
 
-    Rotating game, like Midway's "Rotation VIII".
+Rotating game, like Midway's "Rotation VIII".
 
-    2012-09-28 System working [Robbbert]
+2012-09-28 System working [Robbbert]
 
-    Schematic and PinMAME used as references.
-    Code for the sn76477 sound was derived from PinMAME.
+Schematic and PinMAME used as references.
+Code for the sn76477 sound was derived from PinMAME.
 
-    There is a bug - if you score 1000 and had less than 100, the hundreds digit will
-    be blank. It will of course fix itself during the course of the game.
+There is a bug - if you score 1000 and had less than 100, the hundreds digit will
+be blank. It will of course fix itself during the course of the game.
 
-    Setting up - if you do not set up the game, each player will get 255 balls.
-    Turn test switch to Setup. Press 1 to advance to next set. Press 5 to adjust the
-    set. Use the manual for a description of each set. After setting up set 16, do not
-    press 1, instead turn the dipswitch to Play. Exit (to save nvram), and restart.
-    Now the game is ready. Very quick guide to a reasonable setup:
-    06 - 30000 (1st award score)
-    07 - 50000 (2nd award score)
-    08 - 70000 (3rd award score)
-    09 - 90000 (high score)
-    11 - 1 (1 coin 1 credit)
-    13 - 3 (3 balls)
-    15 - 1 (award is a free game)
-    16 - 1 (match enabled)
+Setting up - if you do not set up the game, each player will get 255 balls.
+Turn test switch to Setup. Press 1 to advance to next set. Press 5 to adjust the
+set. Use the manual for a description of each set. After setting up set 16, do not
+press 1, instead turn the dipswitch to Play. Exit (to save nvram), and restart.
+Now the game is ready. Very quick guide to a reasonable setup:
+06 - 30000 (1st award score)
+07 - 50000 (2nd award score)
+08 - 70000 (3rd award score)
+09 - 90000 (high score)
+11 - 1 (1 coin 1 credit)
+13 - 3 (3 balls)
+15 - 1 (award is a free game)
+16 - 1 (match enabled)
 
+Status:
+- Working
+
+ToDo:
+- Nothing
 
 *******************************************************************************************/
 
@@ -52,33 +57,35 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_snsnd(*this, "snsnd")
-		, m_switch(*this, "SWITCH.%u", 0)
+		, m_switch(*this, "X%u", 0U)
 		, m_p_ram(*this, "nvram")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void spectra(machine_config &config);
 
 private:
-	uint8_t porta_r();
-	uint8_t portb_r();
-	void porta_w(uint8_t data);
-	void portb_w(uint8_t data);
+	u8 porta_r();
+	u8 portb_r();
+	void porta_w(u8 data);
+	void portb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra_map(address_map &map);
 
-	uint8_t m_porta;
-	uint8_t m_portb;
-	uint8_t m_t_c;
-	uint8_t m_out_offs;
+	u8 m_porta;
+	u8 m_portb;
+	u8 m_t_c;
+	u8 m_out_offs;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_switch;
-	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<u8> m_p_ram;
 	output_finder<40> m_digits;
+	output_finder<64> m_io_outputs;  // 16 solenoids + 48 lamps
 };
 
 
@@ -93,56 +100,51 @@ void spectra_state::spectra_map(address_map &map)
 }
 
 static INPUT_PORTS_START( spectra )
-	PORT_START("SWITCH.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Outlane 1") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CR Hole") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TR Hole") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Bumper") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C Bumper") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Bumper") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Sling") PORT_CODE(KEYCODE_O)
-	PORT_START("SWITCH.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Sling") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Outlane") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Rollover") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Rollover") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Inside Target") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C Inside Target") PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Inside Target") PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CL Target") PORT_CODE(KEYCODE_K)
-	PORT_START("SWITCH.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CL Button") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Button") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Target") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Outlane 2") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Outlane 3") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Pentagon") PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Pentagon") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Area") PORT_CODE(KEYCODE_COMMA)
-	PORT_START("SWITCH.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Area") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Area") PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Inlane Button") PORT_CODE(KEYCODE_L)
+	PORT_START("X0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Outlane 1") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CR Hole") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TR Hole") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Bumper") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C Bumper") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Bumper") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Sling") PORT_CODE(KEYCODE_G)
+	PORT_START("X1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Sling") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Outlane") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Rollover") PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Rollover") PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Inside Target") PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C Inside Target") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Inside Target") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL Target") PORT_CODE(KEYCODE_N)
+	PORT_START("X2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL Button") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TL Button") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TL Target") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Outlane 2") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Outlane 3") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Pentagon") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Pentagon") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TL Area") PORT_CODE(KEYCODE_V)
+	PORT_START("X3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("L Area") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("R Area") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Inlane Button") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_TILT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_DIPNAME( 0x60, 0x60, "Test Switch" ) // 3-position slide switch
 	PORT_DIPSETTING(    0x60, "Play" )
 	PORT_DIPSETTING(    0x20, "Setup" )
 	PORT_DIPSETTING(    0x40, "Test" )
 INPUT_PORTS_END
 
-void spectra_state::machine_reset()
+u8 spectra_state::porta_r()
 {
-	m_t_c = 0;
-}
-
-uint8_t spectra_state::porta_r()
-{
-	uint8_t row = (m_porta & 0x18) >> 3;
-	uint8_t key = m_switch[row]->read();
-	uint8_t ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
+	u8 row = (m_porta & 0x18) >> 3;
+	u8 key = m_switch[row]->read();
+	u8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
 	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
 		m_samples->start(3, 8); // coin
@@ -150,7 +152,7 @@ uint8_t spectra_state::porta_r()
 	return ret;
 }
 
-uint8_t spectra_state::portb_r()
+u8 spectra_state::portb_r()
 {
 	if (m_p_ram[0xf0] != 1)
 		return 0x5a; // factory reset if first time
@@ -158,13 +160,13 @@ uint8_t spectra_state::portb_r()
 		return m_portb;
 }
 
-void spectra_state::porta_w(uint8_t data)
+void spectra_state::porta_w(u8 data)
 {
 	m_porta = data;
 }
 
 // sound port
-void spectra_state::portb_w(uint8_t data)
+void spectra_state::portb_w(u8 data)
 {
 	m_portb = data;
 	float vco = 5.0;
@@ -194,13 +196,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 // 70-7F solenoids - no knocker
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
 	m_out_offs++;
 
 	if (m_out_offs < 0x28)
 	{
-		uint8_t data = m_p_ram[m_out_offs];
-		uint8_t segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
+		u8 data = m_p_ram[m_out_offs];
+		u8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
 		m_digits[m_out_offs] = segments;
 	}
 	else
@@ -226,6 +228,32 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 	}
 	else
 		m_out_offs = 0xff;
+
+	// Signals to external solenoids
+	for (u8 i = 0; i < 16; i++)
+		m_io_outputs[i] = m_p_ram[i+0x70] ? 1 : 0;
+	// Signals to external lamps
+	for (u8 i = 0; i < 48; i++)
+		m_io_outputs[i+16] = m_p_ram[i+0x40] ? 1 : 0;
+}
+
+void spectra_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_out_offs));
+}
+
+void spectra_state::machine_reset()
+{
+	genpin_class::machine_reset();
+	m_t_c = 0;
 }
 
 
@@ -282,4 +310,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -2337,7 +2337,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
-	ACORN_VIDC10(config, m_vidc, MASTER_CLOCK/3);
+	ACORN_VIDC1A(config, m_vidc, MASTER_CLOCK/3);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));

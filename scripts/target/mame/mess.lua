@@ -304,7 +304,7 @@ SOUNDS["VRC6"] = true
 --SOUNDS["AC97"] = true
 --SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
---SOUNDS["AD1848"] = true
+SOUNDS["AD1848"] = true
 SOUNDS["UPD1771"] = true
 SOUNDS["GB_SOUND"] = true
 SOUNDS["PCD3311"] = true
@@ -460,7 +460,9 @@ MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
 MACHINES["ACIA6850"] = true
+MACHINES["ACORN_BMU"] = true
 MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_LC"] = true
 MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["ADC0804"] = true
@@ -730,6 +732,8 @@ MACHINES["TTL74543"] = true
 MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UCB1200"] = true
+MACHINES["UPC82C710"] = true
+MACHINES["UPC82C711"] = true
 MACHINES["UPD1990A"] = true
 MACHINES["UPD4991A"] = true
 --MACHINES["UPD4992"] = true
@@ -844,6 +848,8 @@ BUSES["APRICOT_KEYBOARD"] = true
 BUSES["APRICOT_VIDEO"] = true
 BUSES["AQUARIUS"] = true
 BUSES["ARCADIA"] = true
+BUSES["ARCHIMEDES_ECONET"] = true
+BUSES["ARCHIMEDES_PODULE"] = true
 BUSES["ASTROCADE"] = true
 BUSES["ATA"] = true
 BUSES["BBC_1MHZBUS"] = true
@@ -1360,6 +1366,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"pitronic",
 		"poly",
 		"poly88",
+		"positron",
 		"psion",
 		"quantel",
 		"qume",
@@ -2025,6 +2032,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.h",
+	MAME_DIR .. "src/mame/drivers/ctk2000.cpp",
 	MAME_DIR .. "src/mame/drivers/ctk551.cpp",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
@@ -2438,6 +2446,7 @@ files {
 	MAME_DIR .. "src/mame/audio/channelf.cpp",
 	MAME_DIR .. "src/mame/audio/channelf.h",
 	MAME_DIR .. "src/mame/video/channelf.cpp",
+	MAME_DIR .. "src/mame/drivers/f387x.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fairlight")
@@ -3046,6 +3055,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mekd5.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme162.cpp",
+	MAME_DIR .. "src/mame/drivers/sys1121.cpp",
 	MAME_DIR .. "src/mame/drivers/uchroma68.cpp",
 }
 
@@ -3392,6 +3402,11 @@ files {
 	MAME_DIR .. "src/mame/machine/poly88.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "positron")
+files {
+	MAME_DIR .. "src/mame/drivers/positron.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "psion")
 files {
 	MAME_DIR .. "src/mame/drivers/psion.cpp",
@@ -3505,6 +3520,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_tr505.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tr808.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr909.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_u20.cpp",
 	MAME_DIR .. "src/mame/audio/bu3905.cpp",

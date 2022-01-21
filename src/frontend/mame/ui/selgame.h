@@ -32,6 +32,9 @@ public:
 	// force game select menu
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
+protected:
+	void menu_activated() override;
+
 private:
 	enum
 	{
@@ -53,7 +56,7 @@ private:
 	static bool s_first_start;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// drawing
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;

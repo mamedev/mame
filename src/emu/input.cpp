@@ -97,6 +97,7 @@ static const code_string_table devclass_string_table[] =
 // token strings for item modifiers
 static const code_string_table modifier_token_table[] =
 {
+	{ ITEM_MODIFIER_REVERSE, "REVERSE" },
 	{ ITEM_MODIFIER_POS,     "POS" },
 	{ ITEM_MODIFIER_NEG,     "NEG" },
 	{ ITEM_MODIFIER_LEFT,    "LEFT" },
@@ -109,6 +110,7 @@ static const code_string_table modifier_token_table[] =
 // friendly strings for item modifiers
 static const code_string_table modifier_string_table[] =
 {
+	{ ITEM_MODIFIER_REVERSE, "Reverse" },
 	{ ITEM_MODIFIER_POS,     "+" },
 	{ ITEM_MODIFIER_NEG,     "-" },
 	{ ITEM_MODIFIER_LEFT,    "Left" },
@@ -469,7 +471,7 @@ bool input_seq::is_valid() const noexcept
 			if (lastcode.internal())
 				return false;
 
-			// if this is the end, we're ok
+			// if this is the end, we're OK
 			if (code == end_code)
 				return true;
 
@@ -632,21 +634,21 @@ s32 input_manager::code_value(input_code code)
 			// process items according to their native type
 			switch (targetclass)
 			{
-				case ITEM_CLASS_ABSOLUTE:
-					if (result == 0)
-						result = item->read_as_absolute(code.item_modifier());
-					break;
+			case ITEM_CLASS_ABSOLUTE:
+				if (result == 0)
+					result = item->read_as_absolute(code.item_modifier());
+				break;
 
-				case ITEM_CLASS_RELATIVE:
-					result += item->read_as_relative(code.item_modifier());
-					break;
+			case ITEM_CLASS_RELATIVE:
+				result += item->read_as_relative(code.item_modifier());
+				break;
 
-				case ITEM_CLASS_SWITCH:
-					result |= item->read_as_switch(code.item_modifier());
-					break;
+			case ITEM_CLASS_SWITCH:
+				result |= item->read_as_switch(code.item_modifier());
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	} while (0);
@@ -1054,38 +1056,42 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 	bool enable = true;
 	for (int codenum = 0; ; codenum++)
 	{
-		// handle NOT
 		input_code code = seq[codenum];
 		if (code == input_seq::not_code)
-			invert = true;
-
-		// handle OR and END
-		else if (code == input_seq::or_code || code == input_seq::end_code)
 		{
-			// if we have a positive result from the previous set, we're done
-			if (itemclass != ITEM_CLASS_INVALID || code == input_seq::end_code)
-				break;
+			// handle NOT
+			invert = true;
+		}
+		else if (code == input_seq::end_code)
+		{
+			// handle END
+			break;
+		}
+		else if (code == input_seq::or_code)
+		{
+			// handle OR
 
-			// otherwise, reset our state
-			result = 0;
+			// reset invert and enable for the next group
 			invert = false;
 			enable = true;
 		}
-
-		// handle everything else only if we're still enabled
 		else if (enable)
 		{
+			// handle everything else only if we're still enabled
+
 			// switch codes serve as enables
 			if (code.item_class() == ITEM_CLASS_SWITCH)
 			{
 				// AND against previous digital codes
 				if (enable)
-					enable &= code_pressed(code) ^ invert;
+					enable = code_pressed(code) ^ invert;
+				// FIXME: need to clear current group value if enable became false
+				// you can't create a sequence where this matters using the internal UI,
+				// but you can by editing a CFG file (or controller config file)
 			}
-
-			// non-switch codes are analog values
 			else
 			{
+				// non-switch codes are analog values
 				s32 value = code_value(code);
 
 				// if we got a 0 value, don't do anything except remember the first type
@@ -1094,19 +1100,23 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 					if (itemclasszero == ITEM_CLASS_INVALID)
 						itemclasszero = code.item_class();
 				}
-
-				// non-zero absolute values stick
 				else if (code.item_class() == ITEM_CLASS_ABSOLUTE)
 				{
+					// non-zero absolute values override relative values
+					if (itemclass == ITEM_CLASS_ABSOLUTE)
+						result += value;
+					else
+						result = value;
 					itemclass = ITEM_CLASS_ABSOLUTE;
-					result = value;
 				}
-
-				// non-zero relative values accumulate
 				else if (code.item_class() == ITEM_CLASS_RELATIVE)
 				{
-					itemclass = ITEM_CLASS_RELATIVE;
-					result += value;
+					// non-zero relative values accumulate in the absence of absolute values
+					if (itemclass != ITEM_CLASS_ABSOLUTE)
+					{
+						result += value;
+						itemclass = ITEM_CLASS_RELATIVE;
+					}
 				}
 			}
 
@@ -1114,6 +1124,10 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 			invert = false;
 		}
 	}
+
+	// saturate mixed absolute values
+	if (itemclass == ITEM_CLASS_ABSOLUTE)
+		result = std::clamp(result, INPUT_ABSOLUTE_MIN, INPUT_ABSOLUTE_MAX);
 
 	// if the caller wants to know the type, provide it
 	if (result == 0)

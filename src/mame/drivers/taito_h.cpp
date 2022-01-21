@@ -161,49 +161,25 @@ some kind of zoom table?
 
 ***************************************************************************/
 
-u8 taitoh_state::syvalion_input_bypass_r()
+u8 syvalion_state::syvalion_input_bypass_r()
 {
-	/* Bypass TC0040IOC controller for analog input */
+	// Bypass TC0040IOC controller for trackball input
 
-	u8 port = m_tc0040ioc->port_r(); /* read port number */
+	u8 port = m_tc0040ioc->port_r(); // read port number
 
 	switch (port)
 	{
-		case 0x08:              /* trackball y coords bottom 8 bits for 2nd player */
-			return m_io_p2y->read();
+		case 0x08:              // trackball y coords bottom 8 bits for 2nd player
+		case 0x0a:              // trackball x coords bottom 8 bits for 2nd player
+		case 0x0c:              // trackball y coords bottom 8 bits for 1st player
+		case 0x0e:              // trackball x coords bottom 8 bits for 1st player
+			return m_io_track[(port - 8) >> 1]->read();
 
-		case 0x09:              /* trackball y coords top 8 bits for 2nd player */
-			if (m_io_p2y->read() & 0x80)   /* y- direction (negative value) */
-				return 0xff;
-			else                                                /* y+ direction (positive value) */
-				return 0x00;
-
-		case 0x0a:              /* trackball x coords bottom 8 bits for 2nd player */
-			return m_io_p2x->read();
-
-		case 0x0b:              /* trackball x coords top 8 bits for 2nd player */
-			if (m_io_p2x->read() & 0x80)   /* x- direction (negative value) */
-				return 0xff;
-			else                                                /* x+ direction (positive value) */
-				return 0x00;
-
-		case 0x0c:              /* trackball y coords bottom 8 bits for 1st player */
-			return m_io_p1y->read();
-
-		case 0x0d:              /* trackball y coords top 8 bits for 1st player */
-			if (m_io_p1y->read() & 0x80)   /* y- direction (negative value) */
-				return 0xff;
-			else                                                /* y+ direction (positive value) */
-				return 0x00;
-
-		case 0x0e:              /* trackball x coords bottom 8 bits for 1st player */
-			return m_io_p1x->read();
-
-		case 0x0f:              /* trackball x coords top 8 bits for 1st player */
-			if (m_io_p1x->read() & 0x80)   /* x- direction (negative value) */
-				return 0xff;
-			else                                                /* x+ direction (positive value) */
-				return 0x00;
+		case 0x09:              // trackball y coords top 8 bits for 2nd player
+		case 0x0b:              // trackball x coords top 8 bits for 2nd player
+		case 0x0d:              // trackball y coords top 8 bits for 1st player
+		case 0x0f:              // trackball x coords top 8 bits for 1st player
+			return (m_io_track[(port - 8) >> 1]->read() & 0x80) ? 0xff : 0x00;
 
 		default:
 			return m_tc0040ioc->portreg_r();
@@ -230,11 +206,11 @@ void taitoh_state::coin_control_w(u8 data)
 
 ***************************************************************************/
 
-void taitoh_state::syvalion_map(address_map &map)
+void syvalion_state::syvalion_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).mirror(0x010000).ram();
-	map(0x200001, 0x200001).r(FUNC(taitoh_state::syvalion_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x200001, 0x200001).r(FUNC(syvalion_state::syvalion_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x200003, 0x200003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::port_r), FUNC(tc0040ioc_device::port_w));
 	map(0x300000, 0x300001).nopr();
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -277,7 +253,7 @@ void taitoh_state::dleague_map(address_map &map)
 	map(0x300003, 0x300003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x600000, 0x600001).nopw();    /* ?? writes zero once per frame */
+	map(0x600000, 0x600001).nopw();    // ?? writes zero once per frame
 }
 
 
@@ -599,35 +575,17 @@ void taitoh_state::machine_start()
 }
 
 
-void taitoh_state::syvalion(machine_config &config)
+void taitoh_state::taitoh_base(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000) / 2);     /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::syvalion_map);
-	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);     // 12 MHz
 
-	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
-	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
-	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
-	m_tc0040ioc->read_2_callback().set_ioport("IN0");
-	m_tc0040ioc->read_3_callback().set_ioport("IN1");
-	m_tc0040ioc->write_4_callback().set(FUNC(taitoh_state::coin_control_w));
-	m_tc0040ioc->read_7_callback().set_ioport("IN2");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*16, 64*16);
-	screen.set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
-	screen.set_screen_update(FUNC(taitoh_state::screen_update_syvalion));
-	screen.set_palette(m_palette);
-
+	// video hardware
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
@@ -635,7 +593,7 @@ void taitoh_state::syvalion(machine_config &config)
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
@@ -649,17 +607,39 @@ void taitoh_state::syvalion(machine_config &config)
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
 
-void taitoh_state::recordbr(machine_config &config)
+void syvalion_state::syvalion(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000) / 2);     /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::recordbr_map);
+	taitoh_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &syvalion_state::syvalion_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
+	TC0040IOC(config, m_tc0040ioc, 0);
+	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0040ioc->read_2_callback().set_ioport("IN0");
+	m_tc0040ioc->read_3_callback().set_ioport("IN1");
+	m_tc0040ioc->write_4_callback().set(FUNC(syvalion_state::coin_control_w));
+	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
-	config.set_maximum_quantum(attotime::from_hz(600));
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*16, 64*16);
+	screen.set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
+	screen.set_screen_update(FUNC(syvalion_state::screen_update_syvalion));
+	screen.set_palette(m_palette);
+}
+
+void taitoh_state::recordbr(machine_config &config)
+{
+	taitoh_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::recordbr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -669,7 +649,7 @@ void taitoh_state::recordbr(machine_config &config)
 	m_tc0040ioc->write_4_callback().set(FUNC(taitoh_state::coin_control_w));
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -678,32 +658,14 @@ void taitoh_state::recordbr(machine_config &config)
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_recordbr));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 32*16);
-
-	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_offsets(1, 1);
-	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_palette(m_palette);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
-
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	m_palette->set_entries(32*16);
 }
 
 void taitoh_state::tetristh(machine_config &config)
 {
 	recordbr(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::tetristh_map);
 
 	m_palette->set_entries(0x800/2);
@@ -711,15 +673,11 @@ void taitoh_state::tetristh(machine_config &config)
 
 void taitoh_state::dleague(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000) / 2);     /* 12 MHz */
+	taitoh_base(config);
+
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::dleague_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq1_line_hold));
-
-	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
-
-	config.set_maximum_quantum(attotime::from_hz(600));
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
@@ -729,7 +687,7 @@ void taitoh_state::dleague(machine_config &config)
 	tc0220ioc.write_4_callback().set(FUNC(taitoh_state::coin_control_w));
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -737,26 +695,6 @@ void taitoh_state::dleague(machine_config &config)
 	screen.set_visarea(1*16, 21*16-1, 2*16, 17*16-1);
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_dleague));
 	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
-
-	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_offsets(1, 1);
-	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_palette(m_palette);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
-
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
 }
 
 
@@ -1073,13 +1011,13 @@ ROM_START( dleaguej )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT        MONITOR  COMPANY                      FULLNAME                                 FLAGS
-GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, empty_init, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, empty_init, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state, empty_init, ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        MONITOR  COMPANY                      FULLNAME                                 FLAGS
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state,   empty_init, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state,   empty_init, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state,   empty_init, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state,   empty_init, ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state,   empty_init, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )

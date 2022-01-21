@@ -40,7 +40,7 @@ private:
 	class machine_data;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// drawing
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;

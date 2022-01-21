@@ -2,7 +2,7 @@
 // error_code.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -99,6 +99,20 @@ public:
   error_code(ErrorEnum e)
   {
     *this = make_error_code(e);
+  }
+
+  /// Clear the error value to the default.
+  void clear()
+  {
+    value_ = 0;
+    category_ = &system_category();
+  }
+
+  /// Assign a new error value.
+  void assign(int v, const error_category& c)
+  {
+    value_ = v;
+    category_ = &c;
   }
 
   /// Get the error value.

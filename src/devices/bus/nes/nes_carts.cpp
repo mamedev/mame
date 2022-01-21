@@ -343,6 +343,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
 	device.option_add_internal("huang2",           NES_HUANG2); // mapper 116 also
 	device.option_add_internal("nitra",            NES_NITRA);
+	device.option_add_internal("bmw8544",          NES_BMW8544);
 	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);
 	device.option_add_internal("unl_malisb",       NES_MALISB); //  used by Super Mali Splash Bomb
@@ -446,6 +447,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nt639",            NES_NT639);
 	device.option_add_internal("resettxrom",       NES_RESETTXROM);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
+	device.option_add_internal("smd133",           NES_SMD133);
 	device.option_add_internal("tech9in1",         NES_TECHLINE9IN1);
 	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
@@ -483,7 +485,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("coolboy",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?
 	device.option_add_internal("bmc_hik_kof",      NES_NROM); // mapper 251 - UNSUPPORTED

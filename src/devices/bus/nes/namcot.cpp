@@ -296,7 +296,6 @@ void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 	}
 }
 
-
 /*-------------------------------------------------
 
  Namcot 3446 board emulation
@@ -313,31 +312,23 @@ void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("namcot3446 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	// NEStopia does not have this!
 	if (offset >= 0x2000)
-	{
-		if (!(offset & 1))
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		return;
-	}
 
-	switch (offset & 1)
+	if (offset & 1)
 	{
-		case 1:
-			switch (m_latch & 0x07)
+		switch (m_latch & 0x07)
 		{
 			case 2: chr2_0(data, CHRROM); break;
 			case 3: chr2_2(data, CHRROM); break;
 			case 4: chr2_4(data, CHRROM); break;
 			case 5: chr2_6(data, CHRROM); break;
-			case 6: BIT(m_latch, 6) ? prg8_cd(data) : prg8_89(data); break;
+			case 6: prg8_89(data); break;
 			case 7: prg8_ab(data); break;
 		}
-			break;
-		case 0:
-			m_latch = data;
-			break;
 	}
+	else
+		m_latch = data;
 }
 
 /*-------------------------------------------------

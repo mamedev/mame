@@ -20,15 +20,25 @@
 
 #pragma once
 
+
 class powerpc_disassembler : public util::disasm_interface
 {
 public:
-	powerpc_disassembler() = default;
+	enum implementation : int
+	{
+		I_POWER   = 1 << 0,
+		I_POWERPC = 1 << 1,
+	};
+
+	powerpc_disassembler(bool powerpc = true)
+		: m_implementation(powerpc ? I_POWERPC : I_POWER)
+	{
+	};
 	virtual ~powerpc_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-	static offs_t dasm_one(std::ostream &stream, uint32_t pc, uint32_t op);
+	offs_t dasm_one(std::ostream &stream, uint32_t pc, uint32_t op);
 
 private:
 	/*
@@ -91,7 +101,7 @@ private:
 		F_FRT_FRA_FRB,  // frT, frA, frB
 		F_FRT_FRA_FRC,  // frT, frA, frC
 		F_RA_RT_SH_MB_ME,   // rA, rT, SH, MB, ME
-		F_RLWNMx,       // rT, rA, rB, MB, ME   only used by RLWNMx
+		F_RA_RT_RB_MB_ME,   // rA, rT, rB, MB, ME
 		F_RT_RB         // rT, rB
 	};
 
@@ -126,6 +136,7 @@ private:
 						// bit pattern to determine a match)
 		int format;         // operand format
 		int flags;          // flags
+		int implementation;
 	};
 
 	static const IDESCR itab[];
@@ -135,8 +146,19 @@ private:
 	static std::string SPR(int spr_field);
 	static std::string DCR(int dcr_field);
 	static std::string DecodeSigned16(uint32_t op, int do_unsigned);
-	static uint32_t Mask(int mb, int me);
-	static bool Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs);
+	static uint32_t Mask(unsigned const mb, unsigned const me);
+	bool Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs);
+
+	implementation const m_implementation;
+};
+
+class power_disassembler : public powerpc_disassembler
+{
+public:
+	power_disassembler()
+		: powerpc_disassembler(false)
+	{
+	};
 };
 
 #endif

@@ -14,10 +14,12 @@
 #include "audio/segag80r.h"
 #include "audio/segaspeech.h"
 #include "audio/segausb.h"
+
 #include "machine/i8255.h"
 #include "machine/segag80.h"
 #include "sound/samples.h"
 #include "sound/sn76496.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

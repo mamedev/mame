@@ -2636,8 +2636,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-<!-- This game uses an unemulated Konami piano keyboard -->
-	<software name="doremiko" supported="partial">
+	<software name="doremiko">
 		<description>Doremikko</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>

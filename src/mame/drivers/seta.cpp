@@ -1833,8 +1833,13 @@ void usclssic_state::lockout_w(u8 data)
 {
 	u16 tiles_offset = BIT(data, 4) ? 0x4000 : 0;
 
-	m_port_select = BIT(data, 6);
-	m_buttonmux->select_w(m_port_select);
+	if (m_port_select != BIT(data, 6))
+	{
+		m_upd4701->update();
+		m_port_select = BIT(data, 6);
+		m_buttonmux->select_w(m_port_select);
+		m_upd4701->recalibrate();
+	}
 
 	m_upd4701->resetx_w(BIT(data, 7));
 	m_upd4701->resety_w(BIT(data, 7));
@@ -2420,13 +2425,13 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
-MACHINE_START_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_start()
 {
 	m_leds.resolve();
 }
 
 // Coin drop
-MACHINE_RESET_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_reset()
 {
 	m_coin_start_cycles = 0;
 }
@@ -4124,10 +4129,10 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 
 	PORT_START("ROT1")  // Rotation Player 1
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("ROT2")  // Rotation Player 2
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -5091,7 +5096,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 #define KRZYBOWL_TRACKBALL(_dir_, _n_ ) \
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE
 
 static INPUT_PORTS_START( krzybowl )
 	PORT_START("P1") //Player 1
@@ -6556,16 +6561,16 @@ static INPUT_PORTS_START( usclssic )
 	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_y_r)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
 	PORT_START("TRACK1_Y")     /* muxed port 0 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
 	PORT_START("TRACK2_X")     /* muxed port 1 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
 	PORT_START("TRACK2_Y")     /* muxed port 1 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, a0_w)
@@ -7942,8 +7947,6 @@ void downtown_state::tndrcade(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8000,8 +8003,6 @@ void downtown_state::twineagl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8051,8 +8052,6 @@ void downtown_state::downtown(machine_config &config)
 	m_layers[0]->set_xoffsets(0, -1);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8142,8 +8141,6 @@ void usclssic_state::usclssic(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8207,8 +8204,6 @@ void downtown_state::calibr50(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8262,8 +8257,6 @@ void downtown_state::metafox(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8312,8 +8305,6 @@ void seta_state::atehate(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8361,8 +8352,6 @@ void seta_state::blandia(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8399,8 +8388,6 @@ void seta_state::blandiap(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8439,8 +8426,6 @@ void seta_state::blockcar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8518,8 +8503,6 @@ void seta_state::daioh(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8576,8 +8559,6 @@ void seta_state::drgnunit(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8638,9 +8619,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
-	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
-
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_setaroul_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
@@ -8668,8 +8646,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
-
-	MCFG_VIDEO_START_OVERRIDE(setaroul_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8716,8 +8692,6 @@ void seta_state::eightfrc(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8763,8 +8737,6 @@ void seta_state::extdwnhl(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8832,8 +8804,6 @@ void seta_state::gundhara(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8909,8 +8879,6 @@ void seta_state::jjsquawk(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8944,8 +8912,6 @@ void seta_state::jjsquawb(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8993,8 +8959,6 @@ void seta_state::kamenrid(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9033,8 +8997,6 @@ void seta_state::orbs(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9076,8 +9038,6 @@ void seta_state::keroppi(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9126,8 +9086,6 @@ void seta_state::krzybowl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9173,8 +9131,6 @@ void seta_state::madshark(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9226,8 +9182,6 @@ void seta_state::magspeed(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9273,8 +9227,6 @@ void seta_state::msgundam(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9416,8 +9368,6 @@ void kiwame_state::kiwame(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -9463,8 +9413,6 @@ void seta_state::rezon(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9503,8 +9451,6 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9580,8 +9526,6 @@ void seta_state::wiggie(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9622,8 +9566,6 @@ void seta_state::wits(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9660,8 +9602,6 @@ void seta_state::umanclub(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9705,8 +9645,6 @@ void seta_state::utoukond(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9768,8 +9706,6 @@ void seta_state::wrofaero(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9815,8 +9751,6 @@ void seta_state::zingzip(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9872,8 +9806,6 @@ void seta_state::pairlove(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9923,8 +9855,6 @@ void seta_state::crazyfgt(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10004,8 +9934,6 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
-
-	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -10725,7 +10653,11 @@ ROM_START( blockcar )
 	ROM_LOAD( "bl-chr-1.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
+	/* The game plays music from 0x000000 to 0x0bffff and sfx from 0x0c0000 to 0x0fffff
+	   Loading the ROM mirrored like this causes sfx to play instead of music in some levels.
+	   the most logical conclusion is that the ROM below was dumped at half size and should
+	   be 1MByte, hence BAD_DUMP */
+	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, BAD_DUMP CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
 	ROM_RELOAD(                0x080000, 0x080000  )
 ROM_END
 
@@ -11876,9 +11808,8 @@ ROM_START( pairlove )
 	ROM_LOAD( "ut2-001-004.5j",  0x000000, 0x080000, CRC(fdc47b26) SHA1(0de51bcf67b909ac9578f0d1b14af8a4c758aacf) )
 	ROM_LOAD( "ut2-001-005.5l",  0x080000, 0x080000, CRC(076f94a2) SHA1(94b4b41a497dea1b6db5396bd7cd81ebcb217735) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x80000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
-	ROM_RELOAD(                   0x080000, 0x080000 )
 ROM_END
 
 ROM_START( crazyfgt )

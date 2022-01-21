@@ -57,12 +57,12 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 		throw std::bad_alloc();
 
 	// count the number of comments
-	int total_comments = 0;
-	for(auto &source : m_source_list)
-	{
-		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
-		total_comments += dasmsource.device()->debug()->comment_count();
-	}
+	//int total_comments = 0;
+	//for(auto &source : m_source_list)
+	//{
+		//const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
+		//total_comments += dasmsource.device()->debug()->comment_count();
+	//}
 
 	// configure the view
 	m_total.y = DEFAULT_DASM_LINES;

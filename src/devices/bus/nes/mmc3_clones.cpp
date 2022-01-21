@@ -29,6 +29,7 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
+DEFINE_DEVICE_TYPE(NES_BMW8544,       nes_bmw8544_device,       "nes_bmw8544",       "NES Cart BMW8544 PCB")
 DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
 DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Splash Bomb PCB")
@@ -85,7 +86,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_830832C,   nes_bmc_830832c_device,   "nes_bmc_830832c
 DEFINE_DEVICE_TYPE(NES_BMC_YY841101C, nes_bmc_yy841101c_device, "nes_bmc_yy841101c", "NES Cart BMC YY841101C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_YY841155C, nes_bmc_yy841155c_device, "nes_bmc_yy841155c", "NES Cart BMC YY841155C PCB")
 DEFINE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device,        "nes_pjoy84",        "NES Cart Powerjoy 84 PCB")
-DEFINE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device,       "nes_coolboy",       "NES Cart CoolBoy PCB")
+DEFINE_DEVICE_TYPE(NES_SMD133,        nes_smd133_device,        "nes_smd133",        "NES Cart SMD133 PCB")
 
 
 INPUT_PORTS_START( sachen_shero )
@@ -125,6 +126,11 @@ ioport_constructor nes_bmc_f600_device::device_input_ports() const
 
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
+{
+}
+
+nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMW8544, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -432,9 +438,26 @@ nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_COOLBOY, tag, owner, clock)
+nes_smd133_device::nes_smd133_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_SMD133, tag, owner, clock)
 {
+}
+
+
+
+
+void nes_bmw8544_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmw8544_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
 void nes_family4646_device::device_start()
@@ -1002,6 +1025,20 @@ void nes_pjoy84_device::pcb_reset()
 	mmc3_common_initialize(m_prg_mask, m_chr_mask, 0);
 }
 
+void nes_smd133_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_smd133_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
+	mmc3_common_initialize(0x3f, 0xff, 0);
+}
+
 
 
 /*-------------------------------------------------
@@ -1028,6 +1065,42 @@ void nes_nitra_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("nitra write_h, offset: %04x, data: %02x\n", offset, data));
 
 	txrom_write((offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
+}
+
+/*-------------------------------------------------
+
+ Board BMW8544
+
+ Games: Dragon Fighter (Flying Star)
+
+ MMC3 clone with poorly understood PRG/CHR banking.
+
+ NES 2.0: mapper 292
+
+ In MAME: Not supported.
+
+ -------------------------------------------------*/
+
+void nes_bmw8544_device::set_prg(int prg_base, int prg_mask)
+{
+	nes_txrom_device::set_prg(prg_base, prg_mask);
+	prg8_89(m_reg);
+}
+
+u8 nes_bmw8544_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("bmw8544 read_m, offset: %04x\n", offset));
+
+	// CHR banking may be done by reads in this address range
+
+	return nes_txrom_device::read_m(offset);
+}
+
+void nes_bmw8544_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmw8544 write_m, offset: %04x, data: %02x\n", offset, data));
+	m_reg = data;
+	prg8_89(data);
 }
 
 /*-------------------------------------------------
@@ -2960,7 +3033,7 @@ void nes_bmc_gn45_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_gn45 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	nes_txrom_device::write_m(offset, data);    // write to overlapping WRAM
+	nes_txrom_device::write_m(offset, data);  // registers overlay WRAM
 
 	if (!m_lock)
 	{
@@ -3585,32 +3658,78 @@ void nes_pjoy84_device::write_m(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- COOLBOY
+ COOLBOY, MINDKIDS, and others with SMD132/133 chips
 
- Games: several multigame carts
+ Games: many multicarts, Chinese games, and some
+ modern re-releases such as Metal Storm and Holy Diver
 
- In MESS: Not Supported.
+ NES 2.0: mapper 268
+
+ In MAME: Partially supported.
+
+ TODO: There are many unimplemented features, though
+ there may be no carts that use them. Some of the
+ unemulated stuff: regs 4 and 5 not used, more GNROM
+ bits in reg 2, "weird" modes, WRAM at 0x5000, etc.
 
  -------------------------------------------------*/
 
-void nes_coolboy_device::prg_cb(int start, int bank)
+void nes_smd133_device::prg_cb(int start, int bank)
 {
-	bank = (bank & 3) | ((bank & 8) >> 1) | ((bank & 4) << 1);
+	if (BIT(m_reg[3], 4))    // GNROM mode
+	{
+		u8 mask = (m_reg[1] & 0x02) | 0x01;
+		bank &= ~0x0f;
+		bank |= (m_reg[3] & ~mask & 0x0f) | (start & mask);
+	}
+
 	prg8_x(start, bank);
 }
 
-void nes_coolboy_device::chr_cb(int start, int bank, int source)
+void nes_smd133_device::chr_cb(int start, int bank, int source)
 {
-	bank = (bank & 0xdd) | ((bank & 0x20) >> 4) | ((bank & 2) << 4);
+	if (BIT(m_reg[3], 4))    // GNROM mode
+	{
+		bank &= ~m_chr_mask;
+		bank |= (m_reg[2] & 0x0f) << 3 | start;
+	}
+
 	chr1_x(start, bank, source);
 }
 
-void nes_coolboy_device::write_m(offs_t offset, uint8_t data)
+void nes_smd133_device::smd133_write(offs_t offset, u8 data)
 {
-	LOG_MMC(("coolboy write_m, offset: %04x, data: %02x\n", offset, data));
+	int reg = offset & 0x07;
 
-	m_reg[offset & 0x03] = data;
-	//set_base_mask();
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	set_prg(m_prg_base, m_prg_mask);
+	if (reg < 6 && (BIT(m_reg[3], 4) || !BIT(m_reg[3], 7)))
+	{
+		m_reg[reg] = data;
+
+		m_prg_base = (m_reg[0] & 0x30) << 6 | (m_reg[1] & 0x0c) << 6 | (m_reg[1] & 0x10) << 3 | (m_reg[0] & 0x07) << 4;
+		m_prg_mask = (bitswap<3>(m_reg[1], 5, 6, 7) << 5 | (m_reg[0] & 0x40) >> 2 | 0x0f) ^ 0x30;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = (m_reg[0] & 0x80) & ((m_reg[0] & 0x08) << 4);
+		m_chr_mask = 0xff >> BIT(m_reg[0], 7);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+void nes_smd133_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("smd133 write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (offset >= 0x1000 && m_smd133_addr == 0x5000)
+		smd133_write(offset, data);
+}
+
+void nes_smd133_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("smd133 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	nes_txrom_device::write_m(offset, data);  // registers overlay WRAM
+
+	if (offset < 0x1000 && m_smd133_addr == 0x6000)
+		smd133_write(offset, data);
 }

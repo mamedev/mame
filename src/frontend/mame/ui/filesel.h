@@ -82,7 +82,7 @@ private:
 	std::string                     m_filename;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
@@ -120,7 +120,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal state
 	bool        m_can_in_place;

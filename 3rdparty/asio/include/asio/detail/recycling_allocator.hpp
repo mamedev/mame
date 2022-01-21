@@ -2,7 +2,7 @@
 // detail/recycling_allocator.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,14 +25,16 @@
 namespace asio {
 namespace detail {
 
-template <typename T>
+template <typename T, typename Purpose = thread_info_base::default_tag>
 class recycling_allocator
 {
 public:
+  typedef T value_type;
+
   template <typename U>
   struct rebind
   {
-    typedef recycling_allocator<U> other;
+    typedef recycling_allocator<U, Purpose> other;
   };
 
   recycling_allocator()
@@ -40,32 +42,35 @@ public:
   }
 
   template <typename U>
-  recycling_allocator(const recycling_allocator<U>&)
+  recycling_allocator(const recycling_allocator<U, Purpose>&)
   {
   }
 
   T* allocate(std::size_t n)
   {
-    typedef thread_context::thread_call_stack call_stack;
-    void* p = thread_info_base::allocate(call_stack::top(), sizeof(T) * n);
+    void* p = thread_info_base::allocate(Purpose(),
+        thread_context::top_of_thread_call_stack(),
+        sizeof(T) * n, ASIO_ALIGNOF(T));
     return static_cast<T*>(p);
   }
 
   void deallocate(T* p, std::size_t n)
   {
-    typedef thread_context::thread_call_stack call_stack;
-    thread_info_base::deallocate(call_stack::top(), p, sizeof(T) * n);
+    thread_info_base::deallocate(Purpose(),
+        thread_context::top_of_thread_call_stack(), p, sizeof(T) * n);
   }
 };
 
-template <>
-class recycling_allocator<void>
+template <typename Purpose>
+class recycling_allocator<void, Purpose>
 {
 public:
+  typedef void value_type;
+
   template <typename U>
   struct rebind
   {
-    typedef recycling_allocator<U> other;
+    typedef recycling_allocator<U, Purpose> other;
   };
 
   recycling_allocator()
@@ -73,22 +78,22 @@ public:
   }
 
   template <typename U>
-  recycling_allocator(const recycling_allocator<U>&)
+  recycling_allocator(const recycling_allocator<U, Purpose>&)
   {
   }
 };
 
-template <typename Allocator>
+template <typename Allocator, typename Purpose>
 struct get_recycling_allocator
 {
   typedef Allocator type;
   static type get(const Allocator& a) { return a; }
 };
 
-template <typename T>
-struct get_recycling_allocator<std::allocator<T> >
+template <typename T, typename Purpose>
+struct get_recycling_allocator<std::allocator<T>, Purpose>
 {
-  typedef recycling_allocator<T> type;
+  typedef recycling_allocator<T, Purpose> type;
   static type get(const std::allocator<T>&) { return type(); }
 };
 

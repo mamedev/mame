@@ -38,8 +38,6 @@
 #include "machine/pckeybrd.h"
 #include "machine/ram.h"
 
-#include "coreutil.h"
-
 
 class europc_pc_state : public driver_device
 {

@@ -155,6 +155,7 @@ void coco_state::device_start()
 	save_item(NAME(m_dclg_state));
 	save_item(NAME(m_dclg_timer));
 	save_item(NAME(m_vhd_select));
+	save_item(NAME(m_in_floating_bus_read));
 
 	// miscellaneous
 	m_in_floating_bus_read = false;

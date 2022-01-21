@@ -4,40 +4,40 @@
 
     Irem M92 system games:
 
-    Gunforce (World)                                 M92-A   (c) 1991 Irem Corp
-    Gunforce (USA)                                   M92-A   (c) 1991 Irem America Corp
-    Gunforce (Japan)                                 M92-A   (c) 1991 Irem Corp
-    Blade Master (World)                             M92-B   (c) 1991 Irem Corp
-    Cross Blades! (Japan)                            M92-D   (c) 1991 Irem Corp
-    Lethal Thunder (World)                                   (c) 1991 Irem Corp
-    Thunder Blaster (Japan)                          M92-C   (c) 1991 Irem Corp
-    Undercover Cops (World)                          M92-E   (c) 1992 Irem Corp
-    Undercover Cops (US)                             M92-E   (c) 1992 Irem America Corp
-    Undercover Cops (Japan)                          M92-E   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (World)  M92-E   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (US)     M92-E   (c) 1992 Irem America Corp
-    Mystic Riders (World)                                    (c) 1992 Irem Corp
-    Mahou Keibitai Gun Hohki (Japan)                         (c) 1992 Irem Corp
-    Major Title 2 (World)                            M92-F   (c) 1992 Irem Corp
-    Major Title 2 (Japan)                            M92-F   (c) 1992 Irem Corp
-    The Irem Skins Game (USA Set 1)                  M92-F   (c) 1992 Irem America Corp
-    The Irem Skins Game (USA Set 2)                  M92-F   (c) 1992 Irem America Corp
-    Hook (World)                                             (c) 1992 Irem Corp
-    Hook (USA)                                               (c) 1992 Irem America Corp
-    Hook (Japan)                                             (c) 1992 Irem Corp
-    R-Type Leo (World)                                       (c) 1992 Irem Corp
-    R-Type Leo (Japan)                                       (c) 1992 Irem Corp
-    In The Hunt (World)                              M92-E   (c) 1993 Irem Corp
-    In The Hunt (USA)                                M92-E   (c) 1993 Irem Corp
-    Kaitei Daisensou (Japan)                         M92-E   (c) 1993 Irem Corp
-    Ninja Baseball Batman (World)                            (c) 1993 Irem Corp
-    Ninja Baseball Batman (USA)                              (c) 1993 Irem America Corp
-    Yakyuu Kakutou League-Man (Japan)                        (c) 1993 Irem Corp
-    Superior Soldiers (US)                           M92-G   (c) 1993 Irem Corp
-    Perfect Soldiers (Japan)                         M92-G   (c) 1993 Irem Corp
-    Dream Soccer '94 (Japan)                         M92-G   (c) 1994 Irem Corp
-    Gun Force II (US)                                M92-G   (c) 1994 Irem Corp
-    Geo Storm (Japan)                                M92-G   (c) 1994 Irem Corp
+    Gunforce (World)                                 M92-B-A   (c) 1991 Irem Corp
+    Gunforce (USA)                                   M92-B-A   (c) 1991 Irem America Corp
+    Gunforce (Japan)                                 M92-B-A   (c) 1991 Irem Corp
+    Blade Master (World)                             M92-B-B   (c) 1991 Irem Corp
+    Cross Blades! (Japan)                            M92-D-A   (c) 1991 Irem Corp
+    Lethal Thunder (World)                           M92-D-A   (c) 1991 Irem Corp
+    Thunder Blaster (Japan)                          M92-C-B   (c) 1991 Irem Corp
+    Undercover Cops (World)                          M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops (US)                             M92-E-B   (c) 1992 Irem America Corp
+    Undercover Cops (Japan)                          M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (World)  M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (US)     M92-E-B   (c) 1992 Irem America Corp
+    Mystic Riders (World)                            M92-B-B   (c) 1992 Irem Corp
+    Mahou Keibitai Gun Hohki (Japan)                 M92-B-B   (c) 1992 Irem Corp
+    Major Title 2 (World)                            M92-B-F   (c) 1992 Irem Corp
+    Major Title 2 (Japan)                            M92-B-F   (c) 1992 Irem Corp
+    The Irem Skins Game (USA Set 1)                  M92-B-F   (c) 1992 Irem America Corp
+    The Irem Skins Game (USA Set 2)                  M92-B-F   (c) 1992 Irem America Corp
+    Hook (World)                                     M92-D-A   (c) 1992 Irem Corp
+    Hook (USA)                                       M92-D-A   (c) 1992 Irem America Corp
+    Hook (Japan)                                     M92-D-A   (c) 1992 Irem Corp
+    R-Type Leo (World)                               M92-C-N   (c) 1992 Irem Corp
+    R-Type Leo (Japan)                               M92-C-N   (c) 1992 Irem Corp
+    In The Hunt (World)                              M92-E-B   (c) 1993 Irem Corp
+    In The Hunt (USA)                                M92-E-B   (c) 1993 Irem Corp
+    Kaitei Daisensou (Japan)                         M92-E-B   (c) 1993 Irem Corp
+    Ninja Baseball Batman (World)                    M92-F-A   (c) 1993 Irem Corp
+    Ninja Baseball Batman (USA)                      M92-F-A   (c) 1993 Irem America Corp
+    Yakyuu Kakutou League-Man (Japan)                M92-F-A   (c) 1993 Irem Corp
+    Superior Soldiers (US)                           M92-B-G   (c) 1993 Irem Corp
+    Perfect Soldiers (Japan)                         M92-B-G   (c) 1993 Irem Corp
+    Dream Soccer '94 (Japan)                         M92-B-G   (c) 1994 Irem Corp
+    Gun Force II (US)                                M92-B-G   (c) 1994 Irem Corp
+    Geo Storm (Japan)                                M92-B-G   (c) 1994 Irem Corp
 
 System notes:
     Each game has an encrypted sound cpu (see irem_cpu.c), the sound cpu and
