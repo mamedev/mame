@@ -130,7 +130,7 @@ void tsconf_state::tsconf_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(tsconf_state::beta_disable_r));
 }
 
-template <unsigned Bank>
+template <u8 Bank>
 void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 {
 	tsconf_state::ram_bank_write(Bank, offset, data);

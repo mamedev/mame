@@ -170,7 +170,8 @@ private:
 	void tsconf_mem(address_map &map);
 	void tsconf_switch(address_map &map);
 
-	template <unsigned Bank>
+	u8 mem_bank_read(u8 bank, offs_t offset);
+	template <u8 Bank>
 	void tsconf_bank_w(offs_t offset, u8 data);
 	void ram_bank_write(u8 bank, offs_t offset, u8 data);
 	void ram_page_write(u8 page, offs_t offset, u8 data);

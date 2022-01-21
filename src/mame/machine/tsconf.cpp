@@ -363,19 +363,11 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 		{
 			u16 addr_w = machine_addr - fmap_addr;
 			if (addr_w < 512)
-			{
 				cram_write(addr_w, data);
-			}
 			else if (addr_w < 1024)
-			{
-				addr_w -= 512;
-				m_sfile->write(addr_w, data);
-			}
+				m_sfile->write(addr_w - 512, data);
 			else
-			{
-				addr_w -= 1024;
-				m_regs[addr_w] = data;
-			}
+				m_regs[addr_w - 1024] = data;
 		}
 	}
 	if (bank > 0 || (W0_WE && W0_RAM))
@@ -395,18 +387,27 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	}
 	else
 	{
-		if (ram_addr >= PAGE4K(m_regs[V_PAGE]) && ram_addr < PAGE4K(m_regs[V_PAGE] + 1))
-		{
-			m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
-		}
 		if (ram_addr >= PAGE4K(m_regs[T0_G_PAGE]) && ram_addr < PAGE4K(m_regs[T0_G_PAGE] + 8))
 		{
-			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
+			m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
 		}
 		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE]) && ram_addr < PAGE4K(m_regs[T1_G_PAGE] + 8))
 		{
-			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+			m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
 		}
+	}
+
+	if (ram_addr >= PAGE4K(m_regs[V_PAGE]) && ram_addr < PAGE4K(m_regs[V_PAGE] + 1))
+	{
+		m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
+	}
+	if (ram_addr >= PAGE4K(m_regs[m_regs[V_PAGE] ^ 0x01]) && ram_addr < PAGE4K(m_regs[m_regs[V_PAGE] ^ 0x01] + 1))
+	{
+		m_gfxdecode->gfx(TM_TS_CHAR)->mark_all_dirty();
+	}
+	if (ram_addr >= PAGE4K(m_regs[SG_PAGE]) && ram_addr < PAGE4K(m_regs[SG_PAGE] + 8))
+	{
+		m_gfxdecode->gfx(TM_SPRITES)->mark_all_dirty();
 	}
 
 	m_ram->write(ram_addr, data);
@@ -419,8 +420,8 @@ u16 tsconf_state::ram_read16(offs_t offset)
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
 {
-	m_ram->write(offset & 0xfffffffe, data >> 8);
-	m_ram->write(offset | 1, data & 0xff);
+	ram_page_write(0, offset & 0xfffffffe, data >> 8);
+	ram_page_write(0, offset | 1, data & 0xff);
 }
 
 u16 tsconf_state::spi_read16()
@@ -752,7 +753,7 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 	{
 		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
 	}
-	m_line_irq_timer->adjust(m_screen->time_until_pos(0));
+	m_line_irq_timer->adjust(m_screen->time_until_pos(0, m_screen->hpos() + 1));
 }
 
 void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -764,7 +765,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 		if (BIT(m_regs[INT_MASK], 0))
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 		}
 		break;
@@ -773,7 +774,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 		if (BIT(m_regs[INT_MASK], 1))
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
 		}
 		m_line_irq_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1));
 		break;
