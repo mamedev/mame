@@ -507,8 +507,18 @@ void video_manager::screenless_update_callback(void *ptr, int param)
 
 void video_manager::postload()
 {
+	attotime const emutime = machine().time();
 	for (const auto &x : m_movie_recordings)
-		x->set_next_frame_time(machine().time());
+		x->set_next_frame_time(emutime);
+
+	// restart time counters
+	m_speed_last_realtime = osd_ticks();
+	m_speed_last_emutime = emutime;
+	m_speed_percent = 1.0;
+	m_overall_valid_counter = 0;
+	m_overall_real_ticks = 0;
+	m_overall_real_seconds = 0;
+	m_overall_emutime = attotime::zero;
 }
 
 
