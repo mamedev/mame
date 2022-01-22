@@ -622,7 +622,7 @@ void akiko_device::update_cdrom()
 
 			cdda_pause(1);
 
-			m_cdrom_cmd_start = (m_cdrom_cmd_start+2) & 0xff;
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 
 			setup_response( 2, resp );
 		}
@@ -635,7 +635,7 @@ void akiko_device::update_cdrom()
 
 			cdda_pause(0);
 
-			m_cdrom_cmd_start = (m_cdrom_cmd_start+2) & 0xff;
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 
 			setup_response( 2, resp );
 		}
@@ -651,7 +651,7 @@ void akiko_device::update_cdrom()
 				cmd_addr += ( m_cdrom_cmd_start + i + 1 ) & 0xff;
 			}
 
-			m_cdrom_cmd_start = (m_cdrom_cmd_start+13) & 0xff;
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 13) & 0xff;
 
 			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
 			{
@@ -704,7 +704,7 @@ void akiko_device::update_cdrom()
 		}
 		else if ( cmd == 0x05 ) /* read toc */
 		{
-			m_cdrom_cmd_start = (m_cdrom_cmd_start+3) & 0xff;
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 3) & 0xff;
 
 			machine().scheduler().timer_set( attotime::from_msec(1), timer_expired_delegate(FUNC(akiko_device::cd_delayed_cmd ), this), resp[0]);
 
@@ -751,6 +751,9 @@ void akiko_device::update_cdrom()
 			{
 				resp[1] = 0x80;
 			}
+			
+			// needed by cdtv:defcrown (would otherwise hardlock emulation)
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 
 			setup_response( 15, resp );
 		}
@@ -758,7 +761,7 @@ void akiko_device::update_cdrom()
 		{
 			resp[1] = 0x01;
 
-			m_cdrom_cmd_start = (m_cdrom_cmd_start+2) & 0xff;
+			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 
 			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
 				resp[1] = 0x80;
