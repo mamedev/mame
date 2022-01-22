@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 
 /* ----- image formats ----- */
@@ -40,9 +41,9 @@ enum ru_imgformat
 /* ----- render utilities ----- */
 
 void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force = false);
-bool render_clip_line(render_bounds *bounds, const render_bounds *clip);
-bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
-void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1);
+bool render_clip_line(render_bounds &bounds, const render_bounds &clip);
+bool render_clip_quad(render_bounds &bounds, const render_bounds &clip, render_quad_texuv *texcoords);
+std::pair<render_bounds, render_bounds> render_line_to_quad(const render_bounds &bounds, float width, float length_extension);
 void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file);
 void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file);
 bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_as_alpha_to_existing = false);

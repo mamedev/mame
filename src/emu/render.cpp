@@ -2349,11 +2349,11 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				// clip the primitive
 				if (!m_transform_container && PRIMFLAG_GET_VECTOR(curitem.flags()))
 				{
-					clipped = render_clip_line(&prim->bounds, &root_cliprect);
+					clipped = render_clip_line(prim->bounds, root_cliprect);
 				}
 				else
 				{
-					clipped = render_clip_line(&prim->bounds, &cliprect);
+					clipped = render_clip_line(prim->bounds, cliprect);
 				}
 				break;
 
@@ -2386,7 +2386,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					prim->texcoords = oriented_texcoords[finalorient];
 
 					// apply clipping
-					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+					clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
 					prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2446,7 +2446,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						prim->texcoords = oriented_texcoords[finalorient];
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+						clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 						// apply the final orientation from the quad flags and then build up the final flags
 						prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2462,7 +2462,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 							| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
+						clipped = render_clip_quad(prim->bounds, cliprect, nullptr);
 					}
 				}
 				break;
@@ -2587,7 +2587,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		}
 
 		// add to the list or free if we're clipped out
-		bool const clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+		bool const clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 		list.append_or_return(*prim, clipped);
 	}
 }
