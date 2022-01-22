@@ -22143,7 +22143,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5525"/>
 		<info name="release" value="19931029"/>
-		<info name="alt_title" value="ペブルビーチの波涛"/>
+		<info name="alt_title" value="ペブルビーチの波濤"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
