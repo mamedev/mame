@@ -552,14 +552,12 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 * lines which are being printed in different directions is
 		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
-		if (m_bitmap_printer->m_xpos < m_bitmap_printer->m_page_bitmap.width()) {
-			for (int i = 0; i < 9; i++)
-			{
-				if ((m_printhead & (1<<(8-i))) != 0)
-					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, // * 1 for no interleave at 72 vdpi
-					m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset +
-					(m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;
-			}
+		for (int i = 0; i < 9; i++)
+		{
+			if ((m_printhead & (1<<(8-i))) != 0)
+				m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, // * 1 for no interleave at 72 vdpi
+				m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset +
+				(m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;
 		}
 	}
 }
