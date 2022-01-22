@@ -404,6 +404,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "machine/lpci.h"
@@ -447,6 +448,7 @@ public:
 
 	void viper(machine_config &config);
 	void viper_ppp(machine_config &config);
+	void viper_omz(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
@@ -502,6 +504,7 @@ private:
 
 	void viper_map(address_map &map);
 	void viper_ppp_map(address_map &map);
+	void omz3d_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -2725,6 +2728,19 @@ void viper_state::viper_ppp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
 }
 
+void viper_state::omz3d_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("ioboard", 0);
+}
+
+void viper_state::viper_omz(machine_config &config)
+{
+	viper(config);
+
+	upd784031_device &omz3dcpu(UPD784031(config, "omz3dcpu", 12000000));
+	omz3dcpu.set_addrmap(AS_PROGRAM, &viper_state::omz3d_map);
+}
+
 /*****************************************************************************/
 
 void viper_state::init_viper()
@@ -3405,7 +3421,7 @@ GAME(2001, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_viperc
 GAME(2001, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper,     mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2001, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver AAE)", MACHINE_NOT_WORKING)

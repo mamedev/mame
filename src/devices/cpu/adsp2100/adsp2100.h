@@ -153,6 +153,8 @@ enum
 	ADSP2100_FL0,
 	ADSP2100_FL1,
 	ADSP2100_FL2,
+	ADSP2100_PMOVLAY,
+	ADSP2100_DMOVLAY,
 	ADSP2100_AX0_SEC,
 	ADSP2100_AX1_SEC,
 	ADSP2100_AY0_SEC,
@@ -213,6 +215,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -277,6 +280,7 @@ protected:
 	// register read/write
 	inline void update_i(int which);
 	inline void update_l(int which);
+	inline void update_dmovlay();
 	inline void write_reg0(int regnum, int32_t val);
 	inline void write_reg1(int regnum, int32_t val);
 	inline void write_reg2(int regnum, int32_t val);
@@ -382,6 +386,8 @@ protected:
 	uint32_t              m_lmask[8];
 	uint32_t              m_base[8];
 	uint8_t               m_px;
+	uint32_t              m_pmovlay; // External Program Space overlay
+	uint32_t              m_dmovlay; // External Data Space overlay
 
 	// stacks
 	uint32_t              m_loop_stack[LOOP_STACK_DEPTH];
@@ -441,8 +447,8 @@ protected:
 
 	devcb_read32            m_sport_rx_cb;    // callback for serial receive
 	devcb_write32           m_sport_tx_cb;    // callback for serial transmit
-	devcb_write_line        m_timer_fired_cb;          // callback for timer fired
-	devcb_write_line        m_dmovlay_cb;          // callback for DMOVLAY instruction
+	devcb_write_line        m_timer_fired_cb; // callback for timer fired
+	devcb_write32           m_dmovlay_cb;     // callback for DMOVLAY instruction
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS

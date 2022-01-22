@@ -86,6 +86,7 @@ DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_is_pal(0)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
 	, m_stream(nullptr)
@@ -121,6 +122,7 @@ void nesapu_device::device_reset()
 void nesapu_device::device_clock_changed()
 {
 	calculate_rates();
+	m_is_pal = m_clock == PAL_APU_CLOCK;
 }
 
 void nesapu_device::calculate_rates()
@@ -207,8 +209,8 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tail));
 	#else
 	save_item(NAME(m_APU.buf_pos));
-	save_item(NAME(m_APU.step_mode));
 	#endif
+	save_item(NAME(m_APU.step_mode));
 }
 
 /* TODO: sound channels should *ALL* have DC volume decay */
@@ -433,7 +435,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 
 	if (chan->enabled)
 	{
-		freq = dpcm_clocks[chan->regs[0] & 0x0F];
+		freq = dpcm_clocks[m_is_pal][chan->regs[0] & 0x0F];
 		chan->phaseacc -= 4;
 
 		while (chan->phaseacc < 0)

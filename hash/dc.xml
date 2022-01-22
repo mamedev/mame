@@ -6547,21 +6547,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="chkrepair205r" cloneof="chkrepair216r">
-	    <description>DC Checker for Repair v2.05R (World)</description>
-	    <year>1999</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="DCSC205R"/>
-	    <info name="release" value="19991026"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="dc checker for repair v2.05r (world)" status="nodump"/>
-	        </diskarea>
-	    </part>
-	</software>
-	-->
-
-	<!--
 	<software name="chkrepair216r">
 	    <description>DC Checker for Repair v2.16R (World)</description>
 	    <year>2000</year>
@@ -14052,20 +14037,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="chkgd">
-	    <description>GD Drive Repair Program v0.1 (World)</description>
-	    <year>1998</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="DCFD01"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="gd drive repair program v0.1 (world)" status="nodump"/>
-	        </diskarea>
-	    </part>
-	</software>
-	-->
-
-	<!--
 	<rom name="Geist.Force-Resorted.cdi" size="812094891" md5="30fe0122b93a3c9d03711c5f74d759a9" sha1="91b221e916f389118190e141547d92a8df476985"/>
 
 	This prototype was released onto the Internet as a CDI image, which chdman cannot handle correctly right now.
@@ -19136,21 +19107,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
-	<software name="loopchk">
-	    <description>Loop Checker v1.00 (World)</description>
-	    <year>2000</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="SDPS-1"/>
-	    <info name="release" value="20000601"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="loop checker v1.00 (world)" status="nodump"/>
-	        </diskarea>
-	    </part>
-	</software>
-	-->
-
 	<software name="lhsmile"> <!-- Sega Rating: Suitable for All Ages -->
 		<!-- http://redump.org/disc/28866/
 		<rom name="Love Hina - Smile Again (Japan).gdi" size="201" crc="57c73c75" md5="0dfa3dc31d20888bd5885d24ede696f0" sha1="3e266d6c2932f64eb8c20a91de03c154b7a25cb8"/>
@@ -23447,4 +23403,74 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    </part>
 	</software>
 	-->
+
+	<!-- TODO: N-Z goes here -->
+
+	<!-- Check-GD -->
+	<!--
+	Testers may be run in different modes if hold controller buttons while booting (A+B, Right+X, Left+X, Down+A+B+X, Down+X, Up+X and few others).
+
+    Eventually requires emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
+	-->
+
+	<!-- <software name="chkrepair205r" cloneof="chkrepair216r"> -->
+	<software name="chkrepair205r" supported="no">
+	    <description>DC Checker for Repair v2.05R (World)</description>
+	    <year>1999</year>
+	    <publisher>Sega</publisher>
+		<notes><![CDATA[
+Check-GD program
+Hangs with a black screen, needs [SH4] SCIF emulation, bypass with NOPs at PC=0xc018f42 and PC=0xc018f54
+Fails at MMU checks 2-3-4, tries everything back again, stalls on MMU Check_1 back again PC=0x800000a2.
+]]></notes>
+	    <!--<info name="serial" value="DCSC205R"/>-->
+		<info name="serial" value="SPDS-5"/>
+	    <info name="release" value="19991027"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="dc checker for repair v2.05r (world)" sha1="2acfd570b14795da6339eda36a1e3dd0f8dce102"/>
+	        </diskarea>
+	    </part>
+	</software>
+
+	<software name="loopchk" supported="no">
+		<!-- build number: "V0.800" -->
+		<description>Loop Checker v1.00 (World)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Check-GD program
+Hangs with a cyan screen, needs [SH4] SCIF emulation, bypass with NOPs at PC=0xc0196da and PC=0xc0196ec
+Require emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0)
+cfr. https://github.com/mamedev/mame/issues/9106 for more info.
+]]></notes>
+		<info name="serial" value="SDPS-1"/>
+		<info name="release" value="19991109"/>
+		<!-- TODO: understand what the various button combinations actually does -->
+		<info name="usage" value="1. Select tests with A button in port A, selected to be run tests will have a dot at string tail; 2. Once done, in main menu press B to select number of times said tests needs to be run cyclically; 3. Press B to undo, A to move on. Select Con't or Halt mode with A; 4. Selected tests will (hopefully) run;"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="loop checker Ver 1.00 (world)" sha1="cd63dc2bdad2c6ce20af052871bcc77276808910"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chkgd" supported="no">
+		<!-- build number: V0.720 -->
+	    <description>GD Drive Repair Program v0.1 (World)</description>
+	    <year>1998</year>
+	    <publisher>Sega</publisher>
+		<notes><![CDATA[
+Check-GD program
+Stuck with a Sega copyright printed on screen
+]]></notes>
+	    <!--<info name="serial" value="DCFD01"/>-->
+		<info name="serial" value="HKT-999999"/>
+		<info name="release" value="19981201"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="gd drive repair program ver 0.1 (world)" sha1="4b302df1d4bdffcbad2f2475687000352bb08311"/>
+	        </diskarea>
+	    </part>
+	</software>
 </softwarelist>

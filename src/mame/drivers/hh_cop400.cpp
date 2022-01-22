@@ -40,6 +40,7 @@ TODO:
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
+#include "lafootb.lh"
 #include "lchicken.lh" // clickable
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
@@ -1170,6 +1171,119 @@ ROM_END
 
 /***************************************************************************
 
+  Mattel Look Alive! Football (model 1998)
+  * COP421L MCU bonded directly to PCB (rom serial HCJ)
+  * 2 7seg LEDs, LED matrix and overlay mask, 1-bit sound
+
+  For a detailed description, see patent US4582323. 1st-person view versions
+  for Baseball and Basketball were also announced, but not released.
+
+***************************************************************************/
+
+class lafootb_state : public hh_cop400_state
+{
+public:
+	lafootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_l(u8 data);
+	void write_d(u8 data);
+	u8 read_g();
+	void lafootb(machine_config &config);
+};
+
+// handlers
+
+void lafootb_state::update_display()
+{
+	m_display->matrix(~m_d, m_l);
+}
+
+void lafootb_state::write_l(u8 data)
+{
+	// L: led data
+	m_l = data;
+	update_display();
+}
+
+void lafootb_state::write_d(u8 data)
+{
+	// D: led select, D2,D3: input mux
+	m_d = data & 0xf;
+	m_inp_mux = data >> 2 & 3;
+	update_display();
+}
+
+u8 lafootb_state::read_g()
+{
+	// G: multiplexed inputs
+	return read_inputs(2, 7) | (m_inputs[2]->read() & 8);
+}
+
+// config
+
+static INPUT_PORTS_START( lafootb )
+	PORT_START("IN.0") // D2 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Right / Home")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick / Yards to go")
+
+	PORT_START("IN.1") // D3 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Left / Visitors")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Up / Time")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Pass / Status")
+
+	PORT_START("IN.2") // G3
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+void lafootb_state::lafootb(machine_config &config)
+{
+	/* basic machine hardware */
+	COP421(config, m_maincpu, 900000); // approximation - RC osc. R=51K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_l().set(FUNC(lafootb_state::write_l));
+	m_maincpu->write_d().set(FUNC(lafootb_state::write_d));
+	m_maincpu->read_g().set(FUNC(lafootb_state::read_g));
+	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	/* video hardware */
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1920, 864);
+	mask.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0x4, 0x7f);
+	m_display->set_segmask(0x8, 0xff); // right digit has dp
+	m_display->set_bri_levels(0.005);
+	config.set_default_layout(layout_lafootb);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( lafootb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cop421l-hcj", 0x0000, 0x0400, CRC(a9cc1e94) SHA1(7a39f5a5f10b8a2bd72da3ff3f3fcfaad35ead5f) )
+
+	ROM_REGION( 38608, "mask", 0)
+	ROM_LOAD( "lafootb.svg", 0, 38608, CRC(35387445) SHA1(7cd9db170820fc84d47545c3db8d991b2c5f4f7f) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Mattel Dalla$ (J.R. handheld)
   * COP444 MCU label COP444L-HYN/N
   * 8-digit 7seg display, 1-bit sound
@@ -1304,7 +1418,7 @@ void mdallas_state::mdallas(machine_config &config)
 
 ROM_START( mdallas )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+	ROM_LOAD( "cop444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
 ROM_END
 
 
@@ -2095,6 +2209,7 @@ CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  e
 CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, lafootb,    0,         0, lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***

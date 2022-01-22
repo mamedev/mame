@@ -736,8 +736,9 @@ license:CC0
 		</part>
 	</software>
 
+<!-- TODO: This is alleged to be a 3-byte hack of the actual dump to make it run. Original proto doesn't work on hardware? Investigate... -->
 	<software name="drfrankn">
-		<description>The Adventures of Dr. Franken (USA, Prototype)</description>
+		<description>The Adventures of Dr. Franken (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="nes_cart">
@@ -8844,7 +8845,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dondoko2" supported="partial">
+<!-- Crashes at the first boss -->
+	<software name="dondoko2" supported="no">
 		<description>Don Doko Don 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -30008,7 +30010,7 @@ license:CC0
 	</software>
 
 	<software name="qbscramb">
-		<description>Quarter Back Scramble (Jpn)</description>
+		<description>QuarterBack Scramble (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QS (R59V5925)"/>
@@ -45180,7 +45182,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="bioforce">
-		<description>Bio Force Ape (Jpn, Prototype)</description>
+		<description>Bio Force Ape (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bio force ape (us prototype).prg" size="131072" crc="46ba306d" sha1="196ce06860227b16767d88b7f7c3a22d3cd6978d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bio force ape (us prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioforcej" cloneof="bioforce">
+		<description>Bio Force Ape (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49524,6 +49542,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="qbscrambp" cloneof="qbscramb">
+		<description>QuarterBack Scramble (USA, prototype)</description>
+		<year>19??</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="Mike Ditka's Big Play Football"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="mike ditka's big play football (prototype).chr" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- from GoodNES, has CHR -->
 	<software name="racermt2a1" cloneof="racermt2" supported="no">
 		<description>Racermate Challenge 2 (USA, v6.02.002, w/CHR)</description>
@@ -52693,6 +52728,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_8j207">
+		<description>Heros 8 in 1 (JY-207)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="heros 8-in-1 (jy-207).prg" size="1048576" crc="8ad3f063" sha1="3fc05f0999df1ea2b6dcb50d79fb52403346b802" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="heros 8-in-1 (jy-207).chr" size="1048576" crc="60577fb5" sha1="7d679df5f18d84d456e8ecbe6bd5256ef5a6abce" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7j208">
 		<description>Rockman 7 in 1 (JY-208)</description>
 		<year>199?</year>
@@ -52705,6 +52755,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="rockman 7-in-1 (jy-208).chr" size="524288" crc="9a69e951" sha1="2f5dffbb134025c79011741ebdbf67a7b0490927" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j301">
+		<description>Super 8 in 1 (JY-301)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super 8-in-1 (jy-301).prg" size="1048576" crc="573f2af9" sha1="94801052a82772e98baffa12cd5a44449c172e8e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="super 8-in-1 (jy-301).chr" size="1048576" crc="7b4ea60f" sha1="f26adbcdeecafa9be1ea1da6bfde87beaa3d4e56" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j302">
+		<description>King 8 in 1 (JY-302)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy302" />
+			<dataarea name="prg" size="1048576">
+				<rom name="king 8-in-1 (jy-302).prg" size="1048576" crc="0b030660" sha1="07cb6b564cf8776c5eba0efcb8c786d0ec0acd6a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="king 8-in-1 (jy-302).chr" size="1048576" crc="67bffbc6" sha1="1cf285030a26c7856121b989de207cad8d02227c" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -75669,7 +75752,7 @@ Other
 	</software>
 
 <!-- CHR hack of dondoko2. As such it crashes in exactly the same spot at the first boss. -->
-	<software name="smb8a" cloneof="dondoko2" supported="partial">
+	<software name="smb8a" cloneof="dondoko2" supported="no">
 		<description>Super Bros 8 (Don Doko Don 2 pirate, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -78094,13 +78177,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Graphics glitches on some of the player portraits (at least Haggar). Is this fixed with a better dump of PRG (it is an overdump)? -->
 	<software name="strblst5a" cloneof="strblst5" supported="partial">
 		<description>Street Blaster V Turbo 20 (Asia, 20 characters, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik8in1" />
-			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<feature name="slot" value="txrom" />
 			<dataarea name="chr" size="262144">
 				<rom name="street fighter v (20 peoples) (unl) [p1].chr" size="262144" crc="73de5ecc" sha1="31582a8d50f2f87f00138859e32b59b1396893a5" offset="00000" status="baddump" />
 			</dataarea>
@@ -78225,8 +78308,7 @@ be better to redump them properly. -->
 		<year>1996</year>
 		<publisher>Cony</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik8in1" />
-			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<feature name="slot" value="txrom" />
 			<dataarea name="chr" size="262144">
 				<rom name="street fighter v turbo 60 (unl) [p1].chr" size="262144" crc="8d6737d7" sha1="4cfecb9a2d6a9e1f3b3714ad834374a95cb85d82" offset="00000" status="baddump" />
 			</dataarea>
@@ -78658,10 +78740,10 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3a" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Asia, 14 Characters)</description>
+	<software name="umk3a" supported="partial">
+		<description>Ultimate Mortal Kombat 3 (Asia, 14 characters)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="h2288" />
 			<feature name="pcb" value="UNL-H2288" />
@@ -79219,7 +79301,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="262144">
-				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
+				<rom name="battle kid - fortress of peril (v1.000).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80052,7 +80134,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_15ga">
+<!-- Mortal Kombat 30P has major graphics glitches -->
+	<software name="mc_15ga" supported="partial">
 		<description>15 in 1 (GA23C8003 PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -80278,6 +80361,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="chr" size="1048576">
 				<rom name="19-in-1 (k-3088) (810849-c).chr" size="1048576" crc="32b3d63f" sha1="292227a5a98659d3d478fa6425042896cdb60f0c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_19vip">
+		<description>Super 19 in 1 (VIP19)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_kc885" />
+			<feature name="pcb_model" value="KC885" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super 19-in-1 (vip19).prg" size="1048576" crc="c4ebed19" sha1="059f3be8f10660008000e5eee7061498808afb7a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="super 19-in-1 (vip19).chr" size="1048576" crc="86ab5220" sha1="b7a594429dd5fb851ad3c883cf2e901476fcdc27" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80835,7 +80934,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_3k311">
+<!-- Ninja Gaiden 2 has the same issues as set nryuken2 -->
+	<software name="mc_3k311" supported="partial">
 		<description>3 in 1 (K3011)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -81066,7 +81166,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4k303">
+<!-- Tekken III has major graphics glitches -->
+	<software name="mc_4k303" supported="partial">
 		<description>4 in 1 (K4303)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -81162,7 +81263,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4k899">
+<!-- Frog Adventure has broken graphics. It looks like the same issue that affects many Chinese games. -->
+	<software name="mc_4k899" supported="partial">
 		<description>4 in 1 (KG-899A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -83591,7 +83693,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_brain" supported="no">
+	<software name="mc_brain">
 		<description>Brain Series 13 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -83768,7 +83870,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_king4">
+<!-- Pokemon Green has broken graphics. It looks like the same issue that affects many Chinese games. -->
+	<software name="mc_king4" supported="partial">
 		<description>King Series Super 4 in 1 (K4M03)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -84050,7 +84153,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s1m" supported="no">
+	<software name="mc_s1m">
 		<description>Super 1000000 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84182,7 +84285,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3k" supported="no">
+	<software name="mc_s3k">
 		<description>Super 3 in 1 (K3015)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84198,7 +84301,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3ka" supported="no">
+<!-- Ninja Turtle 1 has broken graphics. It looks like the same issue that affects many Chinese games. -->
+	<software name="mc_s3ka" supported="partial">
 		<description>Super 3 in 1 (K3M07)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84233,7 +84337,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3" supported="no">
+<!-- Get Away II has broken graphics. It looks like the same issue that affects many Chinese games. -->
+	<software name="mc_s3" supported="partial">
 		<description>Super 3 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84303,7 +84408,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s4k03" supported="no">
+	<software name="mc_s4k03">
 		<description>Super 4 in 1 (K4003)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84319,7 +84424,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s4k42" supported="no">
+<!-- Bruce Lee 2 has scanline splits happening in unusual places -->
+	<software name="mc_s4k42" supported="partial">
 		<description>Super 4 in 1 (K4042)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84335,7 +84441,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s4k76" supported="no">
+	<software name="mc_s4k76">
 		<description>Super 4 in 1 (K4076)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -84351,7 +84457,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s4k86" supported="no">
+	<software name="mc_s4k86">
 		<description>Super 4 in 1 (K4086)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -85429,13 +85535,13 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+<!-- FIXME: this isn't a NES cartridge but a OneBus Famiclone PnP, mapper 269. It needs to find a home in a driver somewhere. Furthermore, what is the CHR dump here? nes20db.xml only lists the PRG ROM and there's 46% overlap between the two ROMs. -->
 	<software name="mc_gx121" supported="no">
 		<description>Games Xplosion 121 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik8in1" />
-			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<feature name="slot" value="UNKNOWN" />
 			<dataarea name="chr" size="4194304">
 				<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
 			</dataarea>

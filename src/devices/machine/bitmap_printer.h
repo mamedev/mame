@@ -25,15 +25,44 @@ class bitmap_printer_device : public device_t
 {
 public:
 	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi);
 
-	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi) :
-		bitmap_printer_device(mconfig, tag, owner, u32(0))
+	enum
 	{
-		m_paper_width = paper_width;
-		m_paper_height = paper_height;
-		m_hdpi = hdpi;
-		m_vdpi = vdpi;
-	}
+		LED_ERROR,
+		LED_READY,
+		LED_ONLINE
+	};
+
+	void set_led_state(int led, int value);
+	void set_printhead_color(int headcolor, int bordcolor);
+	void set_printhead_size(int xsize, int ysize, int bordersize);
+	void setheadpos(int x, int y);
+
+	void write_snapshot_to_file();
+
+	void draw_pixel(int x, int y, int pixelval);
+	int get_pixel(int x, int y);
+	unsigned int &pix(int y, int x);
+
+	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
+	void bitmap_clear_band(int from_line, int to_line, u32 color);
+	void clear_to_pos(int to_line, u32 color = 0xffffff);
+
+	int get_top_margin();
+	int get_bottom_margin();
+	bool check_new_page();
+
+	int update_stepper_delta(stepper_device *stepper, uint8_t pattern);
+	void update_cr_stepper(int pattern);
+	void update_pf_stepper(int pattern);
+
+	void set_pf_stepper_ratio(int ratio0, int ratio1);
+	void set_cr_stepper_ratio(int ratio0, int ratio1);
+
+	int m_cr_direction; // direction of carriage
+	int m_xpos;
+	int m_ypos;
 
 protected:
 	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -47,25 +76,18 @@ protected:
 
 private:
 	required_device<screen_device> m_screen;
-public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 
 	required_ioport m_top_margin_ioport;
 	required_ioport m_bottom_margin_ioport;
 	required_ioport m_draw_marks_ioport;
-	int m_cr_direction; // direction of carriage
-	int m_pf_stepper_ratio0;
-	int m_pf_stepper_ratio1;
-	int m_cr_stepper_ratio0;
-	int m_cr_stepper_ratio1;
-	int m_xpos;
-	int m_ypos;
 
-	bitmap_rgb32  m_page_bitmap;  // page bitmap
-private:
+	bitmap_rgb32 m_page_bitmap; // page bitmap
+
 	static constexpr int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	static constexpr int m_distfrombottom = 50;  // print position from bottom of screen
+	static constexpr int MAX_LEDS = 5;
 
 	int m_printhead_color;
 	int m_printhead_bordercolor;
@@ -79,41 +101,13 @@ private:
 	int m_vdpi;
 	int m_clear_pos;
 	int m_newpage_flag;  // used to keep printhead at the top of page until actual printing
-	static constexpr int MAX_LEDS = 5;
 	int m_led_state[MAX_LEDS];
 	int m_num_leds;
+	int m_pf_stepper_ratio0;
+	int m_pf_stepper_ratio1;
+	int m_cr_stepper_ratio0;
+	int m_cr_stepper_ratio1;
 
-public:
-
-	enum { LED_ERROR, LED_READY, LED_ONLINE };
-
-	void set_led_state(int led, int value) { m_led_state[led] = value; m_num_leds = std::max(m_num_leds, led); }
-	void set_printhead_color(int headcolor, int bordcolor);
-	void set_printhead_size(int xsize, int ysize, int bordersize);
-	void setheadpos(int x, int y){  if (m_xpos != x) m_newpage_flag = 0; m_xpos = x; m_ypos = y;}
-
-	void write_snapshot_to_file();
-
-	void draw_pixel(int x, int y, int pixelval);
-	int get_pixel(int x, int y);
-	unsigned int& pix(int y, int x);
-
-	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
-	void bitmap_clear_band(int from_line, int to_line, u32 color);
-	void clear_to_pos(int to_line, u32 color = 0xffffff);
-
-	int get_top_margin();
-	int get_bottom_margin();
-	bool check_new_page();
-
-	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);
-	void update_cr_stepper(int pattern);
-	void update_pf_stepper(int pattern);
-
-	void set_pf_stepper_ratio(int ratio0, int ratio1) { m_pf_stepper_ratio0 = ratio0; m_pf_stepper_ratio1 = ratio1;}
-	void set_cr_stepper_ratio(int ratio0, int ratio1) { m_cr_stepper_ratio0 = ratio0; m_cr_stepper_ratio1 = ratio1;}
-
-private:
 	void draw_printhead(bitmap_rgb32 &bitmap, int x, int y);
 	u32 dimcolor(u32 incolor, int factor);
 

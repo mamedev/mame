@@ -26,7 +26,6 @@ AD&D Heroes of the Lance                                      Pony Canyon       
 Aesop World Dai-2-shuu (Denshi Ehon)                          Fujitsu                           1993/12    CD
 Aishuu to Netsujou no Chouwa                                  Fujitsu                           1995/4     CD
 Alice in Wonderland                                           DynEd Japan                       1993/3     SET(CD+FD)
-Akiko Gold                                                    Fairytale (Red Zone)              1995/1     SET(CD+FD)
 Amour Ver. 1.0                                                Kozu System                       1989/11    SET(CD+FD)
 AniVox Eiken 3-4-kyuu Hatsuon-Accent Ban                      Unity                             1992/6     SET(CD+FD)
 Anne no Tea Party                                             Dennou Shoukai                    1993/6     CD
@@ -43,7 +42,6 @@ Butoukai no Yoru                                              Fujitsu           
 ByHAND V1.1                                                   Fujitsu                           1992/1     CD
 ByHAND V2.1                                                   Fujitsu                           1993/3     CD
 ByHAND V3.1                                                   Fujitsu                           1994/3     CD
-Car Marty Exciting CD                                         Fujitsu Ten                       1994/6     CD×2
 CB Trainer Data Library V1.1 L10                              Fujitsu                           1993/5     CD
 CB Trainer Jikkou System V2.1                                 Fujitsu                           1994/9     ?
 CB Trainer V1.1                                               Fujitsu                           1993/5     CD
@@ -254,7 +252,6 @@ Kitty Town no Nakama-tachi: Tanoshii Seikatsuka               Fujitsu Parex     
 Komaki Naomi                                                  Janis                             1994/2     CD
 Koujien Daisanban CD-ROM                                      Fujitsu                           1989/12    CD
 Koujien Daiyonban CD-ROM                                      Fujitsu                           1993/3     CD
-Kyouiku & FM Towns Vol. 1                                     Fujitsu                           ?          CD
 Kyouiku & FM Towns Vol. 4                                     Fujitsu                           ?          CD
 Let's go 1-1                                                  DynEd Japan                       1995/7     SET(CD+FD)
 Let's go 1-2                                                  DynEd Japan                       1995/7     SET(CD+FD)
@@ -320,7 +317,6 @@ NHK Jissen Eikaiwa Part 2                                     CRC Sougou Kenkyuu
 Nihon Kiin no Jouseki Daijiten                                Misawa Home Sougou Kenkyuusho     1992/7     CD
 Nihon Mukashibanashi 2                                        Gyousei                           1991/7     CD
 Nihon Mukashibanashi Vol. 4                                   Gyousei                           1993/12    CD
-Nihon no Chou                                                 Fujitsu Social Science Laboratory 1991/7     CD
 Nihon no Chou (Marty-compatible)                              Fujitsu Social Science Laboratory 1993/3     CD
 Nihon no Kaisuigyo                                            Inter Limited Logic               1995/10    CD
 Nihon no Kusabana                                             Fujitsu Social Science Laboratory 1997/10    CD
@@ -375,7 +371,6 @@ Seikatsuka 1-nen: Asobou Mitsukeyou                           Uchida Youkou     
 Seikatsuka 2-nen: Wakuwaku Tanken                             Uchida Youkou                     1994/5     CD
 Sexy PK 2 World Cup Ban                                       Birdy Soft                        1995/6     CD
 Sexy PK World Cup Ban                                         Birdy Soft                        1995/6     CD
-Shadow of the Beast: Mashou no Okite (1991-10-11)             Victor Entertainment              1991/10?   CD
 Shakaika Database: Nihon no Bunka / Sangyou / Shizen          Nihon Kyouiku System              1991/12    CD
 Shanghai: Banri no Choujou                                    Electronic Arts Victor            1995/9     CD
 Shijou Saikyou no Video Bible                                 System Sacom                      1989/12    CD
@@ -2374,10 +2369,9 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
-	<software name="akikogld" supported="no">
+	<software name="akikogld">
 		<!--
-		Origin: redump.org (CD)
+		Origin: redump.org (CD) / wiggy2k (floppy)
 		<rom name="Akiko Gold (Japan) (Track 01).bin" size="9857232" crc="77d5831d" sha1="723195984afae0f4d12e17834080d1db43d35077"/>
 		<rom name="Akiko Gold (Japan) (Track 02).bin" size="25382784" crc="410aba0e" sha1="985c2528540c84daf35f0ffeb2a51bf250d24679"/>
 		<rom name="Akiko Gold (Japan) (Track 03).bin" size="29068368" crc="e18852c8" sha1="f378a268c7a5cba7d337b349080bfc5848f3da57"/>
@@ -2424,6 +2418,12 @@ User/save disks that can be created from the game itself are not included.
 		<info name="alt_title" value="亜紀子ＧＯＬＤ" />
 		<info name="release" value="199303xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="akiko_gold_disk_a.hdm" size="1261568" crc="fd3d3924" sha1="f52b8c76fcf77c9f2d14938e65e99d2fea25db1f" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="akiko gold (japan)" sha1="f31bff32459dfd56aa29546a4af94e6e116481ac" />
@@ -5906,11 +5906,14 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="dodamega">
 		<!--
-		Origin: P2P
-		<rom name="Image.cdm" size="1823" crc="6569150c" sha1="09802a94fad080d4464fce17ba161c137dc5b0a0"/>
-		<rom name="Image.cue" size="299" crc="b5d5ad42" sha1="ae01659fda3d965a3bbf242bcc69267e9dc6ca0e"/>
-		<rom name="Image.img" size="210720384" crc="d2f023c4" sha1="f9e43906de2e78275eb05d571d404da8654da671"/>
-		<rom name="Image.sub" size="8600832" crc="51fc181b" sha1="5552f73174a7ecd821d5a758b3d378ca3d996235"/>
+		Origin: redump.org
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 1).bin" size="52567200" crc="8b82e587" sha1="d6d1234cc3398efec152e1e180e952c2eee29811"/>
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 2).bin" size="34049904" crc="cbb2ae7e" sha1="cd56945fcd8e2889433797daff7c8db105db8583"/>
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 3).bin" size="31269840" crc="3e1747d2" sha1="d07d4d74b7ae1b28a3f6a98e17fbb6c2665ac665"/>
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 4).bin" size="28459200" crc="f352f923" sha1="332aede45cabd267d91a0e7606263a3cff83d1aa"/>
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 5).bin" size="25326336" crc="ea4bd5b0" sha1="399098e9b8bb243bfe4030516577c68a0ea717e4"/>
+		<rom name="Doda-Mega Mix!!! (Japan) (Track 6).bin" size="39047904" crc="58281a17" sha1="0eda63c060a5897b9d5f2d026629720af62d2957"/>
+		<rom name="Doda-Mega Mix!!! (Japan).cue" size="690" crc="a91a2628" sha1="f3b53dec3168ab97387587f3f7b7ca2116805102"/>
 		-->
 		<description>Doda Mega-Mix!!!</description>
 		<year>1989</year>
@@ -5920,7 +5923,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dodamega" sha1="876ebe9db24ad2206e2bb4795284d828fa264442" />
+				<disk name="doda-mega mix (japan)" sha1="8f22b6018c1451d6d22fea585c9457e2138ce489" />
 			</diskarea>
 		</part>
 	</software>
@@ -10647,20 +10650,20 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="hcc1713">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="High C Compiler Multimedia Development Kit v1.7 L13.ccd" size="770" crc="3c965b0b" sha1="2f5300cec2bebd97b8753239f7f579d4855202df"/>
-		<rom name="High C Compiler Multimedia Development Kit v1.7 L13.cue" size="115" crc="248c2756" sha1="ee4293724107e491a3c3c699c360326745d802cc"/>
-		<rom name="High C Compiler Multimedia Development Kit v1.7 L13.img" size="71187984" crc="28bae35d" sha1="465cc57540e0fc0eb7b43f84d2d4c7e05e1cf3ab"/>
-		<rom name="High C Compiler Multimedia Development Kit v1.7 L13.sub" size="2905632" crc="58a7a430" sha1="0e5cf3f48d2b27601081419eb4316d51960eb7c6"/>
+		Origin: redump.org
+		<rom name="High C Compiler Multimedia Kaihatsu Kit V1.7 L13 (Japan).bin" size="71187984" crc="28bae35d" sha1="465cc57540e0fc0eb7b43f84d2d4c7e05e1cf3ab"/>
+		<rom name="High C Compiler Multimedia Kaihatsu Kit V1.7 L13 (Japan).cue" size="122" crc="3c23b262" sha1="bfa79c93a71d70f9a3667ba97670eb24a2d41e0b"/>
 		-->
-		<description>High C Compiler Multimedia Development Kit v1.7 L13</description>
+		<description>High C Compiler Multimedia Kaihatsu Kit v1.7 L13</description>
 		<year>1995</year>
 		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="Ｈｉｇｈ　Ｃ　Ｃｏｍｐｉｌｅｒ　マルチメディア開発キット　Ｖ１．７Ｌ１３" />
+		<info name="serial" value="B276D231"/>
 		<info name="release" value="199503xx" />
 		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="high c compiler multimedia development kit v1.7 l13" sha1="1755383d812fe07b4ad2cd0b44c111cb14b25ae7" />
+				<disk name="high c compiler multimedia kaihatsu kit v1.7 l13 (japan)" sha1="20462e195d35084e11b5282ad63d88f3da3e3629" />
 			</diskarea>
 		</part>
 	</software>
@@ -10674,6 +10677,7 @@ User/save disks that can be created from the game itself are not included.
 		<description>High C Compiler Multimedia Kit v1.7 L12</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="Ｈｉｇｈ　Ｃ　Ｃｏｍｐｉｌｅｒ　マルチメディア・キット　Ｖ１．７Ｌ１２" />
 		<info name="serial" value="B276D220"/>
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13739,6 +13743,54 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dennou ehon - kyouryuu no sekai (japan)" sha1="159f98ea09b322d6ca42e94dc1dbf5a9519e8a82" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kyofmt1">
+		<!--
+		Origin: redump.org
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 01).bin" size="105840000" crc="654962ed" sha1="8c06249c99c88fdabdba8ae71eb81761f2088fc2"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 02).bin" size="15871296" crc="5918de21" sha1="58e904be30b25d06beeb5d389220929e0af2777e"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 03).bin" size="16621584" crc="f70a218f" sha1="2a3eb377db176a1e5ec2298a61e7fa4ea540d241"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 04).bin" size="5005056" crc="c053b7f0" sha1="270b62c3e73e904b5cdd8a8df77b2ec47a576924"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 05).bin" size="18098640" crc="e16bc853" sha1="7f0383fa4cc0cf79e04fb46b2f8a5b8ac1e5425d"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 06).bin" size="2352000" crc="a0e0a189" sha1="4e876246a70f9a2105bb15d91ce339d0b65439f4"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 07).bin" size="13382880" crc="9edff27c" sha1="bf4a9aba95effa3db5bcc38ea8f90db60d9dca7f"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 08).bin" size="2533104" crc="c574c396" sha1="d074efa3ed06b745d20581797d489d0d847b9718"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 09).bin" size="22320480" crc="163de832" sha1="4108853952a5605d0c9b3ffc928bf2df08638ce8"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 10).bin" size="1500576" crc="532952fd" sha1="deb55abaf72c0ed1714dfbf1cf8cf3a3b551429e"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 11).bin" size="9083424" crc="4c14b9f8" sha1="eadaee1a78fba5b973440db33f3418c02b9d9aea"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 12).bin" size="8526000" crc="3e9b5100" sha1="7b97cd909685be0ebd33dcfe728e91dfb4e54a3a"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 13).bin" size="13413456" crc="6bc68a09" sha1="182305982b22ba4a39844aefd4f5f5c4123b1c2b"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 14).bin" size="2968224" crc="961f8ebf" sha1="be7ca66663cd2c4bf07ef55a16085f3f39800fc9"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 15).bin" size="11755296" crc="08e4fd92" sha1="e5b84729dd295ced80e8be44d5c9260e2a14e4a9"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 16).bin" size="4774560" crc="ebd9259d" sha1="bf71d255cac4e9ee785caeb7e850159f8d945c46"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 17).bin" size="4633440" crc="3d3a4424" sha1="8608e1316c95e48161a3cadf79cb821ce46ac594"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 18).bin" size="9384480" crc="1d382240" sha1="3e776864aec766fc97b242363abf462fb2356226"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 19).bin" size="3450384" crc="bd927624" sha1="f8644bfddcdbefbe07b81f897ba9d5c20c05e5e7"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 20).bin" size="8841168" crc="38f7b5b1" sha1="aeb65b4042b4dacc77bc1e3384c2eea253b32a0d"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 21).bin" size="5174400" crc="26b80fed" sha1="68f822a5a84ca71ebd5d1163a45fa9a65bbf1e00"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 22).bin" size="5788272" crc="ed9c6368" sha1="6514a9f250d18fb2f545704a944b964b2abf9737"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 23).bin" size="10631040" crc="714d2aba" sha1="5b4be689441ae71bfc65b34305e111ae7f026787"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 24).bin" size="1963920" crc="ccd0b895" sha1="65eeb5347d8219aa0cb4c102cd6bd20aa54f9131"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 25).bin" size="1853376" crc="b681fc04" sha1="64d3fa03d2020eb96a110e040781976a482363ec"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 26).bin" size="1498224" crc="4fdd8073" sha1="b84c13f73f4797459c8ee9eab1548769cd0e8f29"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 27).bin" size="13429920" crc="e45f030c" sha1="4eabf20f306b21e9a10d1e58f33e519a7991f6c4"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 28).bin" size="37726080" crc="829d7079" sha1="171f1ae0f5835fe2bfc48c02c82593d73c50ff44"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 29).bin" size="3669120" crc="48363fc0" sha1="f3444dd88a3c7bd91ed7c3de4e60cc78b8d2f8f2"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 30).bin" size="48157200" crc="cf2bcdb1" sha1="b927f84ad96c957ef28d695ab7b8d44a60297a31"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan) (Track 31).bin" size="32222400" crc="e966d0f8" sha1="209d0b28b46214521e2374e967b517f8916d8374"/>
+		<rom name="Kyouiku &amp; FM Towns (Japan).cue" size="3756" crc="ea72e64d" sha1="d29da1d4c067098c5a374520125893f4c2492481"/>
+		-->
+		<description>Kyouiku &amp; FM Towns</description>
+		<year>1990?</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMB-506"/>
+		<info name="alt_title" value="教育＆ＦＭ　ＴＯＷＮＳ" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kyouiku &amp; fm towns (japan)" sha1="79686cdf1abba0959b5fba7e1060248d59559946" />
 			</diskarea>
 		</part>
 	</software>
@@ -19037,6 +19089,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="nihonch">
+		<!--
+		Origin: redump.org
+		<rom name="Nihon no Chou (Japan) (Rev 1).bin" size="317167200" crc="24432690" sha1="62ee705ab5c128ab81c84c56fbe366d49ba6789c"/>
+		<rom name="Nihon no Chou (Japan) (Rev 1).cue" size="118" crc="f25ef112" sha1="faec338b1e8d349fe1a34433272ef0a66b114c99"/>
+		-->
+		<description>Nihon no Chou</description>
+		<year>1991</year>
+		<publisher>富士通ソーシアルサイエンスラボラトリ (Fujitsu Social Science Laboratory)</publisher>
+		<info name="serial" value="HMC-130"/>
+		<info name="alt_title" value="日本の蝶" />
+		<info name="release" value="199107xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no chou (japan) (rev 1)" sha1="c0a4104fc1b09cc0f5803ee4b94fc65d032f6b43" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="nihonya">
 		<!--
 		Origin: redump.org
@@ -20929,21 +21000,35 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="ppersia">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Prince of Persia.ccd" size="3806" crc="5c08c011" sha1="5d10789e220f77e549705a22c1aa1398287bd36e"/>
-		<rom name="Prince of Persia.cue" size="712" crc="bf28b9d2" sha1="dbe9d4cfb2d4e08efab3e52dfff7c458eda86d11"/>
-		<rom name="Prince of Persia.img" size="443469600" crc="a73104c5" sha1="1208836f87c57f14b96316b4e0f0418377631492"/>
-		<rom name="Prince of Persia.sub" size="18100800" crc="9fe57c70" sha1="6e266b21c414984b57e0a7dcb26143b29907a8f9"/>
+		Origin: redump.org
+		<rom name="Prince of Persia (Japan) (Track 01).bin" size="10231200" crc="3690f005" sha1="75de0969b5feb68d07deb2322817cdbd4f80e7c1"/>
+		<rom name="Prince of Persia (Japan) (Track 02).bin" size="59270400" crc="97e9a345" sha1="650e7054556aee5c0ddb4a85c3a539ce390edb62"/>
+		<rom name="Prince of Persia (Japan) (Track 03).bin" size="22755600" crc="4beca733" sha1="27b15bb28352a00cbbe3e1978ef8f1c197cbf5c7"/>
+		<rom name="Prince of Persia (Japan) (Track 04).bin" size="63151200" crc="37d09501" sha1="9ab80ce45548a414651c304546adb2f1e60d8665"/>
+		<rom name="Prince of Persia (Japan) (Track 05).bin" size="11466000" crc="14e85af7" sha1="92c794fb10fd1225d181a0b37ec5026c1b74d48f"/>
+		<rom name="Prince of Persia (Japan) (Track 06).bin" size="29811600" crc="a16c1b75" sha1="2b54b78d0e838dc9d0b72ca6cf4ddf908dc7decd"/>
+		<rom name="Prince of Persia (Japan) (Track 07).bin" size="15170400" crc="4214d798" sha1="714f43ad183aa04a62a964a0fc81e544161a4c5d"/>
+		<rom name="Prince of Persia (Japan) (Track 08).bin" size="11642400" crc="65d1d626" sha1="c38933175b1dd25823fda34de59853f97b11efa3"/>
+		<rom name="Prince of Persia (Japan) (Track 09).bin" size="26460000" crc="202fb44e" sha1="6ba461baf154859ead3c41a8e2d743e05b456003"/>
+		<rom name="Prince of Persia (Japan) (Track 10).bin" size="3704400" crc="77efc28f" sha1="b33da9c9f0f6bacf7412ed85ed024b37392ccf55"/>
+		<rom name="Prince of Persia (Japan) (Track 11).bin" size="10584000" crc="02d74f72" sha1="94d343a25bcf99994f9c8148ceaf86ddca2e950b"/>
+		<rom name="Prince of Persia (Japan) (Track 12).bin" size="2646000" crc="bf3bceda" sha1="6c55d94d315b19aa7381ae58712aba6d0a84a72d"/>
+		<rom name="Prince of Persia (Japan) (Track 13).bin" size="24519600" crc="4f636857" sha1="189075fdc38624b5ee7ff4b5a251f6f0fd952f80"/>
+		<rom name="Prince of Persia (Japan) (Track 14).bin" size="11995200" crc="f3c665c4" sha1="af847e570a1409d23f45fa52d37a29edeba9bdd6"/>
+		<rom name="Prince of Persia (Japan) (Track 15).bin" size="29988000" crc="0c5dc562" sha1="b1bd6609f98f1ad4001db6595f9555bb3b8e6da8"/>
+		<rom name="Prince of Persia (Japan) (Track 16).bin" size="69501600" crc="a96f0618" sha1="7616faea96d7a3d0990e0bad0ad0520484205f58"/>
+		<rom name="Prince of Persia (Japan) (Track 17).bin" size="40572000" crc="8981e788" sha1="97deba68edfea3ee551b533e170ed7409cc6a985"/>
+		<rom name="Prince of Persia (Japan).cue" size="2005" crc="08003be4" sha1="1401775458cc0de3d21a7a885477055c2afa88b5"/>
 		-->
 		<description>Prince of Persia</description>
 		<year>1992</year>
 		<publisher>リバーヒルソフト (Riverhill Soft)</publisher>
-		<info name="serial" value="HMD-123"/>
+		<info name="serial" value="HMD-123 / MTC-1011"/>
 		<info name="alt_title" value="プリンス・オブ・ペルシャ" />
 		<info name="release" value="199206xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="prince of persia" sha1="0d942e85b923c848cd3e66754d1b871fb66f81f5" />
+				<disk name="prince of persia (japan)" sha1="f7423a6949ba6e0655e6e2e2b0c8e3ddd2e6c671" />
 			</diskarea>
 		</part>
 	</software>
@@ -25947,9 +26032,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!--
+	    The game can work with a blank floppy disk, but with the original one it boots to an alternate title screen that says "for adult".
+	    It's unknown if there are any other differences.
+	-->
 	<software name="tenranma">
 		<!--
-		Origin: redump.org
+		Origin: redump.org (CD) / wiggy2k (floppy)
 		<rom name="Tenshin Ranma (Japan).bin" size="10231200" crc="d886d832" sha1="106036b5b730478e6bc7626d12b40f07f0a60903"/>
 		<rom name="Tenshin Ranma (Japan).cue" size="110" crc="24157ac7" sha1="1e875712a4cf447e3bcd61ec355d87715d04cd8a"/>
 		-->
@@ -25959,6 +26048,12 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMD-135"/>
 		<info name="alt_title" value="天神乱魔" />
 		<info name="release" value="199205xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="tenshin_ranma_disk_a.hdm" size="1261568" crc="f2af4301" sha1="f6c9e5a32203672113bab7135756baa7528e9253" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tenshin ranma (japan)" sha1="545427376d437155f46836bb043feb2d6e6f855f" />
@@ -26804,21 +26899,21 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="toukou2">
 		<!--
-		Origin: P2P
-		<rom name="Image.cdm" size="1092" crc="64e86da4" sha1="9bde9b10ec2146df7170170f0499e21e27340082"/>
-		<rom name="Image.cue" size="135" crc="5e56f12c" sha1="f84a11cf3caf8e7c83a250a1bc43b32b1cb7dd36"/>
-		<rom name="Image.img" size="264531792" crc="7b1cf7cb" sha1="7825977b8f98d7db7d31571560df41099d66e564"/>
-		<rom name="Image.sub" size="10797216" crc="971b0745" sha1="9778f27530219b8fb7a0646a43ea655cee2a4d0e"/>
+		Origin: redump.org
+		<rom name="That's Toukou Part 2 (Japan) (Track 1).bin" size="69256992" crc="751a7dab" sha1="1bea0b4062560eae4a13694773b2d8e28fbae0b6"/>
+		<rom name="That's Toukou Part 2 (Japan) (Track 2).bin" size="195274800" crc="e0368103" sha1="901883c04f30708804cd0298a8660598f5bd2758"/>
+		<rom name="That's Toukou Part 2 (Japan).cue" size="249" crc="76b679c4" sha1="c0e23785b37b9e4393f3ba7adcbb25e100d05cad"/>
 		-->
 		<description>That's Toukou Part 2</description>
 		<year>1994</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="serial" value="MTC-1099"/>
 		<info name="alt_title" value="ＴＨＡＴ’Ｓ　投稿　ＰＡＲＴ　２" />
 		<info name="release" value="199408xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="toukou2" sha1="e3d9e3cf9695ab63064de8e02b014e29664a5422" />
+				<disk name="that's toukou part 2 (japan)" sha1="b805b2979455a467d2072766870efa8bdeb63199" />
 			</diskarea>
 		</part>
 	</software>
@@ -28477,11 +28572,9 @@ User/save disks that can be created from the game itself are not included.
 	-->
 	<software name="wang3">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Wrestle Angels 3.ccd" size="771" crc="dc5d3961" sha1="68b25e0a4b49996ac3f47d4be88b1c920ad83b7f"/>
-		<rom name="Wrestle Angels 3.cue" size="80" crc="589d9e69" sha1="36097866d210b633d214c91ec40e15bb23286b27"/>
-		<rom name="Wrestle Angels 3.img" size="146586048" crc="9dbc67f2" sha1="b997acc457d71c74935bcbbfa2f394adda77774b"/>
-		<rom name="Wrestle Angels 3.sub" size="5983104" crc="11cac79b" sha1="9c812343a72770a9c8da1ecdeceba71746565522"/>
+		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
+		<rom name="Wrestle Angels 3 - Mezasu wa Saikyou Dantai! (Japan).bin" size="146586048" crc="9dbc67f2" sha1="b997acc457d71c74935bcbbfa2f394adda77774b"/>
+		<rom name="Wrestle Angels 3 - Mezasu wa Saikyou Dantai! (Japan).cue" size="118" crc="86f00f25" sha1="cfd31afd89aeff12ecc3ed330ee21170e0d54dbe"/>
 		-->
 		<description>Wrestle Angels 3 - Mezasu wa Saikyou Dantai!</description>
 		<year>1994</year>
@@ -28498,7 +28591,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wrestle angels 3" sha1="2d5cde32541789c456d6e0ebb7a4ef7c91886f6d" />
+				<disk name="wrestle angels 3 - mezasu wa saikyou dantai (japan)" sha1="24328f62e8f717179df4902f9ad425960d91b1b7" />
 			</diskarea>
 		</part>
 	</software>

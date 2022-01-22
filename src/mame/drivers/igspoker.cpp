@@ -84,6 +84,8 @@ TODO:
 #include "igspoker.lh"
 
 
+namespace {
+
 #define VERBOSE 0
 
 
@@ -127,6 +129,11 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
+protected:
+	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	uint8_t igs_irqack_r();
 	void igs_irqack_w(uint8_t data);
@@ -151,10 +158,6 @@ private:
 	void igspoker_io_map(address_map &map);
 	void igspoker_prg_map(address_map &map);
 	void number10_io_map(address_map &map);
-
-	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_bg_tile_ram;
@@ -2902,7 +2905,18 @@ ROM_START( igstet341 )
 	ROM_LOAD( "tetris_3.u6",  0x00000, 0x20000, CRC(8159768d) SHA1(b28026afa8206adbc381dfa461eea842354ea5b6) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+ROM_END
 
+ROM_START( igstet342 ) // PCB NO- 0159
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_v-342r.u23",  0x00000, 0x10000, CRC(f0414c5a) SHA1(e28e730de608f80815a4c6bdd846476093c3d846) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "tetris_1.u4",  0x40000, 0x20000, CRC(6bf90dd5) SHA1(280eb3a54cf5e4fbeeee25d87b10900bba360641) )
+	ROM_LOAD( "tetris_2.u5",  0x20000, 0x20000, CRC(7079e79e) SHA1(bc44c446e8a7ee9cb75695ca1c1a27f78e4b3e30) )
+	ROM_LOAD( "tetris_3.u6",  0x00000, 0x20000, CRC(8159768d) SHA1(b28026afa8206adbc381dfa461eea842354ea5b6) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 
 void igspoker_state::init_tet341()
@@ -3021,6 +3035,8 @@ void igspoker_state::init_kungfu()
 	memset( &rom[0xf000], 0, 0x1000);
 }
 
+} // Anonymous namespace
+
 
 GAMEL( 1993?,cpoker,      0,      igspoker, cpoker,   igspoker_state, init_cpoker,      ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
 GAMEL( 1993?,cpokert,     cpoker, igspoker, cpoker,   igspoker_state, init_cpokert,     ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
@@ -3053,5 +3069,6 @@ GAMEL( 1998, stellecu,    0,        number10, number10, igspoker_state, empty_in
 
 GAMEL( 1993?,pktet346,    0,        pktetris, pktet346, igspoker_state, init_pktet346,  ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
 GAMEL( 199?, igstet341,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
+GAMEL( 199?, igstet342,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v342R)",                               0, layout_igspoker )
 
 GAMEL( 1992, kungfu,      0,        igspoker, cpoker,   igspoker_state, init_kungfu,    ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )

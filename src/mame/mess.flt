@@ -241,6 +241,7 @@ dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
 digel804.cpp
+digilog320.cpp
 digijet.cpp
 dim68k.cpp
 dm7000.cpp
@@ -307,7 +308,7 @@ exorterm.cpp
 exp85.cpp
 f387x.cpp
 facit4440.cpp
-falco5220.cpp
+falco500.cpp
 falcots.cpp
 falcots28.cpp
 fanucs15.cpp
