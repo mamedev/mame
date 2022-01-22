@@ -38,8 +38,6 @@ copyright-holders:Robbbert
 	<view name="Default Layout">
 		<bounds left="0" top="20" right="374" bottom="334" />
 
-		<!-- LEDs -->
-
 		<!-- Player 1 Score -->
 		<param name="s" value="0" />
 		<group ref="score">
@@ -76,19 +74,23 @@ copyright-holders:Robbbert
 			<bounds left="210" top="205" right="364" bottom="244" />
 		</group>
 
-		<!-- Credits and Balls -->
+		<!-- Credits -->
 		<element name="digit13" ref="digit">
 			<bounds left="10" top="285" right="44" bottom="324" />
 		</element>
 		<element name="digit12" ref="digit">
 			<bounds left="54" top="285" right="88" bottom="324" />
 		</element>
+
+		<!-- Frames and Match -->
 		<element name="digit14" ref="digit">
 			<bounds left="186" top="285" right="220" bottom="324" />
 		</element>
 		<element name="digit15" ref="digit">
 			<bounds left="230" top="285" right="264" bottom="324" />
 		</element>
+
+		<!-- Text -->
 		<element ref="P0"><bounds left="200" right="258" top="270" bottom="282" /></element>
 		<element ref="P1"><bounds left="30" right="88" top="270" bottom="282" /></element>
 		<element ref="P3"><bounds left="60" right="140" top="30" bottom="42" /></element>
@@ -97,6 +99,8 @@ copyright-holders:Robbbert
 		<element ref="P6"><bounds left="260" right="340" top="110" bottom="122" /></element>
 		<element ref="P7"><bounds left="60" right="140" top="190" bottom="202" /></element>
 		<element ref="P8"><bounds left="260" right="340" top="190" bottom="202" /></element>
+
+		<!-- LEDs -->
 		<element name="led0" ref="red_led">
 			<bounds left="310" right="325" top="300" bottom="315" />
 		</element>

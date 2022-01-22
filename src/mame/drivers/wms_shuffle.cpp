@@ -39,7 +39,7 @@ Status:
 
 ToDo:
 - Only 2 manuals found, and only one schematic, so it's largely guesswork.
-- Layout (s11/a/b)
+- Layout (s11a/b)
 - Inputs
 - Outputs
 - Displays (s11/a/b)
@@ -60,7 +60,8 @@ ToDo:
 #include "sound/dac.h"
 #include "speaker.h"
 
-#include "shuffle.lh"
+#include "shuffle4.lh"
+#include "shuffle9.lh"
 #include "shuffle11.lh"
 
 
@@ -107,10 +108,10 @@ private:
 	void sol2_w(u8 data) { };
 	void sol3_w(u8 data) { };
 	void sound_w(u8);
-	void pia2c_pa_w(u8);
-	void pia2c_pb_w(u8);
-	void pia34_pa_w(u8);
-	void pia34_pb_w(u8);
+	void pia2c_pa_w(u8 data) { }
+	void pia2c_pb_w(u8 data) { }
+	void pia34_pa_w(u8 data) { }
+	void pia34_pb_w(u8 data) { }
 	u8 dips_r();
 	u8 sound_r();
 	u8 switch_r();
@@ -121,8 +122,6 @@ private:
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
-	u32 m_segment1 = 0U;
-	u32 m_segment2 = 0U;
 	u8 m_sound_data = 0U;
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
@@ -325,9 +324,9 @@ INPUT_PORTS_END
 
 void shuffle_state::clockcnt_w(u16 data)
 {
-//	if (data >= 1536)
-//		m_mainirq->in_set<0>();
+	// A wire jumper allows selection of 7,8,9, or 8,9,10
 	m_mainirq->in_w<0>(BIT(data, 7, 3)==7);
+
 	if (BIT(data, 5) && m_irq_in_progress)
 		m_4020->reset_w(1);
 	else
@@ -410,43 +409,6 @@ void shuffle_state::dig1_w(u8 data)
 	m_data_ok = false;
 }
 
-void shuffle_state::pia2c_pa_w(u8 data)
-{
-	m_segment1 |= (data<<8);
-	m_segment1 |= 0x10000;
-	if ((m_segment1 & 0x70000) == 0x30000)
-	{
-		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment1 |= 0x40000;
-	}
-}
-
-void shuffle_state::pia2c_pb_w(u8 data)
-{
-	m_segment1 |= data;
-	m_segment1 |= 0x20000;
-	if ((m_segment1 & 0x70000) == 0x30000)
-	{
-		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment1 |= 0x40000;
-	}
-}
-
-void shuffle_state::pia34_pa_w(u8 data)
-{
-	m_segment2 |= (data<<8);
-	m_segment2 |= 0x10000;
-	if ((m_segment2 & 0x70000) == 0x30000)
-	{
-		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment2 |= 0x40000;
-	}
-}
-
-void shuffle_state::pia34_pb_w(u8 data)
-{
-}
-
 u8 shuffle_state::sound_r()
 {
 	return m_sound_data;
@@ -490,8 +452,6 @@ void shuffle_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_segment1));
-	save_item(NAME(m_segment2));
 	save_item(NAME(m_sound_data));
 }
 
@@ -511,7 +471,7 @@ void shuffle_state::s4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s4_map);
 
 	// Video
-	config.set_default_layout(layout_shuffle);
+	config.set_default_layout(layout_shuffle4);
 
 	// Sound
 	genpin_audio(config);
@@ -570,6 +530,8 @@ void shuffle_state::s9(machine_config &config)
 	s4(config);
 	config.device_remove("pia22");
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s9_map);
+
+	config.set_default_layout(layout_shuffle9);
 
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(shuffle_state::sound_r));
