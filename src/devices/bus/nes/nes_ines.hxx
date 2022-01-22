@@ -436,7 +436,7 @@ static const nes_mmc mmc_list[] =
 	// 398 JY-048 multicart, not in nes.xml?
 	{ 399, BATMAP_000 },           // homebrew game Star Versus
 	// 400 retroUSB (Sealie?) 8-bit XMAS 2017
-	// 401 Super 19-in-1 VIP 19, not in nes.xml?
+	{ 401, BMC_KC885 },
 	// 402 22-in-1 Olympic Games, not in nes.xml?
 	// 403 Tetris Family 19-in-1 that only works on Famiclones with 6502's BCD mode
 	{ 404, BMC_JY012005 },
@@ -445,7 +445,7 @@ static const nes_mmc mmc_list[] =
 	// 407 VT03 PnP
 	// 408 Konami PnP
 	{ 409, SEALIE_DPCMCART },      // A Winner is You homebrew music cart
-	// 410 Unused or JY?
+	{ 410, BMC_JY302 },
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
 	{ 413, BATMAP_SRRX },          // homebrew game Super Russian Roulette

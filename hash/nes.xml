@@ -52727,6 +52727,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_8j207">
+		<description>Heros 8 in 1 (JY-207)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="heros 8-in-1 (jy-207).prg" size="1048576" crc="8ad3f063" sha1="3fc05f0999df1ea2b6dcb50d79fb52403346b802" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="heros 8-in-1 (jy-207).chr" size="1048576" crc="60577fb5" sha1="7d679df5f18d84d456e8ecbe6bd5256ef5a6abce" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7j208">
 		<description>Rockman 7 in 1 (JY-208)</description>
 		<year>199?</year>
@@ -52739,6 +52754,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="rockman 7-in-1 (jy-208).chr" size="524288" crc="9a69e951" sha1="2f5dffbb134025c79011741ebdbf67a7b0490927" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j301">
+		<description>Super 8 in 1 (JY-301)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super 8-in-1 (jy-301).prg" size="1048576" crc="573f2af9" sha1="94801052a82772e98baffa12cd5a44449c172e8e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="super 8-in-1 (jy-301).chr" size="1048576" crc="7b4ea60f" sha1="f26adbcdeecafa9be1ea1da6bfde87beaa3d4e56" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j302">
+		<description>King 8 in 1 (JY-302)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy302" />
+			<dataarea name="prg" size="1048576">
+				<rom name="king 8-in-1 (jy-302).prg" size="1048576" crc="0b030660" sha1="07cb6b564cf8776c5eba0efcb8c786d0ec0acd6a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="king 8-in-1 (jy-302).chr" size="1048576" crc="67bffbc6" sha1="1cf285030a26c7856121b989de207cad8d02227c" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80312,6 +80360,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="chr" size="1048576">
 				<rom name="19-in-1 (k-3088) (810849-c).chr" size="1048576" crc="32b3d63f" sha1="292227a5a98659d3d478fa6425042896cdb60f0c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_19vip">
+		<description>Super 19 in 1 (VIP19)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_kc885" />
+			<feature name="pcb_model" value="KC885" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super 19-in-1 (vip19).prg" size="1048576" crc="c4ebed19" sha1="059f3be8f10660008000e5eee7061498808afb7a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="super 19-in-1 (vip19).chr" size="1048576" crc="86ab5220" sha1="b7a594429dd5fb851ad3c883cf2e901476fcdc27" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
