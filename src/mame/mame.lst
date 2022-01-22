@@ -17217,11 +17217,12 @@ csk227it                        // (c) 198? IGS
 csk234it                        // (c) 198? IGS
 igs_ncs                         // (c) 198? IGS
 igs_ncs2                        // (c) 2000 IGS
+igstet341                       // (c) 199? IGS
+igstet342                       // (c) 199? IGS
 kungfu                          // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
 pktet346                        // (c) 199? IGS
-igstet341                       // (c) 199? IGS
 stellecu                        // (c) 1998
 
 @source:ikki.cpp
