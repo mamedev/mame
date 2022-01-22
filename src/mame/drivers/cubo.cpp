@@ -7,6 +7,13 @@
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use.
 
+   TODO:
+   - remove m_input_hack functions, needed to make inputs working
+   - lsrquiz2i, lsrquizg: access violation on microtouch_device destructor when exiting emulation
+                          Caused by microtouch_device::rcv_complete() overrunning the m_rx_buffer
+						  array space with 149 (array size=16).
+
+
    Known Games:
    Dumped | Title                | Rev.  | Year | Notes
    ----------------------------------------------------
@@ -28,10 +35,6 @@
      YES  | Magic Premium        |    1.1| 1996 |
      YES  | Odeon Twister        |    1.4| 199x |
      YES  | Odeon Twister 2      | 202.19| 1999 |
-
-   ToDo:
-   - remove the hack needed to make inputs working
-
 
 Stephh's notes (based on the game M68EC020 code and some tests) :
 

@@ -380,11 +380,11 @@ uint8_t amiga_state::aga_assemble_even_bitplanes(int planes, int ebitoffs)
 	return pix;
 }
 
-void amiga_state::aga_fetch_bitplane_data(int plane)
+void amiga_state::aga_fetch_bitplane_data(int plane, u8 bitplane_fmode)
 {
 	uint64_t *aga_bpldat = m_aga_bpldat;
 
-	switch (CUSTOM_REG(REG_FMODE) & 0x03)
+	switch (bitplane_fmode)
 	{
 		case 0:
 			aga_bpldat[plane] = (uint64_t)read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
@@ -532,7 +532,10 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// i.e. wbenc30 scrolling in lores mode, sockid_a gameplay
 	// NB: latter now gives specific corrupt bitplanes on arbitrary add due of the delays,
 	// it also draws the status bar slightly offset (doesn't happen on the OCS version of the game)
-	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2); x++)
+	const int offset_hack[] = { 10, 10, 17, 17 };
+	const u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
+	
+	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
 	{
 		int sprpix;
 
@@ -574,7 +577,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			ehb = (CUSTOM_REG(REG_BPLCON0) & 0x7c10) == 0x6000 && !bool(BIT(CUSTOM_REG(REG_BPLCON2), 9));
 
 			/* get default bitoffset */
-			switch(CUSTOM_REG(REG_FMODE) & 0x3)
+			switch(bitplane_fmode)
 			{
 				case 0: defbitoffs = 15; break;
 				case 1:
@@ -659,7 +662,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				{
 					for (pl = 0; pl < planes; pl += 2)
 					{
-						aga_fetch_bitplane_data(pl);
+						aga_fetch_bitplane_data(pl, bitplane_fmode);
 					}
 				}
 
@@ -677,7 +680,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 						for (pl = 0; pl < planes; pl += 2)
 						{
-							aga_fetch_bitplane_data(pl);
+							aga_fetch_bitplane_data(pl, bitplane_fmode);
 						}
 					}
 
@@ -700,7 +703,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				{
 					for (pl = 1; pl < planes; pl += 2)
 					{
-						aga_fetch_bitplane_data(pl);
+						aga_fetch_bitplane_data(pl, bitplane_fmode);
 					}
 				}
 
@@ -718,7 +721,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 						for (pl = 1; pl < planes; pl += 2)
 						{
-							aga_fetch_bitplane_data(pl);
+							aga_fetch_bitplane_data(pl, bitplane_fmode);
 						}
 					}
 

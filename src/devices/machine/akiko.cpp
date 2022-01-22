@@ -11,6 +11,11 @@
     - Chunky to planar converter
     - 2x CIA chips
 
+	TODO:
+    - Reportedly the CD drive should be a Sony KSM-2101BAM,
+	  schematics shows Akiko connected to a laconic "26-pin CD connector"
+	- NVRAM needs inheriting from i2c_24c08_device;
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -56,33 +61,33 @@ void akiko_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AKIKO, tag, owner, clock),
-	m_c2p_input_index(0),
-	m_c2p_output_index(0),
-	m_i2c_scl_out(0),
-	m_i2c_scl_dir(0),
-	m_i2c_sda_out(0),
-	m_i2c_sda_dir(0),
-	m_cdrom_track_index(0),
-	m_cdrom_lba_start(0),
-	m_cdrom_lba_end(0),
-	m_cdrom_lba_cur(0),
-	m_cdrom_readmask(0),
-	m_cdrom_readreqmask(0),
-	m_cdrom_dmacontrol(0),
-	m_cdrom_numtracks(0),
-	m_cdrom_speed(0),
-	m_cdrom_cmd_start(0),
-	m_cdrom_cmd_end(0),
-	m_cdrom_cmd_resp(0),
-	m_cdda(*this, "^cdda"),
-	m_cddevice(*this, "^cdrom"),
-	m_cdrom(nullptr),
-	m_cdrom_toc(nullptr),
-	m_dma_timer(nullptr),
-	m_frame_timer(nullptr),
-	m_mem_r(*this), m_mem_w(*this), m_int_w(*this),
-	m_scl_w(*this), m_sda_r(*this), m_sda_w(*this)
+	: device_t(mconfig, AKIKO, tag, owner, clock)
+	, m_c2p_input_index(0)
+	, m_c2p_output_index(0)
+	, m_i2c_scl_out(0)
+	, m_i2c_scl_dir(0)
+	, m_i2c_sda_out(0)
+	, m_i2c_sda_dir(0)
+	, m_cdrom_track_index(0)
+	, m_cdrom_lba_start(0)
+	, m_cdrom_lba_end(0)
+	, m_cdrom_lba_cur(0)
+	, m_cdrom_readmask(0)
+	, m_cdrom_readreqmask(0)
+	, m_cdrom_dmacontrol(0)
+	, m_cdrom_numtracks(0)
+	, m_cdrom_speed(0)
+	, m_cdrom_cmd_start(0)
+	, m_cdrom_cmd_end(0)
+	, m_cdrom_cmd_resp(0)
+	, m_cdda(*this, "^cdda")
+	, m_cddevice(*this, "^cdrom")
+	, m_cdrom(nullptr)
+	, m_cdrom_toc(nullptr)
+	, m_dma_timer(nullptr)
+	, m_frame_timer(nullptr)
+	, m_mem_r(*this), m_mem_w(*this), m_int_w(*this)
+	, m_scl_w(*this), m_sda_r(*this), m_sda_w(*this)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -669,8 +674,8 @@ void akiko_device::update_cdrom()
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					LOGCD("AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", startpos, endpos );
 					m_cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
+					LOGCD("AKIKO CD: Data read - start lba: %08x - end lba: %08x - divider speed: %d\n", startpos, endpos, m_cdrom_speed );
 					m_cdrom_lba_start = startpos;
 					m_cdrom_lba_end = endpos;
 
