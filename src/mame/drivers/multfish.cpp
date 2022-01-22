@@ -2015,6 +2015,142 @@ ROM_START( fcockt_14 ) // 090708 entertainment
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1786cfef) SHA1(4dd988d07951cd3152e122ca2ca151b5c8f771a0) )
 ROM_END
 
+ROM_START( fcockt_15 ) // 100324 entertainment x
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_x_100324.rom", 0x00000, 0x40000, CRC(67339778) SHA1(14acc02a4cae02b3c7ff758a417369b835562118) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_m.001", 0x000000, 0x80000, CRC(073ddc1e) SHA1(ac5d69dfd72e9a838b5646b305554e1f0e682744) )
+	ROM_LOAD( "fruitcocktail_ent_m.002", 0x100000, 0x80000, CRC(c41561a0) SHA1(5fba75b9ea6fdd515998cb72fb952f14bdcad81c) )
+	ROM_LOAD( "fruitcocktail_ent_m.003", 0x200000, 0x80000, CRC(842b341e) SHA1(7a5c9af4d5068dd715906630ce1235b177c24706) )
+	ROM_LOAD( "fruitcocktail_ent_m.004", 0x300000, 0x80000, CRC(4b32e560) SHA1(4733219003a3db18ceb663bef1eaeb937e93994b) )
+	ROM_LOAD( "fruitcocktail_ent_m.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_m.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_m.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_m.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_16 ) // 100331 entertainment x
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_x_100331.rom", 0x00000, 0x40000, CRC(103e5152) SHA1(32a0cdf96e0aadff4efcda8bb6db808b0fe8284e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_m.001", 0x000000, 0x80000, CRC(073ddc1e) SHA1(ac5d69dfd72e9a838b5646b305554e1f0e682744) )
+	ROM_LOAD( "fruitcocktail_ent_m.002", 0x100000, 0x80000, CRC(c41561a0) SHA1(5fba75b9ea6fdd515998cb72fb952f14bdcad81c) )
+	ROM_LOAD( "fruitcocktail_ent_m.003", 0x200000, 0x80000, CRC(842b341e) SHA1(7a5c9af4d5068dd715906630ce1235b177c24706) )
+	ROM_LOAD( "fruitcocktail_ent_m.004", 0x300000, 0x80000, CRC(4b32e560) SHA1(4733219003a3db18ceb663bef1eaeb937e93994b) )
+	ROM_LOAD( "fruitcocktail_ent_m.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_m.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_m.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_m.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_17 ) // 101208 entertainment n
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_n_101208.rom", 0x00000, 0x40000, CRC(35bde1c1) SHA1(b063d30b819e0dc739b77df4ff0c0e264c943699) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_n.001", 0x000000, 0x80000, CRC(79ba9e10) SHA1(baaf56d0cb01a121dda38c4634276d89222659f8) )
+	ROM_LOAD( "fruitcocktail_ent_n.002", 0x100000, 0x80000, CRC(a24c19a1) SHA1(7372fae8c109db2d72f7379af2c40266fa0a93a6) )
+	ROM_LOAD( "fruitcocktail_ent_n.003", 0x200000, 0x80000, CRC(aa621b0a) SHA1(d03a19ee0c0497d7a36317a61f4f7aaf440e7311) )
+	ROM_LOAD( "fruitcocktail_ent_n.004", 0x300000, 0x80000, CRC(8f5b9e15) SHA1(b03717a74b3426a9c0035a3477ce2c1d1d0eb71e) )
+	ROM_LOAD( "fruitcocktail_ent_n.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_n.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_n.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_n.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_18 ) // 110111 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_a_110111.rom", 0x00000, 0x40000, CRC(017cb2db) SHA1(ea63d3678f7d08175edacb67c69efd1f35e23b4f) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_a.001", 0x000000, 0x80000, CRC(2720c202) SHA1(5f49069fbb10f37ecc6a5eae9647e5aa6189dcce) )
+	ROM_LOAD( "fruitcocktail_ent_a.002", 0x100000, 0x80000, CRC(b45a612e) SHA1(47f47b1c5276d933601c49c2dd6c75afbb0ea8ee) )
+	ROM_LOAD( "fruitcocktail_ent_a.003", 0x200000, 0x80000, CRC(328f79b8) SHA1(a6f7913542ba075972ac945d16a90fcba91f2c5d) )
+	ROM_LOAD( "fruitcocktail_ent_a.004", 0x300000, 0x80000, CRC(226f0281) SHA1(64a05e0c090e30692ad2b516e592e8ba9fedf767) )
+	ROM_LOAD( "fruitcocktail_ent_a.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_a.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_a.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_a.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_19 ) // 110124 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_a_110124.rom", 0x00000, 0x40000, CRC(4b85a5fa) SHA1(9749e2732848820f314a1fc12d0e3ba053925d33) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_a.001", 0x000000, 0x80000, CRC(2720c202) SHA1(5f49069fbb10f37ecc6a5eae9647e5aa6189dcce) )
+	ROM_LOAD( "fruitcocktail_ent_a.002", 0x100000, 0x80000, CRC(b45a612e) SHA1(47f47b1c5276d933601c49c2dd6c75afbb0ea8ee) )
+	ROM_LOAD( "fruitcocktail_ent_a.003", 0x200000, 0x80000, CRC(328f79b8) SHA1(a6f7913542ba075972ac945d16a90fcba91f2c5d) )
+	ROM_LOAD( "fruitcocktail_ent_a.004", 0x300000, 0x80000, CRC(226f0281) SHA1(64a05e0c090e30692ad2b516e592e8ba9fedf767) )
+	ROM_LOAD( "fruitcocktail_ent_a.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_a.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_a.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_a.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_20 ) // 110204 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_a_110204.rom", 0x00000, 0x40000, CRC(ea6dcee2) SHA1(b1fb2a4e099265d5e69c42857ea25809fdb031bd) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_a.001", 0x000000, 0x80000, CRC(2720c202) SHA1(5f49069fbb10f37ecc6a5eae9647e5aa6189dcce) )
+	ROM_LOAD( "fruitcocktail_ent_a.002", 0x100000, 0x80000, CRC(b45a612e) SHA1(47f47b1c5276d933601c49c2dd6c75afbb0ea8ee) )
+	ROM_LOAD( "fruitcocktail_ent_a.003", 0x200000, 0x80000, CRC(328f79b8) SHA1(a6f7913542ba075972ac945d16a90fcba91f2c5d) )
+	ROM_LOAD( "fruitcocktail_ent_a.004", 0x300000, 0x80000, CRC(226f0281) SHA1(64a05e0c090e30692ad2b516e592e8ba9fedf767) )
+	ROM_LOAD( "fruitcocktail_ent_a.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_a.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_a.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_a.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_21 ) // 110311 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_b_110311.rom", 0x00000, 0x40000, CRC(7e51fab3) SHA1(4fbd8d2c81de0443c6bdf407c64804dd209ab680) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_b.001", 0x000000, 0x80000, CRC(5844373e) SHA1(7a5dd82413046225e0f860bea4ea03205923c638) )
+	ROM_LOAD( "fruitcocktail_ent_b.002", 0x100000, 0x80000, CRC(1809f79e) SHA1(42a5e97ea18f9eb82e8c7aa8159db171213830ec) )
+	ROM_LOAD( "fruitcocktail_ent_b.003", 0x200000, 0x80000, CRC(02d7ca19) SHA1(7e3015581ba29adcc37c3c72ed5f54ab28a80910) )
+	ROM_LOAD( "fruitcocktail_ent_b.004", 0x300000, 0x80000, CRC(33463c63) SHA1(5e263a7499f0a914d5f8031b809f83317052e8dd) )
+	ROM_LOAD( "fruitcocktail_ent_b.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_b.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_b.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_b.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( fcockt_22 ) // 140526 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_b_140526.rom", 0x00000, 0x40000, CRC(653a9318) SHA1(d6e3eca090583e215150891f96c58305b30ef5f2) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_ent_ba.001", 0x000000, 0x80000, CRC(7d07a48b) SHA1(e5a6dd96fae59599cb9f728796c94368734a2c1a) )
+	ROM_LOAD( "fruitcocktail_ent_ba.002", 0x100000, 0x80000, CRC(de35d3db) SHA1(d5db6f781701f4798c54d4612801383d8d7b283b) )
+	ROM_LOAD( "fruitcocktail_ent_ba.003", 0x200000, 0x80000, CRC(bb3db516) SHA1(9a7d4ea09ba1a108ea08bcdde3bf58239577cd3b) )
+	ROM_LOAD( "fruitcocktail_ent_ba.004", 0x300000, 0x80000, CRC(68d99ba7) SHA1(a1ddc90d79cf1d725ae559f4bec08bd4e2650aa2) )
+	ROM_LOAD( "fruitcocktail_ent_b.005", 0x080000, 0x80000, CRC(b5c40862) SHA1(1a0890f9a3169ddf54fd702061c73bed84bc97b3) )
+	ROM_LOAD( "fruitcocktail_ent_b.006", 0x180000, 0x80000, CRC(0e46b961) SHA1(a4b30aed5f0ed0dc6fb0d56c028cf501b4b4fd38) )
+	ROM_LOAD( "fruitcocktail_ent_b.007", 0x280000, 0x80000, CRC(b189854b) SHA1(b1f53c6d48b7944bdbbbe06dc2ffd739635d2acb) )
+	ROM_LOAD( "fruitcocktail_ent_b.008", 0x380000, 0x80000, CRC(f4395057) SHA1(c60b270b485fe9710155a875ed58dd0b3a6df056) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+ROM_END
+
 
 /*********************************************************
    Lucky Haunter
@@ -2185,24 +2321,108 @@ ROM_START( lhaunt_10 ) // 090712 entertainment
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(55a909f7) SHA1(5375b656bc4490521f25005350fa6a97d753c2ff) )
 ROM_END
 
-ROM_START( lhaunt_11 ) // 100331 entertainment
+ROM_START( lhaunt_11 ) // 100331 entertainment x
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh_x_100331.rom", 0x00000, 0x40000, CRC(992c4f25) SHA1(23618fb387e24fae26c7cd184bc61be61c11ad62) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "luckyhaunter_ent.001", 0x000000, 0x80000, CRC(f4d3eb09) SHA1(ac6796250a60cf926087671e9fac3980a136d86e) )
-	ROM_LOAD( "luckyhaunter_ent.002", 0x100000, 0x80000, CRC(a2a88abc) SHA1(d417ab939faab373fc50abec5dc6edc160f0fdfb) )
-	ROM_LOAD( "luckyhaunter_ent.003", 0x200000, 0x80000, CRC(7a567d2b) SHA1(61892fe1e93c6bae4c9cd2840dc3c2f71b3cb97d) )
-	ROM_LOAD( "luckyhaunter_ent.004", 0x300000, 0x80000, CRC(bf8fbcdb) SHA1(6045d6f8331d405f9d43d51915253f426529b77b) )
-	ROM_LOAD( "luckyhaunter_ent.005", 0x080000, 0x80000, CRC(eed42a52) SHA1(4a503c3ac7ffd0cd22efc24bb5a830147ce6cee4) )
-	ROM_LOAD( "luckyhaunter_ent.006", 0x180000, 0x80000, CRC(afb10953) SHA1(33937879f5b2e80d178bff12866f70c7bc339088) )
-	ROM_LOAD( "luckyhaunter_ent.007", 0x280000, 0x80000, CRC(132d82c3) SHA1(519f6ee58ba7469aebc69628e694c81f19558522) )
-	ROM_LOAD( "luckyhaunter_ent.008", 0x380000, 0x80000, CRC(32de0c1b) SHA1(1f665bc9f198ddeb2fd16bfe66a111ce21107c59) )
+	ROM_LOAD( "luckyhaunter_ent_m.001", 0x000000, 0x80000, CRC(f4d3eb09) SHA1(ac6796250a60cf926087671e9fac3980a136d86e) )
+	ROM_LOAD( "luckyhaunter_ent_m.002", 0x100000, 0x80000, CRC(a2a88abc) SHA1(d417ab939faab373fc50abec5dc6edc160f0fdfb) )
+	ROM_LOAD( "luckyhaunter_ent_m.003", 0x200000, 0x80000, CRC(7a567d2b) SHA1(61892fe1e93c6bae4c9cd2840dc3c2f71b3cb97d) )
+	ROM_LOAD( "luckyhaunter_ent_m.004", 0x300000, 0x80000, CRC(bf8fbcdb) SHA1(6045d6f8331d405f9d43d51915253f426529b77b) )
+	ROM_LOAD( "luckyhaunter_ent_m.005", 0x080000, 0x80000, CRC(eed42a52) SHA1(4a503c3ac7ffd0cd22efc24bb5a830147ce6cee4) )
+	ROM_LOAD( "luckyhaunter_ent_m.006", 0x180000, 0x80000, CRC(afb10953) SHA1(33937879f5b2e80d178bff12866f70c7bc339088) )
+	ROM_LOAD( "luckyhaunter_ent_m.007", 0x280000, 0x80000, CRC(132d82c3) SHA1(519f6ee58ba7469aebc69628e694c81f19558522) )
+	ROM_LOAD( "luckyhaunter_ent_m.008", 0x380000, 0x80000, CRC(32de0c1b) SHA1(1f665bc9f198ddeb2fd16bfe66a111ce21107c59) )
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(894c960f) SHA1(44a0ee853475fdac5a4bd49ca4ab3e5ff7c24efc) )
 ROM_END
 
+ROM_START( lhaunt_12 ) // 101209 entertainment n
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_n_101209.rom", 0x00000, 0x40000, CRC(cc47fef7) SHA1(6df04c60ec1557bd67958769b1ba59e6a9688557) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_ent_n.001", 0x000000, 0x80000, CRC(665576f2) SHA1(92a2b77a1b5b8f5e97fe36ba85a8f23f9a8b0c1b) )
+	ROM_LOAD( "luckyhaunter_ent_n.002", 0x100000, 0x80000, CRC(e6a3e3ce) SHA1(e56652673217100e870286fc486b94e23a4719d5) )
+	ROM_LOAD( "luckyhaunter_ent_n.003", 0x200000, 0x80000, CRC(757c3c9e) SHA1(c6436698386ab9d12592c76691c038920fadfbf5) )
+	ROM_LOAD( "luckyhaunter_ent_n.004", 0x300000, 0x80000, CRC(a04d6061) SHA1(04bb8e01904be0e6404ac21c8a916b61bc03819d) )
+	ROM_LOAD( "luckyhaunter_ent_n.005", 0x080000, 0x80000, CRC(eed42a52) SHA1(4a503c3ac7ffd0cd22efc24bb5a830147ce6cee4) )
+	ROM_LOAD( "luckyhaunter_ent_n.006", 0x180000, 0x80000, CRC(afb10953) SHA1(33937879f5b2e80d178bff12866f70c7bc339088) )
+	ROM_LOAD( "luckyhaunter_ent_n.007", 0x280000, 0x80000, CRC(132d82c3) SHA1(519f6ee58ba7469aebc69628e694c81f19558522) )
+	ROM_LOAD( "luckyhaunter_ent_n.008", 0x380000, 0x80000, CRC(32de0c1b) SHA1(1f665bc9f198ddeb2fd16bfe66a111ce21107c59) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( lhaunt_13 ) // 110111 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_a_110111.rom", 0x00000, 0x40000, CRC(e23f220b) SHA1(a7943fbe2976150b9f7baf1755d26921cb3e750c) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_ent_a.001", 0x000000, 0x80000, CRC(338603e5) SHA1(0f6d23ca89ed43b79d9f71908c3f06e206597438) )
+	ROM_LOAD( "luckyhaunter_ent_a.002", 0x100000, 0x80000, CRC(95d8684f) SHA1(00e17d59c939e8ff1a728229720d451aad5be22d) )
+	ROM_LOAD( "luckyhaunter_ent_a.003", 0x200000, 0x80000, CRC(7d99b592) SHA1(6257bafa41930821b6fba8691860440f39c38043) )
+	ROM_LOAD( "luckyhaunter_ent_a.004", 0x300000, 0x80000, CRC(c81dd75c) SHA1(5924efabfc00edffdf14e3eaf73e39317d913118) )
+	ROM_LOAD( "luckyhaunter_ent_a.005", 0x080000, 0x80000, CRC(eed42a52) SHA1(4a503c3ac7ffd0cd22efc24bb5a830147ce6cee4) )
+	ROM_LOAD( "luckyhaunter_ent_a.006", 0x180000, 0x80000, CRC(afb10953) SHA1(33937879f5b2e80d178bff12866f70c7bc339088) )
+	ROM_LOAD( "luckyhaunter_ent_a.007", 0x280000, 0x80000, CRC(132d82c3) SHA1(519f6ee58ba7469aebc69628e694c81f19558522) )
+	ROM_LOAD( "luckyhaunter_ent_a.008", 0x380000, 0x80000, CRC(32de0c1b) SHA1(1f665bc9f198ddeb2fd16bfe66a111ce21107c59) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( lhaunt_14 ) // 110204 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_a_110204.rom", 0x00000, 0x40000, CRC(7972eadd) SHA1(35d6a30717386b8c65e46c32f06908bd22edb7c1) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_ent_a.001", 0x000000, 0x80000, CRC(338603e5) SHA1(0f6d23ca89ed43b79d9f71908c3f06e206597438) )
+	ROM_LOAD( "luckyhaunter_ent_a.002", 0x100000, 0x80000, CRC(95d8684f) SHA1(00e17d59c939e8ff1a728229720d451aad5be22d) )
+	ROM_LOAD( "luckyhaunter_ent_a.003", 0x200000, 0x80000, CRC(7d99b592) SHA1(6257bafa41930821b6fba8691860440f39c38043) )
+	ROM_LOAD( "luckyhaunter_ent_a.004", 0x300000, 0x80000, CRC(c81dd75c) SHA1(5924efabfc00edffdf14e3eaf73e39317d913118) )
+	ROM_LOAD( "luckyhaunter_ent_a.005", 0x080000, 0x80000, CRC(eed42a52) SHA1(4a503c3ac7ffd0cd22efc24bb5a830147ce6cee4) )
+	ROM_LOAD( "luckyhaunter_ent_a.006", 0x180000, 0x80000, CRC(afb10953) SHA1(33937879f5b2e80d178bff12866f70c7bc339088) )
+	ROM_LOAD( "luckyhaunter_ent_a.007", 0x280000, 0x80000, CRC(132d82c3) SHA1(519f6ee58ba7469aebc69628e694c81f19558522) )
+	ROM_LOAD( "luckyhaunter_ent_a.008", 0x380000, 0x80000, CRC(32de0c1b) SHA1(1f665bc9f198ddeb2fd16bfe66a111ce21107c59) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( lhaunt_15 ) // 110311 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_b_110311.rom", 0x00000, 0x40000, CRC(9d4b46c2) SHA1(f4cde40e7e70ab0e61f45c69a8911ec6948c04d3) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_ent_b.001", 0x000000, 0x80000, CRC(3a3eac81) SHA1(c75b75967fd336f8c9e284d376acbda49ecbd504) )
+	ROM_LOAD( "luckyhaunter_ent_b.002", 0x100000, 0x80000, CRC(574ec17f) SHA1(814e8104d93b06757cd9c7b04290e59bd96c3786) )
+	ROM_LOAD( "luckyhaunter_ent_b.003", 0x200000, 0x80000, CRC(a257b4c7) SHA1(6ed2eedfbc08331bdda11e32c1d44f70abded378) )
+	ROM_LOAD( "luckyhaunter_ent_b.004", 0x300000, 0x80000, CRC(ac3d001e) SHA1(ae73a2eab1bf884a78044079827019a044635026) )
+	ROM_LOAD( "luckyhaunter_ent_b.005", 0x080000, 0x80000, CRC(ef0e4d16) SHA1(4bc00897be7e244c0e4d07201cea4d630891cfa4) )
+	ROM_LOAD( "luckyhaunter_ent_b.006", 0x180000, 0x80000, CRC(15d3d8ff) SHA1(a79a931bbb40e8fec727d14683af0a38f6142414) )
+	ROM_LOAD( "luckyhaunter_ent_b.007", 0x280000, 0x80000, CRC(3ca1e539) SHA1(a1223cc63d67e87741ad25abdd41ba85d8f19e6c) )
+	ROM_LOAD( "luckyhaunter_ent_b.008", 0x380000, 0x80000, CRC(36ad4ee8) SHA1(8a9c4c30c697e32ed9b7c7f37e969c933592b07d) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( lhaunt_16 ) // 140526 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_b_140526.rom", 0x00000, 0x40000, CRC(61d0cafa) SHA1(731ccfa21cfd24fa42652f9a51fef8b4edf6caae) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_ent_ba.001", 0x000000, 0x80000, CRC(49b5713c) SHA1(f91bf7f5ec67631637bef43599ad32b6f18d8051) )
+	ROM_LOAD( "luckyhaunter_ent_ba.002", 0x100000, 0x80000, CRC(dc65ebb9) SHA1(60a8d3bc20b8edb70a3c3fabd16bb612459e54cd) )
+	ROM_LOAD( "luckyhaunter_ent_ba.003", 0x200000, 0x80000, CRC(1731bca5) SHA1(dcef50ea9157666fd49f6b4e5001845945e6af87) )
+	ROM_LOAD( "luckyhaunter_ent_ba.004", 0x300000, 0x80000, CRC(9491dba0) SHA1(6405a6db8d7bd15e7b8b8d0aa833732949ae00e5) )
+	ROM_LOAD( "luckyhaunter_ent_b.005",  0x080000, 0x80000, CRC(ef0e4d16) SHA1(4bc00897be7e244c0e4d07201cea4d630891cfa4) )
+	ROM_LOAD( "luckyhaunter_ent_b.006",  0x180000, 0x80000, CRC(15d3d8ff) SHA1(a79a931bbb40e8fec727d14683af0a38f6142414) )
+	ROM_LOAD( "luckyhaunter_ent_b.007",  0x280000, 0x80000, CRC(3ca1e539) SHA1(a1223cc63d67e87741ad25abdd41ba85d8f19e6c) )
+	ROM_LOAD( "luckyhaunter_ent_b.008",  0x380000, 0x80000, CRC(36ad4ee8) SHA1(8a9c4c30c697e32ed9b7c7f37e969c933592b07d) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
 
 /*********************************************************
    Garage
@@ -2354,6 +2574,142 @@ ROM_START( garage_9 ) // 090715 entertainment
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(ea8cd62a) SHA1(20214f080d85131102af9b5dae49fadcc8953b98) )
 ROM_END
 
+ROM_START( garage_10 ) // 100331 entertainment x
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_x_100331.rom", 0x00000, 0x40000, CRC(a56c8c78) SHA1(28a936bb49614e7f1a2be6915faed2ecc634d6b2) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_m.001", 0x000000, 0x80000, CRC(404ead88) SHA1(1d26e2dfecccaf78c8f9e806247466658c0ed6d3) )
+	ROM_LOAD( "garage_ent_m.002", 0x100000, 0x80000, CRC(4ae121dc) SHA1(fc82f96dc78aaad661281e0c76136c32c7196947) )
+	ROM_LOAD( "garage_ent_m.003", 0x200000, 0x80000, CRC(1ad2937e) SHA1(ea9ee5b00fea865fcd7cf4a6a6358e3fc46817e5) )
+	ROM_LOAD( "garage_ent_m.004", 0x300000, 0x80000, CRC(4fa49be7) SHA1(21c16f2b877c654e4cd3725dec563da5be1de1f1) )
+	ROM_LOAD( "garage_ent_m.005", 0x080000, 0x80000, CRC(6319c143) SHA1(2d81e69a988a5efcb45858a84fc3282e27e064ce) )
+	ROM_LOAD( "garage_ent_m.006", 0x180000, 0x80000, CRC(dd80e37a) SHA1(741e4e4fb6a45c4ae878afc7ad0a084cd89cabfb) )
+	ROM_LOAD( "garage_ent_m.007", 0x280000, 0x80000, CRC(7013ba19) SHA1(f986fc0251968b91c548993373737abac2a3a603) )
+	ROM_LOAD( "garage_ent_m.008", 0x380000, 0x80000, CRC(95c22280) SHA1(88dd37733aeedd29dd6472cc4c32aaaa8882f080) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_11 ) // 101208 entertainment n
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_n_101208.rom", 0x00000, 0x40000, CRC(93b7f9a6) SHA1(30f9d2f877c495e1eb7088426f92e5f8ef8d5d19) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_n.001", 0x000000, 0x80000, CRC(329ab791) SHA1(0954e92398b4ef05aa34f8cbebe4fbd2a59d90c5) )
+	ROM_LOAD( "garage_ent_n.002", 0x100000, 0x80000, CRC(472f3993) SHA1(42dbdb73ad6e1feda0f9197492b22f57de56464c) )
+	ROM_LOAD( "garage_ent_n.003", 0x200000, 0x80000, CRC(b038bfc1) SHA1(4257391d8282b828d710d37ea35faff4bdb2293c) )
+	ROM_LOAD( "garage_ent_n.004", 0x300000, 0x80000, CRC(298652dd) SHA1(b4e0a1e2c916bab798f5fac905ea039ced855226) )
+	ROM_LOAD( "garage_ent_n.005", 0x080000, 0x80000, CRC(d417970b) SHA1(8b731e5b0a3d2b5266e25774099ef6daf22d9cf5) )
+	ROM_LOAD( "garage_ent_n.006", 0x180000, 0x80000, CRC(3492d71b) SHA1(5c877594efcbbe6a0f5b4a57e82c474674df5da4) )
+	ROM_LOAD( "garage_ent_n.007", 0x280000, 0x80000, CRC(9c4d9491) SHA1(c31b38e4190a662090868cb45193a65dcff01144) )
+	ROM_LOAD( "garage_ent_n.008", 0x380000, 0x80000, CRC(bca327eb) SHA1(697d95830346d0030637ac16ab437cdfbd132ee2) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_12 ) // 110111 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_a_110111.rom", 0x00000, 0x40000, CRC(8d82b114) SHA1(4041a389cdfe28337e2eff3f1f2aeb305a475a71) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_a.001", 0x000000, 0x80000, CRC(329ab791) SHA1(0954e92398b4ef05aa34f8cbebe4fbd2a59d90c5) )
+	ROM_LOAD( "garage_ent_a.002", 0x100000, 0x80000, CRC(472f3993) SHA1(42dbdb73ad6e1feda0f9197492b22f57de56464c) )
+	ROM_LOAD( "garage_ent_a.003", 0x200000, 0x80000, CRC(b038bfc1) SHA1(4257391d8282b828d710d37ea35faff4bdb2293c) )
+	ROM_LOAD( "garage_ent_a.004", 0x300000, 0x80000, CRC(298652dd) SHA1(b4e0a1e2c916bab798f5fac905ea039ced855226) )
+	ROM_LOAD( "garage_ent_a.005", 0x080000, 0x80000, CRC(006ba89e) SHA1(d13c250422be6c783342fe3981d7370d38875904) )
+	ROM_LOAD( "garage_ent_a.006", 0x180000, 0x80000, CRC(e883c26b) SHA1(dcc581f3a173e62fa5ab6dd8acf3f1e0d1850a81) )
+	ROM_LOAD( "garage_ent_a.007", 0x280000, 0x80000, CRC(f81e80cf) SHA1(7c9e890cde55051d1f966ddb0295e7bf9a0f75d9) )
+	ROM_LOAD( "garage_ent_a.008", 0x380000, 0x80000, CRC(4a4b23b8) SHA1(b72fde9c0b4cf2e1f88a47c3fab44fba532ce733) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_13 ) // 110124 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_a_110124.rom", 0x00000, 0x40000, CRC(34557d94) SHA1(39d9b957f3252f3d9b9122c4d8c89ba99d6807ae) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_a.001", 0x000000, 0x80000, CRC(329ab791) SHA1(0954e92398b4ef05aa34f8cbebe4fbd2a59d90c5) )
+	ROM_LOAD( "garage_ent_a.002", 0x100000, 0x80000, CRC(472f3993) SHA1(42dbdb73ad6e1feda0f9197492b22f57de56464c) )
+	ROM_LOAD( "garage_ent_a.003", 0x200000, 0x80000, CRC(b038bfc1) SHA1(4257391d8282b828d710d37ea35faff4bdb2293c) )
+	ROM_LOAD( "garage_ent_a.004", 0x300000, 0x80000, CRC(298652dd) SHA1(b4e0a1e2c916bab798f5fac905ea039ced855226) )
+	ROM_LOAD( "garage_ent_a.005", 0x080000, 0x80000, CRC(006ba89e) SHA1(d13c250422be6c783342fe3981d7370d38875904) )
+	ROM_LOAD( "garage_ent_a.006", 0x180000, 0x80000, CRC(e883c26b) SHA1(dcc581f3a173e62fa5ab6dd8acf3f1e0d1850a81) )
+	ROM_LOAD( "garage_ent_a.007", 0x280000, 0x80000, CRC(f81e80cf) SHA1(7c9e890cde55051d1f966ddb0295e7bf9a0f75d9) )
+	ROM_LOAD( "garage_ent_a.008", 0x380000, 0x80000, CRC(4a4b23b8) SHA1(b72fde9c0b4cf2e1f88a47c3fab44fba532ce733) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_14 ) // 110204 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_a_110204.rom", 0x00000, 0x40000, CRC(1edab477) SHA1(0d83aee859b78703c444f8bb4a8f5ef592d11db0) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_a.001", 0x000000, 0x80000, CRC(329ab791) SHA1(0954e92398b4ef05aa34f8cbebe4fbd2a59d90c5) )
+	ROM_LOAD( "garage_ent_a.002", 0x100000, 0x80000, CRC(472f3993) SHA1(42dbdb73ad6e1feda0f9197492b22f57de56464c) )
+	ROM_LOAD( "garage_ent_a.003", 0x200000, 0x80000, CRC(b038bfc1) SHA1(4257391d8282b828d710d37ea35faff4bdb2293c) )
+	ROM_LOAD( "garage_ent_a.004", 0x300000, 0x80000, CRC(298652dd) SHA1(b4e0a1e2c916bab798f5fac905ea039ced855226) )
+	ROM_LOAD( "garage_ent_a.005", 0x080000, 0x80000, CRC(006ba89e) SHA1(d13c250422be6c783342fe3981d7370d38875904) )
+	ROM_LOAD( "garage_ent_a.006", 0x180000, 0x80000, CRC(e883c26b) SHA1(dcc581f3a173e62fa5ab6dd8acf3f1e0d1850a81) )
+	ROM_LOAD( "garage_ent_a.007", 0x280000, 0x80000, CRC(f81e80cf) SHA1(7c9e890cde55051d1f966ddb0295e7bf9a0f75d9) )
+	ROM_LOAD( "garage_ent_a.008", 0x380000, 0x80000, CRC(4a4b23b8) SHA1(b72fde9c0b4cf2e1f88a47c3fab44fba532ce733) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_15 ) // 110311 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_b_110311.rom", 0x00000, 0x40000, CRC(fe1cc720) SHA1(452a0ee4947708bd6c6c342d7031c79ea643a35b) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_b.001", 0x000000, 0x80000, CRC(fddb4657) SHA1(ac0779c35aefb980ac1c467a8400dc01f5ba0014) )
+	ROM_LOAD( "garage_ent_b.002", 0x100000, 0x80000, CRC(9c7215aa) SHA1(7b525ba0927cd980d8f7642678431a231ebbe688) )
+	ROM_LOAD( "garage_ent_b.003", 0x200000, 0x80000, CRC(9735c682) SHA1(5050cb1e6d9c38a68e9889e19391a24f02fecf34) )
+	ROM_LOAD( "garage_ent_b.004", 0x300000, 0x80000, CRC(b98138bf) SHA1(3b440f3691800cb469c3d61c0c933456ba4136b1) )
+	ROM_LOAD( "garage_ent_b.005", 0x080000, 0x80000, CRC(410d5cf8) SHA1(ef85dafcb2a963578a5c78794fccb4ffab862fb7) )
+	ROM_LOAD( "garage_ent_b.006", 0x180000, 0x80000, CRC(c6709a66) SHA1(c1492e74e9aa89056d5e6a34f52b92b8380ba325) )
+	ROM_LOAD( "garage_ent_b.007", 0x280000, 0x80000, CRC(9b432f99) SHA1(53ba0cf5fa6b68ccc67d5132b7930746f0712d83) )
+	ROM_LOAD( "garage_ent_b.008", 0x380000, 0x80000, CRC(d2b8c5c9) SHA1(e3589d64f16740dd7f353922f872b17668d0e29a) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_16 ) // 140526 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_b_140526.rom", 0x00000, 0x40000, CRC(7bea27a5) SHA1(2e62dd9eb6d286b029af76c74be56b0e2324586a) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_ba.001", 0x000000, 0x80000, CRC(d9636242) SHA1(bd07a43551ef1814a5f7310dc2d09bda1a3e42a2) )
+	ROM_LOAD( "garage_ent_ba.002", 0x100000, 0x80000, CRC(d73e2b42) SHA1(71e986edc3886fde96f115d81e6c2cd592ddb8a7) )
+	ROM_LOAD( "garage_ent_ba.003", 0x200000, 0x80000, CRC(5ceb0acc) SHA1(cdf2382829303b5c8967b637c9a6db8fff190af0) )
+	ROM_LOAD( "garage_ent_ba.004", 0x300000, 0x80000, CRC(7947bc6e) SHA1(1861b4a80f3bc6b5f63452a9dda4b8f8537556cb) )
+	ROM_LOAD( "garage_ent_ba.005", 0x080000, 0x80000, CRC(b453fdda) SHA1(1cf080f75f2e1fa875e28826a5486cee56ec6409) )
+	ROM_LOAD( "garage_ent_ba.006", 0x180000, 0x80000, CRC(c87c1cbd) SHA1(e8788e1b7a029c07b03cef6f6d59c0794b57cc73) )
+	ROM_LOAD( "garage_ent_ba.007", 0x280000, 0x80000, CRC(a4cccd57) SHA1(2d5ee17fa0b898a119a543d63efa0977d904f38d) )
+	ROM_LOAD( "garage_ent_ba.008", 0x380000, 0x80000, CRC(072c0fec) SHA1(ad29777aac3f8bbd3fe036547873953fa68bf008) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( garage_17 ) // 110411 entertainment c
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_c_110411.rom", 0x00000, 0x40000, CRC(d149918e) SHA1(4efb83fa0046c5a152faecfc689d7ce2cde6f916) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_ent_c.001", 0x000000, 0x80000, CRC(329ab791) SHA1(0954e92398b4ef05aa34f8cbebe4fbd2a59d90c5) )
+	ROM_LOAD( "garage_ent_c.002", 0x100000, 0x80000, CRC(472f3993) SHA1(42dbdb73ad6e1feda0f9197492b22f57de56464c) )
+	ROM_LOAD( "garage_ent_c.003", 0x200000, 0x80000, CRC(b038bfc1) SHA1(4257391d8282b828d710d37ea35faff4bdb2293c) )
+	ROM_LOAD( "garage_ent_c.004", 0x300000, 0x80000, CRC(298652dd) SHA1(b4e0a1e2c916bab798f5fac905ea039ced855226) )
+	ROM_LOAD( "garage_ent_c.005", 0x080000, 0x80000, CRC(006ba89e) SHA1(d13c250422be6c783342fe3981d7370d38875904) )
+	ROM_LOAD( "garage_ent_c.006", 0x180000, 0x80000, CRC(e883c26b) SHA1(dcc581f3a173e62fa5ab6dd8acf3f1e0d1850a81) )
+	ROM_LOAD( "garage_ent_c.007", 0x280000, 0x80000, CRC(f81e80cf) SHA1(7c9e890cde55051d1f966ddb0295e7bf9a0f75d9) )
+	ROM_LOAD( "garage_ent_c.008", 0x380000, 0x80000, CRC(4a4b23b8) SHA1(b72fde9c0b4cf2e1f88a47c3fab44fba532ce733) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
 
 /*********************************************************
    Rock Climber
@@ -2452,7 +2808,6 @@ ROM_START( rclimb_5 ) // 070621
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(2030f37d) SHA1(56e0df6310989da67667b37d2734046eabb87cda) )
 ROM_END
 
-
 ROM_START( rclimb_7 ) // 090716 entertainment
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rc_e_090716.rom", 0x00000, 0x40000, CRC(35bd6e28) SHA1(ee99956131ecfe3c4f05acc11bcf20a8a10403bd) )
@@ -2469,6 +2824,125 @@ ROM_START( rclimb_7 ) // 090716 entertainment
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(9e3ca059) SHA1(ccf7cdd29dbbd50dd84a49bc8d01299b87c3a410) )
+ROM_END
+
+ROM_START( rclimb_8 ) // 100331 entertainment x
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_x_100331.rom", 0x00000, 0x40000, CRC(b1fb58fb) SHA1(1a55e2751e0b5d2ab8af823ec3f1304504f41f2b) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_m.001", 0x000000, 0x80000, CRC(03ff431c) SHA1(46b455431cd34a925929dae8a68e0380e8369bc2) )
+	ROM_LOAD( "rockclimber_ent_m.002", 0x100000, 0x80000, CRC(e2be06d5) SHA1(d271dacea099ea37c0baec625d1fa4c76e6c595e) )
+	ROM_LOAD( "rockclimber_ent_m.003", 0x200000, 0x80000, CRC(58de8bb8) SHA1(45307527962a378cee839cfe73f91558d3f885d2) )
+	ROM_LOAD( "rockclimber_ent_m.004", 0x300000, 0x80000, CRC(ff1edfdb) SHA1(c0303d38c1a71f8f5c1275f939eda1e0f4d360c4) )
+	ROM_LOAD( "rockclimber_ent_m.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_m.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_m.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_m.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_9 ) // 101209 entertainment n
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_n_101209.rom", 0x00000, 0x40000, CRC(cdfdd9d9) SHA1(5bd4bfa8b687bd8a3d1b4ef1c1b28044bb97c5da) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_n.001", 0x000000, 0x80000, CRC(94c6f095) SHA1(a16c43965f4c6cdd967f5f8760bf0c2426e7a646) )
+	ROM_LOAD( "rockclimber_ent_n.002", 0x100000, 0x80000, CRC(b0872c3c) SHA1(2dc851cd9d762d8f965c6d0b1467bfeba4f7d153) )
+	ROM_LOAD( "rockclimber_ent_n.003", 0x200000, 0x80000, CRC(f95bc67f) SHA1(81ad66f9db17fbc8f8c62d7fce226828a51559ce) )
+	ROM_LOAD( "rockclimber_ent_n.004", 0x300000, 0x80000, CRC(55ece5cd) SHA1(c8d2a32064fb0cf76c96eb377414a0609802d003) )
+	ROM_LOAD( "rockclimber_ent_n.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_n.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_n.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_n.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_10 ) // 110111 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_a_110111.rom", 0x00000, 0x40000, CRC(4eeced80) SHA1(09f8b1adce534f38355c5d34e754251fcdb501db) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_a.001", 0x000000, 0x80000, CRC(2c27d7ba) SHA1(e4dbd17f80153c43c994c66805aab88345c781e7) )
+	ROM_LOAD( "rockclimber_ent_a.002", 0x100000, 0x80000, CRC(a589c1e3) SHA1(e589eadaa82de0458f3af2ac7c6198ba4bece984) )
+	ROM_LOAD( "rockclimber_ent_a.003", 0x200000, 0x80000, CRC(462b4189) SHA1(f8b8c2117a41bb46823fbb17e91a57f80b028a9b) )
+	ROM_LOAD( "rockclimber_ent_a.004", 0x300000, 0x80000, CRC(4e9b084f) SHA1(a1f5435ff18928af13a73ef8be15aba9e28356a1) )
+	ROM_LOAD( "rockclimber_ent_a.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_a.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_a.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_a.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_11 ) // 110124 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_a_110124.rom", 0x00000, 0x40000, CRC(39967465) SHA1(cb9334a321c2ed5772965651161b85a3925e5543) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_a.001", 0x000000, 0x80000, CRC(2c27d7ba) SHA1(e4dbd17f80153c43c994c66805aab88345c781e7) )
+	ROM_LOAD( "rockclimber_ent_a.002", 0x100000, 0x80000, CRC(a589c1e3) SHA1(e589eadaa82de0458f3af2ac7c6198ba4bece984) )
+	ROM_LOAD( "rockclimber_ent_a.003", 0x200000, 0x80000, CRC(462b4189) SHA1(f8b8c2117a41bb46823fbb17e91a57f80b028a9b) )
+	ROM_LOAD( "rockclimber_ent_a.004", 0x300000, 0x80000, CRC(4e9b084f) SHA1(a1f5435ff18928af13a73ef8be15aba9e28356a1) )
+	ROM_LOAD( "rockclimber_ent_a.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_a.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_a.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_a.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_12 ) // 110204 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_a_110204.rom", 0x00000, 0x40000, CRC(f865a2d1) SHA1(94f2785cecb1ea57194a0b9eaf7a5deb3280ec63) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_a.001", 0x000000, 0x80000, CRC(2c27d7ba) SHA1(e4dbd17f80153c43c994c66805aab88345c781e7) )
+	ROM_LOAD( "rockclimber_ent_a.002", 0x100000, 0x80000, CRC(a589c1e3) SHA1(e589eadaa82de0458f3af2ac7c6198ba4bece984) )
+	ROM_LOAD( "rockclimber_ent_a.003", 0x200000, 0x80000, CRC(462b4189) SHA1(f8b8c2117a41bb46823fbb17e91a57f80b028a9b) )
+	ROM_LOAD( "rockclimber_ent_a.004", 0x300000, 0x80000, CRC(4e9b084f) SHA1(a1f5435ff18928af13a73ef8be15aba9e28356a1) )
+	ROM_LOAD( "rockclimber_ent_a.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_a.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_a.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_a.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_13 ) // 110311 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_b_110311.rom", 0x00000, 0x40000, CRC(a42648b1) SHA1(d510f5f78ee1140b743c016ba9f9dd10978aae55) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_b.001", 0x000000, 0x80000, CRC(63f96b48) SHA1(127d653a96ee1c35be3076137abc9655ab2ea908) )
+	ROM_LOAD( "rockclimber_ent_b.002", 0x100000, 0x80000, CRC(3e38867d) SHA1(8f2c0a29c62ac46773123020e2d72f0877b6a01e) )
+	ROM_LOAD( "rockclimber_ent_b.003", 0x200000, 0x80000, CRC(1b78aff2) SHA1(e5a885126aad66ae756175f395ad67afd27fd68d) )
+	ROM_LOAD( "rockclimber_ent_b.004", 0x300000, 0x80000, CRC(1b153323) SHA1(9e7a7a8e3f5e61d44803b09c9c73daec96953858) )
+	ROM_LOAD( "rockclimber_ent_b.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_b.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_b.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_b.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( rclimb_14 ) // 110411 entertainment c
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_c_110411.rom", 0x00000, 0x40000, CRC(eadea9fd) SHA1(eec2194d31feb408ac24c4362a9f6ef62720f566) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_ent_c.001", 0x000000, 0x80000, CRC(2c27d7ba) SHA1(e4dbd17f80153c43c994c66805aab88345c781e7) )
+	ROM_LOAD( "rockclimber_ent_c.002", 0x100000, 0x80000, CRC(a589c1e3) SHA1(e589eadaa82de0458f3af2ac7c6198ba4bece984) )
+	ROM_LOAD( "rockclimber_ent_c.003", 0x200000, 0x80000, CRC(462b4189) SHA1(f8b8c2117a41bb46823fbb17e91a57f80b028a9b) )
+	ROM_LOAD( "rockclimber_ent_c.004", 0x300000, 0x80000, CRC(4e9b084f) SHA1(a1f5435ff18928af13a73ef8be15aba9e28356a1) )
+	ROM_LOAD( "rockclimber_ent_c.005", 0x080000, 0x80000, CRC(4c97678c) SHA1(23c0d71a497bca685072260ba0e72c75980ee3a4) )
+	ROM_LOAD( "rockclimber_ent_c.006", 0x180000, 0x80000, CRC(ca6bab4e) SHA1(cef9dd73d55f717b111f36fc030703f84d726448) )
+	ROM_LOAD( "rockclimber_ent_c.007", 0x280000, 0x80000, CRC(f653af62) SHA1(9e0989dabf2a2245ea039922cd0375735ac02889) )
+	ROM_LOAD( "rockclimber_ent_c.008", 0x380000, 0x80000, CRC(ac47f4bb) SHA1(8bd0013656f0c9434afe14cb99da1a74018641fd) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
 ROM_END
 
 
@@ -2740,6 +3214,142 @@ ROM_START( resdnt_9 ) // 100316
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d2ec780c) SHA1(15f1044821589e2971f4fdd78e281955f4f72b7a) )
+ROM_END
+
+ROM_START( resdnt_10 ) // 100331 entertainment x
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_x_100331.rom", 0x00000, 0x40000, CRC(466f0c18) SHA1(6eeeba31c98c4b3b83ffa255fa466635fdacdf0b) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_m.001", 0x000000, 0x80000, CRC(ba77e50c) SHA1(02484b1b988ebb3d6f9c0fd3b29b5ceb81156029) )
+	ROM_LOAD( "resident_ent_m.002", 0x100000, 0x80000, CRC(8137e951) SHA1(5636262e1c53324ead59582284465c8801ce416e) )
+	ROM_LOAD( "resident_ent_m.003", 0x200000, 0x80000, CRC(799b296b) SHA1(12ecfbd87c2839920a1885d5c2ae6132fbe29bc1) )
+	ROM_LOAD( "resident_ent_m.004", 0x300000, 0x80000, CRC(b274f6a4) SHA1(068f312841815b24962161bbcdacb19dd94a9a53) )
+	ROM_LOAD( "resident_ent_m.005", 0x080000, 0x80000, CRC(a3ac68b2) SHA1(2ea02f4b8c2107909ed4007df2f8627e0977801f) )
+	ROM_LOAD( "resident_ent_m.006", 0x180000, 0x80000, CRC(0a3e0b9f) SHA1(57cd7f6b7186e5b1fc3a25078b85195bbe5135d3) )
+	ROM_LOAD( "resident_ent_m.007", 0x280000, 0x80000, CRC(8bc20b6e) SHA1(75e9917d84309ef0670b4b5973aef60129630f80) )
+	ROM_LOAD( "resident_ent_m.008", 0x380000, 0x80000, CRC(3d5d3b68) SHA1(f155bc662a1333a6cf5aeeb33159acb2ef039924) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_11 ) // 101209 entertainment n
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_n_101209.rom", 0x00000, 0x40000, CRC(506afd59) SHA1(69ad80310d06229471c2c3eeafdb4ae021be4469) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_n.001", 0x000000, 0x80000, CRC(836e7c80) SHA1(09ada30f4c33f2a412d6654a91fa5005e29795b9) )
+	ROM_LOAD( "resident_ent_n.002", 0x100000, 0x80000, CRC(72d5e8fd) SHA1(1c0b772a71144802e45809c62a8588c22bc6b23f) )
+	ROM_LOAD( "resident_ent_n.003", 0x200000, 0x80000, CRC(a2d65a56) SHA1(bf9f26df37649d6f43797100da6dd1e3c82dcefe) )
+	ROM_LOAD( "resident_ent_n.004", 0x300000, 0x80000, CRC(03fd57d0) SHA1(547ebc9b8509d8355de5133ef8dd3ee7d636ef25) )
+	ROM_LOAD( "resident_ent_n.005", 0x080000, 0x80000, CRC(83aa6267) SHA1(42c3e5e49e55c0e5777bc086b13bdbd971d86949) )
+	ROM_LOAD( "resident_ent_n.006", 0x180000, 0x80000, CRC(85cb7a1b) SHA1(6c9c7e4263ff0bd45ae24c09913e4d86129c6bba) )
+	ROM_LOAD( "resident_ent_n.007", 0x280000, 0x80000, CRC(8d457bf9) SHA1(c575e4105394cdecebab6f1f106e5f72e3479c69) )
+	ROM_LOAD( "resident_ent_n.008", 0x380000, 0x80000, CRC(fea4393b) SHA1(c176f742794f02342a7bd36c069039aa8423d25b) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_12 ) // 110111 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_a_110111.rom", 0x00000, 0x40000, CRC(47e630a7) SHA1(0084d40bfa0b7960aaa5b336c13c2694984a136e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_a.001", 0x000000, 0x80000, CRC(836e7c80) SHA1(09ada30f4c33f2a412d6654a91fa5005e29795b9) )
+	ROM_LOAD( "resident_ent_a.002", 0x100000, 0x80000, CRC(72d5e8fd) SHA1(1c0b772a71144802e45809c62a8588c22bc6b23f) )
+	ROM_LOAD( "resident_ent_a.003", 0x200000, 0x80000, CRC(a2d65a56) SHA1(bf9f26df37649d6f43797100da6dd1e3c82dcefe) )
+	ROM_LOAD( "resident_ent_a.004", 0x300000, 0x80000, CRC(03fd57d0) SHA1(547ebc9b8509d8355de5133ef8dd3ee7d636ef25) )
+	ROM_LOAD( "resident_ent_a.005", 0x080000, 0x80000, CRC(be54c0da) SHA1(9ba4d4da679d7458bdcfe2a6026fa5e0c0b0e6cb) )
+	ROM_LOAD( "resident_ent_a.006", 0x180000, 0x80000, CRC(73ea571c) SHA1(29b8a80ec9591629c1ad21d19b6d1a4dadeb9ce4) )
+	ROM_LOAD( "resident_ent_a.007", 0x280000, 0x80000, CRC(45903a4f) SHA1(0295dcebd70c86440a91104d25c266cd2d3535c9) )
+	ROM_LOAD( "resident_ent_a.008", 0x380000, 0x80000, CRC(59f1fcbb) SHA1(299182dbe1e1944765429df38a355e7554303712) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_13 ) // 110124 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_a_110124.rom", 0x00000, 0x40000, CRC(2f269e0c) SHA1(d278177731f6feef00fa1d25e4fcc9899da6685f) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_a.001", 0x000000, 0x80000, CRC(836e7c80) SHA1(09ada30f4c33f2a412d6654a91fa5005e29795b9) )
+	ROM_LOAD( "resident_ent_a.002", 0x100000, 0x80000, CRC(72d5e8fd) SHA1(1c0b772a71144802e45809c62a8588c22bc6b23f) )
+	ROM_LOAD( "resident_ent_a.003", 0x200000, 0x80000, CRC(a2d65a56) SHA1(bf9f26df37649d6f43797100da6dd1e3c82dcefe) )
+	ROM_LOAD( "resident_ent_a.004", 0x300000, 0x80000, CRC(03fd57d0) SHA1(547ebc9b8509d8355de5133ef8dd3ee7d636ef25) )
+	ROM_LOAD( "resident_ent_a.005", 0x080000, 0x80000, CRC(be54c0da) SHA1(9ba4d4da679d7458bdcfe2a6026fa5e0c0b0e6cb) )
+	ROM_LOAD( "resident_ent_a.006", 0x180000, 0x80000, CRC(73ea571c) SHA1(29b8a80ec9591629c1ad21d19b6d1a4dadeb9ce4) )
+	ROM_LOAD( "resident_ent_a.007", 0x280000, 0x80000, CRC(45903a4f) SHA1(0295dcebd70c86440a91104d25c266cd2d3535c9) )
+	ROM_LOAD( "resident_ent_a.008", 0x380000, 0x80000, CRC(59f1fcbb) SHA1(299182dbe1e1944765429df38a355e7554303712) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_14 ) // 110204 entertainment a
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_a_110204.rom", 0x00000, 0x40000, CRC(55c63dfe) SHA1(4f5205ef715734f1a9e0be7cdc2ad2ccb34b0ca4) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_a.001", 0x000000, 0x80000, CRC(836e7c80) SHA1(09ada30f4c33f2a412d6654a91fa5005e29795b9) )
+	ROM_LOAD( "resident_ent_a.002", 0x100000, 0x80000, CRC(72d5e8fd) SHA1(1c0b772a71144802e45809c62a8588c22bc6b23f) )
+	ROM_LOAD( "resident_ent_a.003", 0x200000, 0x80000, CRC(a2d65a56) SHA1(bf9f26df37649d6f43797100da6dd1e3c82dcefe) )
+	ROM_LOAD( "resident_ent_a.004", 0x300000, 0x80000, CRC(03fd57d0) SHA1(547ebc9b8509d8355de5133ef8dd3ee7d636ef25) )
+	ROM_LOAD( "resident_ent_a.005", 0x080000, 0x80000, CRC(be54c0da) SHA1(9ba4d4da679d7458bdcfe2a6026fa5e0c0b0e6cb) )
+	ROM_LOAD( "resident_ent_a.006", 0x180000, 0x80000, CRC(73ea571c) SHA1(29b8a80ec9591629c1ad21d19b6d1a4dadeb9ce4) )
+	ROM_LOAD( "resident_ent_a.007", 0x280000, 0x80000, CRC(45903a4f) SHA1(0295dcebd70c86440a91104d25c266cd2d3535c9) )
+	ROM_LOAD( "resident_ent_a.008", 0x380000, 0x80000, CRC(59f1fcbb) SHA1(299182dbe1e1944765429df38a355e7554303712) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_15 ) // 110311 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_b_110311.rom", 0x00000, 0x40000, CRC(afb915d2) SHA1(ca312802831cdf912bca31b4e8d567dc5206694d) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_b.001", 0x000000, 0x80000, CRC(8d930862) SHA1(53f37acb046a392773c66af038dd4f0848ce84d6) )
+	ROM_LOAD( "resident_ent_b.002", 0x100000, 0x80000, CRC(e1959759) SHA1(861a5795a455a810e72f2375cf66f04294f1b7ad) )
+	ROM_LOAD( "resident_ent_b.003", 0x200000, 0x80000, CRC(1329fee5) SHA1(5da7c357862abbefff8e0cc7622b68e26cad2be7) )
+	ROM_LOAD( "resident_ent_b.004", 0x300000, 0x80000, CRC(4b22e8c5) SHA1(4964102fd3b800e41b789ffc23a9820b5fbd995a) )
+	ROM_LOAD( "resident_ent_b.005", 0x080000, 0x80000, CRC(d4424929) SHA1(a3a010cf6bf309ee6a81dd8170cd29a7b653aa1b) )
+	ROM_LOAD( "resident_ent_b.006", 0x180000, 0x80000, CRC(961b91b8) SHA1(41c4f503bfc855eb34726d5e54dd960a71cab0fe) )
+	ROM_LOAD( "resident_ent_b.007", 0x280000, 0x80000, CRC(798999f8) SHA1(0c14c52b886267351a7ad8ab510f9c03ff9718e4) )
+	ROM_LOAD( "resident_ent_b.008", 0x380000, 0x80000, CRC(451121ce) SHA1(f51e47d29ad01ae68ca4c8c122ea4f336aec6e63) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_16 ) // 140526 entertainment b
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_b_140526.rom", 0x00000, 0x40000, CRC(4a246e00) SHA1(dfe413c4cba96f3a7173a416c4ce74181ca4b70c) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_ba.001", 0x000000, 0x80000, CRC(5f04e9bc) SHA1(ea6053695a4cf2096d1e4521994d177d542431da) )
+	ROM_LOAD( "resident_ent_ba.002", 0x100000, 0x80000, CRC(732c9f85) SHA1(909ca1436ee2f0f45f28d6da4dea1b45e7419c69) )
+	ROM_LOAD( "resident_ent_ba.003", 0x200000, 0x80000, CRC(da1a02ce) SHA1(aae46962720d8deed251bd671d31b2fe623f6212) )
+	ROM_LOAD( "resident_ent_ba.004", 0x300000, 0x80000, CRC(45fdaf86) SHA1(a958f2ebf9b6f3231ac89a97f329d6b1a43aa518) )
+	ROM_LOAD( "resident_ent_ba.005", 0x080000, 0x80000, CRC(f09c6041) SHA1(f4becd8a4d66622a219f6d70acc7c1f81ec23d94) )
+	ROM_LOAD( "resident_ent_ba.006", 0x180000, 0x80000, CRC(bbe0357d) SHA1(0b0044429d50e3a9c9c16d99ef4e57408ae8a86f) )
+	ROM_LOAD( "resident_ent_ba.007", 0x280000, 0x80000, CRC(e0346fca) SHA1(75d2f9670785e89a517cb4fa2a5623f4d307ade6) )
+	ROM_LOAD( "resident_ent_ba.008", 0x380000, 0x80000, CRC(81c836bb) SHA1(f9676b62e6a0beac698045a09290610be3797f74) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
+ROM_END
+
+ROM_START( resdnt_17 ) // 110411 entertainment c
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_c_110411.rom", 0x00000, 0x40000, CRC(8bb039f5) SHA1(a5f0a021621caf86af988b4dbb8fddbb787ff234) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_ent_c.001", 0x000000, 0x80000, CRC(836e7c80) SHA1(09ada30f4c33f2a412d6654a91fa5005e29795b9) )
+	ROM_LOAD( "resident_ent_c.002", 0x100000, 0x80000, CRC(72d5e8fd) SHA1(1c0b772a71144802e45809c62a8588c22bc6b23f) )
+	ROM_LOAD( "resident_ent_c.003", 0x200000, 0x80000, CRC(a2d65a56) SHA1(bf9f26df37649d6f43797100da6dd1e3c82dcefe) )
+	ROM_LOAD( "resident_ent_c.004", 0x300000, 0x80000, CRC(03fd57d0) SHA1(547ebc9b8509d8355de5133ef8dd3ee7d636ef25) )
+	ROM_LOAD( "resident_ent_c.005", 0x080000, 0x80000, CRC(be54c0da) SHA1(9ba4d4da679d7458bdcfe2a6026fa5e0c0b0e6cb) )
+	ROM_LOAD( "resident_ent_c.006", 0x180000, 0x80000, CRC(73ea571c) SHA1(29b8a80ec9591629c1ad21d19b6d1a4dadeb9ce4) )
+	ROM_LOAD( "resident_ent_c.007", 0x280000, 0x80000, CRC(45903a4f) SHA1(0295dcebd70c86440a91104d25c266cd2d3535c9) )
+	ROM_LOAD( "resident_ent_c.008", 0x380000, 0x80000, CRC(59f1fcbb) SHA1(299182dbe1e1944765429df38a355e7554303712) )
+
+	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00	)
 ROM_END
 
 
@@ -3807,6 +4417,14 @@ GAME( 2003, fcockt_10,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2003, fcockt_11,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2003, fcockt_12,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2003, fcockt_14,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (090708 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2003, fcockt_15,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100324 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2003, fcockt_16,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2003, fcockt_17,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
+GAME( 2003, fcockt_18,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2003, fcockt_19,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2003, fcockt_20,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2003, fcockt_21,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2003, fcockt_22,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
 
 GAME( 2003, lhaunt,      lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030707 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, lhaunt_2,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030804 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3817,7 +4435,12 @@ GAME( 2003, lhaunt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2003, lhaunt_7,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2003, lhaunt_8,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2003, lhaunt_10,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (090712 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2003, lhaunt_11,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (100331 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2003, lhaunt_11,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2003, lhaunt_12,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
+GAME( 2003, lhaunt_13,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2003, lhaunt_14,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2003, lhaunt_15,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2003, lhaunt_16,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
 
 GAME( 2003, rollfr,      rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (030821)", MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, rollfr_2,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (040318)", MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3833,6 +4456,14 @@ GAME( 2004, garage_5,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2004, garage_6,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070213 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2004, garage_7,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070329 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2004, garage_9,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (090715 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2004, garage_10,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2004, garage_11,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
+GAME( 2004, garage_12,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, garage_13,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, garage_14,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, garage_15,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2004, garage_16,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2004, garage_17,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
 
 GAME( 2004, rclimb,      rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040815 World)", MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2004, rclimb_2,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040823 World)", MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3840,6 +4471,13 @@ GAME( 2004, rclimb_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2004, rclimb_4,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070322 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2004, rclimb_5,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070621 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2004, rclimb_7,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2004, rclimb_8,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2004, rclimb_9,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
+GAME( 2004, rclimb_10,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, rclimb_11,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, rclimb_12,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, rclimb_13,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2004, rclimb_14,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
 
 GAME( 2004, sweetl,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (041220 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2004, sweetl_2,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
@@ -3852,6 +4490,14 @@ GAME( 2004, resdnt_5,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2004, resdnt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100311 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2004, resdnt_8,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 GAME( 2004, resdnt_9,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100316 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2004, resdnt_10,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
+GAME( 2004, resdnt_11,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
+GAME( 2004, resdnt_12,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, resdnt_13,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, resdnt_14,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
+GAME( 2004, resdnt_15,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110311 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2004, resdnt_16,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (140526 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2004, resdnt_17,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110411 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
 
 GAME( 2005, island,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (050713 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2005, island_2,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (070409 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
