@@ -26,6 +26,7 @@
 #include "tilemap.h"
 #include "natkeyboard.h"
 #include "ui/uimain.h"
+#include "http.h"
 
 #include "corestr.h"
 #include "unzip.h"

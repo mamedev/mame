@@ -20,8 +20,6 @@
 #include <mutex>
 #include <thread>
 #include <ctime>
-#include "server_http.hpp"
-#include "server_ws.hpp"
 
 //**************************************************************************
 //    TYPE DEFINITIONS
@@ -31,6 +29,13 @@
 namespace asio
 {
 	class io_context;
+}
+
+namespace webpp
+{
+	class http_server;
+	class ws_server;
+	class Connection;
 }
 
 class http_manager

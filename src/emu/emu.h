@@ -34,9 +34,6 @@
 #include "attotime.h"
 #include "profiler.h"
 
-// http interface helpers
-#include "http.h"
-
 // commonly-referenced utilities imported from lib/util
 #include "corealloc.h"
 #include "palette.h"

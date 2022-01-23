@@ -4,6 +4,7 @@
     Ensoniq panel/display device
 */
 #include "emu.h"
+#include "http.h"
 #include "esqpanel.h"
 
 #define ESQPANEL_EXTERNAL_TIMER_ID 47000
