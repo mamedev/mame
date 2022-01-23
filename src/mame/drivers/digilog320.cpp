@@ -6,8 +6,6 @@
 
     Protocol analyzer
 
-    Status: Skeleton
-
     Hardware:
 
     PCB 24-0710-02B:
@@ -42,13 +40,30 @@
     - XTAL 2.688 MHz
     - XTAL 3.6864 MHz
 
+    TODO:
+    - Keyboard
+	- Finish floppy hookup
+    - SCC interrupts
+    - Unknown DUART inputs/outputs
+    - RS232
+    - RTC
+    - Artwork with LEDs
+
+    Notes:
+    - Everything here guessed, no manuals available
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9519.h"
+#include "machine/i8251.h"
 #include "machine/mc68681.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80scc.h"
 #include "video/mc6845.h"
+#include "imagedev/floppy.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -67,8 +82,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
+		m_uic(*this, "uic"),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
+		m_duart(*this, "duart"),
+		m_scc(*this, "scc%u", 0U),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:0"),
 		m_vram(*this, "vram"),
 		m_chargen(*this, "chargen")
 	{ }
@@ -82,8 +102,13 @@ protected:
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<z80_device> m_subcpu;
+	required_device<am9519_device> m_uic;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
+	required_device<scn2681_device> m_duart;
+	required_device_array<scc8530_device, 2> m_scc;
+	required_device<mb8877_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	required_shared_ptr<uint16_t> m_vram;
 	required_region_ptr<uint8_t> m_chargen;
 
@@ -93,6 +118,20 @@ private:
 	void sub_io_map(address_map &map);
 
 	MC6845_UPDATE_ROW(update_row);
+
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	void fdc_ctrl_w(uint8_t data);
+
+	uint8_t subcpu_to_maincpu_r();
+	void maincpu_to_subcpu_w(uint8_t data);
+	uint8_t maincpu_to_subcpu_r();
+	void subcpu_to_maincpu_w(uint8_t data);
+	uint8_t maincpu_status_r();
+
+	uint8_t m_subcpu_to_maincpu;
+	uint8_t m_maincpu_to_subcpu;
+	uint8_t m_maincpu_status;
 };
 
 
@@ -104,14 +143,19 @@ void digilog320_state::main_mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x80000, 0x83fff).ram().share("vram");
+	map(0x90000, 0x90fff).ram();
 	map(0xa0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void digilog320_state::main_io_map(address_map &map)
 {
-	map(0x080, 0x09f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x000, 0x003).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x080, 0x09f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x100, 0x107).rw(FUNC(digilog320_state::fdc_r), FUNC(digilog320_state::fdc_w)).umask16(0x00ff);
 	map(0x180, 0x180).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x182, 0x182).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0x200, 0x200).w(FUNC(digilog320_state::fdc_ctrl_w));
+	map(0x280, 0x280).rw(FUNC(digilog320_state::subcpu_to_maincpu_r), FUNC(digilog320_state::maincpu_to_subcpu_w));
 }
 
 void digilog320_state::sub_mem_map(address_map &map)
@@ -123,6 +167,12 @@ void digilog320_state::sub_mem_map(address_map &map)
 void digilog320_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
+	map(0x01, 0x01).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
+	map(0x04, 0x07).rw(m_scc[0], FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w));
+	map(0x08, 0x0b).rw(m_scc[1], FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w));
+	map(0x10, 0x10).rw(FUNC(digilog320_state::maincpu_to_subcpu_r), FUNC(digilog320_state::subcpu_to_maincpu_w));
+	map(0x11, 0x11).r(FUNC(digilog320_state::maincpu_status_r));
 }
 
 
@@ -138,6 +188,14 @@ MC6845_UPDATE_ROW( digilog320_state::update_row )
 	{
 		uint16_t const data = (m_vram[ma + x]);
 		uint8_t gfx = m_chargen[((data & 0xff) << 4) | ra];
+		uint8_t attr = data >> 8;
+
+		if (x == cursor_x)
+			gfx ^= 0xff;
+
+		// maybe
+		if (BIT(attr, 3))
+			gfx ^= 0xff;
 
 		// draw 8 pixels of the character
 		for (int i = 0; i < 8; i++)
@@ -162,15 +220,108 @@ GFXDECODE_END
 
 
 //**************************************************************************
+//  FLOPPY
+//**************************************************************************
+
+// either cpu too fast or fdc too slow, assume some waitstates to pass check
+uint8_t digilog320_state::fdc_r(offs_t offset)
+{
+	m_maincpu->adjust_icount(-2);
+	return m_fdc->read(offset);
+}
+
+void digilog320_state::fdc_w(offs_t offset, uint8_t data)
+{
+	m_maincpu->adjust_icount(-2);
+	m_fdc->write(offset, data);
+}
+
+void digilog320_state::fdc_ctrl_w(uint8_t data)
+{
+	logerror("fdc_ctrl_w: %02x\n", data);
+
+	floppy_image_device *floppy = m_floppy->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	// motor always on for now
+	if (floppy)
+		floppy->mon_w(0);
+
+	// set to mfm
+	m_fdc->dden_w(0);
+}
+
+static void digilog320_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
+uint8_t digilog320_state::subcpu_to_maincpu_r()
+{
+	logerror("subcpu_to_maincpu_r: %02x\n", m_subcpu_to_maincpu);
+
+	m_maincpu_status &= ~0x40;
+	m_duart->ip3_w(0);
+
+	return m_subcpu_to_maincpu;
+}
+
+void digilog320_state::maincpu_to_subcpu_w(uint8_t data)
+{
+	logerror("maincpu_to_subcpu_w: %02x\n", data);
+
+	m_maincpu_to_subcpu = data;
+
+	m_duart->ip0_w(1);
+	m_uic->ireq4_w(0);
+}
+
+uint8_t digilog320_state::maincpu_to_subcpu_r()
+{
+	logerror("maincpu_to_subcpu_r: %02x\n", m_maincpu_to_subcpu);
+
+	m_duart->ip0_w(0);
+	m_uic->ireq4_w(1);
+
+	return m_maincpu_to_subcpu;
+}
+
+void digilog320_state::subcpu_to_maincpu_w(uint8_t data)
+{
+	logerror("subcpu_to_maincpu_w: %02x\n", data);
+
+	m_subcpu_to_maincpu = data;
+
+	m_maincpu_status |= 0x40;
+	m_duart->ip3_w(1);
+}
+
+uint8_t digilog320_state::maincpu_status_r()
+{
+	// 7-------  unknown
+	// -6------  maincpu ready to receive data (0 = ready)
+	// --543210  unknown
+
+	return m_maincpu_status;
+}
+
 void digilog320_state::machine_start()
 {
+	// register for save states
+	save_item(NAME(m_subcpu_to_maincpu));
+	save_item(NAME(m_maincpu_to_subcpu));
+	save_item(NAME(m_maincpu_status));
 }
 
 void digilog320_state::machine_reset()
 {
+	m_maincpu_status = 0x00;
 }
 
 
@@ -187,6 +338,10 @@ void digilog320_state::digilog320(machine_config &config)
 	Z80(config, m_subcpu, 16_MHz_XTAL / 2); // Z0840008PSC
 	m_subcpu->set_addrmap(AS_PROGRAM, &digilog320_state::sub_mem_map);
 	m_subcpu->set_addrmap(AS_IO, &digilog320_state::sub_io_map);
+	m_subcpu->set_irq_acknowledge_callback(m_uic, FUNC(am9519_device::iack_cb));
+
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(5.6592_MHz_XTAL, 320, 0, 256, 262, 0, 192);
@@ -201,7 +356,19 @@ void digilog320_state::digilog320(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_update_row_callback(FUNC(digilog320_state::update_row));
 
-	SCN2681(config, "duart", 3.6864_MHz_XTAL);
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+
+	I8251(config, "usart", 0);
+
+	SCC8530N(config, m_scc[0], 3.6864_MHz_XTAL);
+
+	SCC8530N(config, m_scc[1], 3.6864_MHz_XTAL);
+
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
+	//m_fdc->drq_wr_callback()
+	FLOPPY_CONNECTOR(config, "fdc:0", digilog320_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 
@@ -234,4 +401,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1988, digilog320, 0,          0,      digilog320, 0,     digilog320_state, empty_init, "Digilog", "320",    MACHINE_IS_SKELETON )
+COMP( 1988, digilog320, 0,          0,      digilog320, 0,     digilog320_state, empty_init, "Digilog", "320",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
