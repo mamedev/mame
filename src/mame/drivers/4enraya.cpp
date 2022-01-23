@@ -694,6 +694,28 @@ ROM_START( tourpgum )
 	ROM_LOAD( "3_tourvision.ic17",   0x10000, 0x8000, CRC(0b081663) SHA1(86dbf69e819ced12ac7cb7a4839fe0ba677580ae) )
 ROM_END
 
+ROM_START( strker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic52",   0x0000, 0x8000, CRC(745beb7f) SHA1(1ead50897d27e338b768b0335d4dbd9581c93372) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "1.ic19",   0x2000, 0x2000, CRC(30b66fcd) SHA1(42b2fb20036e0126abf44b39855eaab449206c71) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(         0x2000, 0x4000 )
+	ROM_CONTINUE(         0x6000, 0x2000 )
+	ROM_CONTINUE(         0x0000, 0x6000 )
+	ROM_CONTINUE(         0x0000, 0x2000 )
+	ROM_LOAD( "2.ic18",   0xa000, 0x2000, CRC(002b5537) SHA1(c293e4307a817064ee1c868491ac927c096b9f5d) ) // x00xxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(         0xa000, 0x4000 )
+	ROM_CONTINUE(         0xe000, 0x2000 )
+	ROM_CONTINUE(         0x8000, 0x6000 )
+	ROM_CONTINUE(         0x8000, 0x2000 )
+	ROM_LOAD( "3.ic17",   0x12000, 0x2000, CRC(9be6aeb7) SHA1(cc7daa39f30c7dfd529b22815af3b62aad79934d) ) // x00xxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(         0x12000, 0x4000 )
+	ROM_CONTINUE(         0x16000, 0x2000 )
+	ROM_CONTINUE(         0x10000, 0x6000 )
+	ROM_CONTINUE(         0x10000, 0x2000 )
+ROM_END
+
 /*
   Unknown 'Pac-Man' gambling game.
 */
@@ -836,6 +858,7 @@ GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, R
 GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, strker,   0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
 
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",        MACHINE_SUPPORTS_SAVE )
