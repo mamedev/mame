@@ -31,7 +31,7 @@ namespace webpp
 {
 	class http_server;
 	class ws_server;
-	class Connection;
+	struct Connection;
 }
 
 class http_manager
