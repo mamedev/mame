@@ -113,7 +113,8 @@ Boots to a purple and blue flickering screen, [FDC] dsksync
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-[Lisa] GFX pitch corruption and offset for backgrounds during gameplay
+Not extensively tested
+[Lisa] sprites leaves an empty gap on bottom of playfield 
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -650,7 +651,7 @@ Corrupt tiles if you switch languages in language select menu
 		<year>1993</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
-Has [Lisa] GFX pitch corruption on gameplay
+Not extensively tested
 Gameplay is too fast
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -1723,7 +1724,7 @@ TODO: verify if it has horizontal stages
 		<year>1994</year>
 		<publisher>Microprose</publisher>
 		<notes><![CDATA[
-Serious [Lisa] GFX pitch corruption when scrolling left or right
+Not extensively tested
 Classic IM works ok
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -1848,9 +1849,9 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 		<year>1994</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
+Not extensively tested
 Cuts off right portion of screen, [Lisa] DDFSTOP
 Status bar has wrong colors, [Copper]
-[Lisa] GFX pitch corruption during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1882,8 +1883,8 @@ Status bar has wrong colors, [Copper]
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
 Offset [Lisa] DDFSTRT screens
-[Lisa] GFX pitch corruption on gameplay
 ]]></notes>
+		<!-- TODO: understand manual ruleset -->
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -2028,8 +2029,8 @@ Black screen when selecting any game option, tests [CIA] for specific time range
 		<year>1996</year>
 		<publisher>Manyk</publisher>
 		<notes><![CDATA[
+Not extensively tested
 Disk swap GFX messages are barely decipherable due of [Lisa] GFX pitch
-Has [Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2156,7 +2157,6 @@ Crashes with black screen after few disk swaps
 		<notes><![CDATA[
 No sound [Paula]
 Doesn't accept fire buttons on main menu
-Attract mode shows [Lisa] GFX pitch corruption
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4588,7 +4588,7 @@ Cannot be installed to HDD, needs blank disk formatting
 		<notes><![CDATA[
 [Lisa] GFX pitch corruption on first screens
 ]]></notes>
-		<!-- baddump: flush the registration code in floppy -->
+		<!-- baddump: needs registration code being erased in floppy data -->
 		<info name="usage" value="Requires AGA, sports code registration" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
@@ -4646,7 +4646,7 @@ Gameplay has wrong pitch draw, uses [Lisa] FMODE=$400f BSCAN2 and SHRES
 		<publisher>OTM</publisher>
 		<notes><![CDATA[
 A few [Lisa] GFX corrupted lines at bottom on title screen
-Has severe [Lisa] GFX pitch corruption depending on current horizontal position during gameplay
+Has severe [Lisa] GFX pitch corruption depending on current horizontal position during gameplay [Copper]
 ]]></notes>
 		<!-- PC+=4 after "COMPUTER JAMMED" screen appears -->
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -4864,7 +4864,7 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-[Lisa] GFX pitch corruption on gameplay
+[Lisa] GFX pitch corruption on gameplay, [Copper] timings
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports code wheel copy-protection" />
 		<part name="flop1" interface="floppy_3_5">

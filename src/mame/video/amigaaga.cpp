@@ -528,13 +528,18 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	/* copper runs on odd timeslots */
 	// TODO: diverges wrt OCS, is this right?
 	next_copper_x = 2;
-	// TODO: verify where we're missing pixels here for the GFX pitch bitplane failures
-	// i.e. wbenc30 scrolling in lores mode, sockid_a gameplay
-	// NB: latter now gives specific corrupt bitplanes on arbitrary add due of the delays,
-	// it also draws the status bar slightly offset (doesn't happen on the OCS version of the game)
-	const int offset_hack[] = { 10, 10, 17, 17 };
+	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
+	// i.e. wbenc30 scrolling in lores mode (fmode=3, expects a +58!)
+	// roadkill title (fmode=3, max +14), gameplay uses fmode=1
+	// sockid_a, alfred gameplay (fmode=1)
+	// virocp_a (fmode=1, +26)
+	// ssf2t (fmode=3, wants >+100, scrolling is very offset)
+	// turbojam gameplay (fmode=3, unaffected here, may be missing ddfstop bits given the screen masking)
+	// watchtow gameplay (fmode=3, copper timings)
+	// cd32 cdtv:insidino copyright screen (fmode=3?)
+	const int offset_hack[] = { 10, 11, 11, 13 };
 	const u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
-	
+
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
 	{
 		int sprpix;
@@ -619,9 +624,25 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			odelay = CUSTOM_REG(REG_BPLCON1) & 0xf;
 			edelay = ( CUSTOM_REG(REG_BPLCON1) >> 4 ) & 0x0f;
 			// extended delays for AGA
-			// FIXME: gives more GFX pitch corruption to games that uses it (sockid_a)
-			odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0c00) >> 6;
-			edelay += (CUSTOM_REG(REG_BPLCON1) & 0xc000) >> 10;
+			// FIXME: check above table for implications about this
+			switch( bitplane_fmode )
+			{
+				case 1:
+				case 2:
+					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
+					edelay += (CUSTOM_REG(REG_BPLCON1) & 0x4000) >> 10;
+					odelay ^= 0x10;
+					edelay ^= 0x10;
+					break;
+				case 3:
+					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
+					edelay += (CUSTOM_REG(REG_BPLCON1) & 0x4000) >> 10;
+					if (CUSTOM_REG(REG_BPLCON1) & 0x0800)
+						odelay ^= 0x20;
+					if (CUSTOM_REG(REG_BPLCON1) & 0x8000)
+						edelay ^= 0x20;
+					break;
+			}
 
 			if ( hires )
 			{
