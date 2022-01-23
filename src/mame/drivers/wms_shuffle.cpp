@@ -30,29 +30,27 @@ Each game consists of a flat board with an air-driven puck and 10 bowling pins.
  way, so in fact the puck never touches the pins at all.
 
 Status:
-- All games (except s11a/b) seem to be playable, but no sound, and the inputs
-    aren't known.
-- s4 games: 6 to insert coin, 9 to start, various keys on bottom 2 rows act as puck
-    detectors, period key to signal end of ball. Press it twice to end a frame.
-- Strike Zone, Alley Cats: 5 to insert coin, 1 to start, then same as above.
-- s11a/b games: stuck in the boot-up sequence.
+- All games (except s11a/b) are playable.
+- s9,s11/a/b: No sound.
+- To play: 5,1,(optional: 3 to select game type), any of keys A-W,Y,Z,comma,period
+    to activate puck detectors, X to signal end. Press it twice to end a frame.
+- s11a/b games: stuck in the boot-up sequence, non-functional.
+- To score a strike, press ABCDFGIX one at a time.
 
 ToDo:
 - Only 2 manuals found, and only one schematic, so it's largely guesswork.
 - Layout (s11a/b)
-- Inputs
 - Outputs
-- Displays (s11/a/b)
-- Sound
+- Displays (s11a/b)
+- Sound (s9/s11/a/b)
 - Roms missing
-- Remove all mechanical sounds (no chimes or knocker in these games)
 
 ************************************************************************************/
 
 #include "emu.h"
 #include "machine/genpin.h"
-
 #include "cpu/m6800/m6800.h"
+#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
@@ -74,6 +72,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
+		, m_s4sound(*this, "s4sound")
 		, m_pia21(*this, "pia21")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
@@ -138,6 +137,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
+	optional_device<williams_s4_sound_device> m_s4sound;
 	optional_device<pia6821_device> m_pia21;
 	optional_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
@@ -192,16 +192,15 @@ void shuffle_state::s11_map(address_map &map)
 	map(0x4000, 0x7fff).rom().region("maincpu", 0);
 }
 
-static INPUT_PORTS_START( shuffle )
+static INPUT_PORTS_START( s4 )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Plumb Tilt") // 3 touches before it tilts
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Select Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
@@ -231,30 +230,17 @@ static INPUT_PORTS_START( shuffle )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP32")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP34")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP35")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP36")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP37")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP39")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP40")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Back Row")
 
-	PORT_START("X5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP41")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP42")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP43")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP44")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP45")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP46")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP47")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP48")
-
-	PORT_START("X6")  // not used?
-	PORT_START("X7")  // not used?
+	PORT_START("X5")  // not used
+	PORT_START("X6")  // not used
+	PORT_START("X7")  // not used
 
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, shuffle_state, main_nmi, 1)
@@ -322,6 +308,22 @@ static INPUT_PORTS_START( shuffle )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( s9 )
+	PORT_INCLUDE(s4)
+	PORT_MODIFY("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Select Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
+
+	PORT_MODIFY("X4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Ticket Dispenser")
+INPUT_PORTS_END
+
 void shuffle_state::clockcnt_w(u16 data)
 {
 	// A wire jumper allows selection of 7,8,9, or 8,9,10
@@ -348,20 +350,11 @@ void shuffle_state::sol0_w(u8 data)
 
 void shuffle_state::sol1_w(u8 data)
 {
-	if (BIT(data, 0))
-		m_samples->start(4, 4); // 10 chime
-
-	if (BIT(data, 1))
-		m_samples->start(1, 1); // 100 chime
-
-	if (BIT(data, 2))
-		m_samples->start(2, 2); // 1000 chime
-
-	if (BIT(data, 3))
-		m_samples->start(3, 3); // 10k chime
-
-	if (BIT(data, 5))
-		m_samples->start(0, 6); // knocker
+	if (m_s4sound)
+	{
+		u8 sound_data = BIT(data, 4, 4);
+		m_s4sound->write(~sound_data);
+	}
 
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[8U+i] = BIT(data, i);
@@ -523,12 +516,17 @@ void shuffle_state::s4(machine_config &config)
 	m_4020->count_out_cb().set(FUNC(shuffle_state::clockcnt_w));
 
 	CLOCK(config, "rclock", 3580000/4).signal_handler().set(m_4020, FUNC(ripple_counter_device::clock_w));
+
+	// Add the soundcard
+	SPEAKER(config, "mono").front_center();
+	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s9(machine_config &config)
 {
 	s4(config);
 	config.device_remove("pia22");
+	config.device_remove("s4sound");
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s9_map);
 
 	config.set_default_layout(layout_shuffle9);
@@ -575,7 +573,7 @@ ROM_START(topaz_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -588,20 +586,20 @@ ROM_START(pomp_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
-/*----------------------------
-/ Aristocrat same roms as Pompeii
-/----------------------------*/
+/*----------------------------------
+/ Aristocrat (same roms as Pompeii)
+/----------------------------------*/
 ROM_START(arist_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gamerom.716",  0x2000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
@@ -614,7 +612,7 @@ ROM_START(taurs_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
@@ -627,7 +625,7 @@ ROM_START(kingt_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
@@ -640,7 +638,7 @@ ROM_START(omni_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
 ROM_END
 
@@ -653,7 +651,7 @@ ROM_START(bstrk_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
 ROM_END
 
@@ -666,7 +664,7 @@ ROM_START(tstrk_l1)
 	ROM_LOAD("ic20.716",     0x3000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
 ROM_END
 
@@ -763,19 +761,19 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1978, topaz_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, pomp_l1,  0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, arist_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, taurs_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, kingt_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "King Tut (Shuffle) (L-1)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, omni_l1,  0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Omni (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, bstrk_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, tstrk_l1, 0,        s4,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, szone_l5, 0,        s9,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-5)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, szone_l2, szone_l5, s9,  shuffle, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-2)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, alcat_l7, 0,        s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l2,   0,        s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l1,   tts_l2,   s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, gmine_l2, 0,        s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, tdawg_l1, 0,        s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, shfin_l1, 0,        s11, shuffle, shuffle_state, empty_init, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, topaz_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, pomp_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, arist_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, taurs_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kingt_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "King Tut (Shuffle) (L-1)",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, omni_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Omni (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, bstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, tstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1984, szone_l5, 0,        s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-5)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1984, szone_l2, szone_l5, s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-2)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, alcat_l7, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, tts_l2,   0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, tts_l1,   tts_l2,   s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, gmine_l2, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, tdawg_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, shfin_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )

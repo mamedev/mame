@@ -33,8 +33,10 @@
 #include "emu.h"
 #include "williams.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
 #include "machine/rescap.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/okim6295.h"
@@ -59,6 +61,7 @@
 DEFINE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device, "wmscvsd", "Williams CVSD Sound Board")
 DEFINE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device, "wmsnarc", "Williams NARC Sound Board")
 DEFINE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device, "wmsadpcm", "Williams ADPCM Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_S4_SOUND, williams_s4_sound_device, "wmss4", "Williams System 4 Sound Board")
 
 
 
@@ -836,3 +839,120 @@ void williams_adpcm_sound_device::device_timer(emu_timer &timer, device_timer_id
 			break;
 	}
 }
+
+
+//**************************************************************************
+//  S4 SOUND BOARD (simple sound card used in system 3/4 pinballs)
+//**************************************************************************
+
+//-------------------------------------------------
+//  williams_s4_sound_device - constructor
+//-------------------------------------------------
+
+williams_s4_sound_device::williams_s4_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, WILLIAMS_S4_SOUND, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+{
+}
+
+//-------------------------------------------------
+//  write - handle an external write
+//-------------------------------------------------
+
+void williams_s4_sound_device::write(u8 data)
+{
+	// If bit 7 low, make bit 4 low, to make the startup tune work
+	if (~data & 0x80)
+		data &= 0xef;
+	// Handle S2 (electronic or tones)
+	data ^= (ioport("S4")->read() & 0x40);
+	if ((data & 0x1f) != 0x1f)
+	{
+		m_pia->portb_w(data);
+		m_pia->cb1_w(0);
+	}
+	m_pia->cb1_w(1);
+}
+
+//-------------------------------------------------
+//  audio CPU map
+//-------------------------------------------------
+
+void williams_s4_sound_device::williams_s4_map(address_map &map)
+{
+	map.global_mask(0x0fff);
+	map(0x0000, 0x00ff).ram();
+	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0800, 0x0fff).rom().region("audiocpu", 0);
+}
+
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void williams_s4_sound_device::device_add_mconfig(machine_config &config)
+{
+	M6808(config, m_cpu, 3580000);
+	m_cpu->set_addrmap(AS_PROGRAM, &williams_s4_sound_device::williams_s4_map);
+
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
+
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void williams_s4_sound_device::device_start()
+{
+	// register for save states
+	save_item(NAME(m_dummy));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void williams_s4_sound_device::device_reset()
+{
+	// reset interrupt states
+	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+}
+
+INPUT_PORTS_START( williams_s4 )
+	PORT_START("S4")
+	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
+	PORT_DIPSETTING(    0x00, "Set 1" )
+	PORT_DIPSETTING(    0x40, "Set 2" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s4_sound_device, audio_nmi, 1)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( williams_s4_sound_device::audio_nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if (newval==CLEAR_LINE)
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to
+//  the device's I/O ports
+//-------------------------------------------------
+
+ioport_constructor williams_s4_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( williams_s4 );
+}
+
+

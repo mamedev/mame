@@ -36,11 +36,11 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6800.h"
+#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/ripple_counter.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 #include "s4.lh"
@@ -54,16 +54,14 @@ public:
 	s4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
 		, m_mainirq(*this, "mainirq")
-		, m_pias(*this, "pias")
+		, m_s4sound(*this, "s4sound")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_4020(*this, "4020")
 		, m_io_keyboard(*this, "X%d", 0U)
-		, m_io_snd(*this, "SND")
 		, m_dips(*this, "DS%d", 1U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
@@ -73,7 +71,6 @@ public:
 	void s4(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
 	virtual void machine_start() override;
@@ -95,7 +92,6 @@ private:
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
-	u8 m_sound_data = 0;
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
@@ -106,19 +102,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	void main_map(address_map &map);
-	void audio_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<input_merger_device> m_mainirq;
-	required_device<pia6821_device> m_pias;
+	required_device<williams_s4_sound_device> m_s4sound;
 	required_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	required_device<ripple_counter_device> m_4020;
 	required_ioport_array<8> m_io_keyboard;
-	required_ioport m_io_snd;
 	required_ioport_array<2> m_dips;
 	output_finder<32> m_digits;
 	output_finder<2> m_leds;
@@ -136,15 +129,6 @@ void s4_state::main_map(address_map &map)
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
 }
-
-void s4_state::audio_map(address_map &map)
-{
-	map.global_mask(0x0fff);
-	map(0x0000, 0x00ff).ram();
-	map(0x0400, 0x0403).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sounds
-	map(0x0800, 0x0fff).rom().region("audiocpu", 0);
-}
-
 
 static INPUT_PORTS_START( s4 )
 	PORT_START("X0")
@@ -274,12 +258,6 @@ static INPUT_PORTS_START( s4 )
 	PORT_DIPSETTING(    0x47, "29" )
 	PORT_DIPSETTING(    0x87, "30" )
 	PORT_DIPSETTING(    0x07, "31" )
-
-	PORT_START("SND")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Music") PORT_CODE(KEYCODE_8_PAD) PORT_TOGGLE
-
-	PORT_MODIFY("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s4_state, audio_nmi, 1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( flash )
@@ -321,8 +299,9 @@ INPUT_PORTS_END
 
 void s4_state::clockcnt_w(u16 data)
 {
-	if (data >= 1536)
-		m_mainirq->in_set<0>();
+	// A wire jumper allows selection of 7,8,9, or 8,9,10
+	m_mainirq->in_w<0>(BIT(data, 7, 3)==7);
+
 	if (BIT(data, 5) && m_irq_in_progress)
 		m_4020->reset_w(1);
 	else
@@ -341,7 +320,6 @@ void s4_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_sound_data));
 }
 
 void s4_state::machine_reset()
@@ -360,13 +338,6 @@ INPUT_CHANGED_MEMBER( s4_state::main_nmi )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
-{
-	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 void s4_state::sol0_w(u8 data)
 {
 	if (BIT(data, 0))
@@ -378,14 +349,9 @@ void s4_state::sol0_w(u8 data)
 
 void s4_state::sol1_w(u8 data)
 {
-	u8 sound_data = m_io_snd->read() | (data & 0x1f);
+	u8 sound_data = data & 0x1f;
 
-	bool cb1 = (sound_data & 0x1f);
-
-	if (cb1)
-		m_sound_data = ~sound_data;
-
-	m_pias->cb1_w(cb1);
+	m_s4sound->write(~sound_data);
 
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
@@ -450,11 +416,6 @@ u8 s4_state::switch_r()
 void s4_state::switch_w(u8 data)
 {
 	m_row = data;
-}
-
-u8 s4_state::sound_r()
-{
-	return m_sound_data;
 }
 
 WRITE_LINE_MEMBER( s4_state::irq_w )
@@ -524,19 +485,8 @@ void s4_state::s4(machine_config &config)
 	CLOCK(config, "rclock", 3580000/4).signal_handler().set(m_4020, FUNC(ripple_counter_device::clock_w));
 
 	// Add the soundcard
-	M6808(config, m_audiocpu, 3580000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s4_state::audio_map);
-
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
-	PIA6821(config, m_pias, 0);
-	m_pias->readpb_handler().set(FUNC(s4_state::sound_r));
-	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
-	m_pias->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
-
-	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
+	SPEAKER(config, "mono").front_center();
+	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -549,7 +499,7 @@ ROM_START(flash_l1)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -559,7 +509,7 @@ ROM_START(flash_l2)
 	ROM_LOAD("yellow1.716",  0x1000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
 	ROM_LOAD("yellow2.716",  0x1800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -569,7 +519,7 @@ ROM_START(flash_t1)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -582,7 +532,7 @@ ROM_START(trizn_l1)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -592,7 +542,7 @@ ROM_START(trizn_t1)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -605,7 +555,7 @@ ROM_START(tmwrp_l3)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -615,7 +565,7 @@ ROM_START(tmwrp_l2)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -625,7 +575,7 @@ ROM_START(tmwrp_t2)
 	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
@@ -638,7 +588,7 @@ ROM_START(stlwr_l2)
 	ROM_LOAD("yellow1.716",  0x1000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
 	ROM_LOAD("yellow2.716",  0x1800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
