@@ -371,13 +371,10 @@ public:
 	}
 
 	// safely write a sample to the buffer
-	void put(s32 index, sample_t sample)
+	void put(s32 start, sample_t sample)
 	{
-		sound_assert(u32(index) < samples());
-		index += m_start;
-		if (index >= m_buffer->size())
-			index -= m_buffer->size();
-		m_buffer->put(index, sample);
+		sound_assert(u32(start) < samples());
+		m_buffer->put(index_to_buffer_index(start), sample);
 	}
 
 	// write a sample to the buffer, clamping to +/- the clamp value
@@ -401,12 +398,10 @@ public:
 	}
 
 	// safely add a sample to the buffer
-	void add(s32 index, sample_t sample)
+	void add(s32 start, sample_t sample)
 	{
-		sound_assert(u32(index) < samples());
-		index += m_start;
-		if (index >= m_buffer->size())
-			index -= m_buffer->size();
+		sound_assert(u32(start) < samples());
+		u32 index = index_to_buffer_index(start);
 		m_buffer->put(index, m_buffer->get(index) + sample);
 	}
 
@@ -421,7 +416,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, value);
@@ -436,7 +431,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, src.get(start + sampindex));
@@ -451,7 +446,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, m_buffer->get(index) + src.get(start + sampindex));
@@ -460,6 +455,16 @@ public:
 	}
 	void add(read_stream_view const &src, s32 start) { add(src, start, samples() - start); }
 	void add(read_stream_view const &src) { add(src, 0, samples()); }
+
+private:
+	// given a stream starting offset, return the buffer index
+	u32 index_to_buffer_index(s32 start) const
+	{
+		u32 index = start + m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
+		return index;
+	}
 };
 
 
@@ -758,6 +763,7 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
+	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
@@ -804,7 +810,7 @@ private:
 	void resume();
 
 	// handle configuration load/save
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// helper to adjust scale factor toward a goal
@@ -828,6 +834,7 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode

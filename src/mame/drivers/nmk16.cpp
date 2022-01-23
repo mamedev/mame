@@ -204,10 +204,10 @@ Reference of music tempo:
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -665,13 +665,6 @@ printed on the up-left corner of the screen).
 		m_mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-#ifdef UNUSED_FUNCTION
-u16 nmk16_state::mcu_shared_r()
-{
-	return nmk16_mcu_shared_ram[offset];
-}
-#endif
-
 //td     - hmf
 //008D9E - 00796e
 /*
@@ -1030,7 +1023,7 @@ void nmk16_state::tdragon_map(address_map &map)
 //  map(0x0b0000, 0x0b7fff).ram();    // Work RAM
 //  map(0x0b8000, 0x0b8fff).ram().share("spriteram"); // Sprite RAM
 //  map(0x0b9000, 0x0bdfff).ram().share("mcu_work_ram");   // Work RAM
-//  map(0x0be000, 0x0befff).rw(FUNC(nmk16_state::mcu_shared_r), FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  // Work RAM
+//  map(0x0be000, 0x0befff).lr(NAME([this] (offs_t offset) { return nmk16_mcu_shared_ram[offset]; })).w(FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  // Work RAM
 //  map(0x0bf000, 0x0bffff).ram();    // Work RAM
 	map(0x0b0000, 0x0bffff).ram().share("mainram");
 	map(0x0c0000, 0x0c0001).portr("IN0");

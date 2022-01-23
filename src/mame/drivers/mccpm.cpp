@@ -64,7 +64,7 @@ private:
 	void fdc_irq(bool);
 	template <int N> void bd_q_w(offs_t offset, u8 data);
 
-	u8 m_fdc_status;
+	u8 m_fdc_status = 0U;
 	floppy_image_device *m_floppy;
 
 	required_device<cpu_device> m_maincpu;

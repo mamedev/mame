@@ -991,8 +991,11 @@
 #include "upndown.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
 
 class goldnpkr_state : public driver_device
@@ -1002,6 +1005,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
@@ -1072,6 +1076,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<discrete_device> m_discrete;
@@ -4342,12 +4347,9 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((39+1)*8, (31+1)*8);          // From MC6845 init, registers 00 & 04 (programmed with value-1).
-	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); // From MC6845 init, registers 01 & 06.
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
@@ -4410,6 +4412,7 @@ void goldnpkr_state::witchcrd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	// sound hardware
@@ -4500,6 +4503,7 @@ void goldnpkr_state::wcrdxtnd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_gfxdecode->set_info(gfx_wcrdxtnd);
 	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
@@ -4771,12 +4775,9 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((32)*8, (32)*8);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -5343,6 +5344,63 @@ ROM_START( ngoldb )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s129n.9c",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump needed
 ROM_END
+
+
+/*********************************************
+
+  Amstar Draw Poker
+  -----------------
+
+  PCB chips:
+
+  SY6502 main CPU
+  MC8621P x 2
+  MC6845P CRT Controller
+
+  TI NE555P precision timer
+  MB7051 BPROM
+
+  OSC: Unknown, no markings
+
+  8-switch dipswitch on PCB
+  6-switch dipswitch on riser board with 6502 CPU
+  Off/On slider switch
+
+  2x 2732 program ROMs
+  4x 2716 data/graphics? ROMs
+  1x MB7051 BPROM
+
+-----------------------------------------
+
+  Program 2000-3fff / A14 & A15 disconnected.
+
+  NMI  : 2DF0
+  Start: 2D36
+  Reset: 2F0B
+
+  There are code just before the vectors.
+  Curious about it... Will be analyzed.
+
+*********************************************/
+
+ROM_START( adpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.16a",   0x2000, 0x1000, CRC(8892fbd4) SHA1(22a27c0c3709ca4808a9afb8848233bc4124559f) )
+	ROM_LOAD( "2732.17a",   0x3000, 0x1000, CRC(b4db832f) SHA1(af1f26c5b703a9031690d4b63fb8555236cd6ddd) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "2716.8a",    0x1000, 0x0800, CRC(7ce15156) SHA1(13c604b4d97186f1cef2cffbc437e76990f7e4bb) )    // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716.4a",     0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "loson.6a",    0x0800, 0x0800, CRC(5afb7cc7) SHA1(334deb71f2d59dd7264150d1c15af01e49f9bd86) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "loson.7a",    0x1000, 0x0800, CRC(19fec412) SHA1(580a56d9a2ae94abf1185ed7fc0280d51e9d5964) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7052.9c",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 
 /**************************************** BUENA SUERTE SETS ****************************************/
@@ -11814,6 +11872,8 @@ void goldnpkr_state::init_super98()
 	ROM[0x69f6] = 0xea;
 }
 
+} // anonymous namespace
+
 
 /*********************************************
 *                Game Drivers                *
@@ -11844,6 +11904,8 @@ GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
+GAMEL( 198?, adpoker,   0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Amstar?",                  "Amstar Draw Poker",                          0,                layout_goldnpkr )
+
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
@@ -11976,5 +12038,5 @@ GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", MACHINE_NOT_WORKING ) // may need an extra reset to work the first time

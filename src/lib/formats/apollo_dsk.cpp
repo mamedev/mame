@@ -8,9 +8,10 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/apollo_dsk.h"
+
+#include "ioprocs.h"
+
 
 apollo_format::apollo_format() : upd765_format(formats)
 {
@@ -46,10 +47,13 @@ const apollo_format::format apollo_format::formats[] = {
 
 const floppy_format_type FLOPPY_APOLLO_FORMAT = &floppy_image_format_creator<apollo_format>;
 
-int apollo_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apollo_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
-	uint32_t expected_size = 77*2*8*1024;
+	uint64_t size;
+	if (io.length(size))
+		return 0;
+
+	constexpr uint32_t expected_size = 77*2*8*1024;
 
 	return ((size == expected_size) || (size == 0)) ? 1 : 0;
 }

@@ -306,6 +306,7 @@ struct rdp_span_aux
 	uint8_t*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
 	rgbaint_t           m_clamp_diff[8];
+	combine_modes_t     m_combine;
 };
 
 struct z_decompress_entry_t

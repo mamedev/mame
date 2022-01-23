@@ -611,18 +611,18 @@ inline void drcbe_x64::smart_call_m64(Assembler &a, x86code **target)
 //-------------------------------------------------
 
 drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
-	: drcbe_interface(drcuml, cache, device),
-		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0xaaaaaaaa5555),
-		m_log(nullptr),
-		m_log_asmjit(nullptr),
-		m_absmask32((uint32_t *)cache.alloc_near(16*2 + 15)),
-		m_absmask64(nullptr),
-		m_rbpvalue(cache.near() + 0x80),
-		m_entry(nullptr),
-		m_exit(nullptr),
-		m_nocode(nullptr),
-		m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
+	: drcbe_interface(drcuml, cache, device)
+	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_map(cache, 0xaaaaaaaa5555)
+	, m_log(nullptr)
+	, m_log_asmjit(nullptr)
+	, m_absmask32((uint32_t *)cache.alloc_near(16*2 + 15))
+	, m_absmask64(nullptr)
+	, m_rbpvalue(cache.near() + 0x80)
+	, m_entry(nullptr)
+	, m_exit(nullptr)
+	, m_nocode(nullptr)
+	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
 	// build up necessary arrays
 	static const uint32_t sse_control[4] =
@@ -673,6 +673,93 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & FLAG_S) flags |= 0x080;
 		if (entry & FLAG_V) flags |= 0x800;
 		m_near.flagsunmap[entry] = flags;
+	}
+
+	// resolve the actual addresses of the address space handlers
+	auto const resolve_accessor =
+			[] (resolved_handler &handler, address_space &space, auto accessor)
+			{
+				if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM)
+				{
+					struct { uintptr_t ptr; ptrdiff_t adj; } equiv;
+					assert(sizeof(accessor) == sizeof(equiv));
+					*reinterpret_cast<decltype(accessor) *>(&equiv) = accessor;
+					handler.obj = uintptr_t(reinterpret_cast<u8 *>(&space) + equiv.adj);
+					if (BIT(equiv.ptr, 0))
+					{
+						auto const vptr = *reinterpret_cast<u8 const *const *>(handler.obj) + equiv.ptr - 1;
+						handler.func = *reinterpret_cast<x86code *const *>(vptr);
+					}
+					else
+					{
+						handler.func = reinterpret_cast<x86code *>(equiv.ptr);
+					}
+				}
+				else if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC)
+				{
+					// interpret the pointer to member function ignoring the virtual inheritance variant
+					struct single { uintptr_t ptr; };
+					struct multi { uintptr_t ptr; int adj; };
+					struct { uintptr_t ptr; int adj; int vadj; int vindex; } unknown;
+					assert(sizeof(accessor) <= sizeof(unknown));
+					*reinterpret_cast<decltype(accessor) *>(&unknown) = accessor;
+					handler.func = reinterpret_cast<x86code *>(unknown.ptr);
+					handler.obj = uintptr_t(&space);
+					if ((sizeof(unknown) == sizeof(accessor)) && unknown.vindex)
+					{
+						handler.obj += unknown.vadj;
+						auto const vptr = *reinterpret_cast<std::uint8_t const *const *>(handler.obj);
+						handler.obj += *reinterpret_cast<int const *>(vptr + unknown.vindex);
+					}
+					if (sizeof(single) < sizeof(accessor))
+						handler.obj += unknown.adj;
+
+					// walk past thunks
+					while (true)
+					{
+						if (0xe9 == handler.func[0])
+						{
+							// absolute jump with 32-bit displacement
+							handler.func += 5 + *reinterpret_cast<s32 const *>(handler.func + 1);
+						}
+						else if ((0x48 == handler.func[0]) && (0x8b == handler.func[1]) && (0x01 == handler.func[2]) && (0xff == handler.func[3]) && ((0x60 == handler.func[4]) || (0xa0 == handler.func[4])))
+						{
+							// virtual function call thunk
+							auto const vptr = *reinterpret_cast<std::uint8_t const *const *>(handler.obj);
+							if (0x60 == handler.func[4])
+								handler.func = *reinterpret_cast<x86code *const *>(vptr + *reinterpret_cast<s8 const *>(handler.func + 5));
+							else
+								handler.func = *reinterpret_cast<x86code *const *>(vptr + *reinterpret_cast<s32 const *>(handler.func + 5));
+						}
+						else
+						{
+							// not something we can easily bypass
+							break;
+						}
+					}
+				}
+			};
+	m_resolved_accessors.resize(m_space.size());
+	for (int space = 0; m_space.size() > space; ++space)
+	{
+		if (m_space[space])
+		{
+			resolve_accessor(m_resolved_accessors[space].read_byte,         *m_space[space], static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
+			resolve_accessor(m_resolved_accessors[space].read_word,         *m_space[space], static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
+			resolve_accessor(m_resolved_accessors[space].read_word_masked,  *m_space[space], static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
+			resolve_accessor(m_resolved_accessors[space].read_dword,        *m_space[space], static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
+			resolve_accessor(m_resolved_accessors[space].read_dword_masked, *m_space[space], static_cast<u32 (address_space::*)(offs_t, u32)>(&address_space::read_dword));
+			resolve_accessor(m_resolved_accessors[space].read_qword,        *m_space[space], static_cast<u64 (address_space::*)(offs_t)     >(&address_space::read_qword));
+			resolve_accessor(m_resolved_accessors[space].read_qword_masked, *m_space[space], static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
+
+			resolve_accessor(m_resolved_accessors[space].write_byte,         *m_space[space], static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
+			resolve_accessor(m_resolved_accessors[space].write_word,         *m_space[space], static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
+			resolve_accessor(m_resolved_accessors[space].write_word_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
+			resolve_accessor(m_resolved_accessors[space].write_dword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
+			resolve_accessor(m_resolved_accessors[space].write_dword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
+			resolve_accessor(m_resolved_accessors[space].write_qword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
+			resolve_accessor(m_resolved_accessors[space].write_qword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
+		}
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -2231,32 +2318,65 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
 
-	// set up a call to the read byte handler
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);            // mov    param1,space
+	// set up a call to the read handler
+	auto &trampolines = m_accessors[spacesizep.space()];
+	auto &resolved = m_resolved_accessors[spacesizep.space()];
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_byte);
-																						// call   read_byte
+		if (resolved.read_byte.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte.obj);                    // mov    param1,space
+			smart_call_r64(a, resolved.read_byte.func, rax);                            // call   read_byte
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_byte);                      // call   read_byte
+		}
 		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_word);
-																						// call   read_word
+		if (resolved.read_word.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word.obj);                    // mov    param1,space
+			smart_call_r64(a, resolved.read_word.func, rax);                            // call   read_word
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_word);                      // call   read_word
+		}
 		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_dword);
-																						// call   read_dword
+		if (resolved.read_dword.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword.obj);                   // mov    param1,space
+			smart_call_r64(a, resolved.read_dword.func, rax);                           // call   read_dword
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_dword);                     // call   read_dword
+		}
 		if (dstreg != eax || inst.size() == 8)
 			a.mov(dstreg, eax);                                                         // mov    dstreg,eax
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_qword);
-																						// call   read_qword
+		if (resolved.read_qword.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword.obj);                   // mov    param1,space
+			smart_call_r64(a, resolved.read_qword.func, rax);                           // call   read_qword
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_qword);                     // call   read_qword
+		}
 		if (dstreg != eax)
 			a.mov(dstreg.r64(), rax);                                                   // mov    dstreg,rax
 	}
@@ -2290,8 +2410,9 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
 
-	// set up a call to the read byte handler
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);            // mov    param1,space
+	// set up a call to the read handler
+	auto &trampolines = m_accessors[spacesizep.space()];
+	auto &resolved = m_resolved_accessors[spacesizep.space()];
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                       // mov    param3,maskp
@@ -2299,21 +2420,45 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                       // mov    param3,maskp
 	if (spacesizep.size() == SIZE_WORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_word_masked);
-																						// call   read_word_masked
+		if (resolved.read_word_masked.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
+			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_byte_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_word_masked);               // call   read_word_masked
+		}
 		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_dword_masked);
-																						// call   read_dword_masked
+		if (resolved.read_dword_masked.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword_masked.obj);            // mov    param1,space
+			smart_call_r64(a, resolved.read_dword_masked.func, rax);                    // call   read_dword_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_dword_masked);              // call   read_word_masked
+		}
 		if (dstreg != eax || inst.size() == 8)
 			a.mov(dstreg, eax);                                                         // mov    dstreg,eax
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].read_qword_masked);
-																						// call   read_qword_masked
+		if (resolved.read_qword_masked.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword_masked.obj);            // mov    param1,space
+			smart_call_r64(a, resolved.read_qword_masked.func, rax);                    // call   read_qword_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_qword_masked);              // call   read_word_masked
+		}
 		if (dstreg != eax)
 			a.mov(dstreg.r64(), rax);                                                   // mov    dstreg,rax
 	}
@@ -2343,21 +2488,66 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	// set up a call to the write byte handler
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);            // mov    param1,space
+	// set up a call to the write handler
+	auto &trampolines = m_accessors[spacesizep.space()];
+	auto &resolved = m_resolved_accessors[spacesizep.space()];
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                        // mov    param3,srcp
 	else
 		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
 	if (spacesizep.size() == SIZE_BYTE)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_byte);     // call   write_byte
+	{
+		if (resolved.write_byte.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte.obj);                   // mov    param1,space
+			smart_call_r64(a, resolved.write_byte.func, rax);                           // call   write_byte
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_byte);                     // call   write_byte
+		}
+	}
 	else if (spacesizep.size() == SIZE_WORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_word);     // call   write_word
+	{
+		if (resolved.write_word.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word.obj);                   // mov    param1,space
+			smart_call_r64(a, resolved.write_word.func, rax);                           // call   write_word
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_word);                     // call   write_word
+		}
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_dword);    // call   write_dword
+	{
+		if (resolved.write_dword.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword.obj);                  // mov    param1,space
+			smart_call_r64(a, resolved.write_dword.func, rax);                          // call   write_dword
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_dword);                    // call   write_dword
+		}
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_qword);    // call   write_qword
+	{
+		if (resolved.write_qword.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword.obj);                  // mov    param1,space
+			smart_call_r64(a, resolved.write_qword.func, rax);                          // call   write_qword
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_qword);                    // call   write_qword
+		}
+	}
 }
 
 
@@ -2379,8 +2569,9 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
 
-	// set up a call to the write byte handler
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);            // mov    param1,space
+	// set up a call to the write handler
+	auto &trampolines = m_accessors[spacesizep.space()];
+	auto &resolved = m_resolved_accessors[spacesizep.space()];
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 	{
@@ -2393,14 +2584,44 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                       // mov    param4,maskp
 	}
 	if (spacesizep.size() == SIZE_WORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_word_masked);
-																						// call   write_word_masked
+	{
+		if (resolved.write_word.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word_masked.obj);            // mov    param1,space
+			smart_call_r64(a, resolved.write_word_masked.func, rax);                    // call   write_word_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_word_masked);              // call   write_word_masked
+		}
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_dword_masked);
-																						// call   write_dword_masked
+	{
+		if (resolved.write_word.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword_masked.obj);           // mov    param1,space
+			smart_call_r64(a, resolved.write_dword_masked.func, rax);                   // call   write_dword_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_dword_masked);             // call   write_dword_masked
+		}
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		smart_call_m64(a, (x86code **)&m_accessors[spacesizep.space()].write_qword_masked);
-																						// call   write_qword_masked
+	{
+		if (resolved.write_word.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword_masked.obj);           // mov    param1,space
+			smart_call_r64(a, resolved.write_qword_masked.func, rax);                   // call   write_qword_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_qword_masked);             // call   write_qword_masked
+		}
+	}
 }
 
 

@@ -273,8 +273,7 @@ Notes:
 #include "machine/te7750.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -1737,8 +1736,11 @@ static INPUT_PORTS_START( qzquest )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)  //??
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Countdown Timer" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Very Slow" )
+	PORT_DIPSETTING(    0x04, "Slow" )
+	PORT_DIPSETTING(    0x0c, "Medium" )
+	PORT_DIPSETTING(    0x08, "Fast" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
@@ -1912,7 +1914,7 @@ static INPUT_PORTS_START( hthero )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( footchmpbl  )
+static INPUT_PORTS_START( footchmpbl )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("IN1")
@@ -1948,7 +1950,7 @@ static INPUT_PORTS_START( ninjak )
 	PORT_DIPSETTING(    0x08, "TROG (4 players / 2 coin slots)" )
 	PORT_DIPSETTING(    0x04, "MTX2 (4 players / 2 cabinets combined)" )
 	PORT_DIPSETTING(    0x00, "TMNT (4 players / 4 coin slots)" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -2163,8 +2165,11 @@ static INPUT_PORTS_START( deadconx )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	PORT_START("DSWB") /* DSW B, missing a timer speed maybe? */
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )        /* Listed as "NOT USE" */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0x03, 0x03, "Number of Enemies 1/2 Player" )  PORT_DIPLOCATION("SW2:1,2") // see MT08059
+	PORT_DIPSETTING(    0x01, "25/45" )
+	PORT_DIPSETTING(    0x03, "30/50" )
+	PORT_DIPSETTING(    0x02, "40/60" )
+	PORT_DIPSETTING(    0x00, "50/70" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "NOT USE" */
 	PORT_DIPNAME( 0x18, 0x18, "Life Meter") PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2172,11 +2177,10 @@ static INPUT_PORTS_START( deadconx )
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x08, "12" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "NOT USE" */
-	PORT_DIPNAME( 0xc0, 0xc0, "Number of Enemies 1/2 Player" )  PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(    0xc0, "30/50" )
-	PORT_DIPSETTING(    0x80, "40/60" )
-	PORT_DIPSETTING(    0x40, "25/45" )
-	PORT_DIPSETTING(    0x00, "50/70" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )  PORT_DIPLOCATION("SW2:8")   // single or two players at once
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( deadconxj ) /* Matches PDF of Dip Sheet but not matching current taito coin macros */
@@ -2563,7 +2567,9 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("IN0")
@@ -4259,7 +4265,7 @@ ROM_START( ssia )
 	ROM_LOAD( "c64-11.ic43", 0x200, 0x117, CRC(f116413e) SHA1(696a8c404ef3d6d832e0fcf530452344f96dd0b2) )
 ROM_END
 
-ROM_START( ssib ) // this is identical to majest12u, but the region-defining byte which is changed to 0x03 (World). All labels are original and the new ROM's number (13) does fill a hole, so seems original
+ROM_START( ssib )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
 	ROM_LOAD16_BYTE( "c64_13.ic8", 0x00001, 0x40000, CRC(99e3dd1c) SHA1(631e6db268d5411acf73d2892ad5107401212a5d) )
@@ -4284,6 +4290,30 @@ ROM_START( ssib ) // this is identical to majest12u, but the region-defining byt
 ROM_END
 
 ROM_START( majest12u )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c64_15.ic9", 0x00000, 0x40000, CRC(3a6d591b) SHA1(cc08aa89046e774046d1e47afb7d124c9a6b0b88) )
+	ROM_LOAD16_BYTE( "c64_17.ic8", 0x00001, 0x40000, CRC(fd514ad9) SHA1(14646ed90dad208b5874191a329396f35f3c0a0d) )
+
+	ROM_REGION( 0x100000, "tc0100scn_1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
+	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "c64-09.13",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
+
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
+
+	/* no Delta-T samples */
+
+	ROM_REGION( 0x400, "plds", 0 ) // originals are protected PAL16L8s, these are brute-forced and reversed for GAL16V8s
+	ROM_LOAD( "c64-10.ic42", 0x000, 0x117, CRC(08e8c3d6) SHA1(9e1f0c8a70af7355d82c2bac249363415c2293e2) )
+	ROM_LOAD( "c64-11.ic43", 0x200, 0x117, CRC(f116413e) SHA1(696a8c404ef3d6d832e0fcf530452344f96dd0b2) )
+ROM_END
+
+ROM_START( majest12ua )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
 	ROM_LOAD16_BYTE( "c64_14.ic8", 0x00001, 0x40000, CRC(eee4ed8a) SHA1(ad50dc12ede0d327ef9ded5ffd9dbd6e865ebcfc) )
@@ -5388,10 +5418,10 @@ void taitof2_state::init_finalb()
 	gfx_element *gx1 = m_gfxdecode->gfx(1);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_decoded_gfx = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -5413,7 +5443,7 @@ void taitof2_state::init_finalb()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_decoded_gfx.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_colors(4096 / 64);
 	gx0->set_granularity(64);
 	m_gfxdecode->set_gfx(1, nullptr);
@@ -5492,6 +5522,7 @@ GAME( 1990, ssi,        0,        ssi,       ssi,        taitof2_state, empty_in
 GAME( 1990, ssia,       ssi,      ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssib,       ssi,      ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, earlier?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12ua, ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US, earlier?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state, empty_init,    ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )

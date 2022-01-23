@@ -67,7 +67,7 @@ TILEMAP_MAPPER_MEMBER(atarig42_state::atarig42_playfield_scan)
  *
  *************************************/
 
-VIDEO_START_MEMBER(atarig42_state,atarig42)
+void atarig42_state::video_start()
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
@@ -91,8 +91,6 @@ VIDEO_START_MEMBER(atarig42_state,atarig42)
 TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
 {
 	int scanline = param;
-
-	if (scanline == 0) logerror("-------\n");
 
 	/* keep in range */
 	int offset = (scanline / 8) * 64 + 48;

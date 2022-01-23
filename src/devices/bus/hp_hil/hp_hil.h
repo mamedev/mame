@@ -59,7 +59,7 @@
 #define HPHIL_DHR       0xFE    // Device Hard Reset
 
 /*
- * init sequnce (p. 4-13)
+ * init sequence (p. 4-13)
  *
  * DHR
  * IFC

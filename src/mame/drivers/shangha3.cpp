@@ -47,7 +47,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

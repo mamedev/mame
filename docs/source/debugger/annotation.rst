@@ -3,101 +3,107 @@
 Code Annotation Debugger Commands
 =================================
 
+:ref:`debugger-command-comadd`
+    adds a comment to the disassembled code at given address
+:ref:`debugger-command-comdelete`
+    removes a comment from the given address
+:ref:`debugger-command-comsave`
+    save the current comments to file
+:ref:`debugger-command-comlist`
+    list comments stored in the comment file for the system
+:ref:`debugger-command-commit`
+    combined ``comadd`` and ``comsave`` command
 
-You can also type **help <command>** for further details on each command in the MAME Debugger interface.
 
-| :ref:`debugger-command-comadd` -- adds a comment to the disassembled code at given address
-| :ref:`debugger-command-comdelete` -- removes a comment from the given address
-| :ref:`debugger-command-comsave` -- save the current comments to a file
-| :ref:`debugger-command-comlist` -- print currently available comments from file
-| :ref:`debugger-command-commit` -- gives a bulk comadd then comsave command
-
-
- .. _debugger-command-comadd:
+.. _debugger-command-comadd:
 
 comadd
 ------
 
-|  **comadd[//] <address>,<comment>**
-|
-| Adds a string <comment> to the disassembled code at <address>. The shortcut for this command is simply '//'
-|
-| Examples:
-|
-|  comadd 0, hello world.
-|
-| Adds the comment 'hello world.' to the code at address 0x0
-|
-|  // 10, undocumented opcode!
-|
-| Adds the comment 'undocumented opcode!' to the code at address 0x10
+**comadd <address>,<comment>**
+
+Sets the specified comment for the specified address in the disassembled
+code for the visible CPU.  This command may be abbreviated to ``//``.
+
+Examples:
+
+``comadd 0,hello world.``
+    Adds the comment “hello world.” to the code at address 0.
+``// 10,undocumented opcode!``
+    Adds the comment “undocumented opcode!” to the code at address 10.
 
 
- .. _debugger-command-comdelete:
+.. _debugger-command-comdelete:
 
 comdelete
 ---------
 
-|  **comdelete**
-|
-| Deletes the comment at the specified memory offset. The comment which is deleted is in the currently active memory bank.
-|
-| Examples:
-|
-|  comdelete 10
-|
-| Deletes the comment at code address 0x10 (using the current memory bank settings)
+**comdelete**
+
+Deletes the comment at the specified address for the visible CPU.
+
+Examples:
+
+``comdelete 10``
+    Deletes the comment at code address 10 for the visible CPU.
 
 
- .. _debugger-command-comsave:
+.. _debugger-command-comsave:
 
 comsave
 -------
 
-|  **comsave**
-|
-| Saves the working comments to the driver's XML comment file.
-|
-| Examples:
-|
-|  comsave
-|
-| Saves the comments to the driver's comment file
+**comsave**
+
+Saves the current comments to the XML comment file for the emulated
+system.  This file will be loaded by the debugger the next time the
+system is run with debugging enabled.  The directory for saving these
+files is set using the
+:ref:`comment_directory <mame-commandline-commentdirectory>` option.
+
+Examples:
+
+``comsave``
+    Saves the current comments to the comment file for the system.
 
 
- .. _debugger-command-comlist:
+.. _debugger-command-comlist:
 
 comlist
 -------
 
-|  **comlist**
-|
-| Prints the currently available comment file in human readable form in debugger output window.
-|
-| Examples:
-|
-|  comlist
-|
-| Shows currently available comments.
+**comlist**
+
+Reads the comments stored in the XML comment file for the emulated
+system and prints them to the debugger console.  This command does not
+affect the comments for the current session, it reads the file directly.
+The directory for these files is set using the
+:ref:`comment_directory <mame-commandline-commentdirectory>` option.
+
+Examples:
+
+comlist
+    Shows comments stored in the comment file for the system.
 
 
- .. _debugger-command-commit:
+.. _debugger-command-commit:
 
 commit
 ------
 
-|  **commit[/*] <address>,<comment>**
-|
-| Adds a string <comment> to the disassembled code at <address> then saves to file. Basically same as comadd + comsave via a single line.
-| The shortcut for this command is simply \'\/\*\'
-|
-| Examples:
-|
-|  commit 0, hello world.
-|
-| Adds the comment 'hello world.' to the code at address 0x0
-|
-|  /* 10, undocumented opcode!
-|
-| Adds the comment 'undocumented opcode!' to the code at address 0x10
+**commit <address>,<comment>**
 
+Sets the specified comment for the specified address in the disassembled
+code for the visible CPU, and saves comments to the file for the current
+emulated system (equivalent to :ref:`debugger-command-comadd` followed
+by :ref:`debugger-command-comsave`).  This command may be abbreviated to
+``/*``.
+
+Examples:
+
+``commit 0,hello world.``
+    Adds the comment “hello world.” to the code at address 0 for the
+    visible CPU and saves comments.
+``/* 10,undocumented opcode!``
+    Adds the comment “undocumented opcode!” to the code at address 10
+    for the visible CPU and saves comments.

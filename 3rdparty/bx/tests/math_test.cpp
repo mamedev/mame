@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -196,6 +196,13 @@ TEST_CASE("ToBits", "")
 	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
 }
 
+TEST_CASE("lerp", "")
+{
+	REQUIRE(1389.0f == bx::lerp(1389.0f, 1453.0f, 0.0f) );
+	REQUIRE(1453.0f == bx::lerp(1389.0f, 1453.0f, 1.0f) );
+	REQUIRE(0.5f == bx::lerp(0.0f, 1.0f, 0.5f) );
+}
+
 void mtxCheck(const float* _a, const float* _b)
 {
 	if (!bx::equal(_a, _b, 16, 0.01f) )
@@ -230,7 +237,7 @@ TEST_CASE("quaternion", "")
 	float mtxQ[16];
 	float mtx[16];
 
-	bx::Quaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
+	bx::Quaternion quat = bx::init::Identity;
 	bx::mtxQuat(mtxQ, quat);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);

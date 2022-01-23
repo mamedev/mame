@@ -1568,7 +1568,8 @@ GAMEL( 199?, m1monmonw, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1,
 
 #define m1_jbond_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
-	/* missing or different sound system? */
+	ROM_LOAD( "dig1-047_u2.bin", 0x000000, 0x080000, CRC(1f301dc4) SHA1(337ff12a7ea52498dc642230dda6a6f5852e0be2) )\
+	ROM_LOAD( "dig1-047_u3.bin", 0x080000, 0x080000, CRC(481ab40c) SHA1(08143f53e25db654e9fe80cfffe2711b0e15eafc) )
 ROM_START( m1jbond )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("jbnd2010",          0x0000, 0x010000, CRC(8a41f5c0) SHA1(f52187b04a9b0103495e93eac16b75789012e072) ) m1_jbond_sound ROM_END_M1A_MCU
 ROM_START( m1jbonda ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-605",           0x0000, 0x010000, CRC(a0882696) SHA1(ae2055b7dbf5644408c21e799a4a2d5355617e0a) ) m1_jbond_sound ROM_END_M1A_MCU
 ROM_START( m1jbondb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-606",           0x0000, 0x010000, CRC(1430f845) SHA1(687d54958db78c0da499e58814d916500e6d426e) ) m1_jbond_sound ROM_END_M1A_MCU
@@ -1766,7 +1767,7 @@ GAMEL( 199?, m1inwinw, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, R
 GAMEL( 199?, m1inwinx, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1inwinc)
 
 /*******************************************************************************************************************************************************************************************************
-  Italian Job
+  The Italian Job
 ******************************************************************************************************************************************************************************************************/
 
 #define m1_itjob_sound \
@@ -1794,23 +1795,23 @@ ROM_START( m1itjobp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1itjobq ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-266",           0x0000, 0x020000, CRC(f23250b4) SHA1(c464bbd3a396fa32bba7c3e16de4c9d12005a4dc) ) m1_itjob_sound ROM_END_M1A_MCU
 ROM_START( m1itjobr ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-267",           0x0000, 0x020000, CRC(a273ae08) SHA1(72876cb81e80e96e75758ce8317a1843947a431a) ) m1_itjob_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1itjob,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobc, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobd, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobe, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobf, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobg, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobh, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobi, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobj, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobk, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobl, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobm, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobn, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobo, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobp, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobq, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobr, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjob,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobc, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobd, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobe, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobf, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobg, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobh, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobi, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobj, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobk, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobl, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobm, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobn, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobo, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobp, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobq, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjobr, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Italian Job (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1itjobc)
 
 /*******************************************************************************************************************************************************************************************************
   Fruit Explosion

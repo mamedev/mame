@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "omti8621.h"
 #include "image.h"
+#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
@@ -47,25 +48,17 @@ static int verbose = VERBOSE;
 // forward declaration of image class
 DECLARE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device)
 
-class omti_disk_image_device :  public device_t,
-								public device_image_interface
+class omti_disk_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "awd"; }
-	virtual const char *custom_instance_name() const noexcept override { return "winchester"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "winchester"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
@@ -1383,8 +1376,7 @@ uint8_t omti8621_device::fd_disk_chg_r()
 DEFINE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device, "omti_disk_image", "OMTI 8621 ESDI disk")
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OMTI_DISK, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: harddisk_image_base_device(mconfig, OMTI_DISK, tag, owner, clock)
 	, m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {
 }
@@ -1458,9 +1450,9 @@ void omti_disk_image_device::device_reset()
 {
 	logerror("device_reset_omti_disk\n");
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		uint32_t disk_size = (uint32_t)(ftell() / OMTI_DISK_SECTOR_SIZE);
+		uint32_t disk_size = uint32_t(ftell() / OMTI_DISK_SECTOR_SIZE);
 		uint16_t disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != m_type) {
 			logerror("device_reset_omti_disk: disk size=%d blocks, disk type=%x\n", disk_size, disk_type);
@@ -1477,12 +1469,10 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 {
 	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
-	int x;
 	unsigned char sectordata[OMTI_DISK_SECTOR_SIZE]; // empty block data
-
-
 	memset(sectordata, 0x55, sizeof(sectordata));
-	for (x = 0; x < m_sector_count; x++)
+
+	for (int x = 0; x < m_sector_count; x++)
 	{
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
@@ -1490,5 +1480,6 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 			return image_init_result::FAIL;
 		}
 	}
+
 	return image_init_result::PASS;
 }

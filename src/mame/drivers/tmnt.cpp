@@ -72,8 +72,10 @@ Updates:
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/samples.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+
 #include "speaker.h"
+#include "ymfm/src/ymfm.h" // decode_fp
 
 
 uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)
@@ -208,7 +210,7 @@ void tmnt_state::tmnt_sres_w(uint8_t data)
 	if (data & 0x04)
 	{
 		if (!m_samples->playing(0))
-			m_samples->start_raw(0, m_sampledata, 0x40000, 20000);
+			m_samples->start_raw(0, m_sampledata, 0x40000, 640000 / 32);
 	}
 	else
 		m_samples->stop(0);
@@ -227,28 +229,16 @@ uint8_t tmnt_state::tmnt_upd_busy_r()
 
 SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 {
-	int i;
+	// using MAME samples to HLE the title music
+	// to put it briefly, it's like this on the PCB:
+	// 640kHz XTAL -> 74161 and 3 74393 -> ROM address -> ROM output to 2 74166 -> YM3014
 	uint8_t *source = memregion("title")->base();
 
-	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
-	 *
-	 *  Bit 15-13:  Exponent (2 ^ x)
-	 *  Bit 12-3 :  Sound data (10 bit)
-	 *
-	 *  (Sound info courtesy of Dave <dave@finalburn.com>)
-	 */
-
-	for (i = 0; i < 0x40000; i++)
+	// sample data is encoded in Yamaha FP format
+	for (int i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
-		int expo = val >> 13;
-
-		val = (val >> 3) & (0x3ff); /* 10 bit, Max Amplitude 0x400 */
-		val -= 0x200;                   /* Centralize value */
-
-		val = (val << expo) >> 3;
-
-		m_sampledata[i] = val;
+		m_sampledata[i] = ymfm::decode_fp(val >> 3);
 	}
 }
 
@@ -591,7 +581,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x204000, 0x207fff).ram(); /* main RAM */
 	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x500000, 0x50003f).m(m_k054000, FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
@@ -995,7 +985,7 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x500000, 0x50003f).m(m_k054000, FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1_COINS");
 	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
@@ -2093,7 +2083,7 @@ void tmnt_state::tmnt(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
 	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void tmnt_state::punkshot(machine_config &config)
@@ -2600,18 +2590,18 @@ void tmnt_state::thndrx2(machine_config &config)
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback));
 
 	K053251(config, m_k053251, 0);
-
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
+	// NB: game defaults in mono
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.25).add_route(1, "rspeaker", 0.25);
 
 	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.75);
-	m_k053260->add_route(1, "rspeaker", 0.75);
+	m_k053260->add_route(0, "lspeaker", 0.50);
+	m_k053260->add_route(1, "rspeaker", 0.50);
 }
 
 
@@ -4310,6 +4300,16 @@ void tmnt_state::init_cuebrick()
 	save_item(NAME(m_cuebrick_nvram));
 }
 
+void tmnt_state::init_thndrx2()
+{
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
+
+	// cfr. notes in k054000 device
+	// this makes 11C / 12C to return bad (for ROM checksum)
+	// but goes on instead of halting for 14D (the protection chip device)
+	ROM[0x16c0 / 2] = 0x4e71;
+}
+
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebrick,ROT0,  "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
@@ -4374,9 +4374,9 @@ GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, empty_init, 
 GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // Fails k054000 unit tests, cfr. driver_init & device
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
 
 GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

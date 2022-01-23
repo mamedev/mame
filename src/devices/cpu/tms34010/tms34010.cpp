@@ -228,14 +228,14 @@ inline void tms340x0_device::RESET_ST()
 }
 
 /* shortcuts for reading opcodes */
-uint32_t tms34010_device::ROPCODE()
+uint16_t tms34010_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_cache.read_word(pc);
 }
 
-uint32_t tms34020_device::ROPCODE()
+uint16_t tms34020_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
@@ -727,7 +727,6 @@ void tms340x0_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 		state_add(TMS34010_SP,     "SP",        m_regs[15].reg);
-		state_add(STATE_GENSP,     "GENSP",     m_regs[15].reg).noshow();
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
@@ -888,7 +887,7 @@ void tms340x0_device::execute_run()
 			uint16_t op;
 			m_ppc = m_pc;
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	else
@@ -899,10 +898,20 @@ void tms340x0_device::execute_run()
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	m_executing = false;
+}
+
+void tms34010_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
+}
+
+void tms34020_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
 }
 
 

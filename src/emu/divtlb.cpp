@@ -177,8 +177,9 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	// if this is the first successful translation for this address, allocate a new entry
 	if ((entry & VTLB_FLAGS_MASK) == 0)
 	{
-		int liveindex = m_dynindex++ % m_dynamic;
+		int liveindex = m_dynindex;
 
+		m_dynindex = (m_dynindex + 1) % m_dynamic;
 
 		// if an entry already exists at this index, free it
 		if (m_live[liveindex] != 0)
@@ -277,7 +278,10 @@ void device_vtlb_interface::vtlb_dynload(u32 index, offs_t address, vtlb_entry v
 		return;
 	}
 
-	int liveindex = m_dynindex++ % m_dynamic;
+	int liveindex = m_dynindex;
+
+	m_dynindex = (m_dynindex + 1) % m_dynamic;
+
 	// is entry already live?
 	if (!(entry & VTLB_FLAG_VALID))
 	{

@@ -295,7 +295,7 @@ Filter Board
 #include "machine/namco_c148.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 namespace {

@@ -193,114 +193,82 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 	m_an2 = state;
 }
 
+template<bool iie, bool invert, bool flip>
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
 {
-	if (!m_altcharset)
+	if (iie)    // IIe/IIc/IIgs
+	{
+		if (!m_altcharset)
+		{
+			if ((code >= 0x40) && (code <= 0x7f))
+			{
+				code &= 0x3f;
+
+				if (m_flash)
+				{
+					using std::swap;
+					swap(fg, bg);
+				}
+			}
+		}
+		else
+		{
+			if ((code >= 0x60) && (code <= 0x7f))
+			{
+				code |= 0x80;    // map to lowercase normal
+				using std::swap; // and flip the color
+				std::swap(fg, bg);
+			}
+		}
+	}
+	else    // original II and II Plus
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
 		{
-			code &= 0x3f;
-
 			if (m_flash)
 			{
 				using std::swap;
 				swap(fg, bg);
 			}
 		}
-	}
-	else
-	{
-		if ((code >= 0x60) && (code <= 0x7f))
-		{
-			code |= 0x80;   // map to lowercase normal
-			using std::swap;// and flip the color
-			std::swap(fg, bg);
-		}
-	}
-
-	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 7; x++)
-		{
-			uint16_t const color = (chardata[y] & (1 << x)) ? bg : fg;
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
-			}
-		}
-	}
-}
-
-void a2_video_device::plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
-{
-	if (!m_altcharset)
-	{
-		if ((code >= 0x40) && (code <= 0x7f))
-		{
-			code &= 0x3f;
-
-			if (m_flash)
-			{
-				using std::swap;
-				swap(fg, bg);
-			}
-		}
-	}
-	else
-	{
-		if ((code >= 0x60) && (code <= 0x7f))
-		{
-			code |= 0x80;   // map to lowercase normal
-			using std::swap;// and flip the color
-			swap(fg, bg);
-		}
-	}
-
-	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 7; x++)
-		{
-			uint16_t const color = (chardata[y] & (1 << (x+1))) ? fg : bg;
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
-			}
-		}
-	}
-}
-
-void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
-{
-	if ((code >= 0x40) && (code <= 0x7f))
-	{
-		if (m_flash)
+		else if (code < 0x40) // inverse: flip FG and BG
 		{
 			using std::swap;
 			swap(fg, bg);
 		}
 	}
-	else if (code < 0x40)   // inverse: flip FG and BG
-	{
-		using std::swap;
-		swap(fg, bg);
-	}
 
 	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
+	u8 const *const chardata = &m_char_ptr[(code * 8)];
 
 	for (int y = 0; y < 8; y++)
 	{
 		for (int x = 0; x < 7; x++)
 		{
-			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			u16 color;
+			// flip and invert are template parameters, so the compiler will boil this down appropriately
+			if (flip)
+			{
+				if (invert)
+				{
+					color = (chardata[y] & (1 << (6 - x))) ? fg : bg;
+				}
+				else
+				{
+					color = (chardata[y] & (1 << (6 - x))) ? bg : fg;
+				}
+			}
+			else
+			{
+				if (invert)
+				{
+					color = (chardata[y] & (1 << x)) ? fg : bg;
+				}
+				else
+				{
+					color = (chardata[y] & (1 << x)) ? bg : fg;
+				}
+			}
 
 			for (int i = 0; i < xscale; i++)
 			{
@@ -416,7 +384,7 @@ void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int 
 
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t const start_address = m_80store ? 0x400 : m_page2 ? 0x0800 : 0x0400;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -726,11 +694,12 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 }
 
+template<bool iie, bool invert, bool flip>
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	uint32_t const start_address = m_80col ? 0x400 : m_page2 ? 0x800 : 0x400;
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
@@ -740,31 +709,40 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
-	//printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
+	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
 	int fg = 0;
 	int bg = 0;
 	switch (m_sysconfig & 0x03)
 	{
-		case 0: case 4: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
+	case 0:
+	case 4:
+		fg = WHITE;
+		break;
+	case 1:
+		fg = WHITE;
+		break;
+	case 2:
+		fg = GREEN;
+		break;
+	case 3:
+		fg = ORANGE;
+		break;
 	}
 
 	for (int row = startrow; row < stoprow; row += 8)
 	{
-		if (m_80col)
+		if ((iie) && (m_80col))
 		{
 			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate address */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
 
-				plot_text_character(bitmap, col * 14, row, 1, aux_page[address],
-					fg, bg);
-				plot_text_character(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
-					fg, bg);
+				plot_text_character<true, invert, flip>(bitmap, col * 14, row, 1, aux_page[address],
+									fg, bg);
+				plot_text_character<true, invert, flip>(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
+									fg, bg);
 			}
 		}
 		else
@@ -772,120 +750,28 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate address */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
 				if (((m_sysconfig & 7) == 4) && (m_dhires))
 				{
 					u8 tmp = aux_page[address];
-					fg = tmp>>4;
+					fg = tmp >> 4;
 					bg = tmp & 0xf;
 				}
 
-				plot_text_character(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
+				plot_text_character<iie, invert, flip>(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
 			}
 		}
 	}
 }
 
-void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	int row, col;
-	uint32_t start_address = m_page2 ? 0x800 : 0x400;
-	uint32_t address;
-	int fg = 0;
-	int bg = 0;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-	const int startcol = (cliprect.left() / 14);
-	const int stopcol = ((cliprect.right() / 14) + 1);
-
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: case 4: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
-
-	for (row = startrow; row <= stoprow; row += 8)
-	{
-		for (col = startcol; col < stopcol; col++)
-		{
-			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-			plot_text_character_orig(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
-		}
-	}
-}
-
-void a2_video_device::text_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	int row, col;
-	uint32_t start_address = m_page2 ? 0x800 : 0x400;
-	uint32_t address;
-	int fg = 0;
-	int bg = 0;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
-
-	for (row = startrow; row <= stoprow; row += 8)
-	{
-		for (col = 0; col < 40; col++)
-		{
-			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-			plot_text_character_orig(bitmap, col * 14, row, 2, m_ram_ptr[address], bg, fg);
-		}
-	}
-}
-
-void a2_video_device::text_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	int row, col;
-	uint32_t start_address = m_page2 ? 0x800 : 0x400;
-	uint32_t address;
-	int fg = 0;
-	int bg = 0;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
-
-	for (row = startrow; row <= stoprow; row += 8)
-	{
-		for (col = 0; col < 40; col++)
-		{
-			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-			plot_text_character_dodo(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
-		}
-	}
-}
+template void a2_video_device::text_update<false, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
@@ -1485,10 +1371,20 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 		{
 			int const shrline = beamy - BORDER_TOP;
 
-			uint8_t const scb = m_aux_ptr[0x9D00 + shrline];
+			uint8_t scb;
+			if (shrline & 1)
+			{
+				scb = m_aux_ptr[0x9e80 + (shrline >> 1)];
+			}
+			else
+			{
+				scb = m_aux_ptr[0x5e80 + (shrline >> 1)];
+			}
 			int const palette = ((scb & 0x0f) << 4);
 
-			uint8_t const *const vram = &m_aux_ptr[0x2000 + (shrline * 160)];
+			uint8_t const *const vram = &m_aux_ptr[0x2000 + (shrline * 80)];
+			uint8_t const *const vram2 = &m_aux_ptr[0x6000 + (shrline * 80)];
+
 			uint32_t *const scanline = &bitmap.pix(beamy);
 
 			// draw left and right borders
@@ -1500,13 +1396,19 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 
 			if (scb & 0x80) // 640 mode
 			{
-				for (int col = 0; col < 160; col++)
+				for (int col = 0; col < 80; col++)
 				{
-					uint8_t const b = vram[col];
-					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
-					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[palette +  4 + ((b >> 4) & 0x03)];
-					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[palette +  8 + ((b >> 2) & 0x03)];
-					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
+					uint8_t b = vram[col];
+					scanline[col * 8 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
+					scanline[col * 8 + 1 + BORDER_LEFT] = m_shr_palette[palette +  4 + ((b >> 4) & 0x03)];
+					scanline[col * 8 + 2 + BORDER_LEFT] = m_shr_palette[palette +  8 + ((b >> 2) & 0x03)];
+					scanline[col * 8 + 3 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
+
+					b = vram2[col];
+					scanline[col * 8 + 4 + BORDER_LEFT] = m_shr_palette[palette + 0 + ((b >> 6) & 0x03)];
+					scanline[col * 8 + 5 + BORDER_LEFT] = m_shr_palette[palette + 4 + ((b >> 4) & 0x03)];
+					scanline[col * 8 + 6 + BORDER_LEFT] = m_shr_palette[palette + 8 + ((b >> 2) & 0x03)];
+					scanline[col * 8 + 7 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
 				}
 			}
 			else        // 320 mode
@@ -1520,7 +1422,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				};
 
 				uint32_t last_pixel = fillmode_init[scb & 0x1f];
-				for (int col = 0; col < 160; col++)
+				for (int col = 0; col < 80; col++)
 				{
 					uint8_t b;
 					uint32_t pixel;
@@ -1533,10 +1435,9 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 					else
 						last_pixel = pixel;
 					pixel += palette;
-					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[pixel];
-					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 0 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 1 + BORDER_LEFT] = m_shr_palette[pixel];
 
-					b = vram[col];
 					pixel = (b >> 0) & 0x0f;
 
 					if ((scb & 0x20) && !pixel)
@@ -1544,8 +1445,29 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 					else
 						last_pixel = pixel;
 					pixel += palette;
-					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[pixel];
-					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 2 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 3 + BORDER_LEFT] = m_shr_palette[pixel];
+
+					b = vram2[col];
+					pixel = (b >> 4) & 0x0f;
+
+					if ((scb & 0x20) && !pixel)
+						pixel = last_pixel;
+					else
+						last_pixel = pixel;
+					pixel += palette;
+					scanline[col * 8 + 4 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 5 + BORDER_LEFT] = m_shr_palette[pixel];
+
+					pixel = (b >> 0) & 0x0f;
+
+					if ((scb & 0x20) && !pixel)
+						pixel = last_pixel;
+					else
+						last_pixel = pixel;
+					pixel += palette;
+					scanline[col * 8 + 6 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 8 + 7 + BORDER_LEFT] = m_shr_palette[pixel];
 				}
 			}
 		}
@@ -1680,8 +1602,7 @@ void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	uint32_t const start_address = m_80col ? 0x400 : m_page2 ? 0x800
-															 : 0x400;
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);

@@ -18,7 +18,7 @@
 #include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/atarimo.h"
 #include "emupal.h"
 #include "screen.h"

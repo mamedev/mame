@@ -22,6 +22,8 @@ public:
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	bool bilinear_enabled() { return m_enable_bilinear; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,10 +41,7 @@ private:
 	std::unique_ptr<uint32_t[]>     m_palette;
 
 	required_region_ptr<uint8_t> m_gfxrom;
-	//int m_tex_width;
-	//int m_tex_height;
-	//int m_tex_mirror_x;
-	//int m_tex_mirror_y;
+	bool m_enable_bilinear;
 };
 
 

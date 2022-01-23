@@ -142,6 +142,7 @@ void phantom_state::init_fphantom()
 }
 
 
+
 /******************************************************************************
     Motor Sim
 ******************************************************************************/
@@ -206,6 +207,7 @@ void phantom_state::update_pieces_position(int state)
 }
 
 
+
 /******************************************************************************
     I/O
 ******************************************************************************/
@@ -215,8 +217,6 @@ void phantom_state::update_lcd()
 	u8 mask = (m_select & 0x80) ? 0xff : 0;
 	for (int i = 0; i < 4; i++)
 		m_display->write_row(i+1, (m_lcd_data >> (8*i) & 0xff) ^ mask);
-
-	m_display->update();
 }
 
 void phantom_state::control_w(offs_t offset, u8 data)
@@ -228,7 +228,7 @@ void phantom_state::control_w(offs_t offset, u8 data)
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
 	// 74259 Q4: led select
-	m_display->matrix_partial(0, 1, BIT(~m_select, 4), 1 << (m_select & 0xf), false);
+	m_display->matrix_partial(0, 1, BIT(~m_select, 4), 1 << (m_select & 0xf));
 
 	// 74259 Q6: bookrom bank
 	m_rombank->set_entry(BIT(m_select, 6));
@@ -334,6 +334,7 @@ u8 phantom_state::vmotor_ff_clear_r()
 
 	return 0;
 }
+
 
 
 /******************************************************************************

@@ -5,7 +5,7 @@ local exports = {}
 exports.name = "cheatfind"
 exports.version = "0.0.1"
 exports.description = "Cheat finder helper library"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local cheatfind = exports
@@ -360,7 +360,7 @@ function cheatfind.startplugin()
 
 		local function menu_lim(val, min, max, menuitem)
 			if min == max then
-				menuitem[3] = 0
+				menuitem[3] = "on"
 			elseif val == min then
 				menuitem[3] = "r"
 			elseif val == max then
@@ -371,7 +371,7 @@ function cheatfind.startplugin()
 		end
 
 		local function incdec(event, val, min, max)
-			local ret
+			local ret = false
 			if event == "left" and val ~= min then
 				val = val - 1
 				ret = true
@@ -389,7 +389,7 @@ function cheatfind.startplugin()
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
 				local c = { _("Default"), _("Custom") }
-				local m = { _("Cheat Name"), c[name], 0 }
+				local m = { _("Cheat Name"), c[name], "on" }
 				menu_lim(name, 1, #c, m)
 				local function f(event)
 					local r
@@ -403,12 +403,12 @@ function cheatfind.startplugin()
 			end
 			if name == 2 then
 				menu[#menu + 1] = function()
-					local m = { _("Player"), cplayer[name_player], 0 }
+					local m = { _("Player"), cplayer[name_player], "on" }
 					menu_lim(name_player, 1, #cplayer, m)
 					return m, function(event) local r name_player, r = incdec(event, name_player, 1, #cplayer) return r end
 				end
 				menu[#menu + 1] = function()
-					local m = { _("Type"), ctype[name_type] .. (name_type == #ctype and (#name_other ~= 0 and name_other or _("(empty)")) or ""), 0 }
+					local m = { _("Type"), ctype[name_type] .. (name_type == #ctype and (#name_other ~= 0 and name_other or _("(empty)")) or ""), "on" }
 					menu_lim(name_type, 1, #ctype, m)
 					local function f(event)
 						local r
@@ -433,7 +433,7 @@ function cheatfind.startplugin()
 				end
 			end
 			menu[#menu + 1] = function()
-				local m = { _("Save"), "", 0 }
+				local m = { _("Save"), "", "on" }
 				local function f(event)
 					if event == "select" then
 						local desc
@@ -489,26 +489,27 @@ function cheatfind.startplugin()
 				end
 				return m, f
 			end
-			menu[#menu + 1] = function() return { _("Cancel"), "", 0 }, function(event) if event == "select" then cheat_save = nil return true end end end
+			menu[#menu + 1] = function() return { _("Cancel"), "", "on" }, function(event) if event == "select" then cheat_save = nil return true end end end
 			return menu_prepare()
 		end
 
 		menu[#menu + 1] = function()
-			local m = { _("CPU or RAM"), devtable[devsel].name, 0 }
+			local m = { _("CPU or RAM"), devtable[devsel].name, "on" }
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
 					manager.machine:popmessage(_("Changes to this only take effect when \"Start new search\" is selected"))
 				end
-				devsel = incdec(event, devsel, 1, #devtable)
-				return true
+				local r
+				devsel, r = incdec(event, devsel, 1, #devtable)
+				return r
 			end
 			return m, f
 		end
 
 		menu[#menu + 1] = function()
 			local pausetable = { _("Automatic"), _("Manual") }
-			local m = { _("Pause Mode"), pausetable[pausesel], 0 }
+			local m = { _("Pause Mode"), pausetable[pausesel], "on" }
 			menu_lim(pausesel, 1, pausetable, m)
 			local function f(event)
 				if (event == "left" or event == "right") then
@@ -521,9 +522,9 @@ function cheatfind.startplugin()
 						manager.machine:popmessage(_("Automatically toggle pause with on-screen menus"))
 						emu.pause()
 					end
+					return true
 				end
-
-				return true
+				return false
 			end
 			return m, f
 		end
@@ -550,8 +551,8 @@ function cheatfind.startplugin()
 					return true
 				end
 			end
-				local opsel = 1
-			return { _("Start new search"), "", 0 }, f
+			local opsel = 1
+			return { _("Start new search"), "", "on" }, f
 		end
 
 		if #menu_blocks ~= 0 then
@@ -577,8 +578,9 @@ function cheatfind.startplugin()
 						devsel = devcur
 						return true
 					end
+					return false
 				end
-				return { string.format(_("Save current memory state to Slot %d"), #menu_blocks[1] + 1), "", 0 }, f
+				return { string.format(_("Save current memory state to Slot %d"), #menu_blocks[1] + 1), "", "on" }, f
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
@@ -615,6 +617,7 @@ function cheatfind.startplugin()
 						devsel = devcur
 						return true
 					end
+					return false
 				end
 
 				local slot_slot_comp = _("Perform Compare : Slot %d %s Slot %d")
@@ -655,17 +658,17 @@ function cheatfind.startplugin()
 				elseif optable[opsel] == "nev" then
 					expression_text = string.format(slot_val_comp, leftop, "!=", value)
 				end
-				return { expression_text, "", 0 }, f
+				return { expression_text, "", "on" }, f
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
-				local m = { _(leftop), "", 0 }
+				local m = { string.format("%d", leftop), "", "on" }
 				menu_lim(leftop, 1, #menu_blocks[1], m)
 				m[1] = string.format(_("Slot %d"), leftop)
 				return m, function(event) local r leftop, r = incdec(event, leftop, 1, #menu_blocks[1]) return r end
 			end
 			menu[#menu + 1] = function()
-				local m = { _(optable[opsel]), "", 0 }
+				local m = { _(optable[opsel]), "", "on" }
 				menu_lim(opsel, 1, #optable, m)
 				local function f(event)
 					local r
@@ -701,7 +704,7 @@ function cheatfind.startplugin()
 				if optable[opsel]:sub(3, 3) == "v" then
 					return nil
 				end
-				local m = { _(rightop), "", 0 }
+				local m = { string.format("%d", rightop), "", "on" }
 				menu_lim(rightop, 1, #menu_blocks[1], m)
 				m[1] = string.format(_("Slot %d"), rightop)
 				return m, function(event) local r rightop, r = incdec(event, rightop, 1, #menu_blocks[1]) return r end
@@ -725,7 +728,7 @@ function cheatfind.startplugin()
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
-				local m = { _("Data Format"), formname[width], 0 }
+				local m = { _("Data Format"), formname[width], "on" }
 				menu_lim(width, 1, #formtable, m)
 				return m, function(event) local r width, r = incdec(event, width, 1, #formtable) return r end
 			end
@@ -734,7 +737,7 @@ function cheatfind.startplugin()
 				local pokevaltable = { _("Slot 1 Value"), _("Last Slot Value"), "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06",
 					"0x07", "0x08", "0x09", "0x63 (99)", "0x99", "0xFF (255)" , "0x3E7 (999)", "0x999", "0x270F (9999)",
 					"0x9999", "0xFFFF (65535)" }
-				local m = { _("Test/Write Poke Value"), pokevaltable[pokevalsel], 0 }
+				local m = { _("Test/Write Poke Value"), pokevaltable[pokevalsel], "on" }
 				menu_lim(pokevalsel, 1, #pokevaltable, m)
 				local function f(event)
 					local r
@@ -757,7 +760,7 @@ function cheatfind.startplugin()
 				if optable[opsel] == "bne" or optable[opsel] == "beq" then
 					return nil
 				end
-				local m = { "BCD", _("Off"), 0 }
+				local m = { "BCD", _("Off"), "on" }
 				menu_lim(bcd, 0, 1, m)
 				if bcd == 1 then
 					m[2] = _("On")
@@ -768,7 +771,7 @@ function cheatfind.startplugin()
 				if formtable[width]:sub(3, 3) == "1" then
 					return nil
 				end
-				local m = { _("Aligned only"), _("Off"), 0 }
+				local m = { _("Aligned only"), _("Off"), "on" }
 				menu_lim(align, 0, 1, m)
 				if align == 1 then
 					m[2] = _("On")
@@ -783,8 +786,9 @@ function cheatfind.startplugin()
 							matchpg = 0
 							return true
 						end
+						return false
 					end
-					return { _("Undo last search -- #") .. #matches, "", 0 }, f
+					return { _("Undo last search -- #") .. #matches, "", "on" }, f
 				end
 				menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 				menu[#menu + 1] = function()
@@ -955,8 +959,8 @@ function cheatfind.startplugin()
 								setname = emu.softname():gsub(":", "/")
 							else
 								for name, image in pairs(manager.machine.images) do
-									if image:exists() and image:software_list_name() ~= "" then
-										setname = image:software_list_name() .. "/" .. emu.softname()
+									if image.exists and image.software_list_name ~= "" then
+										setname = image.software_list_name .. "/" .. emu.softname()
 									end
 								end
 							end
@@ -998,7 +1002,7 @@ function cheatfind.startplugin()
 						end
 						local modes = { _("Test"), _("Write"), _("Watch") }
 						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval,
-													  match.newval), modes[match.mode], 0 }
+													  match.newval), modes[match.mode], "on" }
 						menu_lim(match.mode, 1, #modes, m)
 						local function f(event)
 							local r
@@ -1013,7 +1017,7 @@ function cheatfind.startplugin()
 				end
 				if matches[#matches].count > 100 then
 					menu[#menu + 1] = function()
-						local m = { _("Page"), matchpg, 0 }
+						local m = { _("Page"), matchpg, "on" }
 						local max
 						if matchsel == 0 then
 							max = math.ceil(matches[#matches].count / 100) - 1
@@ -1022,6 +1026,7 @@ function cheatfind.startplugin()
 						end
 						menu_lim(matchpg, 0, max, m)
 						local function f(event)
+							local r
 							matchpg, r = incdec(event, matchpg, 0, max)
 							return r
 						end
@@ -1031,7 +1036,7 @@ function cheatfind.startplugin()
 			end
 			if #watches ~= 0 then
 				menu[#menu + 1] = function()
-					return { _("Clear Watches"), "", 0 }, function(event) if event == "select" then watches = {} return true end end
+					return { _("Clear Watches"), "", "on" }, function(event) if event == "select" then watches = {} return true end end
 				end
 			end
 		end
@@ -1042,13 +1047,13 @@ function cheatfind.startplugin()
 		if event == "cancel" and pausesel == 1 then
 			emu.unpause()
 			menu_is_showing = false
-			return {0,0,0}
+			return false -- return false so menu will be popped off the stack
 		end
 		return menu_func[index](event)
 	end
 	emu.register_menu(menu_callback, menu_populate, _("Cheat Finder"))
 	emu.register_frame_done(function ()
-			local screen = manager.machine.screens:at(1)
+			local screen = manager.machine.render.ui_container
 			local height = mame_manager.ui.line_height
 			for num, watch in ipairs(watches) do
 				screen:draw_text("left", num * height, string.format(watch.format, watch.addr, watch.func()))

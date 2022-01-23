@@ -14,6 +14,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 
 
 //**************************************************************************
@@ -118,10 +119,6 @@ public:
 	bool registerpoint_enable(int index, bool enable = true);
 	void registerpoint_enable_all(bool enable = true );
 
-	// hotspots
-	bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
-	void hotspot_track(int numspots, int threshhold);
-
 	// comments
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
@@ -133,16 +130,16 @@ public:
 	u32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
-	offs_t history_pc(int index) const;
+	std::pair<offs_t, bool> history_pc(int index) const;
 
 	// pc tracking
-	void set_track_pc(bool value) { m_track_pc = value; }
-	bool track_pc_visited(const offs_t& pc) const;
-	void set_track_pc_visited(const offs_t& pc);
+	void set_track_pc(bool value);
+	bool track_pc_visited(offs_t pc) const;
+	void set_track_pc_visited(offs_t pc);
 	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
 	// memory tracking
-	void set_track_mem(bool value) { m_track_mem = value; }
+	void set_track_mem(bool value);
 	offs_t track_mem_pc_from_space_address_data(const int& space,
 												const offs_t& address,
 												const u64& data) const;
@@ -170,7 +167,6 @@ private:
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
 	void breakpoint_check(offs_t pc);
-	void hotspot_check(address_space &space, offs_t address);
 	void reinstall_all(read_or_write mode);
 	void reinstall(address_space &space, read_or_write mode);
 	void write_tracking(address_space &space, offs_t address, u64 data);
@@ -205,6 +201,7 @@ private:
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs
 	u32                     m_pc_history_index;         // current history index
+	u32                     m_pc_history_valid;         // number of valid PC history entries
 
 	// breakpoints and watchpoints
 	std::multimap<offs_t, std::unique_ptr<debug_breakpoint>> m_bplist;     // list of breakpoints
@@ -244,18 +241,6 @@ private:
 	};
 	std::unique_ptr<tracer>                m_trace;                    // tracer state
 
-	// hotspots
-	struct hotspot_entry
-	{
-		offs_t              m_access;                   // access address
-		offs_t              m_pc;                       // PC of the access
-		address_space *     m_space;                    // space where the access occurred
-		u32                 m_count;                    // number of hits
-	};
-	std::vector<hotspot_entry> m_hotspots;              // hotspot list
-	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
-
-	std::vector<memory_passthrough_handler *> m_phr;    // passthrough handler reference for each space, read mode
 	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
 	std::vector<int>        m_notifiers;                // notifiers for each space
 

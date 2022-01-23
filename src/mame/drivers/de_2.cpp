@@ -17,7 +17,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "de2.lh"

@@ -81,8 +81,8 @@ a joystick.  This is not an emulation bug.
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 
@@ -662,6 +662,23 @@ static INPUT_PORTS_START( snowbroj )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1") /* Listed as "NOT USE" in the manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ballboy3p )
+	PORT_INCLUDE(snowbros)
+
+	PORT_MODIFY("DSW1") // on the PCB in place of the dips there's the plug for the controls of the 3rd player
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( honeydol )
@@ -2425,6 +2442,29 @@ ROM_START( pzlbreak )
 	ROM_LOAD( "3.ua5", 0x080000, 0x80000, CRC(6cdb73e9) SHA1(649e91ee54de2b359a207bed4d950db95515a3d8) )
 ROM_END
 
+ROM_START( pzlbreaka )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uh12", 0x00001, 0x20000, CRC(c8a82ca8) SHA1(ee19c253af9c7c8a33435d9d2494c50f16033572) )
+	ROM_LOAD16_BYTE( "ui12", 0x00000, 0x20000, CRC(2f66c4ce) SHA1(4349f093ce1267c2ebcbf1233082661604f10851) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "u1", 0x00000, 0x10000 , CRC(1ad646b7) SHA1(0132baa097e48df2450afdcd316375dc546ea4d0) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) // Intel 87C52 MCU Code
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASEFF ) // Data from Shared RAM
+	// this is not a real rom but instead the data extracted from shared ram, the MCU puts it there
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, BAD_DUMP CRC(092cb794) SHA1(eb2b336d97b440453ca37ee7605654b35dfb6bad) ) // extracted from the parent set, so marked as bad
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "uj15", 0x00000, 0x20000, CRC(5cdffcc5) SHA1(793a20bd0480cfea0dbf9397797428f6d105f724) ) // 1xxxxxxxxxxxxxxxx = 0xFF and half sized compared to the parent
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(d211705a) SHA1(b3a7f8198dc8c034b17b843b2ab0298426de3f55) )
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(eb3044bc) SHA1(c00e7b112b82c8eeb59c2a96168ea5156347f05e) ) // some differences compared to the parent
+ROM_END
+
 
 ROM_START( toppyrap )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
@@ -2529,6 +2569,32 @@ ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u76", 0x080000, 0x80000, CRC(5f4b48ea) SHA1(e9dd1100d55b021b060990988c1e5271ce1ae35b) )
 	ROM_LOAD( "u77", 0x100000, 0x80000, CRC(d44211e3) SHA1(53af19dec03e76912632450414cdbcbb31cc094c) )
 	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(af596afc) SHA1(875d7a51ff5c741cae4483d8da33df9cae8de52a) )
+ROM_END
+
+ROM_START( 3in1semia ) // SemiCom Ser-4331-4 PCB
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(388334a8) SHA1(93823917682f1658a443d23ceb58eafa530d1854) )
+	ROM_LOAD16_BYTE( "u74.bin",  0x00000, 0x40000, CRC(555ae716) SHA1(9a3d7d81d7c6fb8443d263087bb7dca7bc3918b6) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // Z80 Code
+	ROM_LOAD( "u35.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) // Intel 87C52 MCU Code
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) // Data from Shared RAM
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(85deba7c) SHA1(44c6d9306b4f8e47182f4740a18971c49a8df8db) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) // Samples
+	ROM_LOAD( "u14.bin", 0x00000, 0x40000, CRC(c83c11be) SHA1(c05d96d61e5b8245232c85cbbcb7cc1e4e066492) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // Sprites
+	ROM_LOAD( "u75.bin", 0x000000, 0x80000, CRC(9d705249) SHA1(99e0adca1f3f285692bf15c988b25d87f6b1dd90) )
+	ROM_LOAD( "u76.bin", 0x080000, 0x80000, CRC(b65f5d79) SHA1(a9f19cf54f5ecdeca58f853f3053a686b89fea63) )
+	ROM_LOAD( "u77.bin", 0x100000, 0x80000, CRC(b9728be9) SHA1(4ea7940f9d1d7c01cfcab92184b6513e4b0a83d7) )
+	ROM_LOAD( "u78.bin", 0x180000, 0x20000, CRC(aefad49e) SHA1(246ea713eaaa6a01290eded36377437cb7e79fa8) ) // MX26C1000APC
 ROM_END
 
 /*
@@ -2743,6 +2809,27 @@ ROM_START( ballboy )
 ROM_END
 
 
+ROM_START( ballboy3p ) //PCB etched JOYCUS1B and 2001927
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "ur4",  0x00000, 0x20000, CRC(32153d8f) SHA1(1fa698b93507fb775dfff6da8701ab65c986cac5) )
+	ROM_LOAD16_BYTE( "ur3",  0x00001, 0x20000, CRC(4d462a75) SHA1(30a84a618bea5c64201329d02847382c2d0c84ba) )
+
+	// the sound is driven by an MCU
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "sound.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ua5",        0x000000, 0x80000, CRC(fc72011f) SHA1(f1f10b34fd3365c6542299bd0224dad926d650b4) )   // 16x16 tiles
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // 16x16 BG Tiles
+	ROM_LOAD( "un7",        0x000000, 0x400000, CRC(fe427e9d) SHA1(6932ad18b6807af860f8430e2a00e959d6c36a23) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    // OKIM6295 samples
+	ROM_LOAD( "us5",     0x00000, 0x20000, CRC(7c6368ef) SHA1(53393c570c605f7582b61c630980041e2ed32e2d) ) // only ROM identical to the 2 player version
+	ROM_CONTINUE(0x80000,0x60000)
+ROM_END
+
+
 /*
 
 Information from Korean arcade gaming magazine
@@ -2889,6 +2976,13 @@ void snowbros_state::init_snowbro3()
 	save_item(NAME(m_sb3_music));
 }
 
+void snowbros_state::init_ballboy3p()
+{
+	init_snowbro3();
+
+	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x400001); // unmap flipscreen as the DSW has been removed in favor of the controls for the 3rd player
+}
+
 uint16_t snowbros_state::_3in1_read()
 {
 	return 0x000a;
@@ -2984,11 +3078,13 @@ GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_co
 GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreaka,  pzlbreak, semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, empty_init,    ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinklea,   twinkle,  semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semia,  3in1semi, semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan) (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, init_3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
 GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )
@@ -3004,9 +3100,9 @@ GAME( 1996, multi96,    twinadv,  twinadv,     twinadv,  snowbros_state, empty_i
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
 // it is possible this 'ball boy' is the original bootleg, with snwobro3 being a hack of that, and the ballboy set we have a further hack of that
-// there is also a later 2004 version with 3 player support
 // these use an MCU to drive the sound
-GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
-GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj,  snowbros_state, init_snowbro3,  ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj,  snowbros_state, init_snowbro3,  ROT0, "bootleg", "Ball Boy (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, ballboy3p,  snowbro3, snowbro3,    ballboy3p, snowbros_state, init_ballboy3p, ROT0, "bootleg", "Ball Boy (3 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // protection appears to handle the sound, should check if it's just a block of code that is conditionally executed like some of the Semicom titles.
-GAME( 1999, yutnori,    0,        yutnori,     yutnori,  snowbros_state, init_yutnori,  ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
+GAME( 1999, yutnori,    0,        yutnori,     yutnori,   snowbros_state, init_yutnori,   ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer

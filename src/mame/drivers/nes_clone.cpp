@@ -559,7 +559,7 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
 	map(0x5000, 0x5000).w(FUNC(nes_clone_dancexpt_state::mapper_5000_w));
 	map(0x5100, 0x5100).w(FUNC(nes_clone_dancexpt_state::mapper_5100_w));
 	map(0x5200, 0x5200).w(FUNC(nes_clone_dancexpt_state::mapper_5200_w));
-	
+
 	map(0x8000, 0xbfff).bankr("prgrom");
 	map(0xc000, 0xffff).rom().region("maincpu", 0x1c000);
 }
@@ -1276,21 +1276,21 @@ CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvpp
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
-// 
+//
 
 /*
-	Dancing Export by Daidaixing (aka TimeTop)
+    Dancing Export by Daidaixing (aka TimeTop)
 
-	(notes from Sean Riddle regarding missing sound)
-	There are two globs on the main PCB, the bigger one next to a label that says NT6561.
-	Also two 32-pin COBs, one marked 27C020 and the other 27C010 (both dumped)
+    (notes from Sean Riddle regarding missing sound)
+    There are two globs on the main PCB, the bigger one next to a label that says NT6561.
+    Also two 32-pin COBs, one marked 27C020 and the other 27C010 (both dumped)
 
-	Finally, a daughterboard with 1 glob.
-	The daughterboard has 10 traces going to it; power, ground, and 7 from the smaller glob.
-	The 10th trace looks like the audio output.
+    Finally, a daughterboard with 1 glob.
+    The daughterboard has 10 traces going to it; power, ground, and 7 from the smaller glob.
+    The 10th trace looks like the audio output.
 
-	I assume the daughterboard has a microcontroller for sound
-	I'm not sure what the smaller glob is, but it looks like it sends commands to the daughterboard.
+    I assume the daughterboard has a microcontroller for sound
+    I'm not sure what the smaller glob is, but it looks like it sends commands to the daughterboard.
 */
 CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_state, init_nes_clone, "Daidaixing", "Dancing Expert", MACHINE_NOT_WORKING )
 

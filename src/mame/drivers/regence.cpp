@@ -14,10 +14,6 @@ Hardware notes:
 - 2KB RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-TODO:
-- verify irq source/frequency, probably a 555 ic, current approximation is from
-  comparing led blink rate with a video recording
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -181,7 +177,7 @@ void regence_state::regence(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &regence_state::main_map);
 
-	m_maincpu->set_periodic_int(FUNC(regence_state::irq0_line_hold), attotime::from_hz(400)); // approximation
+	m_maincpu->set_periodic_int(FUNC(regence_state::irq0_line_hold), attotime::from_hz(448)); // from 555, measured
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -204,9 +200,9 @@ void regence_state::regence(machine_config &config)
 
 ROM_START( regence )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
-	ROM_LOAD("ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
-	ROM_LOAD("ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
+	ROM_LOAD("arc0.ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) ) // M5L2732K
+	ROM_LOAD("arc1.ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) ) // "
+	ROM_LOAD("arc2.ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) ) // "
 ROM_END
 
 } // anonymous namespace

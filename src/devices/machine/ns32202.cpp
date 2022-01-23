@@ -19,8 +19,9 @@
 #define LOG_STATE   (1U << 1)
 #define LOG_REGW    (1U << 2)
 #define LOG_REGR    (1U << 3)
+#define LOG_COUNTER (1U << 4)
 
-//#define VERBOSE (LOG_GENERAL|LOG_STATE|LOG_REGW|LOG_REGR)
+//#define VERBOSE (LOG_GENERAL|LOG_STATE|LOG_REGW|LOG_REGR|LOG_COUNTER)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NS32202, ns32202_device, "ns32202", "NS32202 Interrupt Control Unit")
@@ -177,10 +178,10 @@ template <unsigned ST1> void ns32202_device::map(address_map &map)
 	map(0x19, 0x19).rw(FUNC(ns32202_device::csvh_r<0>), FUNC(ns32202_device::csvh_w<0>));
 	map(0x1a, 0x1a).rw(FUNC(ns32202_device::csvl_r<1>), FUNC(ns32202_device::csvl_w<1>));
 	map(0x1b, 0x1b).rw(FUNC(ns32202_device::csvh_r<1>), FUNC(ns32202_device::csvh_w<1>));
-	map(0x1c, 0x1c).rw(FUNC(ns32202_device::lccvl_r), FUNC(ns32202_device::lccvl_w));
-	map(0x1d, 0x1d).rw(FUNC(ns32202_device::lccvh_r), FUNC(ns32202_device::lccvh_w));
-	map(0x1e, 0x1e).rw(FUNC(ns32202_device::hccvl_r), FUNC(ns32202_device::hccvl_w));
-	map(0x1f, 0x1f).rw(FUNC(ns32202_device::hccvh_r), FUNC(ns32202_device::hccvh_w));
+	map(0x1c, 0x1c).rw(FUNC(ns32202_device::ccvl_r<0>), FUNC(ns32202_device::ccvl_w<0>));
+	map(0x1d, 0x1d).rw(FUNC(ns32202_device::ccvh_r<0>), FUNC(ns32202_device::ccvh_w<0>));
+	map(0x1e, 0x1e).rw(FUNC(ns32202_device::ccvl_r<1>), FUNC(ns32202_device::ccvl_w<1>));
+	map(0x1f, 0x1f).rw(FUNC(ns32202_device::ccvh_r<1>), FUNC(ns32202_device::ccvh_w<1>));
 }
 
 template void ns32202_device::map<0>(address_map &map);
@@ -254,7 +255,7 @@ template void ns32202_device::ir_w<15>(int state);
 void ns32202_device::interrupt(void *ptr, s32 param)
 {
 	// check for unmasked pending interrupts
-	if (!(m_ipnd & m_imsk))
+	if (!(m_ipnd & ~m_imsk))
 		return;
 
 	if (m_mctl & MCTL_NTAR)
@@ -275,7 +276,7 @@ void ns32202_device::interrupt(void *ptr, s32 param)
 					// check equal priority unmasked pending cascade interrupt
 					if ((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask))
 					{
-						LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros(mask));
+						LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros_32(mask));
 						accept = true;
 					}
 
@@ -285,7 +286,7 @@ void ns32202_device::interrupt(void *ptr, s32 param)
 				// check unmasked pending interrupt
 				if ((m_ipnd & mask) && !(m_imsk & mask))
 				{
-					LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros(mask));
+					LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros_32(mask));
 					accept = true;
 					break;
 				}
@@ -311,7 +312,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 	side_effects &= !machine().side_effects_disabled();
 	u8 vector = m_hvct | 0x0f;
 
-	if ((m_ipnd & m_imsk) && m_fprt)
+	if ((m_ipnd & ~m_imsk) && m_fprt)
 	{
 		// find highest priority unmasked pending interrupt
 		u16 mask = m_fprt;
@@ -324,7 +325,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 			mask = (mask << 1) | (mask >> 15);
 		}
 
-		unsigned const number = 31 - count_leading_zeros(mask);
+		unsigned const number = 31 - count_leading_zeros_32(mask);
 		if (side_effects)
 		{
 			LOGMASKED(LOG_STATE, "acknowledge highest priority unmasked interrupt %d\n", number);
@@ -400,7 +401,7 @@ u8 ns32202_device::interrupt_return(bool side_effects)
 			// rotate priority mask
 			mask = (mask << 1) | (mask >> 15);
 		}
-		unsigned const number = 31 - count_leading_zeros(mask);
+		unsigned const number = 31 - count_leading_zeros_32(mask);
 
 		if (side_effects)
 		{
@@ -666,9 +667,16 @@ void ns32202_device::cctl_w(u8 data)
 
 	// start/stop h-counter
 	if (!(m_cctl & CCTL_CRUNH) && (data & CCTL_CRUNH))
+	{
+		LOGMASKED(LOG_COUNTER, "cctl_w start h-counter clock %d\n", scaled_clock);
 		m_counter[1]->adjust(attotime::from_ticks(1, scaled_clock), 1);
+	}
 	else if ((m_cctl & CCTL_CRUNH) && !(data & CCTL_CRUNH))
+	{
+		LOGMASKED(LOG_COUNTER, "cctl_w stop h-counter\n");
+		update_ccv();
 		m_counter[1]->enable(false);
+	}
 
 	if (!(data & CCTL_CRUNH) && (data & CCTL_CDCRH))
 		{} // TODO: decrement h-counter
@@ -676,23 +684,74 @@ void ns32202_device::cctl_w(u8 data)
 	// start/stop l-counter
 	if (!(data & CCTL_CCON))
 	{
-		if (!(m_cctl & CCTL_CRUNH) && (data & CCTL_CRUNH))
+		if (!(m_cctl & CCTL_CRUNL) && (data & CCTL_CRUNL))
+		{
+			LOGMASKED(LOG_COUNTER, "cctl_w start l-counter clock %d\n", scaled_clock);
 			m_counter[0]->adjust(attotime::from_ticks(1, scaled_clock), 1);
-		else if ((m_cctl & CCTL_CRUNH) && !(data & CCTL_CRUNH))
+		}
+		else if ((m_cctl & CCTL_CRUNL) && !(data & CCTL_CRUNL))
+		{
+			LOGMASKED(LOG_COUNTER, "cctl_w stop l-counter\n");
+			update_ccv();
 			m_counter[0]->enable(false);
+		}
 
 		if (!(data & CCTL_CRUNL) && (data & CCTL_CDCRL))
 			{} // TODO: decrement l-counter
 	}
 
-	m_cctl = data & ~(CCTL_CRUNH | CCTL_CRUNL);
+	m_cctl = data & ~(CCTL_CDCRH | CCTL_CDCRL);
 }
 
 void ns32202_device::cictl_w(u8 data)
 {
 	u8 const mask =
-		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL) : 0) |
-		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH) : 0);
+		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL | CICTL_WENL) : 0) |
+		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH | CICTL_WENH) : 0);
 
 	m_cictl = (m_cictl & ~mask) | (data & mask);
+}
+
+template <unsigned N> void ns32202_device::ccvl_w(u8 data)
+{
+	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
+		m_ccv[N] = (m_ccv[N] & 0xff00) | data;
+}
+
+template <unsigned N> void ns32202_device::ccvh_w(u8 data)
+{
+	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
+		m_ccv[N] = (u16(data) << 8) | u8(m_ccv[N]);
+}
+
+void ns32202_device::mctl_w(u8 data)
+{
+	if (!(m_mctl & MCTL_CFRZ) && (data & MCTL_CFRZ))
+		update_ccv();
+
+	m_mctl = data;
+}
+
+void ns32202_device::update_ccv()
+{
+	u32 const scaled_clock = clock() / ((m_cctl & CCTL_CFNPS) ? 1 : 4);
+
+	if (m_cctl & CCTL_CCON)
+	{
+		if (m_cctl & CCTL_CRUNH)
+		{
+			u32 const delta = ((u32(m_csv[1]) << 16) | m_csv[0]) - m_counter[1]->elapsed().as_ticks(scaled_clock);
+
+			m_ccv[1] = delta >> 16;
+			m_ccv[0] = u16(delta);
+		}
+	}
+	else
+	{
+		if (m_cctl & CCTL_CRUNH)
+			m_ccv[1] = m_csv[1] - m_counter[1]->elapsed().as_ticks(scaled_clock);
+
+		if (m_cctl & CCTL_CRUNL)
+			m_ccv[0] = m_csv[0] - m_counter[0]->elapsed().as_ticks(scaled_clock);
+	}
 }

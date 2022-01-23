@@ -1,17 +1,18 @@
 // license:LGPL-2.1+
-// copyright-holders:Ville Linde, Angelo Salese, hap
+// copyright-holders:Ville Linde, Angelo Salese
 
 // Taito TC0780FPA Polygon Renderer
 
 #include "emu.h"
 #include "tc0780fpa.h"
+#include "screen.h"
 
 
 #define POLY_FIFO_SIZE  32
 
 
 tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram)
-	: poly_manager<float, tc0780fpa_polydata, 6, 10000>(screen)
+	: poly_manager<float, tc0780fpa_polydata, 6>(screen.machine())
 {
 	int width = screen.width();
 	int height = screen.height();
@@ -124,7 +125,7 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 		}
 		else
 		{
-			iu = (tex_base_x + (((int)u >> 4) & 0x3f)) & 0x7ff;
+			iu = (tex_base_x + (((int)u >> 4) & ((0x08 << tex_wrap_x) - 1))) & 0x7ff;
 		}
 
 		if (!tex_wrap_y)
@@ -133,7 +134,7 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 		}
 		else
 		{
-			iv = (tex_base_y + (((int)v >> 4) & 0x3f)) & 0x7ff;
+			iv = (tex_base_y + (((int)v >> 4) & ((0x08 << tex_wrap_y) - 1))) & 0x7ff;
 		}
 
 		texel = m_texture[(iv * 2048) + iu];
@@ -155,7 +156,6 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 {
 	vertex_t vert[4];
-	int i;
 
 	uint16_t cmd = polygon_fifo[0];
 
@@ -206,7 +206,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x0b: Vertex 3 X
 			// 0x0c: Vertex 3 Z
 
-			for (i=0; i < 3; i++)
+			for (int i=0; i < 3; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
@@ -220,11 +220,11 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 					vert[1].p[1] == vert[2].p[1])
 				{
 					// optimization: all colours the same -> render solid
-					render_triangle(m_cliprect, render_delegate(&tc0780fpa_renderer::render_solid_scan, this), 2, vert[0], vert[1], vert[2]);
+					render_triangle<2>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_solid_scan, this), vert[0], vert[1], vert[2]);
 				}
 				else
 				{
-					render_triangle(m_cliprect, render_delegate(&tc0780fpa_renderer::render_shade_scan, this), 2, vert[0], vert[1], vert[2]);
+					render_triangle<2>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_shade_scan, this), vert[0], vert[1], vert[2]);
 				}
 			}
 			break;
@@ -254,20 +254,20 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x12: Vertex 3 X
 			// 0x13: Vertex 3 Z
 
-			tc0780fpa_polydata &extra = object_data_alloc();
+			tc0780fpa_polydata &extra = object_data().next();
 			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+			extra.tex_wrap_x = (cmd >> 6) & 3;
+			extra.tex_wrap_y = (cmd >> 4) & 3;
 
-			for (i=0; i < 3; i++)
+			for (int i=0; i < 3; i++)
 			{
-				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[3] = polygon_fifo[ptr++] + 0.5; // palette
+				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (int16_t)(polygon_fifo[ptr++]);
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
@@ -275,7 +275,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 
 			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 			{
-				render_triangle(m_cliprect, render_delegate(&tc0780fpa_renderer::render_texture_scan, this), 4, vert[0], vert[1], vert[2]);
+				render_triangle<4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_texture_scan, this), vert[0], vert[1], vert[2]);
 			}
 			break;
 		}
@@ -301,7 +301,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x0f: Vertex 4 X
 			// 0x10: Vertex 4 Z
 
-			for (i=0; i < 4; i++)
+			for (int i=0; i < 4; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
@@ -316,11 +316,11 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 					vert[2].p[1] == vert[3].p[1])
 				{
 					// optimization: all colours the same -> render solid
-					render_polygon<4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_solid_scan, this), 2, vert);
+					render_polygon<4, 2>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_solid_scan, this), vert);
 				}
 				else
 				{
-					render_polygon<4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_shade_scan, this), 2, vert);
+					render_polygon<4, 2>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_shade_scan, this), vert);
 				}
 			}
 			break;
@@ -356,28 +356,28 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x18: Vertex 4 X
 			// 0x19: Vertex 4 Z
 
-			tc0780fpa_polydata &extra = object_data_alloc();
+			tc0780fpa_polydata &extra = object_data().next();
 			uint16_t texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+			extra.tex_wrap_x = (cmd >> 6) & 3;
+			extra.tex_wrap_y = (cmd >> 4) & 3;
 
-			for (i=0; i < 4; i++)
+			for (int i=0; i < 4; i++)
 			{
-				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-				vert[i].p[2] = (uint16_t)(polygon_fifo[ptr++]);
-				vert[i].p[1] = (uint16_t)(polygon_fifo[ptr++]);
+				vert[i].p[3] = polygon_fifo[ptr++] + 0.5; // palette
+				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (int16_t)(polygon_fifo[ptr++]);
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].x =  (int16_t)(polygon_fifo[ptr++]);
 				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
-			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
+			if (vert[0].p[0] < 0xc000 && vert[1].p[0] < 0xc000 && vert[2].p[0] < 0xc000 && vert[3].p[0] < 0xc000)
 			{
-				render_polygon<4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_texture_scan, this), 4, vert);
+				render_polygon<4, 4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_texture_scan, this), vert);
 			}
 			break;
 		}

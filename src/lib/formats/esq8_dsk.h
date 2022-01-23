@@ -23,9 +23,9 @@ class esq8img_format : public floppy_image_format_t
 public:
 	esq8img_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -35,7 +35,7 @@ public:
 	static const desc_e esq_6_desc[];
 
 private:
-	void find_size(io_generic *io, int &track_count, int &head_count, int &sector_count);
+	void find_size(util::random_read &io, int &track_count, int &head_count, int &sector_count);
 };
 
 extern const floppy_format_type FLOPPY_ESQ8IMG_FORMAT;

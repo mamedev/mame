@@ -107,10 +107,10 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
-	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
-	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
-	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
+	m_mem_config("mem8", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
+	m_io_config("io8", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
+	m_mem16_config("mem16", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
+	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
 	m_memwidth(0),
@@ -359,6 +359,11 @@ template void isa8_device::install_space<read8smo_delegate, write8smo_delegate>(
 void isa8_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 	m_memspace->install_ram(start, end, data);
+}
+
+void isa8_device::install_bank(offs_t start, offs_t end, memory_bank *bank)
+{
+	m_memspace->install_readwrite_bank(start, end, bank);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end)

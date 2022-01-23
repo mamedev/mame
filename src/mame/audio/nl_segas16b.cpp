@@ -73,7 +73,7 @@ NETLIST_START(segas16b_audio)
 
 	CAP(C21, CAP_U(2.2))
 	CAP(C22, CAP_U(2.2)) // Needs verification
-	CAP(C27, CAP_P(1500))
+	CAP(C29, CAP_P(1500))
 	CAP(C28, CAP_P(1500))
 
 	// ------------------------------------
@@ -81,14 +81,14 @@ NETLIST_START(segas16b_audio)
 	// ------------------------------------
 
 	NET_C(CH1, RCOM1.1)
-	NET_C(RCOM1.2, C27.1, D20.5)
+	NET_C(RCOM1.2, C29.1, D20.5)
 	NET_C(D20.7, D20.6, C22.1)
 
 	NET_C(CH2, RCOM2.1)
 	NET_C(RCOM2.2, C28.1, D20.10)
 	NET_C(D20.8, D20.9, C21.1)
 
-	NET_C(GND, C27.2, C28.2)
+	NET_C(GND, C29.2, C28.2)
 
 	// OPAMPS, no information on schematics, assume 12V since
 	// TL084 with 5V would be outside specifications
@@ -110,7 +110,7 @@ NETLIST_START(segas16b_audio)
 	CAP(C25, CAP_U(0.0022))
 	CAP(C26, CAP_U(0.022))
 	CAP(C23, CAP_U(0.022))
-	CAP(C29, CAP_U(0.01))
+	CAP(C24, CAP_U(0.01))
 	CAP(C62, CAP_U(2.2))
 
 	NET_C(VP5, R11.1)
@@ -120,10 +120,10 @@ NETLIST_START(segas16b_audio)
 	NET_C(XC20.7, XC20.6, C26.2, R12.1)
 
 	NET_C(R12.2, C23.1, R13.1)
-	NET_C(R13.2, C29.1, XC20.3)
+	NET_C(R13.2, C24.1, XC20.3)
 	NET_C(XC20.1, XC20.2, C23.2, C62.1)
 
-	NET_C(GND, R16.2, C25.2, C29.2)
+	NET_C(GND, R16.2, C25.2, C24.2)
 
 	// ------------------------------------
 	// Mixing and pre amplifier

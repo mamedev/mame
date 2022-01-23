@@ -98,8 +98,7 @@ DISCRETE_STEP( dso_wavlog )
 	/* Dump any wave logs */
 	/* get nodes to be logged and apply gain, then clip to 16 bit */
 	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
-	val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
-	wave_data_l = (int16_t)val;
+	wave_data_l = (int16_t)std::clamp<double>(val, -32768, 32767);
 	if (this->active_inputs() == 2)
 	{
 		/* DISCRETE_WAVLOG1 */
@@ -109,8 +108,7 @@ DISCRETE_STEP( dso_wavlog )
 	{
 		/* DISCRETE_WAVLOG2 */
 		val = DISCRETE_INPUT(2) * DISCRETE_INPUT(3);
-		val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
-		wave_data_r = (int16_t)val;
+		wave_data_r = (int16_t)std::clamp<double>(val, -32768, 32767);
 
 		util::wav_add_data_16lr(*m_wavfile, &wave_data_l, &wave_data_r, 1);
 	}

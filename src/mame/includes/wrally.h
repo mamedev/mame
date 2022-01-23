@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gaelcrpt.h"
 #include "video/gaelco_wrally_sprites.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -21,6 +22,7 @@ public:
 		m_palette(*this, "palette"),
 		m_sprites(*this, "sprites"),
 		m_okibank(*this, "okibank"),
+		m_vramcrypt(*this, "vramcrypt"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -41,7 +43,7 @@ protected:
 private:
 	uint8_t shareram_r(offs_t offset);
 	void shareram_w(offs_t offset, uint8_t data);
-	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void okim6295_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -66,6 +68,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gaelco_wrally_sprites_device> m_sprites;
 	required_memory_bank m_okibank;
+	required_device<gaelco_vram_encryption_device> m_vramcrypt;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;

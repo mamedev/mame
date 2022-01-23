@@ -443,8 +443,6 @@ void vme_fccpu20_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 
-	set_vme_device();
-
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
 	//  save_item(NAME(m_board_id)); // TODO: Save this "non base type" item

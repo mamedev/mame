@@ -13,7 +13,7 @@
 
 
 #include "sound/sn76496.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "sg1000exp.h"
 
 

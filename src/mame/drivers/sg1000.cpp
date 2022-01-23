@@ -67,7 +67,7 @@ Notes:
 #include "emu.h"
 #include "includes/sg1000.h"
 #include "bus/rs232/rs232.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -548,7 +548,7 @@ void sg1000_state::sg1000(machine_config &config)
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	/* cartridge */
-	SG1000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
+	SG1000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr).set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
@@ -568,8 +568,7 @@ void sg1000_state::omv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000_state::omv_map);
 	m_maincpu->set_addrmap(AS_IO, &sg1000_state::omv_io_map);
 
-	config.device_remove(CARTSLOT_TAG);
-	OMV_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
+	OMV_CART_SLOT(config.replace(), CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	m_ram->set_default_size("2K");
 }
@@ -601,7 +600,7 @@ void sc3000_state::sc3000(machine_config &config)
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* cartridge */
-	SC3000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
+	SC3000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr).set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");

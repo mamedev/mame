@@ -81,7 +81,7 @@ void pc6001mk2_state::pc6001mk2_palette(palette_device &palette) const
 ATTR_CONST pc6001_state::uint8_t pc6001_get_attributes(uint8_t c,int scanline, int pos)
 {
 	uint8_t result = 0x00;
-	uint8_t val = m_video_ram [(scanline / 12) * 0x20 + pos];
+	uint8_t val = m_video_base [(scanline / 12) * 0x20 + pos];
 
 	if (val & 0x01) {
 		result |= M6847_INV;
@@ -95,7 +95,7 @@ ATTR_CONST pc6001_state::uint8_t pc6001_get_attributes(uint8_t c,int scanline, i
 
 const pc6001_state::uint8_t *pc6001_get_video_ram(int scanline)
 {
-	return m_video_ram +0x0200+ (scanline / 12) * 0x20;
+	return m_video_base +0x0200+ (scanline / 12) * 0x20;
 }
 
 uint8_t pc6001_state::pc6001_get_char_rom(uint8_t ch, int line)
@@ -117,7 +117,8 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-	m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
+	m_video_base = &m_video_ram[0];
 }
 
 void pc6001mk2_state::video_start()
@@ -125,15 +126,14 @@ void pc6001mk2_state::video_start()
 	// ...
 }
 
-void pc6001sr_state::video_start()
+void pc6001mk2sr_state::video_start()
 {
-//  m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+//  m_video_ram = std::make_unique<uint8_t[]>(0x4000);
 	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
 	std::fill_n(m_gvram.get(), 320*256*8, 0);
 	save_pointer(NAME(m_gvram), 320*256*8);
 }
 
-/* this is known as gfx mode 4 */
 void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
 {
 	static const uint8_t pen_gattr[4][4] = {
@@ -157,7 +157,7 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 	{
 		for(int x=0;x<32;x++)
 		{
-			int tile = m_video_ram[(x+(y*32))+0x200];
+			int tile = m_video_base[(x+(y*32))+0x200];
 
 			if(col_setting == 0x00) //monochrome
 			{
@@ -199,7 +199,7 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 		{
 			for(int x=0;x<w;x++)
 			{
-				int tile = m_video_ram[(x+(y*32))+0x200];
+				int tile = m_video_base[(x+(y*32))+0x200];
 
 				for(int yi=0;yi<shrink_y;yi++)
 				{
@@ -221,7 +221,7 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 		{
 			for(int x=0;x<w;x++)
 			{
-				int tile = m_video_ram[(x+((y/3)*32))+0x200];
+				int tile = m_video_base[(x+((y/3)*32))+0x200];
 
 				for(int yi=0;yi<shrink_y;yi++)
 				{
@@ -290,7 +290,6 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 					color = pen ? (fgcol+0) : (fgcol+1);
 				else
 					color = pen ? (fgcol+1) : (fgcol+0);
-
 			}
 			else
 			{
@@ -330,7 +329,7 @@ void pc6001_state::draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 
 void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847)
 {
-	int attr = m_video_ram[0];
+	int attr = m_video_base[0];
 
 	draw_border(bitmap,cliprect,attr,has_mc6847);
 
@@ -351,8 +350,8 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 		{
 			for(int x=0;x<32;x++)
 			{
-				int tile = m_video_ram[(x+(y*32))+0x200];
-				attr = m_video_ram[(x+(y*32)) & 0x1ff];
+				int tile = m_video_base[(x+(y*32))+0x200];
+				attr = m_video_base[(x+(y*32)) & 0x1ff];
 
 				if(attr & 0x40)
 				{
@@ -367,14 +366,14 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-uint32_t pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pc6001_screen_draw(bitmap,cliprect,1);
 
 	return 0;
 }
 
-uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* note: bitmap mode have priority over everything else, check American Truck */
 	if(m_exgfx_bitmap_mode)
@@ -398,8 +397,8 @@ uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_
 					color |= pal_num[(pen[0] & 3) | ((pen[1] & 3) << 2)];
 #endif
 
-					pen[0] = m_video_ram[count+0x0000] >> (6-i*2) & 3;
-					pen[1] = m_video_ram[count+0x2000] >> (6-i*2) & 3;
+					pen[0] = m_video_base[count+0x0000] >> (6-i*2) & 3;
+					pen[1] = m_video_base[count+0x2000] >> (6-i*2) & 3;
 
 					int color = 0x10;
 					color |= ((pen[0] & 1) << 2);
@@ -435,8 +434,8 @@ uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_
 					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
 #endif
 
-					pen[0] = m_video_ram[count+0x0000] >> (7-i) & 1;
-					pen[1] = m_video_ram[count+0x2000] >> (7-i) & 1;
+					pen[0] = m_video_base[count+0x0000] >> (7-i) & 1;
+					pen[1] = m_video_base[count+0x2000] >> (7-i) & 1;
 
 					int color;
 					if(m_bgcol_bank & 4) //PC-6001 emulation mode
@@ -478,8 +477,8 @@ uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_
 				---- xxxx fg color
 				Note that the exgfx banks a different gfx ROM
 				*/
-				int tile = m_video_ram[(x+(y*40))+0x400] + 0x200;
-				int attr = m_video_ram[(x+(y*40)) & 0x3ff];
+				int tile = m_video_base[(x+(y*40))+0x400] + 0x200;
+				int attr = m_video_base[(x+(y*40)) & 0x3ff];
 				tile += ((attr & 0x80) << 1);
 
 				for(int yi=0;yi<12;yi++)
@@ -502,14 +501,14 @@ uint32_t pc6001mk2_state::screen_update_pc6001mk2(screen_device &screen, bitmap_
 	}
 	else
 	{
-		//attr = m_video_ram[0];
+		//attr = m_video_base[0];
 		pc6001_screen_draw(bitmap,cliprect,0);
 	}
 
 	return 0;
 }
 
-uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const gfx_data = m_region_gfx1->base();
 
@@ -517,54 +516,69 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 
 	if(m_sr_text_mode == true) // text mode
 	{
-		for(int y=0;y<m_sr_text_rows;y++)
+		const u8 text_cols = (m_width80 + 1) * 40;
+
+		for(int y = 0; y < m_sr_text_rows; y++)
 		{
-			for(int x=0;x<40;x++)
+			for(int x = 0; x < text_cols; x++)
 			{
-				int tile = m_video_ram[(x+(y*40))*2+0];
-				int attr = m_video_ram[(x+(y*40))*2+1];
+				int tile = m_video_base[(x + (y * text_cols)) * 2 + 0];
+				int attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi=0;yi<12;yi++)
+				for(int yi = 0; yi < 12; yi++)
 				{
-					for(int xi=0;xi<8;xi++)
+					int res_y = y * 12 + yi;
+
+					for(int xi = 0; xi < 8; xi++)
 					{
-						int pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+						int res_x = x * 8 + xi;
+
+						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
 
 						int fgcol = (attr & 0x0f) + 0x10;
-						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
+						// TODO: definitely wants bright colors for N66SR BASIC, but quite won't work for "PC-6*01 World" screens
+						// (can't pinpoint banking on this HW, or maybe it's side effect of CLUT?)
+						int bgcol = ((attr & 0x70) >> 4) + 0x18; //+ m_bgcol_bank;
 
 						int color = pen ? fgcol : bgcol;
 
-						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix(((y*12+yi)), (x*8+xi)) = m_palette->pen(color);
+						if (cliprect.contains(res_x, res_y))
+							bitmap.pix(res_y, res_x) = m_palette->pen(color);
 					}
 				}
 			}
 		}
 	}
-	else //4bpp bitmap mode (TODO)
+	else
 	{
-		for(int y=0;y<200;y++)
+		//4bpp bitmap mode
+		const u32 scroll_x = (m_sr_scrollx[0]) + (m_sr_scrollx[1] << 8);
+		const u32 scroll_y = m_sr_scrolly[0];
+		const int x_pitch = 320;
+		const int y_pitch = 204;
+
+		//popmessage("%04x %02x", scroll_x, scroll_y);
+
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for(int x=0;x<320;x+=2)
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint32_t vram_addr;
 
-				if(x >= 256)
-					vram_addr = 0x1a00 + (x-256)+y*64;
-				else
-					vram_addr = x+y*256;
+				// The Jp emulators maps this for the rightmost X > 256, but it doesn't seem to be the case?
+//              vram_addr = 0x1a00 + (x-256)+y*64;
 
-				int color;
+				// TODO: scrolling is preliminary, based off how Pakuridius sets VRAM and scroll regs
+				// It seems to wraparound at 320x204
+				// Title screen scrolling usage is quite jerky, but it sorta makes sense on gameplay ...
+				vram_addr = ((x + scroll_x) % x_pitch) + ((y + scroll_y) % y_pitch) * x_pitch;
 
-				color = (m_gvram[vram_addr] & 0xf0) >> 4;
-				if (cliprect.contains(x, y+0))
-					bitmap.pix((y+0), (x+0)) = m_palette->pen(color+0x10);
-
-				color = (m_gvram[vram_addr] & 0x0f);
-				if (cliprect.contains(x+1, y+0))
-					bitmap.pix((y+0), (x+1)) = m_palette->pen(color+0x10);
+				// wants RGB -> BRG rotation
+				// (is it using a different palette bank?)
+				u8 color = bitswap<4>(m_gvram[vram_addr] & 0x0f, 3, 0, 2, 1) + 0x10;
+				if (cliprect.contains(x, y))
+					bitmap.pix(y, x) = m_palette->pen(color);
 			}
 		}
 	}

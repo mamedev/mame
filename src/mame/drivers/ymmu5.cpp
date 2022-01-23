@@ -13,6 +13,7 @@
 #include "cpu/h8/h83002.h"
 #include "sound/multipcm.h"
 #include "video/lc7985.h"
+#include "bus/midi/midi.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -74,6 +75,7 @@ void mu5_state::mu5_io_map(address_map &map)
 	map(h8_device::PORT_4, h8_device::PORT_4).lw8(NAME([this](u8 data) { m_matrixsel = data; }));
 	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu5_state::lcd_ctrl_r), FUNC(mu5_state::lcd_ctrl_w));
 	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
+	map(h8_device::PORT_A, h8_device::PORT_A).nopr();
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
 
 	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; })); // battery level
@@ -231,6 +233,11 @@ void mu5_state::mu5(machine_config &config)
 	m_ymw258->add_route(1, "rspeaker", 1.0);
 
 	LC7985(config, m_lcd);
+
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+
+	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
+	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);

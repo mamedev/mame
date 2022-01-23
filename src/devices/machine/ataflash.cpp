@@ -140,7 +140,7 @@ void taito_pccard1_device::device_reset()
 	uint32_t metalength;
 	memset(m_key, 0, sizeof(m_key));
 
-	if (m_handle != nullptr && m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength) == CHDERR_NONE)
+	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
 	{
 		m_locked = 0x1ff;
 	}
@@ -231,7 +231,7 @@ void taito_pccard2_device::device_reset()
 	uint32_t metalength;
 	memset(m_key, 0, sizeof(m_key));
 
-	if (m_handle != nullptr && m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength) == CHDERR_NONE)
+	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
 	{
 		m_locked = true;
 	}
@@ -330,7 +330,7 @@ void taito_compact_flash_device::device_reset()
 	uint32_t metalength;
 	memset(m_key, 0, sizeof(m_key));
 
-	if (m_handle != nullptr && m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength) == CHDERR_NONE)
+	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
 	{
 		m_locked = true;
 	}

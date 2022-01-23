@@ -38,6 +38,7 @@
 #include "http.h"
 
 // commonly-referenced utilities imported from lib/util
+#include "corealloc.h"
 #include "palette.h"
 
 // emulator-specific utilities
@@ -64,7 +65,6 @@
 #include "addrmap.h" // Needs optional_device<> and required_device<>
 #include "distate.h"
 #include "dimemory.h"
-#include "opresolv.h"
 #include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"

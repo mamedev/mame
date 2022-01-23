@@ -184,8 +184,7 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 	return(emx);
 }
 
-#ifdef UNUSED_FUNCTION
-int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and p.27 3.3)
+int konamigx_state::K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and p.27 3.3)
 {
 	int scb, shift, pal, osmx, oson, pl45, emx;
 
@@ -222,7 +221,6 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 
 	return(emx);
 }
-#endif
 
 void konamigx_state::wipezbuf(int noshadow)
 {
@@ -277,8 +275,6 @@ void konamigx_state::wipezbuf(int noshadow)
 #define GX_MAX_LAYERS  6
 #define GX_MAX_OBJECTS (GX_MAX_SPRITES + GX_MAX_LAYERS)
 
-static struct GX_OBJ { int order, offs, code, color; } *gx_objpool;
-
 void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 {
 	m_gx_objdma = 0;
@@ -286,13 +282,14 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 
 	m_gx_objzbuf = &screen.priority().pix(0);
 	m_gx_shdzbuf = std::make_unique<uint8_t[]>(GX_ZBUFSIZE);
-	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
+	m_gx_objpool = std::make_unique<GX_OBJ[]>(GX_MAX_OBJECTS);
 
 	m_k054338->export_config(&m_K054338_shdRGB);
 
 	if (objdma)
 	{
-		m_gx_spriteram = auto_alloc_array(machine(), uint16_t, 0x2000/2);
+		m_gx_spriteram_alloc = std::make_unique<uint16_t[]>(0x2000/2);
+		m_gx_spriteram = m_gx_spriteram_alloc.get();
 		m_gx_objdma = 1;
 	}
 	else
@@ -323,14 +320,14 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
 
-	struct GX_OBJ *objpool, *objptr;
+	GX_OBJ *objpool, *objptr;
 	int cltc_shdpri, /*prflp,*/ disp;
 
 	// buffer can move when it's resized, so refresh the pointer
 	m_gx_objzbuf = &screen.priority().pix(0);
 
 	// abort if object database failed to initialize
-	objpool = gx_objpool;
+	objpool = m_gx_objpool.get();
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
@@ -818,7 +815,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 
 					/* passed from above function */
-					struct GX_OBJ *objpool,
+					GX_OBJ *objpool,
 					int *objbuf,
 					int nobj
 					)
@@ -828,7 +825,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 	for (int count=0; count<nobj; count++)
 	{
-		struct GX_OBJ *objptr = objpool + objbuf[count];
+		GX_OBJ *objptr = objpool + objbuf[count];
 		int order  = objptr->order;
 		int offs   = objptr->offs;
 		int code   = objptr->code;
@@ -1585,7 +1582,6 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 	palette.set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-#ifdef UNUSED_FUNCTION
 // main monitor for type 3
 void konamigx_state::konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1610,7 +1606,6 @@ void konamigx_state::konamigx_555_palette2_w(offs_t offset, uint32_t data, uint3
 	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
 	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
-#endif
 
 void konamigx_state::konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {

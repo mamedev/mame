@@ -51,26 +51,8 @@ enum machine_notification
 // debug flags
 constexpr int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
 constexpr int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
-constexpr int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
-constexpr int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
-constexpr int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
-constexpr int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
-constexpr int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
-constexpr int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
 constexpr int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
 
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-// global allocation helpers
-#define auto_alloc(m, t)                pool_alloc(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_clear(m, t)          pool_alloc_clear(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_array(m, t, c)       pool_alloc_array(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
 
 //**************************************************************************
@@ -109,33 +91,6 @@ public:
 
 
 
-// ======================> dummy_space_device
-
-// a dummy address space for passing to handlers outside of the memory system
-
-class dummy_space_device : public device_t,
-	public device_memory_interface
-{
-public:
-	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
-
-	void dummy(address_map &map);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-private:
-	const address_space_config  m_space_config;
-};
-
-
-
 // ======================> running_machine
 
 typedef delegate<void ()> machine_notify_delegate;
@@ -152,9 +107,6 @@ class running_machine
 
 	typedef std::function<void (const char*)> logerror_callback;
 
-	// must be at top of member variables
-	resource_pool           m_respool;              // pool of resources for this machine
-
 public:
 	// construction/destruction
 	running_machine(const machine_config &config, machine_manager &manager);
@@ -166,7 +118,6 @@ public:
 	const game_driver &system() const { return m_system; }
 	osd_interface &osd() const;
 	machine_manager &manager() const { return m_manager; }
-	[[deprecated("use smart pointers to manage object lifecycles")]] resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
@@ -211,8 +162,7 @@ public:
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
 	// fetch items by name
-	[[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template <class DeviceClass> [[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
+	template <class DeviceClass> [[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(root_device().subdevice(tag)); }
 
 	// immediate operations
 	int run(bool quiet);
@@ -248,7 +198,6 @@ public:
 	void set_rtc_datetime(const system_time &systime);
 
 	// misc
-	address_space &dummy_space() const { return m_dummy_space.space(AS_PROGRAM); }
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
@@ -399,9 +348,6 @@ private:
 
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;
-
-	// configuration state
-	dummy_space_device m_dummy_space;
 
 #if defined(__EMSCRIPTEN__)
 private:

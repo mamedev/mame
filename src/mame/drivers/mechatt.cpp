@@ -137,7 +137,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 #include "video/bufsprite.h"
 // src/emu
 #include "emupal.h"

@@ -93,7 +93,8 @@ const options_entry sdl_options::s_option_entries[] =
 	#ifdef SDLMAME_X11
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL FULL SCREEN OPTIONS" },
 	{ SDLOPTION_USEALLHEADS,                 "0",     OPTION_BOOLEAN,    "split full screen image across monitors" },
-	#endif
+	{ SDLOPTION_ATTACH_WINDOW,               "",      OPTION_STRING,     "attach to arbitrary window" },
+	#endif // SDLMAME_X11
 
 	// keyboard mapping
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
@@ -420,6 +421,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	int bench = options().bench();
 	if (bench > 0)
 	{
+		options().set_value(OPTION_SLEEP, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "bus/msx_cart/msx_audio_kb.h"
 #include "machine/ym2148.h"
 
@@ -35,7 +35,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
 
 	required_memory_region m_region_sfg;
-	required_device<ym2151_device> m_ym2151;
+	required_device<ym_generic_device> m_ym2151;
 	required_device<msx_audio_kbdc_port_device> m_kbdc;
 	required_device<ym2148_device> m_ym2148;
 	int m_ym2151_irq_state;

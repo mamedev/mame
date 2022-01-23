@@ -6,69 +6,10 @@
 
     Controls execution of the core MAME system.
 
-****************************************************************************
-
-    Since there has been confusion in the past over the order of
-    initialization and other such things, here it is, all spelled out
-    as of January, 2008:
-
-    main()
-        - does platform-specific init
-        - calls mame_execute() [mame.c]
-
-        mame_execute() [mame.c]
-            - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-            - begins resource tracking (level 1)
-            - calls create_machine [mame.c] to initialize the running_machine structure
-            - calls init_machine() [mame.c]
-
-            init_machine() [mame.c]
-                - calls fileio_init() [fileio.c] to initialize file I/O info
-                - calls config_init() [config.c] to initialize configuration system
-                - calls input_init() [input.c] to initialize the input system
-                - calls output_init() [output.c] to initialize the output system
-                - calls state_init() [state.c] to initialize save state system
-                - calls state_save_allow_registration() [state.c] to allow registrations
-                - calls palette_init() [palette.c] to initialize palette system
-                - calls render_init() [render.c] to initialize the rendering system
-                - calls ui_init() [ui.c] to initialize the user interface
-                - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
-                - calls timer_init() [timer.c] to reset the timer system
-                - calls osd_init() [osdepend.h] to do platform-specific initialization
-                - calls input_port_init() [inptport.c] to set up the input ports
-                - calls rom_init() [romload.c] to load the game's ROMs
-                - calls memory_init() [memory.c] to process the game's memory maps
-                - calls the driver's DRIVER_INIT callback
-                - calls device_list_start() [devintrf.c] to start any devices
-                - calls video_init() [video.c] to start the video system
-                - calls tilemap_init() [tilemap.c] to start the tilemap system
-                - calls crosshair_init() [crsshair.c] to configure the crosshairs
-                - calls sound_init() [sound.c] to start the audio system
-                - calls debugger_init() [debugger.c] to set up the debugger
-                - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
-                - calls cheat_init() [cheat.c] to initialize the cheat system
-                - calls image_init() [image.c] to initialize the image system
-
-            - calls config_load_settings() [config.c] to load the configuration file
-            - calls nvram_load [machine/generic.c] to load NVRAM
-            - calls ui_display_startup_screens() [ui.c] to display the startup screens
-            - begins resource tracking (level 2)
-            - calls soft_reset() [mame.c] to reset all systems
-
-                -------------------( at this point, we're up and running )----------------------
-
-            - calls scheduler->timeslice() [schedule.c] over and over until we exit
-            - ends resource tracking (level 2), freeing all auto_mallocs and timers
-            - calls the nvram_save() [machine/generic.c] to save NVRAM
-            - calls config_save_settings() [config.c] to save the game's configuration
-            - calls all registered exit routines [mame.c]
-            - ends resource tracking (level 1), freeing all auto_mallocs and timers
-
-        - exits the program
-
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
@@ -76,7 +17,6 @@
 #include "render.h"
 #include "uiinput.h"
 #include "crsshair.h"
-#include "unzip.h"
 #include "debug/debugvw.h"
 #include "debug/debugcpu.h"
 #include "dirtc.h"
@@ -86,10 +26,14 @@
 #include "tilemap.h"
 #include "natkeyboard.h"
 #include "ui/uimain.h"
+
 #include "corestr.h"
-#include <ctime>
+#include "unzip.h"
+
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
+
+#include <ctime>
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
@@ -133,13 +77,9 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_memory(*this),
 		m_ioport(*this),
 		m_parameters(*this),
-		m_scheduler(*this),
-		m_dummy_space(_config, "dummy_space", &root_device(), 0)
+		m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
-
-	m_dummy_space.set_machine(*this);
-	m_dummy_space.config_complete();
 
 	// set the machine on all devices
 	device_enumerator iter(root_device());
@@ -317,8 +257,8 @@ int running_machine::run(bool quiet)
 		if (options().log() && !quiet)
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_logfile->open("error.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_logfile->open("error.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
 			using namespace std::placeholders;
@@ -328,8 +268,8 @@ int running_machine::run(bool quiet)
 		if (options().debug() && options().debuglog())
 		{
 			m_debuglogfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_debuglogfile->open("debug.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_debuglogfile->open("debug.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open debug.log file");
 		}
 
@@ -355,6 +295,8 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
+		m_hard_reset_pending = false;
+
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
@@ -367,8 +309,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_hard_reset_pending = false;
 
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
@@ -418,7 +358,7 @@ int running_machine::run(bool quiet)
 	}
 	catch (binding_type_exception &btex)
 	{
-		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
+		osd_printf_error("Error performing a late bind of function expecting type %s to instance of type %s\n", btex.target_type().name(), btex.actual_type().name());
 		error = EMU_ERR_FATALERROR;
 	}
 	catch (tag_add_exception &aex)
@@ -501,7 +441,7 @@ void running_machine::schedule_soft_reset()
 //-------------------------------------------------
 //  get_statename - allow to specify a subfolder of
 //  the state directory for state loading/saving,
-//  very useful for MESS and consoles or computers
+//  very useful for consoles or computers
 //  where you can have separate folders for diff
 //  software
 //-------------------------------------------------
@@ -534,21 +474,10 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find('/', pos + 3);
-			int end2 = statename_str.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = statename_str.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = statename_str.length();
 
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string devname_str;
@@ -946,7 +875,7 @@ void running_machine::handle_saveload()
 			// open the file
 			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 			{
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 
@@ -988,7 +917,7 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
-			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
@@ -1048,11 +977,9 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	m_dummy_space.start();
-
 	// iterate through the devices
 	int last_failed_starts = -1;
-	while (last_failed_starts != 0)
+	do
 	{
 		// iterate over all devices
 		int failed_starts = 0;
@@ -1063,29 +990,27 @@ void running_machine::start_all_devices()
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device.m_machine == nullptr)
+					if (!device.m_machine)
 						device.set_machine(*this);
 
 					// now start the device
 					osd_printf_verbose("Starting %s '%s'\n", device.name(), device.tag());
 					device.start();
 				}
-
-				// handle missing dependencies by moving the device to the end
-				catch (device_missing_dependencies &)
+				catch (device_missing_dependencies const &)
 				{
-					// if we're the end, fail
+					// handle missing dependencies by moving the device to the end
 					osd_printf_verbose("  (missing dependencies; rescheduling)\n");
 					failed_starts++;
 				}
 			}
 
-		// each iteration should reduce the number of failed starts; error if
-		// this doesn't happen
+		// each iteration should reduce the number of failed starts; error if this doesn't happen
 		if (failed_starts == last_failed_starts)
 			throw emu_fatalerror("Circular dependency in device startup!");
 		last_failed_starts = failed_starts;
 	}
+	while (last_failed_starts);
 }
 
 
@@ -1193,7 +1118,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+		if (!file.open(nvram_filename(nvram.device())))
 		{
 			nvram.nvram_load(file);
 			file.close();
@@ -1215,7 +1140,7 @@ void running_machine::nvram_save()
 		if (nvram.nvram_can_save())
 		{
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			if (!file.open(nvram_filename(nvram.device())))
 			{
 				nvram.nvram_save(file);
 				file.close();
@@ -1342,51 +1267,6 @@ void system_time::full_time::set(struct tm &t)
 	is_dst  = t.tm_isdst;
 }
 
-
-
-//**************************************************************************
-//  DUMMY ADDRESS SPACE
-//**************************************************************************
-
-u8 dummy_space_device::read(offs_t offset)
-{
-	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
-}
-
-void dummy_space_device::write(offs_t offset, u8 data)
-{
-	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
-}
-
-void dummy_space_device::dummy(address_map &map)
-{
-	map(0x00000000, 0xffffffff).rw(FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
-}
-
-DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
-
-dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(FUNC(dummy_space_device::dummy), this))
-{
-}
-
-void dummy_space_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector dummy_space_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
 
 
 //**************************************************************************

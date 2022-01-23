@@ -172,7 +172,7 @@ function xml.conv_cheat(data)
 	end
 
 	local function convert_output(data)
-		local str = "draw_text(screen,"
+		local str = "draw_text(ui,"
 		if data["align"] then
 			str = str .. data["align"]
 		else
@@ -264,20 +264,19 @@ function xml.conv_cheat(data)
 		if next(spaces) then
 			data["cheat"][count]["space"] = {}
 			for name, space in pairs(spaces) do
-				data["cheat"][count]["space"] = {}
 				data["cheat"][count]["space"][name] = { type = space["type"], tag = space["tag"] }
 			end
 		end
 		if next(regions) then
 			data["cheat"][count]["region"] = {}
 			for name, region in pairs(regions) do
-				data["cheat"][count]["region"] = {}
 				data["cheat"][count]["region"][name] = region
 			end
 		end
 		if output then
 			data["cheat"][count]["screen"] = {}
 			data["cheat"][count]["screen"]["screen"] = ":screen"
+			data["cheat"][count]["screen"]["ui"] = "ui"
 		end
 	end
 	return data["cheat"]

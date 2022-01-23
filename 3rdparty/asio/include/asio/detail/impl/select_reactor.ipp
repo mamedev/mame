@@ -2,7 +2,7 @@
 // detail/impl/select_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,12 @@
 #include "asio/detail/select_reactor.hpp"
 #include "asio/detail/signal_blocker.hpp"
 #include "asio/detail/socket_ops.hpp"
+
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
 #include "asio/detail/push_options.hpp"
 
@@ -80,13 +86,14 @@ void select_reactor::shutdown()
   shutdown_ = true;
 #if defined(ASIO_HAS_IOCP)
   stop_thread_ = true;
+  if (thread_)
+    interrupter_.interrupt();
 #endif // defined(ASIO_HAS_IOCP)
   lock.unlock();
 
 #if defined(ASIO_HAS_IOCP)
   if (thread_)
   {
-    interrupter_.interrupt();
     thread_->join();
     delete thread_;
     thread_ = 0;
@@ -164,6 +171,19 @@ void select_reactor::cancel_ops(socket_type descriptor,
   cancel_ops_unlocked(descriptor, asio::error::operation_aborted);
 }
 
+void select_reactor::cancel_ops_by_key(socket_type descriptor,
+    select_reactor::per_descriptor_data&,
+    int op_type, void* cancellation_key)
+{
+  asio::detail::mutex::scoped_lock lock(mutex_);
+  op_queue<operation> ops;
+  bool need_interrupt = op_queue_[op_type].cancel_operations_by_key(
+      descriptor, ops, cancellation_key, asio::error::operation_aborted);
+  scheduler_.post_deferred_completions(ops);
+  if (need_interrupt)
+    interrupter_.interrupt();
+}
+
 void select_reactor::deregister_descriptor(socket_type descriptor,
     select_reactor::per_descriptor_data&, bool)
 {
@@ -178,6 +198,11 @@ void select_reactor::deregister_internal_descriptor(
   op_queue<operation> ops;
   for (int i = 0; i < max_ops; ++i)
     op_queue_[i].cancel_operations(descriptor, ops);
+}
+
+void select_reactor::cleanup_descriptor_data(
+    select_reactor::per_descriptor_data&)
+{
 }
 
 void select_reactor::run(long usec, op_queue<operation>& ops)
@@ -234,7 +259,11 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   // Reset the interrupter.
   if (retval > 0 && fd_sets_[read_op].is_set(interrupter_.read_descriptor()))
   {
-    interrupter_.reset();
+    if (!interrupter_.reset())
+    {
+      lock.lock();
+      interrupter_.recreate();
+    }
     --retval;
   }
 

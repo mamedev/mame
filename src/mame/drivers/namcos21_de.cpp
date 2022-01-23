@@ -45,7 +45,7 @@ Driver's Eyes works,
 #include "video/namco_c355spr.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 
 
@@ -221,7 +221,7 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 	int pri;
 	bitmap.fill(0xff, cliprect );
 	screen.priority().fill(0, cliprect);
-	m_c355spr->get_sprites(cliprect); // TODO : buffered?
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes

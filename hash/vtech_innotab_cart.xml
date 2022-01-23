@@ -15,9 +15,34 @@ license:CC0
 		<description>Mickey Mouse Clubhouse (UK)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<part name="cart" interface="vtech_storio_cart">
+		<info name="serial" value="80-230403-103"/>
+		<part name="cart" interface="vtech_innotab_cart">
 			<dataarea name="rom" size="0x8400000">
 				<rom name="80-230403-103 - Mickey Mouse Clubhouse (UK).bin" size="0x8400000" crc="839567a9" sha1="bd4e2c8138d6f62bcac1978745a2b752bcefb07d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengmad" supported="no">
+		<description>The Penguins of Madagascar (USA)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-230500(US)"/>
+		<part name="cart" interface="vtech_innotab_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="innotab_penguins_of_madagascar_gpr27p01ga_c279.bin" size="0x8400000" crc="5c2d33fa" sha1="6ad8e167b96fed824c164b55f8d011928fd142d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnttp" supported="no">
+		<description>Teenage Mutant Ninja Turtles - Turtle Power! (USA)</description>
+		<year>2013</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-231300(US)"/>
+		<part name="cart" interface="vtech_innotab_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="innotab_tmnt_turtle_power_gpr27p01ga_c279.bin" size="0x8400000" crc="3928e80c" sha1="f3048f990fc9c5e8d29d81a536da90496befa7b4" />
 			</dataarea>
 		</part>
 	</software>

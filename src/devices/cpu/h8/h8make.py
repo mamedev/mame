@@ -18,6 +18,8 @@ def name_to_type(name):
         return 2
     if name == "s26":
         return 3
+    if name == "g":
+        return 4
     sys.stderr.write("Unknown chip type name %s\n" % name)
     sys.exit(1)
 
@@ -29,7 +31,9 @@ def type_to_device(dtype, mode):
             return "h8h_device"
         if dtype == 2:
             return "h8s2000_device"
-        return "h8s2600_device"
+        if dtype == 3:
+            return "h8s2600_device"
+        return "gt913_device"
     else:
         if dtype == 0:
             return "h8_disassembler"
@@ -37,7 +41,9 @@ def type_to_device(dtype, mode):
             return "h8h_disassembler"
         if dtype == 2:
             return "h8s2000_disassembler"
-        return "h8s2600_disassembler"
+        if dtype == 3:
+            return "h8s2600_disassembler"
+        return "gt913_disassembler"
 
 def hexsplit(str):
     res = []
@@ -474,7 +480,7 @@ def main(argv):
     if mode == 's':
         opcodes.build_dispatch()
         opcodes.save_opcodes(f, dname)
-        if dtype == 0:
+        if dtype == 0 or dtype == 4:
             opcodes.save_dispatch(f, dname)
         opcodes.save_exec(f, dname, dtype, "full")
         opcodes.save_exec(f, dname, dtype, "partial")

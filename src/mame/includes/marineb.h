@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/watchdog.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -17,11 +18,13 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
+		m_system(*this, "SYSTEM"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_outlatch(*this, "outlatch")
+		m_outlatch(*this, "outlatch"),
+		m_watchdog(*this, "watchdog")
 	{ }
 
 	void springer(machine_config &config);
@@ -36,6 +39,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport m_system;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -51,6 +55,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_outlatch;
+	required_device<watchdog_timer_device> m_watchdog;
 
 	bool     m_irq_mask;
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
@@ -62,6 +67,7 @@ private:
 	void marineb_palette_bank_1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
+	uint8_t system_watchdog_r();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -75,8 +81,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(marineb_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(wanted_vblank_irq);
 	void set_tilemap_scrolly( int cols );
-	void marineb_io_map(address_map &map);
+
 	void marineb_map(address_map &map);
+	void marineb_io_map(address_map &map);
+	void wanted_map(address_map &map);
 	void wanted_io_map(address_map &map);
 };
 

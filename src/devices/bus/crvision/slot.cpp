@@ -63,7 +63,7 @@ void device_crvision_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CRVISION_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_crvision_cart_interface>(mconfig, *this),
 	m_type(CRV_4K), m_cart(nullptr)
 {
@@ -145,7 +145,7 @@ image_init_result crvision_cart_slot_device::call_load()
 
 		if (size > 0x4800)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an APF cart");
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
 			return image_init_result::FAIL;
 		}
 
@@ -209,10 +209,10 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
-		int type = CRV_4K;
+		uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error return
 
+		int type = CRV_4K;
 		switch (size)
 		{
 			case 0x4800:
@@ -238,7 +238,7 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
 				break;
 		}
 
-		slot_string = crvision_get_slot(type);
+		char const *const slot_string = crvision_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

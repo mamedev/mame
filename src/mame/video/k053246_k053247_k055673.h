@@ -449,7 +449,7 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(K053247, k053247_device)
-DECLARE_DEVICE_TYPE(K053246, k053247_device)
+static auto &K053246 = K053247;
 
 class k055673_device : public k053247_device
 {
@@ -462,7 +462,7 @@ protected:
 	virtual void device_start() override;
 //  virtual void device_reset();
 private:
-
+	std::unique_ptr<u16[]> m_combined_gfx;
 };
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)

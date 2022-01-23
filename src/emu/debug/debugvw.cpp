@@ -9,16 +9,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "express.h"
 #include "debugvw.h"
-#include "dvtext.h"
-#include "dvstate.h"
+
+#include "debugcpu.h"
+#include "dvbpoints.h"
 #include "dvdisasm.h"
 #include "dvmemory.h"
-#include "dvbpoints.h"
+#include "dvrpoints.h"
+#include "dvstate.h"
+#include "dvtext.h"
 #include "dvwpoints.h"
-#include "debugcpu.h"
+#include "express.h"
+
 #include "debugger.h"
+
 #include <cctype>
 
 
@@ -361,6 +365,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 
 		case DVT_WATCH_POINTS:
 			return append(new debug_view_watchpoints(machine(), osdupdate, osdprivate));
+
+		case DVT_REGISTER_POINTS:
+			return append(new debug_view_registerpoints(machine(), osdupdate, osdprivate));
 
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);

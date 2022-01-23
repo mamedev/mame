@@ -42,6 +42,7 @@ Issues:
 #include "speaker.h"
 
 
+namespace {
 
 class rc702_state : public driver_device
 {
@@ -65,10 +66,11 @@ public:
 
 	void rc702(machine_config &config);
 
-private:
-	void machine_reset() override;
-	void machine_start() override;
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void port14_w(uint8_t data);
@@ -87,12 +89,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_q_state;
-	bool m_qbar_state;
-	bool m_drq_state;
-	uint16_t m_beepcnt;
-	bool m_eop;
-	bool m_dack1;
+	bool m_q_state = 0;
+	bool m_qbar_state = 0;
+	bool m_drq_state = 0;
+	uint16_t m_beepcnt = 0U;
+	bool m_eop = 0;
+	bool m_dack1 = 0;
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -420,6 +422,9 @@ ROM_START( rc702 )
 	ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
 	ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

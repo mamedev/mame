@@ -1681,7 +1681,6 @@ void m68000_base_device::define_state(void)
 	state_add(M68K_SR,         "SR",        m_iotemp).callimport().callexport().mask(m_sr_mask);
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).noshow().callimport().callexport().formatstr("%16s");
 	state_add(M68K_SP,         "SP",        m_dar[15]);
-	state_add(STATE_GENSP,     "GENSP",     m_dar[15]).noshow();
 	state_add(M68K_USP,        "USP",       m_iotemp).callimport().callexport();
 	if (m_cpu_type & MASK_020_OR_LATER)
 	{
@@ -2319,7 +2318,7 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
 		m_cpu_space_id(AS_CPU_SPACE),
 		m_reset_instr_callback(*this),
@@ -2336,7 +2335,7 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
 		m_cpu_space_id(AS_CPU_SPACE),
 		m_reset_instr_callback(*this),

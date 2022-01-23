@@ -24,7 +24,7 @@
 #include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ins8250.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "softlist_dev.h"

@@ -102,7 +102,7 @@ COLOR EMULATION (NEC 7220 + extra hardware)
 
 DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (a bit of history)
    (1) the standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-   (2) an unofficial DIY cable enabled R-G-B graphics + seperate text
+   (2) an unofficial DIY cable enabled R-G-B graphics + separate text
 
 EMULATION SPECIFIC
    (1) COLOR_MONITOR reflects DEC's recommendation (R-M-B with VR241 above)
@@ -844,18 +844,18 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 	if (m_gdc_mode_register & GDC_MODE_HIGHRES)
 	{
 		address = ( m_gdc_scroll_buffer[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-		plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
-		plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
+		plane0 = m_video_ram[((address & 0x3fff) + 0x0000)];
+		plane1 = m_video_ram[((address & 0x3fff) + 0x8000)];
 		plane2 = plane3 = 0;
 	}
 	else
 	{
 		address = ( m_gdc_scroll_buffer[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 		// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 -or 4- MONOCHROME SHADES)
-		plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
-		plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
-		plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
-		plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
+		plane0 = m_video_ram[((address & 0x1fff) + 0x00000)];
+		plane1 = m_video_ram[((address & 0x1fff) + 0x08000)];
+		plane2 = m_video_ram[((address & 0x1fff) + 0x10000)];
+		plane3 = m_video_ram[((address & 0x1fff) + 0x18000)];
 	}
 
 	bool mono = (m_monitor_suggested == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR; 4 = AUTO
@@ -2168,7 +2168,7 @@ uint8_t rainbow_modela_state::system_parameter_r()
 	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
 
 	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
-	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
+	BIOS uses a separate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)
@@ -2188,7 +2188,7 @@ uint8_t rainbow_modelb_state::system_parameter_r()
 	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
 
 	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
-	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
+	BIOS uses a separate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)

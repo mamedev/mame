@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -78,6 +78,8 @@ enum
 	SMOUSE,                      /* Smart Mouse */
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
+	SRAM_ARG96,                  /* Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2) */
+	TC2000,                      /* TC 2000 (Argentina, protected) */
 	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
 
@@ -147,7 +149,7 @@ protected:
 // ======================> base_md_cart_slot_device
 
 class base_md_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_md_cart_interface>
 {
 public:
@@ -158,11 +160,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 
 	// slot interface overrides
@@ -176,7 +173,6 @@ public:
 
 	void setup_custom_mappers();
 	void setup_nvram();
-	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 	void file_logging(uint8_t *ROM, uint32_t rom_len, uint32_t nvram_len);
 
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
@@ -197,17 +193,12 @@ public:
 
 	int m_type;
 	device_md_cart_interface*       m_cart;
-	bool                            m_must_be_loaded;
 
 protected:
 	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
 };
 
 // ======================> md_cart_slot_device

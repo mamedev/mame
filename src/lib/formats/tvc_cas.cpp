@@ -7,9 +7,8 @@
     http://tvc.homeserver.hu/html/konvertformatum.html
 
 ********************************************************************/
-#include "tvc_cas.h"
 
-#include <cassert>
+#include "tvc_cas.h"
 
 
 #define TVC64_BIT0_FREQ     1812

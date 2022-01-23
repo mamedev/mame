@@ -76,7 +76,7 @@ public:
 		, m_floppy43(*this, "fdc4:3")
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
-		, m_iop_x(*this, "X.%u", 0)
+		, m_iop_x(*this, "X.%u", 0U)
 	{ }
 
 	void sorcerer(machine_config &config);
@@ -97,7 +97,6 @@ protected:
 	void portff_w(u8 data);
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(serial_tc);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void machine_start_common(offs_t endmem);
 	void machine_reset_common();
@@ -109,8 +108,8 @@ protected:
 	void sorcerera_io(address_map &map);
 	void sorcererb_io(address_map &map);
 
-	u8 m_portfe;
-	u8 m_keyboard_line;
+	u8 m_portfe = 0U;
+	u8 m_keyboard_line = 0U;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
@@ -152,7 +151,7 @@ private:
 	void port34_w(u8 data);
 	void port48_w(u8 data);
 	void intrq4_w(bool state);
-	bool m_halt;
+	bool m_halt = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void busreq_w(bool state);
@@ -179,10 +178,10 @@ private:
 	void port2c_w(u8 data);
 	void intrq2_w(bool state);
 	void drq2_w(bool state);
-	u8 m_port2c;
-	bool m_wait;
-	bool m_drq_off;
-	bool m_intrq_off;
+	u8 m_port2c = 0U;
+	bool m_wait = 0;
+	bool m_drq_off = 0;
+	bool m_intrq_off = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	optional_device<micropolis_device> m_fdc;

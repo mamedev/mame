@@ -114,6 +114,19 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
         fdcset 1072,7fff,ffff,irq
         //fdcset 1074,4e73,ffff,irq
 
+****************************************************************************
+
+    Add something like this to debug_view_memory::write
+
+    // hack for FD1094 editing
+    #ifdef FD1094_HACK
+        if (source.m_base == machine().root_device().memregion("user2"))
+        {
+            extern void fd1094_regenerate_key(running_machine &machine);
+            fd1094_regenerate_key(machine());
+        }
+    #endif
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -222,7 +235,7 @@ static uint8_t *              ignorepc;
 static uint8_t                ignore_all;
 
 /* array of information about each opcode */
-static optable_entry *      optable;
+static std::unique_ptr<optable_entry[]> optable;
 
 /* buffer for undoing operations */
 static uint8_t *              undobuff;
@@ -2087,7 +2100,7 @@ static void build_optable(running_machine &machine)
 	int opnum, inum;
 
 	/* allocate and initialize the opcode table */
-	optable = auto_alloc_array(machine, optable_entry, 65536);
+	optable = std::make_unique<optable_entry[]>(65536);
 	for (opnum = 0; opnum < 65536; opnum++)
 	{
 		optable[opnum].flags = OF_INVALID;

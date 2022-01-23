@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#include <cassert>
+#include "hect_dsk.h"
+#include "basicdsk.h"
 
-#include "formats/hect_dsk.h"
-#include "formats/basicdsk.h"
+#include <cstring>
 
 /*****************************************************************************/
 /******  Management of the floppy images 200Ko and 800Ko *********************/

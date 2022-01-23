@@ -14,7 +14,7 @@
 #include "floppy.h"
 #include "formats/cgenie_dsk.h"
 #include "bus/generic/carts.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  CONSTANTS/MACROS
@@ -181,7 +181,7 @@ DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device::socket_load )
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 

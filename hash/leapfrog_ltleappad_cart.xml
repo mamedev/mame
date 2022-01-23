@@ -5,6 +5,38 @@ license:CC0
 -->
 <softwarelist name="leapfrog_ltleappad_cart" description="LeapFrog Little Touch LeapPad cartridges">
 
+	<!-- Will be clone of "Baby Animals" once found and dumped -->
+	<software name="babyanimlsg" supported="no">
+		<description>Tierbabys (Germany)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11543"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT392RA1"/>
+			<feature name="pcb_rev" value="1A"/>
+			<feature name="u1" value="OKI 32MBit ROM: MR27V3202J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11543 - Tierbabys (GER).bin" size="0x400000" crc="b1a39c17" sha1="b8c34f706a634cb8cd9b57623cd1f54a6665186a" />
+			</dataarea>
+			<dataarea name="pages" size="0x3500000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x23dae7f" crc="ad66c49d" sha1="16dae35cb0c08d27eb588b83833ca71f8a71806a"/>
+				<rom name="0 - 0002.png" size="0x19ec78b" crc="516607e7" sha1="24216669d85540efadd0874ba8507b189e7585f1"/>
+				<rom name="0 - 0003.png" size="0x2ad3b2f" crc="2ab6e5fe" sha1="771481c13f6732becfdc79831badcd33016505f0"/>
+				<rom name="0 - 0004.png" size="0x24c56ed" crc="cc8bbb60" sha1="8e1818a7728bbc44ec8c3a7432390c76ef096112"/>
+				<rom name="0 - 0005.png" size="0x24dd064" crc="4006f47c" sha1="cdc6af0b76d613923561d296fb62024ae9f1a61b"/>
+				<rom name="0 - 0006.png" size="0x24204dd" crc="cdc740df" sha1="6bdabb6a76b4d74ba554cb488352eba556c49e47"/>
+				<rom name="0 - 0007.png" size="0x24ec957" crc="63dd73bc" sha1="cd3183762d5131c1a660cdf51c322dbcc24c511e"/>
+				<rom name="0 - 0008.png" size="0x2bc7c77" crc="7b199399" sha1="46ec72d03bc57b9323cbdebb6893cb8f2b37353f"/>
+				<rom name="0 - 0009.png" size="0x1f2cdaa" crc="ec1259fe" sha1="3371968207f0d055bdb4b5b59a74278489fd824e"/>
+				<rom name="0 - 0010.png" size="0x266ff71" crc="fb61b742" sha1="57f499ff15c1f72f13c48cecbc2a7c93d414976a"/>
+				<rom name="0 - 0011.png" size="0x1a88a46" crc="6153b74d" sha1="2a94cecdcad825060f10a9b9216ba313445c2fc2"/>
+				<rom name="0 - 0012.png" size="0x1908b44" crc="c007d0d7" sha1="aa1c087d36615572266037e76c75dc887d98621e"/>
+				<rom name="0 - 0013.png" size="0x1c1264b" crc="497dc4b5" sha1="b2f6a9587f4a7e8df5eacc54b3ce8e8b0e3f7ae4"/>
+				<rom name="0 - 0014.png" size="0x1e68f7a" crc="b211ff71" sha1="95b1a0911be996460f7cd0da9d0b6fd900d3b146"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="babyfwords" supported="no">
 		<description>Baby's First Words (USA)</description>
 		<year>2003</year>
@@ -35,6 +67,37 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="poohlovesug" cloneof="poohlovesu" supported="no">
+		<description>Disney Puuh mag dich! (Germany)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12032"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT205V6"/>
+			<feature name="pcb_rev" value="1A"/>
+			<feature name="u1" value="Sunplus 16MBit ROM: SPR1600A"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12032 - Puuh mag dich (GER).bin" size="0x200000" crc="86758367" sha1="c5f0dd899c58f879e659a613ba404cbbb2bb7ed5" />
+			</dataarea>
+			<dataarea name="pages" size="0x3500000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x2685430" crc="fd0840ca" sha1="24c3a7f3db4c6efd87974ff388035c6c85ad9347"/>
+				<rom name="0 - 0002.png" size="0x11c378f" crc="e4aeb433" sha1="d486995935ee7168b2f236b2bb2754eca0cb2204"/>
+				<rom name="0 - 0003.png" size="0x30c333c" crc="853af804" sha1="bfa0bbd3079f2c9e145ca85a1b5352abc57d7b97"/>
+				<rom name="0 - 0004.png" size="0x252f5c7" crc="7150e761" sha1="b0ae9ba2d5a2cbdff51e1e523afc279964dc09a8"/>
+				<rom name="0 - 0005.png" size="0x32ab233" crc="28801499" sha1="6ef2e7b652ec00c5e795d3c7f55968473ca837b4"/>
+				<rom name="0 - 0006.png" size="0x322bf92" crc="248f529c" sha1="1e7a4043c409c8f26f2ed4dd1bbf1a665c67a118"/>
+				<rom name="0 - 0007.png" size="0x3274b7e" crc="8d6be3a0" sha1="5cc03ff216d97a75c622687ffaf489e97af82e7c"/>
+				<rom name="0 - 0008.png" size="0x1f1d6ea" crc="a9d16744" sha1="d39084ecb23ac1f1abc64a912b25a2dbe9c65a39"/>
+				<rom name="0 - 0009.png" size="0x31dbe9f" crc="3f529ddf" sha1="0b78d0caf89d19264952283e340232ddbd6c87dc"/>
+				<rom name="0 - 0010.png" size="0x316055b" crc="96980eb5" sha1="f8a2850cb300b05dbb3b335a00473c9c885ed56a"/>
+				<rom name="0 - 0011.png" size="0x25e955a" crc="03750beb" sha1="7286c76c3156f85c8ddeaf2211384be31da7d811"/>
+				<rom name="0 - 0012.png" size="0x25c2d61" crc="1b2365e0" sha1="eb9bd9f248a00e35b558f74a5a93ac6a20ca0e6b"/>
+				<rom name="0 - 0013.png" size="0x195819a" crc="29e96e5e" sha1="cacb0a98e91c3dd02e31d2e358cdc2e89fa337ec"/>
+				<rom name="0 - 0014.png" size="0x1c601b9" crc="c7171d4c" sha1="9b3de89321f637db2ddff814b7e5ae70aae34118"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ifiwere" supported="no">
 		<description>If I were... (USA)</description>
 		<year>2003</year>
@@ -46,6 +109,37 @@ license:CC0
 			<feature name="u1" value="Sunplus ROM: SPR32100A"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-11468 UBL - If I were.bin" size="0x400000" crc="297cb62a" sha1="4bddc6ea95f92fc33690b349277b1e0234d67ce1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ifiwereg" cloneof="ifiwere" supported="no">
+		<description>Was wäre, wenn ...? (Germany)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11542"/>
+		<part name="cart" interface="leapfrog_ltleappad_cart">
+			<feature name="pcb" value="CT392RA1"/>
+			<feature name="pcb_rev" value="1A"/>
+			<feature name="u1" value="OKI 32MBit ROM: MR27V3202J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11542 - Was ware, wenn (GER).bin" size="0x400000" crc="05beb8b3" sha1="64796968d208fbc12eed83a7756321d92daaa719" />
+			</dataarea>
+			<dataarea name="pages" size="0x3500000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x2923cb1" crc="fd98bf40" sha1="5ada16f047eddc69aa81f628a4e25f6dedac7883"/>
+				<rom name="0 - 0002.png" size="0x1ac5323" crc="47dc40e0" sha1="88730b484295b20585b1635d29f9cbdbacfb8957"/>
+				<rom name="0 - 0003.png" size="0x32c5cb1" crc="fcb8eabd" sha1="5c15e670bab926eb345d4a5eea9b7d29aa349c06"/>
+				<rom name="0 - 0004.png" size="0x33095d7" crc="6bba1219" sha1="ffe309dbb074fb218f8774876949515e0946c4c7"/>
+				<rom name="0 - 0005.png" size="0x313f87d" crc="41c53ec2" sha1="0c26714c43019ded927130f9456cbe7b1259ee22"/>
+				<rom name="0 - 0006.png" size="0x3117dee" crc="35ca7c70" sha1="aa7e320ceea425415e15ce8639dfe18a4c090b61"/>
+				<rom name="0 - 0007.png" size="0x2ddf2ad" crc="119de4db" sha1="7cfc6615a9d569ad3353ece6cb973c8a3e7aba51"/>
+				<rom name="0 - 0008.png" size="0x2fd3fdc" crc="c185858d" sha1="aaa55e9d87c3d4521a85df0fcf6e134f94d3536e"/>
+				<rom name="0 - 0009.png" size="0x2fcc4e1" crc="af4b4c8e" sha1="daedd87412854aaae56ee5aeb06d85fd8a61b918"/>
+				<rom name="0 - 0010.png" size="0x32a0774" crc="a8c1da8d" sha1="ba96592f78a7b7ef1a737c10f800af63bb7ccd65"/>
+				<rom name="0 - 0011.png" size="0x2682b72" crc="94d03bad" sha1="152c58f7105fc2b74e78ff292b5156daca10d7b3"/>
+				<rom name="0 - 0012.png" size="0x33a6075" crc="faf97cef" sha1="89f9f3d812324eec151f93ca7b5cab8c3042b71d"/>
+				<rom name="0 - 0013.png" size="0x1a70b0d" crc="eb9835d7" sha1="07a1f3d973d95a21edd94d6dad01f0bafac107fc"/>
+				<rom name="0 - 0014.png" size="0x1e584d3" crc="3fb918d5" sha1="ae3b2a12101a0b89d244cde30ba338dbb3145f6c"/>
 			</dataarea>
 		</part>
 	</software>

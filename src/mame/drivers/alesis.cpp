@@ -409,7 +409,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 void alesis_state::hr16(machine_config &config)
 {
 	/* basic machine hardware */
-	I8031(config, m_maincpu, 12_MHz_XTAL);
+	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
 	m_maincpu->set_addrmap(AS_IO, &alesis_state::hr16_io);
 	m_maincpu->port_in_cb<1>().set_ioport("SELECT");

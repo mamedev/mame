@@ -20,6 +20,16 @@
 DEFINE_DEVICE_TYPE(VTECH_JOYSTICK_INTERFACE, vtech_joystick_interface_device, "vtech_joystick", "Laser/VZ Joystick Interface")
 
 //-------------------------------------------------
+//  io_map - memory space address map
+//-------------------------------------------------
+
+void vtech_joystick_interface_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x20, 0x2f).r(FUNC(vtech_joystick_interface_device::joystick_r));
+}
+
+//-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
@@ -66,8 +76,7 @@ ioport_constructor vtech_joystick_interface_device::device_input_ports() const
 //-------------------------------------------------
 
 vtech_joystick_interface_device::vtech_joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_JOYSTICK_INTERFACE, tag, owner, clock),
-	device_vtech_ioexp_interface(mconfig, *this),
+	vtech_ioexp_device(mconfig, VTECH_JOYSTICK_INTERFACE, tag, owner, clock),
 	m_joy0(*this, "joystick_0"),
 	m_joy0_arm(*this, "joystick_0_arm"),
 	m_joy1(*this, "joystick_1"),
@@ -81,15 +90,7 @@ vtech_joystick_interface_device::vtech_joystick_interface_device(const machine_c
 
 void vtech_joystick_interface_device::device_start()
 {
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_joystick_interface_device::device_reset()
-{
-	io_space().install_read_handler(0x20, 0x2f, read8sm_delegate(*this, FUNC(vtech_joystick_interface_device::joystick_r)));
+	vtech_ioexp_device::device_start();
 }
 
 

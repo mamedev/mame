@@ -51,7 +51,7 @@
 #include "emu.h"
 #include "mecmouse.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MECMOUSE, bus::ti99::joyport, mecmouse_device, "ti99_mecmouse", "TI-99 Mechatronics Mouse")
+DEFINE_DEVICE_TYPE(TI99_MECMOUSE, bus::ti99::joyport::mecmouse_device, "ti99_mecmouse", "TI-99 Mechatronics Mouse")
 
 namespace bus::ti99::joyport {
 

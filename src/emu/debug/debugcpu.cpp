@@ -168,8 +168,8 @@ bool debugger_cpu::comment_save()
 		if (found_comments)
 		{
 			emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
-			if (filerr == osd_file::error::NONE)
+			std::error_condition const filerr = file.open(m_machine.basename() + ".cmt");
+			if (!filerr)
 			{
 				root->write(file);
 				comments_saved = true;
@@ -194,10 +194,10 @@ bool debugger_cpu::comment_load(bool is_inline)
 {
 	// open the file
 	emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_READ);
-	osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
+	std::error_condition const filerr = file.open(m_machine.basename() + ".cmt");
 
 	// if an error, just return false
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		return false;
 
 	// wrap in a try/catch to handle errors
@@ -434,12 +434,12 @@ device_debug::device_debug(device_t &device)
 	, m_total_cycles(0)
 	, m_last_total_cycles(0)
 	, m_pc_history_index(0)
+	, m_pc_history_valid(0)
 	, m_bplist()
 	, m_rplist(std::make_unique<std::forward_list<debug_registerpoint>>())
 	, m_triggered_breakpoint(nullptr)
 	, m_triggered_watchpoint(nullptr)
 	, m_trace(nullptr)
-	, m_hotspot_threshhold(0)
 	, m_track_pc_set()
 	, m_track_pc(false)
 	, m_comment_set()
@@ -458,7 +458,6 @@ device_debug::device_debug(device_t &device)
 	// set up notifiers and clear the passthrough handlers
 	if (m_memory) {
 		int count = m_memory->max_space_count();
-		m_phr.resize(count, nullptr);
 		m_phw.resize(count, nullptr);
 		for (int i=0; i != count; i++)
 			if (m_memory->has_space(i)) {
@@ -552,7 +551,7 @@ device_debug::~device_debug()
 
 void device_debug::write_tracking(address_space &space, offs_t address, u64 data)
 {
-	dasm_memory_access const newAccess(space.spacenum(), address, data, history_pc(0));
+	dasm_memory_access const newAccess(space.spacenum(), address, data, m_state->pcbase());
 	std::pair<std::set<dasm_memory_access>::iterator, bool> trackedAccess = m_track_mem_set.insert(newAccess);
 	if (!trackedAccess.second)
 		trackedAccess.first->m_pc = newAccess.m_pc;
@@ -561,19 +560,6 @@ void device_debug::write_tracking(address_space &space, offs_t address, u64 data
 void device_debug::reinstall(address_space &space, read_or_write mode)
 {
 	int id = space.spacenum();
-	if (u32(mode) & u32(read_or_write::READ))
-	{
-		if (m_phr[id])
-			m_phr[id]->remove();
-		if (!m_hotspots.empty())
-			switch (space.data_width())
-			{
-			case  8: m_phr[id] = space.install_read_tap(0, space.addrmask(), "hotspot", [this, &space](offs_t address, u8  &, u8 ) { hotspot_check(space, address); }, m_phr[id]); break;
-			case 16: m_phr[id] = space.install_read_tap(0, space.addrmask(), "hotspot", [this, &space](offs_t address, u16 &, u16) { hotspot_check(space, address); }, m_phr[id]); break;
-			case 32: m_phr[id] = space.install_read_tap(0, space.addrmask(), "hotspot", [this, &space](offs_t address, u32 &, u32) { hotspot_check(space, address); }, m_phr[id]); break;
-			case 64: m_phr[id] = space.install_read_tap(0, space.addrmask(), "hotspot", [this, &space](offs_t address, u64 &, u64) { hotspot_check(space, address); }, m_phr[id]); break;
-			}
-	}
 	if (u32(mode) & u32(read_or_write::WRITE))
 	{
 		if (m_phw[id])
@@ -581,10 +567,10 @@ void device_debug::reinstall(address_space &space, read_or_write mode)
 		if (m_track_mem)
 			switch (space.data_width())
 			{
-			case  8: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 16: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 32: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 64: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case  8: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 16: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 32: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 64: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
 			}
 	}
 }
@@ -596,6 +582,21 @@ void device_debug::reinstall_all(read_or_write mode)
 		if (m_memory->has_space(i))
 			reinstall(m_memory->space(i), mode);
 }
+
+//-------------------------------------------------
+//  set_track_mem - start or stop tracking memory
+//  writes
+//-------------------------------------------------
+
+void device_debug::set_track_mem(bool value)
+{
+	if (m_track_mem != value)
+	{
+		m_track_mem = value;
+		reinstall_all(read_or_write::WRITE);
+	}
+}
+
 
 //-------------------------------------------------
 //  start_hook - the scheduler calls this hook
@@ -722,7 +723,10 @@ void device_debug::instruction_hook(offs_t curpc)
 	debugcpu.set_within_instruction(true);
 
 	// update the history
-	m_pc_history[m_pc_history_index++ % HISTORY_SIZE] = curpc;
+	m_pc_history[m_pc_history_index] = curpc;
+	m_pc_history_index = (m_pc_history_index + 1) % std::size(m_pc_history);
+	if (std::size(m_pc_history) > m_pc_history_valid)
+		++m_pc_history_valid;
 
 	// update total cycles
 	m_last_total_cycles = m_total_cycles;
@@ -1348,41 +1352,32 @@ void device_debug::registerpoint_enable_all(bool enable)
 
 
 //-------------------------------------------------
-//  hotspot_track - enable/disable tracking of
-//  hotspots
-//-------------------------------------------------
-
-void device_debug::hotspot_track(int numspots, int threshhold)
-{
-	// if we already have tracking enabled, kill it
-	m_hotspots.clear();
-
-	// only start tracking if we have a non-zero count
-	if (numspots > 0)
-	{
-		// allocate memory for hotspots
-		m_hotspots.resize(numspots);
-		memset(&m_hotspots[0], 0xff, numspots*sizeof(m_hotspots[0]));
-
-		// fill in the info
-		m_hotspot_threshhold = threshhold;
-	}
-	reinstall_all(read_or_write::READ);
-}
-
-
-//-------------------------------------------------
 //  history_pc - return an entry from the PC
 //  history
 //-------------------------------------------------
 
-offs_t device_debug::history_pc(int index) const
+std::pair<offs_t, bool> device_debug::history_pc(int index) const
 {
-	if (index > 0)
-		index = 0;
-	if (index <= -HISTORY_SIZE)
-		index = -HISTORY_SIZE + 1;
-	return m_pc_history[(m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history)];
+	if ((index <= 0) && (-index < m_pc_history_valid))
+	{
+		int const i = (m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history);
+		return std::make_pair(m_pc_history[i], true);
+	}
+	else
+	{
+		return std::make_pair(offs_t(0), false);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_track_pc - turn visited PC tracking on or
+//  off
+//-------------------------------------------------
+
+void device_debug::set_track_pc(bool value)
+{
+	m_track_pc = value;
 }
 
 
@@ -1393,7 +1388,7 @@ offs_t device_debug::history_pc(int index) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-bool device_debug::track_pc_visited(const offs_t& pc) const
+bool device_debug::track_pc_visited(offs_t pc) const
 {
 	if (m_track_pc_set.empty())
 		return false;
@@ -1407,7 +1402,7 @@ bool device_debug::track_pc_visited(const offs_t& pc) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-void device_debug::set_track_pc_visited(const offs_t& pc)
+void device_debug::set_track_pc_visited(offs_t pc)
 {
 	const u32 crc = compute_opcode_crc32(pc);
 	m_track_pc_set.insert(dasm_pc_tag(pc, crc));
@@ -1646,12 +1641,20 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
+	// (TODO: this doesn't work with conditional return instructions)
 	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
 	{
 		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
 			m_stepsleft = 100;
 		else
-			m_stepsleft = 1;
+		{
+			// add extra instructions for delay slots
+			int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+			m_stepsleft = extraskip + 1;
+
+			// take the last few steps normally
+			m_flags = (m_flags | DEBUG_FLAG_STEPPING) & ~DEBUG_FLAG_STEPPING_OUT;
+		}
 	}
 }
 
@@ -1744,56 +1747,6 @@ void device_debug::breakpoint_check(offs_t pc)
 				m_device.machine().debugger().console().printf("Stopped at registerpoint %X\n", rp.m_index);
 			}
 			break;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  watchpoint_check - check the watchpoints
-//  for a given CPU and address space
-//-------------------------------------------------
-
-//-------------------------------------------------
-//  hotspot_check - check for hotspots on a
-//  memory read access
-//-------------------------------------------------
-
-void device_debug::hotspot_check(address_space &space, offs_t address)
-{
-	offs_t curpc = m_device.state().pcbase();
-
-	// see if we have a match in our list
-	unsigned int hotindex;
-	for (hotindex = 0; hotindex < m_hotspots.size(); hotindex++)
-		if (m_hotspots[hotindex].m_access == address && m_hotspots[hotindex].m_pc == curpc && m_hotspots[hotindex].m_space == &space)
-			break;
-
-	// if we didn't find any, make a new entry
-	if (hotindex == m_hotspots.size())
-	{
-		// if the bottom of the list is over the threshold, print it
-		hotspot_entry &spot = m_hotspots[m_hotspots.size() - 1];
-		if (spot.m_count > m_hotspot_threshhold)
-			m_device.machine().debugger().console().printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space.name(), spot.m_access, spot.m_pc, spot.m_count);
-
-		// move everything else down and insert this one at the top
-		memmove(&m_hotspots[1], &m_hotspots[0], sizeof(m_hotspots[0]) * (m_hotspots.size() - 1));
-		m_hotspots[0].m_access = address;
-		m_hotspots[0].m_pc = curpc;
-		m_hotspots[0].m_space = &space;
-		m_hotspots[0].m_count = 1;
-	}
-
-	// if we did find one, increase the count and move it to the top
-	else
-	{
-		m_hotspots[hotindex].m_count++;
-		if (hotindex != 0)
-		{
-			hotspot_entry temp = m_hotspots[hotindex];
-			memmove(&m_hotspots[1], &m_hotspots[0], sizeof(m_hotspots[0]) * hotindex);
-			m_hotspots[0] = temp;
 		}
 	}
 }

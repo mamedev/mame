@@ -200,7 +200,7 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
  *************************************/
 
 midzeus_renderer::midzeus_renderer(midzeus_state &state)
-	: poly_manager<float, mz_poly_extra_data, 4, 10000>(state.machine()),
+	: poly_manager<float, mz_poly_extra_data, 4>(state.machine()),
 		m_state(state)
 {}
 
@@ -579,7 +579,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					// m_zeusbase[0x46] = ??? = 0x00000000
 					// m_zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// m_zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					mz_poly_extra_data& extra = m_poly->object_data_alloc();
+					mz_poly_extra_data& extra = m_poly->object_data().next();
 					poly_vertex vert[4];
 
 					vert[0].x = (int16_t)m_zeusbase[0x08];
@@ -1131,7 +1131,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		}
 	}
 
-	numverts = m_state.m_poly->zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
+	numverts = m_state.m_poly->zclip_if_less<4>(4, &vert[0], &clipvert[0], 512.0f);
 	if (numverts < 3)
 		return;
 
@@ -1159,7 +1159,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 			clipvert[i].y += 0.0005f;
 	}
 
-	mz_poly_extra_data& extra = m_state.m_poly->object_data_alloc();
+	mz_poly_extra_data& extra = m_state.m_poly->object_data().next();
 
 	if (ctrl_word & 0x01000000)
 	{
@@ -1197,15 +1197,14 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	// Note: Before being upgraded to the new polygon rasterizing code, this function call was
 	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
 	//       the template argument is 4, but keep an eye out for missing quads.
-	m_state.m_poly->render_polygon<4>(m_state.m_zeus_cliprect,
+	m_state.m_poly->render_polygon<4, 4>(m_state.m_zeus_cliprect,
 							render_delegate(&midzeus_renderer::render_poly, this),
-							4,
 							clipvert);
 }
 
 void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
 {
-	m_state.m_poly->render_polygon<4>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), 0, vert);
+	m_state.m_poly->render_polygon<4, 0>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), vert);
 }
 
 

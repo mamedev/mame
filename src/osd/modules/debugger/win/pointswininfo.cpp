@@ -31,6 +31,7 @@ pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
 	HMENU const optionsmenu = CreatePopupMenu();
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_BREAKPOINTS, TEXT("Breakpoints\tCtrl+1"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_WATCHPOINTS, TEXT("Watchpoints\tCtrl+2"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_REGISTERPOINTS, TEXT("Registerpoints\tCtrl+3"));
 	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
 	// compute a client rect
@@ -69,6 +70,10 @@ bool pointswin_info::handle_key(WPARAM wparam, LPARAM lparam)
 		case '2':
 			SendMessage(window(), WM_COMMAND, ID_SHOW_WATCHPOINTS, 0);
 			return true;
+
+		case '3':
+			SendMessage(window(), WM_COMMAND, ID_SHOW_REGISTERPOINTS, 0);
+			return true;
 		}
 	}
 
@@ -83,6 +88,7 @@ void pointswin_info::update_menu()
 	HMENU const menu = GetMenu(window());
 	CheckMenuItem(menu, ID_SHOW_BREAKPOINTS, MF_BYCOMMAND | (m_views[0]->type() == DVT_BREAK_POINTS ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_SHOW_WATCHPOINTS, MF_BYCOMMAND | (m_views[0]->type() == DVT_WATCH_POINTS ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_SHOW_REGISTERPOINTS, MF_BYCOMMAND | (m_views[0]->type() == DVT_REGISTER_POINTS ? MF_CHECKED : MF_UNCHECKED));
 }
 
 
@@ -109,6 +115,15 @@ bool pointswin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			if (!m_views[0]->is_valid())
 				m_views[0].reset();
 			win_set_window_text_utf8(window(), "All Watchpoints");
+			recompute_children();
+			return true;
+
+		case ID_SHOW_REGISTERPOINTS:
+			m_views[0].reset();
+			m_views[0].reset(new debugview_info(debugger(), *this, window(), DVT_REGISTER_POINTS));
+			if (!m_views[0]->is_valid())
+				m_views[0].reset();
+			win_set_window_text_utf8(window(), "All Registerpoints");
 			recompute_children();
 			return true;
 		}

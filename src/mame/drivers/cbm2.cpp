@@ -36,7 +36,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define PLA1_TAG        "u78"
@@ -81,7 +81,7 @@ public:
 		m_ieee2(*this, DS75161A_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
-		m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -145,6 +145,8 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq);
 	uint8_t read_open_bus();
+	int scanlines_r();
+	offs_t address_r();
 
 	// internal state
 	uint8_t *m_rom;
@@ -162,7 +164,7 @@ protected:
 // ======================> base_sns_cart_slot_device
 
 class base_sns_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_slot_interface
 {
 public:
@@ -172,16 +174,13 @@ public:
 	// configuration
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto open_bus_callback() { return m_open_bus_callback.bind(); }
+	void set_scanlines(int scanlines) { m_scanlines = scanlines; }
+	void set_address(offs_t address) { m_address = address; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 
 	// slot interface overrides
@@ -194,8 +193,14 @@ public:
 	void setup_nvram();
 	void internal_header_logging(uint8_t *ROM, uint32_t len);
 
-	void save_ram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram();
-					if (m_cart && m_cart->get_rtc_ram_size()) m_cart->save_rtc_ram(); }
+	void save_ram()
+	{
+		save_item(NAME(m_address));
+		if (m_cart && m_cart->get_nvram_size())
+			m_cart->save_nvram();
+		if (m_cart && m_cart->get_rtc_ram_size())
+			m_cart->save_rtc_ram();
+	}
 
 	// reading and writing
 	uint8_t read_l(offs_t offset);
@@ -209,6 +214,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
 	uint8_t read_open_bus() { return m_open_bus_callback(); }
+	int scanlines_r() { return m_scanlines; }
+	offs_t address_r() { return m_address; }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -232,12 +239,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
 private:
 	devcb_write_line m_irq_callback;
 	devcb_read8 m_open_bus_callback;
+	int m_scanlines;
+	offs_t m_address;
 };
 
 // ======================> sns_cart_slot_device
@@ -278,7 +284,6 @@ public:
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "st_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "st"; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 };
 
 // ======================> sns_sufami_cart_slot_device
@@ -299,7 +304,6 @@ public:
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "bspack"; }
 	virtual const char *file_extensions() const noexcept override { return "bs"; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 };
 
 

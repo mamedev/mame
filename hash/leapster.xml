@@ -5,124 +5,141 @@ license:CC0
 
 Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but not dumped yet:
 
-|  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
-================================================================================================
-| 500-10093   |ENG| Learning with Leap                                        | LEAPSTER       |
-| 500-10441   |ENG| Math Baseball                                             | LEAPSTER       | (*)
-| 500-10775-A |ENG| Finding Nemo                                              | LEAPSTER       |
-| 500-10777-A |ENG| Top-Secret Personal Beeswax                               | LEAPSTER       | (*)
-| 500-10812-A |ENG| The Incredibles                                           | LEAPSTER       | (*)
-| 500-10825-A |ENG| Spider-Man - The Case of the Sinister Speller             | LEAPSTER       |
-| 500-10829-A |ENG| Reading with Phonics - Mole's Huge Nose                   | LEAPSTER       |
-| 500-10933-A |GER| Spongebob Schwammkopf hat alles im Griff                  | LEAPSTER       |
-| 500-10934-A |GER| Vorschule                                                 | LEAPSTER       |
-| 500-10935-A |GER| Grundschule 1                                             | LEAPSTER       |
-| 500-10999   |ENG| Kindergarten                                              | LEAPSTER       |
-| 500-11000   |ENG| 1st Grade                                                 | LEAPSTER       |
-| 500-11002   |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER       |
-| 500-11003   |ENG| Mr. Pencil's Learn to Draw & Write                        | LEAPSTER       |
-| 500-11004   |ENG| Math Baseball                                             | LEAPSTER       | (*)
-| 500-11006   |ENG| Talking WORDS Factory                                     | LEAPSTER       |
-| 500-11078-A |GER| Lernen mit Leap                                           | LEAPSTER       |
-| 500-11202-A |ENG| Madagascar                                                | LEAPSTER L-MAX |
-| 500-11204-A |ENG| Thomas and Friends - Calling all Engines!                 | LEAPSTER       |
-| 500-11493-A |GER| Mit Bruno Bleistift lernst du MALEN & SCHREIBEN           | LEAPSTER       |
-| 500-11494-A |GER| Grundschule 2 - Musik in Gefahr                           | LEAPSTER       |
-| 500-11495-A |GER| Findet Nemo                                               | LEAPSTER       |
-| 500-11496-A |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       |
-| 500-11496-B |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       | (*)
-| 500-11497-A |GER| Spider-Man - Schachmatt den Schildersaboteuren!           | LEAPSTER       |
-| 500-11529-A |ENG| School House Rock! - America Rock                         | LEAPSTER       | (*)
-| 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       |
-| 500-11777-A |ENG| Numbers on the Run - Counting on Zero                     | LEAPSTER L-MAX |
-| 500-11779-A |ENG| Letters on the Loose                                      | LEAPSTER L-MAX |
-| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller             | LEAPSTER L-MAX |
-| 500-11904-A |ENG| Dora the Explorer - Wildlife Rescue                       | LEAPSTER L-MAX |
-| 500-11905-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER L-MAX |
-| 500-11929-A |ENG| Scholastic I Spy - Challenger                             | LEAPSTER       |
-| 500-11972-A |GER| Batman - Multipliziere, dividiere und reagiere            | LEAPSTER       |
-| 500-11993-A |ENG| Number Raiders - Arcade-Style Learning                    | LEAPSTER       |
-| 500-11994-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       |
-| 500-11995-A |ENG| Letterpillar (v1.0)                                       | LEAPSTER       |
-| 500-11996-A |ENG| Word Chasers                                              | LEAPSTER       | (*)
-| 500-12098-A |ENG| Cars                                                      | LEAPSTER       |
-| 500-12099-A |ENG| NASCAR                                                    | LEAPSTER L-MAX |
-| 500-12100-A |ENG| The Backyardigans                                         | LEAPSTER       | (*)
-| 500-12139-A |GER| Buchstabenraupe - Lernen im Arcade-Stil!                  | LEAPSTER       | (*)
-| 500-12140-A |GER| Weltraum-Mathe - Lernen im Arcade-Stil!                   | LEAPSTER       |
-| 500-12141-A |GER| Zahlenjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
-| 500-12142-A |GER| Wörterjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
-| 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
-| 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
-| 500-12171-A |GER| Cars                                                      | LEAPSTER       |
-| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       |
-| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       |
-| 500-12210-A |SPA| Spider-Man - El Caso de Las Letras Revueltas              | LEAPSTER       |
-| 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
-| 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
-| 500-12227-A |SPA| Buscando a Nemo - Leer Bajo el Mar                        | LEAPSTER       |
-| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       |
-| 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
-| 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
-| 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       |
-| 500-12350-A |ENG| Letterpillar (v1.1)                                       | LEAPSTER       |
-| 500-12352-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       | (*)
-| 500-12392-A |FRA| Dora L'Exploratrice - Le Pont Casse                       | LEAPSTER       |
-| 500-12393-A |FRA| La Rivière Des Lapins + L'atelier De Peinture             | LEAPSTER       |
-| 500-12411-A |FRA| Disney Princesse - La Magie D'Apprendre                   | LEAPSTER       |
-| 500-12413-A |FRA| A La Conquête Des Nombres                                 | LEAPSTER       |
-| 500-12414-A |FRA| Cars                                                      | LEAPSTER       |
-| 500-12415-A |FRA| Bob Leponge - Heros D'un Jour                             | LEAPSTER       |
-| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mystères                  | LEAPSTER       |
-| 500-12466-A |ENG| Clifford - The Big Red Dog - Reading                      | LEAPSTER       |
-| 500-12475-A |FRA| Adibou - A La Recherche De Robitoc                        | LEAPSTER       |
-| 500-12562-B |GER| Dora - Retter der Wildnis                                 | LEAPSTER       |
-| 500-12629-A |FRA| Scooby-Doo! - Et Les Nombres Fous!                        | LEAPSTER       |
-| 500-12654-A |ENG| Ratatouille                                               | LEAPSTER       | (*)
-| 500-12674-A |FRA| Ratatouille                                               | LEAPSTER       |
-| 500-12676-A |ENG| Pet Pals                                                  | LEAPSTER       | (*)
-| 500-12677-A |ENG| Creature Create                                           | LEAPSTER       |
-| 500-12692-A |ENG| Get Puzzled!                                              | LEAPSTER       |
-| 500-12711-A |ENG| Batman - Strength in numbers                              | LEAPSTER       |
-| 500-12712-A |ENG| Cars : Supercharged                                       | LEAPSTER       |
-| 500-12713-A |ENG| Disney World of Enchantment                               | LEAPSTER       | (*)
-| 500-12715-A |ENG| Foster's Home for Imaginary Friends                       | LEAPSTER       |
-| 500-12719-A |ENG| Spongebob Squarepants - Through The Wormhole              | LEAPSTER       |
-| 500-12738-A |GER| Ratatouille                                               | LEAPSTER       |
-| 500-12799-A |FRA| Oui-Oui - Aventures Au Pays Des Jouet                     | LEAPSTER       |
-| 500-12800-A |FRA| Lapin Malin - Danse Avec Les Mots                         | LEAPSTER       |
-| 500-12824-A |SPA| Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende!       | LEAPSTER       |
-| 500-12830-A |SPA| The Batman - El Poder De Los Números                      | LEAPSTER       |
-| 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       |
-| 500-13273-A |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       |
-| 500-13298-A |ENG| I Spy - Treasure Hunt!                                    | LEAPSTER       |
-| 500-13299-A |ENG| Scholastic OutWit!                                        | LEAPSTER       |
-| 500-13306-A |ENG| Star Wars - Jedi Math                                     | LEAPSTER       |
-| 500-13366-A |FRA| Dis Pourquoi Kirikou                                      | LEAPSTER       |
-| 500-13405-A |ENG| Dora the Explorer - Camping Adventure                     | LEAPSTER       |
-| 500-13414-A |SPA| Wall-E                                                    | LEAPSTER       |
-| 500-13417-A |SPA| Star Wars - Matemáticas Jedi                              | LEAPSTER       |
-| 500-13441-A |GER| Wall-E                                                    | LEAPSTER       |
-| 500-13445-A |ENG| Ratatouille                                               | LEAPSTER       |
-| 500-13446-A |ENG| Pet Pals                                                  | LEAPSTER       |
-| 500-13447-A |ENG| Go Diego Go! - Animal Rescuer                             | LEAPSTER       |
-| 500-13448-A |ENG| Disney Princess - Worlds of Enchantment                   | LEAPSTER       |
-| 500-13451-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER       | (*)
-| 500-13453-A |ENG| The Backyardigans                                         | LEAPSTER       |
-| 500-13472-A |ENG| Star Wars - Jedi Reading                                  | LEAPSTER       |
-| 500-13514-A |ENG| Disney Princess                                           | LEAPSTER       |
-| 500-13563-A |ENG| Up                                                        | LEAPSTER       |
-| 500-13629-A |ENG| nihao, kai-lan                                            | LEAPSTER       | (*)
-| 500-13643-A |SPA| Up                                                        | LEAPSTER       |
-| 500-13681-A |ENG| Digging for Dinosaurs                                     | LEAPSTER       |
-| 500-13682-A |ENG| My Amusement Park                                         | LEAPSTER       |
-| 500-13744-A |ENG| Wolverine and the X-Men                                   | LEAPSTER       |
-| 500-13748-A |ENG| Disney Fairies                                            | LEAPSTER       | (*)
-| 500-13763-A |SPA| Disney Fairies                                            | LEAPSTER       |
-| 500-13982-A |ENG| Toy Story 3                                               | LEAPSTER       |
-| 500-14005-A |ENG| Scooby Doo!                                               | LEAPSTER       |
-| 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
-| 500-14492-A |ENG| The Disney-Pixar Collection                               | LEAPSTER       |
+|  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE | DUMPED | Notes
+===============================================================================================================================
+| 500-01168   |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER       | YES    | Same ROM as 500-11002
+| 500-01169   |ENG| 1st Grade                                                 | LEAPSTER       | YES    | Same ROM as 500-11000
+| 500-01170   |ENG| Kindergarten                                              | LEAPSTER       | YES    |
+| 500-01171   |ENG| Dora the Explorer - Animal Rescuer                        | LEAPSTER       | YES    |
+| 500-10093   |ENG| Learning with Leap                                        | LEAPSTER       | YES    |
+| 500-10441   |ENG| Math Baseball                                             | LEAPSTER       | YES    | Same ROM as 500-11004
+| 500-10587   |ENG| Letter Factory                                            | LEAPSTER       | YES    |
+| 500-10775-A |ENG| Finding Nemo (two different sets dumped)                  | LEAPSTER       | YES    |
+| 500-10777-A |ENG| Top-Secret Personal Beeswax                               | LEAPSTER       | YES    |
+| 500-10810-A |ENG| Disney Princess - Enchanted Learning                      | LEAPSTER       | YES    |
+| 500-10812-A |ENG| The Incredibles                                           | LEAPSTER       | YES    |
+| 500-10825-A |ENG| Spider-Man - The Case of the Sinister Speller             | LEAPSTER       | YES    |
+| 500-10829-A |ENG| Reading with Phonics - Mole's Huge Nose                   | LEAPSTER       | YES    |
+| 500-10933-A |GER| Spongebob Schwammkopf hat alles im Griff                  | LEAPSTER       | YES    |
+| 500-10934-A |GER| Vorschule                                                 | LEAPSTER       | YES    |
+| 500-10935-A |GER| Grundschule 1                                             | LEAPSTER       | YES    |
+| 500-10957-A |ENG| 2nd Grade - Musical Menace                                | LEAPSTER       | YES    |
+| 500-10999   |ENG| Kindergarten                                              | LEAPSTER       | YES    |
+| 500-11000   |ENG| 1st Grade                                                 | LEAPSTER       | YES    | Same ROM as 500-01169
+| 500-11001   |ENG| Dora the Explorer - Wildlife Rescue                       | LEAPSTER       | YES    | Two sets with the same serial
+| 500-11002   |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER       | YES    | Same ROM as 500-01168
+| 500-11003   |ENG| Mr. Pencil's Learn to Draw & Write                        | LEAPSTER       | YES    | Two sets with the same serial
+| 500-11004   |ENG| Math Baseball                                             | LEAPSTER       | YES    | Same ROM as 500-10441
+| 500-11006   |ENG| Talking WORDS Factory                                     | LEAPSTER       | YES    |
+| 500-11078-A |GER| Lernen mit Leap                                           | LEAPSTER       | YES    |
+| 500-11201-A |ENG| Bratz World - The Jet Set                                 | LEAPSTER       | YES    |
+| 500-11202-A |ENG| Madagascar                                                | LEAPSTER L-MAX | YES    |
+| 500-11203-A |ENG| Batman - Multiply, Divide and Conquer                     | LEAPSTER       | YES    |
+| 500-11204-A |ENG| Thomas and Friends - Calling all Engines!                 | LEAPSTER       | YES    |
+| 500-11493-A |GER| Mit Bruno Bleistift lernst du MALEN & SCHREIBEN           | LEAPSTER       | YES    |
+| 500-11494-A |GER| Grundschule 2 - Musik in Gefahr                           | LEAPSTER       | YES    |
+| 500-11495-A |GER| Findet Nemo                                               | LEAPSTER       | YES    |
+| 500-11496-A |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       | YES    |
+| 500-11496-B |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       | NO     |
+| 500-11497-A |GER| Spider-Man - Schachmatt den Schildersaboteuren!           | LEAPSTER       | YES    |
+| 500-11528-A |ENG| School House Rock! - Grammar Rock                         | LEAPSTER       | YES    |
+| 500-11529-A |ENG| School House Rock! - America Rock                         | LEAPSTER       | YES    |
+| 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       | YES    |
+| 500-11777-A |ENG| Numbers on the Run - Counting on Zero                     | LEAPSTER L-MAX | YES    |
+| 500-11779-A |ENG| Letters on the Loose                                      | LEAPSTER L-MAX | YES    |
+| 500-11898-A |ENG| Scholastic - Math Missions                                | LEAPSTER       | YES    |
+| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller             | LEAPSTER L-MAX | YES    |
+| 500-11904-A |ENG| Dora the Explorer - Wildlife Rescue                       | LEAPSTER L-MAX | YES    |
+| 500-11905-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER L-MAX | YES    |
+| 500-11929-A |ENG| Scholastic I Spy - Challenger                             | LEAPSTER       | YES    |
+| 500-11972-A |GER| Batman - Multipliziere, dividiere und reagiere            | LEAPSTER       | YES    |
+| 500-11993-A |ENG| Number Raiders - Arcade-Style Learning                    | LEAPSTER       | YES    |
+| 500-11994-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       | YES    |
+| 500-11995-A |ENG| Letterpillar (v1.0)                                       | LEAPSTER       | YES    |
+| 500-11996-A |ENG| Word Chasers - Arcade-Style Learning!                     | LEAPSTER       | YES    |
+| 500-12098-A |ENG| Cars                                                      | LEAPSTER       | YES    |
+| 500-12099-A |ENG| NASCAR                                                    | LEAPSTER L-MAX | YES    |
+| 500-12100-A |ENG| The Backyardigans                                         | LEAPSTER       | YES    |
+| 500-12139-A |GER| Buchstabenraupe - Lernen im Arcade-Stil!                  | LEAPSTER       | NO     |
+| 500-12140-A |GER| Weltraum-Mathe - Lernen im Arcade-Stil!                   | LEAPSTER       | YES    |
+| 500-12141-A |GER| Zahlenjäger - Lernen im Arcade-Stil!                      | LEAPSTER       | YES    |
+| 500-12142-A |GER| Wörterjäger - Lernen im Arcade-Stil!                      | LEAPSTER       | YES    |
+| 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       | YES    |
+| 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       | YES    |
+| 500-12171-A |GER| Cars                                                      | LEAPSTER       | YES    |
+| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       | YES    |
+| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       | YES    |
+| 500-12210-A |SPA| Spider-Man - El Caso de Las Letras Revueltas              | LEAPSTER       | YES    |
+| 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       | YES    |
+| 500-12223-A |SPA| Cars                                                      | LEAPSTER       | YES    |
+| 500-12227-A |SPA| Buscando a Nemo - Leer Bajo el Mar                        | LEAPSTER       | YES    |
+| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       | YES    |
+| 500-12293-A |ENG| Scholastic - Animal Genius                                | LEAPSTER       | YES    |
+| 500-12296-A |ENG| SonicX                                                    | LEAPSTER       | YES    |
+| 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       | YES    |
+| 500-12350-A |ENG| Letterpillar (v1.1)                                       | LEAPSTER       | YES    |
+| 500-12352-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       | NO     |
+| 500-12353-A |ENG| Word Chasers - Arcade-Style Learning!                     | LEAPSTER       | YES    |
+| 500-12392-A |FRA| Dora L'Exploratrice - Le Pont Casse                       | LEAPSTER       | YES    |
+| 500-12393-A |FRA| La Rivière Des Lapins + L'atelier De Peinture             | LEAPSTER       | YES    |
+| 500-12411-A |FRA| Disney Princesse - La Magie D'Apprendre                   | LEAPSTER       | YES    |
+| 500-12413-A |FRA| A La Conquête Des Nombres                                 | LEAPSTER       | YES    |
+| 500-12414-A |FRA| Cars                                                      | LEAPSTER       | YES    |
+| 500-12415-A |FRA| Bob Leponge - Heros D'un Jour                             | LEAPSTER       | YES    |
+| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mystères                  | LEAPSTER       | YES    |
+| 500-12466-A |ENG| Clifford - The Big Red Dog - Reading                      | LEAPSTER       | YES    |
+| 500-12475-A |FRA| Adibou - A La Recherche De Robitoc                        | LEAPSTER       | YES    |
+| 500-12562-B |GER| Dora - Retter der Wildnis                                 | LEAPSTER       | YES    |
+| 500-12629-A |FRA| Scooby-Doo! - Et Les Nombres Fous!                        | LEAPSTER       | YES    |
+| 500-12654-A |ENG| Ratatouille                                               | LEAPSTER       | YES    |
+| 500-12674-A |FRA| Ratatouille                                               | LEAPSTER       | YES    |
+| 500-12676-A |ENG| Pet Pals                                                  | LEAPSTER       | YES    |
+| 500-12677-A |ENG| Creature Create                                           | LEAPSTER       | YES    |
+| 500-12692-A |ENG| Get Puzzled!                                              | LEAPSTER       | YES    |
+| 500-12711-A |ENG| Batman - Strength in numbers                              | LEAPSTER       | YES    |
+| 500-12712-A |ENG| Cars : Supercharged                                       | LEAPSTER       | YES    |
+| 500-12713-A |ENG| Disney Princess - Worlds of Enchantment                   | LEAPSTER       | YES    |
+| 500-12715-A |ENG| Foster's Home for Imaginary Friends                       | LEAPSTER       | YES    |
+| 500-12719-A |ENG| Spongebob Squarepants - Through The Wormhole              | LEAPSTER       | YES    |
+| 500-12738-A |GER| Ratatouille                                               | LEAPSTER       | YES    |
+| 500-12799-A |FRA| Oui-Oui - Aventures Au Pays Des Jouet                     | LEAPSTER       | YES    |
+| 500-12800-A |FRA| Lapin Malin - Danse Avec Les Mots                         | LEAPSTER       | YES    |
+| 500-12824-A |SPA| Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende!       | LEAPSTER       | YES    |
+| 500-12830-A |SPA| The Batman - El Poder De Los Números                      | LEAPSTER       | YES    |
+| 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       | YES    |
+| 500-13273-A |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       | YES    |
+| 500-13298-A |ENG| I Spy - Treasure Hunt!                                    | LEAPSTER       | YES    |
+| 500-13299-A |ENG| Scholastic OutWit!                                        | LEAPSTER       | YES    |
+| 500-13306-A |ENG| Star Wars - Jedi Math                                     | LEAPSTER       | YES    |
+| 500-13366-A |FRA| Dis Pourquoi Kirikou                                      | LEAPSTER       | YES    |
+| 500-13405-A |ENG| Dora the Explorer - Camping Adventure                     | LEAPSTER       | YES    |
+| 500-13414-A |SPA| Wall-E                                                    | LEAPSTER       | YES    |
+| 500-13417-A |SPA| Star Wars - Matemáticas Jedi                              | LEAPSTER       | YES    |
+| 500-13441-A |GER| Wall-E                                                    | LEAPSTER       | YES    |
+| 500-13445-A |ENG| Ratatouille                                               | LEAPSTER       | YES    |
+| 500-13446-A |ENG| Pet Pals                                                  | LEAPSTER       | YES    |
+| 500-13447-A |ENG| Go Diego Go! - Animal Rescuer                             | LEAPSTER       | YES    |
+| 500-13448-A |ENG| Disney Princess - Worlds of Enchantment                   | LEAPSTER       | YES    |
+| 500-13451-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER       | YES    |
+| 500-13453-A |ENG| The Backyardigans                                         | LEAPSTER       | YES    |
+| 500-13472-A |ENG| Star Wars - Jedi Reading                                  | LEAPSTER       | YES    |
+| 500-13514-A |ENG| Disney Princess                                           | LEAPSTER       | YES    |
+| 500-13556-A |ENG| The Princess and the Frog                                 | LEAPSTER       | YES    |
+| 500-13563-A |ENG| Up                                                        | LEAPSTER       | YES    |
+| 500-13629-A |ENG| nihao, kai-lan                                            | LEAPSTER       | YES    |
+| 500-13643-A |SPA| Up                                                        | LEAPSTER       | YES    |
+| 500-13681-A |ENG| Scholastic - Digging for Dinosaurs                        | LEAPSTER       | YES    |
+| 500-13682-A |ENG| My Amusement Park                                         | LEAPSTER       | YES    |
+| 500-13744-A |ENG| Wolverine and the X-Men                                   | LEAPSTER       | YES    |
+| 500-13748-A |ENG| Disney Fairies                                            | LEAPSTER       | YES    |
+| 500-13763-A |SPA| Disney Fairies                                            | LEAPSTER       | YES    |
+| 500-13982-A |ENG| Toy Story 3                                               | LEAPSTER       | YES    |
+| 500-14005-A |ENG| Scooby Doo!                                               | LEAPSTER       | YES    |
+| 500-14007-B |ENG| The Penguins of Madagascar                                | LEAPSTER       | YES    |
+| 500-14190-A |ENG| Tangled                                                   | LEAPSTER       | YES    |
+| 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       | YES    |
+| 500-14464-A |ENG| Crayola - Art Adventure                                   | LEAPSTER       | YES    |
+| 500-14492-A |ENG| The Disney-Pixar Collection                               | LEAPSTER       | YES    |
 
 
 Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end
@@ -134,10 +151,22 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<description>1st Grade (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-11000" />
+		<info name="serial" value="500-11000" /> <!-- Same ROM as 500-01169 -->
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11000.bin" size="8388608" crc="db36283f" sha1="9f9509313a0ebdac84c2dc02566fedf04ea0eee7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2ndgrade" supported="no">
+		<description>2nd Grade - Musical Menace (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10957-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="2nd Grade [500-10957-A].bin" size="8388608" crc="597418d4" sha1="b3933dca626e930fa89001fb256b5765e4d0a1f6" />
 			</dataarea>
 		</part>
 	</software>
@@ -154,20 +183,20 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="anigeni" supported="no">
-		<description>Animal Genius (USA)</description>
+	<software name="backyard" supported="no">
+		<description>Nick Jr. The Backyardigans (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12293-A" />
+		<info name="serial" value="500-12100-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12293-A - Scholastic - Animal Genius (US).bin" size="8388608" crc="af063ba4" sha1="af22fdbb0466e1a078e68fe26752e606b529fcca" />
+				<rom name="The Backyardigans [500-12100-A].bin" size="8388608" crc="d5c3876f" sha1="38f3a493c0312595a84ef9df2a93c8a95f3b9d40" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="backyard" supported="no">
-		<description>The Backyardigans (USA)</description>
+	<software name="backyarda" cloneof="backyard" supported="no">
+		<description>Nick Jr. The Backyardigans (USA, alt)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13453-A" />
@@ -178,20 +207,20 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="batman" supported="no">
-		<description>Batman - Strength in Numbers (USA)</description>
-		<year>2003</year>
+	<software name="batmanmdc" supported="no">
+		<description>The Batman - Multiply, Divide and Conquer (USA)</description>
+		<year>2005</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12711-A" />
+		<info name="serial" value="500-11203-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12711-a.bin" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" />
+				<rom name="Batman - Multiply, Divide and Conquer [500-11203-A].bin" size="8388608" crc="bf60ee5f" sha1="37b98a1bbb53fb0372c6c4e500d255c59d7585dd" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="batmang" cloneof="batman" supported="no">
-		<description>Batman - Multipliziere, dividiere und regiere (Germany)</description>
+	<software name="batmanmdcg" cloneof="batmanmdc" supported="no">
+		<description>The Batman - Multipliziere, dividiere und regiere (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11972-A" />
@@ -202,7 +231,19 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="batmans" cloneof="batman" supported="no">
+	<software name="batmansn" supported="no">
+		<description>The Batman - Strength in Numbers (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12711-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12711-a.bin" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmansns" cloneof="batmansn" supported="no">
 		<description>The Batman - El Poder De Los Números (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -210,6 +251,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12830-a.bin" size="8388608" crc="6a7afd1c" sha1="3ae1372253b852b2cef8bfd549050b324375bda9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bratzwjs" supported="no">
+		<description>Bratz World - The Jet Set (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11201-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Bratz World The Jet Set [500-11201-A].bin" size="8388608" crc="5d4f7cd0" sha1="7af7c31ed911918f4ceab8394696cb76c42ad2fc" />
 			</dataarea>
 		</part>
 	</software>
@@ -310,6 +363,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="crayolaaa" supported="no">
+		<description>Crayola - Art Adventure (USA)</description>
+		<year>2011</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14464-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Crayola Art Adventure [500-14464-A].bin" size="8388608" crc="0eec61a7" sha1="fee48855b67de532f64848dabaf41b6390841060" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="createcr" supported="no">
 		<description>Creature Create (USA)</description>
 		<year>2006</year>
@@ -330,18 +395,6 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11603-a.bin" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digdino" supported="no">
-		<description>Digging for Dinosaurs (USA)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-13681-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="500-13681-a.bin" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -370,7 +423,19 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="fairiess" supported="no">
+	<software name="fairies" supported="no">
+		<description>Disney Fairies (USA)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13748-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Disney Fairies [500-13748-A].bin" size="8388608" crc="8a605512" sha1="5f22ab2fd695795267fba88bba19ddea3a2bf9f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairiess" cloneof="fairies" supported="no">
 		<description>Disney Fairies (Spain)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
@@ -394,7 +459,19 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="princelg" supported="no">
+	<software name="princel" supported="no">
+		<description>Disney Princess - Enchanted Learning (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10810-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Disney Princess - Enchanted Learning [500-10810-A].bin" size="8388608" crc="8c2fe2e8" sha1="e4400ec8d505ff1e8def76757ed3d9251086f176" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princelg" cloneof="princel" supported="no">
 		<description>Disney Prinzessinnen - Zauberhaftes Lernen (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -406,7 +483,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="princelf" cloneof="princelg" supported="no">
+	<software name="princelf" cloneof="princel" supported="no">
 		<description>Disney Princesse - La Magie D'Apprendre (France)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
@@ -418,7 +495,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="princels" cloneof="princelg" supported="no">
+	<software name="princels" cloneof="princel" supported="no">
 		<description>Disney Princesa - La Magia De Aprender (Spain)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
@@ -442,32 +519,32 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="doraca" supported="no">
-		<description>Dora the Explorer - Camping Adventure (USA)</description>
+	<software name="princwena" cloneof="princwen" supported="no">
+		<description>Disney Princess - Worlds of Enchantment (USA, alt)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-13405-A" />
+		<info name="serial" value="500-12713-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13405-a.bin" size="8388608" crc="71778536" sha1="9f8c5e02519def049078614dacc76b990e911add" />
+				<rom name="Disney Princess - Worlds of Enchantment [500-12713-A].bin" size="8388608" crc="96a19f32" sha1="d338b4eee7c94f8647576288995623c7493d6dcc" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dorapp" supported="no">
-		<description>Dora the Explorer - Piñata Party! (USA)</description>
-		<year>2006</year>
+	<software name="doraar" supported="no">
+		<description>Nick Jr. Dora the Explorer - Animal Rescuer (USA)</description>
+		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12161-A" />
+		<info name="serial" value="500-01171" />
 		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="500-12161-a.bin" size="4194304" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Dora the Explorer - Animal Rescuer [500-01171].bin" size="8388608" crc="635f07e6" sha1="cd1772d874e5a3c1b9a82a420d251c7da473d525" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
-		<description>Dora - Retter der Wildnis (Germany)</description>
+	<software name="doraarg" cloneof="doraar" supported="no">
+		<description>Nick Jr. Dora - Retter der Wildnis (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12562-B" />
@@ -478,7 +555,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="doraf" cloneof="dora" supported="no">
+	<software name="doraarf" cloneof="doraar" supported="no">
 		<description>Dora L'Exploratrice - Au Secours Des Animaux (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
@@ -490,7 +567,55 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="dorapont" supported="no">
+	<software name="doraca" supported="no">
+		<description>Nick Jr. Dora the Explorer - Camping Adventure (USA)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13405-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13405-a.bin" size="8388608" crc="71778536" sha1="9f8c5e02519def049078614dacc76b990e911add" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorapp" supported="no">
+		<description>Nick Jr. Dora the Explorer - Piñata Party! - Arcade Style Learning! (USA)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12161-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="500-12161-a.bin" size="4194304" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorawr" supported="no">
+		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11001" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Dora the Explorer - Wildlife Rescue [500-11001] 152-11577.bin" size="8388608" crc="991ced60" sha1="6cbf763c0e74438ac266501d20987b05cf8a3125" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorawra" cloneof="dorawr" supported="no">
+		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA, alt)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11001" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Dora the Explorer - Wildlife Rescue [500-11001] 152-10401.bin" size="8388608" crc="2a20cbbb" sha1="0ba77d84b84db63035688626dd3df6b10a676e17" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorawrf" cloneof="dorawr" supported="no">
 		<description>Dora L'Exploratrice - Le Pont Casse (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
@@ -503,7 +628,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="findnemo" supported="no">
-		<description>Finding Nemo (USA)</description>
+		<description>Disney·Pixar Finding Nemo (USA)</description>
 		<year>2005?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10775-A" />
@@ -514,8 +639,20 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="findnemoa" cloneof="findnemo" supported="no">
+		<description>Disney·Pixar Finding Nemo (USA, alt)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10775-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Finding Nemo [500-10775-A].bin" size="8388608" crc="dd62dd31" sha1="5c28cddf6eb4271c2bd98a3545f1b9c0de164c15" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="findnemog" cloneof="findnemo" supported="no">
-		<description>Findet Nemo (Germany)</description>
+		<description>Disney·Pixar Findet Nemo (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11495-A" />
@@ -527,7 +664,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="findnemos" cloneof="findnemo" supported="no">
-		<description>Buscando a Nemo - Leer Bajo el Mar (Spain)</description>
+		<description>Disney·Pixar Buscando a Nemo - Leer Bajo el Mar (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12227-A" />
@@ -622,6 +759,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="kindergaa" supported="no">
+		<description>Kindergarten (USA, alt)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01170" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Kindergarten [500-01170].bin" size="8388608" crc="70bfed0f" sha1="8eafada11a49c6c36f0c168e31984aa92c4516d1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="riviere" supported="no">
 		<description>La Rivière Des Lapins + L'Atelier De Peinture (France)</description>
 		<year>2006</year>
@@ -682,8 +831,20 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="letrfactry" supported="no">
+		<description>Letter Factory (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10587" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Letter Factory [500-10587].bin" size="0x1000000" crc="9d1c2f35" sha1="9623c50017499e52458fc23887b24db3649d1d75" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="letrpilr" supported="no">
-		<description>Letterpillar (v1.1, USA)</description>
+		<description>Letterpillar (USA, v1.1)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12350-A" />
@@ -695,13 +856,25 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="letrpilr10" cloneof="letrpilr" supported="no">
-		<description>Letterpillar (v1.0, USA)</description>
+		<description>Letterpillar (USA, v1.0)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11995-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="500-11995-A - Letterpillar (v1.0) (US).bin" size="4194304" crc="fa919dff" sha1="dfb24dda3c2ca692495d9ad78f209645bf6e1b67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathbsbl" supported="no">
+		<description>Math Baseball (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10441" /> <!-- Same ROM as 500-11004 -->
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Math Baseball [500-10441].bin" size="8388608" crc="fe8bd3fd" sha1="83c2cbc82826ba4aa8320463060b203641c86940" />
 			</dataarea>
 		</part>
 	</software>
@@ -714,6 +887,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11003.bin" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrpencila" cloneof="mrpencil" supported="no">
+		<description>Mr. Pencil's Learn to Draw &amp; Write (USA, alt)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11003" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Mr. Pencils Learn to Draw and Write [500-11003] 152-11702.bin" size="8388608" crc="4e88e131" sha1="703d09b5b6c7c04cc892b0fbd2ade8854fe1e300" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,6 +923,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13682-a.bin" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nihaokail" supported="no">
+		<description>nihao, kai-lan (USA)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13629-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="Ni Hao Kai-Lan [500-13629-A].bin" size="0x800000" crc="365b09bc" sha1="dae6108eec5498635332113aeccbfa4edfa86dac" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,6 +1001,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 
 	<software name="petpals" supported="no">
 		<description>Pet Pals (USA)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12676-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Pet Pals [500-12676-A].bin" size="8388608" crc="5a013b83" sha1="87df54e89d788716fe3a651a20d517b0c4c80654" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petpalsa" cloneof="petpals" supported="no">
+		<description>Pet Pals (USA, alt)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13446-A" />
@@ -834,6 +1043,18 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13445-A - Ratatouille (US).bin" size="8388608" crc="d0c4de47" sha1="372c61285eee5c8ce2670d12bedb09150fdaaa45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratata" cloneof="ratat" supported="no">
+		<description>Ratatouille (USA, alt)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12654-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Ratatouille [500-12654-A].bin" size="8388608" crc="b8920c83" sha1="e3f2393e193a981305e738ea3314be5593a035b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -874,8 +1095,32 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="scanimalgn" supported="no">
+		<description>Scholastic - Animal Genius (USA)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12293-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Scholastic Animal Genius [500-12293-A].bin" size="8388608" crc="af063ba4" sha1="af22fdbb0466e1a078e68fe26752e606b529fcca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdino" supported="no">
+		<description>Scholastic - Digging for Dinosaurs (USA)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13681-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13681-a.bin" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ispychl" supported="no">
-		<description>Scholastic I Spy - Challenger (USA)</description>
+		<description>Scholastic - I Spy - Challenger (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11929-A" />
@@ -886,14 +1131,50 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="scmathmis" supported="no">
+		<description>Scholastic - Math Missions (USA)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11898-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Scholastic Math Missions [500-11898-A].bin" size="8388608" crc="df2cd38c" sha1="fa6f4ec1beb132dea9163a1b078c90e7e3a664ca" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scoutwit" supported="no">
-		<description>Scholastic OutWit! (USA)</description>
+		<description>Scholastic - OutWit! (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13299-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13299-A.bin" size="8388608" crc="9e69c26a" sha1="395de47ca1e89eb63f4ff316d15da9b0425488d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramerrock" supported="no">
+		<description>School House Rock! - America Rock (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11529-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Schoolhouse Rock - America Rock [500-11529-A].bin" size="0x1000000" crc="43bb0b63" sha1="ca66e8229c622f0216246fa1504bbeef95b99668" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrgramrock" supported="no">
+		<description>School House Rock! - Grammar Rock (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11528-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Schoolhouse Rock - Grammar Rock [500-11528-A].bin" size="0x1000000" crc="53c9d9b2" sha1="3dc06fcb257cb8a6e7e14c4b1fce078dd41a0bb5" />
 			</dataarea>
 		</part>
 	</software>
@@ -946,12 +1227,23 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<!-- same ROM found in Cart ID 500-01168 -->
 	<software name="spongeb" supported="no">
 		<description>Spongebob Squarepants - Saves the Day (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-11002" />
+		<info name="serial" value="500-13451-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="SpongeBob SquarePants Saves the Day [500-13451-A].bin" size="8388608" crc="5fcfcf3c" sha1="6cc9f4d06ec24678aba1f2c9c856c1f4e25cd612" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeba" cloneof="spongeb" supported="no">
+		<description>Spongebob Squarepants - Saves the Day (USA, alt)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11002" /> <!-- Same ROM as 500-01168 -->
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11002.bin" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" />
@@ -1008,8 +1300,8 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="spidermn" supported="no">
-		<description>Spider-Man - The Case of the Sinister Speller (USA)</description>
-		<year>2003</year>
+		<description>Marvel Spider-Man - The Case of the Sinister Speller (USA)</description>
+		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10825-A" />
 		<part name="cart" interface="leapster_cart">
@@ -1103,8 +1395,20 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="tangled" supported="no">
+		<description>Disney Tangled (USA)</description>
+		<year>2010</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14190-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Tangled [500-14190-A].bin" size="8388608" crc="ce9ce136" sha1="c13e3928456323935925a427dd74b55999582f28" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tfcall" supported="no">
-		<description>Thomas and Friends - Calling all Engines! (USA)</description>
+		<description>Thomas &amp; Friends - Calling all Engines! (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11204-A" />
@@ -1115,9 +1419,57 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
+	<software name="incredibles" supported="no">
+		<description>The Incredibles (USA)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10812-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="The Incredibles [500-10812-A].bin" size="8388608" crc="f1d6db36" sha1="ecb356d64b386b8f5a1aa8145995ef5ab0818b31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguins" supported="no">
+		<description>Nickelodeon The Penguins of Madagascar - Race for 1st Place! (USA)</description>
+		<year>2010</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14007-B" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="The Penguins of Madagascar [500-14007-B].bin" size="8388608" crc="076ad299" sha1="bcab8dc869c8e90bb54257fe0a030f4a8599a1b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princefrog" supported="no">
+		<description>The Princess and the Frog (USA)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13556-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="The Princess and the Frog [500-13556-A].bin" size="8388608" crc="c29a72e2" sha1="f9e010565fee6d96a2b97a67fc3b960e2c754fee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tspbeeswax" supported="no">
+		<description>Top-Secret Personal Beeswax - Share a journal with Junie B. (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10777-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Top-Secret Personal Beeswax [500-10777-A].bin" size="8388608" crc="78fce75a" sha1="7551e6e68daef057a2170d4dc9500af137ab4821" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toystor3" supported="no">
-		<description>Toy Story 3 (USA)</description>
-		<year>2010?</year>
+		<description>Disney·Pixar Toy Story 3 (USA)</description>
+		<year>2010</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13982-A" />
 		<part name="cart" interface="leapster_cart">
@@ -1223,8 +1575,31 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<!-- Word Chasers -->
-	<software name="wrdchsrsg" supported="no">
+	<software name="wrdchsrs" supported="no">
+		<description>Word Chasers - Arcade-Style Learning! (USA)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12353-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Word Chasers [500-12353-A].bin" size="4194304" crc="f5a3052a" sha1="9fbc15da1fbec24c8d37aeaf759619cb129d542a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdchsrsa" cloneof="wrdchsrs" supported="no">
+		<description>Word Chasers - Arcade-Style Learning! (USA, alt)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11996-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Word Chasers [500-11996-A].bin" size="4194304" crc="9be0f98d" sha1="c86dcf16eae29d6fdf0277f2b1af63ed445082be" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdchsrsg" cloneof="wrdchsrs" supported="no">
 		<description>Wörterjäger - Lernen im Arcade-Stil! (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -1236,7 +1611,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="wrdchsrss" cloneof="wrdchsrsg" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
+	<software name="wrdchsrss" cloneof="wrdchsrs" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
 		<description>El Laberinto de las Letras (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -1251,8 +1626,8 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 
 	<!-- L-MAX carts, ordered by title -->
 
-	<software name="dorawr">
-		<description>Dora the Explorer - Wildlife Rescue (USA, L-MAX)</description>
+	<software name="dorawrlmx" supported="no">
+		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11904-A" />
@@ -1263,7 +1638,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="lettontl">
+	<software name="lettontllmx" supported="no">
 		<description>Letters on the Loose (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1275,7 +1650,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="madagasc">
+	<software name="madagasclmx" supported="no">
 		<description>Madagascar (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1287,7 +1662,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="nascar">
+	<software name="nascarlmx" supported="no">
 		<description>NASCAR (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1299,7 +1674,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="numbrun">
+	<software name="numbrunlmx" supported="no">
 		<description>Numbers on the Run - Counting on Zero (USA, L-MAX)</description>
 		<year>2005?</year>
 		<publisher>LeapFrog</publisher>
@@ -1311,7 +1686,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spongeblm" cloneof="spongeb">
+	<software name="spongeblmx" cloneof="spongeb" supported="no">
 		<description>Spongebob Squarepants - Saves the Day (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1323,7 +1698,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spidermnlm" cloneof="spidermn">
+	<software name="spidermnlmx" cloneof="spidermn" supported="no">
 		<description>Spider-Man - The Case of the Sinister Speller (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>

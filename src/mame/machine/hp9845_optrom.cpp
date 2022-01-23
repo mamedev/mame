@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(HP9845_OPTROM, hp9845_optrom_device, "hp9845_optrom", "HP9845
 // +--------------------+
 hp9845_optrom_device::hp9845_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, HP9845_OPTROM, tag, owner, clock),
-		device_image_interface(mconfig, *this),
+		device_rom_image_interface(mconfig, *this),
 		m_base_addr(0),
 		m_end_addr(0)
 {

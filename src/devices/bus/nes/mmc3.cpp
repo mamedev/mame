@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(NES_ZZ_PCB, nes_zz_device,     "nes_zz",     "NES Cart PAL-ZZ
 
 
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_mmc_mirror(0), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0)
 	, m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
 {
 }
@@ -69,8 +69,13 @@ nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_TXSROM, tag, owner, clock)
+nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txsrom_device(mconfig, NES_TXSROM, tag, owner, clock)
 {
 }
 
@@ -96,6 +101,7 @@ void nes_txrom_device::mmc3_start()
 	common_start();
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
+	save_item(NAME(m_mmc_mirror));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_wram_protect));
 	save_item(NAME(m_prg_base));
@@ -113,8 +119,19 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 {
 	m_mmc_prg_bank[0] = m_mmc_prg_bank[2] = 0xffe; // m_mmc_prg_bank[2] & m_mmc_prg_bank[3] remain always the same in most MMC3 variants
 	m_mmc_prg_bank[1] = m_mmc_prg_bank[3] = 0xfff; // but some pirate clone mappers change them after writing certain registers
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
 
+	// Point CHR banks to the first 8K of memory. This is needed for a few unlicensed carts that use VRAM and don't init banks properly.
+	// This includes at least some Waixing games, EverQuest and Sanguozhi, and some multicarts, New Star 6 in 1 and Famicom Yarou Vol 1.
+	m_mmc_vrom_bank[0] = 0;
+	m_mmc_vrom_bank[1] = 2;
+	m_mmc_vrom_bank[2] = 4;
+	m_mmc_vrom_bank[3] = 5;
+	m_mmc_vrom_bank[4] = 6;
+	m_mmc_vrom_bank[5] = 7;
+	m_mmc_vrom_bank[6] = 0;  // extension reg used by clone boards
+	m_mmc_vrom_bank[7] = 0;  // extension reg used by clone boards
+
+	m_mmc_mirror = 0;
 	m_latch = 0;
 	m_wram_protect = 0x80;
 
@@ -283,7 +300,9 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			m_mmc_mirror = data;
+			if (m_mirroring != PPU_MIRROR_4SCREEN)
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2001:

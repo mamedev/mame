@@ -30,6 +30,8 @@
 #include "emu.h"
 #include "hp_dc100_tape.h"
 
+#include "util/ioprocsfilter.h"
+
 // Debugging
 #include "logmacro.h"
 #define LOG_TMR_MASK (LOG_GENERAL << 1)
@@ -76,8 +78,7 @@ constexpr double MOTION_MARGIN = 1e-5;  // Margin to ensure motion events have p
 constexpr hti_format_t::tape_pos_t TAPE_INIT_POS = 80 * hti_format_t::ONE_INCH_POS; // Initial tape position: 80" from beginning (just past the punched part)
 
 hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , HP_DC100_TAPE , tag , owner , clock)
-	, device_image_interface(mconfig , *this)
+	: microtape_image_device(mconfig , HP_DC100_TAPE , tag , owner , clock)
 	, m_cart_out_handler(*this)
 	, m_hole_handler(*this)
 	, m_tacho_tick_handler(*this)
@@ -107,12 +108,12 @@ void hp_dc100_tape_device::call_unload()
 	device_reset();
 
 	if (m_image_dirty) {
-		io_generic io;
-		io.file = (device_image_interface *)this;
-		io.procs = &image_ioprocs;
-		io.filler = 0;
-		m_image.save_tape(&io);
-		m_image_dirty = false;
+		check_for_file();
+		auto io = util::random_read_write_fill(image_core_file(), 0);
+		if (io) {
+			m_image.save_tape(*io);
+			m_image_dirty = false;
+		}
 	}
 
 	m_image.clear_tape();
@@ -602,18 +603,31 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 
 	device_reset();
 
-	io_generic io;
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0;
+	check_for_file();
 	if (is_create) {
+		auto io = util::random_read_write_fill(image_core_file(), 0);
+		if (!io) {
+			LOG("out of memory\n");
+			seterror(std::errc::not_enough_memory, nullptr);
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
 		m_image.clear_tape();
-		m_image.save_tape(&io);
-	} else if (!m_image.load_tape(&io)) {
-		LOG("load failed\n");
-		seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
-		set_tape_present(false);
-		return image_init_result::FAIL;
+		m_image.save_tape(*io);
+	} else {
+		auto io = util::random_read_fill(image_core_file(), 0);
+		if (!io) {
+			LOG("out of memory\n");
+			seterror(std::errc::not_enough_memory, nullptr);
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
+		if (!m_image.load_tape(*io)) {
+			LOG("load failed\n");
+			seterror(image_error::INVALIDIMAGE , "Wrong format");
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
 	}
 	LOG("load OK\n");
 

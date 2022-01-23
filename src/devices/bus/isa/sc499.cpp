@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "sc499.h"
-#include "formats/ioprocs.h"
+
 
 #define VERBOSE 0
 
@@ -1285,8 +1285,7 @@ void sc499_device::block_set_filemark()
 DEFINE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device, "sc499_ctape", "SC-499 Cartridge Tape")
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SC499_CTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: microtape_image_device(mconfig, SC499_CTAPE, tag, owner, clock)
 {
 }
 
@@ -1310,18 +1309,17 @@ void sc499_ctape_image_device::write_block(int block_num, uint8_t *ptr)
 
 image_init_result sc499_ctape_image_device::call_load()
 {
-	uint32_t size;
-	io_generic io;
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0xff;
-
-	size = io_generic_size(&io);
-	m_ctape_data.resize(size);
-
-	io_generic_read(&io, &m_ctape_data[0], 0, size);
-
-	return image_init_result::PASS;
+	try
+	{
+		auto const size = length();
+		m_ctape_data.resize(size);
+		if (!fseek(0, SEEK_SET) && (fread(m_ctape_data.data(), size) == size))
+			return image_init_result::PASS;
+	}
+	catch (...)
+	{
+	}
+	return image_init_result::FAIL;
 }
 
 void sc499_ctape_image_device::call_unload()

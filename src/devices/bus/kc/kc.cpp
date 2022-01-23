@@ -300,7 +300,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //-------------------------------------------------
 kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	kcexp_slot_device(mconfig, KCCART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	device_cartrom_image_interface(mconfig, *this)
 {
 }
 

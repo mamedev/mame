@@ -4,36 +4,41 @@
 
     library.h
 
-    Code relevant to the Imgtool library; analogous to the MESS/MAME driver
-    list.
+    Code relevant to the Imgtool library; analogous to the MAME driver list.
 
-    Unlike MESS and MAME which have static driver lists, Imgtool has a
-    concept of a library and this library is built at startup time.
+    Unlike MAME which has a static driver lists, Imgtool has a concept of a
+    library and this library is built at startup time.
     dynamic for which modules are added to.  This makes "dynamic" modules
     much easier
 
 ****************************************************************************/
+#ifndef MAME_TOOLS_IMGTOOL_LIBRARY_H
+#define MAME_TOOLS_IMGTOOL_LIBRARY_H
 
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#pragma once
 
-#include <ctime>
-#include <list>
-#include <chrono>
+#include "imgterrs.h"
 
-#include "corestr.h"
-#include "opresolv.h"
-#include "stream.h"
-#include "unicode.h"
-#include "charconv.h"
-#include "pool.h"
 #include "timeconv.h"
+#include "utilfwd.h"
+
+#include <chrono>
+#include <cstdint>
+#include <ctime>
+#include <iosfwd>
+#include <list>
+#include <memory>
+#include <string>
+#include <vector>
+
 
 namespace imgtool
 {
 	class image;
 	class partition;
 	class directory;
+	class charconverter;
+	class stream;
 };
 
 enum imgtool_suggestion_viability_t
@@ -381,9 +386,9 @@ union imgtoolinfo
 	void *  f;                                          /* generic function pointers */
 	char *  s;                                          /* generic strings */
 
-	imgtoolerr_t    (*open)             (imgtool::image &image, imgtool::stream::ptr &&stream);
+	imgtoolerr_t    (*open)             (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream);
 	void            (*close)            (imgtool::image &image);
-	imgtoolerr_t    (*create)           (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
+	imgtoolerr_t    (*create)           (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, uint64_t first_block, uint64_t block_count);
 	void            (*info)             (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
@@ -459,39 +464,39 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_class imgclass;
+	imgtool_class imgclass = { 0 };
 
-	const char *name;
-	const char *description;
-	const char *extensions;
-	const char *eoln;
+	std::string name;
+	std::string description;
+	std::string extensions;
+	std::string eoln;
 
-	size_t image_extra_bytes;
+	size_t image_extra_bytes = 0;
 
 	/* flags */
-	unsigned int initial_path_separator : 1;
-	unsigned int open_is_strict : 1;
-	unsigned int tracks_are_called_cylinders : 1;   /* used for hard drivers */
-	unsigned int writing_untested : 1;              /* used when we support writing, but not in main build */
-	unsigned int creation_untested : 1;             /* used when we support creation, but not in main build */
+	bool initial_path_separator = false;
+	bool open_is_strict = false;
+	bool tracks_are_called_cylinders = false;    /* used for hard drivers */
+	bool writing_untested = false;               /* used when we support writing, but not in main build */
+	bool creation_untested = false;              /* used when we support creation, but not in main build */
 
-	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream);
-	void            (*close)        (imgtool::image &image);
-	void            (*info)         (imgtool::image &image, std::ostream &stream);
-	imgtoolerr_t    (*create)       (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
-	imgtoolerr_t    (*get_geometry) (imgtool::image &image, uint32_t *track, uint32_t *heads, uint32_t *sectors);
-	imgtoolerr_t    (*read_sector)  (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer);
-	imgtoolerr_t    (*write_sector) (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len);
-	imgtoolerr_t    (*read_block)   (imgtool::image &image, void *buffer, uint64_t block);
-	imgtoolerr_t    (*write_block)  (imgtool::image &image, const void *buffer, uint64_t block);
-	imgtoolerr_t    (*list_partitions)(imgtool::image &image, std::vector<imgtool::partition_info> &partitions);
+	imgtoolerr_t    (*open)         (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream) = nullptr;
+	void            (*close)        (imgtool::image &image) = nullptr;
+	void            (*info)         (imgtool::image &image, std::ostream &stream) = nullptr;
+	imgtoolerr_t    (*create)       (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream, util::option_resolution *opts) = nullptr;
+	imgtoolerr_t    (*get_geometry) (imgtool::image &image, uint32_t *track, uint32_t *heads, uint32_t *sectors) = nullptr;
+	imgtoolerr_t    (*read_sector)  (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer) = nullptr;
+	imgtoolerr_t    (*write_sector) (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len) = nullptr;
+	imgtoolerr_t    (*read_block)   (imgtool::image &image, void *buffer, uint64_t block) = nullptr;
+	imgtoolerr_t    (*write_block)  (imgtool::image &image, const void *buffer, uint64_t block) = nullptr;
+	imgtoolerr_t    (*list_partitions)(imgtool::image &image, std::vector<imgtool::partition_info> &partitions) = nullptr;
 
-	uint32_t block_size;
+	uint32_t block_size = 0;
 
-	const util::option_guide *createimage_optguide;
-	const char *createimage_optspec;
+	const util::option_guide *createimage_optguide = nullptr;
+	std::string createimage_optspec;
 
-	const void *extra;
+	const void *extra = nullptr;
 };
 
 namespace imgtool {
@@ -531,7 +536,6 @@ public:
 	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *   m_pool;
 	modulelist      m_modules;
 
 	// internal lookup and iteration
@@ -540,13 +544,8 @@ private:
 	// helpers
 	void add_class(const imgtool_class *imgclass);
 	int module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort);
-
-	// memory allocators for pooled library memory (these should go away in further C++-ification)
-	void *imgtool_library_malloc(size_t mem);
-	char *imgtool_library_strdup(const char *s);
-	char *imgtool_library_strdup_allow_null(const char *s);
 };
 
 } // namespace imgtool
 
-#endif // LIBRARY_H
+#endif // MAME_TOOLS_IMGTOOL_LIBRARY_H

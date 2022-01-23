@@ -98,7 +98,7 @@ void k033906_device::reg_w(int reg, uint32_t data)
 
 		case 0x10:      // initEnable
 		{
-			m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo->set_init_enable(data);
 			break;
 		}
 

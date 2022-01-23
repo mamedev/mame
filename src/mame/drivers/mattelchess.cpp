@@ -10,6 +10,9 @@ Hardware notes:
 - 2*HLCD0569(also seen with 2*HLCD0601, functionally same?)
 - custom LCD screen with chess squares background
 
+It was also released in the USSR as Электроника ИМ-29 Шахматный партнёр,
+assumed to be an unlicensed clone.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -49,9 +52,6 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 8, 22> m_out_x;
 
-	u8 m_inp_mux;
-	u8 m_lcd_control;
-
 	void update_reset(ioport_value state);
 
 	// I/O handlers
@@ -60,16 +60,15 @@ private:
 	u8 input_r();
 	void lcd_w(u8 data);
 	u8 lcd_r();
+
+	u8 m_inp_mux = 0;
+	u8 m_lcd_control = 0;
 };
 
 void mchess_state::machine_start()
 {
 	// resolve handlers
 	m_out_x.resolve();
-
-	// zerofill
-	m_inp_mux = 0;
-	m_lcd_control = 0;
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -150,7 +149,7 @@ u8 mchess_state::lcd_r()
 	// d7: 2nd LCDC DATA OUT
 	u8 r0 = m_lcd[0]->data_r();
 	u8 r1 = m_lcd[1]->data_r();
-	return (0x84^0xff) | r0 << 2 | r1 << 7;
+	return ~0x84 | r0 << 2 | r1 << 7;
 }
 
 
@@ -193,14 +192,14 @@ INPUT_PORTS_END
 
 void mchess_state::mchess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8050(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->p1_out_cb().set(FUNC(mchess_state::input_w));
 	m_maincpu->p1_in_cb().set(FUNC(mchess_state::input_r));
 	m_maincpu->p2_out_cb().set(FUNC(mchess_state::lcd_w));
 	m_maincpu->p2_in_cb().set(FUNC(mchess_state::lcd_r));
 
-	/* video hardware */
+	// video hardware
 	HLCD0569(config, m_lcd[0], 500); // C=0.01uF
 	m_lcd[0]->write_cols().set(FUNC(mchess_state::lcd_output_w<0>));
 	HLCD0569(config, m_lcd[1], 500); // C=0.01uF

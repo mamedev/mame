@@ -2,7 +2,7 @@
 // copyright-holders:Derrick Renaud
 /*************************************************************************
 
-    audio\dragrace.c
+    audio\dragrace.cpp
 
 *************************************************************************/
 #include "emu.h"
@@ -16,19 +16,19 @@
 static const discrete_lfsr_desc dragrace_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,         /* Bit Length */
-	0,          /* Reset Value */
-	0,          /* Use Bit 0 as XOR input 0 */
-	14,         /* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
-	0x000001,       /* Everything is shifted into the first bit only */
-	0,          /* Output is already inverted by XNOR */
-	15          /* Output bit */
+	16,         // Bit Length
+	0,          // Reset Value
+	0,          // Use Bit 0 as XOR input 0
+	14,         // Use Bit 14 as XOR input 1
+	DISC_LFSR_XNOR,     // Feedback stage1 is XNOR
+	DISC_LFSR_OR,       // Feedback stage2 is just stage 1 output OR with external feed
+	DISC_LFSR_REPLACE,  // Feedback stage3 replaces the shifted register contents
+	0x000001,       // Everything is shifted into the first bit only
+	0,          // Output is already inverted by XNOR
+	15          // Output bit
 };
 
-/* Nodes - Sounds */
+// Nodes - Sounds
 #define DRAGRACE_NOISE          NODE_10
 #define DRAGRACE_SCREECH1_SND   NODE_11
 #define DRAGRACE_SCREECH2_SND   NODE_12
@@ -42,7 +42,7 @@ static const discrete_lfsr_desc dragrace_lfsr =
 
 DISCRETE_SOUND_START(dragrace_discrete)
 	/************************************************/
-	/* dragrace  Effects Relataive Gain Table       */
+	/* dragrace  Effects Relative Gain Table        */
 	/*                                              */
 	/* Effect  V-ampIn  Gain ratio        Relative  */
 	/* LoTone   3.8     10/32               593.8   */
@@ -73,7 +73,7 @@ DISCRETE_SOUND_START(dragrace_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* driver a modulo 12 counter, with div6, 4 & 3 */
 	/* summed as the output of the circuit.         */
 	/* VCO Output is Sq wave = 27-382Hz             */
@@ -88,7 +88,7 @@ DISCRETE_SOUND_START(dragrace_discrete)
 	/* to a 2.2uf capacitor on the R-ladder.        */
 	/* Note the VCO freq. is controlled by a 250k   */
 	/* pot.  The freq. used here is for the pot set */
-	/* to 125k.  The low freq is allways the same.  */
+	/* to 125k.  The low freq is always the same.   */
 	/* This adjusts the high end.                   */
 	/* 0k = 214Hz.   250k = 4416Hz                  */
 	/* NOTE: freqs are ripped from Sprint for now.  */
@@ -97,15 +97,15 @@ DISCRETE_SOUND_START(dragrace_discrete)
 	DISCRETE_ADJUSTMENT(NODE_21, (214.0-27.0)/12/31, (4416.0-27.0)/12/31, DISC_LOGADJ, "MOTOR1")
 	DISCRETE_MULTIPLY(NODE_22, NODE_20, NODE_21)
 
-	DISCRETE_MULTADD(NODE_23, NODE_22, 2, 27.0/6)   /* F1 = /12*2 = /6 */
+	DISCRETE_MULTADD(NODE_23, NODE_22, 2, 27.0/6)   // F1 = /12*2 = /6
 	DISCRETE_SQUAREWAVE(NODE_24, 1, NODE_23, (581.6/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_25, NODE_24, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_26, NODE_22, 3, 27.0/4)   /* F2 = /12*3 = /4 */
+	DISCRETE_MULTADD(NODE_26, NODE_22, 3, 27.0/4)   // F2 = /12*3 = /4
 	DISCRETE_SQUAREWAVE(NODE_27, 1, NODE_26, (581.6/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_28, NODE_27, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_29, NODE_22, 4, 27.0/3)   /* F3 = /12*4 = /3 */
+	DISCRETE_MULTADD(NODE_29, NODE_22, 4, 27.0/3)   // F3 = /12*4 = /3
 	DISCRETE_SQUAREWAVE(NODE_30, 1, NODE_29, (581.6/3), 100.0/3, 0, 360.0/3)
 	DISCRETE_RCFILTER(NODE_31, NODE_30, 10000, 1e-7)
 
@@ -120,15 +120,15 @@ DISCRETE_SOUND_START(dragrace_discrete)
 	DISCRETE_ADJUSTMENT(NODE_41, (214.0-27.0)/12/31, (4416.0-27.0)/12/31, DISC_LOGADJ, "MOTOR2")
 	DISCRETE_MULTIPLY(NODE_42, NODE_40, NODE_41)
 
-	DISCRETE_MULTADD(NODE_43, NODE_42, 2, 27.0/6)   /* F1 = /12*2 = /6 */
+	DISCRETE_MULTADD(NODE_43, NODE_42, 2, 27.0/6)   // F1 = /12*2 = /6
 	DISCRETE_SQUAREWAVE(NODE_44, 1, NODE_43, (581.6/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_45, NODE_44, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_46, NODE_42, 3, 27.0/4)   /* F2 = /12*3 = /4 */
+	DISCRETE_MULTADD(NODE_46, NODE_42, 3, 27.0/4)   // F2 = /12*3 = /4
 	DISCRETE_SQUAREWAVE(NODE_47, 1, NODE_46, (581.6/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_48, NODE_47, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_49, NODE_42, 4, 27.0/3)   /* F3 = /12*4 = /3 */
+	DISCRETE_MULTADD(NODE_49, NODE_42, 4, 27.0/3)   // F3 = /12*4 = /3
 	DISCRETE_SQUAREWAVE(NODE_50, 1, NODE_49, (581.6/3), 100.0/3, 0, 360.0/3)
 	DISCRETE_RCFILTER(NODE_51, NODE_50, 10000, 1e-7)
 

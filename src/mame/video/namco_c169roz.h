@@ -13,7 +13,7 @@ class namco_c169roz_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_ramsize = size; }

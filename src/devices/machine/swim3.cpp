@@ -254,7 +254,7 @@ void swim3_device::write(offs_t offset, u8 data)
 		break;
 	}
 
-	if((m_mode ^ prev_mode) & 0x06)
+	if((m_mode ^ prev_mode) & 0x86)
 		m_devsel_cb((m_mode >> 1) & 3);
 	if((m_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_mode >> 5) & 1);

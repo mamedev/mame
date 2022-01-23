@@ -635,12 +635,12 @@ void screen_device::allocate_scan_bitmaps()
 					else
 						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
 				}
-				m_scan_widths.push_back(m_width);
+				m_scan_widths.push_back(effwidth);
 			}
 		}
 		else
 		{
-			for (int i = effheight; i < old_height; i++)
+			for (int i = old_height - 1; i >= effheight; i--)
 			{
 				for (int j = 0; j < 2; j++)
 				{
@@ -683,9 +683,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Non-raster display cannot have a variable width\n");
 	}
 
-	// check for zero frame rate
-	if (m_refresh == 0)
-		osd_printf_error("Invalid (zero) refresh rate\n");
+	// check for invalid frame rate
+	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
+		osd_printf_error("Invalid (under 1Hz) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
@@ -1108,7 +1108,7 @@ void screen_device::realloc_screen_bitmaps()
 	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
 	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
 
-	// reize all registered screen bitmaps
+	// resize all registered screen bitmaps
 	for (auto &item : m_auto_bitmap_list)
 		item->m_bitmap.resize(effwidth, effheight);
 
@@ -1870,7 +1870,7 @@ void screen_device::finalize_burnin()
 			m_visarea.top() * m_burnin.height() / m_height,
 			m_visarea.bottom() * m_burnin.height() / m_height);
 
-	// wrap a bitmap around the memregion we care about
+	// wrap a bitmap around the subregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();
@@ -1911,8 +1911,8 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
-	if (filerr == osd_file::error::NONE)
+	std::error_condition const filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
+	if (!filerr)
 	{
 		util::png_info pnginfo;
 
@@ -1942,7 +1942,7 @@ void screen_device::load_effect_overlay(const char *filename)
 	// load the file
 	m_screen_overlay_bitmap.reset();
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	if (file.open(fullname) == osd_file::error::NONE)
+	if (!file.open(fullname))
 	{
 		render_load_png(m_screen_overlay_bitmap, file);
 		file.close();

@@ -16,7 +16,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -78,7 +78,7 @@ private:
 	uint8_t                           m_z80_irq_state;
 
 	required_device<cpu_device>     m_cpu;
-	required_device<ym2151_device>  m_ym2151;
+	required_device<ym2164_device>  m_ym2164;
 	required_device<pit8253_device> m_d8253;
 	required_device<i8251_device>   m_d71051;
 	required_device<i8255_device>   m_d71055c_0;

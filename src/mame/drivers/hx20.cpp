@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "includes/hx20.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -835,7 +835,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 
 	if (size != 0x2000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 

@@ -263,6 +263,7 @@ void nscsi_full_device::device_reset()
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	sense(false, SK_NO_SENSE);
 }
 
 void nscsi_full_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

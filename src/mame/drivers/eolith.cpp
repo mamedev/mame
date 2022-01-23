@@ -572,8 +572,6 @@ void eolith_state::eolith45(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

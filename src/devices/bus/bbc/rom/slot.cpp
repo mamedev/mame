@@ -84,7 +84,7 @@ void device_bbc_rom_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 bbc_romslot_device::bbc_romslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_rom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_bbc_rom_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -122,7 +122,7 @@ image_init_result bbc_romslot_device::call_load()
 
 		if (size % 0x2000)
 		{
-			seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid ROM size");
+			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
 			return image_init_result::FAIL;
 		}
 

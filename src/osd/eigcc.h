@@ -55,6 +55,66 @@ inline bool _addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    count_leading_zeros_32 - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_32
+#define count_leading_zeros_32 _count_leading_zeros_32
+inline uint8_t _count_leading_zeros_32(uint32_t val)
+{
+	// uses CPU feature if available, otherwise falls back to runtime library call
+	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
+	return uint8_t(unsigned(val ? __builtin_clz(val) : 32));
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_32 - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_32
+#define count_leading_ones_32 _count_leading_ones_32
+inline uint8_t _count_leading_ones_32(uint32_t val)
+{
+	return count_leading_zeros_32(~val);
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t _count_leading_zeros_64(uint64_t val)
+{
+	// uses CPU feature if available, otherwise falls back to runtime library call
+	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
+	return uint8_t(unsigned(val ? __builtin_clzll(val) : 64));
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t _count_leading_ones_64(uint64_t val)
+{
+	return count_leading_zeros_64(~val);
+}
+#endif
+
+
+/*-------------------------------------------------
     population_count_32 - return the number of
     one bits in a 32-bit value
 -------------------------------------------------*/

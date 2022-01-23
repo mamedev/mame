@@ -10,7 +10,7 @@
 #pragma once
 
 #include "formats/imageutl.h"
-#include "softlist_dev.h"
+#include "imagedev/memcard.h"
 
 //#define SMARTMEDIA_IMAGE_SAVE
 
@@ -156,7 +156,8 @@ protected:
 						// 0 means no card loaded
 	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	uint8_t* m_data_ptr;  // FEEPROM data area
+	uint8_t *m_feeprom_data;  // FEEPROM data area
+	std::unique_ptr<uint8_t[]> m_feeprom_data_alloc;
 	std::unique_ptr<uint8_t[]> m_data_uid_ptr;
 
 	sm_mode_t m_mode;               // current operation mode
@@ -194,19 +195,14 @@ protected:
 
 
 
-class smartmedia_image_device : public nand_device, public device_image_interface
+class smartmedia_image_device : public nand_device, public device_memcard_image_interface
 {
 public:
 	// construction/destruction
 	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "sm_memc"; }
 	virtual const char *file_extensions() const noexcept override { return "smc"; }
@@ -215,7 +211,7 @@ public:
 	virtual void call_unload() override;
 
 protected:
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 	image_init_result smartmedia_format_1();
 	image_init_result smartmedia_format_2();

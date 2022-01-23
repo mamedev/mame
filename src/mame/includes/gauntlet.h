@@ -17,7 +17,7 @@
 #include "video/atarimo.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "tilemap.h"
 

@@ -2,8 +2,8 @@
 // copyright-holders:Robbbert
 /***********************************************************************************
 
-  PINBALL
-  Williams System 8: Still Crazy
+PINBALL
+Williams System 8: Still Crazy
 
 The first time run, the display will show the model number (543).
 Press F3 to clear this.
@@ -16,7 +16,15 @@ A novelty game where the playfield is completely vertical. It has 4 flippers and
   You cannot get more than 99 batches.
   The score only has 5 digits, but the game stores the 100,000 digit internally.
 
+How to play: Press 5, press 1, press Z. Add points by pressing F,G,H,J. Press J
+  a number of times to increment the batches. To end the game, hit X until the siren
+  is heard. If you scored > 99999 points, the high score will show 99999.
+
+Status:
+- Playable
+
 ToDo:
+- Nothing
 
 ************************************************************************************/
 
@@ -45,32 +53,32 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
-		, m_digits(*this, "digit%u", 0U)
-		, m_swarray(*this, "SW.%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void s8a(machine_config &config);
-
-	void init_s8a();
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint8_t sound_r();
-	void dig0_w(uint8_t data);
-	void dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
-	void lamp1_w(uint8_t data) { };
-	void sol2_w(uint8_t data) { }; // solenoids 8-15
-	void sol3_w(uint8_t data); // solenoids 0-7
-	void sound_w(uint8_t data);
-	uint8_t switch_r();
-	void switch_w(uint8_t data);
+	u8 sound_r();
+	void dig0_w(u8 data);
+	void dig1_w(u8 data);
+	void lamp0_w(u8 data);
+	void lamp1_w(u8 data);
+	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
+	void sol3_w(u8 data); // solenoids 0-7
+	void sound_w(u8 data);
+	u8 switch_r();
+	void switch_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
@@ -79,13 +87,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
-	void s8a_audio_map(address_map &map);
-	void s8a_main_map(address_map &map);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 
-	uint8_t m_sound_data;
-	uint8_t m_strobe;
-	uint8_t m_switch_col;
-	bool m_data_ok;
+	u8 m_sound_data = 0;
+	u8 m_strobe = 0;
+	u8 m_row = 0;
+	bool m_data_ok = 0;
+	u8 m_lamp_data = 0;
 	emu_timer* m_irq_timer;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<m6802_cpu_device> m_maincpu;
@@ -95,11 +104,12 @@ private:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<61> m_digits;
-	required_ioport_array<8> m_swarray;
+	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
 };
 
-void s8a_state::s8a_main_map(address_map &map)
+void s8a_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).ram().share("nvram");
@@ -108,60 +118,49 @@ void s8a_state::s8a_main_map(address_map &map)
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x6000, 0x7fff).rom().region("roms", 0);
+	map(0x6000, 0x7fff).rom().region("maincpu", 0);
 }
 
-void s8a_state::s8a_audio_map(address_map &map)
+void s8a_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
 	map(0x2000, 0x2003).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc000, 0xffff).rom().region("audioroms", 0);
+	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
 static INPUT_PORTS_START( s8a )
-	PORT_START("SW.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Top L Flip") // INP04
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bot L Flip") // INP05
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Top R Flip") // INP06
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Bot R Flip") // INP07
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Low L Drain") // INP08
 
-	PORT_START("SW.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Lower Ramp Limit") // INP09 game mechanics are ready to start
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Top Drain") // INP10
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Middle R Drain") //INP11
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Level 1") // INP12
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Level 2") // INP13
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Level 3") // INP14
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Level 4") // INP15
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Upper Ramp Limit") // INP16 revenuers have reached the still
 
-	PORT_START("SW.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SW.3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SW.4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SW.5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SW.6")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SW.7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X2")
+	PORT_START("X3")
+	PORT_START("X4")
+	PORT_START("X5")
+	PORT_START("X6")
+	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, main_nmi, 1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, audio_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( s8a_state::main_nmi )
@@ -178,13 +177,16 @@ INPUT_CHANGED_MEMBER( s8a_state::audio_nmi )
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void s8a_state::sol3_w(uint8_t data)
+void s8a_state::sol3_w(u8 data)
 {
 	if (data==0x0a)
 		m_samples->start(0, 7); // mechanical drum when you have 2 or more batches
+
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = BIT(data, i);
 }
 
-void s8a_state::sound_w(uint8_t data)
+void s8a_state::sound_w(u8 data)
 {
 	m_sound_data = data;
 }
@@ -201,22 +203,32 @@ WRITE_LINE_MEMBER( s8a_state::pia21_ca2_w )
 	m_pias->ca1_w(state);
 }
 
-void s8a_state::lamp0_w(uint8_t data)
+void s8a_state::lamp0_w(u8 data)
 {
+	m_lamp_data = data ^ 0xff;
 }
 
-void s8a_state::dig0_w(uint8_t data)
+void s8a_state::lamp1_w(u8 data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	// find out which row is active
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(data, i))
+			for (u8 j = 0; j < 8; j++)
+				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+}
+
+void s8a_state::dig0_w(u8 data)
+{
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_data_ok = true;
 	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
-void s8a_state::dig1_w(uint8_t data)
+void s8a_state::dig1_w(u8 data)
 {
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
 		m_digits[m_strobe+16] = patterns[data&15];
@@ -225,27 +237,23 @@ void s8a_state::dig1_w(uint8_t data)
 	m_data_ok = false;
 }
 
-uint8_t s8a_state::switch_r()
+u8 s8a_state::switch_r()
 {
-	uint8_t retval = 0xff;
-	// scan all 8 input columns, since multiple can be selected at once
-	for (int i = 0; i < 7; i++)
-	{
-		if (m_switch_col & (1<<i))
-			retval &= m_swarray[i]->read();
-	}
-	//retval &= ioport("OPTOS")->read(); // optos should be read here as well, and are always active even if no column is selected
-	return ~retval;
+	u8 data = 0;
+	// there's hardware for 8 rows, but machine uses 2
+	for (u8 i = 0; i < 2; i++)
+		if (BIT(m_row, i))
+			data |= m_io_keyboard[i]->read();
+
+	return data;
 }
 
-void s8a_state::switch_w(uint8_t data)
+void s8a_state::switch_w(u8 data)
 {
-	// this drives the pulldown 2N3904 NPN transistors Q7-Q14, each of which drives one column of the switch matrix low
-	// it is possible for multiple columns to be enabled at once, this is handled in switch_r above.
-	m_switch_col = data;
+	m_row = data;
 }
 
-uint8_t s8a_state::sound_r()
+u8 s8a_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -288,10 +296,27 @@ void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-void s8a_state::init_s8a()
+void s8a_state::machine_start()
 {
+	genpin_class::machine_start();
+	m_io_outputs.resolve();
+	m_digits.resolve();
+
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_row));
+	save_item(NAME(m_data_ok));
+	save_item(NAME(m_lamp_data));
+	save_item(NAME(m_sound_data));
+
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+}
+
+void s8a_state::machine_reset()
+{
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 }
 
 void s8a_state::s8a(machine_config &config)
@@ -299,7 +324,7 @@ void s8a_state::s8a(machine_config &config)
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_ram_enable(false);
-	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::main_map);
 
 	/* Video */
 	config.set_default_layout(layout_s8a);
@@ -345,7 +370,7 @@ void s8a_state::s8a(machine_config &config)
 
 	/* Add the soundcard */
 	M6808(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s8a_state::audio_map);
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -363,14 +388,14 @@ void s8a_state::s8a(machine_config &config)
 / Still Crazy (#543) 06/1984
 /-----------------------------*/
 ROM_START(scrzy_l1)
-	ROM_REGION(0x2000, "roms", 0)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("ic20.bin", 0x0000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
 
-	ROM_REGION(0x4000, "audioroms", 0)
+	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 	// 1st and 2nd halves are identical
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
 } // Anonymous namespace
 
-GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, init_s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, empty_init, ROT0, "Williams", "Still Crazy", MACHINE_IS_SKELETON_MECHANICAL )

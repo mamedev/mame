@@ -115,7 +115,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 
 #include "emupal.h"
@@ -1019,7 +1019,7 @@ void bfcobra_state::rombank_w(uint8_t data)
 
     Split into machine\bfcobra.cpp !
 
-    Alternatively chuck it all away and borrow the MESS implementation
+    Alternatively chuck it all away and use the existing implementation
     because it's a million times better.
 
 ***************************************************************************/

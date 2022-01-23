@@ -21,8 +21,8 @@
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/upd7759.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"
@@ -114,7 +114,6 @@ public:
 	void init_hwchamp_5521();
 	void init_sdi_5358_small();
 	void init_fpointbla();
-	void init_altbeasj_5521();
 	void init_snapper();
 	void init_shinobi4_5521();
 	void init_defense_5358_small();
@@ -218,8 +217,6 @@ protected:
 	void init_generic(segas16b_rom_board rom_board);
 
 	// i8751 simulations
-	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
-	void altbeasj_i8751_sim();
 	void tturf_i8751_sim();
 	void wb3_i8751_sim();
 
@@ -302,7 +299,7 @@ public:
 
 protected:
 	void sound_control_w(uint8_t data);
-	void dac_data_w(uint8_t data);
+	void dac_data_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER( soundirq_cb );
 	bool m_nmi_enable;
 	uint16_t m_dac_data;

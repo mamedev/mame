@@ -42,7 +42,6 @@ main ram and the buffer.
 *****************************************************************************/
 
 DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
-decltype(K053244) K053245 = K053244;
 
 const gfx_layout k05324x_device::spritelayout =
 {

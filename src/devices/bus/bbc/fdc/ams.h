@@ -48,8 +48,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	required_device<i8271_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 

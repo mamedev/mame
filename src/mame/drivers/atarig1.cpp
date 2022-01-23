@@ -376,15 +376,13 @@ void atarig1_state::atarig1(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_II(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("IN0").bit(14);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
 }
 
 

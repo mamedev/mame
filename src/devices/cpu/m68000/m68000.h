@@ -413,13 +413,13 @@ protected:
 	u16 READ_EA_16(int ea);
 	u32 READ_EA_32(int ea);
 	u64 READ_EA_64(int ea);
-	floatx80 READ_EA_FPE(int ea);
+	floatx80 READ_EA_FPE(int mode, int reg, uint32 di_mode_ea);
 	floatx80 READ_EA_PACK(int ea);
 	void WRITE_EA_8(int ea, u8 data);
 	void WRITE_EA_16(int ea, u16 data);
 	void WRITE_EA_32(int ea, u32 data);
 	void WRITE_EA_64(int ea, u64 data);
-	void WRITE_EA_FPE(int ea, floatx80 fpr);
+	void WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di_mode_ea);
 	void WRITE_EA_PACK(int ea, int k, floatx80 fpr);
 	void fpgen_rm_reg(u16 w2);
 	void fmove_reg_mem(u16 w2);

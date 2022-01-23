@@ -13,7 +13,6 @@
 
  TODO:
  - fix 0x6000-0x7fff accesses, write_m/read_m
- - check glitches in SL-1632
 
  ***********************************************************************************************************/
 
@@ -39,14 +38,13 @@ DEFINE_DEVICE_TYPE(NES_REX_DBZ5,   nes_rex_dbz5_device,   "nes_rex_dbz5",   "NES
 DEFINE_DEVICE_TYPE(NES_REX_SL1632, nes_rex_sl1632_device, "nes_rex_sl1632", "NES Cart Rex Soft SL-1632 PCB")
 
 
-nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_REX_DBZ5, tag, owner, clock)
-	, m_extra(0)
+nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_REX_DBZ5, tag, owner, clock), m_extra(0)
 {
 }
 
-nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_REX_SL1632, tag, owner, clock), m_mode(0), m_mirror(0)
+nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_REX_SL1632, tag, owner, clock), m_mode(0)
 {
 }
 
@@ -71,7 +69,8 @@ void nes_rex_sl1632_device::device_start()
 	mmc3_start();
 	save_item(NAME(m_mode));
 	save_item(NAME(m_mirror));
-	save_item(NAME(m_extra_bank));
+	save_item(NAME(m_vrc2_prg_bank));
+	save_item(NAME(m_vrc2_vrom_bank));
 }
 
 void nes_rex_sl1632_device::pcb_reset()
@@ -79,10 +78,9 @@ void nes_rex_sl1632_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
 	m_mode = 0;
-	m_mirror = 0;
-	memset(m_extra_bank, 0, sizeof(m_extra_bank));
-	m_extra_bank[2] = 0xfe;
-	m_extra_bank[3] = 0xff;
+	m_mirror[0] = m_mirror[1] = 0;
+	m_vrc2_prg_bank[0] = m_vrc2_prg_bank[1] = 0;
+	std::fill(std::begin(m_vrc2_vrom_bank), std::end(m_vrc2_vrom_bank), 0x00);
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
@@ -108,7 +106,7 @@ void nes_rex_sl1632_device::pcb_reset()
 
  iNES: mapper 12
 
- In MESS: Supported
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -141,123 +139,81 @@ void nes_rex_dbz5_device::chr_cb(int start, int bank, int source)
 
  Games: Samurai Spirits
 
- MMC3 clone
+ This board uses a Huang-1 chip, which can simulate the
+ behavior of MMC1, MMC3, and VRC2. A PAL controls which
+ mode is active and limits it to the latter two here.
 
  iNES: mapper 14
 
- In MESS: Supported
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_rex_sl1632_device::set_prg(int prg_base, int prg_mask)
 {
-	if (m_mode & 0x02)
+	if (BIT(m_mode, 1))    // MMC3 mode
+		nes_txrom_device::set_prg(prg_base, prg_mask);
+	else                   // VRC2 mode
 	{
-		// here standard MMC3 bankswitch
-		uint8_t prg_flip = (m_latch & 0x40) ? 2 : 0;
-
-		prg_cb(0, prg_base | (m_mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-		prg_cb(1, prg_base | (m_mmc_prg_bank[1] & prg_mask));
-		prg_cb(2, prg_base | (m_mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-		prg_cb(3, prg_base | (m_mmc_prg_bank[3] & prg_mask));
-	}
-	else
-	{
-		prg8_89(m_extra_bank[0]);
-		prg8_ab(m_extra_bank[1]);
-		prg8_cd(m_extra_bank[2]);
-		prg8_ef(m_extra_bank[3]);
+		prg8_89(m_vrc2_prg_bank[0]);
+		prg8_ab(m_vrc2_prg_bank[1]);
+		prg16_cdef(m_prg_chunks - 1);
 	}
 }
 
-void nes_rex_sl1632_device::set_chr(uint8_t chr, int chr_base, int chr_mask)
+void nes_rex_sl1632_device::chr_cb(int start, int bank, int source)
 {
-	static const uint8_t conv_table[8] = {5, 5, 5, 5, 3, 3, 1, 1};
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
-	uint8_t bank[8];
-	uint8_t chr_base2[8];
+	u16 hi = BIT(m_mode, std::max(start | 1, 3)) << 8;
 
-	if (m_mode & 0x02)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			// since the mapper acts on 1K CHR chunks, we have 8 banks which use the 6 m_mmc_vrom_bank from MMC3 base class
-			if (i < 4)
-				bank[i] = ((m_mmc_vrom_bank[i / 2] & 0xfe) | (i & 1));
-			else
-				bank[i] = m_mmc_vrom_bank[i - 2];
-			chr_base2[i] = chr_base | ((m_mode << conv_table[i]) & 0x100);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			bank[i] = m_extra_bank[i + 4];   // first 4 m_extra_banks are PRG
-			chr_base2[i] = chr_base;
-		}
-	}
-
-	chr1_x(chr_page ^ 0, chr_base2[0] | (bank[0] & chr_mask), chr);
-	chr1_x(chr_page ^ 1, chr_base2[1] | (bank[1] & chr_mask), chr);
-	chr1_x(chr_page ^ 2, chr_base2[2] | (bank[2] & chr_mask), chr);
-	chr1_x(chr_page ^ 3, chr_base2[3] | (bank[3] & chr_mask), chr);
-	chr1_x(chr_page ^ 4, chr_base2[4] | (bank[4] & chr_mask), chr);
-	chr1_x(chr_page ^ 5, chr_base2[5] | (bank[5] & chr_mask), chr);
-	chr1_x(chr_page ^ 6, chr_base2[6] | (bank[6] & chr_mask), chr);
-	chr1_x(chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
+	if (BIT(m_mode, 1))    // MMC3 mode
+		chr1_x(start, hi | bank, source);
+	else                   // VRC2 mode
+		chr1_x(start, hi | m_vrc2_vrom_bank[start], source);
 }
 
-void nes_rex_sl1632_device::write_h(offs_t offset, uint8_t data)
+void nes_rex_sl1632_device::write_h(offs_t offset, u8 data)
 {
-	uint8_t helper1, helper2;
 	LOG_MMC(("rex_sl1632 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 0x2131)
+	if (offset == 0x2131)       // Mode control register at $A131
 	{
 		m_mode = data;
 		set_prg(m_prg_base, m_prg_mask);
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 
-		if (!(m_mode & 0x02))
-			set_nt_mirroring(BIT(m_mirror, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(m_mirror[BIT(m_mode, 1)] ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		if (!BIT(m_mode, 1))
+			set_irq_line(CLEAR_LINE);
 	}
-
-	if (m_mode & 0x02)
+	else if (BIT(m_mode, 1))    // MMC3 mode
 	{
-		switch (offset & 0x6001)
-		{
-			case 0x2000:
-				set_nt_mirroring(BIT(m_mirror, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-				break;
-
-			default:
-				txrom_write(offset, data);
-				break;
-		}
+		txrom_write(offset, data);
+		if ((offset & 0x6001) == 0x2000)
+			m_mirror[1] = data & 1;
 	}
-	else if (offset >= 0x3000 && offset <= 0x6003)
-	{
-		helper1 = (offset & 0x01) << 2;
-		offset = ((offset & 0x02) | (offset >> 10)) >> 1;
-		helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 m_extra_banks are for PRG!
-		m_extra_bank[helper2] = (m_extra_bank[helper2] & (0xf0 >> helper1)) | ((data & 0x0f) << helper1);
-		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
-	else
-	{
-		switch (offset & 0x7003)
+	else                        // VRC2 mode
+		switch (offset & 0x7000)
 		{
 			case 0x0000:
 			case 0x2000:
-				m_extra_bank[offset >> 13] = data;
-				set_prg(m_prg_base, m_prg_mask);
+				m_vrc2_prg_bank[BIT(offset, 13)] = data;
+				prg8_x(BIT(offset, 13), data);
 				break;
-
 			case 0x1000:
-				m_mirror = data;
-				set_nt_mirroring(BIT(m_mirror, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				m_mirror[0] = data & 1;
+				set_nt_mirroring(m_mirror[0] ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
+			case 0x3000:
+			case 0x4000:
+			case 0x5000:
+			case 0x6000:
+			{
+				u8 bank = ((offset >> 12) - 3) * 2 + BIT(offset, 1);
+				u8 shift = (offset & 1) << 2;
+				u8 mask = 0x0f << shift;
+				m_vrc2_vrom_bank[bank] = (m_vrc2_vrom_bank[bank] & ~mask) | ((data << shift) & mask);
+				chr_cb(bank, 0, CHRROM);
+				break;
+			}
 		}
-	}
 }

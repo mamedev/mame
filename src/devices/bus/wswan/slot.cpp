@@ -78,7 +78,7 @@ void device_ws_cart_interface::nvram_alloc(u32 size)
 //-------------------------------------------------
 ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, WS_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_ws_cart_interface>(mconfig, *this),
 	m_type(WS_STD),
 	m_cart(nullptr)
@@ -277,13 +277,22 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
 {
 	if (hook.image_file())
 	{
+		// FIXME: multiple issues in this function
+		// * Check for error from getting file length
+		// * Check for file length too large for size_t
+		// * File length is bytes but vector is sized in words
+		// * Catch out-of-memory when resizing vector
+		// * Check for error reading
+		// * Consider big-endian hosts - word data needs swapping
 		const char *slot_string;
-		u32 size = hook.image_file()->size();
+		std::uint64_t size = 0;
+		hook.image_file()->length(size);
 		std::vector<u16> rom(size);
 		int type;
 		u32 nvram;
 
-		hook.image_file()->read(&rom[0], size);
+		size_t actual;
+		hook.image_file()->read(&rom[0], size, actual);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);

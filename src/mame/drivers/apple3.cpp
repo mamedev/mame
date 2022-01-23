@@ -20,33 +20,18 @@
 #include "includes/apple3.h"
 #include "formats/ap2_dsk.h"
 
-#include "bus/a2bus/a2cffa.h"
-#include "bus/a2bus/a2applicard.h"
-#include "bus/a2bus/a2thunderclock.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/cmsscsi.h"
+#include "bus/a2bus/cards.h"
 
 #include "bus/rs232/rs232.h"
 
 #include "machine/input_merger.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void apple3_state::apple3_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
-}
-
-static void apple3_cards(device_slot_interface &device)
-{
-	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2.0 Compact Flash for Apple II (www.dreher.net), 6502 firmware
-	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
-	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
-	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
-	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  // Focus Drive IDE card
-	device.option_add("cmsscsi", A2BUS_CMSSCSI);        // CMS Apple II SCSI Card
 }
 
 static void a3_floppies(device_slot_interface &device)

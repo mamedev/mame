@@ -38,7 +38,6 @@ void mcs96_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
-	state_add(STATE_GENSP,     "GENSP",     register_file[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
 	state_add(MCS96_PC,        "PC",        PC);
 	state_add(MCS96_PSW,       "PSW",       PSW);

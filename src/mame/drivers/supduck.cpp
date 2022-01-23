@@ -131,6 +131,12 @@ void supduck_state::video_start()
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
 
+	m_text_tilemap->set_scrolldx(128, 128);
+	m_text_tilemap->set_scrolldy(  6,   6);
+	m_fore_tilemap->set_scrolldx(128, 128);
+	m_fore_tilemap->set_scrolldy(  6,   6);
+	m_back_tilemap->set_scrolldx(128, 128);
+	m_back_tilemap->set_scrolldy(  6,   6);
 }
 
 uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -425,11 +431,8 @@ void supduck_state::supduck(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 

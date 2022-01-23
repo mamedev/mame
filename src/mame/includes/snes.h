@@ -5,6 +5,7 @@
 #define MAME_INCLUDES_SNES_H
 
 #include "cpu/g65816/g65816.h"
+#include "machine/input_merger.h"
 #include "machine/s_smp.h"
 #include "sound/s_dsp.h"
 #include "video/snes_ppu.h"
@@ -306,6 +307,7 @@ public:
 		m_s_dsp(*this, "s_dsp"),
 		m_ppu(*this, "ppu"),
 		m_screen(*this, "screen"),
+		m_scpu_irq(*this, "scpu_irq"),
 		m_wram(*this, "wram")
 	{ }
 
@@ -395,6 +397,7 @@ protected:
 	required_device<s_dsp_device> m_s_dsp;
 	required_device<snes_ppu_device> m_ppu;
 	required_device<screen_device> m_screen;
+	optional_device<input_merger_device> m_scpu_irq;
 
 	required_shared_ptr<u8> m_wram;
 
@@ -440,6 +443,7 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_sufami_cart);
 	void snes_init_timers();
+	void scpu_irq_refresh();
 };
 
 /* Special chips, checked at init and used in memory handlers */

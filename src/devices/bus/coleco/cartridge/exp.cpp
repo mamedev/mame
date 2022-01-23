@@ -56,7 +56,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_colecovision_cartridge_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_card(nullptr)
 {
 }
@@ -106,16 +106,16 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 {
 	if (hook.image_file())
 	{
-		uint32_t length = hook.image_file()->size();
+		uint64_t length;
+		hook.image_file()->length(length); // FIXME: check error return
+
 		if (length == 0x100000 || length == 0x200000)
 			return software_get_default_slot("xin1");
 
-		if (length > 0x8000)
-		{
-			// Assume roms longer than 32K are megacarts.
+		if (length > 0x8000) // Assume roms longer than 32K are megacarts.
 			return software_get_default_slot("megacart");
-		}
 	}
+
 	return software_get_default_slot("standard");
 }
 

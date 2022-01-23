@@ -72,7 +72,7 @@ void a2bus_cmsscsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380N);
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380);
 }
 
 //-------------------------------------------------

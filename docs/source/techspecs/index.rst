@@ -20,3 +20,4 @@ MAME’s source or working on scripts that run within the MAME framework.
         luaengine
         luareference
         m6502
+        poly_manager

@@ -12,7 +12,7 @@
 
 #include "emu.h"
 
-#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)))
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)))
 
 #include "rgbsse.h"
 

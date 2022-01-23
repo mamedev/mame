@@ -32,7 +32,7 @@
 #include "includes/x07.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -1063,7 +1063,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
 
 		if (strcmp(card_type, "xp140"))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported card type");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported card type");
 			return image_init_result::FAIL;
 		}
 	}

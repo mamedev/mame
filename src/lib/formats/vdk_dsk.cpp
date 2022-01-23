@@ -12,6 +12,9 @@
 
 #include "vdk_dsk.h"
 
+#include "ioprocs.h"
+
+
 vdk_format::vdk_format()
 {
 }
@@ -31,10 +34,11 @@ const char *vdk_format::extensions() const
 	return "vdk";
 }
 
-int vdk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int vdk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
+	size_t actual;
 	uint8_t id[2];
-	io_generic_read(io, id, 0, 2);
+	io.read_at(0, id, 2, actual);
 
 	if (id[0] == 'd' && id[1] == 'k')
 		return 50;
@@ -42,16 +46,21 @@ int vdk_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 		return 0;
 }
 
-bool vdk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
+	if (io.seek(0, SEEK_SET))
+		return false;
+
 	uint8_t header[0x100];
-	io_generic_read(io, header, 0, 0x100);
+	io.read(header, 0x100, actual);
 
-	int header_size = header[3] * 0x100 + header[2];
-	int track_count = header[8];
-	int head_count = header[9];
+	int const header_size = header[3] * 0x100 + header[2];
+	int const track_count = header[8];
+	int const head_count = header[9];
 
-	int file_offset = header_size;
+	if (io.seek(header_size, SEEK_SET))
+		return false;
 
 	for (int track = 0; track < track_count; track++)
 	{
@@ -72,10 +81,9 @@ bool vdk_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				sectors[i].bad_crc = false;
 				sectors[i].data = &sector_data[sector_offset];
 
-				io_generic_read(io, sectors[i].data, file_offset, SECTOR_SIZE);
+				io.read(sectors[i].data, SECTOR_SIZE, actual);
 
 				sector_offset += SECTOR_SIZE;
-				file_offset += SECTOR_SIZE;
 			}
 
 			build_wd_track_mfm(track, head, image, 100000, SECTOR_COUNT, sectors, 22, 32, 24);
@@ -85,9 +93,11 @@ bool vdk_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-bool vdk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint64_t file_offset = 0;
+	size_t actual;
+	if (io.seek(0, SEEK_SET))
+		return false;
 
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
@@ -108,8 +118,7 @@ bool vdk_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 	header[10] = 0;
 	header[11] = 0;
 
-	io_generic_write(io, header, file_offset, sizeof(header));
-	file_offset += sizeof(header);
+	io.write(header, sizeof(header), actual);
 
 	// write disk data
 	for (int track = 0; track < track_count; track++)
@@ -120,10 +129,7 @@ bool vdk_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < SECTOR_COUNT; i++)
-			{
-				io_generic_write(io, sectors[FIRST_SECTOR_ID + i].data(), file_offset, SECTOR_SIZE);
-				file_offset += SECTOR_SIZE;
-			}
+				io.write(sectors[FIRST_SECTOR_ID + i].data(), SECTOR_SIZE, actual);
 		}
 	}
 

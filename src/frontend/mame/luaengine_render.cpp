@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "luaengine.ipp"
 
+#include "mame.h"
+#include "ui/ui.h"
+
 #include "render.h"
 #include "rendlay.h"
 
@@ -36,7 +39,7 @@ struct layout_view_items
 	layout_view_items(layout_view &v) : view(v) { }
 	layout_view::item_list &items() { return view.items(); }
 
-	static layout_view::item &unwrap(layout_view::item_list::iterator const &it) { return *it; }
+	static layout_view_item &unwrap(layout_view::item_list::iterator const &it) { return *it; }
 	static int push_key(lua_State *L, layout_view::item_list::iterator const &it, std::size_t ix) { return sol::stack::push(L, ix + 1); }
 
 	layout_view &view;
@@ -94,7 +97,7 @@ public:
 	{
 		layout_view_items &self(get_self(L));
 		char const *const id(stack::unqualified_get<char const *>(L));
-		layout_view::item *const item(self.view.get_item(id));
+		layout_view_item *const item(self.view.get_item(id));
 		if (item)
 			return stack::push_reference(L, *item);
 		else
@@ -276,94 +279,86 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_type["has_art"] = sol::property(&layout_view::has_art);
 
 
-	auto layout_view_item_type = sol().registry().new_usertype<layout_view::item>("layout_item", sol::no_constructor);
-	layout_view_item_type["set_state"] = &layout_view::item::set_state;
+	auto layout_view_item_type = sol().registry().new_usertype<layout_view_item>("layout_item", sol::no_constructor);
+	layout_view_item_type["set_state"] = &layout_view_item::set_state;
 	layout_view_item_type["set_element_state_callback"] =
 		make_simple_callback_setter<int>(
-				&layout_view::item::set_element_state_callback,
+				&layout_view_item::set_element_state_callback,
 				[] () { return 0; },
 				"set_element_state_callback",
 				"element state");
 	layout_view_item_type["set_animation_state_callback"] =
 		make_simple_callback_setter<int>(
-				&layout_view::item::set_animation_state_callback,
+				&layout_view_item::set_animation_state_callback,
 				[] () { return 0; },
 				"set_animation_state_callback",
 				"animation state");
 	layout_view_item_type["set_bounds_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_bounds_callback(layout_view::item::bounds_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_bounds_callback(layout_view::item::bounds_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] (render_bounds &b)
-							{
-								auto result(invoke(cbfunc).get<sol::optional<render_bounds> >());
-								if (result)
-								{
-									b = *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from bounds callback\n");
-									b = render_bounds{ 0.0, 0.0, 1.0, 1.0 };
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_bounds_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<render_bounds>(
+				&layout_view_item::set_bounds_callback,
+				[] () { return render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f }; },
+				"set_bounds_callback",
+				"bounds");
 	layout_view_item_type["set_color_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_color_callback(layout_view::item::color_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_color_callback(layout_view::item::color_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] (render_color &c)
-							{
-								auto result(invoke(cbfunc).get<sol::optional<render_color> >());
-								if (result)
-								{
-									c = *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from color callback\n");
-									c = render_color{ 1.0, 1.0, 1.0, 1.0 };
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_bounds_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<render_color>(
+				&layout_view_item::set_color_callback,
+				[] () { return render_color{ 1.0f, 1.0f, 1.0f, 1.0f }; },
+				"set_color_callback",
+				"color");
+	layout_view_item_type["set_scroll_size_x_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_size_x_callback,
+				[] () { return 1.0f; },
+				"set_scroll_size_x_callback",
+				"horizontal scroll window size");
+	layout_view_item_type["set_scroll_size_y_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_size_y_callback,
+				[] () { return 1.0f; },
+				"set_scroll_size_y_callback",
+				"vertical scroll window size");
+	layout_view_item_type["set_scroll_pos_x_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_pos_x_callback,
+				[] () { return 1.0f; },
+				"set_scroll_pos_x_callback",
+				"horizontal scroll position");
+	layout_view_item_type["set_scroll_pos_y_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_pos_y_callback,
+				[] () { return 1.0f; },
+				"set_scroll_pos_y_callback",
+				"vertical scroll position");
 	layout_view_item_type["id"] = sol::property(
-			[] (layout_view::item &i, sol::this_state s) -> sol::object
+			[] (layout_view_item &i, sol::this_state s) -> sol::object
 			{
 				if (i.id().empty())
 					return sol::lua_nil;
 				else
 					return sol::make_object(s, i.id());
 			});
-	layout_view_item_type["bounds_animated"] = sol::property(&layout_view::item::bounds_animated);
-	layout_view_item_type["color_animated"] = sol::property(&layout_view::item::color_animated);
-	layout_view_item_type["bounds"] = sol::property(&layout_view::item::bounds);
-	layout_view_item_type["color"] = sol::property(&layout_view::item::color);
-	layout_view_item_type["blend_mode"] = sol::property(&layout_view::item::blend_mode);
-	layout_view_item_type["orientation"] = sol::property(&layout_view::item::orientation);
-	layout_view_item_type["element_state"] = sol::property(&layout_view::item::element_state);
-	layout_view_item_type["animation_state"] = sol::property(&layout_view::item::animation_state);
+	layout_view_item_type["bounds_animated"] = sol::property(&layout_view_item::bounds_animated);
+	layout_view_item_type["color_animated"] = sol::property(&layout_view_item::color_animated);
+	layout_view_item_type["bounds"] = sol::property(&layout_view_item::bounds);
+	layout_view_item_type["color"] = sol::property(&layout_view_item::color);
+	layout_view_item_type["scroll_wrap_x"] = sol::property(&layout_view_item::scroll_wrap_x);
+	layout_view_item_type["scroll_wrap_y"] = sol::property(&layout_view_item::scroll_wrap_y);
+	layout_view_item_type["scroll_size_x"] = sol::property(
+			&layout_view_item::scroll_size_x,
+			&layout_view_item::set_scroll_size_x);
+	layout_view_item_type["scroll_size_y"] = sol::property(
+			&layout_view_item::scroll_size_y,
+			&layout_view_item::set_scroll_size_y);
+	layout_view_item_type["scroll_pos_x"] = sol::property(
+			&layout_view_item::scroll_pos_x,
+			&layout_view_item::set_scroll_pos_y);
+	layout_view_item_type["scroll_pos_y"] = sol::property(
+			&layout_view_item::scroll_pos_y,
+			&layout_view_item::set_scroll_pos_y);
+	layout_view_item_type["blend_mode"] = sol::property(&layout_view_item::blend_mode);
+	layout_view_item_type["orientation"] = sol::property(&layout_view_item::orientation);
+	layout_view_item_type["element_state"] = sol::property(&layout_view_item::element_state);
+	layout_view_item_type["animation_state"] = sol::property(&layout_view_item::animation_state);
 
 
 	auto layout_file_type = sol().registry().new_usertype<layout_file>("layout_file", sol::no_constructor);
@@ -397,6 +392,68 @@ void lua_engine::initialize_render(sol::table &emu)
 
 
 	auto render_container_type = sol().registry().new_usertype<render_container>("render_container", sol::no_constructor);
+	render_container_type["draw_box"] =
+			[] (render_container &ctnr, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				x1 = std::clamp(x1, 0.0f, 1.0f);
+				y1 = std::clamp(y1, 0.0f, 1.0f);
+				x2 = std::clamp(x2, 0.0f, 1.0f);
+				y2 = std::clamp(y2, 0.0f, 1.0f);
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = ui.colors().background_color();
+				ui.draw_outlined_box(ctnr, x1, y1, x2, y2, *fgcolor, *bgcolor);
+			};
+	render_container_type["draw_line"] =
+			[] (render_container &ctnr, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
+			{
+				x1 = std::clamp(x1, 0.0f, 1.0f);
+				y1 = std::clamp(y1, 0.0f, 1.0f);
+				x2 = std::clamp(x2, 0.0f, 1.0f);
+				y2 = std::clamp(y2, 0.0f, 1.0f);
+				if (!color)
+					color = mame_machine_manager::instance()->ui().colors().text_color();
+				ctnr.add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			};
+	render_container_type["draw_text"] =
+			[this] (render_container &ctnr, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				auto justify = ui::text_layout::text_justify::LEFT;
+				float x = 0;
+				if (xobj.is<float>())
+				{
+					x = std::clamp(xobj.as<float>(), 0.0f, 1.0f);
+				}
+				else if (xobj.is<char const *>())
+				{
+					char const *const justifystr(xobj.as<char const *>());
+					if (!strcmp(justifystr, "left"))
+						justify = ui::text_layout::text_justify::LEFT;
+					else if (!strcmp(justifystr, "right"))
+						justify = ui::text_layout::text_justify::RIGHT;
+					else if (!strcmp(justifystr, "center"))
+						justify = ui::text_layout::text_justify::CENTER;
+				}
+				else
+				{
+					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					return;
+				}
+				y = std::clamp(y, 0.0f, 1.0f);
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = 0;
+				ui.draw_text_full(
+						ctnr,
+						msg,
+						x, y, (1.0f - x),
+						justify, ui::text_layout::word_wrapping::WORD,
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+			};
 	render_container_type["user_settings"] = sol::property(&render_container::get_user_settings, &render_container::set_user_settings);
 	render_container_type["orientation"] = sol::property(
 			&render_container::orientation,

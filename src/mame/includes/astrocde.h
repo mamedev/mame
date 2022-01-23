@@ -41,6 +41,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
+		m_astrocade_sound2(*this, "astrocade2"),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
 		m_nvram(*this, "nvram"),
@@ -56,6 +57,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<votrax_sc01_device> m_votrax;
 	optional_device<astrocade_io_device> m_astrocade_sound1;
+	optional_device<astrocade_io_device> m_astrocade_sound2;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	optional_shared_ptr<uint8_t> m_nvram;

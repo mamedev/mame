@@ -5,7 +5,11 @@
 
 #pragma once
 
+#define USE_BUS_ADB (0)
 
+#if USE_BUS_ADB
+#include "bus/adb/adb.h"
+#endif
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -59,6 +63,12 @@ public:
 	uint8_t pram_r(offs_t offset);
 	void pram_w(offs_t offset, uint8_t data);
 
+#if USE_BUS_ADB
+	void adb_w(int id, int state);
+	void adb_poweron_w(int id, int state);
+	void adb_change();
+#endif
+
 	// interface routines
 	uint8_t get_xcvr_session() { return xcvr_session; }
 	void set_via_full(uint8_t val) { via_full = val; }
@@ -106,6 +116,14 @@ private:
 	emu_timer *m_timer;
 	uint8_t pram[0x100], disk_pram[0x100];
 	bool pram_loaded;
+
+	#if USE_BUS_ADB
+	optional_device <adb_connector> m_adb_connector[2];
+	adb_device *m_adb_device[2];
+	bool m_adb_device_out[2];
+	bool m_adb_device_poweron[2];
+	bool m_adb_out;
+	#endif
 
 	void send_port(uint8_t offset, uint8_t data);
 };

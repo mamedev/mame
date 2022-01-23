@@ -18,6 +18,12 @@ public:
 	{
 	}
 
+	void bosco(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_bosco_radarattr;
 
 	required_shared_ptr<uint8_t> m_bosco_starcontrol;
@@ -33,7 +39,6 @@ public:
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	DECLARE_VIDEO_START(bosco);
 	void bosco_palette(palette_device &palette) const;
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bosco);
@@ -46,7 +51,6 @@ public:
 	void bosco_scrollx_w(uint8_t data);
 	void bosco_scrolly_w(uint8_t data);
 	void bosco_starclr_w(uint8_t data);
-	void bosco(machine_config &config);
 	void bosco_map(address_map &map);
 };
 

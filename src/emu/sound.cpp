@@ -1068,6 +1068,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_rightmix(machine.sample_rate()),
 	m_compressor_scale(1.0),
 	m_compressor_counter(0),
+	m_compressor_enabled(machine.options().compressor()),
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_attenuation(0),
@@ -1090,7 +1091,10 @@ sound_manager::sound_manager(running_machine &machine) :
 #endif
 
 	// register callbacks
-	machine.configuration().config_register("mixer", config_load_delegate(&sound_manager::config_load, this), config_save_delegate(&sound_manager::config_save, this));
+	machine.configuration().config_register(
+			"mixer",
+			configuration_manager::load_delegate(&sound_manager::config_load, this),
+			configuration_manager::save_delegate(&sound_manager::config_save, this));
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&sound_manager::pause, this));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&sound_manager::resume, this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&sound_manager::reset, this));
@@ -1224,11 +1228,14 @@ void sound_manager::samples(s16 *buffer)
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+	bool old_muted = m_muted;
 	if (mute)
 		m_muted |= reason;
 	else
 		m_muted &= ~reason;
-	set_attenuation(m_attenuation);
+
+	if(old_muted != (m_muted != 0))
+		set_attenuation(m_attenuation);
 }
 
 
@@ -1353,14 +1360,10 @@ void sound_manager::resume()
 //  configuration file
 //-------------------------------------------------
 
-void sound_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void sound_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// might not have any data
-	if (parentnode == nullptr)
+	// we only care system-specific configuration
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// iterate over channel nodes
@@ -1385,29 +1388,28 @@ void sound_manager::config_load(config_type cfg_type, util::xml::data_node const
 
 void sound_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// iterate over mixer channels
-	if (parentnode != nullptr)
-		for (int mixernum = 0; ; mixernum++)
-		{
-			mixer_input info;
-			if (!indexed_mixer_input(mixernum, info))
-				break;
-			float newvol = info.stream->input(info.inputnum).user_gain();
+	for (int mixernum = 0; ; mixernum++)
+	{
+		mixer_input info;
+		if (!indexed_mixer_input(mixernum, info))
+			break;
 
-			if (newvol != 1.0f)
+		float const newvol = info.stream->input(info.inputnum).user_gain();
+		if (newvol != 1.0f)
+		{
+			util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
+			if (channelnode)
 			{
-				util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
-				if (channelnode != nullptr)
-				{
-					channelnode->set_attribute_int("index", mixernum);
-					channelnode->set_attribute_float("newvol", newvol);
-				}
+				channelnode->set_attribute_int("index", mixernum);
+				channelnode->set_attribute_float("newvol", newvol);
 			}
 		}
+	}
 }
 
 
@@ -1542,8 +1544,11 @@ void sound_manager::update(void *ptr, int param)
 		if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
 			lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
 
+		lprev = lsamp * lscale;
+		if (m_compressor_enabled)
+			lsamp = lprev;
+
 		// clamp the left side
-		lprev = lsamp *= lscale;
 		if (lsamp > 1.0)
 			lsamp = 1.0;
 		else if (lsamp < -1.0)
@@ -1555,8 +1560,11 @@ void sound_manager::update(void *ptr, int param)
 		if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
 			rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
 
-		// clamp the left side
-		rprev = rsamp *= rscale;
+		rprev = rsamp * rscale;
+		if (m_compressor_enabled)
+			rsamp = rprev;
+
+		// clamp the right side
 		if (rsamp > 1.0)
 			rsamp = 1.0;
 		else if (rsamp < -1.0)

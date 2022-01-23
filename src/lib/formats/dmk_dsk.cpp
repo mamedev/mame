@@ -13,9 +13,9 @@ TODO:
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "dmk_dsk.h"
+
+#include "ioprocs.h"
 
 
 dmk_format::dmk_format()
@@ -41,14 +41,16 @@ const char *dmk_format::extensions() const
 }
 
 
-int dmk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
+	uint64_t size;
+	if (io.length(size))
+		return 0;
+
 	const int header_size = 16;
 	uint8_t header[header_size];
-
-	uint64_t size = io_generic_size(io);
-
-	io_generic_read(io, header, 0, header_size);
+	size_t actual;
+	io.read_at(0, header, header_size, actual);
 
 	int tracks = header[1];
 	int track_size = ( header[3] << 8 ) | header[2];
@@ -81,12 +83,13 @@ int dmk_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 }
 
 
-bool dmk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	size_t actual;
+
 	const int header_size = 16;
 	uint8_t header[header_size];
-
-	io_generic_read(io, header, 0, header_size);
+	io.read_at(0, header, header_size, actual);
 
 	const int tracks = header[1];
 	const int track_size = ( header[3] << 8 ) | header[2];
@@ -128,7 +131,7 @@ bool dmk_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			int dam_location[64];
 
 			// Read track
-			io_generic_read(io, &track_data[0], header_size + ( heads * track + head ) * track_size, track_size);
+			io.read_at(header_size + (heads * track + head) * track_size, &track_data[0], track_size, actual);
 
 			for (int i = 0; i < 64; i++)
 			{
@@ -213,7 +216,7 @@ bool dmk_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 }
 
 
-bool dmk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

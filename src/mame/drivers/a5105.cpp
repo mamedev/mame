@@ -89,10 +89,10 @@ private:
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
 	uint8_t *m_char_ram;
-	uint16_t m_pcg_addr;
-	uint16_t m_pcg_internal_addr;
-	uint8_t m_key_mux;
-	uint8_t m_memsel[4];
+	uint16_t m_pcg_addr = 0U;
+	uint16_t m_pcg_internal_addr = 0U;
+	uint8_t m_key_mux = 0U;
+	uint8_t m_memsel[4]{};
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
@@ -114,7 +114,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	int const gfx = m_video_ram[(address & 0xffff)];
 
 	for (int xi = 0; xi < 16; xi++)
 	{

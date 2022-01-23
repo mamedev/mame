@@ -197,6 +197,7 @@ end
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat/fpatan.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
 
@@ -572,11 +573,6 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "winstore*" }
-		defines {
-			"NO_GETENV"
-		}
-
 	configuration { }
 
 	files {
@@ -664,12 +660,6 @@ end
 	configuration { "mingw-clang" }
 		buildoptions {
 			"-include stdint.h"
-		}
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-enum-conversion",
-			"-Wno-unused-function",
 		}
 
 	configuration { }
@@ -773,11 +763,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
-
 	configuration { }
 		defines {
 			"_7ZIP_PPMD_SUPPPORT",
@@ -866,25 +851,15 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h",
-		}
-
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
 		defines {
 			"LUA_USE_POSIX",
-		}
-	end
-	if ("pnacl" == _OPTIONS["gcc"]) then
-		defines {
-			"LUA_32BITS",
 		}
 	end
 
@@ -952,11 +927,6 @@ project "lualibs"
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
 		}
 
-	configuration { "pnacl"}
-		buildoptions {
-			"-Wno-char-subscripts",
-		}
-
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -964,22 +934,14 @@ project "lualibs"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
-	}
-if (_OPTIONS["osd"] ~= "uwp") then
-	includedirs {
 		MAME_DIR .. "3rdparty/linenoise",
 	}
-end
+
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
 		ext_includedir("sqlite3"),
 	}
-
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
 
 	configuration {}
 
@@ -987,16 +949,8 @@ end
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
-	}
-if (_OPTIONS["osd"] == "uwp") then
-	files {
-		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
-	}
-else
-	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
-end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -1025,16 +979,6 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-implicit-int-float-conversion",
 		}
 end
-	configuration { "winstore*" }
-		defines {
-			"SQLITE_OS_WINRT",
-		}
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-unused-variable",
-		}
 
 	configuration { }
 
@@ -1159,7 +1103,7 @@ project "bx"
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1227,7 +1171,7 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1240,6 +1184,11 @@ project "bimg"
 	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
 		}
 
 	configuration { }
@@ -1299,12 +1248,6 @@ project "bgfx"
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-unneeded-internal-declaration",
-			"-Wno-unused-const-variable",
-		}
-
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -1320,12 +1263,8 @@ end
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bimg/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
-
-	configuration { "not steamlink"}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-		}
 
 	configuration { "android-*"}
 		buildoptions {
@@ -1341,7 +1280,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1363,14 +1302,6 @@ end
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
 		}
-	configuration { "rpi" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
-		}
-		defines {
-			"__STDC_VERSION__=199901L",
-		}
 
 	configuration { }
 
@@ -1389,6 +1320,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
 				"-Wno-int-to-pointer-cast",
+				"-Wno-ignored-attributes", -- many instances in ImGui
 			}
 		end
 	end
@@ -1415,7 +1347,6 @@ end
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
-		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
@@ -1444,6 +1375,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_agc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
@@ -1452,17 +1384,19 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_webgpu.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/vertexlayout.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_tables.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
@@ -1507,15 +1441,6 @@ project "portaudio"
 			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 	end
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-missing-braces",
-			"-Wno-switch",
-			"-Wno-unused-function",
-			"-Wno-unused-variable",
-		}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
@@ -1681,12 +1606,6 @@ if _OPTIONS["targetos"]=="android" then
 		end
 		if _OPTIONS["PLATFORM"]=="arm64" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
-		end
-		if _OPTIONS["PLATFORM"]=="mips" then
-			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
-		end
-		if _OPTIONS["PLATFORM"]=="mips64" then
-			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
 		end
 		if _OPTIONS["PLATFORM"]=="x86" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
@@ -2170,7 +2089,6 @@ end
 -- linenoise library
 --------------------------------------------------
 
-if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
@@ -2192,7 +2110,6 @@ project "linenoise"
 		MAME_DIR .. "3rdparty/linenoise/utf8.c",
 		MAME_DIR .. "3rdparty/linenoise/linenoise.c",
 	}
-end
 
 
 --------------------------------------------------
@@ -2205,7 +2122,7 @@ project "utf8proc"
 	kind "StaticLib"
 
 	defines {
-		"UTF8PROC_DLLEXPORT="
+		"UTF8PROC_STATIC",
 	}
 
 	configuration "Debug"
@@ -2219,9 +2136,6 @@ project "utf8proc"
 		}
 
 	configuration { }
-		defines {
-			"ZLIB_CONST",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"
@@ -2255,6 +2169,44 @@ project "wdlfft"
 
 
 --------------------------------------------------
+-- ymfm library objects
+--------------------------------------------------
+
+project "ymfm"
+	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
+	kind "StaticLib"
+
+	configuration { }
+		defines {
+			"YMFM_MAME",
+		}
+
+	files {
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.ipp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opn.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opq.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opz.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_pcm.h",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.h",
+	}
+
+
+--------------------------------------------------
 -- asmjit library
 --------------------------------------------------
 
@@ -2262,6 +2214,11 @@ if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
 
 	configuration { }
 

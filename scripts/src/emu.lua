@@ -111,8 +111,6 @@ files {
 	MAME_DIR .. "src/emu/driver.h",
 	MAME_DIR .. "src/emu/drivenum.cpp",
 	MAME_DIR .. "src/emu/drivenum.h",
-	MAME_DIR .. "src/emu/emualloc.cpp",
-	MAME_DIR .. "src/emu/emualloc.h",
 	MAME_DIR .. "src/emu/emucore.cpp",
 	MAME_DIR .. "src/emu/emucore.h",
 	MAME_DIR .. "src/emu/emumem.cpp",
@@ -240,6 +238,8 @@ files {
 	MAME_DIR .. "src/emu/debug/dvmemory.h",
 	MAME_DIR .. "src/emu/debug/dvbpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvbpoints.h",
+	MAME_DIR .. "src/emu/debug/dvrpoints.cpp",
+	MAME_DIR .. "src/emu/debug/dvrpoints.h",
 	MAME_DIR .. "src/emu/debug/dvwpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvwpoints.h",
 	MAME_DIR .. "src/emu/debug/dvstate.cpp",
@@ -268,8 +268,7 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 3 files do not include emu.h
-nopch(MAME_DIR .. "src/emu/emualloc.cpp")
+-- 2 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
 

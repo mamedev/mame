@@ -32,7 +32,7 @@ acorn_memc_device::acorn_memc_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, ACORN_MEMC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
-	, m_space_config("MEMC", ENDIANNESS_LITTLE, 32, 26, 0)
+	, m_space_config("memc", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_abort_w(*this)
 	, m_sirq_w(*this)
 	, m_output_dram_rowcol(false)
@@ -51,7 +51,7 @@ device_memory_interface::space_config_vector acorn_memc_device::memory_space_con
 	};
 }
 
-void acorn_memc_device::memc_map_debug_commands(int ref, const std::vector<std::string> &params)
+void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string> &params)
 {
 	uint64_t offset;
 	if (params.size() != 1 || !machine().debugger().commands().validate_number_parameter(params[0], offset))
@@ -103,7 +103,7 @@ void acorn_memc_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("memc_map", CMDFLAG_NONE, 0, 1, 1, std::bind(&acorn_memc_device::memc_map_debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("memc_map", CMDFLAG_NONE, 1, 1, std::bind(&acorn_memc_device::memc_map_debug_commands, this, _1));
 	}
 }
 
@@ -505,6 +505,15 @@ void acorn_memc_device::high_mem_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		invalid_access(true, addr, data, mem_mask);
 	else if (addr < 0x1000000)   // DRAM
 		m_space->write_dword(dram_address(addr), data, mem_mask);
+	else if (addr < 0x1400000)   // Buffer enabled by IOC
+	{
+		if (ACCESSING_BITS_16_31)
+		{
+			data >>= 16;
+			mem_mask >>= 16;
+		}
+		m_space->write_dword(0x2000000 | addr, data, mem_mask);
+	}
 	else
 		m_space->write_dword(0x2000000 | addr, data, mem_mask);
 }

@@ -62,7 +62,8 @@ void device_ql_rom_cartridge_card_interface::interface_post_start()
 ql_rom_cartridge_slot_device::ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ql_rom_cartridge_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this), m_card(nullptr)
+	device_cartrom_image_interface(mconfig, *this),
+	m_card(nullptr)
 {
 }
 

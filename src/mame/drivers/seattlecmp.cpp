@@ -44,7 +44,7 @@ public:
 	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pic(*this, "pic%u", 1)
+		, m_pic(*this, "pic%u", 1U)
 		, m_monitor(*this, "monitor")
 	{ }
 

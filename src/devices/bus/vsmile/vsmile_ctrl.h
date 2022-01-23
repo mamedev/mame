@@ -104,6 +104,7 @@ protected:
 	// UART simulation helpers
 	bool is_tx_empty() const { return m_tx_fifo_empty; }
 	bool queue_tx(uint8_t data);
+	bool is_selected() { return m_select; }
 
 private:
 	// device_vsmile_ctrl_interfaceA implementation

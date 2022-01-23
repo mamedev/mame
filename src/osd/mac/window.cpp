@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "render.h"
+#include "screen.h"
 #include "ui/uimain.h"
 
 // OSD headers
@@ -476,7 +477,7 @@ void mac_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_iterator(machine().root_device()).byindex(index());
+				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(index());
 				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else

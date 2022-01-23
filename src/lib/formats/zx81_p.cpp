@@ -34,8 +34,6 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #include "zx81_p.h"
 #include "tzx_cas.h"
 
-#include <cassert>
-
 
 #define WAVEENTRY_LOW   -32768
 #define WAVEENTRY_HIGH   32767

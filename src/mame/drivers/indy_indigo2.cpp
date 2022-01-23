@@ -407,7 +407,7 @@ void ip24_state::indy_5015(machine_config &config)
 {
 	ip24(config);
 
-	R5000(config, m_maincpu, 50000000*3);
+	R5000(config, m_maincpu, 75'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -415,7 +415,7 @@ void ip24_state::indy_4613(machine_config &config)
 {
 	ip24(config);
 
-	R4600(config, m_maincpu, 33333333*4);
+	R4600(config, m_maincpu, 66'666'666);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -423,7 +423,7 @@ void ip24_state::indy_4610(machine_config &config)
 {
 	ip24(config);
 
-	R4600(config, m_maincpu, 33333333*3);
+	R4600(config, m_maincpu, 50'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -436,7 +436,7 @@ void ip22_state::wd33c93_2(device_t *device)
 
 void ip22_state::indigo2_4415(machine_config &config)
 {
-	R4400(config, m_maincpu, 50000000*3);
+	R4400(config, m_maincpu, 75'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	ip24_base(config);

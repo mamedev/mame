@@ -57,7 +57,7 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "cpu/cp1610/cp1610.h"
 #include "sound/ay8910.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

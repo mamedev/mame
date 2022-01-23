@@ -16,7 +16,7 @@
 
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 #include "speaker.h"
 
@@ -50,10 +50,10 @@ void labyrunr_state::labyrunr_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
 	map(0x0020, 0x005f).ram().share("scrollram");
-	map(0x0800, 0x0800).rw("ym1", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
-	map(0x0801, 0x0801).rw("ym1", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
-	map(0x0900, 0x0900).rw("ym2", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
-	map(0x0901, 0x0901).rw("ym2", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
+	map(0x0800, 0x0800).rw("ym1", FUNC(ym2203_device::data_r), FUNC(ym2203_device::data_w));
+	map(0x0801, 0x0801).rw("ym1", FUNC(ym2203_device::status_r), FUNC(ym2203_device::address_w));
+	map(0x0900, 0x0900).rw("ym2", FUNC(ym2203_device::data_r), FUNC(ym2203_device::data_w));
+	map(0x0901, 0x0901).rw("ym2", FUNC(ym2203_device::status_r), FUNC(ym2203_device::address_w));
 	map(0x0a00, 0x0a00).portr("P2");
 	map(0x0a01, 0x0a01).portr("P1");
 	map(0x0b00, 0x0b00).portr("SYSTEM");

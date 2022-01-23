@@ -13,7 +13,6 @@
 #include "ui/simpleselgame.h"
 
 #include "ui/info.h"
-#include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/ui.h"
 #include "ui/utils.h"
@@ -35,9 +34,8 @@ namespace ui {
 
 simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
 	: menu(mui, container)
-	, m_error(false), m_rerandomize(false)
+	, m_nomatch(false), m_error(false), m_rerandomize(false)
 	, m_search()
-	, m_skip_main_items(0)
 	, m_driverlist(driver_list::total() + 1)
 	, m_drivlist()
 	, m_cached_driver(nullptr)
@@ -45,6 +43,8 @@ simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_co
 	, m_cached_unemulated(device_t::feature::NONE), m_cached_imperfect(device_t::feature::NONE)
 	, m_cached_color(ui().colors().background_color())
 {
+	set_process_flags(PROCESS_IGNOREPAUSE);
+	set_needs_prev_menu_item(false);
 	build_driver_list();
 	if (gamename)
 		m_search.assign(gamename);
@@ -109,34 +109,30 @@ void simple_menu_select_game::build_driver_list()
 //  handle - handle the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::handle()
+void simple_menu_select_game::handle(event const *ev)
 {
-	// ignore pause keys by swallowing them before we process the menu
-	machine().ui_input().pressed(IPT_UI_PAUSE);
-
 	// process the menu
-	const event *menu_event = process(0);
-	if (menu_event && menu_event->itemref)
+	if (ev)
 	{
 		if (m_error)
 		{
-			// reset the error on any future menu_event
+			// reset the error on any subsequent menu event
 			m_error = false;
 			machine().ui_input().reset();
 		}
 		else
 		{
 			// handle selections
-			switch(menu_event->iptkey)
+			switch(ev->iptkey)
 			{
 			case IPT_UI_SELECT:
-				inkey_select(menu_event);
+				inkey_select(*ev);
 				break;
 			case IPT_UI_CANCEL:
 				inkey_cancel();
 				break;
 			case IPT_SPECIAL:
-				inkey_special(menu_event);
+				inkey_special(*ev);
 				break;
 			}
 		}
@@ -149,7 +145,7 @@ void simple_menu_select_game::handle()
 				container(),
 				_("The selected game is missing one or more required ROM or CHD images. "
 				"Please select a different game.\n\nPress any key to continue."),
-				ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
 }
 
@@ -158,21 +154,22 @@ void simple_menu_select_game::handle()
 //  inkey_select
 //-------------------------------------------------
 
-void simple_menu_select_game::inkey_select(const event *menu_event)
+void simple_menu_select_game::inkey_select(const event &menu_event)
 {
-	const game_driver *driver = (const game_driver *)menu_event->itemref;
+	const game_driver *driver = (const game_driver *)menu_event.itemref;
 
-	// special case for configure inputs
-	if ((uintptr_t)driver == 1)
+	if ((uintptr_t)driver == 1) // special case for configure inputs
 	{
 		menu::stack_push<menu_simple_game_options>(
 				ui(),
 				container(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
 	}
-
-	// anything else is a driver
-	else
+	else if (!driver) // special case for previous menu
+	{
+		stack_pop();
+	}
+	else // anything else is a driver
 	{
 		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *driver);
@@ -207,6 +204,7 @@ void simple_menu_select_game::inkey_cancel()
 	if (!m_search.empty())
 	{
 		m_search.clear();
+		m_rerandomize = true;
 		reset(reset_options::SELECT_FIRST);
 	}
 }
@@ -216,11 +214,11 @@ void simple_menu_select_game::inkey_cancel()
 //  inkey_special - typed characters append to the buffer
 //-------------------------------------------------
 
-void simple_menu_select_game::inkey_special(const event *menu_event)
+void simple_menu_select_game::inkey_special(const event &menu_event)
 {
 	// typed characters append to the buffer
 	size_t old_size = m_search.size();
-	if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+	if (input_character(m_search, menu_event.unichar, uchar_is_printable))
 	{
 		if (m_search.size() < old_size)
 			m_rerandomize = true;
@@ -242,41 +240,42 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 		matchcount++;
 
 	// if nothing there, add a single multiline item and return
-	if (matchcount == 0)
-	{
-		std::string txt = string_format(
-				_("No machines found. Please check the rompath specified in the %1$s.ini file.\n\n"
-				"If this is your first time using %2$s, please see the config.txt file in "
-				"the docs directory for information on configuring %2$s."),
-				emulator_info::get_configname(),
-				emulator_info::get_appname());
-		item_append(txt, FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
-		return;
-	}
+	m_nomatch = !matchcount;
 
 	// otherwise, rebuild the match list
-	assert(m_drivlist != nullptr);
-	if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
-	m_rerandomize = false;
-
-	// iterate over entries
-	for (curitem = 0; curitem < matchcount; curitem++)
+	if (matchcount)
 	{
-		int curmatch = m_matchlist[curitem];
-		if (curmatch != -1)
+		assert(m_drivlist != nullptr);
+		if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
+			m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+		m_rerandomize = false;
+
+		// iterate over entries
+		for (curitem = 0; curitem < matchcount; curitem++)
 		{
-			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).type.fullname(), (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			int curmatch = m_matchlist[curitem];
+			if (curmatch != -1)
+			{
+				int cloneof = m_drivlist->non_bios_clone(curmatch);
+				item_append(
+						m_drivlist->driver(curmatch).type.fullname(),
+						m_drivlist->driver(curmatch).name,
+						(cloneof == -1) ? 0 : FLAG_INVERT,
+						(void *)&m_drivlist->driver(curmatch));
+			}
 		}
+		item_append(menu_item_type::SEPARATOR);
 	}
 
 	// if we're forced into this, allow general input configuration as well
 	if (stack_has_special_main_menu())
 	{
-		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), 0, (void *)1);
-		m_skip_main_items = 1;
+		item_append(_("Exit"), 0, nullptr);
+	}
+	else
+	{
+		item_append(_("Return to Previous Menu"), 0, nullptr);
 	}
 
 	// configure the custom rendering
@@ -291,6 +290,23 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 
 void simple_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
+	// if no matches, display the error message
+	if (m_nomatch)
+	{
+		ui().draw_text_box(
+				container(),
+				string_format(
+						_("No machines found. Please check the rompath specified in the %1$s.ini file.\n\n"
+						"If this is your first time using %2$s, please see the config.txt file in "
+						"the docs directory for information on configuring %2$s."),
+						emulator_info::get_configname(),
+						emulator_info::get_appname()),
+				text_layout::text_justify::CENTER,
+				0.5f, origy2 + ui().box_tb_border() + (0.5f * (bottom - ui().box_tb_border())),
+				UI_RED_COLOR);
+		return;
+	}
+
 	const game_driver *driver;
 	std::string tempbuf[5];
 
@@ -304,11 +320,11 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	draw_text_box(
 			tempbuf, tempbuf + 1,
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// determine the text to render below
-	driver = ((uintptr_t)selectedref > m_skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	driver = ((uintptr_t)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
 	if (driver)
 	{
 		// first line is game name
@@ -318,7 +334,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
+		tempbuf[2] = string_format(_("Driver: %1$s"), core_filename_extract_base(driver->type.source()));
 
 		// update cached values if selection changed
 		if (driver != m_cached_driver)
@@ -386,7 +402,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	draw_text_box(
 			tempbuf, tempbuf + 4,
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, true,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
 			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color(), 1.0f);
 }
 
@@ -401,13 +417,10 @@ void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_con
 	char *gamename = (char *)mui.machine().options().system_name();
 
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
 
-	// add the quit entry followed by the game select entry
-	menu::stack_push_special_main<menu_quit_game>(mui, container);
-	menu::stack_push<simple_menu_select_game>(mui, container, gamename);
-
-	// force the menus on
+	// drop any existing menus and start the system selection menu
+	menu::stack_reset(mui);
+	menu::stack_push_special_main<simple_menu_select_game>(mui, container, gamename);
 	mui.show_menu();
 
 	// make sure MAME is paused

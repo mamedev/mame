@@ -67,7 +67,7 @@
 #include "machine/spg2xx.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class clickstart_state : public driver_device

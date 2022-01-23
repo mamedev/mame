@@ -16,25 +16,38 @@
 #ifndef MAME_MACHINE_LATCH8_H
 #define MAME_MACHINE_LATCH8_H
 
-#include "sound/discrete.h"
+#pragma once
+
 
 class latch8_device : public device_t
 {
 public:
 	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	/* write & read full byte */
+	// Write bit to discrete node
+	template <unsigned N> auto write_cb() { return m_write_cb[N].bind(); }
 
+	// Upon read, replace bits by reading from another device handler
+	template <unsigned N> auto read_cb() { return m_read_cb[N].bind(); }
+
+	// Bit mask specifying bits to be masked *out*
+	void set_maskout(uint32_t maskout) { m_maskout = maskout; }
+
+	// Bit mask specifying bits to be inverted
+	void set_xorvalue(uint32_t xorvalue) { m_xorvalue = xorvalue; }
+
+	// Bit mask specifying bits not needing cpu synchronization.
+	void set_nosync(uint32_t nosync) { m_nosync = nosync; }
+
+	// write & read full byte
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	/* reset the latch */
-
+	// reset the latch
 	void reset_w(offs_t offset, uint8_t data);
 
-	/* read bit x                 */
-	/* return (latch >> x) & 0x01 */
-
+	// read bit x
+	// FIXME: does not honour read callbacks or XOR mask
 	DECLARE_READ_LINE_MEMBER( bit0_r ) { return BIT(m_value, 0); }
 	DECLARE_READ_LINE_MEMBER( bit1_r ) { return BIT(m_value, 1); }
 	DECLARE_READ_LINE_MEMBER( bit2_r ) { return BIT(m_value, 2); }
@@ -44,21 +57,19 @@ public:
 	DECLARE_READ_LINE_MEMBER( bit6_r ) { return BIT(m_value, 6); }
 	DECLARE_READ_LINE_MEMBER( bit7_r ) { return BIT(m_value, 7); }
 
-	/* read inverted bit x        */
-	/* return (latch >> x) & 0x01 */
+	// read inverted bit
+	// FIXME: does not honour read callbacks or XOR mask
+	DECLARE_READ_LINE_MEMBER( bit0_q_r ) { return BIT(~m_value, 0); }
+	DECLARE_READ_LINE_MEMBER( bit1_q_r ) { return BIT(~m_value, 1); }
+	DECLARE_READ_LINE_MEMBER( bit2_q_r ) { return BIT(~m_value, 2); }
+	DECLARE_READ_LINE_MEMBER( bit3_q_r ) { return BIT(~m_value, 3); }
+	DECLARE_READ_LINE_MEMBER( bit4_q_r ) { return BIT(~m_value, 4); }
+	DECLARE_READ_LINE_MEMBER( bit5_q_r ) { return BIT(~m_value, 5); }
+	DECLARE_READ_LINE_MEMBER( bit6_q_r ) { return BIT(~m_value, 6); }
+	DECLARE_READ_LINE_MEMBER( bit7_q_r ) { return BIT(~m_value, 7); }
 
-	DECLARE_READ_LINE_MEMBER( bit0_q_r ) { return BIT(m_value, 0) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit1_q_r ) { return BIT(m_value, 1) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit2_q_r ) { return BIT(m_value, 2) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit3_q_r ) { return BIT(m_value, 3) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit4_q_r ) { return BIT(m_value, 4) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit5_q_r ) { return BIT(m_value, 5) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit6_q_r ) { return BIT(m_value, 6) ^ 1; }
-	DECLARE_READ_LINE_MEMBER( bit7_q_r ) { return BIT(m_value, 7) ^ 1; }
-
-	/* write bit x from data into bit determined by offset */
-	/* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
-
+	// write bit x from data into bit determined by offset
+	// latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset)
 	void bit0_w(offs_t offset, uint8_t data);
 	void bit1_w(offs_t offset, uint8_t data);
 	void bit2_w(offs_t offset, uint8_t data);
@@ -68,21 +79,6 @@ public:
 	void bit6_w(offs_t offset, uint8_t data);
 	void bit7_w(offs_t offset, uint8_t data);
 
-	/* Bit mask specifying bits to be masked *out* */
-	void set_maskout(uint32_t maskout) { m_maskout = maskout; }
-
-	/* Bit mask specifying bits to be inverted */
-	void set_xorvalue(uint32_t xorvalue) { m_xorvalue = xorvalue; }
-
-	/* Bit mask specifying bits not needing cpu synchronization. */
-	void set_nosync(uint32_t nosync) { m_nosync = nosync; }
-
-	/* Write bit to discrete node */
-	template <unsigned N> auto write_cb() { return m_write_cb[N].bind(); }
-
-	/* Upon read, replace bits by reading from another device handler */
-	template <unsigned N> auto read_cb() { return m_read_cb[N].bind(); }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -91,21 +87,21 @@ protected:
 
 	TIMER_CALLBACK_MEMBER( timerproc );
 	void update(uint8_t new_val, uint8_t mask);
-	inline void bitx_w(int bit, offs_t offset, uint8_t data);
+	template <int Bit> void bitx_w(offs_t offset, uint8_t data);
 
 private:
-	// internal state
-	uint8_t            m_value;
-	uint8_t            m_has_write;
-	uint8_t            m_has_read;
-
-	/* only for byte reads, does not affect bit reads and node_map */
-	uint32_t           m_maskout;
-	uint32_t           m_xorvalue;  /* after mask */
-	uint32_t           m_nosync;
-
 	devcb_write_line::array<8> m_write_cb;
 	devcb_read_line::array<8> m_read_cb;
+
+	// internal state
+	uint8_t            m_value;
+	bool               m_has_write;
+	bool               m_has_read;
+
+	// only for byte reads, does not affect bit reads and node_map
+	uint32_t           m_maskout;
+	uint32_t           m_xorvalue;  // after mask
+	uint32_t           m_nosync;
 };
 
 DECLARE_DEVICE_TYPE(LATCH8, latch8_device)

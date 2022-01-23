@@ -3,7 +3,7 @@
 
 /*
    Hyllian's xBR LV2 - pass1 Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,31 +27,31 @@
 */
 
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
-    },
-    "depth": {
-    	"function": "always",
-    	"writeenable": false
-    },
-    "cull": {
-    	"mode": "none"
-    },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/xbr/xbr-lv2-multipass/vs_xbr-lv2-pass1",
-    "fragment": "chains/xbr/xbr-lv2-multipass/fs_xbr-lv2-pass1",
-    "uniforms": [
-    	{ "name": "decal",         "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "ORIG_texture",  "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-    	{ "name": "u_tex_size1",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-    	{ "name": "u_target_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/xbr/xbr-lv2-multipass/vs_xbr-lv2-pass1",
+	"fragment": "chains/xbr/xbr-lv2-multipass/fs_xbr-lv2-pass1",
+	"uniforms": [
+		{ "name": "decal",         "type": "int",  "values": [ 1.0 ] },
+		{ "name": "ORIG_texture",  "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size1",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_target_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
 }

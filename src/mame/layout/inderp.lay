@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+
+<mamelayout version="2">
+
+	<element name="digit8_" defstate="0">
+		<led8seg_gts1>
+			<color red="0.0" green="0.75" blue="1.0" />
+		</led8seg_gts1>
+	</element>
+	<element name="digit7_" defstate="0">
+		<led7seg>
+			<color red="0.0" green="0.75" blue="1.0" />
+		</led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<bounds left="0" top="25" right="325" bottom="205" />
+
+		<!-- Top Row -->
+		<element name="digit5" ref="digit8_">
+			<bounds left="10" top="45" right="30" bottom="84" />
+		</element>
+		<element name="digit4" ref="digit8_">
+			<bounds left="34" top="45" right="54" bottom="84" />
+		</element>
+		<element name="digit3" ref="digit8_">
+			<bounds left="58" top="45" right="78" bottom="84" />
+		</element>
+		<element name="digit2" ref="digit8_">
+			<bounds left="87" top="45" right="107" bottom="84" />
+		</element>
+		<element name="digit1" ref="digit8_">
+			<bounds left="111" top="45" right="131" bottom="84" />
+		</element>
+		<element name="digit0" ref="digit8_">
+			<bounds left="135" top="45" right="155" bottom="84" />
+		</element>
+		<element name="digit15" ref="digit8_">
+			<bounds left="170" top="45" right="190" bottom="84" />
+		</element>
+		<element name="digit14" ref="digit8_">
+			<bounds left="194" top="45" right="214" bottom="84" />
+		</element>
+		<element name="digit13" ref="digit8_">
+			<bounds left="218" top="45" right="238" bottom="84" />
+		</element>
+		<element name="digit12" ref="digit8_">
+			<bounds left="247" top="45" right="267" bottom="84" />
+		</element>
+		<element name="digit11" ref="digit8_">
+			<bounds left="271" top="45" right="291" bottom="84" />
+		</element>
+		<element name="digit10" ref="digit8_">
+			<bounds left="295" top="45" right="315" bottom="84" />
+		</element>
+
+		<!-- Bottom Row -->
+		<element name="digit25" ref="digit8_">
+			<bounds left="10" top="100" right="30" bottom="139" />
+		</element>
+		<element name="digit24" ref="digit8_">
+			<bounds left="34" top="100" right="54" bottom="139" />
+		</element>
+		<element name="digit23" ref="digit8_">
+			<bounds left="58" top="100" right="78" bottom="139" />
+		</element>
+		<element name="digit22" ref="digit8_">
+			<bounds left="87" top="100" right="107" bottom="139" />
+		</element>
+		<element name="digit21" ref="digit8_">
+			<bounds left="111" top="100" right="131" bottom="139" />
+		</element>
+		<element name="digit20" ref="digit8_">
+			<bounds left="135" top="100" right="155" bottom="139" />
+		</element>
+		<element name="digit35" ref="digit8_">
+			<bounds left="170" top="100" right="190" bottom="139" />
+		</element>
+		<element name="digit34" ref="digit8_">
+			<bounds left="194" top="100" right="214" bottom="139" />
+		</element>
+		<element name="digit33" ref="digit8_">
+			<bounds left="218" top="100" right="238" bottom="139" />
+		</element>
+		<element name="digit32" ref="digit8_">
+			<bounds left="247" top="100" right="267" bottom="139" />
+		</element>
+		<element name="digit31" ref="digit8_">
+			<bounds left="271" top="100" right="291" bottom="139" />
+		</element>
+		<element name="digit30" ref="digit8_">
+			<bounds left="295" top="100" right="315" bottom="139" />
+		</element>
+
+		<!-- 4 digit display -->
+		<element name="digit45" ref="digit7_">
+			<bounds left="121" top="155" right="136" bottom="189" />
+		</element>
+		<element name="digit44" ref="digit7_">
+			<bounds left="140" top="155" right="155" bottom="189" />
+		</element>
+		<element name="digit41" ref="digit7_">
+			<bounds left="170" top="155" right="185" bottom="189" />
+		</element>
+		<element name="digit40" ref="digit7_">
+			<bounds left="189" top="155" right="204" bottom="189" />
+		</element>
+	</view>
+</mamelayout>

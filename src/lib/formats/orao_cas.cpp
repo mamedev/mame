@@ -5,9 +5,8 @@
     Tape support for Orao  TAP format
 
 */
-#include "orao_cas.h"
 
-#include <cassert>
+#include "orao_cas.h"
 
 
 #define ORAO_WAV_FREQUENCY  44100

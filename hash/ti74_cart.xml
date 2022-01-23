@@ -2,13 +2,16 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+-->
 
-    Not dumped yet:
-    - Chemical Engineering
-    - Statistics
+<!--
 
-    Not included in list:
-    - 8KB RAM, battery backed
+Not dumped yet:
+- Chemical Engineering
+- Statistics
+
+Not yet emulated:
+- 8KB RAM, battery backed
 
 -->
 

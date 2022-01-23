@@ -9,10 +9,10 @@
 **********************************************************************/
 
 #include "thom_cas.h"
-#include "pool.h"
 
-#include <cassert>
 #include <cmath>
+#include <cstdio>
+#include <cstring>
 
 
 /***************************** configuration **************************/

@@ -16,7 +16,6 @@ void sm530_device::do_branch(u8 pu, u8 pl)
 }
 
 
-
 // instruction set
 
 // RAM address instructions

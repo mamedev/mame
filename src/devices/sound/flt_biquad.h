@@ -44,10 +44,17 @@ public:
 	void modify(biquad_type type, double fc, double q, double gain);
 	void modify(biquad_params p);
 
-	// helper setup functions to create common filters representable by biquad filters
+	// helper setup functions to create common filters representable by biquad filters:
+
 	// Sallen-Key low-pass
 	filter_biquad_device& opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2);
+	void opamp_sk_lowpass_modify(double r1, double r2, double r3, double r4, double c1, double c2);
+	biquad_params opamp_sk_lowpass_calc(double r1, double r2, double r3, double r4, double c1, double c2);
+
 	// TODO when needed: Sallen-Key band-pass
+
+	// TODO when needed: Sallen-Key band-reject
+
 	// TODO when needed: Sallen-Key high-pass
 
 	// Multiple-Feedback low-pass
@@ -60,6 +67,11 @@ public:
 
 	// Multiple-Feedback high-pass
 	filter_biquad_device& opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3);
+
+	// Differentiator band-pass
+	filter_biquad_device& opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2);
+	void opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2);
+	biquad_params opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2);
 
 
 protected:

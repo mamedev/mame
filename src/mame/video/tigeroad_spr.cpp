@@ -102,7 +102,7 @@ void tigeroad_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 		tile_number,
 		color,
 		flipx, flipy,
-		sx, sy, 15);
+		sx+128, sy+6, 15);
 
 		source -= 4;
 	}

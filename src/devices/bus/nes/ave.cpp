@@ -48,8 +48,8 @@ nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char
 {
 }
 
-nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_MAXI15, tag, owner, clock), m_reg(0), m_bank(0)
+nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_MAXI15, tag, owner, clock)
 {
 }
 
@@ -80,25 +80,20 @@ void nes_nina006_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-
 void nes_maxi15_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_bank));
 	save_item(NAME(m_reg));
 }
 
 void nes_maxi15_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
+	chr8(0, CHRROM);
 	set_nt_mirroring(PPU_MIRROR_VERT);
 
-	m_reg = 0;
-	m_bank = 0;
+	m_reg[0] = m_reg[1] = 0;
 }
-
 
 
 
@@ -118,7 +113,7 @@ void nes_maxi15_device::pcb_reset()
  then readable back in WRAM (WRAM is tested by
  Impossible Mission II at start)
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -151,7 +146,7 @@ void nes_nina001_device::write_m(offs_t offset, uint8_t data)
 
  iNES: mapper 79
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -174,41 +169,30 @@ void nes_nina006_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 234
 
- In MESS: Partially Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_maxi15_device::update_banks()
-{
-	if (m_bank & 0x40)
-	{
-		prg32((m_bank & 0x0e) | (m_reg & 1));
-		chr8(((m_bank & 0x0e) << 2) | ((m_reg >> 4) & 7), m_chr_source);
-	}
-	else
-	{
-		prg32(m_bank & 0x0f);
-		chr8(((m_bank & 0x0f) << 2) | ((m_reg >> 4) & 3), m_chr_source);
-	}
-}
-
-uint8_t nes_maxi15_device::read_h(offs_t offset)
+u8 nes_maxi15_device::read_h(offs_t offset)
 {
 	LOG_MMC(("Maxi 15 read_h, offset: %04x\n", offset));
 
-	if (offset >= 0x7f80 && offset < 0x7fa0)
+	u8 temp = hi_access_rom(offset);
+
+	if ((offset >= 0x7f80 && offset < 0x7fa0) || (offset >= 0x7fe8 && offset < 0x7ff8))
 	{
-		m_bank = hi_access_rom(offset);
-		set_nt_mirroring(BIT(m_bank, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-		update_banks();
-		return m_bank;
-	}
-	if (offset >= 0x7fe8 && offset < 0x7ff8)
-	{
-		m_reg = hi_access_rom(offset);
-		update_banks();
-		return m_reg;
+		int reg = BIT(offset, 6);
+		if (reg || !(m_reg[0] & 0x3f))    // inner banks always modifiable, outer banks locked once set
+		{
+			m_reg[reg] = temp;
+
+			u8 mode = !BIT(m_reg[0], 6);
+			u8 outer = m_reg[0] & (0x0e | mode);
+			prg32(outer | (m_reg[1] & !mode));
+			chr8(outer << 2 | ((m_reg[1] >> 4) & (7 >> mode)), CHRROM);
+			set_nt_mirroring(BIT(m_reg[0], 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		}
 	}
 
-	return hi_access_rom(offset);
+	return temp;
 }

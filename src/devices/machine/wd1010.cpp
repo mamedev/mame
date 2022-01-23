@@ -112,6 +112,7 @@ void wd1010_device::device_start()
 	save_item(NAME(m_cylinder));
 	save_item(NAME(m_sdh));
 	save_item(NAME(m_status));
+	save_item(NAME(m_head));
 }
 
 //-------------------------------------------------
@@ -330,6 +331,14 @@ void wd1010_device::drdy_w(int state)
 void wd1010_device::brdy_w(int state)
 {
 	m_brdy = state;
+}
+
+void wd1010_device::sc_w(int state)
+{
+	if (state)
+		m_status |= STATUS_SC;
+	else
+		m_status &= ~STATUS_SC;
 }
 
 int wd1010_device::sc_r()

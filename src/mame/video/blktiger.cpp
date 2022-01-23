@@ -86,6 +86,13 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
+	m_tx_tilemap->set_scrolldx(128, 128);
+	m_tx_tilemap->set_scrolldy(  6,   6);
+	m_bg_tilemap8x4->set_scrolldx(128, 128);
+	m_bg_tilemap8x4->set_scrolldy(  6,   6);
+	m_bg_tilemap4x8->set_scrolldx(128, 128);
+	m_bg_tilemap4x8->set_scrolldy(  6,   6);
+
 	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
@@ -207,7 +214,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				code,
 				color,
 				flipx,flip_screen(),
-				sx,sy,15);
+				sx+128,sy+6,15);
 	}
 }
 
