@@ -41,6 +41,7 @@ mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, d
 	cdrom_image_device(mconfig, ISA16_MCD, tag, owner, clock),
 	device_isa16_card_interface( mconfig, *this )
 {
+	set_interface("cdrom");
 }
 
 //-------------------------------------------------
