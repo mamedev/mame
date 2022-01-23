@@ -62,6 +62,7 @@ DEFINE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device, "wmscvsd", "
 DEFINE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device, "wmsnarc", "Williams NARC Sound Board")
 DEFINE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device, "wmsadpcm", "Williams ADPCM Sound Board")
 DEFINE_DEVICE_TYPE(WILLIAMS_S4_SOUND, williams_s4_sound_device, "wmss4", "Williams System 4 Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_S6_SOUND, williams_s6_sound_device, "wmss6", "Williams System 6 Sound Board")
 
 
 
@@ -953,6 +954,126 @@ INPUT_CHANGED_MEMBER( williams_s4_sound_device::audio_nmi )
 ioport_constructor williams_s4_sound_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( williams_s4 );
+}
+
+
+//**************************************************************************
+//  S6 SOUND BOARD (s4 with speech, used in system 6/6a/7 pinballs)
+//**************************************************************************
+
+//-------------------------------------------------
+//  williams_s6_sound_device - constructor
+//-------------------------------------------------
+
+williams_s6_sound_device::williams_s6_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, WILLIAMS_S6_SOUND, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+	, m_hc(*this, "hc")
+{
+}
+
+//-------------------------------------------------
+//  write - handle an external write
+//-------------------------------------------------
+
+void williams_s6_sound_device::write(u8 data)
+{
+	// Handle dips
+	data ^= (ioport("S6")->read() & 0x60);
+	if ((data & 0x1f) != 0x1f)
+	{
+		m_pia->portb_w(data);
+		m_pia->cb1_w(0);
+	}
+	m_pia->cb1_w(1);
+}
+
+//-------------------------------------------------
+//  audio CPU map
+//-------------------------------------------------
+
+void williams_s6_sound_device::williams_s6_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).ram();
+	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3000, 0x7fff).rom().region("audiocpu", 0);
+}
+
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void williams_s6_sound_device::device_add_mconfig(machine_config &config)
+{
+	M6802(config, m_cpu, 3580000);
+	m_cpu->set_addrmap(AS_PROGRAM, &williams_s6_sound_device::williams_s6_map);
+
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+
+	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
+
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia->ca2_handler().set(m_hc, FUNC(hc55516_device::digit_w));
+	m_pia->cb2_handler().set(m_hc, FUNC(hc55516_device::clock_w));
+	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
+	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
+
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_cpu, M6802_IRQ_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void williams_s6_sound_device::device_start()
+{
+	// register for save states
+	save_item(NAME(m_dummy));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void williams_s6_sound_device::device_reset()
+{
+	// reset interrupt states
+	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+}
+
+INPUT_PORTS_START( williams_s6 )
+	PORT_START("S6")
+	PORT_DIPNAME( 0x20, 0x20, "Speech" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x20, "On" )
+	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
+	PORT_DIPSETTING(    0x00, "Set 1" )
+	PORT_DIPSETTING(    0x40, "Set 2" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s6_sound_device, audio_nmi, 1)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( williams_s6_sound_device::audio_nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if (newval==CLEAR_LINE)
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to
+//  the device's I/O ports
+//-------------------------------------------------
+
+ioport_constructor williams_s6_sound_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( williams_s6 );
 }
 
 

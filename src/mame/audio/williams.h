@@ -25,6 +25,7 @@ DECLARE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device)
 DECLARE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device)
 DECLARE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device)
 DECLARE_DEVICE_TYPE(WILLIAMS_S4_SOUND, williams_s4_sound_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_S6_SOUND, williams_s6_sound_device)
 
 
 
@@ -219,5 +220,35 @@ private:
 	void williams_s4_map(address_map &map);
 	required_device<m6808_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
+	u8 m_dummy = 0;   // needed for save-state support
+};
+
+
+// ======================> williams_s6_sound_device
+
+class williams_s6_sound_device : public device_t, public device_mixer_interface
+{
+public:
+	// construction/destruction
+	williams_s6_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// read/write
+	void write(u8 data);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+protected:
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// devices
+	void williams_s6_map(address_map &map);
+	required_device<m6802_cpu_device> m_cpu;
+	required_device<pia6821_device> m_pia;
+	required_device<hc55516_device> m_hc;
 	u8 m_dummy = 0;   // needed for save-state support
 };
