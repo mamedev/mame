@@ -2874,7 +2874,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ibmcom1">
 		<description>Asynchronous Communications Support (Version 1.00)</description>
 		<year>1981</year>
@@ -3135,7 +3135,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="diag100">
 		<description>Diagnostics (Version 1.00)</description>
 		<year>1981</year>
@@ -3160,7 +3160,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="easywr1">
 		<description>EasyWriter (Version 1.00)</description>
 		<year>1981</year>
@@ -3312,7 +3312,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="masm1">
 		<description>Macro Assembler (Version 1.00)</description>
 		<year>1981</year>
@@ -3487,7 +3487,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pascom1">
 		<description>Pascal Compiler (Version 1.00)</description>
 		<year>1981</year>
@@ -3996,7 +3996,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="typtut">
 		<description>Typing Tutor (Version 1.00)</description>
 		<year>1981</year>
@@ -4048,13 +4048,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vc156y0" supported="no">
 		<description>VisiCalc (VC-156Y0-IBM)</description>
 		<year>1981</year>
 		<publisher>Personal Software</publisher>
 		<!-- Origin: WinWorld, SCP image converted to MFM using HxC 2.5.6.6 -->
-		<!-- Doesn't work, gives either fake "Bad command or file name" error (failed copy protection check) 
+		<!-- Doesn't work, gives either fake "Bad command or file name" error (failed copy protection check)
 		     or "Disk read error" -->
 		<!-- Tested working on 86Box v3.0 -->
 		<part name="flop1" interface="floppy_5_25">

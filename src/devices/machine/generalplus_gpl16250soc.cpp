@@ -137,7 +137,7 @@ void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map
 	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpspi_direct_device::spi_direct_7af0_r), FUNC(generalplus_gpspi_direct_device::spi_direct_7af0_w));
 
 	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
-//	map(0x007b46, 0x007b46).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b46_r));
+//  map(0x007b46, 0x007b46).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b46_r));
 	map(0x007b40, 0x007b40).nopw();
 	map(0x007b41, 0x007b41).nopw();
 	map(0x007b42, 0x007b42).nopw();

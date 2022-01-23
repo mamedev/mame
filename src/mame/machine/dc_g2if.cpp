@@ -10,10 +10,10 @@
     - Time Out mechanism thru DS# & TR# signals;
     - External pin enable in trigger select;
     - Create a pure abstract interface shared with PVR-DMA I/F
-	  (one channel, different max size, simpler tsel, no suspend,
-	   different security code & area protection);
-	- DMA starts should send DDT requests and being notified back to use this i/f implementation
-	  anyway. Exact purpose is unknown, maybe it's for granting use of the bus?
+      (one channel, different max size, simpler tsel, no suspend,
+       different security code & area protection);
+    - DMA starts should send DDT requests and being notified back to use this i/f implementation
+      anyway. Exact purpose is unknown, maybe it's for granting use of the bus?
 
 **************************************************************************************************/
 

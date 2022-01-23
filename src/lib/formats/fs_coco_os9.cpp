@@ -2,14 +2,14 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_coco_os9.cpp
+    fs_coco_os9.cpp
 
-	Management of CoCo OS-9 floppy images
+    Management of CoCo OS-9 floppy images
 
-	OS-9 Level 2 Technical Reference, Chapter 5, Random Block File Manager,
-	page 2
+    OS-9 Level 2 Technical Reference, Chapter 5, Random Block File Manager,
+    page 2
 
-	http://www.colorcomputerarchive.com/coco/Documents/Manuals/Operating Systems/OS-9 Level 2 Manual (Tandy).pdf
+    http://www.colorcomputerarchive.com/coco/Documents/Manuals/Operating Systems/OS-9 Level 2 Manual (Tandy).pdf
 
 ***************************************************************************/
 
@@ -27,7 +27,7 @@ const coco_os9_image COCO_OS9;
 //**************************************************************************
 
 //-------------------------------------------------
-//	name
+//  name
 //-------------------------------------------------
 
 const char *coco_os9_image::name() const
@@ -37,7 +37,7 @@ const char *coco_os9_image::name() const
 
 
 //-------------------------------------------------
-//	description
+//  description
 //-------------------------------------------------
 
 const char *coco_os9_image::description() const
@@ -47,7 +47,7 @@ const char *coco_os9_image::description() const
 
 
 //-------------------------------------------------
-//	enumerate_f
+//  enumerate_f
 //-------------------------------------------------
 
 void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
@@ -61,7 +61,7 @@ void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const s
 
 
 //-------------------------------------------------
-//	can_format
+//  can_format
 //-------------------------------------------------
 
 bool coco_os9_image::can_format() const
@@ -71,7 +71,7 @@ bool coco_os9_image::can_format() const
 
 
 //-------------------------------------------------
-//	can_read
+//  can_read
 //-------------------------------------------------
 
 bool coco_os9_image::can_read() const
@@ -81,7 +81,7 @@ bool coco_os9_image::can_read() const
 
 
 //-------------------------------------------------
-//	can_write
+//  can_write
 //-------------------------------------------------
 
 bool coco_os9_image::can_write() const
@@ -91,7 +91,7 @@ bool coco_os9_image::can_write() const
 
 
 //-------------------------------------------------
-//	has_rsrc
+//  has_rsrc
 //-------------------------------------------------
 
 bool coco_os9_image::has_rsrc() const
@@ -101,7 +101,7 @@ bool coco_os9_image::has_rsrc() const
 
 
 //-------------------------------------------------
-//	directory_separator
+//  directory_separator
 //-------------------------------------------------
 
 char coco_os9_image::directory_separator() const
@@ -111,7 +111,7 @@ char coco_os9_image::directory_separator() const
 
 
 //-------------------------------------------------
-//	volume_meta_description
+//  volume_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> coco_os9_image::volume_meta_description() const
@@ -123,7 +123,7 @@ std::vector<meta_description> coco_os9_image::volume_meta_description() const
 
 
 //-------------------------------------------------
-//	file_meta_description
+//  file_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> coco_os9_image::file_meta_description() const
@@ -133,7 +133,7 @@ std::vector<meta_description> coco_os9_image::file_meta_description() const
 
 
 //-------------------------------------------------
-//	directory_meta_description
+//  directory_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> coco_os9_image::directory_meta_description() const
@@ -143,7 +143,7 @@ std::vector<meta_description> coco_os9_image::directory_meta_description() const
 
 
 //-------------------------------------------------
-//	entity_meta_description
+//  entity_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> coco_os9_image::entity_meta_description() const
@@ -159,7 +159,7 @@ std::vector<meta_description> coco_os9_image::entity_meta_description() const
 
 
 //-------------------------------------------------
-//	mount
+//  mount
 //-------------------------------------------------
 
 std::unique_ptr<filesystem_t> coco_os9_image::mount(fsblk_t &blockdev) const
@@ -178,7 +178,7 @@ std::unique_ptr<filesystem_t> coco_os9_image::mount(fsblk_t &blockdev) const
 
 
 //-------------------------------------------------
-//	pick_os9_string
+//  pick_os9_string
 //-------------------------------------------------
 
 std::string coco_os9_image::pick_os9_string(std::string_view raw_string)
@@ -201,7 +201,7 @@ std::string coco_os9_image::pick_os9_string(std::string_view raw_string)
 
 
 //-------------------------------------------------
-//	pick_integer_be
+//  pick_integer_be
 //-------------------------------------------------
 
 u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
@@ -214,7 +214,7 @@ u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
 
 
 //-------------------------------------------------
-//	validate_filename
+//  validate_filename
 //-------------------------------------------------
 
 bool coco_os9_image::validate_filename(std::string_view name)
@@ -226,8 +226,8 @@ bool coco_os9_image::validate_filename(std::string_view name)
 
 
 //-------------------------------------------------
-//	is_ignored_filename - should this file name be
-//	ignored if it is in the file system?
+//  is_ignored_filename - should this file name be
+//  ignored if it is in the file system?
 //-------------------------------------------------
 
 bool coco_os9_image::is_ignored_filename(std::string_view name)
@@ -240,7 +240,7 @@ bool coco_os9_image::is_ignored_filename(std::string_view name)
 
 
 //-------------------------------------------------
-//	volume_header ctor
+//  volume_header ctor
 //-------------------------------------------------
 
 coco_os9_image::volume_header::volume_header(fsblk_t::block_t &&block)
@@ -250,7 +250,7 @@ coco_os9_image::volume_header::volume_header(fsblk_t::block_t &&block)
 
 
 //-------------------------------------------------
-//	volume_header::name
+//  volume_header::name
 //-------------------------------------------------
 
 std::string coco_os9_image::volume_header::name() const
@@ -261,7 +261,7 @@ std::string coco_os9_image::volume_header::name() const
 
 
 //-------------------------------------------------
-//	file_header ctor
+//  file_header ctor
 //-------------------------------------------------
 
 coco_os9_image::file_header::file_header(fsblk_t::block_t &&block)
@@ -271,48 +271,48 @@ coco_os9_image::file_header::file_header(fsblk_t::block_t &&block)
 
 
 //-------------------------------------------------
-//	file_header::creation_date
+//  file_header::creation_date
 //-------------------------------------------------
 
 util::arbitrary_datetime coco_os9_image::file_header::creation_date() const
 {
 	util::arbitrary_datetime dt;
 	memset(&dt, 0, sizeof(dt));
-	dt.year			= 1900 + m_block.r8(13);
-	dt.month		= m_block.r8(14);
-	dt.day_of_month	= m_block.r8(15);
+	dt.year         = 1900 + m_block.r8(13);
+	dt.month        = m_block.r8(14);
+	dt.day_of_month = m_block.r8(15);
 	return dt;
 }
 
 
 //-------------------------------------------------
-//	file_header::metadata
+//  file_header::metadata
 //-------------------------------------------------
 
 meta_data coco_os9_image::file_header::metadata() const
 {
 	// format the attributes
 	std::string attributes = util::string_format("%c%c%c%c%c%c%c%c",
-		is_directory()		? 'd' : '-',
-		is_non_sharable()	? 's' : '-',
-		is_public_execute()	? 'x' : '-',
-		is_public_write()	? 'w' : '-',
-		is_public_read()	? 'r' : '-',
-		is_user_execute()	? 'x' : '-',
-		is_user_write()		? 'w' : '-',
-		is_user_read()		? 'r' : '-');
+		is_directory()      ? 'd' : '-',
+		is_non_sharable()   ? 's' : '-',
+		is_public_execute() ? 'x' : '-',
+		is_public_write()   ? 'w' : '-',
+		is_public_read()    ? 'r' : '-',
+		is_user_execute()   ? 'x' : '-',
+		is_user_write()     ? 'w' : '-',
+		is_user_read()      ? 'r' : '-');
 
 	meta_data result;
-	result.set(meta_name::creation_date,	creation_date());
-	result.set(meta_name::owner_id,			owner_id());
-	result.set(meta_name::attributes,		std::move(attributes));
-	result.set(meta_name::length,			file_size());
+	result.set(meta_name::creation_date,    creation_date());
+	result.set(meta_name::owner_id,         owner_id());
+	result.set(meta_name::attributes,       std::move(attributes));
+	result.set(meta_name::length,           file_size());
 	return result;
 }
 
 
 //-------------------------------------------------
-//	file_header::get_sector_map_entry_count
+//  file_header::get_sector_map_entry_count
 //-------------------------------------------------
 
 int coco_os9_image::file_header::get_sector_map_entry_count() const
@@ -322,18 +322,18 @@ int coco_os9_image::file_header::get_sector_map_entry_count() const
 
 
 //-------------------------------------------------
-//	file_header::get_sector_map_entry
+//  file_header::get_sector_map_entry
 //-------------------------------------------------
 
 void coco_os9_image::file_header::get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const
 {
-	start_lsn	= m_block.r24b(16 + (entry_number * 5) + 0);
-	count		= m_block.r16b(16 + (entry_number * 5) + 3);
+	start_lsn   = m_block.r24b(16 + (entry_number * 5) + 0);
+	count       = m_block.r16b(16 + (entry_number * 5) + 3);
 }
 
 
 //-------------------------------------------------
-//	impl ctor
+//  impl ctor
 //-------------------------------------------------
 
 coco_os9_image::impl::impl(fsblk_t &blockdev, volume_header &&header)
@@ -344,7 +344,7 @@ coco_os9_image::impl::impl(fsblk_t &blockdev, volume_header &&header)
 
 
 //-------------------------------------------------
-//	impl::metadata
+//  impl::metadata
 //-------------------------------------------------
 
 meta_data coco_os9_image::impl::metadata()
@@ -356,7 +356,7 @@ meta_data coco_os9_image::impl::metadata()
 
 
 //-------------------------------------------------
-//	impl::root
+//  impl::root
 //-------------------------------------------------
 
 filesystem_t::dir_t coco_os9_image::impl::root()
@@ -368,7 +368,7 @@ filesystem_t::dir_t coco_os9_image::impl::root()
 
 
 //-------------------------------------------------
-//	impl::drop_root_ref
+//  impl::drop_root_ref
 //-------------------------------------------------
 
 void coco_os9_image::impl::drop_root_ref()
@@ -378,7 +378,7 @@ void coco_os9_image::impl::drop_root_ref()
 
 
 //-------------------------------------------------
-//	impl::open_directory
+//  impl::open_directory
 //-------------------------------------------------
 
 coco_os9_image::impl::directory *coco_os9_image::impl::open_directory(u32 lsn)
@@ -389,7 +389,7 @@ coco_os9_image::impl::directory *coco_os9_image::impl::open_directory(u32 lsn)
 
 
 //-------------------------------------------------
-//	impl::read_file_data
+//  impl::read_file_data
 //-------------------------------------------------
 
 std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) const
@@ -416,7 +416,7 @@ std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) 
 
 
 //-------------------------------------------------
-//	file ctor
+//  file ctor
 //-------------------------------------------------
 
 coco_os9_image::impl::file::file(impl &i, file_header &&file_header)
@@ -427,7 +427,7 @@ coco_os9_image::impl::file::file(impl &i, file_header &&file_header)
 
 
 //-------------------------------------------------
-//	file::drop_weak_references
+//  file::drop_weak_references
 //-------------------------------------------------
 
 void coco_os9_image::impl::file::drop_weak_references()
@@ -436,7 +436,7 @@ void coco_os9_image::impl::file::drop_weak_references()
 
 
 //-------------------------------------------------
-//	file::metadata
+//  file::metadata
 //-------------------------------------------------
 
 meta_data coco_os9_image::impl::file::metadata()
@@ -446,7 +446,7 @@ meta_data coco_os9_image::impl::file::metadata()
 
 
 //-------------------------------------------------
-//	file::read_all
+//  file::read_all
 //-------------------------------------------------
 
 std::vector<u8> coco_os9_image::impl::file::read_all()
@@ -456,7 +456,7 @@ std::vector<u8> coco_os9_image::impl::file::read_all()
 
 
 //-------------------------------------------------
-//	directory ctor
+//  directory ctor
 //-------------------------------------------------
 
 coco_os9_image::impl::directory::directory(impl &i, file_header &&file_header)
@@ -467,7 +467,7 @@ coco_os9_image::impl::directory::directory(impl &i, file_header &&file_header)
 
 
 //-------------------------------------------------
-//	directory::drop_weak_references
+//  directory::drop_weak_references
 //-------------------------------------------------
 
 void coco_os9_image::impl::directory::drop_weak_references()
@@ -476,7 +476,7 @@ void coco_os9_image::impl::directory::drop_weak_references()
 
 
 //-------------------------------------------------
-//	directory::metadata
+//  directory::metadata
 //-------------------------------------------------
 
 meta_data coco_os9_image::impl::directory::metadata()
@@ -486,7 +486,7 @@ meta_data coco_os9_image::impl::directory::metadata()
 
 
 //-------------------------------------------------
-//	directory::contents
+//  directory::contents
 //-------------------------------------------------
 
 std::vector<dir_entry> coco_os9_image::impl::directory::contents()
@@ -520,7 +520,7 @@ std::vector<dir_entry> coco_os9_image::impl::directory::contents()
 
 
 //-------------------------------------------------
-//	directory::file_get
+//  directory::file_get
 //-------------------------------------------------
 
 filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
@@ -531,7 +531,7 @@ filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
 
 
 //-------------------------------------------------
-//	directory::dir_get
+//  directory::dir_get
 //-------------------------------------------------
 
 filesystem_t::dir_t coco_os9_image::impl::directory::dir_get(u64 key)

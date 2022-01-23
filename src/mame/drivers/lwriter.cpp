@@ -386,10 +386,10 @@ void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 TIMER_CALLBACK_MEMBER(lwriter_state::pb6_tick)
 {
-    m_pb6_tick_count += 1;
-    m_via->write_pb6(0);
-    m_via->write_pb6(1);
-    m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
+	m_pb6_tick_count += 1;
+	m_via->write_pb6(0);
+	m_via->write_pb6(1);
+	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */

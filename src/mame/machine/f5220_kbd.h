@@ -48,7 +48,7 @@ private:
 
 	uint8_t translate(uint8_t row, uint8_t column);
 	void send_key(uint8_t code);
-	
+
 	emu_timer *m_reset_timer;
 
 	uint8_t m_data;

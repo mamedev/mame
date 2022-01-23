@@ -225,10 +225,10 @@ void nes_cony_device::write_h(offs_t offset, u8 data)
 			set_prg();
 			switch (data & 0x03)
 			{
-				case 0:	set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 1:	set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 2:	set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 3:	set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x0200:

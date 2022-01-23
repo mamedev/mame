@@ -91,7 +91,7 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 Notes on floppy drive:
 
     Diskette Unit 6360 models -010, -011 have Type 1D (SS/SD) drives;
-	models -020, -021 -- Type 2D (DS/DD).  Each drive has "file control card".
+    models -020, -021 -- Type 2D (DS/DD).  Each drive has "file control card".
 
 
     Useful parts of PSM Feb83 (pdf page numbers):

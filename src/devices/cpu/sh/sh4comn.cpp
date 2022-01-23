@@ -732,15 +732,15 @@ void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_
 		break;
 
 	/*
-		LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+	    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
 
-		L = LRUI = Least recently used ITLB
-		B = URB = UTLB replace boundary
-		C = URC = UTLB replace counter
-		Q = SQMD = Store Queue Mode Bit
-		V = SV = Single Virtual Mode Bit
-		T = TI = TLB invalidate
-		A = AT = Address translation bit (enable)
+	    L = LRUI = Least recently used ITLB
+	    B = URB = UTLB replace boundary
+	    C = URC = UTLB replace counter
+	    Q = SQMD = Store Queue Mode Bit
+	    V = SV = Single Virtual Mode Bit
+	    T = TI = TLB invalidate
+	    A = AT = Address translation bit (enable)
 	*/
 	case MMUCR: // MMU Control
 		m_m[MMUCR] &= 0xffffffff;

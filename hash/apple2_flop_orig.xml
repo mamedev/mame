@@ -18574,10 +18574,10 @@ license:CC0
 		<info name="release" value="2022-01-19"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-        <!-- Please refer to the following websites for more details on the
+		<!-- Please refer to the following websites for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/20220121195058/https://twitter.com/KaySavetz/status/1482204397903904768
-        https://archive.org/details/atari-youth-advisory-board-tracey-cullinan
+		https://archive.org/details/atari-youth-advisory-board-tracey-cullinan
 		-->
 		<!--"Glutton" is a 1983 action game developed by Tracey Cullinan and intended to be distributed by Superior Software. (It was never commercially released.) It runs on any Apple II with 48K.-->
 
