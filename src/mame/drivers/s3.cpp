@@ -621,7 +621,7 @@ void s3a_state::s3a(machine_config &config)
 
 	m_pia22->writepa_handler().set(FUNC(s3a_state::s3a_sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s3a_state::s3a_sol1_w));
-	
+
 	// Add the soundcard
 	SPEAKER(config, "mono").front_center();
 	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
