@@ -15,6 +15,7 @@ license:CC0
 		<description>American Heritage - Illustrated Encyclopedic Dictionary</description>
 		<year>1992</year>
 		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6100"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="American Heritage - Illustrated Encyclopedic Dictionary (USA)" sha1="aa708c6fc807a4cf9f5b255674ddcd421ba82a51"/>
@@ -49,6 +50,7 @@ license:CC0
 		<description>Americans in Space</description>
 		<year>1992</year>
 		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6203 / CDRM1047200"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Americans in Space (USA)" sha1="31a960a4d6f0f5a37fe5f16a54e1ca91c92f6b34"/>
@@ -65,6 +67,7 @@ license:CC0
 		<description>American Vista</description>
 		<year>1992</year>
 		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6105"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="American Vista (USA)" sha1="572b8ade674a6599a34007a80a0f360c9abaef0b"/>
@@ -81,6 +84,7 @@ license:CC0
 		<description>Multimedia Animals Encyclopedia</description>
 		<year>1993</year>
 		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6186"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Multimedia Animals Encyclopedia (USA)" sha1="5bc378803dfa6546b5519ce8239c4bc0f189395f"/>
@@ -97,6 +101,7 @@ license:CC0
 		<description>Astrology Source</description>
 		<year>1992</year>
 		<publisher>Multicom</publisher>
+		<info name="serial" value="25-6141 / CDRM1047090"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Astrology Source (USA)" sha1="9d31f8eb99078393f5c660a9a704d756eab622ff"/>
@@ -113,6 +118,7 @@ license:CC0
 		<description>Atlas of U.S. Presidents</description>
 		<year>1992</year>
 		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6106"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Atlas of U.S. Presidents (USA)" sha1="a4798f33305d53384ab62cf63da5ea3501901430"/>
@@ -129,6 +135,7 @@ license:CC0
 		<description>Bible Lands, Bible Stories</description>
 		<year>1992</year>
 		<publisher>Context Systems</publisher>
+		<info name="serial" value="25-6157"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Bible Lands, Bible Stories (USA)" sha1="d8f7b27a73aa5813517c570e28bbb53282db6f1d"/>
@@ -146,6 +153,7 @@ license:CC0
 		<description>Sail with Columbus</description>
 		<year>1992</year>
 		<publisher>Parallax Publishing</publisher>
+		<info name="serial" value="25-6181"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Sail with Columbus (USA)" sha1="4dd3f5b59ece8073cccff0e1d5066941125b7200"/>
@@ -162,6 +170,7 @@ license:CC0
 		<description>Compton's MultiMedia Encyclopedia VIS Edition</description>
 		<year>1992</year>
 		<publisher>Compton's NewMedia</publisher>
+		<info name="serial" value="CDRM1030360"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Compton's MultiMedia Encyclopedia VIS Edition (USA)" sha1="0b0b98498c77949700763709b8f4e092f814d645"/>
@@ -178,6 +187,7 @@ license:CC0
 		<description>December 24th</description>
 		<year>1992</year>
 		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6182"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="December 24th (USA)" sha1="cd94ab849aa9d185df052a7219f3450b0a35b474"/>
@@ -194,6 +204,7 @@ license:CC0
 		<description>Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6138 / CDRM1046160"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es)" sha1="781bde92ff6df9e0051ae8c42bdf553cb2361ceb"/>
@@ -210,6 +221,7 @@ license:CC0
 		<description>Discis Books Multimedia - The Necklace - Guy de Maupassant</description>
 		<year>1993</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6139 / CDRM1046150"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es)" sha1="a387503f794270552bad6adf0124c21b68877141"/>
@@ -226,6 +238,7 @@ license:CC0
 		<description>Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6137 / CDRM1045010"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es)" sha1="4700e7c8f45ed4414a3483187d663315b8adf79f"/>
@@ -242,6 +255,7 @@ license:CC0
 		<description>Fitness Partner</description>
 		<year>1993</year>
 		<publisher>Computer Directions</publisher>
+		<info name="serial" value="25-6150"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Fitness Partner (USA)" sha1="39453577fd164118a637753aa4eecebf477f744d"/>
@@ -261,6 +275,7 @@ license:CC0
 		<description>Mercer Mayer's Just Grandma and Me</description>
 		<year>1992</year>
 		<publisher>Broderbund Software</publisher>
+		<info name="serial" value="25-6158 / CDAC 030800"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es)" sha1="a6357a6e3d3973eb2a394284b67f24285a2eca5e"/>
@@ -277,6 +292,7 @@ license:CC0
 		<description>Great Lives Series - Interactive Biographies of American Heroes Vol. 1</description>
 		<year>1992</year>
 		<publisher>The JLR Group</publisher>
+		<info name="serial" value="25-6148 / CDRM GL001"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Great Lives Series - Interactive Biographies of American Heroes Vol. 1 (USA)" sha1="71d59116e03b3b844b08edcc3dc7b815ae932208"/>
@@ -293,6 +309,7 @@ license:CC0
 		<description>Better Homes and Gardens - Healthy Cooking</description>
 		<year>1992</year>
 		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6142 / CDRM1033540"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Better Homes and Gardens - Healthy Cooking (USA)" sha1="f276ebdeb929d42b0d0e21f45499d676a6611903"/>
@@ -309,6 +326,7 @@ license:CC0
 		<description>Henry and Mudge - The First Book</description>
 		<year>1992</year>
 		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6174"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Henry and Mudge - The First Book (USA)" sha1="ceac6bee16c9f3cdb7f5f56d28724a2912f1c759"/>
@@ -325,6 +343,7 @@ license:CC0
 		<description>Henry and Mudge in the Sparkle Days</description>
 		<year>1992</year>
 		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6175"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Henry and Mudge in the Sparkle Days (USA)" sha1="6cc1b5da528c4d0d3ba862a9865e1a911c27f2e4"/>
@@ -341,6 +360,7 @@ license:CC0
 		<description>The Secrets of Hosea Freeman</description>
 		<year>1992</year>
 		<publisher>Top Ten Software</publisher>
+		<info name="serial" value="25-6144 / CDRM1045620"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Secrets of Hosea Freeman, The (USA)" sha1="45576e1186fe0f9ef7f06b29e40decfaa9bd2736"/>
@@ -357,6 +377,7 @@ license:CC0
 		<description>Jesse Bear, What Will You Wear</description>
 		<year>1992</year>
 		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6200"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Jesse Bear, What Will You Wear (USA)" sha1="419a54d761f4e0b6b37b2292140d8e290ac733a9"/>
@@ -373,6 +394,7 @@ license:CC0
 		<description>Better Not Get Wet, Jesse Bear</description>
 		<year>1992</year>
 		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6201"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Better Not Get Wet, Jesse Bear (USA)" sha1="ff0d36c1b272ca289fa88dfbaf6b26149046d7d8"/>
@@ -389,6 +411,7 @@ license:CC0
 		<description>Kid-Fun</description>
 		<year>1992</year>
 		<publisher>Mindplay</publisher>
+		<info name="serial" value="25-6164 / 960035-CD"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kid-Fun (USA)" sha1="f73ce8fb7be6b9302fb6260590a0259bdb719304"/>
@@ -405,6 +428,7 @@ license:CC0
 		<description>Kids Can Read! Aesop's Fables</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6136 / CDRM1024490"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Aesop's Fables (USA) (En,Es)" sha1="854414cc423f23216662277352659ab3b4325ea9"/>
@@ -421,6 +445,7 @@ license:CC0
 		<description>Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6126 / CDRM1024470"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es)" sha1="84e56efabed860a77303685a3670979cdb3e4fd9"/>
@@ -437,6 +462,7 @@ license:CC0
 		<description>Kids Can Read! Cinderella - The Original Fairy Tale</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6131 / CDRM1024480"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Cinderella - The Original Fairy Tale (USA) (En,Es)" sha1="d74cd19296d8007ce93f97a66d4775ddbb449db0"/>
@@ -453,6 +479,7 @@ license:CC0
 		<description>Kids Can Read! Heather Hits Her First Home Run by Ted Planos</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6133 / CDRM1024500"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Heather Hits Her First Home Run by Ted Planos (USA) (En,Es)" sha1="ef3d050d90686f4f21d3a74acf506094557146a5"/>
@@ -469,6 +496,7 @@ license:CC0
 		<description>Kids Can Read! The Night Before Christmas - Clement C. Moore LLD</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6135 / CDRM1024580"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es)" sha1="8d04cf6d3847b5c82d1b3271e3f0f3bf2cf06c51"/>
@@ -485,6 +513,7 @@ license:CC0
 		<description>Kids Can Read! The Paper Bag Princess - Robert N. Munsch</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6127 / CDRM1024530"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Paper Bag Princess - Robert N. Munsch (USA) (En,Es)" sha1="896ef1fba1de510f6024ad5ae22b601d30bf1bd4"/>
@@ -501,6 +530,7 @@ license:CC0
 		<description>Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6125 / CDRM1024540"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es)" sha1="66c896197ad8082b05d9196483b09673ffbead9b"/>
@@ -517,6 +547,7 @@ license:CC0
 		<description>Kids Can Read! Mud Puddle - Robert N. Munsch</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6128 / CDRM1024510"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Mud Puddle - Robert N. Munsch (USA) (En,Es)" sha1="87d8bdde798bb347edf92b1be9bafc8739089c09"/>
@@ -533,6 +564,7 @@ license:CC0
 		<description>Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6132 / CDRM1024550"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es)" sha1="3e5bd6a383e3f37e0cb7614604482e4b5c32c19f"/>
@@ -549,6 +581,7 @@ license:CC0
 		<description>Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6130 / CDRM1024560"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es)" sha1="8ea2018f9a0ed288e91eca9f9981dd1a16850ede"/>
@@ -565,6 +598,7 @@ license:CC0
 		<description>Kids Can Read! Thomas' Snowsuit - R. Munsch</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6129 / CDRM1024570"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Thomas' Snowsuit - R. Munsch (USA) (En,Es)" sha1="94f3187f2ce8164d958f66a3453b90e66cac3849"/>
@@ -581,6 +615,7 @@ license:CC0
 		<description>Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6134 / CDRM1024520"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es)" sha1="31bd18f53549f3fb2ddb2b453a6ab6f57020767d"/>
@@ -610,6 +645,7 @@ license:CC0
 		<description>Learn to Play Guitar Volume 1</description>
 		<year>1993</year>
 		<publisher>Parallax Publishing</publisher>
+		<info name="serial" value="25-6177"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Learn to Play Guitar Volume 1 (USA)" sha1="99af8977c036979df3062c17f8f0f97025130d00"/>
@@ -626,6 +662,7 @@ license:CC0
 		<description>Links - The Challenge of Golf</description>
 		<year>1992</year>
 		<publisher>Access Software</publisher>
+		<info name="serial" value="25-6114"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Links - The Challenge of Golf (USA)" sha1="4db0f7818f6099b95712f9c28df2f505643a536b"/>
@@ -669,6 +706,7 @@ license:CC0
 		<description>The Manhole - New and Enhanced!</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
+		<info name="serial" value="25-6155"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Manhole, The - New and Enhanced (USA)" sha1="8815e1a7fec5fffc4a5a3e2f4f109bee8430bca1"/>
@@ -685,6 +723,7 @@ license:CC0
 		<description>The Meeting of Minds Series - Interactive Games of History, Art, Music, and Ideas</description>
 		<year>1992</year>
 		<publisher>The JLR Group</publisher>
+		<info name="serial" value="25-6147 / CDRM MOM001"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Meeting of Minds Series, The - Interactive Games of History, Art, Music, and Ideas (USA)" sha1="1fb95b15acf87cd65d30ef2c75e78bc712977815"/>
@@ -701,6 +740,7 @@ license:CC0
 		<description>Mosaic Magic</description>
 		<year>1993</year>
 		<publisher>KinderMagic Software</publisher>
+		<info name="serial" value="25-6123"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Mosaic Magic (USA)" sha1="6ec11cb7b8129d3e27a0a600e7b2f45b45ec82ac"/>
@@ -717,6 +757,7 @@ license:CC0
 		<description>Mutanoid Math Challenge</description>
 		<year>1992</year>
 		<publisher>Legacy Software</publisher>
+		<info name="serial" value="25-6169"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Mutanoid Math Challenge (USA)" sha1="c47fbffa32507739ca5950f538bfc1110843defd"/>
@@ -747,6 +788,7 @@ license:CC0
 		<description>Mutanoid Word Challenge</description>
 		<year>1992</year>
 		<publisher>Legacy Software</publisher>
+		<info name="serial" value="25-6170"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Mutanoid Word Challenge (USA)" sha1="ec98b10465cd111dc5094b84cd36df708ebf18cd"/>
@@ -763,6 +805,7 @@ license:CC0
 		<description>My Paint</description>
 		<year>1992</year>
 		<publisher>Saddleback Graphics</publisher>
+		<info name="serial" value="25-6122"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="My Paint (USA)" sha1="f56bb111099c751b1fc4c3cdfce0fb5a6a91d327"/>
@@ -779,6 +822,7 @@ license:CC0
 		<description>The New Basics Electronic Cookbook</description>
 		<year>1992</year>
 		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6101"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="New Basics Electronic Cookbook, The (USA)" sha1="5c67f9ad9cfc3738806bdbb2b27244b8325284d3"/>
@@ -795,6 +839,7 @@ license:CC0
 		<description>Our House featuring The Family Circus</description>
 		<year>1992</year>
 		<publisher>Context Systems</publisher>
+		<info name="serial" value="25-6146"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Our House featuring The Family Circus (USA)" sha1="a4d4041fa48d119f9c45d345c41c335fa8d2c09b"/>
@@ -813,6 +858,7 @@ license:CC0
 		<description>Peter and the Wolf - A Multimedia Storybook</description>
 		<year>1992</year>
 		<publisher>Ebook</publisher>
+		<info name="serial" value="25-6154 / PTW-92V"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Peter and the Wolf - A Multimedia Storybook (USA)" sha1="87ec23b384562439b956a6a9f7e45a77d6d0ca37"/>
@@ -829,6 +875,7 @@ license:CC0
 		<description>Playing with Language - Games in English</description>
 		<year>1992</year>
 		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6120 / IG 4"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Playing with Language - Games in English (USA)" sha1="9d3450559b98a286217b568f3e3e85cdf1af98ff"/>
@@ -845,6 +892,7 @@ license:CC0
 		<description>Playing with Language - Games in French</description>
 		<year>1992</year>
 		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6119 / IG 3"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Playing with Language - Games in French (USA)" sha1="bd71c3f6a76544bcbfbf9b61ea739077607053c9"/>
@@ -861,6 +909,7 @@ license:CC0
 		<description>Playing with Language - Games in German</description>
 		<year>1992</year>
 		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6118 / IG 1"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Playing with Language - Games in German (USA)" sha1="e758892f26d64da02fcea4a3405794c1f23cf2b0"/>
@@ -877,6 +926,7 @@ license:CC0
 		<description>Playing with Language - Games in Japanese</description>
 		<year>1992</year>
 		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6185 / IG 5"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Playing with Language - Games in Japanese (USA)" sha1="6c33072af27ac5c0e97204ffc34152367c24b7cd"/>
@@ -893,6 +943,7 @@ license:CC0
 		<description>Playing with Language - Games in Spanish</description>
 		<year>1992</year>
 		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6117 / IG 2"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Playing with Language - Games in Spanish (USA)" sha1="ecd4298d5812e1318a4fffafc979fe0aae319180"/>
@@ -909,6 +960,7 @@ license:CC0
 		<description>Race the Clock</description>
 		<year>1992</year>
 		<publisher>Mindplay</publisher>
+		<info name="serial" value="25-6163 / 040035-CD"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Race the Clock (USA) (En,Es)" sha1="8a6fb5991c64fbba64545a3e40fbafbff4ce7d48"/>
@@ -926,6 +978,7 @@ license:CC0
 		<description>Rick Ribbit - Adventures in Early Learning</description>
 		<year>1992</year>
 		<publisher>Tadpole Productions</publisher>
+		<info name="serial" value="25-6172 / TPRR1D"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Rick Ribbit - Adventures in Early Learning (USA)" sha1="60c9ec812d937ce20b5cd9501b679aca6c61390c"/>
@@ -942,6 +995,7 @@ license:CC0
 		<description>Rodney's Funscreen</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
+		<info name="serial" value="25-6152"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Rodney's Funscreen (USA)" sha1="29ca62059dd3d347641387a5cda08c6f2de0ed4b"/>
@@ -959,6 +1013,7 @@ license:CC0
 		<description>Title Sampler</description>
 		<year>1992</year>
 		<publisher>Tandy</publisher>
+		<info name="serial" value="CDRM1030350"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Title Sampler (USA)" sha1="0a7fea2619c8a1952be305f2a1f088280a32b3ea"/>
@@ -975,6 +1030,7 @@ license:CC0
 		<description>Search for the Sea</description>
 		<year>1992</year>
 		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6143 / CDRM1038600"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Search for the Sea (USA)" sha1="1a2de1f5983c61da78ea0e6e52b46edaa9e44a5e"/>
@@ -991,6 +1047,7 @@ license:CC0
 		<description>Sherlock Holmes - Consulting Detective Volume I</description>
 		<year>1992</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="25-6183 / CDRM1038390"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Sherlock Holmes - Consulting Detective Volume I (USA)" sha1="babc7f220fcf40f937a8f8462773849d032c158f"/>
@@ -1007,6 +1064,7 @@ license:CC0
 		<description>Sherlock Holmes - Consulting Detective Volume II</description>
 		<year>1992</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="25-6184 / CDRM1038400"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Sherlock Holmes - Consulting Detective Volume II (USA)" sha1="8b3483a71d3ea20bfe010be786a3e45c27f65d39"/>
@@ -1023,6 +1081,7 @@ license:CC0
 		<description>SmartKids Challenge One</description>
 		<year>1992</year>
 		<publisher>Arkeo Software</publisher>
+		<info name="serial" value="25-6176"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="SmartKids Challenge One (USA)" sha1="2eb59e6e8425d1d7ce9646bf067e75f5c529b3d8"/>
@@ -1040,6 +1099,7 @@ license:CC0
 		<description>A Survey of Western Art - The Electronic Library of Art</description>
 		<year>1993</year>
 		<publisher>Ebook</publisher>
+		<info name="serial" value="25-6153 / ELASWI-92V"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Survey of Western Art, A - The Electronic Library of Art (USA)" sha1="45c747e2416624d170472e06f97b3717101ac380"/>
@@ -1057,6 +1117,7 @@ license:CC0
 		<description>Talking Stepping Stones - Bonus Pack</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="25-6113 / 600146-D100"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Talking Stepping Stones - Bonus Pack (USA)" sha1="4516b74244f0ddd398d2d64553656c1716901b4f"/>
@@ -1074,6 +1135,7 @@ license:CC0
 		<description>Time Magazine Compact Almanac 1992</description>
 		<year>1993</year>
 		<publisher>Compact Publishing</publisher>
+		<info name="serial" value="25-6204"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Time Magazine Compact Almanac 1992 (USA)" sha1="ce176f9f433724d2cbbbb6dd93e5759f9dd90b6b"/>
@@ -1090,6 +1152,7 @@ license:CC0
 		<description>Time Table of History - Arts and Entertainment - 1993 Edition</description>
 		<year>1993</year>
 		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6102"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Time Table of History - Arts and Entertainment - 1993 Edition (USA)" sha1="4fa1e6138661a40b7837a94c7590cce3fc3ee0b6"/>
@@ -1106,6 +1169,7 @@ license:CC0
 		<description>Time Table of History - Business, Politics &amp; Media - 1993 Edition</description>
 		<year>1993</year>
 		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6103"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Time Table of History - Business, Politics &amp; Media - 1993 Edition (USA)" sha1="26294c12e1fbaf0b3ea87b9823829e68b073caad"/>
@@ -1122,6 +1186,7 @@ license:CC0
 		<description>Time Table of History - Science and Innovation - 1993 Edition</description>
 		<year>1993</year>
 		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6104"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Time Table of History - Science and Innovation - 1993 Edition (USA)" sha1="26c661c0ac8e848155b032968c82fee2af37bcb3"/>
@@ -1138,6 +1203,7 @@ license:CC0
 		<description>The Adventures of Victor Vector &amp; Yondo - Adventure No. 1 - The Vampire's Coffin</description>
 		<year>1992</year>
 		<publisher>Sanctuary Woods</publisher>
+		<info name="serial" value="25-6115 / VVY1-VIS1"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Adventures of Victor Vector &amp; Yondo, The - Adventure No. 1 - The Vampire's Coffin (USA)" sha1="a8a78996139dc133bfb9c1c43ff1d0ebc7d29bb4"/>
@@ -1154,6 +1220,7 @@ license:CC0
 		<description>Vision - Multimedia Bible for the Entire Family</description>
 		<year>1992</year>
 		<publisher>Candlelight Publishing</publisher>
+		<info name="serial" value="25-6162"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Vision - Multimedia Bible for the Entire Family (USA)" sha1="649ce7ea268c086478a2eb7bf0c689a22a27e5fe"/>
@@ -1170,6 +1237,7 @@ license:CC0
 		<description>Wild Animals!</description>
 		<year>1993</year>
 		<publisher>Optic Moon</publisher>
+		<info name="serial" value="25-6159"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Wild Animals (USA)" sha1="8cac5012e7b602a254def914b9abbc2cb2cd2dcf"/>
@@ -1186,6 +1254,7 @@ license:CC0
 		<description>World Vista</description>
 		<year>1992</year>
 		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6107"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="World Vista (USA)" sha1="b430a43910375c8305067eefd146961c89511431"/>
