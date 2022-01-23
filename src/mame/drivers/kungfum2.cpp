@@ -342,4 +342,4 @@ ROM_START( kungfum2 )
 	ROM_LOAD( "km-b.6f", 0x0000, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )
 ROM_END
 
-GAME( 1987, kungfum2,  0,        kungfum2, kungfum2,  kungfum2_state, empty_init, ROT0,   "Irem", "Beyond Kung-Fu (prototype)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, kungfum2,  0,        kungfum2, kungfum2,  kungfum2_state, empty_init, ROT0,   "Irem", "Beyond Kung-Fu (location test)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
