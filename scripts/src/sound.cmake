@@ -1562,3 +1562,15 @@ if("UDA1344" IN_LIST SOUNDS)
 		${MAME_DIR}/src/devices/sound/uda1344.h
 	)
 endif()
+
+###################################################
+##
+##@src/devices/sound/lynx.h,list(APPEND SOUNDS LYNX)
+###################################################
+
+if("LYNX" IN_LIST SOUNDS)
+	list(APPEND SOUND_SRCS
+		${MAME_DIR}/src/devices/sound/lynx.cpp
+		${MAME_DIR}/src/devices/sound/lynx.h
+	)
+endif()

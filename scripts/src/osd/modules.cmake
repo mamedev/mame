@@ -248,6 +248,10 @@ macro(osdmodulesbuild _project)
 
 	target_include_directories(${_project} PRIVATE ${EXT_INCLUDEDIR_ASIO})
 
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		target_compile_options(${_project} PRIVATE -Wno-unused-private-field)
+	endif()
+
 	if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 		target_include_directories(${_project} PRIVATE
 			${MAME_DIR}/3rdparty/compat/mingw

@@ -954,21 +954,6 @@ endif()
 
 ##################################################
 ##
-##@src/devices/video/stvvdp1.h,list(APPEND VIDEOS STVVDP)
-##@src/devices/video/stvvdp2.h,list(APPEND VIDEOS STVVDP)
-##################################################
-
-if("STVVDP" IN_LIST VIDEOS)
-	list(APPEND VIDEO_SRCS
-		${MAME_DIR}/src/devices/video/stvvdp1.cpp
-		${MAME_DIR}/src/devices/video/stvvdp1.h
-		${MAME_DIR}/src/devices/video/stvvdp2.cpp
-		${MAME_DIR}/src/devices/video/stvvdp2.h
-	)
-endif()
-
-##################################################
-##
 ##@src/devices/video/t6963c.h,list(APPEND VIDEOS T6963C)
 ##################################################
 

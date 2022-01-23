@@ -36,6 +36,8 @@ set(MACHINE_SRCS
 
 	${MAME_DIR}/src/devices/imagedev/bitbngr.cpp
 	${MAME_DIR}/src/devices/imagedev/bitbngr.h
+	${MAME_DIR}/src/devices/imagedev/cartrom.cpp
+	${MAME_DIR}/src/devices/imagedev/cartrom.h
 	${MAME_DIR}/src/devices/imagedev/cassette.cpp
 	${MAME_DIR}/src/devices/imagedev/cassette.h
 	${MAME_DIR}/src/devices/imagedev/chd_cd.cpp
@@ -48,6 +50,10 @@ set(MACHINE_SRCS
 	${MAME_DIR}/src/devices/imagedev/floppy.h
 	${MAME_DIR}/src/devices/imagedev/harddriv.cpp
 	${MAME_DIR}/src/devices/imagedev/harddriv.h
+	${MAME_DIR}/src/devices/imagedev/magtape.cpp
+	${MAME_DIR}/src/devices/imagedev/magtape.h
+	${MAME_DIR}/src/devices/imagedev/memcard.cpp
+	${MAME_DIR}/src/devices/imagedev/memcard.h
 	${MAME_DIR}/src/devices/imagedev/mfmhd.cpp
 	${MAME_DIR}/src/devices/imagedev/mfmhd.h
 	${MAME_DIR}/src/devices/imagedev/microdrv.cpp
@@ -56,6 +62,8 @@ set(MACHINE_SRCS
 	${MAME_DIR}/src/devices/imagedev/midiin.h
 	${MAME_DIR}/src/devices/imagedev/midiout.cpp
 	${MAME_DIR}/src/devices/imagedev/midiout.h
+	${MAME_DIR}/src/devices/imagedev/papertape.cpp
+	${MAME_DIR}/src/devices/imagedev/papertape.h
 	${MAME_DIR}/src/devices/imagedev/picture.cpp
 	${MAME_DIR}/src/devices/imagedev/picture.h
 	${MAME_DIR}/src/devices/imagedev/printer.cpp
@@ -71,6 +79,18 @@ set(MACHINE_SRCS
 
 ##################################################
 ##
+##@src/devices/machine/acorn_bmu.h,list(APPEND MACHINES ACORN_BMU)
+##################################################
+
+if("ACORN_BMU" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/acorn_bmu.cpp
+		${MAME_DIR}/src/devices/machine/acorn_bmu.h
+	)
+endif()
+
+##################################################
+##
 ##@src/devices/machine/acorn_ioc.h,list(APPEND MACHINES ACORN_IOC)
 ##################################################
 
@@ -78,6 +98,18 @@ if("ACORN_IOC" IN_LIST MACHINES)
 	list(APPEND MACHINE_SRCS
 		${MAME_DIR}/src/devices/machine/acorn_ioc.cpp
 		${MAME_DIR}/src/devices/machine/acorn_ioc.h
+	)
+endif()
+
+##################################################
+##
+##@src/devices/machine/acorn_lc.h,list(APPEND MACHINES ACORN_LC)
+##################################################
+
+if("ACORN_LC" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/acorn_lc.cpp
+		${MAME_DIR}/src/devices/machine/acorn_lc.h
 	)
 endif()
 
@@ -1104,6 +1136,16 @@ if("CXD1095" IN_LIST MACHINES)
 	)
 endif()
 
+##@src/devices/machine/dl11.h,list(APPEND MACHINES DL11)
+###################################################
+
+if("DL11" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/dl11.cpp
+		${MAME_DIR}/src/devices/machine/dl11.h
+	)
+endif()
+
 ##@src/devices/machine/ds1204.h,list(APPEND MACHINES DS1204)
 ###################################################
 
@@ -1389,7 +1431,9 @@ endif()
 
 ###################################################
 ##
-##@src/devices/machine/gt913.h,list(APPEND MACHINES GT913)
+##@src/devices/machine/gt913_io.h,list(APPEND MACHINES GT913)
+##@src/devices/machine/gt913_kbd.h,list(APPEND MACHINES GT913)
+##@src/devices/machine/gt913_snd.h,list(APPEND MACHINES GT913)
 ###################################################
 
 if("GT913" IN_LIST MACHINES)
@@ -3445,6 +3489,30 @@ endif()
 
 ###################################################
 ##
+##@src/devices/machine/upc82c710.h,list(APPEND MACHINES UPC82C710)
+###################################################
+
+if("UPC82C710" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/upc82c710.cpp
+		${MAME_DIR}/src/devices/machine/upc82c710.h
+	)
+endif()
+
+###################################################
+##
+##@src/devices/machine/upc82c711.h,list(APPEND MACHINES UPC82C711)
+###################################################
+
+if("UPC82C711" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/upc82c711.cpp
+		${MAME_DIR}/src/devices/machine/upc82c711.h
+	)
+endif()
+
+###################################################
+##
 ##@src/devices/machine/upd1990a.h,list(APPEND MACHINES UPD1990A)
 ###################################################
 
@@ -4808,5 +4876,38 @@ if("NS32082" IN_LIST MACHINES)
 	list(APPEND MACHINE_SRCS
 		${MAME_DIR}/src/devices/machine/ns32082.cpp
 		${MAME_DIR}/src/devices/machine/ns32082.h
+	)
+endif()
+
+###################################################
+##
+##@src/devices/machine/tsconfdma.h,list(APPEND MACHINES TSCONF_DMA)
+###################################################
+if("TSCONF_DMA" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/tsconfdma.cpp
+		${MAME_DIR}/src/devices/machine/tsconfdma.h
+	)
+endif()
+
+###################################################
+##
+##@src/devices/machine/glukrs.h,list(APPEND MACHINES GLUKRS)
+###################################################
+if("GLUKRS" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/glukrs.cpp
+		${MAME_DIR}/src/devices/machine/glukrs.h
+	)
+endif()
+
+###################################################
+##
+##@src/devices/machine/bitmap_printer.h,list(APPEND MACHINES BITMAP_PRINTER)
+###################################################
+if("BITMAP_PRINTER" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/bitmap_printer.cpp
+		${MAME_DIR}/src/devices/machine/bitmap_printer.h
 	)
 endif()

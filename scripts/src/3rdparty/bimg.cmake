@@ -9,6 +9,9 @@ add_library(bimg STATIC EXCLUDE_FROM_ALL)
 
 target_link_libraries(bimg PUBLIC bx)
 
+if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+	target_compile_options(bimg PRIVATE -Wno-unused-but-set-variable)
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	target_compile_options(bimg PRIVATE -Wno-unused-const-variable)
 endif()

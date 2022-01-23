@@ -2451,20 +2451,23 @@ endif()
 if("SM510" IN_LIST CPUS)
 	list(APPEND CPU_SRCS
 		${MAME_DIR}/src/devices/cpu/sm510/sm510base.cpp
+		${MAME_DIR}/src/devices/cpu/sm510/sm510base.h
 		${MAME_DIR}/src/devices/cpu/sm510/sm510.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm510.cpp
 		${MAME_DIR}/src/devices/cpu/sm510/sm510op.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm510core.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm511core.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm530.h
-		${MAME_DIR}/src/devices/cpu/sm510/sm530op.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm530core.cpp
+		${MAME_DIR}/src/devices/cpu/sm510/sm511.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm511.cpp
 		${MAME_DIR}/src/devices/cpu/sm510/sm500.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm500.cpp
 		${MAME_DIR}/src/devices/cpu/sm510/sm500op.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm500core.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm5acore.cpp
+		${MAME_DIR}/src/devices/cpu/sm510/sm5a.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm5a.cpp
+		${MAME_DIR}/src/devices/cpu/sm510/sm530.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm530.cpp
+		${MAME_DIR}/src/devices/cpu/sm510/sm530op.cpp
 		${MAME_DIR}/src/devices/cpu/sm510/sm590.h
+		${MAME_DIR}/src/devices/cpu/sm510/sm590.cpp
 		${MAME_DIR}/src/devices/cpu/sm510/sm590op.cpp
-		${MAME_DIR}/src/devices/cpu/sm510/sm590core.cpp
 	)
 endif()
 
@@ -3630,6 +3633,7 @@ endif()
 ##@src/devices/cpu/upd78k/upd78k0.h,list(APPEND CPUS UPD78K)
 ##@src/devices/cpu/upd78k/upd78k2.h,list(APPEND CPUS UPD78K)
 ##@src/devices/cpu/upd78k/upd78k3.h,list(APPEND CPUS UPD78K)
+##@src/devices/cpu/upd78k/upd78k4.h,list(APPEND CPUS UPD78K)
 ##################################################
 
 if("UPD78K" IN_LIST CPUS)
@@ -3640,6 +3644,8 @@ if("UPD78K" IN_LIST CPUS)
 		${MAME_DIR}/src/devices/cpu/upd78k/upd78k2.h
 		${MAME_DIR}/src/devices/cpu/upd78k/upd78k3.cpp
 		${MAME_DIR}/src/devices/cpu/upd78k/upd78k3.h
+		${MAME_DIR}/src/devices/cpu/upd78k/upd78k4.cpp
+		${MAME_DIR}/src/devices/cpu/upd78k/upd78k4.h
 	)
 endif()
 
@@ -3654,6 +3660,8 @@ if(("UPD78K" IN_LIST CPUS) OR TOOLS)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/upd78k/upd78k2d.h)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/upd78k/upd78k3d.cpp)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/upd78k/upd78k3d.h)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/upd78k/upd78k4d.cpp)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/upd78k/upd78k4d.h)
 endif()
 
 ##################################################
@@ -3749,9 +3757,16 @@ if(("MK1" IN_LIST CPUS) OR TOOLS)
 endif()
 
 ##################################################
-## Motorola M68HC16 (CPU16) - Disassembler only
-##@src/devices/cpu/m68hc16/m68hc16.h,list(APPEND CPUS M68HC16)
+## Motorola M68HC16 (CPU16)
+##@src/devices/cpu/m68hc16/cpu16.h,list(APPEND CPUS M68HC16)
 ##################################################
+
+if("M68HC16" IN_LIST CPUS)
+	list(APPEND CPU_SRCS
+		${MAME_DIR}/src/devices/cpu/m68hc16/cpu16.cpp
+		${MAME_DIR}/src/devices/cpu/m68hc16/cpu16.h
+	)
+endif()
 
 if(("M68HC16" IN_LIST CPUS) OR TOOLS)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/m68hc16/cpu16dasm.cpp)

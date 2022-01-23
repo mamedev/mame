@@ -151,6 +151,7 @@ list(APPEND CPUS KS0164)
 #list(APPEND CPUS COPS1)
 list(APPEND CPUS MEG)
 list(APPEND CPUS F2MC16)
+list(APPEND CPUS M68HC16)
 
 ##################################################
 ## specify available sound cores
@@ -297,6 +298,7 @@ list(APPEND SOUNDS TT5665)
 #list(APPEND SOUNDS UDA1344)
 list(APPEND SOUNDS SWP30)
 list(APPEND SOUNDS XT446)
+#list(APPEND SOUNDS LYNX)
 
 ##################################################
 ## specify available video cores
@@ -376,7 +378,6 @@ list(APPEND VIDEOS PWM_DISPLAY)
 #list(APPEND VIDEOS SED1500)
 #list(APPEND VIDEOS SED1520)
 list(APPEND VIDEOS SNES_PPU)
-list(APPEND VIDEOS STVVDP)
 #list(APPEND VIDEOS T6963C)
 #list(APPEND VIDEOS T6A04)
 list(APPEND VIDEOS TLC34076)
@@ -409,6 +410,7 @@ list(APPEND MACHINES ALPHA_8921)
 #list(APPEND MACHINES AM2901B)
 list(APPEND MACHINES ARM_IOMD)
 list(APPEND MACHINES AUTOCONFIG)
+list(APPEND MACHINES BITMAP_PRINTER)
 list(APPEND MACHINES BUSMOUSE)
 list(APPEND MACHINES CR511B)
 list(APPEND MACHINES DMAC)
@@ -1161,8 +1163,6 @@ createMAMEProjects(_target, _subtarget, "atari"
 	${MAME_DIR}/src/mame/machine/nl_tank.cpp
 	${MAME_DIR}/src/mame/machine/nl_tank.h
 	${MAME_DIR}/src/mame/drivers/atetris.cpp
-	${MAME_DIR}/src/mame/includes/atetris.h
-	${MAME_DIR}/src/mame/video/atetris.cpp
 	${MAME_DIR}/src/mame/drivers/avalnche.cpp
 	${MAME_DIR}/src/mame/includes/avalnche.h
 	${MAME_DIR}/src/mame/audio/avalnche.cpp
@@ -1246,6 +1246,7 @@ createMAMEProjects(_target, _subtarget, "atari"
 	${MAME_DIR}/src/mame/drivers/gauntlet.cpp
 	${MAME_DIR}/src/mame/includes/gauntlet.h
 	${MAME_DIR}/src/mame/video/gauntlet.cpp
+	${MAME_DIR}/src/mame/drivers/gumrally.cpp
 	${MAME_DIR}/src/mame/drivers/harddriv.cpp
 	${MAME_DIR}/src/mame/includes/harddriv.h
 	${MAME_DIR}/src/mame/machine/harddriv.cpp
@@ -1336,8 +1337,6 @@ createMAMEProjects(_target, _subtarget, "atari"
 	${MAME_DIR}/src/mame/audio/sprint2.cpp
 	${MAME_DIR}/src/mame/video/sprint2.cpp
 	${MAME_DIR}/src/mame/drivers/sprint4.cpp
-	${MAME_DIR}/src/mame/includes/sprint4.h
-	${MAME_DIR}/src/mame/video/sprint4.cpp
 	${MAME_DIR}/src/mame/audio/sprint4.cpp
 	${MAME_DIR}/src/mame/audio/sprint4.h
 	${MAME_DIR}/src/mame/drivers/sprint8.cpp
@@ -1424,11 +1423,9 @@ createMAMEProjects(_target, _subtarget, "atari"
 )
 
 createMAMEProjects(_target, _subtarget, "atlus"
-	${MAME_DIR}/src/mame/drivers/ohmygod.cpp
-	${MAME_DIR}/src/mame/includes/ohmygod.h
-	${MAME_DIR}/src/mame/video/ohmygod.cpp
-	${MAME_DIR}/src/mame/drivers/patapata.cpp
 	${MAME_DIR}/src/mame/drivers/bowltry.cpp
+	${MAME_DIR}/src/mame/drivers/ohmygod.cpp
+	${MAME_DIR}/src/mame/drivers/patapata.cpp
 )
 
 createMAMEProjects(_target, _subtarget, "barcrest"
@@ -1665,14 +1662,11 @@ createMAMEProjects(_target, _subtarget, "cvs"
 
 createMAMEProjects(_target, _subtarget, "dataeast"
 	${MAME_DIR}/src/mame/drivers/actfancr.cpp
-	${MAME_DIR}/src/mame/includes/actfancr.h
-	${MAME_DIR}/src/mame/video/actfancr.cpp
 	${MAME_DIR}/src/mame/drivers/astrof.cpp
 	${MAME_DIR}/src/mame/includes/astrof.h
 	${MAME_DIR}/src/mame/audio/astrof.cpp
 	${MAME_DIR}/src/mame/drivers/backfire.cpp
 	${MAME_DIR}/src/mame/drivers/battlera.cpp
-	${MAME_DIR}/src/mame/includes/battlera.h
 	${MAME_DIR}/src/mame/drivers/boogwing.cpp
 	${MAME_DIR}/src/mame/includes/boogwing.h
 	${MAME_DIR}/src/mame/video/boogwing.cpp
@@ -2001,7 +1995,7 @@ createMAMEProjects(_target, _subtarget, "gaelco"
 	${MAME_DIR}/src/mame/includes/gaelco.h
 	${MAME_DIR}/src/mame/video/gaelco.cpp
 	${MAME_DIR}/src/mame/machine/gaelcrpt.cpp
-	${MAME_DIR}/src/mame/includes/gaelcrpt.h
+	${MAME_DIR}/src/mame/machine/gaelcrpt.h
 	${MAME_DIR}/src/mame/drivers/gaelco2.cpp
 	${MAME_DIR}/src/mame/includes/gaelco2.h
 	${MAME_DIR}/src/mame/machine/gaelco2.cpp
@@ -2174,6 +2168,7 @@ createMAMEProjects(_target, _subtarget, "irem"
 	${MAME_DIR}/src/mame/drivers/m62.cpp
 	${MAME_DIR}/src/mame/includes/m62.h
 	${MAME_DIR}/src/mame/video/m62.cpp
+	${MAME_DIR}/src/mame/drivers/kungfum2.cpp
 	${MAME_DIR}/src/mame/drivers/spartanxtec.cpp
 	${MAME_DIR}/src/mame/drivers/m63.cpp
 	${MAME_DIR}/src/mame/drivers/m72.cpp
@@ -2539,8 +2534,6 @@ createMAMEProjects(_target, _subtarget, "konami"
 	${MAME_DIR}/src/mame/drivers/nwk-tr.cpp
 	${MAME_DIR}/src/mame/drivers/otomedius.cpp
 	${MAME_DIR}/src/mame/drivers/overdriv.cpp
-	${MAME_DIR}/src/mame/includes/overdriv.h
-	${MAME_DIR}/src/mame/video/overdriv.cpp
 	${MAME_DIR}/src/mame/drivers/pandoras.cpp
 	${MAME_DIR}/src/mame/includes/pandoras.h
 	${MAME_DIR}/src/mame/video/pandoras.cpp
@@ -2979,6 +2972,7 @@ createMAMEProjects(_target, _subtarget, "namco"
 	${MAME_DIR}/src/mame/drivers/rallyx.cpp
 	${MAME_DIR}/src/mame/includes/rallyx.h
 	${MAME_DIR}/src/mame/video/rallyx.cpp
+	${MAME_DIR}/src/mame/drivers/rbowlorama.cpp
 	${MAME_DIR}/src/mame/drivers/shootaway2.cpp
 	${MAME_DIR}/src/mame/drivers/skykid.cpp
 	${MAME_DIR}/src/mame/includes/skykid.h
@@ -3200,8 +3194,6 @@ createMAMEProjects(_target, _subtarget, "nmk"
 	${MAME_DIR}/src/mame/drivers/ddealer.cpp
 	${MAME_DIR}/src/mame/drivers/jalmah.cpp
 	${MAME_DIR}/src/mame/drivers/macrossp.cpp
-	${MAME_DIR}/src/mame/includes/macrossp.h
-	${MAME_DIR}/src/mame/video/macrossp.cpp
 	${MAME_DIR}/src/mame/drivers/nmk16.cpp
 	${MAME_DIR}/src/mame/includes/nmk16.h
 	${MAME_DIR}/src/mame/machine/nmk004.cpp
@@ -3436,8 +3428,10 @@ createMAMEProjects(_target, _subtarget, "sega"
 	${MAME_DIR}/src/mame/machine/model3.cpp
 	${MAME_DIR}/src/mame/drivers/monacogp.cpp
 	${MAME_DIR}/src/mame/drivers/naomi.cpp
-	${MAME_DIR}/src/mame/includes/naomi.h
+	${MAME_DIR}/src/mame/drivers/dc_atomiswave.cpp
 	${MAME_DIR}/src/mame/includes/dc.h
+	${MAME_DIR}/src/mame/includes/naomi.h
+	${MAME_DIR}/src/mame/includes/dc_atomiswave.h
 	${MAME_DIR}/src/mame/drivers/segasp.cpp
 	${MAME_DIR}/src/mame/includes/segasp.h
 	${MAME_DIR}/src/mame/machine/dc.cpp
@@ -3446,9 +3440,10 @@ createMAMEProjects(_target, _subtarget, "sega"
 	${MAME_DIR}/src/mame/video/powervr2.h
 	${MAME_DIR}/src/mame/machine/gunsense.cpp
 	${MAME_DIR}/src/mame/machine/gunsense.h
-	${MAME_DIR}/src/mame/machine/naomi.cpp
 	${MAME_DIR}/src/mame/machine/naomig1.cpp
 	${MAME_DIR}/src/mame/machine/naomig1.h
+	${MAME_DIR}/src/mame/machine/dc_g2if.cpp
+	${MAME_DIR}/src/mame/machine/dc_g2if.h
 	${MAME_DIR}/src/mame/machine/naomibd.cpp
 	${MAME_DIR}/src/mame/machine/naomibd.h
 	${MAME_DIR}/src/mame/machine/naomirom.cpp
@@ -3557,6 +3552,7 @@ createMAMEProjects(_target, _subtarget, "sega"
 	${MAME_DIR}/src/mame/includes/saturn.h
 	${MAME_DIR}/src/mame/drivers/saturn.cpp
 	${MAME_DIR}/src/mame/machine/saturn.cpp
+	${MAME_DIR}/src/mame/video/saturn.cpp
 	${MAME_DIR}/src/mame/machine/saturn_cdb.cpp
 	${MAME_DIR}/src/mame/machine/saturn_cdb.h
 	${MAME_DIR}/src/mame/includes/stv.h
@@ -4030,8 +4026,6 @@ createMAMEProjects(_target, _subtarget, "taito"
 	${MAME_DIR}/src/mame/includes/rbisland.h
 	${MAME_DIR}/src/mame/video/rbisland.cpp
 	${MAME_DIR}/src/mame/drivers/rastan.cpp
-	${MAME_DIR}/src/mame/includes/rastan.h
-	${MAME_DIR}/src/mame/video/rastan.cpp
 	${MAME_DIR}/src/mame/drivers/retofinv.cpp
 	${MAME_DIR}/src/mame/includes/retofinv.h
 	${MAME_DIR}/src/mame/video/retofinv.cpp
@@ -4074,15 +4068,12 @@ createMAMEProjects(_target, _subtarget, "taito"
 	${MAME_DIR}/src/mame/includes/taito_l.h
 	${MAME_DIR}/src/mame/video/taito_l.cpp
 	${MAME_DIR}/src/mame/drivers/taito_x.cpp
-	${MAME_DIR}/src/mame/includes/taito_x.h
 	${MAME_DIR}/src/mame/machine/taitocchip.cpp
 	${MAME_DIR}/src/mame/machine/taitocchip.h
 	${MAME_DIR}/src/mame/drivers/taito_z.cpp
 	${MAME_DIR}/src/mame/includes/taito_z.h
 	${MAME_DIR}/src/mame/video/taito_z.cpp
 	${MAME_DIR}/src/mame/drivers/taito_o.cpp
-	${MAME_DIR}/src/mame/includes/taito_o.h
-	${MAME_DIR}/src/mame/video/taito_o.cpp
 	${MAME_DIR}/src/mame/drivers/taitoair.cpp
 	${MAME_DIR}/src/mame/includes/taitoair.h
 	${MAME_DIR}/src/mame/video/taitoair.cpp
@@ -4533,6 +4524,7 @@ createMAMEProjects(_target, _subtarget, "zaccaria"
 createMAMEProjects(_target, _subtarget, "pinball"
 	${MAME_DIR}/src/mame/drivers/allied.cpp
 	${MAME_DIR}/src/mame/drivers/alvg.cpp
+	${MAME_DIR}/src/mame/drivers/atari_4x4.cpp
 	${MAME_DIR}/src/mame/drivers/atari_s1.cpp
 	${MAME_DIR}/src/mame/drivers/atari_s2.cpp
 	${MAME_DIR}/src/mame/drivers/barni.cpp
@@ -4576,6 +4568,7 @@ createMAMEProjects(_target, _subtarget, "pinball"
 	${MAME_DIR}/src/mame/drivers/jp.cpp
 	${MAME_DIR}/src/mame/drivers/jvh.cpp
 	${MAME_DIR}/src/mame/drivers/kissproto.cpp
+	${MAME_DIR}/src/mame/drivers/lancelot.cpp
 	${MAME_DIR}/src/mame/drivers/lckydraw.cpp
 	${MAME_DIR}/src/mame/drivers/ltd.cpp
 	${MAME_DIR}/src/mame/drivers/macp.cpp
@@ -4625,6 +4618,7 @@ createMAMEProjects(_target, _subtarget, "pinball"
 	${MAME_DIR}/src/mame/drivers/whitestar.cpp
 	${MAME_DIR}/src/mame/drivers/white_mod.cpp
 	${MAME_DIR}/src/mame/drivers/wico.cpp
+	${MAME_DIR}/src/mame/drivers/wms_shuffle.cpp
 	${MAME_DIR}/src/mame/drivers/wpc_95.cpp
 	${MAME_DIR}/src/mame/drivers/wpc_an.cpp
 	${MAME_DIR}/src/mame/drivers/wpc_dcs.cpp
@@ -4684,10 +4678,12 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/includes/ampoker2.h
 	${MAME_DIR}/src/mame/video/ampoker2.cpp
 	${MAME_DIR}/src/mame/drivers/amspdwy.cpp
-	${MAME_DIR}/src/mame/includes/amspdwy.h
-	${MAME_DIR}/src/mame/video/amspdwy.cpp
 	${MAME_DIR}/src/mame/drivers/amusco.cpp
 	${MAME_DIR}/src/mame/drivers/anes.cpp
+	${MAME_DIR}/src/mame/video/apple2.cpp
+	${MAME_DIR}/src/mame/video/apple2.h
+	${MAME_DIR}/src/mame/machine/apple2common.cpp
+	${MAME_DIR}/src/mame/machine/apple2common.h
 	${MAME_DIR}/src/mame/drivers/arachnid.cpp
 	${MAME_DIR}/src/mame/drivers/artmagic.cpp
 	${MAME_DIR}/src/mame/includes/artmagic.h
@@ -4747,6 +4743,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/coinmvga.cpp
 	${MAME_DIR}/src/mame/drivers/cointek.cpp
 	${MAME_DIR}/src/mame/drivers/comebaby.cpp
+	${MAME_DIR}/src/mame/drivers/compucranes.cpp
 	${MAME_DIR}/src/mame/drivers/cowtipping.cpp
 	${MAME_DIR}/src/mame/drivers/crazybal.cpp
 	${MAME_DIR}/src/mame/drivers/cromptons.cpp
@@ -4778,6 +4775,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/dgpix.cpp
 	${MAME_DIR}/src/mame/drivers/diamondking.cpp
 	${MAME_DIR}/src/mame/drivers/discoboy.cpp
+	${MAME_DIR}/src/mame/drivers/dmainevent.cpp
 	${MAME_DIR}/src/mame/drivers/dominob.cpp
 	${MAME_DIR}/src/mame/drivers/dorachan.cpp
 	${MAME_DIR}/src/mame/drivers/drdmania.cpp
@@ -4805,6 +4803,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/ettrivia.cpp
 	${MAME_DIR}/src/mame/drivers/extrema.cpp
 	${MAME_DIR}/src/mame/drivers/ez2d.cpp
+	${MAME_DIR}/src/mame/drivers/falgas_m89.cpp
 	${MAME_DIR}/src/mame/drivers/fastinvaders.cpp
 	${MAME_DIR}/src/mame/drivers/fireball.cpp
 	${MAME_DIR}/src/mame/drivers/flipjack.cpp
@@ -4816,6 +4815,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/includes/freekick.h
 	${MAME_DIR}/src/mame/video/freekick.cpp
 	${MAME_DIR}/src/mame/drivers/freeway.cpp
+	${MAME_DIR}/src/mame/drivers/funeball.cpp
 	${MAME_DIR}/src/mame/drivers/fungames.cpp
 	${MAME_DIR}/src/mame/drivers/funkball.cpp
 	${MAME_DIR}/src/mame/drivers/gambl186.cpp
@@ -4853,7 +4853,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/video/homedata.cpp
 	${MAME_DIR}/src/mame/drivers/hotblock.cpp
 	${MAME_DIR}/src/mame/drivers/hotstuff.cpp
-	${MAME_DIR}/src/mame/drivers/ichiban.cpp
+	${MAME_DIR}/src/mame/drivers/houseball.cpp
 	${MAME_DIR}/src/mame/drivers/imolagp.cpp
 	${MAME_DIR}/src/mame/drivers/intrscti.cpp
 	${MAME_DIR}/src/mame/drivers/island.cpp
@@ -4927,6 +4927,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/multfish_boot.cpp
 	${MAME_DIR}/src/mame/drivers/murogem.cpp
 	${MAME_DIR}/src/mame/drivers/murogmbl.cpp
+	${MAME_DIR}/src/mame/drivers/neomania.cpp
 	${MAME_DIR}/src/mame/drivers/neoprint.cpp
 	${MAME_DIR}/src/mame/drivers/news.cpp
 	${MAME_DIR}/src/mame/includes/news.h
@@ -4975,6 +4976,7 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/quizo.cpp
 	${MAME_DIR}/src/mame/drivers/quizpun2.cpp
 	${MAME_DIR}/src/mame/drivers/radikaldarts.cpp
+	${MAME_DIR}/src/mame/drivers/rawthrillspc.cpp
 	${MAME_DIR}/src/mame/drivers/rbmk.cpp
 	${MAME_DIR}/src/mame/drivers/rcorsair.cpp
 	${MAME_DIR}/src/mame/drivers/re900.cpp
@@ -5015,12 +5017,14 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/sstrangr.cpp
 	${MAME_DIR}/src/mame/drivers/startouch.cpp
 	${MAME_DIR}/src/mame/drivers/statriv2.cpp
+	${MAME_DIR}/src/mame/drivers/stop.cpp
 	${MAME_DIR}/src/mame/drivers/strkzn.cpp
 	${MAME_DIR}/src/mame/drivers/stuntair.cpp
 	${MAME_DIR}/src/mame/drivers/su2000.cpp
 	${MAME_DIR}/src/mame/drivers/summit.cpp
 	${MAME_DIR}/src/mame/drivers/sumt8035.cpp
 	${MAME_DIR}/src/mame/drivers/supercrd.cpp
+	${MAME_DIR}/src/mame/drivers/superga2.cpp
 	${MAME_DIR}/src/mame/drivers/supertnk.cpp
 	${MAME_DIR}/src/mame/drivers/tapatune.cpp
 	${MAME_DIR}/src/mame/drivers/tattack.cpp
@@ -5054,8 +5058,6 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/unkpoker.cpp
 	${MAME_DIR}/src/mame/drivers/usbilliards.cpp
 	${MAME_DIR}/src/mame/drivers/usgames.cpp
-	${MAME_DIR}/src/mame/includes/usgames.h
-	${MAME_DIR}/src/mame/video/usgames.cpp
 	${MAME_DIR}/src/mame/drivers/vamphalf.cpp
 	${MAME_DIR}/src/mame/drivers/vcombat.cpp
 	${MAME_DIR}/src/mame/drivers/vectrex.cpp

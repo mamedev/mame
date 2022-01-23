@@ -313,6 +313,88 @@ if("ARCADIA" IN_LIST BUSES)
 	)
 endif()
 
+###################################################
+##
+##@src/devices/bus/archimedes/econet/slot.h,list(APPEND BUSES ARCHIMEDES_ECONET)
+###################################################
+
+if("ARCHIMEDES_ECONET" IN_LIST BUSES)
+	list(APPEND BUS_SRCS
+		${MAME_DIR}/src/devices/bus/archimedes/econet/slot.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/econet/slot.h
+		${MAME_DIR}/src/devices/bus/archimedes/econet/econet.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/econet/econet.h
+		${MAME_DIR}/src/devices/bus/archimedes/econet/rtfmjoy.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/econet/rtfmjoy.h
+	)
+endif()
+
+
+###################################################
+##
+##@src/devices/bus/archimedes/podule/slot.h,list(APPEND BUSES ARCHIMEDES_PODULE)
+###################################################
+
+if("ARCHIMEDES_PODULE" IN_LIST BUSES)
+	list(APPEND BUS_SRCS
+		${MAME_DIR}/src/devices/bus/archimedes/podule/slot.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/slot.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/a448.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/a448.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/acejoy.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/acejoy.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/armadeus.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/armadeus.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/eaglem2.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/eaglem2.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ether1.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ether1.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/etherd.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/etherd.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/etherr.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/etherr.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/faxpack.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/faxpack.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/greyhawk.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/greyhawk.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ide_be.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ide_be.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ide_rdev.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/ide_rdev.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_hccs.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_hccs.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_morley.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_morley.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_we.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/io_we.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/lark.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/lark.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/laserd.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/laserd.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/midimax.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/midimax.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/nexus.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/nexus.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/rom.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/rom.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/rs423.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/rs423.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scan256.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scan256.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scanlight.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scanlight.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scsi_vti.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/scsi_vti.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/serial.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/serial.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/spectra.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/spectra.h
+		${MAME_DIR}/src/devices/bus/archimedes/podule/tube.cpp
+		${MAME_DIR}/src/devices/bus/archimedes/podule/tube.h
+	)
+endif()
 
 ###################################################
 ##
@@ -2292,8 +2374,12 @@ if("VME" IN_LIST BUSES)
 	list(APPEND BUS_SRCS
 		${MAME_DIR}/src/devices/bus/vme/vme.cpp
 		${MAME_DIR}/src/devices/bus/vme/vme.h
+		${MAME_DIR}/src/devices/bus/vme/vme_cp31.cpp
+		${MAME_DIR}/src/devices/bus/vme/vme_cp31.h
 		${MAME_DIR}/src/devices/bus/vme/vme_mzr8300.cpp
 		${MAME_DIR}/src/devices/bus/vme/vme_mzr8300.h
+		${MAME_DIR}/src/devices/bus/vme/vme_mvme120.cpp
+		${MAME_DIR}/src/devices/bus/vme/vme_mvme120.h
 		${MAME_DIR}/src/devices/bus/vme/vme_mvme350.cpp
 		${MAME_DIR}/src/devices/bus/vme/vme_mvme350.h
 		${MAME_DIR}/src/devices/bus/vme/vme_fccpu20.cpp
@@ -2449,6 +2535,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/a2vulcan.h
 		${MAME_DIR}/src/devices/bus/a2bus/a2zipdrive.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/a2zipdrive.h
+		${MAME_DIR}/src/devices/bus/a2bus/ace2x00.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/ace2x00.h
 		${MAME_DIR}/src/devices/bus/a2bus/agat_fdc.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/agat_fdc.h
 		${MAME_DIR}/src/devices/bus/a2bus/agat7langcard.cpp
@@ -2463,6 +2551,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/booti.h
 		${MAME_DIR}/src/devices/bus/a2bus/byte8251.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/byte8251.h
+		${MAME_DIR}/src/devices/bus/a2bus/cards.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/cards.h
 		${MAME_DIR}/src/devices/bus/a2bus/ccs7710.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/ccs7710.h
 		${MAME_DIR}/src/devices/bus/a2bus/cmsscsi.cpp
@@ -2475,6 +2565,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/corvfdc02.h
 		${MAME_DIR}/src/devices/bus/a2bus/ezcgi.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/ezcgi.h
+		${MAME_DIR}/src/devices/bus/a2bus/grafex.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/grafex.h
 		${MAME_DIR}/src/devices/bus/a2bus/grappler.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/grappler.h
 		${MAME_DIR}/src/devices/bus/a2bus/lancegs.cpp
@@ -2487,6 +2579,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/nippelclock.h
 		${MAME_DIR}/src/devices/bus/a2bus/pc_xporter.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/pc_xporter.h
+		${MAME_DIR}/src/devices/bus/a2bus/prodosromdrive.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/prodosromdrive.h
 		${MAME_DIR}/src/devices/bus/a2bus/q68.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/q68.h
 		${MAME_DIR}/src/devices/bus/a2bus/ramcard128k.cpp
@@ -2562,6 +2656,8 @@ if("NSCSI" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nscsi/cdu415.h
 		${MAME_DIR}/src/devices/bus/nscsi/cdu561.cpp
 		${MAME_DIR}/src/devices/bus/nscsi/cdu561.h
+		${MAME_DIR}/src/devices/bus/nscsi/cfp1080s.cpp
+		${MAME_DIR}/src/devices/bus/nscsi/cfp1080s.h
 		${MAME_DIR}/src/devices/bus/nscsi/crd254sh.cpp
 		${MAME_DIR}/src/devices/bus/nscsi/crd254sh.h
 		${MAME_DIR}/src/devices/bus/nscsi/cw7501.cpp
@@ -2660,6 +2756,8 @@ if("CENTRONICS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/centronics/samdac.h
 		${MAME_DIR}/src/devices/bus/centronics/smartboard.cpp
 		${MAME_DIR}/src/devices/bus/centronics/smartboard.h
+		${MAME_DIR}/src/devices/bus/centronics/spjoy.cpp
+		${MAME_DIR}/src/devices/bus/centronics/spjoy.h
 		${GEN_DIR}/emu/layout/ex800.lh
 		${GEN_DIR}/emu/layout/lx800.lh
 		${GEN_DIR}/emu/layout/smartboard.lh
@@ -2898,12 +2996,16 @@ if("NES_CTRL" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes_ctrl/arkpaddle.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/bcbattle.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/bcbattle.h
-		${MAME_DIR}/src/devices/bus/nes_ctrl/ftrainer.cpp
-		${MAME_DIR}/src/devices/bus/nes_ctrl/ftrainer.h
+		${MAME_DIR}/src/devices/bus/nes_ctrl/dorepiano.cpp
+		${MAME_DIR}/src/devices/bus/nes_ctrl/dorepiano.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/fckeybrd.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/fckeybrd.h
+		${MAME_DIR}/src/devices/bus/nes_ctrl/fcmat.cpp
+		${MAME_DIR}/src/devices/bus/nes_ctrl/fcmat.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/hori.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/hori.h
+		${MAME_DIR}/src/devices/bus/nes_ctrl/konamibag.cpp
+		${MAME_DIR}/src/devices/bus/nes_ctrl/konamibag.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/konamihs.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/konamihs.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/miracle.cpp
@@ -2916,8 +3018,12 @@ if("NES_CTRL" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes_ctrl/partytap.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/powerpad.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/powerpad.h
+		${MAME_DIR}/src/devices/bus/nes_ctrl/snesadapter.cpp
+		${MAME_DIR}/src/devices/bus/nes_ctrl/snesadapter.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/suborkey.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/suborkey.h
+		${MAME_DIR}/src/devices/bus/nes_ctrl/turbofile.cpp
+		${MAME_DIR}/src/devices/bus/nes_ctrl/turbofile.h
 		${MAME_DIR}/src/devices/bus/nes_ctrl/zapper.cpp
 		${MAME_DIR}/src/devices/bus/nes_ctrl/zapper.h
 	)
@@ -3410,6 +3516,10 @@ if("TI99" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/ti99/peb/pgram.h
 		${MAME_DIR}/src/devices/bus/ti99/peb/samsmem.cpp
 		${MAME_DIR}/src/devices/bus/ti99/peb/samsmem.h
+		${MAME_DIR}/src/devices/bus/ti99/peb/samsmem.cpp
+		${MAME_DIR}/src/devices/bus/ti99/peb/samsmem.h
+		${MAME_DIR}/src/devices/bus/ti99/peb/scsicard.cpp
+		${MAME_DIR}/src/devices/bus/ti99/peb/scsicard.h
 		${MAME_DIR}/src/devices/bus/ti99/peb/sidmaster.cpp
 		${MAME_DIR}/src/devices/bus/ti99/peb/sidmaster.h
 		${MAME_DIR}/src/devices/bus/ti99/peb/spchsyn.cpp
@@ -3900,6 +4010,8 @@ if("QBUS" IN_LIST BUSES)
 	list(APPEND BUS_SRCS
 		${MAME_DIR}/src/devices/bus/qbus/dsd4432.cpp
 		${MAME_DIR}/src/devices/bus/qbus/dsd4432.h
+		${MAME_DIR}/src/devices/bus/qbus/dvk_kgd.cpp
+		${MAME_DIR}/src/devices/bus/qbus/dvk_kgd.h
 		${MAME_DIR}/src/devices/bus/qbus/pc11.cpp
 		${MAME_DIR}/src/devices/bus/qbus/pc11.h
 		${MAME_DIR}/src/devices/bus/qbus/qbus.cpp

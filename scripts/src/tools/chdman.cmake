@@ -20,7 +20,5 @@ target_sources(chdman PRIVATE
 	${GEN_DIR}/version.cpp
 )
 
-set_source_files_properties(${GEN_DIR}/version.cpp PROPERTIES GENERATED TRUE)
-
 strip_executable(chdman)
 minimal_symbols(chdman)

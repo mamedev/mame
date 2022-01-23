@@ -17,7 +17,7 @@ else()
 	set(projectname ${TARGET}${SUBTARGET})
 endif()
 
-project(${projectname} VERSION 0.236 LANGUAGES CXX C)
+project(${projectname} VERSION 0.239 LANGUAGES CXX C)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	enable_language(OBJCXX OBJC)
 endif()
@@ -612,6 +612,7 @@ endif()
 
 set_git_version()
 configure_file(${MAME_DIR}/scripts/resources/version.cpp.in ${GEN_DIR}/version.cpp @ONLY)
+set_source_files_properties(${GEN_DIR}/version.cpp PROPERTIES GENERATED TRUE)
 
 if(NOT EXISTS ${MAME_DIR}/scripts/src/osd/${OSD}/osd.cmake)
 	message(FATAL_ERROR "Unsupported value '${OSD}' for OSD")

@@ -170,6 +170,7 @@ list(APPEND CPUS UPD78K)
 list(APPEND CPUS ROMP)
 list(APPEND CPUS COPS1)
 list(APPEND CPUS MK1)
+list(APPEND CPUS M68HC16)
 
 ##################################################
 ## specify available sound cores; some of these are
@@ -304,7 +305,7 @@ list(APPEND SOUNDS VRC6)
 #list(APPEND SOUNDS AC97)
 #list(APPEND SOUNDS ES1373)
 list(APPEND SOUNDS L7A1045)
-#list(APPEND SOUNDS AD1848)
+list(APPEND SOUNDS AD1848)
 list(APPEND SOUNDS UPD1771)
 list(APPEND SOUNDS GB_SOUND)
 list(APPEND SOUNDS PCD3311)
@@ -324,6 +325,7 @@ list(APPEND SOUNDS ROLANDPCM)
 #list(APPEND SOUNDS TT5665)
 list(APPEND SOUNDS RP2C33_SOUND)
 list(APPEND SOUNDS UDA1344)
+list(APPEND SOUNDS LYNX)
 
 ##################################################
 ## specify available video cores
@@ -409,7 +411,6 @@ list(APPEND VIDEOS SED1356)
 list(APPEND VIDEOS SED1500)
 list(APPEND VIDEOS SED1520)
 list(APPEND VIDEOS SNES_PPU)
-list(APPEND VIDEOS STVVDP)
 list(APPEND VIDEOS T6963C)
 list(APPEND VIDEOS T6A04)
 list(APPEND VIDEOS TEA1002)
@@ -460,7 +461,9 @@ list(APPEND MACHINES 68681)
 list(APPEND MACHINES 7200FIFO)
 list(APPEND MACHINES 8530SCC)
 list(APPEND MACHINES ACIA6850)
+list(APPEND MACHINES ACORN_BMU)
 list(APPEND MACHINES ACORN_IOC)
+list(APPEND MACHINES ACORN_LC)
 list(APPEND MACHINES ACORN_MEMC)
 list(APPEND MACHINES ACORN_VIDC)
 list(APPEND MACHINES ADC0804)
@@ -507,6 +510,7 @@ list(APPEND MACHINES CS4031)
 list(APPEND MACHINES CS8221)
 list(APPEND MACHINES CS8900A)
 list(APPEND MACHINES CXD1095)
+list(APPEND MACHINES DL11)
 list(APPEND MACHINES DP8390)
 list(APPEND MACHINES DP83932C)
 list(APPEND MACHINES DP8573)
@@ -530,6 +534,7 @@ list(APPEND MACHINES ER2055)
 list(APPEND MACHINES EXORTERM)
 list(APPEND MACHINES F3853)
 list(APPEND MACHINES F4702)
+list(APPEND MACHINES GLUKRS)
 list(APPEND MACHINES GT913)
 list(APPEND MACHINES HD63450)
 list(APPEND MACHINES HD64610)
@@ -712,6 +717,7 @@ list(APPEND MACHINES TMS9901)
 list(APPEND MACHINES TMS9902)
 list(APPEND MACHINES TMS9914)
 list(APPEND MACHINES TPI6525)
+list(APPEND MACHINES TSCONF_DMA)
 list(APPEND MACHINES TTL7400)
 list(APPEND MACHINES TTL7404)
 #list(APPEND MACHINES TSB12LV01A)
@@ -730,6 +736,8 @@ list(APPEND MACHINES TTL74543)
 list(APPEND MACHINES TTL7474)
 list(APPEND MACHINES TUBE)
 list(APPEND MACHINES UCB1200)
+list(APPEND MACHINES UPC82C710)
+list(APPEND MACHINES UPC82C711)
 list(APPEND MACHINES UPD1990A)
 list(APPEND MACHINES UPD4991A)
 #list(APPEND MACHINES UPD4992)
@@ -821,6 +829,7 @@ list(APPEND MACHINES BL_HANDHELDS_MENUCONTROL)
 list(APPEND MACHINES NS32081)
 list(APPEND MACHINES NS32202)
 list(APPEND MACHINES NS32082)
+list(APPEND MACHINES BITMAP_PRINTER)
 
 ##################################################
 ## specify available bus cores
@@ -844,6 +853,8 @@ list(APPEND BUSES APRICOT_KEYBOARD)
 list(APPEND BUSES APRICOT_VIDEO)
 list(APPEND BUSES AQUARIUS)
 list(APPEND BUSES ARCADIA)
+list(APPEND BUSES ARCHIMEDES_ECONET)
+list(APPEND BUSES ARCHIMEDES_PODULE)
 list(APPEND BUSES ASTROCADE)
 list(APPEND BUSES ATA)
 list(APPEND BUSES BBC_1MHZBUS)
@@ -1174,6 +1185,8 @@ list(APPEND FORMATS XDF_DSK)
 list(APPEND FORMATS ZX81_P)
 list(APPEND FORMATS FS_PRODOS)
 list(APPEND FORMATS FS_ORIC_JASMIN)
+list(APPEND FORMATS FS_COCO_RSDOS)
+list(APPEND FORMATS FS_COCO_OS9)
 
 ##################################################
 ## this is the list of driver libraries that
@@ -1264,6 +1277,7 @@ macro(linkProjects_mame_mess _target, _subtarget _projectname)
 		exorterm
 		fairch
 		fairlight
+		falco
 		fidelity
 		force
 		francedr
@@ -1276,6 +1290,7 @@ macro(linkProjects_mame_mess _target, _subtarget _projectname)
 		grundy
 		h01x
 		hartung
+		hds
 		heathkit
 		hec2hrp
 		hegener
@@ -1360,6 +1375,7 @@ macro(linkProjects_mame_mess _target, _subtarget _projectname)
 		pitronic
 		poly
 		poly88
+		positron
 		psion
 		quantel
 		qume
@@ -1496,6 +1512,7 @@ macro(createProjects_mame_mess _target _subtarget)
 ## 3do.c (MESS + MAME), konamim2.c (MAME)
 ## vectrex.c (MESS + MAME)
 ## cps1.c (MESS + MAME)
+## apple
 ##################################################
 
 if (${_subtarget} STREQUAL "mess")
@@ -1557,13 +1574,14 @@ createMESSProjects(_target _subtarget "mameshared"
 	${MAME_DIR}/src/mame/machine/mapledev.h
 	${MAME_DIR}/src/mame/machine/mie.cpp
 	${MAME_DIR}/src/mame/machine/mie.h
-	${MAME_DIR}/src/mame/machine/naomi.cpp
 	${MAME_DIR}/src/mame/machine/naomibd.cpp
 	${MAME_DIR}/src/mame/machine/naomibd.h
 	${MAME_DIR}/src/mame/machine/naomig1.cpp
 	${MAME_DIR}/src/mame/machine/naomig1.h
-	${MAME_DIR}/src/mame/machine/naomigd.cpp
-	${MAME_DIR}/src/mame/machine/naomigd.h
+	${MAME_DIR}/src/mame/machine/naomig1.cpp
+	${MAME_DIR}/src/mame/machine/naomig1.h
+	${MAME_DIR}/src/mame/machine/dc_g2if.cpp
+	${MAME_DIR}/src/mame/machine/dc_g2if.h
 	${MAME_DIR}/src/mame/machine/naomim1.cpp
 	${MAME_DIR}/src/mame/machine/naomim1.h
 	${MAME_DIR}/src/mame/machine/naomim2.cpp
@@ -1614,8 +1632,13 @@ createMESSProjects(_target _subtarget "mameshared"
 	${MAME_DIR}/src/mame/includes/saturn.h
 	${MAME_DIR}/src/mame/drivers/saturn.cpp
 	${MAME_DIR}/src/mame/machine/saturn.cpp
+	${MAME_DIR}/src/mame/video/saturn.cpp
 	${MAME_DIR}/src/mame/machine/saturn_cdb.cpp
 	${MAME_DIR}/src/mame/machine/saturn_cdb.h
+	${MAME_DIR}/src/mame/video/apple2.cpp
+	${MAME_DIR}/src/mame/video/apple2.h
+	${MAME_DIR}/src/mame/machine/apple2common.cpp
+	${MAME_DIR}/src/mame/machine/apple2common.h
 )
 endif()
 ##################################################
@@ -1782,12 +1805,8 @@ createMESSProjects(_target _subtarget "apple"
 	${MAME_DIR}/src/mame/drivers/apple2.cpp
 	${MAME_DIR}/src/mame/drivers/apple2e.cpp
 	${MAME_DIR}/src/mame/includes/apple2e.h
-	${MAME_DIR}/src/mame/video/apple2.cpp
-	${MAME_DIR}/src/mame/video/apple2.h
 	${MAME_DIR}/src/mame/drivers/tk2000.cpp
 	${MAME_DIR}/src/mame/drivers/apple2gs.cpp
-	${MAME_DIR}/src/mame/machine/apple2common.cpp
-	${MAME_DIR}/src/mame/machine/apple2common.h
 	${MAME_DIR}/src/mame/drivers/apple3.cpp
 	${MAME_DIR}/src/mame/includes/apple3.h
 	${MAME_DIR}/src/mame/machine/apple3.cpp
@@ -1821,7 +1840,6 @@ createMESSProjects(_target _subtarget "apple"
 	${MAME_DIR}/src/mame/machine/macscsi.cpp
 	${MAME_DIR}/src/mame/machine/macscsi.h
 	${MAME_DIR}/src/mame/drivers/iphone2g.cpp
-	${MAME_DIR}/src/mame/drivers/superga2.cpp
 )
 
 createMESSProjects(_target _subtarget "applied"
@@ -1876,8 +1894,6 @@ createMESSProjects(_target _subtarget "atari_mess"
 	${MAME_DIR}/src/mame/video/atarist.h
 	${MAME_DIR}/src/mame/drivers/lynx.cpp
 	${MAME_DIR}/src/mame/includes/lynx.h
-	${MAME_DIR}/src/mame/audio/lynx.cpp
-	${MAME_DIR}/src/mame/audio/lynx.h
 	${MAME_DIR}/src/mame/machine/lynx.cpp
 	${MAME_DIR}/src/mame/drivers/pofo.cpp
 	${MAME_DIR}/src/mame/machine/pofo_kbd.cpp
@@ -2248,21 +2264,6 @@ createMESSProjects(_target _subtarget "einis"
 	${MAME_DIR}/src/mame/video/pecom.cpp
 )
 
-createMESSProjects(_target _subtarget "elektrka"
-	${MAME_DIR}/src/mame/drivers/bk.cpp
-	${MAME_DIR}/src/mame/includes/bk.h
-	${MAME_DIR}/src/mame/machine/bk.cpp
-	${MAME_DIR}/src/mame/drivers/dvk_kcgd.cpp
-	${MAME_DIR}/src/mame/drivers/dvk_ksm.cpp
-	${MAME_DIR}/src/mame/machine/ms7004.cpp
-	${MAME_DIR}/src/mame/machine/ms7004.h
-	${MAME_DIR}/src/mame/drivers/mk85.cpp
-	${MAME_DIR}/src/mame/drivers/mk90.cpp
-	${MAME_DIR}/src/mame/drivers/ms6102.cpp
-	${MAME_DIR}/src/mame/machine/kr1601rr1.cpp
-	${MAME_DIR}/src/mame/machine/kr1601rr1.h
-)
-
 createMESSProjects(_target _subtarget "elektor"
 	${MAME_DIR}/src/mame/drivers/avrmax.cpp
 	${MAME_DIR}/src/mame/drivers/ec65.cpp
@@ -2272,6 +2273,22 @@ createMESSProjects(_target _subtarget "elektor"
 
 createMESSProjects(_target _subtarget "elektron"
 	${MAME_DIR}/src/mame/drivers/elektronmono.cpp
+)
+
+createMESSProjects(_target _subtarget "elektrka"
+	${MAME_DIR}/src/mame/drivers/bk.cpp
+	${MAME_DIR}/src/mame/includes/bk.h
+	${MAME_DIR}/src/mame/machine/bk.cpp
+	${MAME_DIR}/src/mame/drivers/im01.cpp
+	${MAME_DIR}/src/mame/drivers/dvk_kcgd.cpp
+	${MAME_DIR}/src/mame/drivers/dvk_ksm.cpp
+	${MAME_DIR}/src/mame/machine/ms7004.cpp
+	${MAME_DIR}/src/mame/machine/ms7004.h
+	${MAME_DIR}/src/mame/drivers/mk85.cpp
+	${MAME_DIR}/src/mame/drivers/mk90.cpp
+	${MAME_DIR}/src/mame/drivers/ms6102.cpp
+	${MAME_DIR}/src/mame/machine/kr1601rr1.cpp
+	${MAME_DIR}/src/mame/machine/kr1601rr1.h
 )
 
 createMESSProjects(_target _subtarget "emusys"
@@ -2353,6 +2370,7 @@ createMESSProjects(_target _subtarget "fairch"
 	${MAME_DIR}/src/mame/audio/channelf.cpp
 	${MAME_DIR}/src/mame/audio/channelf.h
 	${MAME_DIR}/src/mame/video/channelf.cpp
+	${MAME_DIR}/src/mame/drivers/f387x.cpp
 )
 
 createMESSProjects(_target _subtarget "fairlight"
@@ -2363,6 +2381,14 @@ createMESSProjects(_target _subtarget "fairlight"
 	${MAME_DIR}/src/mame/machine/cmi_ankbd.h
 	${MAME_DIR}/src/mame/machine/cmi_mkbd.cpp
 	${MAME_DIR}/src/mame/machine/cmi_mkbd.h
+)
+
+createMESSProjects(_target _subtarget "falco"
+	${MAME_DIR}/src/mame/drivers/falco500.cpp
+	${MAME_DIR}/src/mame/machine/f5220_kbd.cpp
+	${MAME_DIR}/src/mame/machine/f5220_kbd.h
+	${MAME_DIR}/src/mame/drivers/falcots.cpp
+	${MAME_DIR}/src/mame/drivers/falcots28.cpp
 )
 
 createMESSProjects(_target _subtarget "fidelity"
@@ -2459,6 +2485,12 @@ createMESSProjects(_target _subtarget "hartung"
 	${MAME_DIR}/src/mame/drivers/gmaster.cpp
 )
 
+createMESSProjects(_target _subtarget "hds"
+	${MAME_DIR}/src/mame/drivers/hds200.cpp
+	${MAME_DIR}/src/mame/machine/hds200_kbd.cpp
+	${MAME_DIR}/src/mame/machine/hds200_kbd.h
+)
+
 createMESSProjects(_target _subtarget "heathkit"
 	${MAME_DIR}/src/mame/drivers/et3400.cpp
 	${MAME_DIR}/src/mame/drivers/h8.cpp
@@ -2518,6 +2550,7 @@ createMESSProjects(_target _subtarget "homebrew"
 	${MAME_DIR}/src/mame/drivers/slc1.cpp
 	${MAME_DIR}/src/mame/drivers/test_t400.cpp
 	${MAME_DIR}/src/mame/drivers/uzebox.cpp
+	${MAME_DIR}/src/mame/drivers/z80clock.cpp
 	${MAME_DIR}/src/mame/drivers/z80dev.cpp
 	${MAME_DIR}/src/mame/drivers/zexall.cpp
 )
@@ -2679,6 +2712,7 @@ createMESSProjects(_target _subtarget "jazz"
 )
 
 createMESSProjects(_target _subtarget "kawai"
+	${MAME_DIR}/src/mame/drivers/kawai_acr20.cpp
 	${MAME_DIR}/src/mame/drivers/kawai_k1.cpp
 	${MAME_DIR}/src/mame/drivers/kawai_k4.cpp
 	${MAME_DIR}/src/mame/drivers/kawai_k5.cpp
@@ -2896,6 +2930,7 @@ createMESSProjects(_target _subtarget "motorola"
 	${MAME_DIR}/src/mame/drivers/mekd5.cpp
 	${MAME_DIR}/src/mame/drivers/mvme147.cpp
 	${MAME_DIR}/src/mame/drivers/mvme162.cpp
+	${MAME_DIR}/src/mame/drivers/sys1121.cpp
 	${MAME_DIR}/src/mame/drivers/uchroma68.cpp
 )
 
@@ -3210,6 +3245,10 @@ createMESSProjects(_target _subtarget "poly88"
 	${MAME_DIR}/src/mame/machine/poly88.cpp
 )
 
+createMESSProjects(_target _subtarget "positron"
+	${MAME_DIR}/src/mame/drivers/positron.cpp
+)
+
 createMESSProjects(_target _subtarget "psion"
 	${MAME_DIR}/src/mame/drivers/psion.cpp
 	${MAME_DIR}/src/mame/includes/psion.h
@@ -3313,6 +3352,7 @@ createMESSProjects(_target _subtarget "roland"
 	${MAME_DIR}/src/mame/drivers/roland_tr505.cpp
 	${MAME_DIR}/src/mame/drivers/roland_tr606.cpp
 	${MAME_DIR}/src/mame/drivers/roland_tr707.cpp
+	${MAME_DIR}/src/mame/drivers/roland_tr808.cpp
 	${MAME_DIR}/src/mame/drivers/roland_tr909.cpp
 	${MAME_DIR}/src/mame/drivers/roland_u20.cpp
 	${MAME_DIR}/src/mame/audio/bu3905.cpp
@@ -3566,6 +3606,9 @@ createMESSProjects(_target _subtarget "sinclair"
 	${MAME_DIR}/src/mame/video/zx8301.h
 	${MAME_DIR}/src/mame/machine/zx8302.cpp
 	${MAME_DIR}/src/mame/machine/zx8302.h
+	${MAME_DIR}/src/mame/drivers/tsconf.cpp
+	${MAME_DIR}/src/mame/includes/tsconf.h
+	${MAME_DIR}/src/mame/machine/tsconf.cpp
 )
 
 createMESSProjects(_target _subtarget "siemens"
@@ -3703,8 +3746,6 @@ createMESSProjects(_target _subtarget "tatung"
 
 createMESSProjects(_target _subtarget "teamconc"
 	${MAME_DIR}/src/mame/drivers/comquest.cpp
-	${MAME_DIR}/src/mame/includes/comquest.h
-	${MAME_DIR}/src/mame/video/comquest.cpp
 )
 
 createMESSProjects(_target _subtarget "tectoy"
@@ -4186,6 +4227,7 @@ createMESSProjects(_target _subtarget "yamaha"
 	${MAME_DIR}/src/mame/drivers/ympsr40.cpp
 	${MAME_DIR}/src/mame/drivers/ympsr60.cpp
 	${MAME_DIR}/src/mame/drivers/ympsr340.cpp
+	${MAME_DIR}/src/mame/drivers/ymrx15.cpp
 	${MAME_DIR}/src/mame/drivers/ymsy35.cpp
 	${MAME_DIR}/src/mame/drivers/ymtx81z.cpp
 	${MAME_DIR}/src/mame/drivers/ymvl70.cpp
@@ -4216,7 +4258,9 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/acd.cpp
 	${MAME_DIR}/src/mame/drivers/aceex.cpp
 	${MAME_DIR}/src/mame/drivers/adacp150.cpp
+	${MAME_DIR}/src/mame/drivers/adds2020.cpp
 	${MAME_DIR}/src/mame/drivers/aid80f.cpp
+	${MAME_DIR}/src/mame/drivers/airbase99.cpp
 	${MAME_DIR}/src/mame/drivers/alcat7100.cpp
 	${MAME_DIR}/src/mame/drivers/alesis_qs.cpp
 	${MAME_DIR}/src/mame/drivers/alfaskop41xx.cpp
@@ -4242,7 +4286,6 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/machine/basf7100_kbd.h
 	${MAME_DIR}/src/mame/drivers/binbug.cpp
 	${MAME_DIR}/src/mame/drivers/bert.cpp
-	${MAME_DIR}/src/mame/drivers/besta.cpp
 	${MAME_DIR}/src/mame/drivers/bitgraph.cpp
 	${MAME_DIR}/src/mame/drivers/blit.cpp
 	${MAME_DIR}/src/mame/drivers/bpmmicro.cpp
@@ -4282,6 +4325,7 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/diablo1300.cpp
 	${MAME_DIR}/src/mame/drivers/didact.cpp
 	${MAME_DIR}/src/mame/drivers/digel804.cpp
+	${MAME_DIR}/src/mame/drivers/digilog320.cpp
 	${MAME_DIR}/src/mame/drivers/digijet.cpp
 	${MAME_DIR}/src/mame/drivers/dim68k.cpp
 	${MAME_DIR}/src/mame/drivers/dm7000.cpp
@@ -4305,8 +4349,6 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/eurocom2.cpp
 	${MAME_DIR}/src/mame/drivers/excali64.cpp
 	${MAME_DIR}/src/mame/drivers/facit4440.cpp
-	${MAME_DIR}/src/mame/drivers/falco5220.cpp
-	${MAME_DIR}/src/mame/drivers/falcots.cpp
 	${MAME_DIR}/src/mame/drivers/fanucs15.cpp
 	${MAME_DIR}/src/mame/drivers/fanucspmg.cpp
 	${MAME_DIR}/src/mame/drivers/fc100.cpp

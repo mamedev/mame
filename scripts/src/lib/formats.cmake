@@ -4,7 +4,6 @@ addprojectflags(formats)
 
 target_include_directories(formats PRIVATE
 	${MAME_DIR}/src/osd
-	${MAME_DIR}/src/emu
 	${MAME_DIR}/src/lib
 	${MAME_DIR}/src/lib/util
 	${GEN_DIR}
@@ -66,6 +65,8 @@ target_sources(formats PRIVATE
 	${MAME_DIR}/src/lib/formats/fsblk_vec.cpp
 	${MAME_DIR}/src/lib/formats/fs_unformatted.h
 	${MAME_DIR}/src/lib/formats/fs_unformatted.cpp
+	${MAME_DIR}/src/lib/formats/fsmeta.h
+	${MAME_DIR}/src/lib/formats/fsmeta.cpp
 )
 
 ##################################################
@@ -545,6 +546,18 @@ if (("COCO_CAS" IN_LIST FORMATS) OR TOOLS)
 target_sources(formats PRIVATE
 	${MAME_DIR}/src/lib/formats/coco_cas.cpp
 	${MAME_DIR}/src/lib/formats/coco_cas.h
+)
+endif()
+
+##################################################
+##
+##@src/lib/formats/coco_rawdsk.h,list(APPEND FORMATS COCO_RAWDSK)
+##################################################
+
+if (("COCO_RAWDSK" IN_LIST FORMATS) OR TOOLS)
+target_sources(formats PRIVATE
+	${MAME_DIR}/src/lib/formats/coco_rawdsk.cpp
+	${MAME_DIR}/src/lib/formats/coco_rawdsk.h
 )
 endif()
 
@@ -2082,5 +2095,29 @@ if (("FS_ORIC_JASMIN" IN_LIST FORMATS) OR TOOLS)
 target_sources(formats PRIVATE
 	${MAME_DIR}/src/lib/formats/fs_oric_jasmin.cpp
 	${MAME_DIR}/src/lib/formats/fs_oric_jasmin.h
+)
+endif()
+
+##################################################
+##
+##@src/lib/formats/fs_coco_rsdos.h,list(APPEND FORMATS FS_COCO_RSDOS)
+##################################################
+
+if (("FS_COCO_RSDOS" IN_LIST FORMATS) OR TOOLS)
+target_sources(formats PRIVATE
+	${MAME_DIR}/src/lib/formats/fs_coco_rsdos.cpp
+	${MAME_DIR}/src/lib/formats/fs_coco_rsdos.h
+)
+endif()
+
+##################################################
+##
+##@src/lib/formats/fs_coco_os9.h,list(APPEND FORMATS FS_COCO_OS9)
+##################################################
+
+if (("FS_COCO_OS9" IN_LIST FORMATS) OR TOOLS)
+target_sources(formats PRIVATE
+	${MAME_DIR}/src/lib/formats/fs_coco_os9.cpp
+	${MAME_DIR}/src/lib/formats/fs_coco_os9.h
 )
 endif()
