@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="vis" description="Tandy/Memorex Visual Information System CD-ROM images">
+<softwarelist name="vis" description="Tandy/Memorex Video Information System CD-ROM images">
 
 	<!-- Garbled text -->
 	<software name="amherit" supported="no">
