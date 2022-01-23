@@ -57,10 +57,7 @@
   # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
 
   TODO:
-  - Interrupts
   - ZX-Mode locks
-  - CPU frequency
-  - Timings
   - Ram cache
   - VDos
   - Many more...
@@ -303,4 +300,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_IMPERFECT_TIMING )
+COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_IS_INCOMPLETE)

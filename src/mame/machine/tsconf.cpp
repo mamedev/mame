@@ -749,18 +749,18 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
 	u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
 	u16 hpos = m_regs[HS_INT];
-	if (vpos <= 319 && hpos <= 223)
+	if (hpos > 0 && vpos <= 319 && hpos <= 223)
 	{
+		// Only if not overlapping with scanline. Otherwise we need to prioritize.
 		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
 	}
-	m_line_irq_timer->adjust(m_screen->time_until_pos(0, m_screen->hpos() + 1));
+	m_line_irq_timer->adjust(attotime::zero);
 }
 
 void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	// That's not the way it desired, looking for any suggestions...
 	case TIMER_IRQ_FRAME:
 	{
 		if (BIT(m_regs[INT_MASK], 0))
@@ -772,11 +772,21 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 	case TIMER_IRQ_SCANLINE:
 	{
+		u16 screen_vpos = m_screen->vpos();
+		m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
 		if (BIT(m_regs[INT_MASK], 1))
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
+			// Not quite precise. Scanline can't be skipped.
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 		}
-		m_line_irq_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1));
+		u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
+		u16 hpos = m_regs[HS_INT];
+		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && hpos == 0)
+		{
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+		}
 		break;
 	}
 	default:
