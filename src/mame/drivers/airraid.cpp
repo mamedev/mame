@@ -37,8 +37,6 @@
   TODO:
   - cshooter/airraid gfx, obviously
   - is failgate a prototype?
-  - failgate usually doesn't play in-game bgm, comms/timing issue?
-    it does play if you overclock the main cpu
 
 -----------------------------------------------------------------------
 
@@ -209,7 +207,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::scanline)
 	if (scanline == 240) // updates scroll registers
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 
-	if (scanline == 250) // vblank-out irq
+	if (scanline == 0) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
