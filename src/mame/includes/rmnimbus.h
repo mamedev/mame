@@ -235,8 +235,8 @@ private:
 	/* Mouse/Joystick */
 	struct
 	{
-		int8_t      m_mouse_x;
-		int8_t      m_mouse_y;
+		uint8_t     m_mouse_x;
+		uint8_t     m_mouse_y;
 
 		uint8_t     m_mouse_pcx;
 		uint8_t     m_mouse_pcy;
