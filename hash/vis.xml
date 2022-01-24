@@ -143,7 +143,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Most sections display a "YUV 422" message over a blank screen -->
+	<!-- Most sections display a "YUV 422 mode" message over a blank screen -->
 	<software name="columbus" supported="no">
 		<!--
 		Origin: redump.org
