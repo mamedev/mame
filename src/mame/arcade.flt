@@ -671,7 +671,6 @@ kpontoon.cpp
 kpython.cpp
 ksayakyu.cpp
 ksys573.cpp
-kungfum2.cpp
 kungfur.cpp
 kurukuru.cpp
 kyugo.cpp
@@ -721,6 +720,7 @@ m52.cpp
 m57.cpp
 m58.cpp
 m62.cpp
+m62_bkungfu.cpp
 m63.cpp
 m72.cpp
 m79amb.cpp

@@ -19826,9 +19826,6 @@ sys573                          //
 @source:ktm3.cpp
 ktm3                            // (c) 1980 Synertek Systems Corp.
 
-@source:kungfum2.cpp
-kungfum2                        // (c) 1986 Irem
-
 @source:kungfur.cpp
 kungfur                         // (c) 1987
 
@@ -20399,6 +20396,9 @@ spelunkr                        // (c) 1985 licensed from Broderbund
 spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
+
+@source:m62_bkungfu.cpp
+bkungfu                         // (c) 1987 Irem
 
 @source:m63.cpp
 atomboy                         // M63 (c) 1985 Irem + Memetron license
