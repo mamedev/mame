@@ -708,4 +708,4 @@ void airraid_state::init_airraide()
 GAME( 1987, cshooter, airraid, airraide, airraid, airraid_state, init_airraide, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, airraid,  0,       airraide, airraid, airraid_state, init_airraide, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-GAME( 198?, failgate, 0,       airraid,  failgate,airraid_state, init_airraid,  ROT270, "Seibu Kaihatsu",                  "Fail Gate",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, failgate, 0,       airraid,  failgate,airraid_state, init_airraid,  ROT270, "Seibu Kaihatsu",                  "Fail Gate",                  MACHINE_SUPPORTS_SAVE )
