@@ -27,7 +27,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/overdriv.h"
+
+#include "machine/k053252.h"
+#include "machine/timer.h"
+#include "video/k051316.h"
+#include "video/k053246_k053247_k055673.h"
+#include "video/k053251.h"
+#include "video/konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
@@ -37,10 +43,84 @@
 #include "sound/k053260.h"
 #include "sound/ymopm.h"
 #include "video/k053250.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "overdriv.lh"
+
+namespace {
+
+class overdriv_state : public driver_device
+{
+public:
+	overdriv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_audiocpu(*this, "audiocpu")
+		, m_k051316_1(*this, "k051316_1")
+		, m_k051316_2(*this, "k051316_2")
+		, m_k053246(*this, "k053246")
+		, m_k053251(*this, "k053251")
+		, m_k053252(*this, "k053252")
+		, m_screen(*this, "screen")
+		, m_led(*this, "led0")
+	{ }
+
+	void overdriv(machine_config &config);
+
+private:
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cpuB_ctrl_r();
+	void cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void overdriv_soundirq_w(uint16_t data);
+	void sound_ack_w(uint8_t data);
+	void slave_irq4_assert_w(uint16_t data);
+	void slave_irq5_assert_w(uint16_t data);
+	void objdma_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(objdma_end_cb);
+
+	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] INTERRUPT_GEN_MEMBER(cpuB_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
+
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+	K053246_CB_MEMBER(sprite_callback);
+	void overdriv_master_map(address_map &map);
+	void overdriv_slave_map(address_map &map);
+	void overdriv_sound_map(address_map &map);
+
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	/* video-related */
+	int       m_zoom_colorbase[2];
+	int       m_road_colorbase[2];
+	int       m_sprite_colorbase;
+	emu_timer *m_objdma_end_timer;
+
+	/* misc */
+	uint16_t     m_cpuB_ctrl;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k051316_device> m_k051316_1;
+	required_device<k051316_device> m_k051316_2;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
+	required_device<screen_device> m_screen;
+	output_finder<> m_led;
+	int m_fake_timer;
+};
+
 
 /***************************************************************************
 
@@ -95,12 +175,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
 }
-#endif
 
 void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -159,6 +237,70 @@ void overdriv_state::slave_irq5_assert_w(uint16_t data)
 	m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
+
+/***************************************************************************
+
+  Callbacks for the K053247
+
+***************************************************************************/
+
+K053246_CB_MEMBER(overdriv_state::sprite_callback)
+{
+	int pri = (*color & 0xffe0) >> 5;   /* ??????? */
+	if (pri)
+		*priority_mask = 0x02;
+	else
+		*priority_mask = 0x00;
+
+	*color = m_sprite_colorbase + (*color & 0x001f);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K051316
+
+***************************************************************************/
+
+K051316_CB_MEMBER(overdriv_state::zoom_callback_1)
+{
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8);
+	*color = m_zoom_colorbase[0] + ((*color & 0x3c) >> 2);
+}
+
+K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
+{
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8);
+	*color = m_zoom_colorbase[1] + ((*color & 0x3c) >> 2);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
+	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
+	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_zoom_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
+	m_zoom_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	screen.priority().fill(0, cliprect);
+
+	m_k051316_1->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 1);
+
+	m_k053246->k053247_sprites_draw( bitmap,cliprect);
+	return 0;
+}
+
+
 void overdriv_state::overdriv_master_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -186,31 +328,6 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
-
-#ifdef UNUSED_FUNCTION
-void overdriv_state::overdriv_k053246_w(offs_t offset, uint8_t data)
-{
-	m_k053246->k053246_w(offset,data);
-
-	uint16_t *src, *dst;
-
-	m_k053246->k053247_get_ram(&dst);
-
-	src = m_sprram;
-
-	// this should be the sprite dma/irq bit...
-	// but it is already turned off by the time overdriv_state::cpuB_interrupt is executed?
-	// even now it rarely gets set, I imagine because the communication / irq is actually
-	// worse than we thought. (drive very slowly and things update..)
-	if (m_k053246->k053246_is_irq_enabled())
-	{
-		memcpy(dst,src,0x1000);
-	}
-
-	//printf("%02x %04x %04x\n", offset, data, mem_mask);
-
-}
-#endif
 
 TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
 {
@@ -518,6 +635,9 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e03.j1", 0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
 GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?

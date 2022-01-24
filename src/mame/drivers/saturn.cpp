@@ -432,8 +432,6 @@ test1f diagnostic hacks:
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/saturn_cdb.h"
-#include "video/stvvdp1.h"
-#include "video/stvvdp2.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"

@@ -18,26 +18,6 @@
 #define INTVKBD_X_SCALE             2
 #define INTVKBD_Y_SCALE             INTV_Y_SCALE
 
-struct intv_sprite_type
-{
-	int visible;
-	int xpos;
-	int ypos;
-	int coll;
-	int collision;
-	int doublex;
-	int doubley;
-	int quady;
-	int xflip;
-	int yflip;
-	int behind_foreground;
-	int grom;
-	int card;
-	int color;
-	int doubleyres;
-	int dirty;
-};
-
 
 // ======================> stic_device
 
@@ -136,6 +116,26 @@ private:
 		CSRS
 	};
 
+	struct intv_sprite_type
+	{
+		int visible;
+		int xpos;
+		int ypos;
+		int coll;
+		int collision;
+		int doublex;
+		int doubley;
+		int quady;
+		int xflip;
+		int yflip;
+		int behind_foreground;
+		int grom;
+		int card;
+		int color;
+		int doubleyres;
+		int dirty;
+	};
+
 
 	required_region_ptr<uint8_t> m_grom;
 
@@ -153,10 +153,8 @@ private:
 	void render_background(bitmap_ind16 &bitmap);
 	void draw_borders(bitmap_ind16 &bitmap);
 
-#ifdef UNUSED_CODE
-	void draw_background(bitmap_ind16 &bitmap, int transparency);
-	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
-#endif
+	[[maybe_unused]] void draw_background(bitmap_ind16 &bitmap, int transparency);
+	[[maybe_unused]] void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
 
 	bitmap_ind16 m_bitmap;
 

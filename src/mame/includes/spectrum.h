@@ -159,7 +159,7 @@ protected:
 	uint8_t spectrum_clone_port_ula_r();
 
 	void spectrum_palette(palette_device &palette) const;
-	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 
@@ -210,7 +210,8 @@ protected:
 	optional_ioport m_io_joy2;
 
 	void spectrum_UpdateBorderBitmap();
-	void spectrum_UpdateScreenBitmap(bool eof = false);
+	virtual u16 get_border_color();
+	virtual void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 

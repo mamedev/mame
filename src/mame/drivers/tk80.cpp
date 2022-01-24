@@ -88,11 +88,11 @@ private:
 	void tk80_mem(address_map &map);
 	void tk85_mem(address_map &map);
 
-	uint8_t m_term_data;
-	uint8_t m_keyb_press;
-	uint8_t m_keyb_press_flag;
-	uint8_t m_shift_press_flag;
-	uint8_t m_ppi_portc;
+	uint8_t m_term_data = 0U;
+	uint8_t m_keyb_press = 0U;
+	uint8_t m_keyb_press_flag = 0U;
+	uint8_t m_shift_press_flag = 0U;
+	uint8_t m_ppi_portc = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

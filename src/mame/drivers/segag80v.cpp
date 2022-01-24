@@ -1506,16 +1506,16 @@ void segag80v_state::init_startrek()
  *
  *************************************/
 
-//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,    STATE           INIT,            MONITOR,                     COMPANY,   FULLNAME,FLAGS
-GAME( 1981, elim2,      0,        elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)", 0 )
-GAME( 1981, elim2a,     elim2,    elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)", 0 )
-GAME( 1981, elim2c,     elim2,    elim2,      elim2c,   segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)", 0 )
-GAME( 1981, elim4,      elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)", 0 )
-GAME( 1981, elim4p,     elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", 0 )
-GAME( 1981, spacfury,   0,        spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)", 0 )
-GAME( 1981, spacfurya,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)", 0 )
-GAME( 1981, spacfuryb,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)", 0 )
-GAME( 1981, spacfurybl, spacfury, spacfurybl, spacfury, segag80v_state, init_spacfurybl, ORIENTATION_FLIP_Y,          "bootleg", "Advisor (Italian bootleg of Space Fury)", MACHINE_IMPERFECT_SOUND ) // TODO: hook up TMS5100 speech
-GAME( 1982, zektor,     0,        zektor,     zektor,   segag80v_state, init_zektor,     ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)", 0 )
-GAME( 1982, tacscan,    0,        tacscan,    tacscan,  segag80v_state, init_tacscan,    ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan", 0 )
-GAME( 1982, startrek,   0,        startrek,   startrek, segag80v_state, init_startrek,   ORIENTATION_FLIP_Y,          "Sega",    "Star Trek", 0 )
+//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,    STATE           INIT,            MONITOR,                     COMPANY,             FULLNAME,FLAGS
+GAME( 1981, elim2,      0,        elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin",           "Eliminator (2 Players, set 1)", 0 )
+GAME( 1981, elim2a,     elim2,    elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin",           "Eliminator (2 Players, set 2)", 0 )
+GAME( 1981, elim2c,     elim2,    elim2,      elim2c,   segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin",           "Eliminator (2 Players, cocktail)", 0 )
+GAME( 1981, elim4,      elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin",           "Eliminator (4 Players)", 0 )
+GAME( 1981, elim4p,     elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin",           "Eliminator (4 Players, prototype)", 0 )
+GAME( 1981, spacfury,   0,        spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",              "Space Fury (revision C)", 0 )
+GAME( 1981, spacfurya,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",              "Space Fury (revision A)", 0 )
+GAME( 1981, spacfuryb,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",              "Space Fury (revision B)", 0 )
+GAME( 1981, spacfurybl, spacfury, spacfurybl, spacfury, segag80v_state, init_spacfurybl, ORIENTATION_FLIP_Y,          "bootleg (Rumiano)", "Advisor (Italian bootleg of Space Fury)", MACHINE_IMPERFECT_SOUND ) // TODO: hook up TMS5100 speech
+GAME( 1982, zektor,     0,        zektor,     zektor,   segag80v_state, init_zektor,     ORIENTATION_FLIP_Y,          "Sega",              "Zektor (revision B)", 0 )
+GAME( 1982, tacscan,    0,        tacscan,    tacscan,  segag80v_state, init_tacscan,    ORIENTATION_FLIP_X ^ ROT270, "Sega",              "Tac/Scan", 0 )
+GAME( 1982, startrek,   0,        startrek,   startrek, segag80v_state, init_startrek,   ORIENTATION_FLIP_Y,          "Sega",              "Star Trek", 0 )

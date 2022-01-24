@@ -26,7 +26,7 @@
 /*
    GI SP0256 Narrator Speech Processor
 
-   By Joe Zbiciak. Ported to MESS by tim lindner.
+   By Joe Zbiciak. Ported to MAME by tim lindner.
 
 */
 

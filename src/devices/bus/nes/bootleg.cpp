@@ -78,8 +78,8 @@ nes_sc127_device::nes_sc127_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_mbaby_device::nes_mbaby_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_MARIOBABY, tag, owner, clock), m_latch(0), m_irq_enable(0), irq_timer(nullptr)
+nes_mbaby_device::nes_mbaby_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_MARIOBABY, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 {
 }
 
@@ -262,20 +262,20 @@ void nes_mbaby_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->reset();
-	timer_freq = clocks_to_attotime(24576);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
 	save_item(NAME(m_latch));
 }
 
 void nes_mbaby_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
+	m_irq_count = 0;
 	m_latch = 0;
 }
 
@@ -797,12 +797,17 @@ void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 {
 	if (id == TIMER_IRQ)
 	{
-		hold_irq_line();
-		irq_timer->adjust(attotime::never);
+		if (m_irq_enable)
+		{
+			m_irq_count = (m_irq_count + 1) & 0x7fff;  // unverified 15-bit counter based on FCEUX
+
+			if (m_irq_count >= 0x6000)
+				set_irq_line(ASSERT_LINE);
+		}
 	}
 }
 
-void nes_mbaby_device::write_h(offs_t offset, uint8_t data)
+void nes_mbaby_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("Mario Baby write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -817,23 +822,18 @@ void nes_mbaby_device::write_h(offs_t offset, uint8_t data)
 				set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 			case 0x02:
-				/* Check if IRQ is being enabled */
-				if (!m_irq_enable && (data & 0x02))
+				m_irq_enable = BIT(data, 1);
+				if (!m_irq_enable)
 				{
-					m_irq_enable = 1;
-					irq_timer->adjust(timer_freq);
-				}
-				if (!(data & 0x02))
-				{
-					m_irq_enable = 0;
-					irq_timer->adjust(attotime::never);
+					m_irq_count = 0;
+					set_irq_line(CLEAR_LINE);
 				}
 				break;
 		}
 	}
 }
 
-uint8_t nes_mbaby_device::read_m(offs_t offset)
+u8 nes_mbaby_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Mario Baby read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000) + (offset & 0x1fff)];

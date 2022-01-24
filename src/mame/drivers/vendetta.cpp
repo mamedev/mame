@@ -208,7 +208,7 @@ void vendetta_state::main_map(address_map &map)
 	map(0x4000, 0x4fff).view(m_videoview0);
 	m_videoview0[0](0x4000, 0x4fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	m_videoview0[1](0x4000, 0x4fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
-	map(0x5f80, 0x5f9f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x5f80, 0x5f9f).m(m_k054000, FUNC(k054000_device::map));
 	map(0x5fa0, 0x5faf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x5fb0, 0x5fb7).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x5fc0, 0x5fc0).portr("P1");
@@ -457,14 +457,13 @@ void vendetta_state::vendetta(machine_config &config)
 	m_k053246->set_palette(m_palette);
 
 	K053251(config, m_k053251, 0);
-
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);  /* verified with PCB */
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);  /* verified with PCB */
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified with PCB */
 	k053260.add_route(0, "lspeaker", 0.75);

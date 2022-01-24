@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Yonezawa / PartyRoom 21 Party Tap Controller
+    Nintendo Family Computer Yonezawa / Party Room 21 Partytap Controller
 
 **********************************************************************/
 
@@ -25,22 +25,21 @@ class nes_partytap_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_partytap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_partytap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 	required_ioport m_inputs;
-	uint8_t m_mode;
-	uint32_t m_latch;
+	u8 m_latch;
 };
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_PARTYTAP, nes_partytap_device)

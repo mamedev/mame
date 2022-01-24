@@ -891,7 +891,7 @@ void thomson_state::to7_game_reset()
 /* IMPORTANT NOTE:
    The following is experimental and not compiled in by default.
    It relies on the existence of an hypothetical "character device" API able
-   to transmit bytes between the MESS driver and the outside world
+   to transmit bytes between the MAME driver and the outside world
    (using, e.g., character device special files on some UNIX).
 */
 

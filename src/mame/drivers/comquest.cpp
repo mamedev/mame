@@ -42,14 +42,41 @@ icq3250a-d
 */
 
 #include "emu.h"
-#include "includes/comquest.h"
 
 #include "cpu/m6805/m68hc05.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 
-#ifdef UNUSED_FUNCTION
+namespace {
+
+class comquest_state : public driver_device
+{
+public:
+	comquest_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void comquest(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	[[maybe_unused]] uint8_t m_data[128][8];
+
+	[[maybe_unused]] uint8_t comquest_read(offs_t offset);
+	[[maybe_unused]] void comquest_write(offs_t offset, uint8_t data);
+
+	uint32_t screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void comquest_mem(address_map &map);
+};
+
+
 uint8_t comquest_state::comquest_read(offs_t offset)
 {
 	uint8_t data=0;
@@ -59,9 +86,22 @@ uint8_t comquest_state::comquest_read(offs_t offset)
 
 void comquest_state::comquest_write(offs_t offset, uint8_t data)
 {
-	logerror("comquest read %.4x %.2x\n",offset,data);
+	logerror("comquest write %.4x %.2x\n",offset,data);
 }
+
+uint32_t comquest_state::screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 128; y++) {
+		for (int x = 0, j = 0; j < 8; j++, x += 8 * 4) {
+#if 0
+			m_gfxdecode->gfx(0)->opaque(bitmap,0, state->m_data[y][j],0,
+					0,0,x,y);
 #endif
+		}
+	}
+	return 0;
+}
+
 
 void comquest_state::comquest_mem(address_map &map)
 {
@@ -294,6 +334,8 @@ ROM_START(comquest)
 	ROM_REGION(0x80000,"gfx1",0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

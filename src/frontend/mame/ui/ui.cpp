@@ -351,7 +351,7 @@ void mame_ui_manager::initialize(running_machine &machine)
 		const char *const service_mode_dipname = ioport_configurer::string_from_token(DEF_STR(Service_Mode));
 		for (auto &port : machine.ioport().ports())
 			for (ioport_field &field : port.second->fields())
-				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
+				if ((field.type() == IPT_DIPSWITCH) && (field.name() == service_mode_dipname)) // FIXME: probably breaks with localisation, also issues with multiple devices
 					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
 

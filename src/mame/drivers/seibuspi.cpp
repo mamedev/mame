@@ -2044,8 +2044,8 @@ void seibuspi_state::init_viprp1o()
 
 void seibuspi_state::init_ejanhs()
 {
-//  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
+	// idle skip doesn't work properly?
+	if (false && ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
@@ -2127,15 +2127,13 @@ u32 seibuspi_state::viprp1o_speedup_r()
 	return m_mainram[0x001d49c/4];
 }
 
-#ifdef UNUSED_FUNCTION
 // causes input problems?
 u32 seibuspi_state::ejanhs_speedup_r()
 {
-// osd_printf_debug("%08x\n",m_maincpu->pc());
 	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x002d224/4];
 }
-#endif
 
 u32 seibuspi_state::rdft_speedup_r()
 {

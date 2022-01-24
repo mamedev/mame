@@ -61,8 +61,8 @@ private:
 	void sacstate_io(address_map &map);
 	void sacstate_mem(address_map &map);
 
-	u8 m_term_data;
-	u8 m_val;
+	u8 m_term_data = 0U;
+	u8 m_val = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

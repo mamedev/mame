@@ -101,6 +101,7 @@
 
 #include "util/corestr.h"
 #include "util/ioprocsfilter.h"
+#include "util/language.h"
 #include "util/unicode.h"
 
 #include "osdepend.h"
@@ -307,6 +308,37 @@ inline bool input_seq_good(running_machine &machine, input_seq const &seq)
 		return input_seq::end_code != machine.input().seq_clean(seq)[0];
 }
 
+
+std::string substitute_player(std::string_view name, u8 player)
+{
+	using util::lang_translate;
+
+	std::string result;
+	while (!name.empty())
+	{
+		auto const found = name.find('%');
+		if ((std::string_view::npos == found) || (name.length() == found + 1))
+		{
+			result.append(name);
+			break;
+		}
+		switch (name[found + 1])
+		{
+		case '%':
+			result.append(name.substr(0, found + 1));
+			break;
+		case 'p':
+			result.append(name.substr(0, found));
+			result.append(util::string_format(_("input-name", "P%1$u"), player + 1));
+			break;
+		default:
+			result.append(name.substr(0, found + 2));
+		}
+		name.remove_prefix(found + 2);
+	}
+	return result;
+}
+
 } // anonymous namespace
 
 
@@ -387,6 +419,24 @@ input_type_entry::input_type_entry(ioport_type type, ioport_group group, int pla
 	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
 	m_defseq[SEQ_TYPE_INCREMENT] = m_seq[SEQ_TYPE_INCREMENT] = increment;
 	m_defseq[SEQ_TYPE_DECREMENT] = m_seq[SEQ_TYPE_DECREMENT] = decrement;
+}
+
+
+//-------------------------------------------------
+//  name - gets the display name for the input
+//  type
+//-------------------------------------------------
+
+std::string input_type_entry::name() const
+{
+	using util::lang_translate;
+
+	if (!m_name)
+		return std::string();
+	else if ((group() < IPG_PLAYER1) || (group() > IPG_PLAYER10))
+		return _("input-name", m_name);
+	else
+		return substitute_player(_("input-name", m_name), player());
 }
 
 
@@ -685,16 +735,25 @@ ioport_field::~ioport_field()
 //  field (this must never return nullptr)
 //-------------------------------------------------
 
-const char *ioport_field::name() const
+std::string ioport_field::name() const
 {
-	// if we have a non-default name, use that
-	if (m_live != nullptr && !m_live->name.empty())
-		return m_live->name.c_str();
-	if (m_name != nullptr)
+	using util::lang_translate;
+
+	// if we have an overridden name, use that
+	if (m_live && !m_live->name.empty())
+		return m_live->name;
+
+	// if no specific name, use the generic name for the type
+	if (!m_name)
+		return manager().type_name(m_type, m_player);
+
+	// return name for non-controller fields as-is
+	ioport_group const group = manager().type_group(m_type, m_player);
+	if ((group < IPG_PLAYER1) || (group > IPG_PLAYER10))
 		return m_name;
 
-	// otherwise, return the name associated with the type
-	return manager().type_name(m_type, m_player);
+	// substitute the player number in if necessary
+	return substitute_player(m_name, m_player);
 }
 
 
@@ -750,8 +809,8 @@ void ioport_field::set_defseq(input_seq_type seqtype, const input_seq &newseq)
 ioport_type_class ioport_field::type_class() const noexcept
 {
 	// inputs associated with specific players
-	ioport_group group = manager().type_group(m_type, m_player);
-	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER10)
+	ioport_group const group = manager().type_group(m_type, m_player);
+	if ((group >= IPG_PLAYER1) && (group <= IPG_PLAYER10))
 		return INPUT_CLASS_CONTROLLER;
 
 	// keys (names derived from character codes)
@@ -1702,12 +1761,14 @@ time_t ioport_manager::initialize()
 			if (&port.second->device() == &device)
 			{
 				for (ioport_field &field : port.second->fields())
+				{
 					if (field.type_class() == INPUT_CLASS_CONTROLLER)
 					{
 						if (players < field.player() + 1)
 							players = field.player() + 1;
 						field.set_player(field.player() + player_offset);
 					}
+				}
 			}
 		}
 		player_offset += players;
@@ -1846,15 +1907,21 @@ ioport_manager::~ioport_manager()
 //  type/player
 //-------------------------------------------------
 
-const char *ioport_manager::type_name(ioport_type type, u8 player) const noexcept
+std::string ioport_manager::type_name(ioport_type type, u8 player) const
 {
+	using util::lang_translate;
+
 	// if we have a machine, use the live state and quick lookup
-	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr && entry->name() != nullptr)
-		return entry->name();
+	input_type_entry const *const entry = m_type_to_entry[type][player];
+	if (entry)
+	{
+		std::string name = entry->name();
+		if (!name.empty())
+			return name;
+	}
 
 	// if we find nothing, return a default string (not a null pointer)
-	return "???";
+	return _("input-name", "???");
 }
 
 
@@ -2313,7 +2380,10 @@ bool ioport_manager::load_controller_config(
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
 				if (input_seq_good(machine(), newseq[seqtype].first))
+				{
+					field.live().seq[seqtype] = newseq[seqtype].first;
 					field.set_defseq(seqtype, newseq[seqtype].first);
+				}
 			}
 
 			// fetch configurable attributes

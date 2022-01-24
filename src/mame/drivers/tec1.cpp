@@ -86,7 +86,6 @@ class tec1_state : public driver_device
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_key_pressed(0)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
@@ -108,9 +107,9 @@ private:
 	void tecjmon_digit_w(u8 data);
 	void segment_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(da_w);
-	bool m_key_pressed;
-	u8 m_seg;
-	u8 m_digit;
+	bool m_key_pressed = 0;
+	u8 m_seg = 0U;
+	u8 m_digit = 0U;
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);

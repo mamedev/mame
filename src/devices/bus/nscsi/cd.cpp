@@ -56,8 +56,9 @@ nscsi_toshiba_xm5701_sun_device::nscsi_toshiba_xm5701_sun_device(const machine_c
 {
 }
 
+// drive identifies as an original Apple CDSC (Sony CDU-8001 with custom firmware)
 nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "Sony", "CD-ROM CDU-8001", "1.0", 0x00, 0x05)
 {
 }
 
@@ -105,7 +106,10 @@ int nscsi_cdrom_device::to_msf(int frame)
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
 	if (bytes_per_sector % block_size)
-		throw emu_fatalerror("nscsi_cdrom_device(%s): block size must be a factor of sector size", tag());
+	{
+		logerror("nscsi_cdrom_device(%s): block size %d must be a factor of sector size %d", tag(), block_size, bytes_per_sector);
+		return;
+	}
 
 	bytes_per_block = block_size;
 };
@@ -422,17 +426,16 @@ void nscsi_cdrom_device::scsi_command()
 
 			case 0x30: // magic Apple page
 				{
-					static const u8 apple_magic[0x24] =
-					{
-						0x23, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x30, 0x16, 0x41, 0x50,
-						0x50, 0x4C, 0x45, 0x20, 0x43, 0x4F, 0x4D, 0x50, 0x55, 0x54, 0x45, 0x52, 0x2C, 0x20, 0x49, 0x4E,
-						0x43, 0x20, 0x20, 0x20
-					};
+					static const u8 apple_magic[0x17] =
+						{
+							0x00, 0x41, 0x50, 0x50, 0x4C, 0x45, 0x20, 0x43, 0x4F, 0x4D, 0x50, 0x55,
+							0x54, 0x45, 0x52, 0x2C, 0x20, 0x49, 0x4E, 0x43, 0x20, 0x20, 0x20
+						};
 
 					LOG("Apple special MODE SENSE page\n");
 					scsi_cmdbuf[pos++] = 0x30; // PS, page id
-					memcpy(&scsi_cmdbuf[pos], apple_magic, 0x24);
-					pos += 0x24;
+					memcpy(&scsi_cmdbuf[pos], apple_magic, 0x17);
+					pos += 0x17;
 				}
 				break;
 

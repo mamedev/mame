@@ -198,10 +198,10 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	u8 m_sol20_fa;
-	u8 m_sol20_fc;
-	u8 m_sol20_fe;
-	u8 m_framecnt;
+	u8 m_sol20_fa = 0U;
+	u8 m_sol20_fc = 0U;
+	u8 m_sol20_fe = 0U;
+	u8 m_framecnt = 0U;
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();

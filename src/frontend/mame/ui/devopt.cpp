@@ -120,10 +120,16 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				}
 				else
 				{
-					std::string hz(std::to_string(float(screen.frame_period().as_hz())));
-					size_t last = hz.find_last_not_of('0');
-					size_t dpos = hz.find_last_of('.');
-					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+					const u32 rate = u32(screen.frame_period().as_hz() * 1'000'000 + 0.5);
+					const bool valid = rate >= 1'000'000;
+					std::string hz(valid ? std::to_string(rate) : "?");
+					if (valid)
+					{
+						size_t dpos = hz.length() - 6;
+						hz.insert(dpos, ".");
+						size_t last = hz.find_last_not_of('0');
+						hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+					}
 
 					const rectangle &visarea = screen.visible_area();
 					layout->add_text(
@@ -252,12 +258,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						if (setting.value() == field.defvalue())
 						{
 							def = true;
-							util::stream_format(dips_opt, _("  %1$s    [default: %2$s]\n"), field.name(), setting.name());
+							util::stream_format(dips_opt, _("  %1$s    [default: %2$s]\n"), field.specific_name(), setting.name());
 							break;
 						}
 					}
 					if (!def)
-						util::stream_format(dips_opt, _("  %1$s\n"), field.name());
+						util::stream_format(dips_opt, _("  %1$s\n"), field.specific_name());
 				}
 				else if (field.type() == IPT_CONFIG)
 				{
@@ -268,12 +274,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						if (setting.value() == field.defvalue())
 						{
 							def = true;
-							util::stream_format(confs_opt, _("  %1$s    [default: %2$s]\n"), field.name(), setting.name());
+							util::stream_format(confs_opt, _("  %1$s    [default: %2$s]\n"), field.specific_name(), setting.name());
 							break;
 						}
 					}
 					if (!def)
-						util::stream_format(confs_opt, _("  %1$s\n"), field.name());
+						util::stream_format(confs_opt, _("  %1$s\n"), field.specific_name());
 				}
 			}
 

@@ -67,8 +67,8 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void st_mp201(machine_config &config);
@@ -101,19 +101,19 @@ private:
 
 	void mem_map(address_map &map);
 
-	u8 m_u10a = 0;
-	u8 m_u10b = 0;
-	u8 m_u11a = 0;
-	u8 m_u11b = 0;
+	u8 m_u10a = 0U;
+	u8 m_u10b = 0U;
+	u8 m_u11a = 0U;
+	u8 m_u11b = 0U;
 	bool m_u10_ca2 = 0;
 	bool m_u10_cb2 = 0;
 	bool m_u11_cb2 = 0;
 	bool m_7d = 0; // 7-digit display yes/no
-	u8 m_stored_lamp = 0xff;
-	u8 m_digit = 0;
-	u8 m_counter = 0;
+	u8 m_stored_lamp = 0xffU;
+	u8 m_digit = 0U;
+	u8 m_counter = 0U;
 	u8 m_segment[5]{};
-	u8 m_last_solenoid = 31;
+	u8 m_last_solenoid = 31U;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
 	optional_region_ptr<u8> m_speech;
@@ -538,7 +538,6 @@ u8 st_mp200_state::speech_r(offs_t offset)
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -560,6 +559,7 @@ void st_mp200_state::machine_start()
 void st_mp200_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	m_u10a = 0;
 	m_u10b = 0;
 	m_u10_cb2 = 0;

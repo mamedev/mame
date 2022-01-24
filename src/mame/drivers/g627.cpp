@@ -57,10 +57,10 @@ public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switch(*this, "SWITCH.%u", 0)
-		, m_testipt(*this, "TEST.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_testipt(*this, "T%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void g627(machine_config &config);
@@ -76,15 +76,15 @@ private:
 	void lamp_w(offs_t offset, u8 data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_seg[6];
-	u8 m_portc = 0;
-	u8 m_motor = 0;
-	u8 m_last_solenoid = 0;
+	u8 m_seg[6]{};
+	u8 m_portc = 0U;
+	u8 m_motor = 0U;
+	u8 m_last_solenoid = 0U;
 	bool m_type = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<7> m_switch;
+	required_ioport_array<7> m_io_keyboard;
 	required_ioport_array<6> m_testipt;
 	output_finder<56> m_digits;
 	output_finder<72> m_io_outputs;  // 16 solenoids + 56 lamps
@@ -108,10 +108,10 @@ void g627_state::io_map(address_map &map)
 }
 
 static INPUT_PORTS_START( g627 )
-	PORT_START("SWITCH.0")
+	PORT_START("X0")
 	//bits 0,1 : optical encoder for precise table alignment. Correct position = 3.
 	//bit2-7   : position of table as it turns, using Gray code.
-	PORT_START("SWITCH.1")
+	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Centre TB")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Bank Shot Outlane")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Spinner")
@@ -120,7 +120,7 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Call South")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Call North")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START4) PORT_NAME("Call West")
-	PORT_START("SWITCH.2")
+	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Bottom TB")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Left Flipper Return") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("3/11 Target")
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("North Test")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("North Coin")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("North Tilt")
-	PORT_START("SWITCH.3")
+	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Top Slingshot")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Bank Shot Advance")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("4/12 Target")
@@ -138,16 +138,16 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("South Test")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("South Coin")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("South Tilt")
-	PORT_START("SWITCH.4")
+	PORT_START("X4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Right Slingshot")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("OutHole")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("5/13 Target")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("4/16 Target")
-	PORT_START("SWITCH.5")
+	PORT_START("X5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Left Slingshot")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right Flipper Return") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Right Out Lane")
-	PORT_START("SWITCH.6")
+	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Top TB")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("7/15 Target")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("10 Points")
@@ -156,32 +156,32 @@ static INPUT_PORTS_START( g627 )
 
 	// Diagnostic Keyboard: Press GAME then END then TEST#. Press GAME etc for more tests.
 	// Pressing test 8 at any time will instantly reset the NVRAM.
-	PORT_START("TEST.0")
+	PORT_START("T0")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)
-	PORT_START("TEST.1")
+	PORT_START("T1")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_START("TEST.2")
+	PORT_START("T2")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SET") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)
-	PORT_START("TEST.3")
+	PORT_START("T3")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 3") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 2") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 1") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("GAME") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_START("TEST.4")
+	PORT_START("T4")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 7") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 6") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 5") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 4") PORT_CODE(KEYCODE_COLON)
-	PORT_START("TEST.5")
+	PORT_START("T5")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("END") PORT_CODE(KEYCODE_END)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 10") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test 9") PORT_CODE(KEYCODE_CLOSEBRACE)
@@ -199,7 +199,7 @@ u8 g627_state::porta_r()
 	if (!m_portc)
 		return ((m_motor >> 1)^m_motor) | 3; // convert to Gray Code
 	else if (m_portc < 7)
-		return m_switch[m_portc]->read();
+		return m_io_keyboard[m_portc]->read();
 
 	return 0;
 }
@@ -327,7 +327,6 @@ void g627_state::lamp_w(offs_t offset, u8 data)
 void g627_state::machine_start()
 {
 	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -341,6 +340,8 @@ void g627_state::machine_start()
 void g627_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 }
 
 void g627_state::g627(machine_config &config)

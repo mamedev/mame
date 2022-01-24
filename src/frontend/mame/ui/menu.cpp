@@ -480,6 +480,8 @@ void menu::draw(uint32_t flags)
 		// add in width of right hand side
 		if (!pitem.subtext().empty())
 			total_width += 2.0f * gutter_width + ui().get_string_width(pitem.subtext());
+		else if (pitem.flags() & FLAG_UI_HEADING)
+			total_width += 4.0f * ud_arrow_width;
 
 		// track the maximum
 		if (total_width > visible_width)

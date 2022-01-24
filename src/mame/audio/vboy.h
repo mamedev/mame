@@ -4,7 +4,7 @@
     vboy.h - Virtual Boy audio emulation
 
     By Richard Bannister and Gil Pedersen.
-    MESS device adaptation by R. Belmont
+    MAME device adaptation by R. Belmont
 */
 #ifndef MAME_AUDIO_VBOY_H
 #define MAME_AUDIO_VBOY_H

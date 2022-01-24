@@ -92,6 +92,7 @@ public:
 	void init_znpwfv();
 	void init_othellos();
 	void init_mausuke();
+	void init_stv_us();
 
 protected:
 	virtual void machine_start() override;

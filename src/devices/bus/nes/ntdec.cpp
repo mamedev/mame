@@ -8,7 +8,6 @@
 
  Here we emulate the following PCBs
 
- * NTDEC 2746 [mapper 435]
  * NTDEC ASDER [mapper 112]
  * NTDEC Fighting Hero [mapper 193]
  * NTDEC N715021 [mapper 81]
@@ -36,16 +35,10 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_NTDEC_2746,    nes_ntdec_2746_device,    "nes_ntdec_2746",    "NES Cart NTDEC 2746 PCB")
 DEFINE_DEVICE_TYPE(NES_NTDEC_ASDER,   nes_ntdec_asder_device,   "nes_ntdec_asder",   "NES Cart NTDEC Asder PCB")
 DEFINE_DEVICE_TYPE(NES_NTDEC_FH,      nes_ntdec_fh_device,      "nes_ntdec_fh",      "NES Cart NTDEC Fighting Hero PCB")
 DEFINE_DEVICE_TYPE(NES_NTDEC_N715021, nes_ntdec_n715021_device, "nes_ntdec_n715021", "NES Cart NTDEC N715021 PCB")
 
-
-nes_ntdec_2746_device::nes_ntdec_2746_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_NTDEC_2746, tag, owner, clock)
-{
-}
 
 nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_NTDEC_ASDER, tag, owner, clock), m_latch(0), m_chr_outer(0)
@@ -64,13 +57,6 @@ nes_ntdec_n715021_device::nes_ntdec_n715021_device(const machine_config &mconfig
 
 
 
-
-void nes_ntdec_2746_device::pcb_reset()
-{
-	prg16_89ab(0);
-	prg16_cdef(0);
-	chr8(0, CHRROM);
-}
 
 void nes_ntdec_asder_device::device_start()
 {
@@ -108,31 +94,6 @@ void nes_ntdec_n715021_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- NTDEC 2746 Board
-
- Games: 14 in 1
-
- NES 2.0: mapper 435
-
- In MAME: Supported.
-
- -------------------------------------------------*/
-
-void nes_ntdec_2746_device::write_h(offs_t offset, u8 data)
-{
-	LOG_MMC(("ntdec_2746 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	u8 bank = bitswap<4>(offset, 9, 8, 7, 5);
-	u8 mode = BIT(offset, 6);
-	prg16_89ab(bank & ~mode);
-	prg16_cdef(bank | mode);
-
-	chr8(offset & 0x0f, CHRROM);
-	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-}
 
 /*-------------------------------------------------
 

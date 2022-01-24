@@ -36,12 +36,10 @@ void zn_state::machine_start()
 }
 
 
-#ifdef UNUSED_FUNCTION
-inline uint16_t zn_state::psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
+[[maybe_unused]] inline uint16_t zn_state::psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
 {
 	return *( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
-#endif
 
 inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data )
 {

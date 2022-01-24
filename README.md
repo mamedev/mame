@@ -25,7 +25,7 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 How to compile?
 ===============
 
-If you're on a *NIX or OSX system, it could be as easy as typing
+If you're on a UNIX-like system (including Linux and macOS), it could be as easy as typing
 
 ```
 make
@@ -43,11 +43,11 @@ for an arcade-only build, or
 make SUBTARGET=mess
 ```
 
-for MESS build.
+for a MESS build.
 
-See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for Mac OS X and popular Linux distributions.
+See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for macOS and popular Linux distributions.
 
-For recent versions of OSX you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
+For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
 
 For Windows users, we provide a ready-made [build environment](http://mamedev.org/tools/) based on MinGW-w64.
 

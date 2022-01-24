@@ -97,6 +97,7 @@
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
+#include "bus/vme/vme_cp31.h"
 #include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
@@ -173,6 +174,7 @@ INPUT_PORTS_END
 
 static void miniforce_vme_cards(device_slot_interface &device)
 {
+	device.option_add("cp31", VME_CP31);
 	device.option_add("fccpu21", VME_FCCPU21);
 	device.option_add("fcisio", VME_FCISIO1);
 	device.option_add("fcscsi", VME_FCSCSI1);

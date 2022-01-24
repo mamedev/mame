@@ -97,9 +97,9 @@ private:
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
 
-	u16 s_curpos;
-	u8 s_command;
-	u8 s_data;
+	u16 s_curpos = 0U;
+	u8 s_command = 0U;
+	u8 s_data = 0U;
 	std::unique_ptr<u8[]> m_vram;
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;

@@ -531,7 +531,7 @@ void s11_state::s11_only(machine_config &config)
 / Grand Lizard 04/86 (#523)
 /-----------------------------*/
 ROM_START(grand_l4)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
@@ -549,7 +549,7 @@ ROM_START(grand_l4)
 ROM_END
 
 ROM_START(grand_l3)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l3", 0x8000, 0x8000, CRC(9061dfdc) SHA1(06e0add721afa0a89ad4961cddbc5409f95362df))
@@ -570,7 +570,7 @@ ROM_END
 / High Speed 01/86 (#541)
 /--------------------------*/
 ROM_START(hs_l4)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("hs_u26.l4", 0x4000, 0x2000, CRC(38b73830) SHA1(df89670f3df2b657dcf1f8ee08e506e54e016028))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("hs_u27.l4", 0x8000, 0x8000, CRC(24c6f7f0) SHA1(bb0058650ec0908f88b6a202df79e971b46f8594))
@@ -584,7 +584,7 @@ ROM_START(hs_l4)
 ROM_END
 
 ROM_START(hs_l3)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u26-l3.rom", 0x4000, 0x2000, CRC(fd587959) SHA1(20fe6d7bd617b1fa886362ce520393a25be9a632))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("hs_u27.l4", 0x8000, 0x8000, CRC(24c6f7f0) SHA1(bb0058650ec0908f88b6a202df79e971b46f8594))
@@ -602,7 +602,7 @@ ROM_END
 /--------------------------*/
 
 ROM_START(rdkng_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("road_u26.l1", 0x4000, 0x4000, CRC(19abe96b) SHA1(d6c3b6dab328f23cc4506e4f56cd0beeb06fb3cb))
 	ROM_LOAD("road_u27.l1", 0x8000, 0x8000, CRC(3dcad794) SHA1(0cf06f8e16d738f0bc0111e2e12351a26e2f02c6))
 
@@ -615,7 +615,7 @@ ROM_START(rdkng_l1)
 ROM_END
 
 ROM_START(rdkng_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("road_u26.l1", 0x4000, 0x4000, CRC(19abe96b) SHA1(d6c3b6dab328f23cc4506e4f56cd0beeb06fb3cb))
 	ROM_LOAD("road_u27.l2", 0x8000, 0x8000, CRC(aff45e2b) SHA1(c52aca20639f519a940951ef04c2bd179a596b30))
 
@@ -628,7 +628,7 @@ ROM_START(rdkng_l2)
 ROM_END
 
 ROM_START(rdkng_l3)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("road_u26.l3", 0x4000, 0x4000, CRC(9bade45d) SHA1(c1791724761cdd1d863e12b02655c5fed8936162))
 	ROM_LOAD("road_u27.l3", 0x8000, 0x8000, CRC(97b599dc) SHA1(18524d22a75b0569bb480d847cef8047ee51f91e))
 
@@ -641,7 +641,7 @@ ROM_START(rdkng_l3)
 ROM_END
 
 ROM_START(rdkng_l4)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("road_u26.l4", 0x4000, 0x4000, CRC(4ea27d67) SHA1(cf46e8c5e417999150403d6d40adf8c36b1c0347))
 	ROM_LOAD("road_u27.l4", 0x8000, 0x8000, CRC(5b88e755) SHA1(6438505bb335f670e0892126764819a48eec9b88))
 
@@ -655,11 +655,24 @@ ROM_END
 
 /************************ From here, not pinball machines **************************************/
 
+/*------------------------------
+/ Alley Cats (Shuffle) (#918)
+/-------------------------------*/
+ROM_START(alcat_l7)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u26_rev7.rom", 0xd000, 0x1000, CRC(4d274dd3) SHA1(80d72bd0f85ce2cac04f6d9f59dc1fcccc86d402))
+	ROM_LOAD("u27_rev7.rom", 0xe000, 0x2000, CRC(9c7faf8a) SHA1(dc1a561948b9a303f7924d7bebcd972db766827b))
+
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("acs_u21.bin", 0x18000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
+	ROM_LOAD("acs_u22.bin", 0x10000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
+ROM_END
+
 /*--------------------
 / Tic-Tac-Strike (#919)
 /--------------------*/
 ROM_START(tts_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27_l2.128", 0x8000, 0x4000, CRC(edbcab92) SHA1(0f6b2dc01874984f9a17ee873f2fa0b6c9bba5be))
 	ROM_RELOAD( 0xc000, 0x4000)
 
@@ -669,7 +682,7 @@ ROM_START(tts_l2)
 ROM_END
 
 ROM_START(tts_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u27.128", 0x8000, 0x4000, CRC(f540c53c) SHA1(1c7a318278ad1afdcbe6aaf81f9b774882b069d6))
 	ROM_RELOAD( 0xc000, 0x4000)
 
@@ -682,7 +695,7 @@ ROM_END
 / Gold Mine (Shuffle) (#920) s11b
 /--------------------------------*/
 ROM_START(gmine_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27.128", 0x8000, 0x4000, CRC(99c6e049) SHA1(356faec0598a54892050a28857e9eb5cdbf35833))
 	ROM_RELOAD( 0xc000, 0x4000)
 
@@ -695,7 +708,7 @@ ROM_END
 / Top Dawg (Shuffle) (#921)
 /--------------------------*/
 ROM_START(tdawg_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tdu27r1.128", 0x8000, 0x4000, CRC(0b4bb586) SHA1(a927ebf7167609cc84b38c22aa35d0c4d259dd8b))
 	ROM_RELOAD( 0xc000, 0x4000)
 
@@ -708,7 +721,7 @@ ROM_END
 / Shuffle Inn (Shuffle) (#922)
 /-----------------------------*/
 ROM_START(shfin_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27rom-1.rv1", 0x8000, 0x4000, CRC(40cfb74a) SHA1(8cee4212ea8bb6b360060391df3208e1e129d7e5))
 	ROM_RELOAD( 0xc000, 0x4000)
 
@@ -717,17 +730,20 @@ ROM_START(shfin_l1)
 	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
 ROM_END
 
-GAME( 1986, grand_l4, 0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, grand_l3, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+// Pinball
+GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",               MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 1986, tts_l2,   0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1986, tts_l1,   tts_l2,   s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1987, gmine_l2, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, tdawg_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, shfin_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+// Shuffle
+GAME( 1985, alcat_l7, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, tts_l2,   0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, tts_l1,   tts_l2,   s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, gmine_l2, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, tdawg_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, shfin_l1, 0,        s11_only, s11, s11_state, init_s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_IS_SKELETON_MECHANICAL )

@@ -99,14 +99,7 @@ public:
 		, m_sync_rom(*this, "video")
 		, m_char_rom(*this, "chargen")
 		, m_video_ram(*this, "video_ram")
-		, m_key(*this, "KEY.%u", 0)
-		, m_cmd_d1(0)
-		, m_fdint(0)
-		, m_vsync(0)
-		, m_srq(1)
-		, m_atn(1)
-		, m_rxrdy(0)
-		, m_txrdy(0)
+		, m_key(*this, "KEY.%u", 0U)
 	{ }
 
 	void vixen(machine_config &config);
@@ -165,30 +158,30 @@ private:
 	void update_interrupt();
 
 	// keyboard state
-	uint8_t m_col;
+	uint8_t m_col = 0U;
 
 	// interrupt state
-	int m_cmd_d0;
-	int m_cmd_d1;
+	int m_cmd_d0 = 0;
+	int m_cmd_d1 = 0;
 
-	bool m_fdint;
-	int m_vsync;
+	bool m_fdint = 0;
+	int m_vsync = 0;
 
-	int m_srq;
-	int m_atn;
-	int m_enb_srq_int;
-	int m_enb_atn_int;
+	int m_srq = 1;
+	int m_atn = 1;
+	int m_enb_srq_int = 0;
+	int m_enb_atn_int = 0;
 
-	int m_rxrdy;
-	int m_txrdy;
-	int m_int_clk;
-	int m_enb_xmt_int;
-	int m_enb_rcv_int;
-	int m_enb_ring_int;
+	int m_rxrdy = 0;
+	int m_txrdy = 0;
+	int m_int_clk = 0;
+	int m_enb_xmt_int = 0;
+	int m_enb_rcv_int = 0;
+	int m_enb_ring_int = 0;
 
 	// video state
-	bool m_alt;
-	bool m_256;
+	bool m_alt = 0;
+	bool m_256 = 0;
 };
 
 
