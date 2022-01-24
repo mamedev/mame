@@ -11,6 +11,10 @@ if((CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION
 	target_compile_definitions(asmjit PRIVATE TARGET_OS_OSX=1)
 endif()
 
+if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+	target_compile_options(asmjit PRIVATE -Wno-unused-but-set-variable)
+endif()
+
 target_sources(asmjit PRIVATE
 	${MAME_DIR}/3rdparty/asmjit/src/asmjit/asmjit.h
 	${MAME_DIR}/3rdparty/asmjit/src/asmjit/core.h

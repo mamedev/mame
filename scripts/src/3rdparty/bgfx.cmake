@@ -101,3 +101,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	# /usr/local/include is not considered a system include directory on FreeBSD. GL.h resides there.
 	target_compile_options(bgfx PRIVATE -isystem /usr/local/include)
 endif()
+
+if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+	target_compile_options(bgfx PRIVATE -Wno-unused-but-set-variable)
+endif()
