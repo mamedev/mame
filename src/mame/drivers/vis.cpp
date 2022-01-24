@@ -242,6 +242,7 @@ protected:
 	virtual void recompute_params() override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -378,6 +379,51 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 }
 
+void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const uint32_t IV = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int curr_addr = 0;
+
+	for (int addr = vga.crtc.start_addr, line=0; line<(vga.crtc.vert_disp_end+1); line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		for(int yi = 0;yi < height; yi++)
+		{
+			uint8_t ua = 0, va = 0;
+			if((line + yi) < (vga.crtc.line_compare & 0x3ff))
+				curr_addr = addr;
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				curr_addr = 0;
+			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8, pos+=16)
+			{
+				if(pos + 0x08 > 0x80000)
+					return;
+				for(int xi=0,xm=0;xi<8;xi+=2,xm+=4)
+				{
+					if(!screen().visible_area().contains(col+xi, line + yi))
+						continue;
+					uint8_t y0 = vga.memory[pos + xm + 0], ub = vga.memory[pos + xm + 1];
+					uint8_t y1 = vga.memory[pos + xm + 2], vb = vga.memory[pos + xm + 3];
+					uint16_t u, v;
+					if(col)
+					{
+						u = (ua + ub) >> 1;
+						v = (va + vb) >> 1;
+					}
+					else
+					{
+						u = ub;
+						v = vb;
+					}
+					ua = ub; va = vb;
+					bitmap.pix(line + yi, col + xi + 0) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 1) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+				}
+			}
+		}
+	}
+}
+
 void vis_vga_device::device_start()
 {
 	set_isa_device();
@@ -421,7 +467,7 @@ uint32_t vis_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			popmessage("Border encoded 8-bit mode");
 			break;
 		case 0xc3:
-			popmessage("YUV 422 mode");
+			vga_vh_yuv422(bitmap, cliprect);
 			break;
 		case 0xc4:
 			vga_vh_yuv8(bitmap, cliprect);
@@ -741,12 +787,14 @@ private:
 	uint8_t m_unk1[4];
 	uint8_t m_cardreg, m_cardval, m_cardcnt;
 	uint16_t m_padctl, m_padstat;
+	bool m_padsel;
 };
 
 void vis_state::machine_reset()
 {
 	m_sysctl = 0;
 	m_padctl = 0;
+	m_padsel = false;
 }
 
 INPUT_CHANGED_MEMBER(vis_state::update)
@@ -835,12 +883,17 @@ uint16_t vis_state::pad_r(offs_t offset)
 	switch(offset)
 	{
 		case 0:
-			ret = m_pad->read();
-			if(m_padctl != 0x18)
-				ret |= 0x400;
+			if(!m_padsel)
+			{
+				ret = m_pad->read();
+				m_padsel = true;
+			}
 			else
-				m_padctl = 0;
-			m_padstat = 0;
+			{
+				ret = 0x400;
+				m_padstat = 0;
+				m_padsel = false;
+			}
 			m_pic1->ir3_w(CLEAR_LINE);
 			break;
 		case 1:
@@ -941,12 +994,6 @@ static INPUT_PORTS_START(vis)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 INPUT_PORTS_END
 
 void vis_state::vis(machine_config &config)
