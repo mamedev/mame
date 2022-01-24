@@ -201,10 +201,11 @@ license:CC0
 		<rom name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es).bin" size="613156992" crc="48c9bd76" sha1="30a2284858239bc795b053a4d307c0f680032571"/>
 		<rom name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es).cue" size="170" crc="fa7b855f" sha1="80921f97a3807594d046541d6557ab3cc4756011"/>
 		-->
-		<description>Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe</description>
+		<description>Discis Books Multimedia - The Cask of Amontillado</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6138 / CDRM1046160"/>
+		<info name="book_author" value="Edgar Allan Poe"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es)" sha1="781bde92ff6df9e0051ae8c42bdf553cb2361ceb"/>
@@ -218,10 +219,11 @@ license:CC0
 		<rom name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es).bin" size="647952480" crc="0496038e" sha1="208bd307dfff1081ddbbc9bc2c29655786829cbd"/>
 		<rom name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es).cue" size="138" crc="c6ac4102" sha1="0da01592272c6bd7fdfbb15329542a86b77aca83"/>
 		-->
-		<description>Discis Books Multimedia - The Necklace - Guy de Maupassant</description>
+		<description>Discis Books Multimedia - The Necklace</description>
 		<year>1993</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6139 / CDRM1046150"/>
+		<info name="book_author" value="Guy de Maupassant"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es)" sha1="a387503f794270552bad6adf0124c21b68877141"/>
@@ -235,10 +237,11 @@ license:CC0
 		<rom name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es).bin" size="545807472" crc="4d4af009" sha1="3fe7d7f1b0fb18d166ce24c0a0ce2b64616e9e39"/>
 		<rom name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es).cue" size="166" crc="0f5bca69" sha1="4d8628eddcf9f4604a10753864f3e2231e4dc20b"/>
 		-->
-		<description>Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe</description>
+		<description>Discis Books Multimedia - The Tell-Tale Heart</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6137 / CDRM1045010"/>
+		<info name="book_author" value="Edgar Allan Poe"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es)" sha1="4700e7c8f45ed4414a3483187d663315b8adf79f"/>
@@ -442,10 +445,11 @@ license:CC0
 		<rom name="Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es).bin" size="370639920" crc="1c493070" sha1="2857e3b5f9c96c301369fcdbbe36da497be8f242"/>
 		<rom name="Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es).cue" size="138" crc="1ee42b4c" sha1="12a03a16a29d24ab81eaf63b0aa84bbceede9442"/>
 		-->
-		<description>Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter</description>
+		<description>Kids Can Read! The Tale of Benjamin Bunny</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6126 / CDRM1024470"/>
+		<info name="book_author" value="Beatrix Potter"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es)" sha1="84e56efabed860a77303685a3670979cdb3e4fd9"/>
@@ -476,10 +480,11 @@ license:CC0
 		<rom name="Kids Can Read! Heather Hits Her First Home Run by Ted Planos (USA) (En,Es).bin" size="317520000" crc="acdd851f" sha1="49174711e4f19a5ef2fed5d02df18b3edf14c028"/>
 		<rom name="Kids Can Read! Heather Hits Her First Home Run by Ted Planos (USA) (En,Es).cue" size="140" crc="a9be62c4" sha1="b47c7107c29488a8bb0c91a141570e405635d107"/>
 		-->
-		<description>Kids Can Read! Heather Hits Her First Home Run by Ted Planos</description>
+		<description>Kids Can Read! Heather Hits Her First Home Run</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6133 / CDRM1024500"/>
+		<info name="book_author" value="Ted Plantos"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Heather Hits Her First Home Run by Ted Planos (USA) (En,Es)" sha1="ef3d050d90686f4f21d3a74acf506094557146a5"/>
@@ -493,10 +498,11 @@ license:CC0
 		<rom name="Kids Can Read! The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es).bin" size="289197216" crc="f87ea0be" sha1="f14526fdf81dcfc541c08f0c67bff593b7ee5ad9"/>
 		<rom name="Kids Can Read! The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es).cue" size="144" crc="772af51b" sha1="b04450b5b1545a7071b4d006ea2a7c2a47600b8a"/>
 		-->
-		<description>Kids Can Read! The Night Before Christmas - Clement C. Moore LLD</description>
+		<description>Kids Can Read! The Night Before Christmas</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6135 / CDRM1024580"/>
+		<info name="book_author" value="Clement C. Moore LLD"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es)" sha1="8d04cf6d3847b5c82d1b3271e3f0f3bf2cf06c51"/>
@@ -510,10 +516,11 @@ license:CC0
 		<rom name="Kids Can Read! The Paper Bag Princess - Robert N. Munsch (USA) (En,Es).bin" size="287797776" crc="5d6f9120" sha1="79579e11027766cdc07f6a804d06da075efb34fe"/>
 		<rom name="Kids Can Read! The Paper Bag Princess - Robert N. Munsch (USA) (En,Es).cue" size="136" crc="a25822ea" sha1="519e7a9eec0cd0476f74cf84679b0e5eb0087b62"/>
 		-->
-		<description>Kids Can Read! The Paper Bag Princess - Robert N. Munsch</description>
+		<description>Kids Can Read! The Paper Bag Princess</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6127 / CDRM1024530"/>
+		<info name="book_author" value="Robert N. Munsch"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Paper Bag Princess - Robert N. Munsch (USA) (En,Es)" sha1="896ef1fba1de510f6024ad5ae22b601d30bf1bd4"/>
@@ -527,10 +534,11 @@ license:CC0
 		<rom name="Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es).bin" size="339473568" crc="d78898b0" sha1="cfc24625e685d95a789ca8d1797ad4e73b998e11"/>
 		<rom name="Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es).cue" size="136" crc="e9535e2d" sha1="9600cc06f194f4e986173d4785bd78d50899ac05"/>
 		-->
-		<description>Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter</description>
+		<description>Kids Can Read! The Tale of Peter Rabbit</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6125 / CDRM1024540"/>
+		<info name="book_author" value="Beatrix Potter"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es)" sha1="66c896197ad8082b05d9196483b09673ffbead9b"/>
@@ -544,10 +552,11 @@ license:CC0
 		<rom name="Kids Can Read! Mud Puddle - Robert N. Munsch (USA) (En,Es).bin" size="304174752" crc="2e2949fd" sha1="f1c77360418e68f85b1c1670947ba9aad8df0a3f"/>
 		<rom name="Kids Can Read! Mud Puddle - Robert N. Munsch (USA) (En,Es).cue" size="124" crc="f1eff5ba" sha1="dbcbad05214cea8c07aa7c89912a73a5ae62c4e5"/>
 		-->
-		<description>Kids Can Read! Mud Puddle - Robert N. Munsch</description>
+		<description>Kids Can Read! Mud Puddle</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6128 / CDRM1024510"/>
+		<info name="book_author" value="Robert N. Munsch"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Mud Puddle - Robert N. Munsch (USA) (En,Es)" sha1="87d8bdde798bb347edf92b1be9bafc8739089c09"/>
@@ -561,10 +570,11 @@ license:CC0
 		<rom name="Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es).bin" size="284634336" crc="be686fd2" sha1="34678e1046e6d1acb7256915b73162b3766ed312"/>
 		<rom name="Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es).cue" size="139" crc="6b7b747b" sha1="ce1ccd679f871170312517784cd8d7ffe8d255ec"/>
 		-->
-		<description>Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson</description>
+		<description>Kids Can Read! A Long Hard Day at the Ranch</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6132 / CDRM1024550"/>
+		<info name="book_author" value="Audrey Nelson"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es)" sha1="3e5bd6a383e3f37e0cb7614604482e4b5c32c19f"/>
@@ -578,10 +588,11 @@ license:CC0
 		<rom name="Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es).bin" size="506110416" crc="3aead446" sha1="b088b24e5fd665c6aef317314b066078fbbb85bf"/>
 		<rom name="Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es).cue" size="147" crc="20adf688" sha1="607ab2632c949f96518acc720f7081bfb5f53841"/>
 		-->
-		<description>Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin</description>
+		<description>Kids Can Read! Scary Poems for Rotten Kids</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6130 / CDRM1024560"/>
+		<info name="book_author" value="Sean O Huigin"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es)" sha1="8ea2018f9a0ed288e91eca9f9981dd1a16850ede"/>
@@ -595,10 +606,11 @@ license:CC0
 		<rom name="Kids Can Read! Thomas' Snowsuit - R. Munsch (USA) (En,Es).bin" size="308700000" crc="ee0f8c42" sha1="53e4d136c46af051900607f1f93a638091cf3ef3"/>
 		<rom name="Kids Can Read! Thomas' Snowsuit - R. Munsch (USA) (En,Es).cue" size="123" crc="0675a5d5" sha1="33d19b30daf6b4a86fcb36643b7a886e9749a4e7"/>
 		-->
-		<description>Kids Can Read! Thomas' Snowsuit - R. Munsch</description>
+		<description>Kids Can Read! Thomas' Snowsuit</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6129 / CDRM1024570"/>
+		<info name="book_author" value="Robert N. Munsch"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Thomas' Snowsuit - R. Munsch (USA) (En,Es)" sha1="94f3187f2ce8164d958f66a3453b90e66cac3849"/>
@@ -612,10 +624,11 @@ license:CC0
 		<rom name="Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es).bin" size="300679680" crc="6dbbcdf5" sha1="ab7293093bbdf907ab3aeddd31ff50278e237a27"/>
 		<rom name="Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es).cue" size="151" crc="ebfce707" sha1="e0d84762c23d6ed45a8ef724620b2f71e2ce1862"/>
 		-->
-		<description>Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend</description>
+		<description>Kids Can Read! Moving Gives Me a Stomach Ache</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
 		<info name="serial" value="25-6134 / CDRM1024520"/>
+		<info name="book_author" value="Heather McKend"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Kids Can Read Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es)" sha1="31bd18f53549f3fb2ddb2b453a6ab6f57020767d"/>
