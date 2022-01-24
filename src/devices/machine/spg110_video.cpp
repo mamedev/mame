@@ -542,6 +542,58 @@ void spg110_video_device::map_video(address_map &map)
 
 void spg110_video_device::device_start()
 {
+	// Initialize the reverse color table by mapping all rgb triplets
+	// and using the mean color for each 16-bits hsl value.
+	std::vector<std::array<int, 4>> ctable(0x10000);
+	m_hsl_to_rgb.resize(0x10000);
+	for(int r = 0; r != 256; r++)
+		for(int g = 0; g != 256; g++)
+			for(int b = 0; b != 256; b++) {
+				uint16_t lum = uint16_t(0.0748*r + 0.1467*g + 0.0286*b + 0.5);
+				if(lum >= 64)
+					lum = 63;
+
+				uint16_t sat = uint16_t(fabs(0.0308*r - 0.0142*g - 0.0166*b) + fabs(0.0110*r - 0.0270*g + 0.0160*b));
+				if(sat >= 8)
+					sat = 7;
+
+				uint8_t mi = std::min(r, std::min(g, b));
+				uint8_t mx = std::max(r, std::max(g, b));
+
+				int16_t hue;
+				if(mi == mx)
+					hue = 47;
+
+				else {
+					if(r == mx)
+						hue = int16_t((44/3.0)*(g-b)/(mx-mi) - 11);
+					else if(g == mx)
+						hue = int16_t((44/3.0)*(b-r)/(mx-mi) + 18.33);
+					else
+						hue = int16_t((44/3.0)*(r-g)/(mx-mi) + 47.67);
+					if(hue < 0)
+						hue += 88;
+				}
+
+				uint16_t hsl = (lum << 10) | (sat << 7) | hue;
+
+				ctable[hsl][0] += r;
+				ctable[hsl][1] += g;
+				ctable[hsl][2] += b;
+				ctable[hsl][3] += 1;
+			}
+
+	for(int i = 0; i != 0x10000; i++)
+		if(ctable[i][3] == 0)
+			m_hsl_to_rgb[i] = 0;
+		else {
+			int half = ctable[i][3]/2;
+			uint8_t r = (ctable[i][0] + half) / ctable[i][3];
+			uint8_t g = (ctable[i][1] + half) / ctable[i][3];
+			uint8_t b = (ctable[i][2] + half) / ctable[i][3];
+			m_hsl_to_rgb[i] = (r << 16) | (g << 8) | b;
+		}
+
 	save_item(NAME(m_dma_src_step));
 	save_item(NAME(m_dma_dst_step));
 	save_item(NAME(m_dma_unk_2061));
@@ -575,60 +627,10 @@ void spg110_video_device::device_reset()
 	m_video_irq_status = 0x0000;
 }
 
-double spg110_video_device::hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
-
-// wrong format!
 void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// probably not
-	const double h_add = 0.65f;
-	const double h_divide = 43.2f;
-
-	COMBINE_DATA(&m_palram[offset]);
-
-	uint16_t dat = m_palram[offset];
-
-	// llll lsss sshh hhhh
-	int l_raw =  (dat & 0xfe00) >> 10;
-	int sl_raw = (dat & 0x03c0) >> 6;
-	int h_raw =  (dat & 0x003f) >> 0;
-
-	double l = (double)l_raw / 63.0f;
-	double s = (double)sl_raw / 15.0f;
-	double h = (double)h_raw / h_divide;
-
-	// probably not
-	h += h_add;
-
-	if (h>1.0f)
-		h-= 1.0f;
-
-	double r, g, b;
-
-	if (s == 0) {
-		r = g = b = l; // greyscale
-	} else {
-		double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-		double p = 2 * l - q;
-		r = hue2rgb(p, q, h + 1/3.0f);
-		g = hue2rgb(p, q, h);
-		b = hue2rgb(p, q, h - 1/3.0f);
-	}
-
-	int r_real = r * 255.0f;
-	int g_real = g * 255.0f;
-	int b_real = b * 255.0f;
-
-	m_palette->set_pen_color(offset, r_real, g_real, b_real);
+	uint32_t col = m_hsl_to_rgb[data];
+	m_palette->set_pen_color(offset, col >> 16, (col >> 8) & 0xff, col & 0xff);
 }
 
 uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

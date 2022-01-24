@@ -31,7 +31,6 @@ public:
 
 	void map_video(address_map &map);
 
-	double hue2rgb(double p, double q, double t);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -130,6 +129,8 @@ private:
 	required_shared_ptr<uint16_t> m_sprtileno;
 	required_shared_ptr<uint16_t> m_sprattr1;
 	required_shared_ptr<uint16_t> m_sprattr2;
+
+	std::vector<uint32_t> m_hsl_to_rgb;
 
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
