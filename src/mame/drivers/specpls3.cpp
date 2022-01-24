@@ -436,7 +436,7 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	// these models don't have floating bus
-	m_exp->fb_r_handler().set([this]() { return 0xff; });
+	m_exp->fb_r_handler().set([]() { return 0xff; });
 }
 
 void specpls3_state::spectrum_plus3(machine_config &config)
