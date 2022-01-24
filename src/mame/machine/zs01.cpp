@@ -468,7 +468,7 @@ WRITE_LINE_MEMBER( zs01_device::write_scl )
 									if ( m_write_buffer[ 1 ] == 0xfc )
 									{
 										// TODO: Unknown serial
-										// The serial is verified by the same algorithm as the one read from 0x7e8 (DS2401 serial), so maybe it's the same or related.
+										// The serial is verified by the same algorithm as the one read from 0x7e8 (DS2401 serial), but the serial is different.
 										for (int i = 0; i < SIZE_DATA_BUFFER; i++)
 										{
 											m_read_buffer[2 + i] = m_ds2401->direct_read(SIZE_DATA_BUFFER - i - 1);
