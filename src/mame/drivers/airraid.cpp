@@ -36,7 +36,9 @@
 
   TODO:
   - cshooter/airraid gfx, obviously
-  - is failgate a prototype?
+  - What's the story behind failgate? Is it an unreleased prototype?
+    There's a game from 1990 by Success called "Final Gate" that's the
+    same as this game, did Seibu eventually license it out to Success?
 
 -----------------------------------------------------------------------
 
