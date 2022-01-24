@@ -40,6 +40,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class spoker_state : public driver_device
 {
 public:
@@ -771,6 +773,22 @@ ROM_START( spk102ua )
 	ROM_LOAD( "mx28f2000p_v102_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
+ROM_START( spk102u ) // no labels on the ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u43",   0x0000, 0x10000, CRC(7c17bf58) SHA1(dd16b9f52d8c08a61fe234978cc84b95c25c5dec) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "u25",  0x80000, 0x40000, CRC(67f2a1d6) SHA1(115655cf4718105e7ff054dd662d9d53e9ea91e0) )
+	ROM_LOAD( "u24",  0x40000, 0x40000, CRC(fb9d8c09) SHA1(6cbefa90f6b866ee682f7981d6f5d30e9346a123) )
+	ROM_LOAD( "u23",  0x00000, 0x40000, CRC(98b71478) SHA1(b5bd9eef91f5cc2e9628e5181fbbd6fd453487f0) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
 /*
    Super Poker
    Italian sets...
@@ -970,6 +988,8 @@ void spoker_state::init_3super8()
 	}
 }
 
+} // anonymous namespace
+
 
 /***************************************************************************
                               Game Drivers
@@ -985,4 +1005,5 @@ GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  empty_init, 
 GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk102u,    spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v102U)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs decryption, proper machine driver
 GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
