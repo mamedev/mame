@@ -199,6 +199,7 @@ private:
 	gluk_ext m_port_f7_ext;
 	u8 m_port_f7_gluk_reg;
 
+	u16 m_rendering_gfx_y_offset;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_ts_tilemap[3];

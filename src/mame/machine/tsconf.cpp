@@ -162,7 +162,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		{
 			spectrum_state::spectrum_UpdateScreenBitmap(eof);
 		}
-		else if (m_previous_screen_y != m_screen->vpos())
+		else
 		{
 			s16 y = m_screen->vpos() - resolution.top() - TSCONF_SCREEN_VBLANK;
 			//TODO consider perfom update not based on current line but from previous saved.
@@ -175,12 +175,11 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 				if (VM == VM_TXT)
 				{
 					// TODO u16 x_offset = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
-					y = (y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) % resolution.right();
 					u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
-					u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256);
+					u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (m_rendering_gfx_y_offset / 8 * 256);
 					for (auto x = 0; x < resolution.width() / 8; x++)
 					{
-						u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
+						u8 char_x = *(font_location + (*text_location * 8) + (m_rendering_gfx_y_offset % 8));
 						u8 font_color = *(text_location + 128) & 0x0f;
 						u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
 						for (auto i = 7; i >= 0; i--)
@@ -193,8 +192,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 				else
 				{
 					u16 x_offset = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
-					u16 y_offset = (((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L] + y) & 0x1ff;
-					u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
+					u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((m_rendering_gfx_y_offset * 512 + x_offset) >> (2 - VM));
 					if (VM == VM_16C)
 					{
 						if (x_offset & 1)
@@ -223,6 +221,9 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 						}
 					}
 				}
+				m_rendering_gfx_y_offset = (m_rendering_gfx_y_offset + 1) & 0x1ff;
+			} else {
+				m_rendering_gfx_y_offset = ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L];
 			}
 		}
 	}
@@ -516,6 +517,11 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 			tsconf_update_video_mode();
 		break;
 
+	case G_Y_OFFS_L:
+	case G_Y_OFFS_H:
+		m_rendering_gfx_y_offset = ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L];
+		break;
+
 	case T_MAP_PAGE:
 		m_ts_tilemap[TM_TILES0]->mark_all_dirty();
 		m_ts_tilemap[TM_TILES1]->mark_all_dirty();
@@ -628,8 +634,6 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case TS_CONFIG:
 	case G_X_OFFS_L:
 	case G_X_OFFS_H:
-	case G_Y_OFFS_L:
-	case G_Y_OFFS_H:
 	case HS_INT:
 	case VS_INT_L:
 	case VS_INT_H:
@@ -787,6 +791,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 		}
+		spectrum_UpdateScreenBitmap();
 		break;
 	}
 	default:
