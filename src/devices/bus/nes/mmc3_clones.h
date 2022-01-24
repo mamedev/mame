@@ -652,6 +652,27 @@ private:
 };
 
 
+// ======================> nes_bmc_5in1_device
+
+class nes_bmc_5in1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	required_ioport m_jumper;
+};
+
+
 // ======================> nes_bmc_8in1_device
 
 class nes_bmc_8in1_device : public nes_txrom_device
@@ -1184,6 +1205,7 @@ DECLARE_DEVICE_TYPE(NES_NT639,         nes_nt639_device)
 DECLARE_DEVICE_TYPE(NES_RESETTXROM,    nes_resettxrom_device)
 DECLARE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device)
 DECLARE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_5IN1,      nes_bmc_5in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)

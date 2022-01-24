@@ -57,10 +57,10 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_snsnd(*this, "snsnd")
-		, m_switch(*this, "X%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_p_ram(*this, "nvram")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void spectra(machine_config &config);
@@ -74,15 +74,15 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra_map(address_map &map);
 
-	u8 m_porta;
-	u8 m_portb;
-	u8 m_t_c;
-	u8 m_out_offs;
+	u8 m_porta = 0U;
+	u8 m_portb = 0U;
+	u8 m_t_c = 0U;
+	u8 m_out_offs = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
-	required_ioport_array<4> m_switch;
+	required_ioport_array<4> m_io_keyboard;
 	required_shared_ptr<u8> m_p_ram;
 	output_finder<40> m_digits;
 	output_finder<64> m_io_outputs;  // 16 solenoids + 48 lamps
@@ -143,7 +143,7 @@ INPUT_PORTS_END
 u8 spectra_state::porta_r()
 {
 	u8 row = (m_porta & 0x18) >> 3;
-	u8 key = m_switch[row]->read();
+	u8 key = m_io_keyboard[row]->read();
 	u8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
 	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
@@ -240,7 +240,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 void spectra_state::machine_start()
 {
 	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -253,6 +252,9 @@ void spectra_state::machine_start()
 void spectra_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_t_c = 0;
 }
 

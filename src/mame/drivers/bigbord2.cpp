@@ -144,10 +144,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
-	u8 m_term_data;
-	u8 m_term_status;
-	uint16_t m_cnt;
-	bool m_cc[8];
+	u8 m_term_data = 0U;
+	u8 m_term_status = 0U;
+	uint16_t m_cnt = 0U;
+	bool m_cc[8]{};
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

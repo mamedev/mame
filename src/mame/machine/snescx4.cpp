@@ -21,7 +21,7 @@ static uint16_t CX4_readw(uint16_t addr);
 static uint32_t CX4_readl(uint16_t addr);
 
 static void CX4_writew(address_space &space, uint16_t addr, uint16_t data);
-//static void CX4_writel(address_space &space, uint16_t addr, uint32_t data);
+[[maybe_unused]] static void CX4_writel(address_space &space, uint16_t addr, uint32_t data);
 
 static void CX4_C4DrawLine(int32_t X1, int32_t Y1, int16_t Z1, int32_t X2, int32_t Y2, int16_t Z2, uint8_t Color);
 
@@ -191,12 +191,10 @@ void CX4_write(address_space &space, uint32_t addr, uint8_t data)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-void CX4_writeb(address_space &space, uint16_t addr, uint8_t data)
+[[maybe_unused]] static void CX4_writeb(address_space &space, uint16_t addr, uint8_t data)
 {
 	CX4_write(space, addr,     data);
 }
-#endif
 
 static void CX4_writew(address_space &space, uint16_t addr, uint16_t data)
 {
@@ -204,14 +202,12 @@ static void CX4_writew(address_space &space, uint16_t addr, uint16_t data)
 	CX4_write(space, addr + 1, data >> 8);
 }
 
-#ifdef UNUSED_FUNCTION
-void CX4_writel(address_space &space, uint16_t addr, uint32_t data)
+static void CX4_writel(address_space &space, uint16_t addr, uint32_t data)
 {
 	CX4_write(space, addr + 0, data >>  0);
 	CX4_write(space, addr + 1, data >>  8);
 	CX4_write(space, addr + 2, data >> 16);
 }
-#endif
 
 uint8_t CX4_read(uint32_t addr)
 {
@@ -230,12 +226,10 @@ uint8_t CX4_read(uint32_t addr)
 	return 0xff;
 }
 
-#ifdef UNUSED_FUNCTION
-uint8_t CX4_readb(uint16_t addr)
+[[maybe_unused]] static uint8_t CX4_readb(uint16_t addr)
 {
 	return CX4_read(addr);
 }
-#endif
 
 static uint16_t CX4_readw(uint16_t addr)
 {
@@ -247,10 +241,8 @@ static uint32_t CX4_readl(uint16_t addr)
 	return CX4_read(addr) | (CX4_read(addr + 1) << 8) | (CX4_read(addr + 2) << 16);
 }
 
-#ifdef UNUSED_FUNCTION
-void CX4_reset()
+[[maybe_unused]] void CX4_reset()
 {
 	memset(cx4.ram, 0, 0x0c00);
 	memset(cx4.reg, 0, 0x0100);
 }
-#endif

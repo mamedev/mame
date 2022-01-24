@@ -43,7 +43,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_z80pio(*this, "z80pio")
-		, m_buttons(*this, "BUTTONS.%u", 0)
+		, m_buttons(*this, "BUTTONS.%u", 0U)
 	{ }
 
 	void bbcbc(machine_config &config);
@@ -53,7 +53,7 @@ private:
 	void input_select_w(uint8_t data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	uint8_t m_input_select;
+	uint8_t m_input_select = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;

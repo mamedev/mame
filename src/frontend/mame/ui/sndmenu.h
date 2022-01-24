@@ -25,10 +25,10 @@ class menu_sound_options : public menu
 {
 public:
 	menu_sound_options(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_sound_options() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_dismissed() override;
 
 private:
 	enum

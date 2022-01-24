@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Robbbert
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led8seg_gts1>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led8seg_gts1>
+	</element>
+
+	<group name="score">
+		<repeat count="7">
+			<param name="n" start="~s~" increment="-1" />
+			<param name="x" start="0" increment="44" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="0" width="34" height="39" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="Default Layout">
+		<bounds left="0" top="20" right="318" bottom="279" />
+
+		<!-- Player 1 Score -->
+		<param name="s" value="6" />
+		<group ref="score">
+			<bounds left="10" top="45" right="308" bottom="84" />
+		</group>
+
+		<!-- Player 2 Score -->
+		<param name="s" value="13" />
+		<group ref="score">
+			<bounds left="10" top="105" right="308" bottom="144" />
+		</group>
+
+		<!-- Player 3 Score -->
+		<param name="s" value="22" />
+		<group ref="score">
+			<bounds left="10" top="165" right="308" bottom="204" />
+		</group>
+
+		<!-- Player 4 Score -->
+		<param name="s" value="29" />
+		<group ref="score">
+			<bounds left="10" top="225" right="308" bottom="264" />
+		</group>
+	</view>
+</mamelayout>

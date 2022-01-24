@@ -90,7 +90,7 @@ local function populate_main_menu(buttons)
 			rate = math.floor(rate * 100) / 100
 			local text
 			if button.button then
-				text = string.format(_p('plugin-autofire', '%s [%g Hz]'), _p('input-name', button.button.name), rate)
+				text = string.format(_p('plugin-autofire', '%s [%g Hz]'), button.button.name, rate)
 			else
 				text = string.format(_p('plugin-autofire', 'n/a [%g Hz]'), rate)
 			end
@@ -145,7 +145,7 @@ end
 local function populate_configure_menu(menu)
 	local button_name
 	if current_button.button then
-		button_name = _p('input-name', current_button.button.name)
+		button_name = current_button.button.name
 	elseif current_button.port then
 		button_name = _p('plugin-autofire', 'n/a')
 	else

@@ -27,7 +27,7 @@ void nes_state::nes_vh_sprite_dma_w(address_space &space, uint8_t data)
 
 void nes_state::nes_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().mirror(0x1800);                                               // RAM
+	map(0x0000, 0x07ff).ram().mirror(0x1800).share("mainram");                              // RAM
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write)); // PPU registers
 	map(0x4014, 0x4014).w(FUNC(nes_state::nes_vh_sprite_dma_w));                            // stupid address space hole
 	map(0x4016, 0x4016).rw(FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         // IN0 - input port 1
@@ -223,7 +223,7 @@ void nes_state::fds(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(nes_state, fds)
 
 	config.device_remove("nes_slot");
-	NES_DISKSYS(config, "disk", 0);
+	NES_DISKSYS(config, "disk", NTSC_APU_CLOCK);
 
 	config.device_remove("cart_list");
 	config.device_remove("cass_list");
@@ -269,7 +269,7 @@ void nes_state::famitwin(machine_config &config)
 
 	m_cartslot->set_must_be_loaded(false);
 
-	NES_DISKSYS(config, "disk", 0);
+	NES_DISKSYS(config, "disk", NTSC_APU_CLOCK);
 }
 
 

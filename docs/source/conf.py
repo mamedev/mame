@@ -262,3 +262,12 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+# Add download links at bottom left when the MAMEDEV environment
+# varaible is set. See versions.html in the _template folder.
+try:
+    html_context
+except NameError:
+    html_context = dict()
+if os.getenv("MAMEDEV") != None:
+    html_context['mamedev_site'] = True

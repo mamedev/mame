@@ -405,8 +405,8 @@ static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
 	PORT_START("MOUSEBTN")
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
 
 	PORT_START("MOUSEX")
@@ -479,7 +479,10 @@ INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
 {
 	if (m_clkmouse_cnt || !m_clkmouse_irq)
 		return;
-	if ((m_clkmouse_irq & BT_IRQ) && (field.name()[5] == 'B'))
+
+	const bool is_button = bool(param);
+
+	if ((m_clkmouse_irq & BT_IRQ) && is_button)
 	{
 		m_clkmouse_cnt = 1;
 		m_clkmouse_cmd[0] = 'B';

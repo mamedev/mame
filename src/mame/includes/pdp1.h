@@ -364,6 +364,9 @@ protected:
 
 public:
 	void set_il(int il);
+	TIMER_CALLBACK_MEMBER(rotation_timer_callback);
+	TIMER_CALLBACK_MEMBER(il_timer_callback);
+	[[maybe_unused]] void parallel_drum_init();
 	uint32_t drum_read(int field, int position);
 	void drum_write(int field, int position, uint32_t data);
 

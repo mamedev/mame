@@ -130,7 +130,7 @@ private:
 
 	static inline u32 get_texel_palette16(const render_texinfo &texture, s32 curu, s32 curv)
 	{
-		const rgb_t *palbase = texture.palette;
+		rgb_t const *const palbase = texture.palette;
 		if constexpr (BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
@@ -142,7 +142,7 @@ private:
 			if (v0 < 0) v0 = v1 = 0;
 			else if (v0 + 1 >= texture.height) v0 = texture.height - 1, v1 = 0;
 
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base);
+			u16 const *texbase = reinterpret_cast<u16 const *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
 			u32 pix00 = palbase[texbase[0]];
@@ -153,7 +153,7 @@ private:
 		}
 		else
 		{
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
 			return palbase[texbase[0]];
 		}
 	}
@@ -166,7 +166,7 @@ private:
 
 	static inline u32 get_texel_palette16a(const render_texinfo &texture, s32 curu, s32 curv)
 	{
-		const rgb_t *palbase = texture.palette;
+		rgb_t const *const palbase = texture.palette;
 		if constexpr (BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
@@ -178,14 +178,14 @@ private:
 			if (v0 < 0) v0 = v1 = 0;
 			else if (v0 + 1 >= texture.height) v0 = texture.height - 1, v1 = 0;
 
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base);
+			u16 const *texbase = reinterpret_cast<u16 const *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
 			return rgbaint_t::bilinear_filter(palbase[texbase[0]], palbase[texbase[u1]], palbase[texbase[v1]], palbase[texbase[u1 + v1]], curu >> 8, curv >> 8);
 		}
 		else
 		{
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
 			return palbase[texbase[0]];
 		}
 	}
@@ -415,7 +415,7 @@ private:
 	//  draw_line - draw a line or point
 	//-------------------------------------------------
 
-	static void draw_line(const render_primitive &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
+	static void draw_line(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
 		// internal tables
 		static u32 s_cosine_table[2049];
@@ -576,49 +576,35 @@ private:
 	//  draw_rect - draw a solid rectangle
 	//-------------------------------------------------
 
-	static void draw_rect(const render_primitive &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
+	static void draw_rect(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
-		render_bounds fpos = prim.bounds;
+		render_bounds const fpos = prim.bounds;
 		assert(fpos.x0 <= fpos.x1);
 		assert(fpos.y0 <= fpos.y1);
 
-		// clamp to integers
-		s32 startx = round_nearest(fpos.x0);
-		s32 starty = round_nearest(fpos.y0);
-		s32 endx = round_nearest(fpos.x1);
-		s32 endy = round_nearest(fpos.y1);
-
-		// ensure we fit
-		if (startx < 0) startx = 0;
-		if (startx >= width) startx = width;
-		if (endx < 0) endx = 0;
-		if (endx >= width) endx = width;
-		if (starty < 0) starty = 0;
-		if (starty >= height) starty = height;
-		if (endy < 0) endy = 0;
-		if (endy >= height) endy = height;
+		// clamp to integers and ensure we fit
+		s32 const startx = std::clamp<s32>(round_nearest(fpos.x0), 0, width);
+		s32 const starty = std::clamp<s32>(round_nearest(fpos.y0), 0, height);
+		s32 const endx = std::clamp<s32>(round_nearest(fpos.x1), 0, width);
+		s32 const endy = std::clamp<s32>(round_nearest(fpos.y1), 0, height);
 
 		// bail if nothing left
-		if (fpos.x0 > fpos.x1 || fpos.y0 > fpos.y1)
+		if ((startx > endx) || (starty > endy))
 			return;
 
 		// only support alpha and "none" blendmodes
 		assert(PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE ||
 				PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_ALPHA);
 
-		// fast case: no alpha
-		if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE || is_opaque(prim.color.a))
+		if ((PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE) || is_opaque(prim.color.a))
 		{
-			u32 r = u32(256.0f * prim.color.r);
-			u32 g = u32(256.0f * prim.color.g);
-			u32 b = u32(256.0f * prim.color.b);
-			u32 pix;
+			// fast case: no alpha
 
 			// clamp R,G,B to 0-256 range
-			if (r > 0xff) { if (s32(r) < 0) r = 0; else r = 0xff; }
-			if (g > 0xff) { if (s32(g) < 0) g = 0; else g = 0xff; }
-			if (b > 0xff) { if (s32(b) < 0) b = 0; else b = 0xff; }
-			pix = dest_rgb_to_pixel(r, g, b);
+			u32 const r = u32(std::clamp(256.0f * prim.color.r, 0.0f, 255.0f));
+			u32 const g = u32(std::clamp(256.0f * prim.color.g, 0.0f, 255.0f));
+			u32 const b = u32(std::clamp(256.0f * prim.color.b, 0.0f, 255.0f));
+			u32 const pix = dest_rgb_to_pixel(r, g, b);
 
 			// loop over rows
 			for (s32 y = starty; y < endy; y++)
@@ -630,23 +616,18 @@ private:
 					*dest++ = pix;
 			}
 		}
-
-		// alpha and/or coloring case
 		else if (!is_transparent(prim.color.a))
 		{
-			u32 rmask = dest_rgb_to_pixel(0xff,0x00,0x00);
-			u32 gmask = dest_rgb_to_pixel(0x00,0xff,0x00);
-			u32 bmask = dest_rgb_to_pixel(0x00,0x00,0xff);
-			u32 r = u32(256.0f * prim.color.r * prim.color.a);
-			u32 g = u32(256.0f * prim.color.g * prim.color.a);
-			u32 b = u32(256.0f * prim.color.b * prim.color.a);
-			u32 inva = u32(256.0f * (1.0f - prim.color.a));
+			// alpha and/or coloring case
+			u32 const rmask = dest_rgb_to_pixel(0xff,0x00,0x00);
+			u32 const gmask = dest_rgb_to_pixel(0x00,0xff,0x00);
+			u32 const bmask = dest_rgb_to_pixel(0x00,0x00,0xff);
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (r > 0xff) { if (s32(r) < 0) r = 0; else r = 0xff; }
-			if (g > 0xff) { if (s32(g) < 0) g = 0; else g = 0xff; }
-			if (b > 0xff) { if (s32(b) < 0) b = 0; else b = 0xff; }
-			if (inva > 0x100) { if (s32(inva) < 0) inva = 0; else inva = 0x100; }
+			u32 r = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 255.0f));
+			u32 g = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 255.0f));
+			u32 b = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 255.0f));
+			u32 const inva = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
 
 			// pre-shift the RGBA pieces
 			r = dest_rgb_to_pixel(r, 0, 0) << 8;
@@ -681,14 +662,15 @@ private:
 	//  rasterization of a 16bpp palettized texture
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_none(const render_primitive &prim, PixelType *dstdata, u32 pitch, const quad_setup_data &setup)
+	static void draw_quad_palette16_none(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
 	{
 		// ensure all parameters are valid
 		assert(prim.texture.palette != nullptr);
 
-		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
+			// fast case: no coloring, no alpha
+
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
 			{
@@ -699,25 +681,21 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
 					*dest++ = source32_to_dest(pix);
 					curu += setup.dudx;
 					curv += setup.dvdx;
 				}
 			}
 		}
-
-		// coloring-only case
 		else if (is_opaque(prim.color.a))
 		{
-			u32 sr = u32(256.0f * prim.color.r);
-			u32 sg = u32(256.0f * prim.color.g);
-			u32 sb = u32(256.0f * prim.color.b);
+			// coloring-only case
 
 			// clamp R,G,B to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b, 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -729,10 +707,10 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
-					const u32 r = (source32_r(pix) * sr) >> 8;
-					const u32 g = (source32_g(pix) * sg) >> 8;
-					const u32 b = (source32_b(pix) * sb) >> 8;
+					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const r = (source32_r(pix) * sr) >> 8;
+					u32 const g = (source32_g(pix) * sg) >> 8;
+					u32 const b = (source32_b(pix) * sb) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
@@ -740,20 +718,15 @@ private:
 				}
 			}
 		}
-
-		// alpha and/or coloring case
 		else if (!is_transparent(prim.color.a))
 		{
-			u32 sr = u32(256.0f * prim.color.r * prim.color.a);
-			u32 sg = u32(256.0f * prim.color.g * prim.color.a);
-			u32 sb = u32(256.0f * prim.color.b * prim.color.a);
-			u32 invsa = u32(256.0f * (1.0f - prim.color.a));
+			// alpha and/or coloring case
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
-			if (invsa > 0x100) { if (s32(invsa) < 0) invsa = 0; else invsa = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
+			u32 const invsa = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -765,11 +738,11 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
-					const u32 dpix = NoDestRead ? 0 : *dest;
-					const u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-					const u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-					const u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
+					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const dpix = NoDestRead ? 0 : *dest;
+					u32 const r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
+					u32 const g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
+					u32 const b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
@@ -785,14 +758,15 @@ private:
 	//  rasterization of a 16bpp palettized texture
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_add(const render_primitive &prim, PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
+	static void draw_quad_palette16_add(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
 	{
 		// ensure all parameters are valid
 		assert(prim.texture.palette != nullptr);
 
-		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
+			// fast case: no coloring, no alpha
+
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
 			{
@@ -806,7 +780,7 @@ private:
 					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
 					if ((pix & 0xffffff) != 0)
 					{
-						const u32 dpix = NoDestRead ? 0 : *dest;
+						u32 const dpix = NoDestRead ? 0 : *dest;
 						u32 r = source32_r(pix) + dest_r(dpix);
 						u32 g = source32_g(pix) + dest_g(dpix);
 						u32 b = source32_b(pix) + dest_b(dpix);
@@ -821,18 +795,14 @@ private:
 				}
 			}
 		}
-
-		// alpha and/or coloring case
 		else
 		{
-			u32 sr = u32(256.0f * prim.color.r * prim.color.a);
-			u32 sg = u32(256.0f * prim.color.g * prim.color.a);
-			u32 sb = u32(256.0f * prim.color.b * prim.color.a);
+			// alpha and/or coloring case
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -844,10 +814,10 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
 					if ((pix & 0xffffff) != 0)
 					{
-						const u32 dpix = NoDestRead ? 0 : *dest;
+						u32 const dpix = NoDestRead ? 0 : *dest;
 						u32 r = ((source32_r(pix) * sr) >> 8) + dest_r(dpix);
 						u32 g = ((source32_g(pix) * sg) >> 8) + dest_g(dpix);
 						u32 b = ((source32_b(pix) * sb) >> 8) + dest_b(dpix);
@@ -874,11 +844,12 @@ private:
 	//  rasterization of a 16bpp YUY image
 	//-------------------------------------------------
 
-	static void draw_quad_yuy16_none(const render_primitive &prim, PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
+	static void draw_quad_yuy16_none(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
 	{
-		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
+			// fast case: no coloring, no alpha
+
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
 			{
@@ -889,25 +860,21 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
 					*dest++ = source32_to_dest(pix);
 					curu += setup.dudx;
 					curv += setup.dvdx;
 				}
 			}
 		}
-
-		// coloring-only case
 		else if (is_opaque(prim.color.a))
 		{
-			u32 sr = u32(256.0f * prim.color.r);
-			u32 sg = u32(256.0f * prim.color.g);
-			u32 sb = u32(256.0f * prim.color.b);
+			// coloring-only case
 
 			// clamp R,G,B to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b, 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -919,10 +886,10 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					const u32 r = (source32_r(pix) * sr) >> 8;
-					const u32 g = (source32_g(pix) * sg) >> 8;
-					const u32 b = (source32_b(pix) * sb) >> 8;
+					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					u32 const r = (source32_r(pix) * sr) >> 8;
+					u32 const g = (source32_g(pix) * sg) >> 8;
+					u32 const b = (source32_b(pix) * sb) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
@@ -930,20 +897,15 @@ private:
 				}
 			}
 		}
-
-		// alpha and/or coloring case
 		else if (!is_transparent(prim.color.a))
 		{
-			u32 sr = u32(256.0f * prim.color.r * prim.color.a);
-			u32 sg = u32(256.0f * prim.color.g * prim.color.a);
-			u32 sb = u32(256.0f * prim.color.b * prim.color.a);
-			u32 invsa = u32(256.0f * (1.0f - prim.color.a));
+			// alpha and/or coloring case
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
-			if (invsa > 0x100) { if (s32(invsa) < 0) invsa = 0; else invsa = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
+			u32 const invsa = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -955,11 +917,11 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					const u32 dpix = NoDestRead ? 0 : *dest;
-					const u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-					const u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-					const u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
+					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					u32 const dpix = NoDestRead ? 0 : *dest;
+					u32 const r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
+					u32 const g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
+					u32 const b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
@@ -976,15 +938,16 @@ private:
 	//  conversion
 	//-------------------------------------------------
 
-	static void draw_quad_yuy16_add(const render_primitive &prim, PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
+	static void draw_quad_yuy16_add(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
 	{
 		// simply can't do this without reading from the dest
 		if constexpr (NoDestRead)
 			return;
 
-		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
+			// fast case: no coloring, no alpha
+
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
 			{
@@ -995,8 +958,8 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					const u32 dpix = NoDestRead ? 0 : *dest;
+					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					u32 const dpix = NoDestRead ? 0 : *dest;
 					u32 r = source32_r(pix) + dest_r(dpix);
 					u32 g = source32_g(pix) + dest_g(dpix);
 					u32 b = source32_b(pix) + dest_b(dpix);
@@ -1009,20 +972,15 @@ private:
 				}
 			}
 		}
-
-		// alpha and/or coloring case
 		else
 		{
-			u32 sr = u32(256.0f * prim.color.r);
-			u32 sg = u32(256.0f * prim.color.g);
-			u32 sb = u32(256.0f * prim.color.b);
-			u32 sa = u32(256.0f * prim.color.a);
+			// alpha and/or coloring case
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
-			if (sa > 0x100) { if (s32(sa) < 0) sa = 0; else sa = 0x100; }
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b, 0.0f, 256.0f));
+			u32 const sa = u32(std::clamp(256.0f * prim.color.a, 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -1164,10 +1122,10 @@ private:
 			// alpha and/or coloring case
 
 			// clamp R,G,B and inverse A to 0-256 range
-			u32 sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
-			u32 sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
-			u32 sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
-			u32 invsa = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
+			u32 const sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
+			u32 const sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
+			u32 const sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
+			u32 const invsa = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
 
 			// loop over rows
 			for (s32 y = setup.starty; y < setup.endy; y++)
@@ -1769,16 +1727,16 @@ private:
 	//  drawing routine
 	//-------------------------------------------------
 
-	static void setup_and_draw_textured_quad(const render_primitive &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
+	static void setup_and_draw_textured_quad(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
 		assert(prim.bounds.x0 <= prim.bounds.x1);
 		assert(prim.bounds.y0 <= prim.bounds.y1);
 
 		// determine U/V deltas
-		float fdudx = (prim.texcoords.tr.u - prim.texcoords.tl.u) / (prim.bounds.x1 - prim.bounds.x0);
-		float fdvdx = (prim.texcoords.tr.v - prim.texcoords.tl.v) / (prim.bounds.x1 - prim.bounds.x0);
-		float fdudy = (prim.texcoords.bl.u - prim.texcoords.tl.u) / (prim.bounds.y1 - prim.bounds.y0);
-		float fdvdy = (prim.texcoords.bl.v - prim.texcoords.tl.v) / (prim.bounds.y1 - prim.bounds.y0);
+		float const fdudx = (prim.texcoords.tr.u - prim.texcoords.tl.u) / (prim.bounds.x1 - prim.bounds.x0);
+		float const fdvdx = (prim.texcoords.tr.v - prim.texcoords.tl.v) / (prim.bounds.x1 - prim.bounds.x0);
+		float const fdudy = (prim.texcoords.bl.u - prim.texcoords.tl.u) / (prim.bounds.y1 - prim.bounds.y0);
+		float const fdvdy = (prim.texcoords.bl.v - prim.texcoords.tl.v) / (prim.bounds.y1 - prim.bounds.y0);
 
 		// clamp to integers
 		quad_setup_data setup;
@@ -1892,10 +1850,10 @@ private:
 	//-------------------------------------------------
 
 public:
-	static void draw_primitives(const render_primitive_list &primlist, void *dstdata, u32 width, u32 height, u32 pitch)
+	static void draw_primitives(render_primitive_list const &primlist, void *dstdata, u32 width, u32 height, u32 pitch)
 	{
 		// loop over the list and render each element
-		for (const render_primitive *prim = primlist.first(); prim != nullptr; prim = prim->next())
+		for (render_primitive const *prim = primlist.first(); prim != nullptr; prim = prim->next())
 			switch (prim->type)
 			{
 				case render_primitive::LINE:

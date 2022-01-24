@@ -308,6 +308,7 @@ private:
 	void dkong2b_palette(palette_device &palette);
 	DECLARE_MACHINE_START(dkong3);
 	void dkong3_palette(palette_device &palette);
+	[[maybe_unused]] void dkong4b_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp);
 	void radarscp_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp1);

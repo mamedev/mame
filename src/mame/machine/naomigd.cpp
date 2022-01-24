@@ -448,7 +448,7 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 
 static void gdrom_devices(device_slot_interface &device)
 {
-	device.option_add(":gdrom", GDROM);
+	device.option_add("gdrom", GDROM);
 }
 
 
@@ -459,7 +459,7 @@ WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
 
 void idegdrom_device::device_add_mconfig(machine_config &config)
 {
-	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, ":gdrom", nullptr, true);
+	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, "gdrom", nullptr, true);
 	m_ide->irq_handler().set(*this, FUNC(idegdrom_device::ide_irq));
 	m_ide->set_bus_master_space(space_owner_tag, space_owner_id);
 }

@@ -77,7 +77,7 @@ public:
 		m_vram(*this, "vram"),
 		m_palette(*this, "palette"),
 		m_fdc(*this, "fdc"),
-		m_floppy(*this, "fdc:%u", 0),
+		m_floppy(*this, "fdc:%u", 0U),
 		m_kbdmcu(*this, "kbdmcu"),
 		m_special(*this, "SPECIAL"),
 		m_keys(*this, "K%02u", 0U)
@@ -113,9 +113,9 @@ private:
 	void kbd_p1_w(uint8_t data);
 	void kbd_p2_w(uint8_t data);
 	void kbd_data_w(uint8_t data);
-	int m_kbd_col;
-	int m_kbd_row;
-	uint8_t m_kbd_data;
+	int m_kbd_col = 0;
+	int m_kbd_row = 0;
+	uint8_t m_kbd_data = 0U;
 
 	void ppi2_pa_w(uint8_t data);
 	uint8_t ppi2_pb_r();

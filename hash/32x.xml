@@ -116,7 +116,7 @@ license:CC0
 
 	<!-- Dump by Radar -->
 	<software name="pinochio">
-		<description>Pinocchio (Euro, Prototype 19951206)</description>
+		<description>Pinocchio (Euro, prototype 19951206)</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -157,7 +157,7 @@ license:CC0
 
 	<!-- Dump by Porchy -->
 	<software name="cf2">
-		<description>Clay Fighter 2 (Euro, USA, Jpn, Prototype 19950429)</description>
+		<description>Clay Fighter 2 (Euro, USA, Jpn, prototype 19950429)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -278,7 +278,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941011)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -290,7 +290,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp1" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941007)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941007)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -302,7 +302,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp2" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941005)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -314,7 +314,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp3" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941004)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -326,7 +326,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp4" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940928)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -338,7 +338,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp5" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940926)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940926)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -350,7 +350,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp6" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940921)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -362,7 +362,7 @@ license:CC0
 	</software>
 
 	<software name="cosmiccp7" cloneof="cosmicc">
-		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940906)</description>
+		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -406,7 +406,7 @@ license:CC0
 	</software>
 
 	<software name="doomp" cloneof="doom">
-		<description>Doom (Prototype, 19941201)</description>
+		<description>Doom (prototype, 19941201)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -418,7 +418,7 @@ license:CC0
 	</software>
 
 	<software name="doomp1" cloneof="doom">
-		<description>Doom (Euro, Prototype, 19941002)</description>
+		<description>Doom (Euro, prototype, 19941002)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -431,7 +431,7 @@ license:CC0
 
 	<software name="doomp2" cloneof="doom">
 		<!-- the same checksum is shared by the prototype (19940927), released by drx -->
-		<description>Doom (USA, Prototype, 19940928)</description>
+		<description>Doom (USA, prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -443,7 +443,7 @@ license:CC0
 	</software>
 
 	<software name="doomp3" cloneof="doom">
-		<description>Doom (Prototype, 19940925)</description>
+		<description>Doom (prototype, 19940925)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -455,7 +455,7 @@ license:CC0
 	</software>
 
 	<software name="doomp4" cloneof="doom">
-		<description>Doom (Prototype, 19940923)</description>
+		<description>Doom (prototype, 19940923)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -467,7 +467,7 @@ license:CC0
 	</software>
 
 	<software name="doomp5" cloneof="doom" supported="partial">
-		<description>Doom (Prototype, 19940921)</description>
+		<description>Doom (prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -479,7 +479,7 @@ license:CC0
 	</software>
 
 	<software name="doomp6" cloneof="doom" supported="partial">
-		<description>Doom (Prototype, 19940916)</description>
+		<description>Doom (prototype, 19940916)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -491,7 +491,7 @@ license:CC0
 	</software>
 
 	<software name="doomp7" cloneof="doom" supported="partial">
-		<description>Doom (Prototype, 19940914)</description>
+		<description>Doom (prototype, 19940914)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -503,7 +503,7 @@ license:CC0
 	</software>
 
 	<software name="doomp8" cloneof="doom" supported="partial">
-		<description>Doom (Prototype, 19940909)</description>
+		<description>Doom (prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -515,7 +515,7 @@ license:CC0
 	</software>
 
 	<software name="doomp9" cloneof="doom" supported="partial">
-		<description>Doom (Prototype, 19940906)</description>
+		<description>Doom (prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -527,7 +527,7 @@ license:CC0
 	</software>
 
 	<software name="doomrr" cloneof="doom">
-		<description>Doom RR (USA, Prototype, 19950307)</description>
+		<description>Doom RR (USA, prototype, 19950307)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -539,7 +539,7 @@ license:CC0
 	</software>
 
 	<software name="doomrr1" cloneof="doom">
-		<description>Doom RR (USA, Prototype, 19950221)</description>
+		<description>Doom RR (USA, prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -551,7 +551,7 @@ license:CC0
 	</software>
 
 	<software name="doomrr2" cloneof="doom">
-		<description>Doom RR (USA, Prototype, 19950215)</description>
+		<description>Doom RR (USA, prototype, 19950215)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -563,7 +563,7 @@ license:CC0
 	</software>
 
 	<software name="eccodemo" supported="no">
-		<description>Ecco the Dolphin CinePak Demo (Jpn, USA, Developer Cart)</description>
+		<description>Ecco the Dolphin CinePak Demo (Jpn, USA, developer cart)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -613,7 +613,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941221-B)</description>
+		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941221-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -625,7 +625,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp1" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941221)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -637,7 +637,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp2" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941219)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941219)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -649,7 +649,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp3" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941214)</description>
+		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -661,7 +661,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp4" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941213)</description>
+		<description>36 Great Holes starring Fred Couples (Euro, prototype, 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -673,7 +673,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp5" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941206)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -685,7 +685,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp6" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941203)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -697,7 +697,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp7" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941202)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -709,7 +709,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp8" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941130)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941130)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -721,7 +721,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp9" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941129)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -733,7 +733,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp10" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941128-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -745,7 +745,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp11" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941128)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -757,7 +757,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp12" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941127)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -769,7 +769,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp13" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941126)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941126)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -781,7 +781,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp14" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941123)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941123)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -793,7 +793,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp15" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941122-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -805,7 +805,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp16" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941122)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -817,7 +817,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp17" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941121)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941121)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -829,7 +829,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp18" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119-B)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941119-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -841,7 +841,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp19" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941119)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -853,7 +853,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp20" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941118)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941118)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -865,7 +865,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp21" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941116)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -877,7 +877,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp22" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941110)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -889,7 +889,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp23" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941108)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -902,7 +902,7 @@ license:CC0
 
 	<!-- this is the earliest set that doesn't just crash it -->
 	<software name="36greatp24" cloneof="36great" supported="partial">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941107)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -914,7 +914,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp25" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941105)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941105)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -925,7 +925,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp26" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941103)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -936,7 +936,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp27" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941101)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -947,7 +947,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp28" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941026)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941026)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -958,7 +958,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp29" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941024)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941024)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -969,7 +969,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp30" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941018)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -980,7 +980,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp31" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941017)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -991,7 +991,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp32" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941011)</description>
+		<description>36 Great Holes starring Fred Couples (USA, prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1002,7 +1002,7 @@ license:CC0
 	</software>
 
 	<software name="36greatp33" cloneof="36great" supported="no">
-		<description>36 Great Holes starring Fred Couples (USA, v1.x Prototype, 19940706)</description>
+		<description>36 Great Holes starring Fred Couples (USA, v1.x prototype, 19940706)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1041,7 +1041,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 214, 19950214, 06.46)</description>
+		<description>Chaotix (Jpn, USA, prototype 214, 19950214, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1053,7 +1053,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup1" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 0213, 19950213, 07.30)</description>
+		<description>Chaotix (Jpn, USA, prototype 0213, 19950213, 07.30)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1065,7 +1065,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup2" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 213B, 19950213, 06.46)</description>
+		<description>Chaotix (Jpn, USA, prototype 213B, 19950213, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1077,7 +1077,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup3" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 210, 19950210, 06.28)</description>
+		<description>Chaotix (Jpn, USA, prototype 210, 19950210, 06.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1089,7 +1089,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup4" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 209, 19950209, 08.25)</description>
+		<description>Chaotix (Jpn, USA, prototype 209, 19950209, 08.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1101,7 +1101,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup5" cloneof="chaotix">
-		<description>Chaotix (Jpn, USA, Prototype 208, 19950208, 11.17)</description>
+		<description>Chaotix (Jpn, USA, prototype 208, 19950208, 11.17)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1113,7 +1113,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup6" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 0202, 19950207, 15.25)</description>
+		<description>Chaotix (Jpn, USA, prototype 0202, 19950207, 15.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1125,7 +1125,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup7" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 119, 19950119, 07.04)</description>
+		<description>Chaotix (Jpn, USA, prototype 119, 19950119, 07.04)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1137,7 +1137,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup8" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 0111, 19950112, 09.36)</description>
+		<description>Chaotix (Jpn, USA, prototype 0111, 19950112, 09.36)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1149,7 +1149,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup9" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 1207, 19941207, 07.15)</description>
+		<description>Chaotix (Jpn, USA, prototype 1207, 19941207, 07.15)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1161,7 +1161,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup10" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 1227, 19941227, 10.28)</description>
+		<description>Chaotix (Jpn, USA, prototype 1227, 19941227, 10.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1173,7 +1173,7 @@ license:CC0
 	</software>
 
 	<software name="chaotixjup11" cloneof="chaotix" supported="no">
-		<description>Chaotix (Jpn, USA, Prototype 1229, 19941230, 15.31)</description>
+		<description>Chaotix (Jpn, USA, prototype 1229, 19941230, 15.31)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1200,7 +1200,7 @@ license:CC0
 	</software>
 
 	<software name="marsch">
-		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 1)</description>
+		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK build set 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1212,7 +1212,7 @@ license:CC0
 	</software>
 
 	<software name="marsch1" cloneof="marsch">
-		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 2)</description>
+		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK build set 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1224,7 +1224,7 @@ license:CC0
 	</software>
 
 	<software name="marssa">
-		<description>Mars Sample Program - Gnu Sierra (Jpn, USA, SDK Build)</description>
+		<description>Mars Sample Program - Gnu Sierra (Jpn, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1236,7 +1236,7 @@ license:CC0
 	</software>
 
 	<software name="marssa1" cloneof="marssa">
-		<description>Mars Sample Program - Pharaoh (Jpn, USA, SDK Build)</description>
+		<description>Mars Sample Program - Pharaoh (Jpn, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1248,7 +1248,7 @@ license:CC0
 	</software>
 
 	<software name="marssa2" cloneof="marssa">
-		<description>Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK Build)</description>
+		<description>Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1260,7 +1260,7 @@ license:CC0
 	</software>
 
 	<software name="marssa3" cloneof="marssa">
-		<description>Mars Sample Program - Texture Test (Jpn, USA, SDK Build)</description>
+		<description>Mars Sample Program - Texture Test (Jpn, USA, SDK build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1303,7 +1303,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941220)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1315,7 +1315,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp1" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941213)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1327,7 +1327,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp2" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941209)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1339,7 +1339,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp3" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941207-B)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941207-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1351,7 +1351,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp4" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941207)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1363,7 +1363,7 @@ license:CC0
 	</software>
 
 	<software name="metalhdp5" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941202)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1376,7 +1376,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp6" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941121)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1389,7 +1389,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp7" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941118)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941118)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1402,7 +1402,7 @@ license:CC0
 
 <!-- Also works on PAL -->
 	<software name="metalhdp8" cloneof="metalhd">
-		<description>Metal Head (Jpn, USA, Prototype, 19941114)</description>
+		<description>Metal Head (Jpn, USA, prototype, 19941114)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1456,7 +1456,7 @@ license:CC0
 	</software>
 
 	<software name="motoxp" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941111)</description>
+		<description>Motocross Championship (USA, prototype, 19941111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1468,7 +1468,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpa" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941108)</description>
+		<description>Motocross Championship (USA, prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1480,7 +1480,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpb" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941107)</description>
+		<description>Motocross Championship (USA, prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1492,7 +1492,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpc" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941104)</description>
+		<description>Motocross Championship (USA, prototype, 19941104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1504,7 +1504,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpd" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941103)</description>
+		<description>Motocross Championship (USA, prototype, 19941103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1516,7 +1516,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpe" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941102-B)</description>
+		<description>Motocross Championship (USA, prototype, 19941102-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1528,7 +1528,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpf" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941102)</description>
+		<description>Motocross Championship (USA, prototype, 19941102)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1540,7 +1540,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpg" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941101)</description>
+		<description>Motocross Championship (USA, prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1552,7 +1552,7 @@ license:CC0
 	</software>
 
 	<software name="motoxph" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941028)</description>
+		<description>Motocross Championship (USA, prototype, 19941028)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1564,7 +1564,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpi" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941024)</description>
+		<description>Motocross Championship (USA, prototype, 19941024)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1576,7 +1576,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpj" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941020)</description>
+		<description>Motocross Championship (USA, prototype, 19941020)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1588,7 +1588,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpk" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941019)</description>
+		<description>Motocross Championship (USA, prototype, 19941019)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1600,7 +1600,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpl" cloneof="motox">
-		<description>Motocross Championship (USA, Prototype, 19941018)</description>
+		<description>Motocross Championship (USA, prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1612,7 +1612,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpm" cloneof="motox">
-		<description>Motocross Championship (Prototype, 19941017)</description>
+		<description>Motocross Championship (prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1624,7 +1624,7 @@ license:CC0
 	</software>
 
 	<software name="motoxpn" cloneof="motox">
-		<description>Motocross Championship (Prototype, 19941012)</description>
+		<description>Motocross Championship (prototype, 19941012)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1744,7 +1744,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313-B)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950313-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1756,7 +1756,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp1" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1768,7 +1768,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp2" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950306)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1780,7 +1780,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp3" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950302)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950302)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
@@ -1792,7 +1792,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp4" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950222)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950222)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1804,7 +1804,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp5" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950213)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1816,7 +1816,7 @@ license:CC0
 	</software>
 
 	<software name="stellarp6" cloneof="stellar">
-		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950206)</description>
+		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -1830,7 +1830,7 @@ license:CC0
 	<!-- boot OK, OSD and player sprite aren't drawn -->
 	<software name="soulstar" supported="no">
 	<!-- The dumper also released larger size files, which were this exact dump padded with 0xff up to the end of the file -->
-		<description>SoulStar X (USA, Prototype)</description>
+		<description>SoulStar X (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1860,7 +1860,7 @@ license:CC0
 	</software>
 
 	<software name="sharrierp" cloneof="sharrier">
-		<description>Space Harrier (Prototype, 19940920)</description>
+		<description>Space Harrier (prototype, 19940920)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -1914,7 +1914,7 @@ license:CC0
 	</software>
 
 	<software name="swap" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, Prototype, 19941007-B)</description>
+		<description>Star Wars Arcade (Euro, prototype, 19941007-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1925,7 +1925,7 @@ license:CC0
 	</software>
 
 	<software name="swap1" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, Prototype, 19941006-P)</description>
+		<description>Star Wars Arcade (Euro, prototype, 19941006-P)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1936,7 +1936,7 @@ license:CC0
 	</software>
 
 	<software name="swap2" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, Prototype, 19941005)</description>
+		<description>Star Wars Arcade (Jpn, prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1947,7 +1947,7 @@ license:CC0
 	</software>
 
 	<software name="swap3" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, Prototype, 19941003)</description>
+		<description>Star Wars Arcade (Jpn, prototype, 19941003)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1958,7 +1958,7 @@ license:CC0
 	</software>
 
 	<software name="swap4" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Jpn, Prototype, 19940930-B)</description>
+		<description>Star Wars Arcade (Jpn, prototype, 19940930-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1969,7 +1969,7 @@ license:CC0
 	</software>
 
 	<software name="swap5" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Euro, Prototype, 19940929)</description>
+		<description>Star Wars Arcade (Euro, prototype, 19940929)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1980,7 +1980,7 @@ license:CC0
 	</software>
 
 	<software name="swap6" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940923)</description>
+		<description>Star Wars Arcade (prototype, 19940923)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1991,7 +1991,7 @@ license:CC0
 	</software>
 
 	<software name="swap7" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (USA, Prototype, 19940918)</description>
+		<description>Star Wars Arcade (USA, prototype, 19940918)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2002,7 +2002,7 @@ license:CC0
 	</software>
 
 	<software name="swap8" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (USA, Prototype, 19940916)</description>
+		<description>Star Wars Arcade (USA, prototype, 19940916)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2013,7 +2013,7 @@ license:CC0
 	</software>
 
 	<software name="swap9" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940915)</description>
+		<description>Star Wars Arcade (prototype, 19940915)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2024,7 +2024,7 @@ license:CC0
 	</software>
 
 	<software name="swap10" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (USA, Prototype, 19940914-D)</description>
+		<description>Star Wars Arcade (USA, prototype, 19940914-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2035,7 +2035,7 @@ license:CC0
 	</software>
 
 	<software name="swap11" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (USA, Prototype, 19940913-B)</description>
+		<description>Star Wars Arcade (USA, prototype, 19940913-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2046,7 +2046,7 @@ license:CC0
 	</software>
 
 	<software name="swap12" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (USA, Prototype, 19940912)</description>
+		<description>Star Wars Arcade (USA, prototype, 19940912)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2057,7 +2057,7 @@ license:CC0
 	</software>
 
 	<software name="swap13" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940909)</description>
+		<description>Star Wars Arcade (prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2068,7 +2068,7 @@ license:CC0
 	</software>
 
 	<software name="swap14" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940907)</description>
+		<description>Star Wars Arcade (prototype, 19940907)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2079,7 +2079,7 @@ license:CC0
 	</software>
 
 	<software name="swap15" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940906)</description>
+		<description>Star Wars Arcade (prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2090,7 +2090,7 @@ license:CC0
 	</software>
 
 	<software name="swap16" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940901)</description>
+		<description>Star Wars Arcade (prototype, 19940901)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2101,7 +2101,7 @@ license:CC0
 	</software>
 
 	<software name="swap17" cloneof="swa" supported="no">
-		<description>Star Wars Arcade (Prototype, 19940830)</description>
+		<description>Star Wars Arcade (prototype, 19940830)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2143,7 +2143,7 @@ license:CC0
 	</software>
 
 	<software name="tempop" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950207)</description>
+		<description>Tempo (USA, prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2155,7 +2155,7 @@ license:CC0
 	</software>
 
 	<software name="tempop1" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950206)</description>
+		<description>Tempo (USA, prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2167,7 +2167,7 @@ license:CC0
 	</software>
 
 	<software name="tempop2" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950206-B)</description>
+		<description>Tempo (USA, prototype, 19950206-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2179,7 +2179,7 @@ license:CC0
 	</software>
 
 	<software name="tempop3" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950204)</description>
+		<description>Tempo (USA, prototype, 19950204)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2191,7 +2191,7 @@ license:CC0
 	</software>
 
 	<software name="tempop4" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950126)</description>
+		<description>Tempo (USA, prototype, 19950126)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2203,7 +2203,7 @@ license:CC0
 	</software>
 
 	<software name="tempop5" cloneof="tempo">
-		<description>Tempo (USA, Prototype, 19950124)</description>
+		<description>Tempo (USA, prototype, 19950124)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2215,7 +2215,7 @@ license:CC0
 	</software>
 
 	<software name="tempop6" cloneof="tempo">
-		<description>Tempo (Prototype, 19950121)</description>
+		<description>Tempo (prototype, 19950121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2227,7 +2227,7 @@ license:CC0
 	</software>
 
 	<software name="tempop7" cloneof="tempo">
-		<description>Tempo (Prototype, 19941229)</description>
+		<description>Tempo (prototype, 19941229)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2271,7 +2271,7 @@ license:CC0
 	</software>
 
 	<software name="vfp" cloneof="vf">
-		<description>Virtua Fighter (USA, Prototype, 19950725)</description>
+		<description>Virtua Fighter (USA, prototype, 19950725)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2283,7 +2283,7 @@ license:CC0
 	</software>
 
 	<software name="vfp1" cloneof="vf">
-		<description>Virtua Fighter (USA, Prototype, 19950724)</description>
+		<description>Virtua Fighter (USA, prototype, 19950724)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2295,7 +2295,7 @@ license:CC0
 	</software>
 
 	<software name="vfp2" cloneof="vf">
-		<description>Virtua Fighter (USA, Prototype, 19950721)</description>
+		<description>Virtua Fighter (USA, prototype, 19950721)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2307,7 +2307,7 @@ license:CC0
 	</software>
 
 	<software name="vfp3" cloneof="vf">
-		<description>Virtua Fighter (USA, Prototype, 19950717)</description>
+		<description>Virtua Fighter (USA, prototype, 19950717)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2319,7 +2319,7 @@ license:CC0
 	</software>
 
 	<software name="vfp4" cloneof="vf">
-		<description>Virtua Fighter (Prototype, 19950630)</description>
+		<description>Virtua Fighter (prototype, 19950630)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2331,7 +2331,7 @@ license:CC0
 	</software>
 
 	<software name="vfp5" cloneof="vf">
-		<description>Virtua Fighter (Prototype, 19950615)</description>
+		<description>Virtua Fighter (prototype, 19950615)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2343,7 +2343,7 @@ license:CC0
 	</software>
 
 	<software name="vfp6" cloneof="vf">
-		<description>Virtua Fighter (Prototype, 19950530)</description>
+		<description>Virtua Fighter (prototype, 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2355,7 +2355,7 @@ license:CC0
 	</software>
 
 	<software name="vham">
-		<description>Virtua Hamster (USA, Prototype)</description>
+		<description>Virtua Hamster (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2399,7 +2399,7 @@ license:CC0
 	</software>
 
 	<software name="vrdxp" cloneof="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (USA, Prototype, 19940905)</description>
+		<description>Virtua Racing Deluxe (USA, prototype, 19940905)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2411,7 +2411,7 @@ license:CC0
 	</software>
 
 	<software name="vrdxp1" cloneof="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (USA, Prototype, 19940829)</description>
+		<description>Virtua Racing Deluxe (USA, prototype, 19940829)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -2423,7 +2423,7 @@ license:CC0
 	</software>
 
 	<software name="vrdxp2" cloneof="vrdx">
-		<description>Virtua Racing Deluxe (Prototype, 19940822)</description>
+		<description>Virtua Racing Deluxe (prototype, 19940822)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2474,7 +2474,7 @@ license:CC0
 
 	<!-- black screen after choosing a level, requires SH2 SCI support -->
 	<software name="xmen" supported="no">
-		<description>X-Men (USA, Prototype)</description>
+		<description>X-Men (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -2514,7 +2514,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950331)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950331)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2526,7 +2526,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp1" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950315)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950315)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2538,7 +2538,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp2" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950310)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950310)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2550,7 +2550,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp3" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950306)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2562,7 +2562,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp4" cloneof="zaxxon2k" supported="no">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950303)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950303)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2574,7 +2574,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp5" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950227)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950227)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2586,7 +2586,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp6" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950223)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950223)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2598,7 +2598,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp7" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950221)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
@@ -2610,7 +2610,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxon2kp8" cloneof="zaxxon2k">
-		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950210)</description>
+		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>

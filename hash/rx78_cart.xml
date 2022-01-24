@@ -146,6 +146,17 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="creatgr">
+		<description>Creative Graphics</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="364c94-3j1.ic2.bin" size="0x2000" crc="80873b44" sha1="38b7aadf16cc0273f7fd735867d4d3987d0772aa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exbaseb">
 		<description>Excite Baseball</description>
 		<year>1983</year>

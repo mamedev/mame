@@ -67,8 +67,8 @@ private:
 	void microdec_io(address_map &map);
 	void microdec_mem(address_map &map);
 
-	uint8_t m_portf8;
-	bool m_fdc_rdy;
+	uint8_t m_portf8 = 0U;
+	bool m_fdc_rdy = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;

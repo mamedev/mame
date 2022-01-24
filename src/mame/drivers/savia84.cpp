@@ -59,8 +59,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_digit;
-	uint8_t m_seg;
+	uint8_t m_digit = 0U;
+	uint8_t m_seg = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;

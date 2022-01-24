@@ -82,7 +82,6 @@ nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NES_POWERPAD, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_ipt(*this, "POWERPAD.%u", 0)
-	, m_strobe(0)
 {
 }
 
@@ -123,10 +122,7 @@ u8 nes_powerpad_device::read_bit34()
 
 void nes_powerpad_device::write(u8 data)
 {
-	u8 prev_strobe = m_strobe;
-	m_strobe = data & 1;
-
-	if (prev_strobe && !m_strobe)
+	if (write_strobe(data))
 		for (int i = 0; i < 2; i++)
 			m_latch[i] = m_ipt[i]->read();
 }

@@ -52,6 +52,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	, m_cp_state(0)
 	, m_vec_active(false)
 	, m_pf_active(false)
+	, m_berr_active(false)
 	, m_hlt_active(false)
 	, m_out_reset_func(*this)
 	, m_in_iack_func(*this)
@@ -222,9 +223,14 @@ void t11_device::t11_check_irqs()
 		return;
 	}
 
-	// PF has next-highest priority
-	int priority = PSW & 0340;
-	if (m_power_fail && priority != 0340)
+	// non-maskable hardware traps
+	if (m_bus_error)
+	{
+		m_bus_error = false;
+		take_interrupt(T11_TIMEOUT);
+		return;
+	}
+	else if (m_power_fail)
 	{
 		m_power_fail = false;
 		take_interrupt(T11_PWRFAIL);
@@ -233,7 +239,7 @@ void t11_device::t11_check_irqs()
 
 	// compare the priority of the CP interrupt to the PSW
 	const struct irq_table_entry *irq = &irq_table[m_cp_state & 15];
-	if (irq->priority > priority)
+	if (irq->priority > (PSW & 0340))
 	{
 		// call the callback
 		standard_irq_callback(m_cp_state & 15);
@@ -404,6 +410,7 @@ void t11_device::device_reset()
 
 	m_wait_state = 0;
 	m_power_fail = false;
+	m_bus_error = false;
 	m_ext_halt = false;
 }
 
@@ -445,6 +452,12 @@ void t11_device::execute_set_input(int irqline, int state)
 		if (state != CLEAR_LINE && !m_pf_active)
 			m_power_fail = true;
 		m_pf_active = (state != CLEAR_LINE);
+		break;
+
+	case BUS_ERROR:
+		if (state != CLEAR_LINE && !m_berr_active)
+			m_bus_error = true;
+		m_berr_active = (state != CLEAR_LINE);
 		break;
 
 	case HLT_LINE:

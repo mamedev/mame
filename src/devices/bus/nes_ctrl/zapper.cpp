@@ -34,7 +34,7 @@ static INPUT_PORTS_START( nes_bandaihs )
 
 	PORT_START("JOYPAD")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )  // has complete joypad inputs except button A
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -86,7 +86,6 @@ nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const ch
 	: nes_zapper_device(mconfig, NES_BANDAIHS, tag, owner, clock)
 	, m_joypad(*this, "JOYPAD")
 	, m_latch(0)
-	, m_strobe(0)
 {
 }
 
@@ -144,17 +143,23 @@ u8 nes_zapper_device::read_exp(offs_t offset)
 {
 	u8 ret = 0;
 	if (offset == 1)    // $4017
-		ret |= nes_zapper_device::read_bit34();
+		ret = nes_zapper_device::read_bit34();
 	return ret;
 }
 
-u8 nes_bandaihs_device::read_bit0()
+u8 nes_bandaihs_device::read_exp(offs_t offset)
 {
-	if (m_strobe & 1)
-		m_latch = m_joypad->read();
+	u8 ret = 0;
 
-	u8 ret = m_latch & 1;
-	m_latch = (m_latch >> 1) | 0x80;
+	if (offset == 0)    // $4016
+	{
+		if (m_strobe)
+			m_latch = m_joypad->read();
+		ret = (m_latch & 1) << 1;
+		m_latch = (m_latch >> 1) | 0x80;
+	}
+	else                // $4017
+		ret = nes_zapper_device::read_exp(offset);
 
 	return ret;
 }
@@ -167,8 +172,6 @@ u8 nes_bandaihs_device::read_bit0()
 // carried on expansion port pin 2, so there's likely nothing more going on.
 void nes_bandaihs_device::write(u8 data)
 {
-	if (m_strobe & 1)
+	if (write_strobe(data))
 		m_latch = m_joypad->read();
-
-	m_strobe = data;
 }

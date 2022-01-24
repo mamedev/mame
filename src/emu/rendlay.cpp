@@ -1246,9 +1246,6 @@ int get_blend_mode(emu::render::detail::view_environment &env, util::xml::data_n
 layout_element::make_component_map const layout_element::s_make_component{
 	{ "image",         &make_component<image_component>         },
 	{ "text",          &make_component<text_component>          },
-	{ "dotmatrix",     &make_dotmatrix_component<8>             },
-	{ "dotmatrix5dot", &make_dotmatrix_component<5>             },
-	{ "dotmatrixdot",  &make_dotmatrix_component<1>             },
 	{ "simplecounter", &make_component<simplecounter_component> },
 	{ "reel",          &make_component<reel_component>          },
 	{ "led7seg",       &make_component<led7seg_component>       },
@@ -3079,47 +3076,6 @@ protected:
 };
 
 
-// row of dots for a dotmatrix
-class layout_element::dotmatrix_component : public component
-{
-public:
-	// construction/destruction
-	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode)
-		: component(env, compnode)
-		, m_dots(dots)
-	{
-	}
-
-protected:
-	// overrides
-	virtual int maxstate() const override { return (1 << m_dots) - 1; }
-
-	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
-	{
-		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
-
-		// sizes for computation
-		int bmheight = 300;
-		int dotwidth = 250;
-
-		// allocate a temporary bitmap for drawing
-		bitmap_argb32 tempbitmap(dotwidth*m_dots, bmheight);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
-
-		for (int i = 0; i < m_dots; i++)
-			draw_segment_decimal(tempbitmap, ((dotwidth / 2) + (i * dotwidth)), bmheight / 2, dotwidth, BIT(state, i) ? onpen : offpen);
-
-		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
-	}
-
-private:
-	// internal state
-	int m_dots;
-};
-
-
 // simple counter
 class layout_element::simplecounter_component : public component
 {
@@ -3163,6 +3119,8 @@ public:
 		, m_searchpath(env.search_path() ? env.search_path() : "")
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
+		osd_printf_warning("Warning: layout file contains deprecated reel component\n");
+
 		std::string_view symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
@@ -3555,18 +3513,6 @@ template <typename T>
 layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode)
 {
 	return std::make_unique<T>(env, compnode);
-}
-
-
-//-------------------------------------------------
-//  make_component - create dotmatrix component
-//  with given vertical resolution
-//-------------------------------------------------
-
-template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode)
-{
-	return std::make_unique<dotmatrix_component>(D, env, compnode);
 }
 
 

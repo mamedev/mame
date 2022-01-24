@@ -50,15 +50,15 @@ class micropin_state : public genpin_class
 public:
 	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_leds(*this, "led%d", 0U)
 	{ }
 
 	void pentacup2(machine_config &config);
 
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	u8 m_led_time[10]; // size must match m_leds
+	u8 m_led_time[10]{}; // size must match m_leds
 	void mr_common();
 	void ms_common();
 	output_finder<76> m_digits;
@@ -92,8 +92,8 @@ private:
 	void p51b_w(u8 data) { };  // volume control
 	void mem_map(address_map &map);
 
-	u8 m_row;
-	u8 m_counter;
+	u8 m_row = 0U;
+	u8 m_counter = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6800_cpu_device> m_v1cpu;

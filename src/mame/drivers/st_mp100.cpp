@@ -47,8 +47,8 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void st_mp100(machine_config &config);
@@ -74,18 +74,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	void mem_map(address_map &map);
 
-	u8 m_u10a = 0;
-	u8 m_u10b = 0;
-	u8 m_u11a = 0;
-	u8 m_u11b = 0;
+	u8 m_u10a = 0U;
+	u8 m_u10b = 0U;
+	u8 m_u11a = 0U;
+	u8 m_u11b = 0U;
 	bool m_u10_ca2 = 0;
 	bool m_u10_cb2 = 0;
 	bool m_u11_cb2 = 0;
-	u8 m_stored_lamp = 0xff;
-	u8 m_digit = 0;
-	u8 m_counter = 0;
+	u8 m_stored_lamp = 0xffU;
+	u8 m_digit = 0U;
+	u8 m_counter = 0U;
 	u8 m_segment[5]{};
-	u8 m_last_solenoid = 15;
+	u8 m_last_solenoid = 15U;
 
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
@@ -718,7 +718,6 @@ void st_mp100_state::u11_b_w(u8 data)
 void st_mp100_state::machine_start()
 {
 	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 

@@ -374,7 +374,7 @@ void moo_state::bucky_map(address_map &map)
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
-	map(0x0d2000, 0x0d20ff).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x0d2000, 0x0d203f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */

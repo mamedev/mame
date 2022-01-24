@@ -1,16 +1,23 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 /******************************************************************************
+
+ Atari Lynx
  PeT peter.trauner@utanet.at 2000,2001
 
  info found in bastian schick's bll
  and in cc65 for lynx
 
+ TODO:
+ - ComLynx emulation is missing/imperfect
+ - Verify timings from real hardware
+ - EEPROM Support in some homebrew cartridges?
+ - Lynx II support, needs internal ROM dump
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "includes/lynx.h"
-#include "audio/lynx.h"
 
 #include "cpu/m6502/m65sc02.h"
 #include "softlist.h"
@@ -18,27 +25,19 @@
 
 #include "lynx.lh"
 
-void lynx_state::lynx_mem(address_map &map)
+void lynx_state::cpu_map(address_map &map)
 {
-	map(0x0000, 0xfbff).ram().share("mem_0000");
-	map(0xfc00, 0xfcff).m(m_bank_fc00, FUNC(address_map_bank_device::amap8));
-	map(0xfd00, 0xfdff).m(m_bank_fd00, FUNC(address_map_bank_device::amap8));
-	map(0xfe00, 0xfff7).bankr("bank_fe00").writeonly().share("mem_fe00");
-	map(0xfff8, 0xfff8).ram();
-	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
-	map(0xfffa, 0xffff).bankr("bank_fffa").writeonly().share("mem_fffa");
-}
-
-void lynx_state::lynx_fc00_mem(address_map &map)
-{
-	map(0x000, 0x0ff).rw(FUNC(lynx_state::suzy_read), FUNC(lynx_state::suzy_write));
-	map(0x100, 0x1ff).ram().share("mem_fc00");
-}
-
-void lynx_state::lynx_fd00_mem(address_map &map)
-{
-	map(0x000, 0x0ff).rw(FUNC(lynx_state::mikey_read), FUNC(lynx_state::mikey_write));
-	map(0x100, 0x1ff).ram().share("mem_fd00");
+	map(0x0000, 0xffff).ram().share(m_dram);
+	map(0xfc00, 0xfcff).view(m_suzy_view);
+	m_suzy_view[0](0xfc00, 0xfcff).rw(FUNC(lynx_state::suzy_read), FUNC(lynx_state::suzy_write));
+	map(0xfd00, 0xfdff).view(m_mikey_view);
+	m_mikey_view[0](0xfd00, 0xfdff).rw(FUNC(lynx_state::mikey_read), FUNC(lynx_state::mikey_write));
+	map(0xfe00, 0xffff).view(m_rom_view);
+	m_rom_view[0](0xfe00, 0xfff7).rom().region("maincpu", 0x0000);
+	map(0xfff8, 0xfff8).ram(); // Reserved for future hardware (RAM)
+	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::memory_config_r), FUNC(lynx_state::memory_config_w));
+	map(0xfff8, 0xffff).view(m_vector_view);
+	m_vector_view[0](0xfffa, 0xffff).rom().region("maincpu", 0x01fa);
 }
 
 static INPUT_PORTS_START( lynx )
@@ -54,6 +53,8 @@ static INPUT_PORTS_START( lynx )
 
 	PORT_START("PAUSE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_3)
+	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) CART0 Strobe
+	//PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) CART1 Strobe
 	// power on and power off buttons
 INPUT_PORTS_END
 
@@ -62,34 +63,31 @@ void lynx_state::video_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 }
 
-uint32_t lynx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 lynx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-// callback for Mikey call of shift(3) which shall act on the lynx_timer_count_down
+// callback for Mikey call of shift(3) which shall act on the timer_count_down
 void lynx_state::sound_cb()
 {
-	lynx_timer_count_down(1);
+	timer_count_down(1);
 }
 
 void lynx_state::lynx(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, 4000000);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
-	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::lynx_mem);
+	M65SC02(config, m_maincpu, XTAL(16'000'000) / 4);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::cpu_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
-
-	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
-	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
-	m_screen->set_refresh_hz(30);
+	m_screen->set_refresh_hz(XTAL(16'000'000) / 16 / (158 + 1) / (104 + 1)); // default config from machine_reset(), actually variable
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(lynx_state::screen_update));
-	m_screen->set_size(160, 102);
+	m_screen->set_size(160, 105); // 102 visible scanline + 3 blank scanline, horizontal unknown/unverified, variable?
 	m_screen->set_visarea(0, 160-1, 0, 102-1);
 	config.set_default_layout(layout_lynx);
 
@@ -97,7 +95,7 @@ void lynx_state::lynx(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	LYNX_SND(config, m_sound, 0);
+	LYNX_SND(config, m_sound, XTAL(16'000'000));
 	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
@@ -112,6 +110,7 @@ void lynx_state::lynx(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("lynx");
 }
 
+// Lynx II has Hayato replaces Mikey, Compatible but supports stereo
 #if 0
 void lynx_state::lynx2(machine_config &config)
 {
@@ -121,8 +120,7 @@ void lynx_state::lynx2(machine_config &config)
 	config.device_remove("mono");
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	config.device_remove("lynx");
-	LYNX2_SND(config.replace(), m_sound, 0);
+	LYNX2_SND(config.replace(), m_sound, XTAL(16'000'000));
 	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
@@ -141,16 +139,12 @@ ROM_START(lynx)
 	ROMX_LOAD("lynx.bin",  0x00000, 0x200, BAD_DUMP CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
 	ROMX_LOAD("lynxa.bin", 0x00000, 0x200, BAD_DUMP CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(1))
-
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
 ROM_END
 
 #if 0
 ROM_START(lynx2)
 	ROM_REGION(0x200,"maincpu", 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
-
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
 ROM_END
 #endif
 
@@ -158,9 +152,9 @@ ROM_END
 QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	std::vector<uint8_t> data;
-	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t header[10]; // 80 08 dw Start dw Len B S 9 3
+	std::vector<u8> data;
+	u8 *rom = memregion("maincpu")->base();
+	u8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	uint16_t start, length;
 	int i;
 
@@ -168,7 +162,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 		return image_init_result::FAIL;
 
 	/* Check the image */
-	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
+	if (verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
 	{
 		image.seterror(image_error::INVALIDIMAGE, "Not a valid Lynx file");
 		return image_init_result::FAIL;

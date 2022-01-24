@@ -87,7 +87,7 @@ public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: defender_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
-		, m_keyboard(*this, "X%d", 0)
+		, m_keyboard(*this, "X%d", 0U)
 		, m_codebank(*this, "codebank")
 		, m_soundbank(*this, "soundbank")
 	{ }
@@ -115,10 +115,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t m_wmg_c400;
-	uint8_t m_wmg_d000;
-	uint8_t m_wmg_port_select;
-	uint8_t m_wmg_vram_bank;
+	uint8_t m_wmg_c400 = 0U;
+	uint8_t m_wmg_d000 = 0U;
+	uint8_t m_wmg_port_select = 0U;
+	uint8_t m_wmg_vram_bank = 0U;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<17> m_keyboard;
 	required_memory_bank m_codebank;

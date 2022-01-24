@@ -228,7 +228,7 @@ void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) co
 		palette.set_pen_color(i + (512 * 1), level[r], level[g], level[b]); // shadow
 		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
 	}
-	// seperated SMS compatible mode color
+	// separated SMS compatible mode color
 	static constexpr u8 sms_level[4] = {0,99,162,255};
 	for (int i = 0; i < 64; i++)
 	{

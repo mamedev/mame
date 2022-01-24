@@ -14,10 +14,11 @@ template<int Width, int AddrShift> class handler_entry_read_memory : public hand
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_memory(address_space *space, void *base) : handler_entry_read_address<Width, AddrShift>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
+	handler_entry_read_memory(address_space *space, u16 flags, void *base) : handler_entry_read_address<Width, AddrShift>(space, flags), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_read_memory() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 
 	std::string name() const override;
@@ -31,10 +32,11 @@ template<int Width, int AddrShift> class handler_entry_write_memory : public han
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_memory(address_space *space, void *base) : handler_entry_write_address<Width, AddrShift>(space, 0), m_base(reinterpret_cast<uX *>(base)) {}
+	handler_entry_write_memory(address_space *space, u16 flags, void *base) : handler_entry_write_address<Width, AddrShift>(space, flags), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_write_memory() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 
 	std::string name() const override;
@@ -53,10 +55,11 @@ template<int Width, int AddrShift> class handler_entry_read_memory_bank : public
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_memory_bank(address_space *space, memory_bank &bank) : handler_entry_read_address<Width, AddrShift>(space, 0), m_bank(bank) {}
+	handler_entry_read_memory_bank(address_space *space, u16 flags, memory_bank &bank) : handler_entry_read_address<Width, AddrShift>(space, flags), m_bank(bank) {}
 	~handler_entry_read_memory_bank() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 
 	std::string name() const override;
@@ -70,10 +73,11 @@ template<int Width, int AddrShift> class handler_entry_write_memory_bank : publi
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_memory_bank(address_space *space, memory_bank &bank) : handler_entry_write_address<Width, AddrShift>(space, 0), m_bank(bank) {}
+	handler_entry_write_memory_bank(address_space *space, u16 flags, memory_bank &bank) : handler_entry_write_address<Width, AddrShift>(space, flags), m_bank(bank) {}
 	~handler_entry_write_memory_bank() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 
 	std::string name() const override;

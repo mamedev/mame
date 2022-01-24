@@ -35,15 +35,13 @@ inline uint32_t get_UINT32BE(UINT32BE word)
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
-#ifdef UNUSED_FUNCTION
-inline void set_UINT32BE(UINT32BE *word, uint32_t data)
+[[maybe_unused]] inline void set_UINT32BE(UINT32BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
 	word->bytes[2] = (data >> 8) & 0xff;
 	word->bytes[3] = data & 0xff;
 }
-#endif
 
 /* SmartMedia image header */
 struct SM_disk_image_header

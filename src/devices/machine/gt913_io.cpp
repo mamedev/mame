@@ -108,9 +108,9 @@ void gt913_io_hle_device::timer_adjust(offs_t num)
 			logerror("unknown timer %u prescaler %u (pc = %04x)\n", num, m_timer_control[num] & 0x7, m_cpu->pc());
 			[[fallthrough]];
 		case 0:
-			clocks <<= 1; break;
+			break;
 		case 2:
-			clocks <<= 10; break;
+			clocks <<= 9; break;
 		}
 
 		attotime period = m_cpu->clocks_to_attotime(clocks);
