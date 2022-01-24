@@ -11,6 +11,7 @@
 #include "sound/ymopl.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
+#include "softlist_dev.h"
 
 
 class vis_audio_device : public device_t,
@@ -1019,6 +1020,8 @@ void vis_state::vis(machine_config &config)
 	ISA16_SLOT(config, "mcd",      0, "mb:isabus", pc_isa16_cards, "mcd",      true);
 	ISA16_SLOT(config, "visaudio", 0, "mb:isabus", vis_cards,      "visaudio", true);
 	ISA16_SLOT(config, "visvga",   0, "mb:isabus", vis_cards,      "visvga",   true);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("vis");
 
 	DS6417(config, m_card, 0);
 }

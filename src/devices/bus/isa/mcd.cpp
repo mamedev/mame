@@ -40,6 +40,7 @@ mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface( mconfig, *this ),
 	m_cdda(*this, "cdda")
 {
+	set_interface("cdrom");
 }
 
 //-------------------------------------------------
