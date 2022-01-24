@@ -43256,6 +43256,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="ignitionp" cloneof="ignition">
+		<description>The Ignition Factor (prototype)</description>
+		<year>1994</year>
+		<publisher>Jaleco</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="the ignition factor (prototype b).sfc" size="1048576" crc="9a0532b7" sha1="0882539aa7c9c169921e62b7ca2c0474020d54d4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ignition">
 		<description>The Ignition Factor (USA)</description>
 		<year>1995</year>
@@ -51410,6 +51423,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="peacekepp" cloneof="peacekep">
+		<description>The Peace Keepers (prototype)</description>
+		<year>1994</year>
+		<publisher>Jaleco</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="the peace keepers (prototype).sfc" size="2097152" crc="793cf3c8" sha1="7db93ce59e9c0e841e37e94f985e3e849d7c793e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="peacekep">
 		<description>The Peace Keepers (USA)</description>
 		<year>1994</year>
@@ -52586,6 +52612,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="ppersiap" cloneof="ppersia">
+		<description>Prince of Persia (prototype)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="prince of persia (prototype).sfc" size="1048576" crc="b09ce083" sha1="26957f4fb29f80f7146a603085c96e4c81bf2b0a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersiau" cloneof="ppersia">
 		<description>Prince of Persia (USA)</description>
 		<year>1992</year>
@@ -52868,6 +52906,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="puttsqudp" cloneof="puttsqud">
+		<description>Putty Squad (prototype)</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="putty squad (prototype).sfc" size="1048576" crc="8e57bb02" sha1="765352a55bfb58e52f08e403823b0c77e8650300" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pbobble">
 		<description>Puzzle Bobble - Bust-A-Move (Euro)</description>
 		<year>1995</year>
@@ -52977,6 +53027,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="race drivin' (europe).sfc" size="524288" crc="12cb0a54" sha1="c39dda44055e23782fa9a5ee650d87e555deadd6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racedrivp" cloneof="racedriv">
+		<description>Race Drivin' (prototype)</description>
+		<year>1992</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="race drivin' (prototype).sfc" size="524288" crc="90947b50" sha1="d2529eb2c9ed6d3365fb4013168802260757ce9b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -54585,6 +54647,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shadowrun (usa) (beta).sfc" size="1048576" crc="85d4cda1" sha1="8ade311171b94f745a3007a85277f91b7a687765" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowrnp" cloneof="shadowrn">
+		<description>Shadowrun (prototype)</description>
+		<year>1993</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shadowrun (prototype b).sfc" size="1048576" crc="f5ea8088" sha1="2fa9f48ac174924e2cf0decee3ea2cbc4ab9ff13" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -58390,6 +58466,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="sgngp" cloneof="sgng">
+		<description>Super Ghouls'n Ghosts (prototype)</description>
+		<year>1991</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super ghouls 'n ghosts (prototype).sfc" size="2097152" crc="d923c321" sha1="f8f03f9c63300bf3ffa1d182632c17fc606bd569" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sgngu" cloneof="sgng">
 		<description>Super Ghouls'n Ghosts (USA)</description>
 		<year>1991</year>
@@ -62144,13 +62232,37 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="troddlerp" cloneof="troddler">
-		<description>Troddlers (Euro, prototype)</description>
+		<description>Troddlers (prototype 19930210)</description>
+		<year>1993</year>
+		<publisher>Seika</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="troddlers (feb 10, 1993 prototype).sfc" size="524288" crc="b19c42c0" sha1="0c863905fcb174b2bc8b66f0ca232573a143f15a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troddlerp1" cloneof="troddler">
+		<description>Troddlers (Euro, prototype 19930203)</description>
 		<year>1993</year>
 		<publisher>Seika</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="troddlers (europe) (beta).sfc" size="524288" crc="5a80c4cb" sha1="c0f26aacf7890b7bd5b8292b90e61f874158c15e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troddlerp2" cloneof="troddler">
+		<description>Troddlers (prototype 19921023)</description>
+		<year>1992</year>
+		<publisher>Seika</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="troddlers (oct 23, 1992 prototype).sfc" size="524288" crc="3bb07105" sha1="e5f5c45ca0192dda42141a9d654dc6b73246e678" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -63092,6 +63204,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="utopia - the creation of a nation (japan).sfc" size="524288" crc="268c1181" sha1="9f9c5dd2002c52608c60a1032beb4f3e94364e80" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utopiap" cloneof="utopia">
+		<description>Utopia - The Creation of a Nation (prototype)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="utopia - the creation of a nation (prototype).sfc" size="524288" crc="c57a6158" sha1="25468b97c09fff2e99e73516d10c927708c164a0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
