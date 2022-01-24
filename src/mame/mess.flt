@@ -537,6 +537,7 @@ lb186.cpp
 lbpc.cpp
 lc80.cpp
 lcmate2.cpp
+ld50.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
 leapfrog_leapster_explorer.cpp

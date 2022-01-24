@@ -19968,6 +19968,9 @@ lckydrawa                       // (c) 1979 Mirco
 @source:lcmate2.cpp
 lcmate2                         //
 
+@source:ld50.cpp
+ld50                            //
+
 @source:leapfrog_iquest.cpp
 iquest
 ttwistfb
