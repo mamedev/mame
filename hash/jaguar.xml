@@ -832,7 +832,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- stuck waiting for coin inputs? -->
+	<!-- crashes when coin is input (P1 Pause) -->
 	<software name="speedst2" supported="no">
 		<description>Speedster II</description>
 		<year>1995?</year>
