@@ -102,6 +102,7 @@ void spectrum_opus_device::device_add_mconfig(machine_config &config)
 	/* passthru without NMI */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 const tiny_rom_entry *spectrum_opus_device::device_rom_region() const
@@ -188,7 +189,7 @@ uint8_t spectrum_opus_device::iorq_r(offs_t offset)
 	// PIA bit 7 is enable joystick and selected on A5 only
 	if (!BIT(m_pia->a_output(), 7) && (~offset & 0x20))
 	{
-		data &= m_joy->read() & 0x1f;
+		data = m_joy->read() & 0x1f;
 	}
 	return data;
 }
