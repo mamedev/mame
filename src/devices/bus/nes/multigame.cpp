@@ -51,9 +51,11 @@ DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_81054
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_830928c",    "NES Cart BMC 830928C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_891227,     nes_bmc_891227_device,     "nes_bmc_891227",     "NES Cart BMC 891227 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device,    "nes_bmc_970630c",    "NES Cart BMC 970630C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_CTC12IN1,   nes_bmc_ctc12in1_device,   "nes_bmc_ctc12in1",   "NES Cart BMC CTC-12IN1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device,     "nes_bmc_fam250",     "NES Cart BMC FAM250 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
@@ -458,6 +460,21 @@ nes_vram_protect_device::nes_vram_protect_device(const machine_config &mconfig, 
 
 nes_bmc_60311c_device::nes_bmc_60311c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_vram_protect_device(mconfig, NES_BMC_60311C, tag, owner, clock)
+{
+}
+
+nes_bmc_ctc12in1_device::nes_bmc_ctc12in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_bmc_ctc12in1_device::nes_bmc_ctc12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_ctc12in1_device(mconfig, NES_BMC_CTC12IN1, tag, owner, clock)
+{
+}
+
+nes_bmc_891227_device::nes_bmc_891227_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_ctc12in1_device(mconfig, NES_BMC_891227, tag, owner, clock)
 {
 }
 
@@ -1149,6 +1166,21 @@ void nes_bmc_60311c_device::pcb_reset()
 
 	m_reg[0] = m_reg[1] = m_reg[2] = 0;
 	update_banks();
+}
+
+void nes_bmc_ctc12in1_device::device_start()
+{
+	nes_vram_protect_device::device_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_ctc12in1_device::pcb_reset()
+{
+	nes_vram_protect_device::pcb_reset();
+	prg16_89ab(0);
+	prg16_cdef(0);
+
+	m_reg[0] = m_reg[1] = 0;
 }
 
 void nes_bmc_fam250_device::device_start()
@@ -3226,6 +3258,90 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_60311c write_h, offset: %04x, data: %02x\n", offset, data));
 	m_reg[2] = data & 0x07;
 	update_banks();
+}
+
+/*-------------------------------------------------
+
+ BMC-CTC-12IN1
+
+ Games: 12 in 1 Game Card
+
+ NES 2.0: mapper 337
+
+ In MAME: Supported.
+
+ TODO: Investigate why Legend of Kage has a corrupt
+ title screen (inverting mirroring bit fixes it but
+ breaks the rest of the game). Also why are walls in
+ Pacman glitched?
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_ctc12in1_device::read_m(offs_t offset)
+{
+	LOG_MMC(("bmc_ctc12in1 read_m, offset: %04x, data: %02x\n", offset));
+	return m_prg[0x01 * 0x2000 + offset];    // fixed to bank 1
+}
+
+void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_ctc12in1 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg[BIT(offset, 14)] = data;
+
+	u8 bank = (m_reg[0] & 0x18) | (m_reg[1] & 0x07);
+	switch (m_reg[0] >> 6)
+	{
+		case 0:
+			prg16_89ab(bank);
+			prg16_cdef(bank);
+			break;
+		case 1:
+			prg32(bank >> 1);
+			break;
+		case 2:
+		case 3:
+			prg16_89ab(bank);
+			prg16_cdef(bank | 0x07);
+			break;
+	}
+
+	m_vram_protect == !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
+	set_nt_mirroring(BIT(m_reg[0], 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC-891227
+
+ Games: Super 15 in 1 Game Card
+
+ NES 2.0: mapper 350
+
+ This board is similar to CTC-12IN1 above but with
+ the mirroring and banking mode bits moved and with
+ support for Contra on a separate 128K chip.
+
+ In MAME: Supported.
+
+ TODO: Contra bugs: Without input character sprite
+ is always in the UP position. Cannot pickup weapons.
+
+ -------------------------------------------------*/
+
+void nes_bmc_891227_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_891227 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x4000)
+	     data = (data & 0x80) >> 2 | (data & 0x60) << 1 | (data & 0x1f);
+
+	nes_bmc_ctc12in1_device::write_h(offset, data);
+
+	if ((m_reg[0] & 0xc0) == 0xc0)  // Contra only mode
+	{
+		prg16_89ab(0x20 | (m_reg[1] & 0x07));
+		prg16_cdef(0x27);
+	}
 }
 
 /*-------------------------------------------------
