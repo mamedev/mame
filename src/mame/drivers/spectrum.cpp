@@ -833,7 +833,7 @@ void spectrum_state::spectrum_clone(machine_config &config)
 
 	// no floating bus
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_clone_io);
-	m_exp->fb_r_handler().set([this]() { return 0xff; });
+	m_exp->fb_r_handler().set([]() { return 0xff; });
 }
 
 /***************************************************************************
