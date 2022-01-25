@@ -395,16 +395,16 @@ void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &clipre
 				curr_addr = addr;
 			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
 				curr_addr = 0;
-			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8, pos+=16)
+			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8,  pos+=8)
 			{
 				if(pos + 0x08 > 0x80000)
 					return;
-				for(int xi=0,xm=0;xi<8;xi+=2,xm+=4)
+				for(int xi=0;xi<8;xi+=4)
 				{
 					if(!screen().visible_area().contains(col+xi, line + yi))
 						continue;
-					uint8_t y0 = vga.memory[pos + xm + 0], ub = vga.memory[pos + xm + 1];
-					uint8_t y1 = vga.memory[pos + xm + 2], vb = vga.memory[pos + xm + 3];
+					uint8_t y0 = vga.memory[pos + xi + 0], ub = vga.memory[pos + xi + 1];
+					uint8_t y1 = vga.memory[pos + xi + 2], vb = vga.memory[pos + xi + 3];
 					uint16_t u, v;
 					if(col)
 					{
@@ -417,8 +417,11 @@ void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &clipre
 						v = vb;
 					}
 					ua = ub; va = vb;
+					// this reads one byte per clock so it'll be one pixel for every 2 clocks
 					bitmap.pix(line + yi, col + xi + 0) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
-					bitmap.pix(line + yi, col + xi + 1) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+					bitmap.pix(line + yi, col + xi + 1) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 2) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+					bitmap.pix(line + yi, col + xi + 3) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
 				}
 			}
 		}
@@ -802,6 +805,7 @@ INPUT_CHANGED_MEMBER(vis_state::update)
 {
 	m_pic1->ir3_w(ASSERT_LINE);
 	m_padstat = 0x80;
+	m_padsel = false;
 }
 
 //chipset registers?
@@ -887,12 +891,12 @@ uint16_t vis_state::pad_r(offs_t offset)
 			if(!m_padsel)
 			{
 				ret = m_pad->read();
+				m_padstat = 0;
 				m_padsel = true;
 			}
 			else
 			{
-				ret = 0x400;
-				m_padstat = 0;
+				ret = 0x400; // this is probably for the second controller
 				m_padsel = false;
 			}
 			m_pic1->ir3_w(CLEAR_LINE);
