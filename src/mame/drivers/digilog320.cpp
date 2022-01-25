@@ -41,7 +41,6 @@
     - XTAL 3.6864 MHz
 
     TODO:
-    - Keyboard
 	- Finish floppy hookup
     - SCC interrupts
     - Unknown DUART inputs/outputs
@@ -58,6 +57,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9519.h"
+#include "machine/digilog320_kbd.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
@@ -186,20 +186,31 @@ MC6845_UPDATE_ROW( digilog320_state::update_row )
 
 	for (int x = 0; x < x_count; x++)
 	{
+		// attributes
+		// 76------  unknown
+		// --5-----  half intensity
+		// ---4----  unknown
+		// ----3---  reverse
+		// -----2--  unknown
+		// ------10  chargen high bits
+
 		uint16_t const data = (m_vram[ma + x]);
-		uint8_t gfx = m_chargen[((data & 0xff) << 4) | ra];
+		uint8_t gfx = m_chargen[((data & 0x3ff) << 4) | ra];
 		uint8_t attr = data >> 8;
 
 		if (x == cursor_x)
 			gfx ^= 0xff;
 
-		// maybe
 		if (BIT(attr, 3))
 			gfx ^= 0xff;
 
+		// foreground/background colors
+		rgb_t fg = BIT(attr, 5) ? pen[1] : pen[2];
+		rgb_t bg = pen[0];
+
 		// draw 8 pixels of the character
 		for (int i = 0; i < 8; i++)
-			bitmap.pix(y, x * 8 + i) = pen[BIT(gfx, i)];
+			bitmap.pix(y, x * 8 + i) = BIT(gfx, i) ? fg : bg;
 	}
 }
 
@@ -347,7 +358,7 @@ void digilog320_state::digilog320(machine_config &config)
 	screen.set_raw(5.6592_MHz_XTAL, 320, 0, 256, 262, 0, 192);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
@@ -358,6 +369,9 @@ void digilog320_state::digilog320(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_duart->a_tx_cb().set("kbd", FUNC(digilog320_kbd_hle_device::rx_w));
+	m_duart->outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
+	m_duart->outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
 	I8251(config, "usart", 0);
 
@@ -369,6 +383,9 @@ void digilog320_state::digilog320(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 	//m_fdc->drq_wr_callback()
 	FLOPPY_CONNECTOR(config, "fdc:0", digilog320_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+
+	digilog320_kbd_hle_device &kbd(DIGILOG320_KBD_HLE(config, "kbd"));
+	kbd.tx_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 }
 
 
