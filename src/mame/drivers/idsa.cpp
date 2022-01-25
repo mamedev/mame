@@ -1,9 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista, Robbbert
 /***********************************************************************************************************************
-// Skeleton driver for IDSA pinballs.
-// Known pinballs to be dumped: Fantastic Car (1986)
-// Hardware listing and ROM definitions from PinMAME.
+PINBALL
+IDSA pinballs
+
+Games:
+- Basketball
+- Fantastic Car (1984, to be dumped)
+- V1
+
+Hardware listing and ROM definitions from PinMAME.
 
 Hardware:
 ---------
@@ -36,6 +42,7 @@ ToDO:
 #include "machine/i8255.h"
 #include "speaker.h"
 
+namespace {
 
 class idsa_state : public genpin_class
 {
@@ -400,6 +407,7 @@ ROM_START(bsktbllp)
 	ROM_LOAD( "sp0256a-al2.1b",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+} // Anonymous namespace
 
 GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )

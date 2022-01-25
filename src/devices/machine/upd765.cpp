@@ -2005,6 +2005,14 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		write_data_continue(fi);
 		return;
 	}
+	else if(fi.dev && fi.dev->wpt_r()) {
+		fi.st0 |= ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = ST1_NW;
+		st2 = 0;
+		write_data_continue(fi);
+		return;
+	}
 
 	write_data_continue(fi);
 }
@@ -2315,9 +2323,18 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
+	st1 = 0;
+	st2 = 0;
 	if(!fi.ready) {
 		fi.st0 = (command[1] & 7) | ST0_NR | ST0_FAIL;
 		fi.sub_state = TRACK_DONE;
+		format_track_continue(fi);
+		return;
+	}
+	else if(fi.dev && fi.dev->wpt_r()) {
+		fi.st0 = (command[1] & 7) | ST0_FAIL;
+		fi.sub_state = TRACK_DONE;
+		st1 = ST1_NW;
 		format_track_continue(fi);
 		return;
 	}
@@ -2360,8 +2377,8 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			LOGSTATE("TRACK_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
-			result[1] = 0;
-			result[2] = 0;
+			result[1] = st1;
+			result[2] = st2;
 			result[3] = 0;
 			result[4] = 0;
 			result[5] = 0;

@@ -110,6 +110,7 @@ sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios
 @source:4enraya.cpp
 4enraya                         // (c) 1990 IDSA
 4enrayaa                        //
+strker
 tourpgum
 unkpacg                         // (c) 19?? ???
 unkpacga                        //
@@ -3119,6 +3120,7 @@ atetrisb                        // (bootleg)
 atetrisb2                       // (bootleg)
 atetrisb3                       // (bootleg)
 atetrisb4                       // (bootleg)
+atetrisb5                       // (bootleg)
 atetb3482                       // (bootleg, with UM3482)
 atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
@@ -11540,6 +11542,7 @@ crospuzl                        //
 @source:crshrace.cpp
 crshrace                        // (c) 1993 Video System Co.
 crshrace2                       // (c) 1993 Video System Co.
+crshrace2a                      // (c) 1993 Video System Co.
 
 @source:crvision.cpp
 crvisio2                        //
@@ -11566,6 +11569,7 @@ wulybuly                        //
 @source:airraid.cpp
 airraid                         // (c) 1987 Seibu Kaihatsu
 cshooter                        // (c) 1987 JKH (bootleg)
+failgate                        // (c) 1991 Seibu Kaihatsu
 
 @source:csplayh5.cpp
 aimode                          // (c) 1999
@@ -11834,6 +11838,43 @@ dbz                             // (c) 1993 Banpresto
 dbz2                            // (c) 1994 Banpresto
 dbz2bl                          // bootleg
 dbza                            // (c) 1993 Banpresto
+
+@source:dc_atomiswave.cpp
+anmlbskt                        // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
+anmlbskta                       // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
+awbios                          // 2002.?? Atomiswave BIOS
+basschal                        // 2009.07 Sega Bass Challenge Version A
+basschalo                       // 2009.02 Sega Bass Challenge
+blokpong                        // 2004.12 Block Pong-Pong
+claychal                        // 2008.11 Sega Clay Challenge
+demofist                        // 2003.06 Demolish Fist
+dirtypig                        // 2004.09 Dirty Pig Skin Football
+dolphin                         // 2003.08 Dolphin Blue
+fotns                           // 2005.12 Hokuto no Ken
+ftspeed                         // 2004.09 Faster than Speed
+ggisuka                         // 2003.12 Guilty Gear Isuka
+ggx15                           // 2003.03 Guilty Gear X Ver.1.5
+kofnw                           // 2004.07 The King of Fighters Neo Wave
+kofnwj                          // 2004.07 The King of Fighters Neo Wave (Japan)
+kofxi                           // 2005.10 The King of Fighters XI
+kov7sprt                        // 2003.11 Knights of Valour - The Seven Sprits
+maxspeed                        // 2002.12 Maximum Speed
+mslug6                          // 2006.02 Metal Slug 6
+ngbc                            // 2005.07 NeoGeo Battle Colloseum
+ngbcj                           // 2005.07 NeoGeo Battle Colloseum (Japan)
+rangrmsn                        // 2004.03 Ranger Mission
+rumblef                         // 2004.03 The Rumble Fish
+rumblef2                        // 2005.03 The Rumble Fish 2
+rumblefp                        // 2004.02 The Rumble Fish (prototype)
+rumblf2p                        // 2005.01 The Rumble Fish 2 (prototype)
+salmankt                        // 2004.06 Salary Man Kintarou Net Select
+samsptk                         // 2005.09 Samurai Spirits Tenkaichi Kenkakuden
+sprtshot                        // 2002.12 Sports Shooting USA
+sushibar                        // 2003 Sushi Bar
+vfurlong                        // 2005.03 Net Select Keiba Victory Furlong
+waidrive                        // 2005.01 WaiWai Drive
+xtrmhnt2                        // 2006.09 Extreme Hunting 2 Tournament Edition
+xtrmhunt                        // 2004.09 Extreme Hunting
 
 @source:dccons.cpp
 dc                              // 1999 Sega Dreamcast (USA)
@@ -12381,12 +12422,16 @@ modulab                         //
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
 dietgoe                         // MAY (c) 1993
+dietgoea                        // MAY (c) 1993
 dietgoj                         // MAY (c) 1993
 dietgou                         // MAY (c) 1993
 
 @source:digel804.cpp
 digel804                        //
 ep804                           //
+
+@source:digilog320.cpp
+digilog320                      //
 
 @source:digijet.cpp
 digijet                         //
@@ -13589,6 +13634,7 @@ mtrap                           // (c) 1981
 mtrap2                          // (c) 1981
 mtrap3                          // (c) 1981
 mtrap4                          // (c) 1981
+mtrap4g                         // (c) 1981
 mtrapb                          // bootleg
 mtrapb2                         // bootleg
 panzer                          // (c) 1980 Proel (bootleg)
@@ -13743,8 +13789,9 @@ f387x                           // (c) 1979 Fairchild
 @source:facit4440.cpp
 facit4440                       // 1984
 
-@source:falco5220.cpp
+@source:falco500.cpp
 falco5220e                      // 1987
+falco500e                       // 1991
 falco5220s                      // 1989
 
 @source:falcots.cpp
@@ -15987,6 +16034,7 @@ cueball3                        //
 freddy                          //
 freddy4                         //
 gladiatp                        //
+mac_zois                        //
 rescu911                        //
 sfight2                         //
 sfight2a                        //
@@ -16156,6 +16204,9 @@ mspuzzle                        // (c) 1994 Min Corp.
 mspuzzlea                       // (c) 1994 Min Corp.
 mspuzzleb                       // (c) 1994 Min Corp.
 mspuzzleg                       // (c) 1994 Min Corp.
+
+@source:gumrally.cpp
+gumrally                        // Atari Games
 
 @source:gunbustr.cpp
 gunbustr                        // D27 (c) 1992 Taito Corporation Japan (World)
@@ -16349,11 +16400,13 @@ funtag                          // Mattel
 h2hbaskbc                       // Coleco
 h2hhockeyc                      // Coleco
 h2hsoccerc                      // Coleco
+lafootb                         // Mattel
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
 mdallas                         // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
+solution                        // SCAT
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
@@ -16466,7 +16519,9 @@ gnw_flagman                     // Nintendo
 gnw_gcliff                      // Nintendo
 gnw_ghouse                      // Nintendo
 gnw_helmet                      // Nintendo
+gnw_helmeto                     // Nintendo
 gnw_judge                       // Nintendo
+gnw_judgeo                      // Nintendo
 gnw_lboat                       // Nintendo
 gnw_lion                        // Nintendo
 gnw_manhole                     // Nintendo
@@ -16474,6 +16529,7 @@ gnw_manholeg                    // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mariocmt                    // Nintendo
+gnw_mariocmta                   // Nintendo
 gnw_mariotj                     // Nintendo
 gnw_mbaway                      // Nintendo
 gnw_mmouse                      // Nintendo
@@ -16733,6 +16789,7 @@ nyjoker                         //
 record                          // (c) 2000 High Video
 tour4000                        // (c) 2000 High Video
 tour4010                        // (c) 2000 High Video
+unksmk                          //
 
 @source:hikaru.cpp
 airtrix                         // 2001.02? Air Trix (Rev A)
@@ -17122,6 +17179,7 @@ xymg                            // (c) 1996
 @source:igs017.cpp
 genius6                         // (c) 1998
 genius6a                        // (c) 1997
+genius6b                        // (c) 1997
 happyskl                        // (c) 2001?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
@@ -17163,11 +17221,12 @@ csk227it                        // (c) 198? IGS
 csk234it                        // (c) 198? IGS
 igs_ncs                         // (c) 198? IGS
 igs_ncs2                        // (c) 2000 IGS
+igstet341                       // (c) 199? IGS
+igstet342                       // (c) 199? IGS
 kungfu                          // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
 pktet346                        // (c) 199? IGS
-igstet341                       // (c) 199? IGS
 stellecu                        // (c) 1998
 
 @source:ikki.cpp
@@ -19909,6 +19968,9 @@ lckydrawa                       // (c) 1979 Mirco
 @source:lcmate2.cpp
 lcmate2                         //
 
+@source:ld50.cpp
+ld50                            //
+
 @source:leapfrog_iquest.cpp
 iquest
 ttwistfb
@@ -20338,6 +20400,9 @@ spelunkr                        // (c) 1985 licensed from Broderbund
 spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
+
+@source:m62_bkungfu.cpp
+bkungfu                         // (c) 1987 Irem
 
 @source:m63.cpp
 atomboy                         // M63 (c) 1985 Irem + Memetron license
@@ -22932,6 +22997,7 @@ rodland                         // (c) 1990
 rodlanda                        // (c) 1990
 rodlandj                        // (c) 1990 (Japan)
 rodlandjb                       // bootleg
+rodlandjb2                      // bootleg
 soldam                          // (c) 1992
 soldamj                         // (c) 1992 (Japan)
 stdragon                        // (c) 1989
@@ -31175,6 +31241,16 @@ crzmon2                         // (c) 2010
 crzmon2_2                       // (c) 2010
 crzmon2_3                       // (c) 2010
 crzmon2_4                       // (c) 2010
+crzmon2_5                       // (c) 2010
+crzmon2_6                       // (c) 2010
+crzmon2_7                       // (c) 2010
+crzmon2_8                       // (c) 2010
+crzmon2_9                       // (c) 2010
+crzmon2_10                      // (c) 2010
+crzmon2_11                      // (c) 2010
+crzmon2_12                      // (c) 2010
+crzmon2_13                      // (c) 2010
+crzmon2_14                      // (c) 2010
 czmon                           // (c) 2003
 czmon_2                         // (c) 2003
 czmon_3                         // (c) 2003
@@ -31210,6 +31286,14 @@ fcockt_10                       // (c) 2003
 fcockt_11                       // (c) 2003
 fcockt_12                       // (c) 2003
 fcockt_14                       // (c) 2003
+fcockt_15                       // (c) 2003
+fcockt_16                       // (c) 2003
+fcockt_17                       // (c) 2003
+fcockt_18                       // (c) 2003
+fcockt_19                       // (c) 2003
+fcockt_20                       // (c) 2003
+fcockt_21                       // (c) 2003
+fcockt_22                       // (c) 2003
 fcockt2                         // (c) 2008
 fcockt2_2                       // (c) 2008
 fcockt2_3                       // (c) 2008
@@ -31217,6 +31301,14 @@ fcockt2_4                       // (c) 2008
 fcockt2_5                       // (c) 2008
 fcockt2_6                       // (c) 2008
 fcockt2_7                       // (c) 2008
+fcockt2_8                       // (c) 2008
+fcockt2_9                       // (c) 2008
+fcockt2_10                      // (c) 2008
+fcockt2_11                      // (c) 2008
+fcockt2_12                      // (c) 2008
+fcockt2_13                      // (c) 2008
+fcockt2_14                      // (c) 2008
+fcockt2_15                      // (c) 2008
 garage                          // (c) 2004
 garage_2                        // (c) 2004
 garage_3                        // (c) 2004
@@ -31225,6 +31317,14 @@ garage_5                        // (c) 2004
 garage_6                        // (c) 2004
 garage_7                        // (c) 2004
 garage_9                        // (c) 2004
+garage_10                       // (c) 2004
+garage_11                       // (c) 2004
+garage_12                       // (c) 2004
+garage_13                       // (c) 2004
+garage_14                       // (c) 2004
+garage_15                       // (c) 2004
+garage_16                       // (c) 2004
+garage_17                       // (c) 2004
 gnome                           // (c) 2007
 gnome_2                         // (c) 2007
 gnome_3                         // (c) 2007
@@ -31236,6 +31336,13 @@ gnome_9                         // (c) 2007
 gnome_10                        // (c) 2007
 gnome_11                        // (c) 2007
 gnome_12                        // (c) 2007
+gnome_13                        // (c) 2007
+gnome_14                        // (c) 2007
+gnome_15                        // (c) 2007
+gnome_16                        // (c) 2007
+gnome_17                        // (c) 2007
+gnome_18                        // (c) 2007
+gnome_19                        // (c) 2007
 goldfish                        // (c) 2002 - Prototype of Multifish
 island                          // (c) 2005
 island_2                        // (c) 2005
@@ -31246,6 +31353,14 @@ island2_3                       // (c) 2006
 island2_4                       // (c) 2006
 island2_5                       // (c) 2006
 island2_6                       // (c) 2006
+island2_7                       // (c) 2006
+island2_8                       // (c) 2006
+island2_9                       // (c) 2006
+island2_10                      // (c) 2006
+island2_11                      // (c) 2006
+island2_12                      // (c) 2006
+island2_13                      // (c) 2006
+island2_14                      // (c) 2006
 keks                            // (c) 2006
 keks_2                          // (c) 2006
 keks_3                          // (c) 2006
@@ -31253,6 +31368,18 @@ keks_4                          // (c) 2006
 keks_5                          // (c) 2006
 keks_6                          // (c) 2006
 keks_7                          // (c) 2006
+keks_8                          // (c) 2006
+keks_9                          // (c) 2006
+keks_10                         // (c) 2006
+keks_11                         // (c) 2006
+keks_12                         // (c) 2006
+keks_13                         // (c) 2006
+keks_14                         // (c) 2006
+keks_15                         // (c) 2006
+keks_16                         // (c) 2006
+keks_17                         // (c) 2006
+keks_18                         // (c) 2006
+keks_19                         // (c) 2006
 lhaunt                          // (c) 2003
 lhaunt_2                        // (c) 2003
 lhaunt_3                        // (c) 2003
@@ -31263,6 +31390,11 @@ lhaunt_7                        // (c) 2003
 lhaunt_8                        // (c) 2003
 lhaunt_10                       // (c) 2003
 lhaunt_11                       // (c) 2003
+lhaunt_12                       // (c) 2003
+lhaunt_13                       // (c) 2003
+lhaunt_14                       // (c) 2003
+lhaunt_15                       // (c) 2003
+lhaunt_16                       // (c) 2003
 mfish                           // (c) 2002
 mfish_2                         // (c) 2002
 mfish_3                         // (c) 2002
@@ -31285,12 +31417,27 @@ pirate2                         // (c) 2006
 pirate2_2                       // (c) 2006
 pirate2_3                       // (c) 2006
 pirate2_4                       // (c) 2006
+pirate2_5                       // (c) 2006
+pirate2_6                       // (c) 2006
+pirate2_7                       // (c) 2006
+pirate2_8                       // (c) 2006
+pirate2_9                       // (c) 2006
+pirate2_10                      // (c) 2006
+pirate2_11                      // (c) 2006
+pirate2_12                      // (c) 2006
 rclimb                          // (c) 2004
 rclimb_2                        // (c) 2004
 rclimb_3                        // (c) 2004
 rclimb_4                        // (c) 2004
 rclimb_5                        // (c) 2004
 rclimb_7                        // (c) 2004
+rclimb_8                        // (c) 2004
+rclimb_9                        // (c) 2004
+rclimb_10                       // (c) 2004
+rclimb_11                       // (c) 2004
+rclimb_12                       // (c) 2004
+rclimb_13                       // (c) 2004
+rclimb_14                       // (c) 2004
 resdnt                          // (c) 2004
 resdnt_2                        // (c) 2004
 resdnt_3                        // (c) 2004
@@ -31298,6 +31445,14 @@ resdnt_5                        // (c) 2004
 resdnt_6                        // (c) 2004
 resdnt_8                        // (c) 2004
 resdnt_9                        // (c) 2004
+resdnt_10                       // (c) 2004
+resdnt_11                       // (c) 2004
+resdnt_12                       // (c) 2004
+resdnt_13                       // (c) 2004
+resdnt_14                       // (c) 2004
+resdnt_15                       // (c) 2004
+resdnt_16                       // (c) 2004
+resdnt_17                       // (c) 2004
 rollfr                          // (c) 2003
 rollfr_2                        // (c) 2003
 rollfr_3                        // (c) 2003
@@ -31310,6 +31465,14 @@ sweetl2                         // (c) 2007
 sweetl2_2                       // (c) 2007
 sweetl2_3                       // (c) 2007
 sweetl2_4                       // (c) 2007
+sweetl2_5                       // (c) 2007
+sweetl2_6                       // (c) 2007
+sweetl2_7                       // (c) 2007
+sweetl2_8                       // (c) 2007
+sweetl2_9                       // (c) 2007
+sweetl2_10                      // (c) 2007
+sweetl2_11                      // (c) 2007
+sweetl2_12                      // (c) 2007
 windjamr                        // (c) 2002
 
 @source:multfish_boot.cpp
@@ -31656,6 +31819,7 @@ machbrkr                        // (c) 1995 (World)
 machbrkrj                       // (c) 1995 (Japan)
 nebulray                        // (c) 1994 (World)
 nebulrayj                       // (c) 1994 (Japan)
+nebulrayp                       // prototype
 outfxies                        // (c) 1994 (World)
 outfxiesa                       // (c) 1994 (Korea?)
 outfxiesj                       // (c) 1994 (Japan)
@@ -32068,17 +32232,11 @@ alienfnt                        // 2001.09 Alien Front (Rev T)
 alienfnta                       // 2001.09 Alien Front (Rev A)
 alpilotj                        // 1999.03 Airline Pilots (Japan, Rev A)
 alpilot                         // 1999.?? Airline Pilots (World, Rev B)
-anmlbskt                        // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
-anmlbskta                       // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
 anpanman2                       // 2003.09 Soreike! Anpanman Popcorn Koujou 2 (Rev C)
 asndynmt                        // 2007.07 Dynamite Deka EX - Asian dynamite
 asndynmto                       // 2007.07 Dynamite Deka EX - Asian dynamite (older)
 ausfache                        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
-awbios                          // 2002.?? Atomiswave BIOS
 azumanga                        // 2002.12 Azumanga Daiou Puzzle Bobble
-basschal                        // 2009.07 Sega Bass Challenge Version A
-basschalo                       // 2009.02 Sega Bass Challenge
-blokpong                        // 2004.12 Block Pong-Pong
 bdrdown                         // 2003.09 Border Down (Rev A)
 beachspi                        // 2001.07 Beach Spikers
 capsnk                          // 2000.09 Capcom vs. SNK Millennium Fight 2000 (Rev C)
@@ -32086,7 +32244,6 @@ capsnka                         // 2000.08 Capcom vs. SNK Millennium Fight 2000 
 capsnkb                         // 2000.08 Capcom vs. SNK Millennium Fight 2000
 cfield                          // 2004.06 Chaos Field
 chocomk                         // 2002.06 Musapey's Choco Marker (Rev A)
-claychal                        // 2008.11 Sega Clay Challenge
 cleoftp                         // 2002.05 Cleopatra Fortune Plus
 clubk2k3                        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp                        // 2003.?? Club Kart: European Session (2003, prototype, set 1)
@@ -32112,16 +32269,13 @@ cvsgd                           // 2001.05 Capcom Vs. SNK Millennium Fight 2000 
 deathcox                        // 2000.?? Death Crimson OX (USA)
 deathcoxj                       // 2000.10 Death Crimson OX (Japan, Rev A)
 deathcoxo                       // 2000.10 Death Crimson OX (Japan)
-demofist                        // 2003.06 Demolish Fist
 derbyo2k                        // 2000.06 Derby Owners Club 2000 Ver.2 (Japan) (Rev A)
 derbyoc                         // 1999.10 Derby Owners Club (Japan) (Rev B)
 derbyoc2                        // 2001.10 Derby Owners Club II Ver.2.1 (Japan) (Rev B)
 derbyocw                        // 2005.?? Derby Owners Club World Edition EX (Rev D)
-dirtypig                        // 2004.09 Dirty Pig Skin Football
 doa2                            // 1999.12? Dead or Alive 2
 doa2a                           // 1999.11 Dead or Alive 2 (Rev A)
 doa2m                           // 2000.01 Dead or Alive 2 Millennium
-dolphin                         // 2003.08 Dolphin Blue
 dragntra                        // 2003.05 Dragon Treasure (Rev A)
 dragntr                         // 2003.10 Dragon Treasure (Rev B)
 dragntr2                        // 2004.?? Dragon Treasure 2 (Rev A)
@@ -32139,12 +32293,8 @@ f355dlx                         // 1999.07 F355 Challenge Deluxe (BIOS)
 f355twin                        // 1999.07 Ferrari F355 Challenge (twin/deluxe)
 f355twinp                       // 1999.?? Ferrari F355 Challenge (twin/deluxe, prototype)
 f355twn2                        // 2001.01 Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)
-fotns                           // 2005.12 Hokuto no Ken
-ftspeed                         // 2004.09 Faster than Speed
-ggisuka                         // 2003.12 Guilty Gear Isuka
 ggram2                          // 1999.04 Giant Gram: All Japan Pro Wrestling 2
 ggx                             // 2000.07 Guilty Gear X
-ggx15                           // 2003.03 Guilty Gear X Ver.1.5
 ggxx                            // 2002.05 Guilty Gear XX
 ggxxac                          // 2006.11 Guilty Gear XX Accent Core
 ggxxrl                          // 2003.03 Guilty Gear XX # Reload (Rev A)
@@ -32187,10 +32337,6 @@ keyboard                        // 2001.11 La Keyboard
 kick4csh                        // 2004.?? Kick '4' Cash
 kingrt66                        // 2002.02 The King of Route 66 (Rev A)
 kingrt66p                       // 2002.01 The King of Route 66 (prototype)
-kofnw                           // 2004.07 The King of Fighters Neo Wave
-kofnwj                          // 2004.07 The King of Fighters Neo Wave (Japan)
-kofxi                           // 2005.10 The King of Fighters XI
-kov7sprt                        // 2003.11 Knights of Valour - The Seven Sprits
 kurucham                        // 2006.03 Kurukuru Chameleon
 lupinsho                        // 2002.05 Lupin the Third: the Shooting (Rev A)
 lupinshoo                       // 2001.12 Lupin the Third: the Shooting
@@ -32198,7 +32344,6 @@ luptype                         // 2002.04 Lupin The Third - The Typing (Rev A)
 mamonoro                        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
 marstv                          // 1999.12 Mars TV
-maxspeed                        // 2002.12 Maximum Speed
 mazan                           // 2002.07 Mazan: Flash of the Blade (World, MAZ2 Ver.A)
 mazanj                          // 2002.07 Mazan: Flash of the Blade (Japan, MAZ1 Ver.A)
 mazanu                          // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
@@ -32212,7 +32357,6 @@ mj1                             // 2002.10 Sega Yonin Uchi Mahjong MJ (Update Di
 moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
-mslug6                          // 2006.02 Metal Slug 6
 mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
 mushi2k61                       // 2006.?? MushiKing The King Of Beetles 2006 First (Japan)
@@ -32232,8 +32376,6 @@ naomi                           // 1998.?? Naomi BIOS
 naomi2                          // 2001.?? Naomi 2 BIOS
 naomigd                         // 2001.?? Naomi GD-ROM Bios
 ndcfboxa                        // 2009.04.01 DIMM Firmware Updater for CF-BOX (Rev A)
-ngbc                            // 2005.07 NeoGeo Battle Colloseum
-ngbcj                           // 2005.07 NeoGeo Battle Colloseum (Japan)
 ngdup23a                        // DIMM Firmware Updater (Rev A)
 ngdup23c                        // DIMM Firmware Updater (Rev C)
 ngdup23e                        // DIMM Firmware Updater (Rev E)
@@ -32258,20 +32400,13 @@ quizqgd                         // 2002.?? Quiz Keitai Q mode
 radirgy                         // 2005.12.04 Radirgy (Rev A)
 radirgyn                        // 2009.06 Radirgy Noa
 radirgyo                        // 2005.10 Radirgy
-rangrmsn                        // 2004.03 Ranger Mission
 rhytngk                         // 2007.09 Rhythm Tengoku
 ringouto                        // 1999.06 Ring Out 4x4
 ringout                         // 1999.06 Ring Out 4x4 (Rev A)
-rumblef                         // 2004.03 The Rumble Fish
-rumblef2                        // 2005.03 The Rumble Fish 2
-rumblefp                        // 2004.02 The Rumble Fish (prototype)
-rumblf2p                        // 2005.01 The Rumble Fish 2 (prototype)
-salmankt                        // 2004.06 Salary Man Kintarou Net Select
 samba                           // 1999.12 Samba de Amigo (Rev B)
 sambaa                          // 1999.?? Samba de Amigo (Rev A)
 samba2k                         // 2000.12 Samba de Amigo Ver.2000
 sambap                          // 1999.?? Samba de Amigo (prototype)
-samsptk                         // 2005.09 Samurai Spirits Tenkaichi Kenkakuden
 senko                           // 2005.08 Senko no Ronde (Rev A)
 senkoo                          // 2005.04 Senko no Ronde
 senkosp                         // 2006.08 Senkou no Rondo SP
@@ -32287,20 +32422,6 @@ shootopl                        // 2002.?? Shootout Pool
 shootpl                         // 2003.?? Shootout Pool Prize / Shootout Pool The Medal (Rev A)
 shootplm                        // 2004.?? Shootout Pool Prize / Shootout Pool The Medal Ver. B
 shootplmp                       // 2004.?? Shootout Pool Prize / Shootout Pool The Medal Ver. B -P
-sl2007                          // 2007.07 Shooting Love
-slasho                          // 2000.07 Slashout
-slashout                        // 2000.?? Slashout
-smarinef                        // 2000.03 Sega Marine Fishing
-smlg99                          // 1999.09 World Series 99 / Super Major League 99
-soulsurf                        // 2002.07 Soul Surfer
-spawn                           // 1999.?? Spawn In the Demon's Hand
-spkrbtl                         // 2001.07 Spikers Battle
-sprtjam                         // 2000.11.13 Sports Jam
-sprtshot                        // 2002.12 Sports Shooting USA
-ss2005                          // 2005.04 Super Shanghai 2005 (Rev A)
-ss2005o                         // 2005.03 Super Shanghai 2005
-sstrkfgt                        // 2000.10 Sega Strike Fighter (Rev A)
-sstrkfgta                       // 2000.10 Sega Strike Fighter (Rev A, no training mode)
 shorse                          // 2000.11.28 Star Horse (satellite)
 shorsem                         // 2000.??    Star Horse (main screens)
 shorsel                         // 2000.12    Star Horse (live and backup)
@@ -32319,9 +32440,21 @@ shorseprl                       // 2009.?? Star Horse Progress Returns (live and
 shorseprs                       // 2009.?? Star Horse Progress Returns (sound)
 shorseprvl                      // 2009.?? Star Horse Progress Returns (main screen left)
 shorseprvr                      // 2009.?? Star Horse Progress Returns (main screen right)
+sl2007                          // 2007.07 Shooting Love
+slasho                          // 2000.07 Slashout
+slashout                        // 2000.?? Slashout
+smarinef                        // 2000.03 Sega Marine Fishing
+smlg99                          // 1999.09 World Series 99 / Super Major League 99
+soulsurf                        // 2002.07 Soul Surfer
+spawn                           // 1999.?? Spawn In the Demon's Hand
+spkrbtl                         // 2001.07 Spikers Battle
+sprtjam                         // 2000.11.13 Sports Jam
+ss2005                          // 2005.04 Super Shanghai 2005 (Rev A)
+ss2005o                         // 2005.03 Super Shanghai 2005
+sstrkfgt                        // 2000.10 Sega Strike Fighter (Rev A)
+sstrkfgta                       // 2000.10 Sega Strike Fighter (Rev A, no training mode)
 starseek                        // 2001.07 Dokidoki Idol Star Seeker
 suchie3                         // 1999.09 Idol Janshi Su-Chi-Pi 3
-sushibar                        // 2003 Sushi Bar
 takoron                         // 2006.12.16 Noukone Puzzle Takoron
 tduno                           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine
 tduno2                          // 2000.02 Touch de UNO! 2
@@ -32349,7 +32482,6 @@ vf4o                            // 2001.08.02 Virtua Fighter 4 (GD-ROM)
 vf4tuned                        // 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
 vf4tuneda                       // 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
 vf4tunedd                       // 2004.10 Virtua Fighter 4 Final Tuned (Rev D)
-vfurlong                        // 2005.03 Net Select Keiba Victory Furlong
 virnba                          // 2000.02 Virtua NBA (USA)
 virnbao                         // 2000.02 Virtua NBA
 virnbap                         // 1999.?? Virtua NBA (prototype)
@@ -32364,7 +32496,6 @@ vtenis2c                        // 2001.10 Virtua Tennis 2 / Power Smash 2 (Rev 
 vtennis                         // 1999.12 Virtua Tennis / Power Smash (cartridge)
 vtennis2                        // 2001.08.27 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 vtennisg                        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
-waidrive                        // 2005.01 WaiWai Drive
 wccf116                         // 2003.?? World Club Champion Football Serie A 2001-2002 Ver. 2
 wccf1dup                        // 2002.?? World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03
 wccf212e                        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
@@ -32384,8 +32515,6 @@ wrungp                          // 2001.08 Wave Runner GP
 wrungpo                         // 2001.?? Wave Runner GP (USA, Rev A)
 wsbbgd                          // 2001.06 World Series Baseball / Super Major League
 wwfroyal                        // 2000.11 WWF Royal Rumble
-xtrmhnt2                        // 2006.09 Extreme Hunting 2 Tournament Edition
-xtrmhunt                        // 2004.09 Extreme Hunting
 zerogu2                         // 2001.05 Zero Gunner 2
 zombrvn                         // 1999.03 Zombie Revenge (Rev A)
 zombrvne                        // 1999.03 Zombie Revenge (Export)
@@ -32732,7 +32861,7 @@ lans2004                        // bootleg of shocktr2
 lastblad                        // 0234 (c) 1997 SNK
 lastbladh                       // 0234 (c) 1997 SNK
 lastbld2                        // 0243 (c) 1998 SNK
-lasthope
+lasthope                        //
 lastsold                        // 0196 Censored Korean release of lastblad
 lbowling                        // 0019 (c) 1990 SNK
 legendos                        // 0029 (c) 1991 SNK
@@ -32885,6 +33014,9 @@ wjammers                        // 0065 (c) 1994 Data East Corporation
 zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
+
+@source:neomania.cpp
+neomania                        // bootleg
 
 @source:neopcb.cpp
 kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
@@ -33338,6 +33470,7 @@ noki8890                        //
 @source:norautp.cpp
 bjpoker                         // (c) M. Kramer Inc.
 cdrawpkr                        // (c) 1984, Coinmaster
+cgip23b                         // (c) 1998, CGI
 cgip30cs                        // (c) 1999, CGI
 cgidjp                          // (c) 1999, CGI
 df_djpkr                        // (c) DellFern Ltd.
@@ -36196,6 +36329,7 @@ rastanua                        // B04 (c) 1987 Taito America Corporation (US)
 rastanub                        // B04 (c) 1987 Taito America Corporation (US)
 rastsaga                        // B04 (c) 1987 Taito Corporation (Japan)
 rastsagaa                       // B04 (c) 1987 Taito Corporation (Japan)
+rastsagaabl                     // bootleg
 rastsagab                       // B04 (c) 1987 Taito Corporation (Japan)
 
 @source:rastersp.cpp
@@ -36208,7 +36342,7 @@ ravens                          //
 ravens2                         //
 
 @source:rawthrillspc.cpp
-fnf                             // (c) 2014 Raw Thrills
+fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
 @source:rbisland.cpp
@@ -36623,8 +36757,6 @@ rzindy500                       //
 rztoshden                       //
 
 @source:s11.cpp
-alcat_l7                        //
-gmine_l2                        //
 grand_l3                        //
 grand_l4                        //
 hs_l3                           //
@@ -36633,10 +36765,6 @@ rdkng_l1                        //
 rdkng_l2                        //
 rdkng_l3                        //
 rdkng_l4                        //
-shfin_l1                        //
-tdawg_l1                        //
-tts_l1                          //
-tts_l2                          //
 
 @source:s11a.cpp
 f14_l1                          //
@@ -36761,23 +36889,15 @@ pkrno_l1                        //
 wldcp_l1                        //
 
 @source:s4.cpp
-arist_l1                        //
-bstrk_l1                        //
 flash_l1                        //
 flash_l2                        //
 flash_t1                        //
-kingt_l1                        //
-omni_l1                         //
-pomp_l1                         //
 stlwr_l2                        //
-taurs_l1                        //
 tmwrp_l2                        //
 tmwrp_l3                        //
 tmwrp_t2                        //
-topaz_l1                        //
 trizn_l1                        //
 trizn_t1                        //
-tstrk_l1                        //
 
 @source:s6.cpp
 blkou_f1                        //
@@ -36842,8 +36962,6 @@ sorcr_l1                        //
 sorcr_l2                        //
 sshtl_l3                        //
 sshtl_l7                        //
-szone_l2                        //
-szone_l5                        //
 
 @source:sacstate.cpp
 sacstate                        //
@@ -39078,7 +39196,6 @@ spdodgeb                        // TA-0022 (c) 1987
 
 @source:spec128.cpp
 hc128                           // 1991 HC-128
-hc2000                          // 1992 HC-2000
 spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
@@ -39125,6 +39242,7 @@ didakm92                        // 1992 Didaktik M 92
 didakm93                        // 1993 Didaktik M 93
 didakt90                        // 1990 Didaktik Skalica 90
 didaktk                         // 1992 Didaktik Kompakt
+hc2000                          // 1992 HC-2000
 hc85                            // 1985 HC-85
 hc88                            // 1988 HC-88
 hc90                            // 1990 HC-90
@@ -39420,6 +39538,7 @@ spk116it                        // (c) 199? IGS
 spk116itmx                      // (c) 199? IGS
 spk115it                        // (c) 199? IGS
 spk114it                        // (c) 199? IGS
+spk102u                         // (c) 1996 IGS
 spk102ua                        // (c) 1996 IGS
 3super8                         // unknown
 
@@ -39597,7 +39716,8 @@ orbitor1                        //
 quicksil                        //
 seawitch                        //
 spltsecp                        //
-st_game                         //
+st_sam                          //
+st_sam4                         //
 stargzr                         //
 viperp                          //
 
@@ -40042,7 +40162,8 @@ cyvernj                         // 1998.02 (c) 1998 Kaneko (Japan)
 galpani4                        // 1996.09 (c) 1996 Kaneko (Europe)
 galpani4j                       // 1996.09 (c) 1996 Kaneko (Japan)
 galpani4k                       // 1996.09 (c) 1996 Kaneko (Korea)
-galpanidx                       // 1996.09 (c) 1996 Kaneko (Asia)
+galpanidx                       // 2001
+galpaniex                       // 2000
 galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisa                       // 1997.04 (c) 1997 Kaneko (Asia)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
@@ -41427,6 +41548,7 @@ extrmatnj                       // B06 (c) 1987 Taito Corporation (Japan)
 extrmatnu                       // B06 (c) 1987 World Games (US)
 extrmatnur                      // B06 (c) 1987 Taito America Corporation + Romstar license (US)
 insectx                         // B97 (c) 1989 Taito Corporation Japan (World)
+insectxbl                       // bootleg (Nagoya Kaihatsu)
 insectxj                        // B97 (c) 1989 Taito Corporation (Japan)
 jpopnics                        // (c)1992 NICs, based on Plump Pop code
 kabukiz                         // B50 (c) 1988 Taito Corporation Japan (World)
@@ -43214,6 +43336,24 @@ wmsboom                         // (c) 1998 WMS - Boom (Russian)
 wmstopb                         // (c) 1999 WMS - Top Banana (Russian)
 yukongld                        // (c) 2000 WMS - Yukon Gold (Russian)
 
+@source:wms_shuffle.cpp
+alcat_l7                        //
+arist_l1                        //
+bstrk_l1                        //
+gmine_l2                        //
+kingt_l1                        //
+omni_l1                         //
+pomp_l1                         //
+shfin_l1                        //
+szone_l2                        //
+szone_l5                        //
+taurs_l1                        //
+tdawg_l1                        //
+topaz_l1                        //
+tstrk_l1                        //
+tts_l1                          //
+tts_l2                          //
+
 @source:wolfpack.cpp
 wolfpack                        // ?????? prototype         [6502]
 
@@ -43805,8 +43945,8 @@ magixb                          // bootleg
 rocktris                        // (c) 1994? Yun Sung
 
 @source:yuvomz80.cpp
-goldhexa                        // Yuvo / Yubis
-hexapres                        //
+hexaprs                         // 1995 Yuvo / Yubis - Hexa President (YM2610 set)
+hexaprsz                        // 1995 Yuvo / Yubis - Hexa President (YMZ280B set)
 
 @source:z100.cpp
 z100                            //

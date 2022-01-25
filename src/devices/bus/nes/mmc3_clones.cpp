@@ -68,6 +68,8 @@ DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8",      "NES Cart BMC HIK 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_JY208,     nes_bmc_jy208_device,     "nes_bmc_jy208",     "NES Cart BMC JY-208 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_JY302,     nes_bmc_jy302_device,     "nes_bmc_jy302",     "NES Cart BMC JY-302 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_KC885,     nes_bmc_kc885_device,     "nes_bmc_kc885",     "NES Cart BMC KC885 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SFC12,     nes_bmc_sfc12_device,     "nes_bmc_sfc12",     "NES Cart BMC SFC-12 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
@@ -111,6 +113,19 @@ INPUT_PORTS_START( bmc_f600 )
 	PORT_CONFSETTING(    0x80, "Mario Party II (6 in 1)" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( bmc_kc885 )
+	PORT_START("JUMPER")
+	PORT_CONFNAME( 0x07, 0x07, "Menu Type" )
+	PORT_CONFSETTING(    0x00, "6000 in 1" )
+	PORT_CONFSETTING(    0x01, "400 in 1" )
+	PORT_CONFSETTING(    0x02, "800 in 1" )
+	PORT_CONFSETTING(    0x03, "5000 in 1" )
+	PORT_CONFSETTING(    0x04, "190 in 1" )
+	PORT_CONFSETTING(    0x05, "1000 in 1" )
+	PORT_CONFSETTING(    0x06, "2000 in 1" )
+	PORT_CONFSETTING(    0x07, "19 in 1" )
+INPUT_PORTS_END
+
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -129,6 +144,11 @@ ioport_constructor nes_bmc_5in1_device::device_input_ports() const
 ioport_constructor nes_bmc_f600_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( bmc_f600 );
+}
+
+ioport_constructor nes_bmc_kc885_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_kc885 );
 }
 
 
@@ -222,8 +242,8 @@ nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock)
+nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
@@ -357,6 +377,17 @@ nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const ch
 
 nes_bmc_jy208_device::nes_bmc_jy208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_JY208, tag, owner, clock)
+{
+}
+
+nes_bmc_jy302_device::nes_bmc_jy302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_hik8_device(mconfig, NES_BMC_JY302, tag, owner, clock)
+{
+}
+
+nes_bmc_kc885_device::nes_bmc_kc885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_hik8_device(mconfig, NES_BMC_KC885, tag, owner, clock)
+	, m_jumper(*this, "JUMPER")
 {
 }
 
@@ -571,16 +602,15 @@ void nes_kay_device::pcb_reset()
 void nes_h2288_device::device_start()
 {
 	mmc3_start();
-	save_item(NAME(m_reg));
+	save_item(NAME(m_mmc3_mode));
 }
 
 void nes_h2288_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
+	m_mmc3_mode = true;
+	mmc3_common_initialize(0x3f, 0xff, 0);
 }
 
 void nes_6035052_device::device_start()
@@ -827,6 +857,13 @@ void nes_bmc_hik8_device::pcb_reset()
 	m_count = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	mmc3_common_initialize(0x3f, 0xff, 0);
+}
+
+void nes_bmc_kc885_device::pcb_reset()
+{
+	nes_bmc_hik8_device::pcb_reset();
+	m_prg_mask = 0x1f;
+	set_prg(m_prg_base, m_prg_mask);
 }
 
 void nes_bmc_hik4_device::device_start()
@@ -1660,66 +1697,49 @@ void nes_kay_device::write_h(offs_t offset, u8 data)
 
  UNL-H2288
 
+ Games: Earthworm Jim 2, Ultimate Mortal Kombat 3
+
+ iNES: mapper 123
+
+ In MAME: Supported.
+
  -------------------------------------------------*/
 
 void nes_h2288_device::prg_cb(int start, int bank)
 {
-	if (!(m_reg[0] & 0x40))
-		prg8_x(start, bank);
+	if (m_mmc3_mode)
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_h2288_device::write_l(offs_t offset, uint8_t data)
+void nes_h2288_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("h2288 write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
+	offset += 0x100;
 	if (offset >= 0x1800)
 	{
-		m_reg[offset & 1] = data;
-		if (m_reg[0] & 0x40)
-		{
-			uint8_t helper1 = (m_reg[0] & 0x05) | ((m_reg[0] >> 2) & 0x0a);
-			uint8_t helper2 = BIT(m_reg[0], 1);
-			prg16_89ab(helper1 & ~helper2);
-			prg16_cdef(helper1 |  helper2);
-		}
-		else
+		m_mmc3_mode = !BIT(data, 6);
+		if (m_mmc3_mode)
 			set_prg(m_prg_base, m_prg_mask);
-	}
-}
-
-uint8_t nes_h2288_device::read_l(offs_t offset)
-{
-	LOG_MMC(("h2288 read_l, offset: %04x\n", offset));
-	offset += 0x100;
-
-	if (offset >= 0x1000)
-	{
-		int helper = offset >> 8;
-		if (offset & 1)
-			return helper | 0x01;
 		else
-			return helper ^ 0x01;
+		{
+			u8 bank = bitswap<4>(data, 5, 2, 3, 0);
+			u8 mode = BIT(data, 1);
+			prg16_89ab(bank & ~mode);
+			prg16_cdef(bank | mode);
+		}
 	}
-
-	return 0;
 }
 
-void nes_h2288_device::write_h(offs_t offset, uint8_t data)
+void nes_h2288_device::write_h(offs_t offset, u8 data)
 {
-	static const uint8_t conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("h2288 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6001)
-	{
-		case 0x0000:
-			txrom_write(0x0000, (data & 0xc0) | conv_table[data & 0x07]);
-			break;
+	static constexpr u8 reg_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 
-		default:
-			txrom_write(offset, data);
-			break;
-	}
+	if (!(offset & 0x6001))
+		data = (data & 0xc0) | reg_table[data & 0x07];
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1839,7 +1859,7 @@ void nes_kof96_device::write_l(offs_t offset, u8 data)
 	LOG_MMC(("kof96 write_l, offset: %04x, data: %02x\n", offset, data));
 
 	offset += 0x100;
-	if ((offset & 0x5001) == 0x1000)
+	if ((offset & 0x1001) == 0x1000)
 	{
 		m_mmc3_mode = !BIT(data, 7);
 		if (m_mmc3_mode)
@@ -2664,6 +2684,79 @@ void nes_bmc_jy208_device::write_m(offs_t offset, u8 data)
 	}
 	else
 		m_mirroring = PPU_MIRROR_NONE;         // allow MMC3 mirror switching
+}
+
+/*-------------------------------------------------
+
+ BMC-JY-302
+
+ Games: Super 8 in 1
+
+ Variant of the HIK8IN1 boards that adds 8K of VRAM
+ which seems the same as the SFC-12 board below,
+ other than the line which selects VRAM/VROM.
+
+ NES 2.0: mapper 410
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_jy302_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (BIT(m_reg[2], 6))
+		chr8(0, CHRRAM);
+	else
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+}
+
+/*-------------------------------------------------
+
+ BMC-KC885
+
+ Games: Super 8 in 1 VIP19
+
+ Variant of the HIK8IN1 boards that has different
+ upper address lines for PRG banking. Exactly how
+ these lines are selected is determined by three
+ jumper/solder pads.
+
+ NES 2.0: mapper 401
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_kc885_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("bmc_kc885 read_h, offset: %04x\n", offset));
+
+	if (BIT(m_reg[1], 7) & BIT(m_jumper->read(), 2))
+		return get_open_bus();
+	else
+		return hi_access_rom(offset);
+}
+
+void nes_bmc_kc885_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_kc885 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (!BIT(m_reg[3], 6))  // outer register lock bit
+	{
+		if (m_count == 1)
+			data = (data & ~0x60) | bitswap<2>(data, 5, 6) << 5;
+		m_reg[m_count] = data;
+		m_count = (m_count + 1) & 0x03;
+
+		u8 mask = 0x80 | (m_jumper->read() & 0x03) << 5;
+		m_prg_base = (m_reg[2] & mask) | (m_reg[1] & ~mask);
+		m_prg_mask = ~m_reg[3] & 0x1f;
+		set_prg(m_prg_base, m_prg_mask);
+
+		m_chr_base = (m_reg[2] & 0xf0) << 4 | m_reg[0];
+		m_chr_mask = 0xff >> (~m_reg[2] & 0x0f);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }
 
 /*-------------------------------------------------

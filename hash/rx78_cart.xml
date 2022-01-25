@@ -288,4 +288,97 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="zerosen" supported="no"><!-- exception after plane takes off -->
+		<description>Zerosen</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="84.ic2.bin" size="0x2000" crc="a569048f" sha1="7d9a37b7347dddca7e16b14689d0bbbc9079afbd" offset="0x4000" />
+				<rom name="85.ic1.bin" size="0x2000" crc="acfcf43f" sha1="c7da59a6222f8664a7ef423af3b7d658627fda39" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="aerial.bin" size="0x2d7c" crc="64406f92" sha1="eee0b9584c2d09c5a8dff0ceaadd654b34aab608" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="battlot.bin" size="0x2f46" crc="d1236463" sha1="25375a30b32ce6a083273d27d46ccac3b271bd31" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="bootskell">
+		<description>Bootskell</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bootskell.bin" size="0x2fb4" crc="8c9b02e9" sha1="6eb1c4345636c17cb72cba6590bb07ac8bfee31b" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cavit.bin" size="0x33d7" crc="6c3c5729" sha1="32eb81614672a66fe7e672c01e121dedf2777fca" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="lift">
+		<description>Lift</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="lift.bin" size="0x2635" crc="fe79dd47" sha1="2d165c4e32e4c5c81b7c05df18a51b92ba9a8951" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="neuras.bin" size="0x2c03" crc="3a7758ef" sha1="0043e72dd22c8adccd8e7f7bc3ab85322ecfe024" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2021</year>
+		<publisher>Inufoto</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ruptus.bin" size="0x37a6" crc="6b903647" sha1="a5d4dbf22bbe55efdd27b8237ad39074bb80b822" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xchase">
+		<description>Xchase</description><!-- issues on the title screen, but i think it's a bug in the game -->
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="xchase.bin" size="0x4000" crc="51c0eeec" sha1="95c4703dda69ab624f22ceb086bea1e2195776c6" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -12,13 +12,13 @@
     - EN and EXT Out bits
     - Src B and Src NOTE bits
     - statusreg Busy flag
-    - timer register 0x11
     - PFM (FM using external PCM waveform)
     - detune (should be same as on other Yamaha chips)
     - Acc On bit (some sound effects in viprp1?). The documentation says
       "determines if slot output is accumulated(1), or output directly(0)"
-    - Is memory handling 100% correct? At the moment, seibuspi.c is the only
+    - Is memory handling 100% correct? At the moment, seibuspi.cpp is the only
       hardware currently emulated that uses external handlers.
+	- *16 multiplier for timer B is free-running like other yamaha FM chips?
 */
 
 #include "emu.h"
@@ -1326,7 +1326,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 
 			// reload timer
-			m_timA->adjust(clocks_to_attotime(384 * 4 * (256 - m_timerA)), 0);
+			m_timA->adjust(clocks_to_attotime(384 * (1024 - m_timerA)), 0);
 			break;
 
 		case 1:
@@ -1371,14 +1371,13 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 		switch (address)
 		{
 			case 0x10:
-				m_timerA = data;
+				m_timerA = (m_timerA & 0x003) | (uint32_t(data) << 2); // High 8 bit of Timer A period
 				break;
 
 			case 0x11:
-				// According to Yamaha's documentation, this sets timer A upper 2 bits
-				// (it says timer A is 10 bits). But, PCB audio recordings proves
-				// otherwise: it doesn't affect timer A frequency. (see ms32.c tetrisp)
-				// Does this register have another function regarding timer A/B?
+				// Timer A is 10 bit, splitted high 8 bit and low 2 bit like other Yamaha FM chips
+				// unlike Yamaha's documentation; it says 0x11 writes timer A upper 2 bits.
+				m_timerA = (m_timerA & 0x3fc) | (data & 0x03); // Low 2 bit of Timer A period
 				break;
 
 			case 0x12:
@@ -1389,7 +1388,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 				// timer A load
 				if (~m_enable & data & 1)
 				{
-					attotime period = clocks_to_attotime(384 * 4 * (256 - m_timerA));
+					attotime period = clocks_to_attotime(384 * (1024 - m_timerA));
 					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
 

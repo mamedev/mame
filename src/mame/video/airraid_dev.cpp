@@ -233,7 +233,6 @@ uint32_t airraid_video_device::screen_update_airraid(screen_device &screen, bitm
 		mix_layer(screen, bitmap, cliprect, m_tx_clut, 0xc0);
 	}
 
-
 	return 0;
 }
 
@@ -250,7 +249,7 @@ void airraid_video_device::vregs_w(offs_t offset, uint8_t data)
 	m_vregs[offset] = data;
 
 	if ((offset != 0x2) && (offset != 0x01) && (offset != 0xa) && (offset != 0x09)   && (offset != 0xe) && (offset != 0x0d)  )
-		printf("vregs_w %02x: %02x\n", offset, data);
+		logerror("vregs_w %02x: %02x\n", offset, data);
 }
 
 void airraid_video_device::layer_enable_w(uint8_t enable)

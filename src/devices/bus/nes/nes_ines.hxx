@@ -436,7 +436,7 @@ static const nes_mmc mmc_list[] =
 	// 398 JY-048 multicart, not in nes.xml?
 	{ 399, BATMAP_000 },           // homebrew game Star Versus
 	// 400 retroUSB (Sealie?) 8-bit XMAS 2017
-	// 401 Super 19-in-1 VIP 19, not in nes.xml?
+	{ 401, BMC_KC885 },
 	// 402 22-in-1 Olympic Games, not in nes.xml?
 	// 403 Tetris Family 19-in-1 that only works on Famiclones with 6502's BCD mode
 	{ 404, BMC_JY012005 },
@@ -445,7 +445,7 @@ static const nes_mmc mmc_list[] =
 	// 407 VT03 PnP
 	// 408 Konami PnP
 	{ 409, SEALIE_DPCMCART },      // A Winner is You homebrew music cart
-	// 410 Unused or JY?
+	{ 410, BMC_JY302 },
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
 	{ 413, BATMAP_SRRX },          // homebrew game Super Russian Roulette
@@ -961,6 +961,11 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_pcb_ctrl_mirror(true);
 			break;
 
+		case CONY_BOARD:
+			if (submapper == 0 || submapper == 2)
+				pcb_id = CONY1K_BOARD;
+			break;
+
 		case UNL_LH28_LH54:
 			if (vrom_size)
 				m_pcb_id = (vrom_size == 0x4000) ? UNL_LE05 : UNL_LH31;
@@ -1307,6 +1312,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case BTL_MARIOBABY:
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
+			break;
+
+		case CONY_BOARD:
+			if (submapper == 0 || submapper == 2)
+				pcb_id = CONY1K_BOARD;         // Mapper 83 is used for 3 diff boards
 			break;
 
 		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards

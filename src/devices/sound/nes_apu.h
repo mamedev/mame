@@ -68,9 +68,12 @@ private:
 	/* GLOBAL CONSTANTS */
 	static constexpr unsigned  SYNCS_MAX1     = 0x20;
 	static constexpr unsigned  SYNCS_MAX2     = 0x80;
+	static constexpr u32       NTSC_APU_CLOCK = 21477272 / 12;
+	static constexpr u32       PAL_APU_CLOCK  = 26601712 / 16;
 
 	// internal state
 	apu_t   m_APU;                   /* Actual APUs */
+	int     m_is_pal;
 	u32     m_samps_per_sync;        /* Number of samples per vsync */
 	u32     m_buffer_size;           /* Actual buffer size in bytes */
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */

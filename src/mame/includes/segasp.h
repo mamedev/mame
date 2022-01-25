@@ -6,6 +6,11 @@
 
 */
 
+#ifndef MAME_INCLUDES_SEGASP_H
+#define MAME_INCLUDES_SEGASP_H
+
+#pragma once
+
 #include "naomi.h"
 
 class segasp_state : public naomi_state
@@ -36,3 +41,5 @@ private:
 	void onchip_port(address_map &map);
 	void segasp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SEGASP_H

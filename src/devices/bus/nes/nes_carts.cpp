@@ -251,6 +251,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("waixing_sh2",      NES_WAIXING_SH2);
 	device.option_add_internal("fs304",            NES_WAIXING_FS304);  // used in Zelda 3 by Waixing
 	device.option_add_internal("cony",             NES_CONY);
+	device.option_add_internal("cony1k",           NES_CONY1K);
 	device.option_add_internal("yoko",             NES_YOKO);
 	device.option_add_internal("hengg_srich",      NES_HENGG_SRICH);
 	device.option_add_internal("hengg_xhzs",       NES_HENGG_XHZS);
@@ -457,6 +458,8 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);
 	device.option_add_internal("bmc_hik8in1",      NES_BMC_HIK8);
 	device.option_add_internal("bmc_jy208",        NES_BMC_JY208);
+	device.option_add_internal("bmc_jy302",        NES_BMC_JY302);
+	device.option_add_internal("bmc_kc885",        NES_BMC_KC885);
 	device.option_add_internal("bmc_sfc12",        NES_BMC_SFC12);
 	device.option_add_internal("bmc_hik4in1",      NES_BMC_HIK4);
 	device.option_add_internal("bmc_mario7in1",    NES_BMC_MARIO7IN1);
