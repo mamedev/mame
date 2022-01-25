@@ -3317,7 +3317,7 @@ void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
 
  NES 2.0: mapper 350
 
- This boad is similar to CTC-12IN1 above but with
+ This board is similar to CTC-12IN1 above but with
  the mirroring and banking mode bits moved and with
  support for Contra on a separate 128K chip.
 
