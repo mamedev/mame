@@ -130,7 +130,8 @@ private:
 	required_shared_ptr<uint16_t> m_sprattr1;
 	required_shared_ptr<uint16_t> m_sprattr2;
 
-	std::vector<uint32_t> m_hsl_to_rgb;
+	static uint16_t rgb_to_hsl(uint8_t r, uint8_t g, uint8_t b);
+	static std::tuple<uint8_t, uint8_t, uint8_t> hsl_to_rgb(uint16_t hsl);
 
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
