@@ -260,6 +260,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 
 void specpls3_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("mface3", SPECTRUM_MFACE3);
 }
 

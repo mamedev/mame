@@ -47,7 +47,7 @@ protected:
 	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); };
 	virtual uint8_t iorq_r(offs_t offset) override { return m_exp->iorq_r(offset); }
 	virtual void iorq_w(offs_t offset, uint8_t data) override { m_exp->iorq_w(offset, data); }
-	
+
 	void nmi(line_state state) { m_slot->nmi_w(state); m_nmi_pending = state; };
 
 	required_memory_region m_rom;
@@ -153,10 +153,10 @@ public:
 
 protected:
 	spectrum_mface128v1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
-	
+
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -191,13 +191,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	
+
 private:
 	uint8_t m_reg_file[4];  // no initial state
 	int m_disable;
@@ -212,7 +213,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -223,7 +224,7 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; };
-	
+
 	required_device<centronics_device> m_centronics;
 
 	int m_busy;

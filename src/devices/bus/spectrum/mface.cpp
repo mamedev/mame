@@ -288,6 +288,14 @@ void spectrum_mface_base_device::device_add_mconfig(machine_config &config)
 	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
+void spectrum_mface3_device::device_add_mconfig(machine_config &config)
+{
+	spectrum_mface_base_device::device_add_mconfig(config);
+
+	/* passthru (+3 compatible devices only) */
+	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
+}
+
 void spectrum_mprint_device::device_add_mconfig(machine_config &config)
 {
 	spectrum_mface_base_device::device_add_mconfig(config);
