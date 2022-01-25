@@ -466,7 +466,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 	tsconf_update_video_mode();
 }
 
-void tsconf_state::tsconf_port_fe_w(offs_t offset, u8 data)
+void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
 {
 	m_regs[BORDER] = (data & 0x07) | 0xf0;
 	spectrum_ula_w(offset, data);

@@ -150,7 +150,7 @@ private:
 	rectangle get_screen_area();
 
 	void tsconf_port_7ffd_w(u8 data);
-	void tsconf_port_fe_w(offs_t offset, u8 data);
+	void tsconf_ula_w(offs_t offset, u8 data);
 	u8 tsconf_port_xxaf_r(offs_t reg);
 	void tsconf_port_xxaf_w(offs_t reg, u8 data);
 	u8 tsconf_port_77_zctr_r(offs_t reg);
