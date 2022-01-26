@@ -73,6 +73,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
 		, m_s4sound(*this, "s4sound")
+		, m_s9sound(*this, "s9sound")
 		, m_pia21(*this, "pia21")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
@@ -106,13 +107,11 @@ private:
 	void sol1_w(u8 data);
 	void sol2_w(u8 data) { };
 	void sol3_w(u8 data) { };
-	void sound_w(u8);
 	void pia2c_pa_w(u8 data) { }
 	void pia2c_pb_w(u8 data) { }
 	void pia34_pa_w(u8 data) { }
 	void pia34_pb_w(u8 data) { }
 	u8 dips_r();
-	u8 sound_r();
 	u8 switch_r();
 	void switch_w(u8 data);
 	void clockcnt_w(u16 data);
@@ -122,6 +121,7 @@ private:
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
 	u8 m_sound_data = 0U;
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
@@ -138,6 +138,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	optional_device<williams_s4_sound_device> m_s4sound;
+	optional_device<williams_s9_sound_device> m_s9sound;
 	optional_device<pia6821_device> m_pia21;
 	optional_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
@@ -402,16 +403,6 @@ void shuffle_state::dig1_w(u8 data)
 	m_data_ok = false;
 }
 
-u8 shuffle_state::sound_r()
-{
-	return m_sound_data;
-}
-
-void shuffle_state::sound_w(u8 data)
-{
-	m_sound_data = data;
-}
-
 u8 shuffle_state::switch_r()
 {
 	u8 data = 0;
@@ -532,19 +523,23 @@ void shuffle_state::s9(machine_config &config)
 	config.set_default_layout(layout_shuffle9);
 
 	PIA6821(config, m_pia21, 0);
-	m_pia21->readpa_handler().set(FUNC(shuffle_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
-	m_pia21->writepa_handler().set(FUNC(shuffle_state::sound_w));
+	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(shuffle_state::sol2_w));
-	//m_pia21->ca2_handler().set(FUNC(shuffle_state::pia21_ca2_w));
-	//m_pia21->cb2_handler().set(FUNC(shuffle_state::pia21_cb2_w));
+	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
+	m_pia21->cb2_handler().set(FUNC(shuffle_state::pia21_cb2_w));
 	m_pia21->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<9>));
 	m_pia21->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<10>));
+
+	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s11(machine_config &config)
 {
 	s9(config);
+	config.device_remove("s9sound");
+	m_pia21->writepa_handler().set_nop();
+	m_pia21->ca2_handler().set_nop();
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s11_map);
 
 	config.set_default_layout(layout_shuffle11);
@@ -676,7 +671,7 @@ ROM_START(szone_l5)
 	ROM_LOAD("sz_u19r5.732", 0x1000, 0x1000, CRC(c79c46cb) SHA1(422ba74ae67bebbe02f85a9a8df0e3072f3cebc0))
 	ROM_LOAD("sz_u20r5.764", 0x2000, 0x2000, CRC(9b5b3be2) SHA1(fce051a60b6eecd9bc07273892b14046b251b372))
 
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
 ROM_END
 
@@ -685,7 +680,7 @@ ROM_START(szone_l2)
 	ROM_LOAD("sz_u19r2.732", 0x1000, 0x1000, CRC(c0e4238b) SHA1(eae60ccd5b5001671cd6d2685fd588494d052d1e))
 	ROM_LOAD("sz_u20r2.764", 0x2000, 0x2000, CRC(91c08137) SHA1(86da08f346f85810fceceaa7b9824ab76a68da54))
 
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
 ROM_END
 

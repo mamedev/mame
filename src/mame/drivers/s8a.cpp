@@ -76,10 +76,10 @@ private:
 	u8 switch_r();
 	void switch_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
 	void main_map(address_map &map);

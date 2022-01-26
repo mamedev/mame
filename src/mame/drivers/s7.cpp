@@ -122,16 +122,16 @@ private:
 	void switch_w(u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	void main_map(address_map &map);
 
