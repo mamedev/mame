@@ -1064,8 +1064,8 @@ ROM_START(fpwr2_l2)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
-/*--------------------------------
-/ Wild Texas
+/*-------------------------------
+/ Wild Texas (displays as #521L1)
 /-------------------------------*/
 // Conversion of Firepower II
 // http://www.ipdb.org/machine.cgi?id=5500
