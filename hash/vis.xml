@@ -1111,8 +1111,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs immediately after starting -->
-	<software name="stepstones" supported="no">
+	<software name="stepstones">
 		<!--
 		Origin: redump.org
 		<rom name="Talking Stepping Stones - Bonus Pack (USA).bin" size="3697344" crc="3de7af11" sha1="29d7eaa479fd5fb0d8fa3d637c517a7400fa83fc"/>
@@ -1120,7 +1119,7 @@ license:CC0
 		-->
 		<description>Talking Stepping Stones - Bonus Pack</description>
 		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Compu-Teach</publisher>
 		<info name="serial" value="25-6113 / 600146-D100"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
