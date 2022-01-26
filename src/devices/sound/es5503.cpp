@@ -70,7 +70,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }
@@ -235,7 +235,7 @@ void es5503_device::device_start()
 	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 void es5503_device::device_clock_changed()

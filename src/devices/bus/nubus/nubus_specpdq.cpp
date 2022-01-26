@@ -117,7 +117,7 @@ void nubus_specpdq_device::device_start()
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
 	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_timer->adjust(screen().time_until_pos(843, 0), 0);
 }
 
@@ -139,7 +139,7 @@ void nubus_specpdq_device::device_reset()
 }
 
 
-void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (!m_vbl_disable)
 	{

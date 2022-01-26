@@ -464,9 +464,9 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 //  callback
 //-------------------------------------------------
 
-emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
+emu_timer *device_t::timer_alloc(device_timer_id id)
 {
-	return machine().scheduler().timer_alloc(*this, id, ptr);
+	return machine().scheduler().timer_alloc(*this, id);
 }
 
 
@@ -475,9 +475,9 @@ emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 //  call our device callback
 //-------------------------------------------------
 
-void device_t::timer_set(const attotime &duration, device_timer_id id, int param, void *ptr)
+void device_t::timer_set(const attotime &duration, device_timer_id id, int param)
 {
-	machine().scheduler().timer_set(duration, *this, id, param, ptr);
+	machine().scheduler().timer_set(duration, *this, id, param);
 }
 
 
@@ -886,7 +886,7 @@ void device_t::device_debug_setup()
 //  fires
 //-------------------------------------------------
 
-void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void device_t::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// do nothing by default
 }

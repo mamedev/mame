@@ -199,7 +199,7 @@ void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 	if (startup)
 		chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
 	else
-		signal_irq(nullptr, chan->index);
+		signal_irq(chan->index);
 
 	LOG("dma_reload(%d): offs=%06X len=%04X\n", chan->index, chan->curlocation, chan->curlength);
 }
@@ -357,7 +357,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 				// if we're in manual mode, signal an interrupt once we latch the low byte
 				if (!chan->dma_enabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(nullptr, channum);
+					signal_irq(channum);
 					chan->manualmode = false;
 				}
 			}

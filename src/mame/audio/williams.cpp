@@ -249,7 +249,7 @@ void williams_cvsd_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// process incoming data write
 	m_pia->portb_w(param & 0xff);
@@ -585,7 +585,7 @@ void williams_narc_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -821,7 +821,7 @@ void williams_adpcm_sound_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void williams_adpcm_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

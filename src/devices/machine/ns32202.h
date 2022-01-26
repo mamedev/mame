@@ -26,13 +26,13 @@ protected:
 	void set_int(bool int_state);
 	void set_cout(bool cout_state);
 
-	void interrupt(void *buf, s32 param);
+	void interrupt(s32 param);
 	u8 interrupt_acknowledge(bool side_effects);
 	u8 interrupt_return(bool side_effects);
 
 	void interrupt_update();
 
-	template <unsigned N> void counter(void *buf, s32 param);
+	template <unsigned N> void counter(s32 param);
 
 	template <unsigned ST1, bool SideEffects> u8 hvct_r();
 

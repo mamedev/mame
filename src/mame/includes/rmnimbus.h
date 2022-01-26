@@ -210,7 +210,7 @@ private:
 	int m_scsi_req;
 	int m_scsi_reqlat;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	enum
 	{

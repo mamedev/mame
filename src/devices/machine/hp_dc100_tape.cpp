@@ -504,7 +504,7 @@ void hp_dc100_tape_device::device_reset()
 	clear_state();
 }
 
-void hp_dc100_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_dc100_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_TMR("%.6f TMR %d p=%d s=%.3f(%.3f) a=%d\n" , machine().time().as_double() , id , m_tape_pos , m_speed , m_set_point , m_accelerating);
 	update_speed_pos();

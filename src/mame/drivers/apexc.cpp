@@ -139,7 +139,7 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #32")             PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
-void apexc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void apexc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_POLL_INPUTS)
 	{

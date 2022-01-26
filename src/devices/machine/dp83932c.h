@@ -33,7 +33,7 @@ protected:
 	virtual void recv_complete_cb(int result) override;
 
 	// command helpers
-	void command(void *ptr, s32 param);
+	void command(s32 param);
 	void transmit();
 	void read_rra(bool command = false);
 	void load_cam();

@@ -184,7 +184,7 @@ protected:
 		} s3d;
 	} s3virge;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
 	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)

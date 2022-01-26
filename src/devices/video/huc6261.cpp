@@ -94,7 +94,7 @@ void huc6261_device::apply_pal_offs(uint16_t *pix_data)
 	*pix_data &= 0x1ff;
 }
 
-void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int vpos = screen().vpos();
 	int hpos = screen().hpos();

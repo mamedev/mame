@@ -302,7 +302,7 @@ void am7990_device_base::recv_complete_cb(int result)
 	update_interrupts();
 }
 
-void am7990_device_base::transmit_poll(void *ptr, s32 param)
+void am7990_device_base::transmit_poll(s32 param)
 {
 	// check transmitter enabled
 	if (m_csr[0] & CSR0_TXON)

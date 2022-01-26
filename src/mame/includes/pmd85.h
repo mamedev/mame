@@ -131,7 +131,7 @@ private:
 	void mato_update_memory();
 	void c2717_update_memory();
 	void common_driver_init();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

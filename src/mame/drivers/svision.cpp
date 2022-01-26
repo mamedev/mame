@@ -52,7 +52,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(svision_state::svision_pet_timer_dev)
 {
-	svision_pet_timer(ptr,param);
+	svision_pet_timer(param);
 }
 
 WRITE_LINE_MEMBER(svision_state::sound_irq_w)

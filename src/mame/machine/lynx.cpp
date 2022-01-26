@@ -533,21 +533,21 @@ void lynx_state::blit_lines()
 	}
 }
 
-void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		blitter_timer(ptr, param);
+		blitter_timer(param);
 		break;
 	case TIMER_SHOT:
-		timer_shot(ptr, param);
+		timer_shot(param);
 		break;
 	case TIMER_UART_LOOPBACK:
-		uart_loopback_timer(ptr, param);
+		uart_loopback_timer(param);
 		break;
 	case TIMER_UART:
-		uart_timer(ptr, param);
+		uart_timer(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in lynx_state::device_timer");

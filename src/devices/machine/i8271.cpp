@@ -1546,7 +1546,7 @@ std::string i8271_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 

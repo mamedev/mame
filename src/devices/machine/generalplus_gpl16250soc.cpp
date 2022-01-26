@@ -1785,7 +1785,7 @@ void sunplus_gcm394_base_device::checkirq6()
 */
 
 
-void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

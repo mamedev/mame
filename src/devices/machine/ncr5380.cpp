@@ -410,7 +410,7 @@ void ncr5380_device::sdir_w(u8 data)
 	}
 }
 
-void ncr5380_device::state_timer(void *ptr, s32 param)
+void ncr5380_device::state_timer(s32 param)
 {
 	// step state machine
 	int const delay = state_step();

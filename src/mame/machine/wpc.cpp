@@ -54,7 +54,7 @@ void wpc_device::device_reset()
 	m_alpha_pos = 0;
 }
 
-void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

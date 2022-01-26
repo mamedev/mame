@@ -114,7 +114,7 @@ void jmfb_device::device_start()
 
 	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_screen = nullptr;    // can we look this up now?
 }
 
@@ -143,7 +143,7 @@ void jmfb_device::device_reset()
 
 ***************************************************************************/
 
-void jmfb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void jmfb_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (!m_vbl_disable)
 	{

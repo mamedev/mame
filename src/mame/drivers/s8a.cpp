@@ -64,7 +64,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void dig0_w(u8 data);
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER( s8a_state::pia_irq )
 	}
 }
 
-void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

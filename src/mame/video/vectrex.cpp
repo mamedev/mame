@@ -220,8 +220,8 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::update_signal)
 
 	m_vector_start_time = machine().time();
 
-	if (ptr)
-		* (uint8_t *) ptr = param;
+	if (m_signal_ptr)
+		* (uint8_t *) m_signal_ptr = param;
 }
 
 
@@ -275,7 +275,8 @@ void vectrex_state::video_start()
 
 void vectrex_base_state::vectrex_multiplexer(int mux)
 {
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA], &m_analog[mux]);
+	m_signal_ptr = &m_analog[mux];
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA]);
 
 	if (mux == A_AUDIO)
 		m_dac->write(m_via_out[PORTA] ^ 0x80); // not gate shown on schematic
@@ -330,6 +331,7 @@ void vectrex_base_state::v_via_pb_w(uint8_t data)
 		if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
+			m_signal_ptr = nullptr;
 			timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL);
 		}
 	}
@@ -361,7 +363,8 @@ void vectrex_base_state::v_via_pb_w(uint8_t data)
 		vectrex_multiplexer((data >> 1) & 0x3);
 
 	m_via_out[PORTB] = data;
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data & 0x80, &m_ramp);
+	m_signal_ptr = &m_ramp;
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data & 0x80);
 }
 
 
@@ -369,7 +372,8 @@ void vectrex_base_state::v_via_pa_w(uint8_t data)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data, &m_analog[A_Y]);
+	m_signal_ptr = &m_analog[A_Y];
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data);
 
 	if (!(m_via_out[PORTB] & 0x1))
 		vectrex_multiplexer((m_via_out[PORTB] >> 1) & 0x3);
@@ -406,7 +410,8 @@ WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 			}
 		}
 
-		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, state, &m_blank);
+		m_signal_ptr = &m_blank;
+		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, state);
 		m_cb2 = state;
 	}
 }

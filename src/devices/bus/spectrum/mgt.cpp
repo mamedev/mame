@@ -716,7 +716,7 @@ void spectrum_disciple_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

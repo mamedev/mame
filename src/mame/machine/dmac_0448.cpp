@@ -79,7 +79,7 @@ void dmac_0448_device::set_irq_line(int number, int state)
 	m_irq_check->adjust(attotime::zero);
 }
 
-void dmac_0448_device::irq_check(void *ptr, s32 param)
+void dmac_0448_device::irq_check(s32 param)
 {
 	bool const out_int_stat = bool(m_gstat & 0x55);
 
@@ -115,7 +115,7 @@ void dmac_0448_device::cctl_w(u8 data)
 	m_dma_check->adjust(attotime::zero);
 }
 
-void dmac_0448_device::dma_check(void *ptr, s32 param)
+void dmac_0448_device::dma_check(s32 param)
 {
 	bool active = false;
 

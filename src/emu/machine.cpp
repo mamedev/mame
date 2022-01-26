@@ -942,7 +942,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, s32 param)
+void running_machine::soft_reset(s32 param)
 {
 	logerror("Soft reset\n");
 

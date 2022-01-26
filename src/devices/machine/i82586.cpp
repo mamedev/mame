@@ -204,7 +204,7 @@ void i82586_base_device::device_reset()
 	m_mac_multi = 0;
 }
 
-void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

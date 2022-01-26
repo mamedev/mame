@@ -1669,7 +1669,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

@@ -121,7 +121,7 @@ void dc_g2if_device::device_reset()
 	}
 }
 
-void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	u8 channel = (u8)id;
 	bool dma_result = (param == 1);

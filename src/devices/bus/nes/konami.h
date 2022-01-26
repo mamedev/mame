@@ -73,7 +73,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	static constexpr device_timer_id TIMER_IRQ = 0;
@@ -106,7 +106,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void set_mirror(u8 data);
 	void set_prg(int prg_base, int prg_mask);
 	virtual void set_prg() { set_prg(0x00, 0x1f); }

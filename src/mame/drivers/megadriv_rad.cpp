@@ -363,7 +363,7 @@ void megadriv_radica_6button_state::machine_start()
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this));
 
 	save_item(NAME(m_bank));
 }
@@ -395,7 +395,7 @@ void megadriv_ra145_state::machine_start()
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this));
 
 	m_a1630a = 0;
 	save_item(NAME(m_a1630a));

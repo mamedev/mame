@@ -108,7 +108,7 @@ void i7220_device::device_reset()
 	memset(&m_regs, 0, sizeof(m_regs));
 }
 
-void i7220_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i7220_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	general_continue(bi);
 }

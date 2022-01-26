@@ -564,7 +564,7 @@ void smpc_hle_device::command_register_w(uint8_t data)
 }
 
 
-void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

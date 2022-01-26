@@ -116,7 +116,7 @@ private:
 	  TIMER_POLL_START,
 	  TIMER_POLL_BIT
 	};
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// DEBUG stuff, will be removed when hooked up towards remote peer
 	/* zero extended SDLC poll message frame to feed into receiver as a test
@@ -480,7 +480,7 @@ void alfaskop4110_state::machine_start()
 	timer_set(attotime::from_msec(5000), TIMER_POLL_START);
 }
 
-void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Debug, inserts a poll SDLC frame through the ADLC, it ends up at address 0x140 in RAM through DMA
 	switch (id)

@@ -316,7 +316,7 @@ void pioneer_pr8210_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -374,7 +374,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -986,7 +986,7 @@ void simutrek_special_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1003,7 +1003,7 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 
 		// pass everything else onto the parent
 		default:
-			pioneer_pr8210_device::device_timer(timer, id, param, ptr);
+			pioneer_pr8210_device::device_timer(timer, id, param);
 			break;
 	}
 }
