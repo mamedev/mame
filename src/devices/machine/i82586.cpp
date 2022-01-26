@@ -162,7 +162,7 @@ void i82586_base_device::device_start()
 {
 	m_space = &space(0);
 
-	m_out_irq.resolve();
+	m_out_irq.resolve_safe();
 
 	m_cu_timer = timer_alloc(CU_TIMER);
 	m_cu_timer->enable(false);
