@@ -56,7 +56,7 @@ Starlight         530  AS hit 1                  AS
 
 Status:
 - All machines are playable
-- Very rarely, machines can go berzerk if you hit too many keys quickly
+- Thunderball: turn Speech DIP off, or you get corrupt sound.
 
 ToDo:
 - Some games have an additional alphanumeric display, or different display arrangements
@@ -528,7 +528,8 @@ void s7_state::sol2_w(u8 data)
 void s7_state::sound_w(u8 data)
 {
 	u8 t = m_game ? 0x3f : 0x1f;
-	m_s6sound->write(data & t);
+	u8 t3 = (data & t) | ~t;
+	m_s6sound->write(t3);
 
 	// PA7 solenoid
 	m_io_outputs[23] = BIT(data, 7);

@@ -33,7 +33,6 @@
 #include "emu.h"
 #include "williams.h"
 #include "machine/6821pia.h"
-#include "machine/input_merger.h"
 #include "machine/rescap.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
@@ -864,12 +863,9 @@ williams_s4_sound_device::williams_s4_sound_device(const machine_config &mconfig
 
 void williams_s4_sound_device::write(u8 data)
 {
-	// If bit 7 low, make bit 4 low, to make the startup tune work
-	if (~data & 0x80)
-		data &= 0xef;
 	// Handle S2 (electronic or tones)
-	data ^= (ioport("S4")->read() & 0x40);
-	if ((data & 0x1f) != 0x1f)
+	data &= ioport("S4")->read();
+	if ((data & 0x9f) != 0x9f)
 	{
 		m_pia->portb_w(data);
 		m_pia->cb1_w(0);
@@ -903,10 +899,8 @@ void williams_s4_sound_device::device_add_mconfig(machine_config &config)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
-	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
-
-	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
+	m_pia->irqa_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
 }
 
 
@@ -933,10 +927,11 @@ void williams_s4_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s4 )
 	PORT_START("S4")
+	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
 	PORT_DIPSETTING(    0x00, "Set 1" )
 	PORT_DIPSETTING(    0x40, "Set 2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s4_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s4_sound_device, audio_nmi, 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s4_sound_device::audio_nmi )
@@ -980,13 +975,23 @@ williams_s6_sound_device::williams_s6_sound_device(const machine_config &mconfig
 
 void williams_s6_sound_device::write(u8 data)
 {
+	data = bitswap<8>(data, 6, 7, 5, 4, 3, 2, 1, 0) | 0x40;
 	// Handle dips
-	data ^= (ioport("S6")->read() & 0x60);
-	if ((data & 0x1f) != 0x1f)
+	data &= ioport("S6")->read();
+	if ((data & 0x9f) != 0x9f)
 	{
 		m_pia->portb_w(data);
 		m_pia->cb1_w(0);
 	}
+	m_pia->cb1_w(1);
+}
+
+//-------------------------------------------------
+//  pb_w - acknowledge interrupt
+//-------------------------------------------------
+
+void williams_s6_sound_device::pb_w(u8 data)
+{
 	m_pia->cb1_w(1);
 }
 
@@ -1018,12 +1023,11 @@ void williams_s6_sound_device::device_add_mconfig(machine_config &config)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia->writepb_handler().set(FUNC(williams_s6_sound_device::pb_w));
 	m_pia->ca2_handler().set(m_hc, FUNC(hc55516_device::digit_w));
 	m_pia->cb2_handler().set(m_hc, FUNC(hc55516_device::clock_w));
-	m_pia->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
-	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
-
-	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_cpu, M6802_IRQ_LINE);
+	m_pia->irqa_handler().set_inputline(m_cpu, M6802_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline(m_cpu, M6802_IRQ_LINE);
 }
 
 
@@ -1050,13 +1054,14 @@ void williams_s6_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s6 )
 	PORT_START("S6")
-	PORT_DIPNAME( 0x20, 0x20, "Speech" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x20, "On" )
-	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
-	PORT_DIPSETTING(    0x00, "Set 1" )
-	PORT_DIPSETTING(    0x40, "Set 2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s6_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME( 0x20, 0x00, "Speech" )
+	PORT_DIPSETTING(    0x20, "Off" )
+	PORT_DIPSETTING(    0x00, "On" )
+	PORT_DIPNAME( 0x40, 0x40, "Sounds" )
+	PORT_DIPSETTING(    0x00, "Tones" )
+	PORT_DIPSETTING(    0x40, "Synth" )
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s6_sound_device, audio_nmi, 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s6_sound_device::audio_nmi )

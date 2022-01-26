@@ -251,7 +251,7 @@ void s6a_state::sol0_w(u8 data)
 
 void s6a_state::sol1_w(u8 data)
 {
-	u8 sound_data = data & 0x1f;
+	u8 sound_data = data & 0x7f;
 
 	m_s6sound->write(~sound_data);
 

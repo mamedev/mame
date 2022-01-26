@@ -245,6 +245,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	void pb_w(u8 data);
 	// devices
 	void williams_s6_map(address_map &map);
 	required_device<m6802_cpu_device> m_cpu;
