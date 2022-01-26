@@ -42,7 +42,7 @@
 */
 
 #include "emu.h"
-#include "includes/s11b.h"
+#include "includes/s11.h"
 
 #include "cpu/m6809/m6809.h"
 #include "speaker.h"

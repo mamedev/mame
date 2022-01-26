@@ -80,8 +80,8 @@ public:
 	void dig0_w(uint8_t data);
 	void dig1_w(uint8_t data);
 	void lamp0_w(uint8_t data);
-	void lamp1_w(uint8_t data) { };
-	void sol2_w(uint8_t data) { }; // solenoids 8-15
+	void lamp1_w(uint8_t data) { }
+	void sol2_w(uint8_t data) { } // solenoids 8-15
 	void sol3_w(uint8_t data); // solenoids 0-7
 	void sound_w(uint8_t data);
 
@@ -94,11 +94,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
@@ -162,5 +162,67 @@ private:
 	bool m_timer_irq_active;
 	bool m_pia_irq_active;
 };
+
+
+class s11a_state : public s11_state
+{
+public:
+	s11a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11_state(mconfig, type, tag)
+	{ }
+
+	void s11a_base(machine_config &config);
+	void s11a(machine_config &config);
+	void s11a_obg(machine_config &config);
+
+	void init_s11a();
+
+	void dig0_w(uint8_t data);
+};
+
+
+class s11b_state : public s11a_state
+{
+public:
+	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11a_state(mconfig, type, tag)
+	{ }
+
+	void s11b_base(machine_config &config);
+	void s11b(machine_config &config);
+	void s11b_jokerz(machine_config &config);
+
+	void init_s11b();
+	void init_s11b_invert();
+
+protected:
+	virtual void machine_reset() override;
+	void set_invert(bool inv) { m_invert = inv; }
+
+	void dig1_w(uint8_t data);
+	void pia2c_pa_w(uint8_t data);
+	void pia2c_pb_w(uint8_t data);
+	void pia34_pa_w(uint8_t data);
+
+private:
+	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
+};
+
+
+class s11c_state : public s11b_state
+{
+public:
+	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11b_state(mconfig, type, tag)
+	{ }
+
+	void s11c(machine_config &config);
+
+	void init_s11c();
+
+protected:
+	virtual void machine_reset() override;
+};
+
 
 #endif // MAME_INCLUDES_S11_H
