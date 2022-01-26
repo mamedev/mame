@@ -21508,7 +21508,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A4" />
+			<feature name="vrc7-pin19" value="PRG A4" />
 			<dataarea name="prg" size="524288">
 				<rom name="rc851j00p" size="524288" crc="743387ff" sha1="2dc2c795421a5db2427c460f35828a23beba9274" offset="00000" />
 			</dataarea>
@@ -39732,7 +39732,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A3" />
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="prg" size="131072">
 				<rom name="rv051j00p" size="131072" crc="1aa0479c" sha1="8ab54a69f551d954179109fb5ae33df42ba2eb30" offset="00000" />
 			</dataarea>
@@ -75823,7 +75823,7 @@ Other
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A3" /> <!-- unconfirmed, based on Tiny Toon 2 -->
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros 14 (unl).chr" size="131072" crc="24e491ea" sha1="324f922f8f7cdecb948a5348d79e37428654c1bc" offset="00000" status="baddump" />
 			</dataarea>
@@ -78054,6 +78054,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="UNL-VRC7" />
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat v pro [p1][u].chr" size="262144" crc="879fadf1" sha1="9f38b8fa75d70b518ac5cb5886718bba51c43846" offset="00000" status="baddump" />
 			</dataarea>

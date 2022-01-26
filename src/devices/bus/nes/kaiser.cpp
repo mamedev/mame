@@ -526,7 +526,7 @@ void nes_ks7032_device::write_h(offs_t offset, u8 data)
 		case 0x2000:
 		case 0x3000:
 		{
-			int shift = (offset >> 10);
+			int shift = 4 * BIT(offset, 12, 2);
 			m_irq_count_latch &= ~(0x000f << shift);
 			m_irq_count_latch |= (data & 0x0f) << shift;
 			break;
