@@ -9446,6 +9446,7 @@ bankrob                         // (c) 1993 Entertainment Technology Corp.
 bankroba                        // (c) 1993 Entertainment Technology Corp.
 bankrobb                        // (c) 1993 Blitz Systems Inc.
 cj3play                         // (c) 1998 Cadillac Jack
+cjbj                            // (c) 1999 Cadillac Jack
 cjffruit                        // (c) 1998 Cadillac Jack
 cjplus                          // (c) 1999 Cadillac Jack
 deucesw2                        // (c) 1997
@@ -42523,6 +42524,7 @@ vp111                           // 1977 Cosmac VIP VP-111
 @source:viper.cpp
 boxingm                         // 2001
 code1d                          // 2000
+code1da                         // 2000
 code1db                         // 2000
 gticlub2                        // 2001
 gticlub2ea                      // 2001
