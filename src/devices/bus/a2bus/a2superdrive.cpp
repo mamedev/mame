@@ -34,7 +34,7 @@
 
 #include "emu.h"
 #include "a2superdrive.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "machine/applefdintf.h"
 #include "machine/swim1.h"
 #include "imagedev/floppy.h"
@@ -126,7 +126,7 @@ void a2bus_superdrive_device::m65c02_mem(address_map &map)
 void a2bus_superdrive_device::device_add_mconfig(machine_config &config)
 {
 
-	M65C02(config, m_65c02,  A2BUS_7M_CLOCK / 3.5);  /* ~ 2.046 MHz */
+	W65C02S(config, m_65c02,  A2BUS_7M_CLOCK / 3.5);  /* ~ 2.046 MHz */
 	m_65c02->set_addrmap(AS_PROGRAM, &a2bus_superdrive_device::m65c02_mem);
 
 	SWIM1(config, m_fdc, C16M);
