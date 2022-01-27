@@ -3,10 +3,10 @@
 
 ##########################################################################
 ##
-##   tiny.lua
+##   tiny.cmake
 ##
 ##   Small driver-specific example makefile
-##   Use make SUBTARGET=tiny to build
+##   Use cmake -DSUBTARGET=tiny to build
 ##
 ##########################################################################
 

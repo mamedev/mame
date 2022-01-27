@@ -3,10 +3,10 @@
 
 ##########################################################################
 ##
-##   nl.lua
+##   nl.cmake
 ##
 ##   Compiles all drivers using netlist code
-##   Use make SUBTARGET=nl to build
+##   Use cmake -DSUBTARGET=nl to build
 ##
 ##########################################################################
 

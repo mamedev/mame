@@ -3,10 +3,10 @@
 
 ##########################################################################
 ##
-##   ci.lua
+##   ci.cmake
 ##
 ##   Small driver-specific example makefile for use in CI
-##   Use make SUBTARGET=ci to build
+##   Use cmake -DSUBTARGET=ci to build
 ##
 ##########################################################################
 
