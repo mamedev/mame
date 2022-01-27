@@ -31,7 +31,6 @@ Each game consists of a flat board with an air-driven puck and 10 bowling pins.
 
 Status:
 - All games (except s11a/b) are playable.
-- s9,s11/a/b: No sound.
 - To play: 5,1,(optional: 3 to select game type), any of keys A-W,Y,Z,comma,period
     to activate puck detectors, X to signal end. Press it twice to end a frame.
 - s11a/b games: stuck in the boot-up sequence, non-functional.
@@ -42,7 +41,6 @@ ToDo:
 - Layout (s11a/b)
 - Outputs
 - Displays (s11a/b)
-- Sound (s9/s11/a/b)
 - Roms missing
 
 ************************************************************************************/
@@ -74,6 +72,7 @@ public:
 		, m_mainirq(*this, "mainirq")
 		, m_s4sound(*this, "s4sound")
 		, m_s9sound(*this, "s9sound")
+		, m_s11sound(*this, "s11sound")
 		, m_pia21(*this, "pia21")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
@@ -139,6 +138,7 @@ private:
 	required_device<input_merger_device> m_mainirq;
 	optional_device<williams_s4_sound_device> m_s4sound;
 	optional_device<williams_s9_sound_device> m_s9sound;
+	optional_device<williams_s11_sound_device> m_s11sound;
 	optional_device<pia6821_device> m_pia21;
 	optional_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
@@ -538,8 +538,8 @@ void shuffle_state::s11(machine_config &config)
 {
 	s9(config);
 	config.device_remove("s9sound");
-	m_pia21->writepa_handler().set_nop();
-	m_pia21->ca2_handler().set_nop();
+	m_pia21->writepa_handler().set("s11sound", FUNC(williams_s11_sound_device::write));
+	m_pia21->ca2_handler().set("s11sound", FUNC(williams_s11_sound_device::strobe));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s11_map);
 
 	config.set_default_layout(layout_shuffle11);
@@ -556,6 +556,8 @@ void shuffle_state::s11(machine_config &config)
 	//m_pia34->cb2_handler().set(FUNC(shuffle_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<13>));
 	m_pia34->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<14>));
+
+	WILLIAMS_S11_SOUND(config, m_s11sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -692,30 +694,30 @@ ROM_START(alcat_l7)
 	ROM_LOAD("u26_rev7.rom", 0x1000, 0x1000, CRC(4d274dd3) SHA1(80d72bd0f85ce2cac04f6d9f59dc1fcccc86d402))
 	ROM_LOAD("u27_rev7.rom", 0x2000, 0x2000, CRC(9c7faf8a) SHA1(dc1a561948b9a303f7924d7bebcd972db766827b))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("acs_u21.bin", 0x18000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
-	ROM_LOAD("acs_u22.bin", 0x10000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("acs_u21.bin", 0x8000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
+	ROM_LOAD("acs_u22.bin", 0x0000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
 ROM_END
 
-/*--------------------
+/*-------------------------
 / Tic-Tac-Strike (#919)
-/--------------------*/
+/-------------------------*/
 ROM_START(tts_l2)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27_l2.128", 0x0000, 0x4000, CRC(edbcab92) SHA1(0f6b2dc01874984f9a17ee873f2fa0b6c9bba5be))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
 ROM_END
 
 ROM_START(tts_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u27.128", 0x0000, 0x4000, CRC(f540c53c) SHA1(1c7a318278ad1afdcbe6aaf81f9b774882b069d6))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
 ROM_END
 
 /*-------------------------------
@@ -725,9 +727,9 @@ ROM_START(gmine_l2)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27.128", 0x0000, 0x4000, CRC(99c6e049) SHA1(356faec0598a54892050a28857e9eb5cdbf35833))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21.256", 0x18000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
-	ROM_LOAD("u22.256", 0x10000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u21.256", 0x8000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
+	ROM_LOAD("u22.256", 0x0000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
 ROM_END
 
 /*-------------------------
@@ -737,9 +739,9 @@ ROM_START(tdawg_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tdu27r1.128", 0x0000, 0x4000, CRC(0b4bb586) SHA1(a927ebf7167609cc84b38c22aa35d0c4d259dd8b))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tdsu21r1.256", 0x18000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
-	ROM_LOAD("tdsu22r1.256", 0x10000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tdsu21r1.256", 0x8000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
+	ROM_LOAD("tdsu22r1.256", 0x0000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
 ROM_END
 
 /*----------------------------
@@ -749,9 +751,9 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27rom-1.rv1", 0x0000, 0x4000, CRC(40cfb74a) SHA1(8cee4212ea8bb6b360060391df3208e1e129d7e5))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21snd-2.rv1", 0x18000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
-	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u21snd-2.rv1", 0x8000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
+	ROM_LOAD("u22snd-2.rv1", 0x0000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
 ROM_END
 
 } // Anonymous namespace
