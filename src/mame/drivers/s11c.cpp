@@ -197,9 +197,9 @@ void s11c_state::s11c(machine_config &config)
 // set so W2 is shorted, W3 open (U4 and U19 are 27512) and (assuming the board
 // installed has jumpers W10/W11) W10/W11 are set so W10 is shorted, W11 open
 // (U20 is 27512)
-/*--------------------
-/ Bugs Bunny Birthday Ball 11/90
-/--------------------*/
+/*----------------------------------------
+/ Bugs Bunny Birthday Ball 11/90 (#20009)
+/----------------------------------------*/
 ROM_START(bbnny_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bugs_u26.l2", 0x4000, 0x4000, CRC(b4358920) SHA1(93af1cf5dc2b5442f428a621c0f73b27c197a3df))
@@ -227,7 +227,7 @@ ROM_START(bbnny_lu)
 ROM_END
 
 /*--------------------
-/ Diner 8/90
+/ Diner 8/90 (#571)
 /--------------------*/
 ROM_START(diner_l4)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -307,9 +307,9 @@ ROM_START(diner_p0)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*--------------------
-/ Dr. Dude 11/90
-/--------------------*/
+/*-----------------------
+/ Dr. Dude 11/90 (#2016)
+/-----------------------*/
 ROM_START(dd_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dude_u26.lu1", 0x4000, 0x4000, CRC(6f6a6e22) SHA1(2d8a1b472eb06a9f7aeea4b2f9a82f83eb4ee08a))
@@ -349,9 +349,9 @@ ROM_START(dd_p6)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*--------------------
-/ Pool Sharks 6/90
-/--------------------*/
+/*-------------------------
+/ Pool Sharks 6/90 (#2014)
+/-------------------------*/
 ROM_START(pool_l7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("pool_u26.l7", 0x4000, 0x4000, CRC(cee98aed) SHA1(5b652684c10ab4945783089d848b2f663d3b2547))
@@ -417,9 +417,9 @@ ROM_START(pool_p7)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*--------------------
-/ Radical 9/90
-/--------------------*/
+/*----------------------
+/ Radical 9/90 (#2015)
+/----------------------*/
 ROM_START(radcl_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("rad_u26.l1", 0x4000, 0x4000, CRC(84b1a125) SHA1(dd01fb9189acd2620c57149921aadb051f7a2412))
@@ -465,9 +465,9 @@ ROM_START(radcl_p3)
 	ROM_RELOAD(0x58000, 0x8000)
 ROM_END
 
-/*--------------------
-/ Riverboat Gambler 10/90
-/--------------------*/
+/*---------------------------------
+/ Riverboat Gambler 10/90 (#50007)
+/---------------------------------*/
 ROM_START(rvrbt_l3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gamb_u26.l3", 0x4000, 0x4000, CRC(a65f6004) SHA1(ea44bb7f8f2ec9e5989be63ba41f674b14d19b8a))
@@ -494,9 +494,9 @@ ROM_START(rvrbt_p7)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*--------------------
-/ Rollergames 5/90
-/--------------------*/
+/*------------------------
+/ Rollergames 5/90 (#576)
+/------------------------*/
 ROM_START(rollr_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("rolr_u26.l2", 0x4000, 0x4000, CRC(cd7cad9e) SHA1(e381fa73895c307a0b3b4b699cfec2a68908f6f7))
@@ -614,9 +614,9 @@ ROM_START(rollr_d2) // American Drops 2 - sample/prototype with 8 drop targets
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*--------------------
-/ The Bally Game Show 4/90
-/--------------------*/
+/*---------------------------------
+/ The Bally Game Show 4/90 (#2003)
+/---------------------------------*/
 ROM_START(gs_lu4)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
@@ -669,9 +669,9 @@ ROM_START(gs_lg6)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
-/*-----------------------
-/ Star Trax 9/90
-/-----------------------*/
+/*-------------------------------
+/ Star Trax 9/90 (not a pinball)
+/-------------------------------*/
 ROM_START(strax_p7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("strx_u26.p7", 0x4000, 0x4000, CRC(0d2a401c) SHA1(b0a0899dcde04dc42e4fd5d6baf39bb0e81dbb34))
@@ -727,4 +727,4 @@ GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c, ROT0,  
 GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)
