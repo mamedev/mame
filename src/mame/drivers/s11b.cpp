@@ -1611,3 +1611,4 @@ GAME(1989,  tsptr_l3,       0,          s11b,   s11b, s11b_state, init_s11b_inve
 GAME(1990,  whirl_l3,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Whirlwind (L-3)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  whirl_l2,       whirl_l3,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Whirlwind (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  whirl_lg3,      whirl_l3,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Whirlwind (LG-3)",                             MACHINE_IS_SKELETON_MECHANICAL)
+

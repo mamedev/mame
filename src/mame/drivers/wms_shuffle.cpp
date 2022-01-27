@@ -30,17 +30,13 @@ Each game consists of a flat board with an air-driven puck and 10 bowling pins.
  way, so in fact the puck never touches the pins at all.
 
 Status:
-- All games (except s11a/b) are playable.
+- All games are playable.
 - To play: 5,1,(optional: 3 to select game type), any of keys A-W,Y,Z,comma,period
     to activate puck detectors, X to signal end. Press it twice to end a frame.
-- s11a/b games: stuck in the boot-up sequence, non-functional.
 - To score a strike, press ABCDFGIX one at a time.
 
 ToDo:
 - Only 2 manuals found, and only one schematic, so it's largely guesswork.
-- Layout (s11a/b)
-- Outputs
-- Displays (s11a/b)
 - Roms missing
 
 ************************************************************************************/
@@ -84,7 +80,6 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_dips(*this, "DS%d", 1U)
 		, m_digits(*this, "digit%d", 0U)
-		, m_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -104,11 +99,11 @@ private:
 	void lamp1_w(u8 data);
 	void sol0_w(u8 data);
 	void sol1_w(u8 data);
-	void sol2_w(u8 data) { };
-	void sol3_w(u8 data) { };
+	void sol2_w(u8 data);
+	void sol3_w(u8 data);
 	void pia2c_pa_w(u8 data) { }
 	void pia2c_pb_w(u8 data) { }
-	void pia34_pa_w(u8 data) { }
+	void pia34_pa_w(u8 data) { m_data_ok = false; }
 	void pia34_pb_w(u8 data) { }
 	u8 dips_r();
 	u8 switch_r();
@@ -119,7 +114,6 @@ private:
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
-	u8 m_sound_data = 0U;
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
@@ -150,8 +144,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 	required_ioport_array<2> m_dips;
 	output_finder<32> m_digits;
-	output_finder<2> m_leds;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<96> m_io_outputs; // 32 solenoids + 64 lamps
 };
 
 
@@ -361,6 +354,18 @@ void shuffle_state::sol1_w(u8 data)
 		m_io_outputs[8U+i] = BIT(data, i);
 }
 
+void shuffle_state::sol2_w(u8 data)
+{
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[16U+i] = BIT(data, i);
+}
+
+void shuffle_state::sol3_w(u8 data)
+{
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[24U+i] = BIT(data, i);
+}
+
 void shuffle_state::lamp0_w(u8 data)
 {
 	m_mainirq->in_clear<0>();
@@ -373,7 +378,7 @@ void shuffle_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[32U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 u8 shuffle_state::dips_r()
@@ -386,10 +391,11 @@ u8 shuffle_state::dips_r()
 
 void shuffle_state::dig0_w(u8 data)
 {
-	m_strobe = data & 15;
-	m_data_ok = true;
-	m_leds[0] = !BIT(data, 4);
-	m_leds[1] = !BIT(data, 5);
+	if (data < 0x90)
+	{
+		m_strobe = data & 15;
+		m_data_ok = true;
+	}
 }
 
 void shuffle_state::dig1_w(u8 data)
@@ -429,14 +435,12 @@ void shuffle_state::machine_start()
 	genpin_class::machine_start();
 	m_io_outputs.resolve();
 	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_sound_data));
 }
 
 void shuffle_state::machine_reset()
@@ -479,7 +483,6 @@ void shuffle_state::s4(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(shuffle_state::dips_r));
-	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set_ioport("DIAGS").bit(2); // advance button
 	m_pia28->readcb1_handler().set_ioport("DIAGS").bit(3); // auto/manual switch
 	m_pia28->writepa_handler().set(FUNC(shuffle_state::dig0_w));
@@ -526,7 +529,6 @@ void shuffle_state::s9(machine_config &config)
 	config.set_default_layout(layout_shuffle9);
 
 	PIA6821(config, m_pia21, 0);
-	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(shuffle_state::sol2_w));
 	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
@@ -541,9 +543,10 @@ void shuffle_state::s11(machine_config &config)
 {
 	s9(config);
 	config.device_remove("s9sound");
+	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s11_map);
+
 	m_pia21->writepa_handler().set("s11sound", FUNC(williams_s11_sound_device::write));
 	m_pia21->ca2_handler().set("s11sound", FUNC(williams_s11_sound_device::strobe));
-	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s11_map);
 
 	config.set_default_layout(layout_shuffle11);
 
@@ -651,8 +654,12 @@ ROM_START(bstrk_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x05dd,1,0x7e)
+	ROM_FILL(0x05de,2,0xdd)
+	ROM_FILL(0x07fe,2,0xdd)
 ROM_END
 
 /*----------------------------
@@ -664,8 +671,12 @@ ROM_START(tstrk_l1)
 	ROM_LOAD("ic20.716",     0x3000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x05dd,1,0x7e)
+	ROM_FILL(0x05de,2,0xdd)
+	ROM_FILL(0x07fe,2,0xdd)
 ROM_END
 
 /*--------------------------------
@@ -712,6 +723,10 @@ ROM_START(tts_l2)
 	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x9ddd,1,0x7e)
+	ROM_FILL(0x9dde,2,0xdd)
+	ROM_FILL(0xbffe,2,0xdd)
 ROM_END
 
 ROM_START(tts_l1)
@@ -721,6 +736,10 @@ ROM_START(tts_l1)
 	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x9ddd,1,0x7e)
+	ROM_FILL(0x9dde,2,0xdd)
+	ROM_FILL(0xbffe,2,0xdd)
 ROM_END
 
 /*-------------------------------
