@@ -1880,12 +1880,12 @@ void playch10_state::init_ttoon()
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  */
 
 /* Standard Games */
-GAME( 1983, pc_tenis, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
-GAME( 1983, pc_mario, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
-GAME( 1984, pc_bball, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
-GAME( 1984, pc_bfght, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
-GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", 0 )
-GAME( 1984, pc_golf,  playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
+GAME( 1983, pc_tenis, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
+GAME( 1983, pc_mario, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
+GAME( 1984, pc_bball, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
+GAME( 1984, pc_bfght, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
+GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // scanline in middle of screen scrolls when it should not
+GAME( 1984, pc_golf,  playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
 GAME( 1985, pc_kngfu, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
 GAME( 1985, pc_smb,   playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )
 GAME( 1986, pc_vball, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Volley Ball (PlayChoice-10)", 0 )
@@ -1941,7 +1941,7 @@ GAME( 1990, pc_mman3, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1990, pc_suprc, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Super C (PlayChoice-10)", 0 )
 GAME( 1990, pc_tmnt2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles II: The Arcade Game (PlayChoice-10)", 0 )
 GAME( 1990, pc_wcup,  playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Technos Japan (Nintendo license)",         "Nintendo World Cup (PlayChoice-10)", 0 )
-GAME( 1990, pc_ngai2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", 0 )
+GAME( 1990, pc_ngai2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // level 2 BG graphics are a total mess
 GAME( 1991, pc_ngai3, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
