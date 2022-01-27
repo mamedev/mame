@@ -378,6 +378,18 @@ void galaxian_state::eagle_palette(palette_device &palette)
 	}
 }
 
+void sbhoei_state::sbhoei_palette(palette_device &palette)
+{
+	galaxian_palette(palette);
+
+	// uses a wiring harness that swaps RGB -> RBG
+	for (unsigned i = 0; palette.entries() > i; ++i)
+	{
+		rgb_t const c = palette.pen(i);
+		palette.set_pen_color(i, c.r(), c.b(), c.g());
+	}
+}
+
 /*************************************
  *
  *  Common video init

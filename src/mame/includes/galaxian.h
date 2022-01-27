@@ -890,6 +890,7 @@ private:
 	void sbhoei_sound_map(address_map &map);
 	void sbhoei_sound_io_map(address_map &map);
 
+	void sbhoei_palette(palette_device &palette);
 	void sbhoei_soundlatch_w(uint8_t data);
 	void p2_w(uint8_t data);
 	uint8_t p1_r();

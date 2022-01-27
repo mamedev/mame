@@ -8119,6 +8119,8 @@ void sbhoei_state::sbhoei(machine_config &config)
 	m_8039->t1_in_cb().set(m_sp0250, FUNC(sp0250_device::drq_r));
 	m_8039->bus_out_cb().set(m_sp0250, FUNC(sp0250_device::write));
 
+	m_palette->set_init(FUNC(sbhoei_state::sbhoei_palette));
+
 	// sound hardware
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -15406,7 +15408,7 @@ ROM_START( sbhoei )
 	ROM_LOAD( "c.14k",    0x2000, 0x0800, CRC(c15ac36f) SHA1(dbe3cf6017c263413c770040d659612c3954be73) )
 	ROM_LOAD( "e.13k",    0x2800, 0x0800, CRC(a7bb7c92) SHA1(ef356c10793d02d4f80582dc429340f682f2c40c) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not sure if correct
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "colrom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
@@ -15438,7 +15440,7 @@ ROM_START( sbhoeia )
 	ROM_LOAD( "c.14k",    0x2000, 0x0800, CRC(c15ac36f) SHA1(dbe3cf6017c263413c770040d659612c3954be73) )
 	ROM_LOAD( "e.13k",    0x2800, 0x0800, CRC(a7bb7c92) SHA1(ef356c10793d02d4f80582dc429340f682f2c40c) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not sure if correct
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "colrom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
