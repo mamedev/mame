@@ -21109,8 +21109,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kungfuju" cloneof="kungfu">
-		<description>Kung Fu (Jpn, USA)</description><!-- Dump still to be confirmed from a Jpn cart -->
+	<software name="kungfuu" cloneof="kungfu">
+		<description>Kung Fu (USA)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-SX-USA"/>
