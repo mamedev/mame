@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="cd32" description="Commodore Amiga CD-32 CD-ROMs">
+<softwarelist name="cd32" description="Commodore Amiga CD32 CD-ROMs">
 
 	<!--
 	UNDUMPED:
@@ -11,12 +11,12 @@ license:CC0
 	1001 Girl
 	Acid Attack Compilation (Guardian, Roadkill, Super Skidmarks)
 	Amiga CD Football (Sports: Football)
+	Amiga CD32 Sports Football
 	Amiga Workbench 3.0
 	Arabian Nights [Poland]
-	Assassins 4
 	Brian The Lion
 	Brutal: Paws Of Fury
-	Camel Racer
+	Camel Racer (same as CDTV release?)
 	CD32 Scene - Volume 1
 	CD Exchange Vol 1
 	CD Micro French
@@ -75,7 +75,7 @@ license:CC0
 	James Pond 3: Operation Starfi5h [Kixx]
 	John Barnes European Football
 	Jungle Strike
-	Kang Fu
+	Kang Fu (AmigaCD)
 	Karaoke: Julsånger I
 	Kingpin: Arcade Sports Bowling
 	Labyrinth Of Time, The

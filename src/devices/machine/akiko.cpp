@@ -15,6 +15,9 @@
     - Reportedly the CD drive should be a Sony KSM-2101BAM,
 	  schematics shows Akiko connected to a laconic "26-pin CD connector"
 	- NVRAM needs inheriting from i2c_24c08_device;
+	- Handle tray open/close events, needed at very least by:
+	  \- cdtv:cdremix2 load sequences;
+	  \- kangfu on cd32 as "out of memory" workaround;
 
 ***************************************************************************/
 
@@ -350,7 +353,7 @@ void akiko_device::cdda_stop()
 	if (m_cdda != nullptr)
 	{
 		m_cdda->stop_audio();
-		m_frame_timer->reset(  );
+		m_frame_timer->reset();
 	}
 }
 

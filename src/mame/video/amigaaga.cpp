@@ -471,7 +471,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pl;
 	int defbitoffs = 0;
 	rgb_t *aga_palette = m_aga_palette;
-	
+
 	int save_scanline = scanline;
 
 	/* on the first scanline, reset the COPPER and HAM color */
@@ -529,14 +529,17 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// TODO: diverges wrt OCS, is this right?
 	next_copper_x = 2;
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
-	// i.e. wbenc30 scrolling in lores mode (fmode=3, expects a +58!)
-	// roadkill title (fmode=3, max +14), gameplay uses fmode=1
-	// sockid_a, alfred gameplay (fmode=1)
-	// virocp_a (fmode=1, +26)
-	// ssf2t (fmode=3, wants >+100, scrolling is very offset)
-	// turbojam gameplay (fmode=3, unaffected here, may be missing ddfstop bits given the screen masking)
-	// watchtow gameplay (fmode=3, copper timings)
-	// cd32 cdtv:insidino copyright screen (fmode=3?)
+	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt)
+	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
+	// - sockid_a, alfred gameplay (fmode=1)
+	// - virocp_a (fmode=1, +26)
+	// - ssf2t (fmode=3, wants >+100, scrolling is very offset)
+	// - turbojam gameplay
+	//   (fmode=3, unaffected here, may be missing ddfstop bits given the screen masking)
+	// - watchtow gameplay (fmode=3, copper timings)
+	// - cd32 cdtv:insidino copyright screen (fmode=3)
+	// - cd32 cdtv:labytime intro/tutorial screens
+	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
 	const int offset_hack[] = { 10, 11, 11, 13 };
 	const u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
 
@@ -573,7 +576,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// In theory it's simple: maps bitplanes in 35ns resolution, offsetting where needed.
 			// In practice we need to separate bitplane delays & drawing first.
 			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
-			
+
 			// In AGA Extra Half-Brite applies if this condition is satisfied
 			// (bit 9 of BPLCON2 is KILLEHB)
 			// cfr. bblow_a main menu
@@ -780,7 +783,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
-				
+
 				/* hold-and-modify mode -- hires and shres supported (cfr. roadkill) */
 				if (ham)
 				{
@@ -903,7 +906,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			int vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
 			vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
 			int16_t current_modulo = ((vstart ^ (scanline ^ 1)) & 1) ? odd_modulo : even_modulo;
-			
+
 			for (pl = 0; pl < planes; pl ++)
 				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += current_modulo;
 		}

@@ -22061,7 +22061,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="graffiti" supported="partial">
+	<software name="graffiti" supported="no">
 		<!-- SPS (CAPS) release 2168 -->
 		<description>Graffiti Man (Euro, 5th Anniversary)</description>
 		<!-- retail, standalone -->
@@ -22070,6 +22070,7 @@ ATK test: C:0 H:U Bad
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
 boot OK, sprites flickers in-game
+Status bar colors are ugly to look (btanb)
 Sports garbage pitch with a500p
 ATK test: OK
 ]]></notes>
@@ -36728,7 +36729,7 @@ ATK test: C:0 H:U Bad
 boot OK
 a500: has a stripe of garbage on bottom (especially noticeable on game end screen, btanb?)
 a500: CPU vs CPU acts oddly, like missing easy receivers (doesn't occur in a500n, btanb?)
-Unsupported Genias or Standard 4-players interface
+Unsupported Genias or Standard 4-players parallel interface
 ATK test: OK
 ]]></notes>
 		<!-- Developer: Genias -->
@@ -54866,6 +54867,8 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: C:0 H:U Bad
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (Novella)"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps2100)weirddreams.ipf" size="1049304" crc="d683b85c" sha1="ccb19e856c1d8426a2b15c45ab418e7aa89ae534"/>
