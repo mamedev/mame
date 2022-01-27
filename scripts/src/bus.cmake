@@ -4102,6 +4102,8 @@ if("SPECTRUM" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/spectrum/mgt.h
 		${MAME_DIR}/src/devices/bus/spectrum/mikroplus.cpp
 		${MAME_DIR}/src/devices/bus/spectrum/mikroplus.h
+		${MAME_DIR}/src/devices/bus/spectrum/mpoker.cpp
+		${MAME_DIR}/src/devices/bus/spectrum/mpoker.h
 		${MAME_DIR}/src/devices/bus/spectrum/opus.cpp
 		${MAME_DIR}/src/devices/bus/spectrum/opus.h
 		${MAME_DIR}/src/devices/bus/spectrum/plus2test.cpp
@@ -4116,6 +4118,8 @@ if("SPECTRUM" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/spectrum/speccydos.h
 		${MAME_DIR}/src/devices/bus/spectrum/specdrum.cpp
 		${MAME_DIR}/src/devices/bus/spectrum/specdrum.h
+		${MAME_DIR}/src/devices/bus/spectrum/specmate.cpp
+		${MAME_DIR}/src/devices/bus/spectrum/specmate.h
 		${MAME_DIR}/src/devices/bus/spectrum/uslot.cpp
 		${MAME_DIR}/src/devices/bus/spectrum/uslot.h
 		${MAME_DIR}/src/devices/bus/spectrum/usource.cpp

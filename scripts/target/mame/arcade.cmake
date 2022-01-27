@@ -2168,7 +2168,7 @@ createMAMEProjects(_target, _subtarget, "irem"
 	${MAME_DIR}/src/mame/drivers/m62.cpp
 	${MAME_DIR}/src/mame/includes/m62.h
 	${MAME_DIR}/src/mame/video/m62.cpp
-	${MAME_DIR}/src/mame/drivers/kungfum2.cpp
+	${MAME_DIR}/src/mame/drivers/m62_bkungfu.cpp
 	${MAME_DIR}/src/mame/drivers/spartanxtec.cpp
 	${MAME_DIR}/src/mame/drivers/m63.cpp
 	${MAME_DIR}/src/mame/drivers/m72.cpp
@@ -4586,11 +4586,8 @@ createMAMEProjects(_target, _subtarget, "pinball"
 	${MAME_DIR}/src/mame/drivers/s11.cpp
 	${MAME_DIR}/src/mame/includes/s11.h
 	${MAME_DIR}/src/mame/drivers/s11a.cpp
-	${MAME_DIR}/src/mame/includes/s11a.h
 	${MAME_DIR}/src/mame/drivers/s11b.cpp
-	${MAME_DIR}/src/mame/includes/s11b.h
 	${MAME_DIR}/src/mame/drivers/s11c.cpp
-	${MAME_DIR}/src/mame/includes/s11c.h
 	${MAME_DIR}/src/mame/audio/pinsnd88.cpp
 	${MAME_DIR}/src/mame/audio/pinsnd88.h
 	${MAME_DIR}/src/mame/audio/s11c_bg.cpp
