@@ -42,6 +42,8 @@
 #define C16M    (15.6672_MHz_XTAL)
 
 
+namespace {
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -356,6 +358,8 @@ void a2bus_superdrive_device::hdsel_w(int hdsel)
 	m_fdc->set_clock_scale( hdsel ? 1.0 : 0.5);
 }
 
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE(A2BUS_SUPERDRIVE, a2bus_superdrive_device, "superdrive", "Applied II 3.5\" Disk Controller Card")
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_SUPERDRIVE, device_a2bus_card_interface, a2bus_superdrive_device, "superdrive", "Apple II 3.5\" Disk Controller Card")
 

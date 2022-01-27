@@ -17,6 +17,6 @@
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_SUPERDRIVE, a2bus_superdrive_device)
+DECLARE_DEVICE_TYPE(A2BUS_SUPERDRIVE, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_SUPERDRIVE_H

@@ -68,7 +68,6 @@
 #include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/titan3plus2.h"
 #include "bus/a2bus/softcard3.h"
-
 #include "bus/a2bus/a2superdrive.h"
 
 
