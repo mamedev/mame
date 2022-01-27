@@ -99,6 +99,15 @@ void sp0250_device::device_start()
 	save_item(NAME(m_fifo_pos));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sp0250_device::device_reset()
+{
+	load_values();
+}
+
 void sp0250_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_stream->update();

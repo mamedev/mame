@@ -10,14 +10,15 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/netlist.h"
 #include "machine/timer.h"
-
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
+#include "sound/sp0250.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -862,5 +863,43 @@ private:
 	uint8_t m_direction[2];
 	uint8_t m_counter_74ls161[2];
 };
+
+
+class sbhoei_state : public galaxian_state
+{
+public:
+	sbhoei_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_8039(*this, "i8039")
+		, m_sp0250(*this, "sp0250")
+		, m_soundbank(*this, "soundbank")
+	{
+	}
+
+	void sbhoei(machine_config &config);
+	void init_sbhoei();
+	void sbhoei_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
+	void sbhoei_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void sbhoei_map(address_map &map);
+	void sbhoei_map_discrete(address_map &map);
+	void sbhoei_sound_map(address_map &map);
+	void sbhoei_sound_io_map(address_map &map);
+
+	void sbhoei_soundlatch_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t p1_r();
+
+	required_device<i8039_device> m_8039;
+	required_device<sp0250_device> m_sp0250;
+	required_memory_bank m_soundbank;
+
+	uint8_t m_p2;
+};
+
 
 #endif // MAME_INCLUDES_GALAXIAN_H

@@ -253,7 +253,7 @@ inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 	if(slotnum & 3)
 		return;
 
-   /*
+	/*
     bit scheme is kinda twisted
     status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
     status2 End44 End32 End20 End8  End40 End28 End16 End4
@@ -1371,11 +1371,11 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 		switch (address)
 		{
 			case 0x10:
-				m_timerA = (m_timerA & 0x003) | (uint32_t(data) << 2); // High 8 bit of Timer A period
+				m_timerA = (m_timerA & 0x003) | (data << 2); // High 8 bit of Timer A period
 				break;
 
 			case 0x11:
-				// Timer A is 10 bit, splitted high 8 bit and low 2 bit like other Yamaha FM chips
+				// Timer A is 10 bit, split high 8 bit and low 2 bit like other Yamaha FM chips
 				// unlike Yamaha's documentation; it says 0x11 writes timer A upper 2 bits.
 				m_timerA = (m_timerA & 0x3fc) | (data & 0x03); // Low 2 bit of Timer A period
 				break;
