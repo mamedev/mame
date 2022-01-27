@@ -75,20 +75,21 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
-	uint8_t sound_r();
-	void bank_w(uint8_t data);
-	void dig0_w(uint8_t data);
-	void dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
-	void lamp1_w(uint8_t data) { }
-	void sol2_w(uint8_t data) { } // solenoids 8-15
-	void sol3_w(uint8_t data); // solenoids 0-7
-	void sound_w(uint8_t data);
+protected:
 
-	void pia2c_pa_w(uint8_t data);
-	void pia2c_pb_w(uint8_t data);
-	void pia34_pa_w(uint8_t data);
-	void pia34_pb_w(uint8_t data);
+	u8 sound_r();
+	void bank_w(u8 data);
+	void dig1_w(u8 data);
+	void lamp0_w(u8 data);
+	void lamp1_w(u8 data) { }
+	void sol2_w(u8 data) { } // solenoids 8-15
+	void sol3_w(u8 data); // solenoids 0-7
+	void sound_w(u8 data);
+
+	void pia2c_pa_w(u8 data);
+	void pia2c_pb_w(u8 data);
+	void pia34_pa_w(u8 data);
+	void pia34_pb_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
@@ -102,14 +103,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
-	uint8_t switch_r();
-	void switch_w(uint8_t data);
-	uint8_t pia28_w7_r();
+	u8 switch_r();
+	void switch_w(u8 data);
+	u8 pia28_w7_r();
 
 	void s11_main_map(address_map &map);
 	void s11_audio_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_reset() override;
@@ -138,10 +138,10 @@ protected:
 	required_ioport_array<8> m_swarray;
 
 	// getters/setters
-	uint8_t get_strobe() { return m_strobe; }
-	void set_strobe(uint8_t s) { m_strobe = s; }
-	uint8_t get_diag() { return m_diag; }
-	void set_diag(uint8_t d) { m_diag = d; }
+	u8 get_strobe() { return m_strobe; }
+	void set_strobe(u8 s) { m_strobe = s; }
+	u8 get_diag() { return m_diag; }
+	void set_diag(u8 d) { m_diag = d; }
 	uint32_t get_segment1() { return m_segment1; }
 	void set_segment1(uint32_t s) { m_segment1 = s; }
 	uint32_t get_segment2() { return m_segment2; }
@@ -151,10 +151,11 @@ protected:
 	static const device_timer_id TIMER_IRQ = 0;
 
 private:
-	uint8_t m_sound_data;
-	uint8_t m_strobe;
-	uint8_t m_switch_col;
-	uint8_t m_diag;
+	void dig0_w(u8 data);
+	u8 m_sound_data;
+	u8 m_strobe;
+	u8 m_switch_col;
+	u8 m_diag;
 	uint32_t m_segment1;
 	uint32_t m_segment2;
 	uint32_t m_timer_count;
@@ -177,7 +178,8 @@ public:
 
 	void init_s11a();
 
-	void dig0_w(uint8_t data);
+protected:
+	void s11a_dig0_w(u8 data);
 };
 
 
@@ -199,10 +201,10 @@ protected:
 	virtual void machine_reset() override;
 	void set_invert(bool inv) { m_invert = inv; }
 
-	void dig1_w(uint8_t data);
-	void pia2c_pa_w(uint8_t data);
-	void pia2c_pb_w(uint8_t data);
-	void pia34_pa_w(uint8_t data);
+	void s11b_dig1_w(u8 data);
+	void s11b_pia2c_pa_w(u8 data);
+	void s11b_pia2c_pb_w(u8 data);
+	void s11b_pia34_pa_w(u8 data);
 
 private:
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
