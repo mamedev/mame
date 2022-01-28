@@ -1915,7 +1915,7 @@ GAME( 1986, pc_goons, playch10, playch10_c, playch10, playch10_state, init_pccbo
 
 /* D-Board Games */
 GAME( 1986, pc_mtoid, playch10, playch10_d2,playch10, playch10_state, init_pcdboard_2, ROT0, "Nintendo",                               "Metroid (PlayChoice-10)", 0 )
-GAME( 1987, pc_radrc, playch10, playch10_d, playch10, playch10_state, init_pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", 0 )
+GAME( 1987, pc_radrc, playch10, playch10_d, playch10, playch10_state, init_pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* E-Board Games */
 GAME( 1987, pc_miket, playch10, playch10_e,   playch10, playch10_state, init_pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1948,7 +1948,7 @@ GAME( 1991, pc_rkats, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1991, pc_ttoon, playch10, playch10_g, playch10, playch10_state, init_ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
 
 /* variant with 4 screen mirror */
-GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
+GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
