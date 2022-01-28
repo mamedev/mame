@@ -940,6 +940,10 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_vrc_lines(0, 1, 0);
 			break;
 
+		case KONAMI_VRC7:
+			m_cart->set_vrc_lines((crc_hack || submapper == 2) ? 4 : 3, 0, 0);
+			break;
+
 		case IREM_G101:
 			if (crc_hack && !submapper)
 				m_cart->set_mirroring(PPU_MIRROR_HIGH); // Major League has hardwired mirroring

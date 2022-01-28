@@ -654,6 +654,9 @@ void nes_cart_slot_device::call_load_pcb()
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
 
+	if (m_pcb_id == KONAMI_VRC7)
+		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc7-pin19")), 0, 0);
+
 	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
 	{
 		if (get_feature("mmc1_type") != nullptr)
