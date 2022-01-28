@@ -95,8 +95,8 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 
-	unsigned m_bank_select;
-	unsigned m_side;
+	uint8_t m_bank_select;
+	uint8_t m_side;
 };
 
 
@@ -173,7 +173,6 @@ void a2bus_superdrive_device::device_reset()
 {
 	m_bank_select = 0;
 	m_side = 0;
-	m_65c02->reset();
 }
 
 
@@ -188,8 +187,6 @@ uint8_t a2bus_superdrive_device::read_c0nx(uint8_t offset)
 
 void a2bus_superdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	if (machine().side_effects_disabled()) return;
-
 	m_bank_select = offset & 0x0f;
 }
 
@@ -222,7 +219,6 @@ uint8_t a2bus_superdrive_device::read_c800(uint16_t offset)
 
 void a2bus_superdrive_device::write_c800(uint16_t offset, uint8_t data)
 {
-
 	unsigned address;
 
 	if (offset < 0x400)
@@ -237,15 +233,11 @@ void a2bus_superdrive_device::write_c800(uint16_t offset, uint8_t data)
 /* uc 65c02 i/o at $0a00 */
 void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 {
-	if (machine().side_effects_disabled()) return;
-
 	// $00-$0f = swim registers
-	// $10 
-	// $80 = diagnostic led on
-	// $81 = diagnostic led off
-
 	// $40 = head sel low
 	// $41 = head sel high
+	// $80 = diagnostic led on
+	// $81 = diagnostic led off
 
 	if (offset < 16)
 	{
@@ -253,70 +245,62 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 		return;
 	}
 
-	if (offset == 0x40)
+	switch (offset)
 	{
-		if (m_cur_floppy) m_cur_floppy->ss_w(0);
-		return;
+		case 0x40:
+			m_side = 0;
+			if (m_cur_floppy) m_cur_floppy->ss_w(0);
+			break;
+
+		case 0x41:
+			m_side = 1;
+			if (m_cur_floppy) m_cur_floppy->ss_w(1);
+			break;
+
+		case 0x80:
+			logerror("LED on");
+			break;
+
+		case 0x81:
+			logerror("LED off");
+			break;
+
+		default:
+			logerror("write($0a%02x,%02x)\n", offset, value);
 	}
-
-	if (offset == 0x41)
-	{
-		if (m_cur_floppy) m_cur_floppy->ss_w(1);
-		return;
-	}
-
-	if (offset == 0x80)
-	{
-		logerror("LED on");
-		return;
-	}
-
-	if (offset == 0x81)
-	{
-		logerror("LED off");
-		return;
-	}
-
-
-	logerror("write($0a%02x,%02x)\n", offset, value);
 }
 
-uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset) {
-	if (machine().side_effects_disabled()) return 0;
-
+uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
+{
 
 	if (offset < 16)
-	{
 		return m_fdc->read(offset);
-	}
 
-	if (offset == 0x40)
+	switch (offset)
 	{
-		m_side = 0;
-		if (m_cur_floppy) m_cur_floppy->ss_w(0);
-		return 0;
+		case 0x40:
+			if (machine().side_effects_disabled()) break;
+			m_side = 0;
+			if (m_cur_floppy) m_cur_floppy->ss_w(0);
+			break;
+
+		case 0x41:
+			if (machine().side_effects_disabled()) break;
+			m_side = 1;
+			if (m_cur_floppy) m_cur_floppy->ss_w(1);
+			break;
+
+		case 0x80:
+			logerror("LED on");
+			break;
+
+		case 0x81:
+			logerror("LED off");
+			break;
+
+		default:
+			logerror("read($0a%02x)\n", offset);
 	}
-
-	if (offset == 0x41)
-	{
-		m_side = 1;
-		if (m_cur_floppy) m_cur_floppy->ss_w(1);
-		return 0;
-	}
-
-	if (offset == 0x80) {
-		logerror("LED on");
-		return 0;
-	}
-
-	if (offset == 0x81) {
-		logerror("LED off");
-		return 0;
-	}
-
-	logerror("read($0a%02x)\n", offset);
-
-
 	return 0;
 }
 
@@ -324,7 +308,7 @@ uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset) {
 void a2bus_superdrive_device::devsel_w(uint8_t devsel)
 {
 
-	switch(devsel)
+	switch (devsel)
 	{
 		case 1:
 			m_cur_floppy = m_floppy[0]->get_device();
@@ -341,7 +325,7 @@ void a2bus_superdrive_device::devsel_w(uint8_t devsel)
 
 void a2bus_superdrive_device::phases_w(uint8_t phases)
 {
-	if(m_cur_floppy)
+	if (m_cur_floppy)
 		m_cur_floppy->seek_phase_w(phases);
 }
 
