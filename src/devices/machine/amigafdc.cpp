@@ -270,12 +270,16 @@ void amiga_fdc_device::live_run(const attotime &limit)
 					if(adkcon & 0x0400) {
 						// FIXME: exact dsksync behaviour
 						// - Some games currently writes two dsksync to the buffer (marked as "[FDC] dsksync"),
-						//   removing one will make most of them happy.
-						//   This is reported as 0-lower cylinder good and everything else as bad in the ATK suite;
-						// - Some games trashes memory, mostly the ones with "[FDC] dsksync bootblock":
+						//   To workaround:
+						//   1. comment out dma_write here and change the dma_state *only*;
+						//   2. remove all of the non-DMA_WAIT_START phase here;
+						//   NB: according to documentation syncing doesn't really write anything on the bus,
+						//   so technically this "workaround" is more correct.
+						//   However it unfortunately causes other SW regressions, most notably in Workbench.
+						// - Other games trashes memory, mostly the ones with "[FDC] dsksync bootblock":
 						//   they attempt to load the tracks in AmigaDOS in the same way that's done by the
 						//   Kickstart to check if the disk is bootable.
-						//   This is reported as 0-upper cylinder bad in the ATK suite;
+						//   This is generally reported as 0-upper cylinder bad in the ATK suite;
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 
