@@ -1303,7 +1303,8 @@ ROM_START( shisen2 )
 	/* No samples */
 ROM_END
 
-ROM_START( dicegame ) // JP language, but it came from Germany sold by Turing.
+// This is a clone of DiceDiceDice (Irem Corp, 1991). It came from Germany sold by Turing, and is JP language.
+ROM_START( dicegame )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dice-p1.ic61",  0x00001, 0x20000, CRC(8f2257d8) SHA1(d804c0ca7cd70bdc30c028607040eaf260d877d4) )
 	ROM_LOAD16_BYTE( "dice-p0.ic65",  0x00000, 0x20000, CRC(9c191d18) SHA1(5016b0c688cfd62aee5b829653f28ab1889e5b46) )
