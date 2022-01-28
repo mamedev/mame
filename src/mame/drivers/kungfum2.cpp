@@ -331,4 +331,4 @@ ROM_START( kungfum2 )
 	ROM_LOAD( "mcu",        0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-GAME( 1986, kungfum2,  0,        kungfum2, kungfum2,  kungfum2_state, empty_init, ROT0,   "Irem", "Kung Fu Master 2", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, kungfum2,  0,        kungfum2, kungfum2,  kungfum2_state, empty_init, ROT0,   "Irem", "Beyond Kung-Fu (location test)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
