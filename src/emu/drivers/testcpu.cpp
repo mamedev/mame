@@ -38,7 +38,7 @@ public:
 	}
 
 	// timer callback; used to wrest control of the system
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override
 	{
 		static const u32 sample_instructions[] =
 		{

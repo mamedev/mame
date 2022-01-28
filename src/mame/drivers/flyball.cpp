@@ -84,7 +84,7 @@ private:
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 	void flyball_map(address_map &map);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -181,18 +181,18 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_POT_ASSERT:
-		joystick_callback(ptr, param);
+		joystick_callback(param);
 		break;
 	case TIMER_POT_CLEAR:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_QUARTER:
-		quarter_callback(ptr, param);
+		quarter_callback(param);
 		break;
 
 	default:

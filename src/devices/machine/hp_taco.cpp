@@ -607,7 +607,7 @@ void hp_taco_device::device_reset()
 	m_error_timer->reset();
 }
 
-void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case GAP_TMR_ID:

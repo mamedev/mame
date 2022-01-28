@@ -56,7 +56,7 @@ Starlight         530  AS hit 1                  AS
 
 Status:
 - All machines are playable
-- Very rarely, machines can go berzerk if you hit too many keys quickly
+- Thunderball: turn Speech DIP off, or you get corrupt sound.
 
 ToDo:
 - Some games have an additional alphanumeric display, or different display arrangements
@@ -106,7 +106,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void dig0_w(u8 data);
@@ -122,16 +122,16 @@ private:
 	void switch_w(u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	void main_map(address_map &map);
 
@@ -528,7 +528,8 @@ void s7_state::sol2_w(u8 data)
 void s7_state::sound_w(u8 data)
 {
 	u8 t = m_game ? 0x3f : 0x1f;
-	m_s6sound->write(data & t);
+	u8 t3 = (data & t) | ~t;
+	m_s6sound->write(t3);
 
 	// PA7 solenoid
 	m_io_outputs[23] = BIT(data, 7);
@@ -617,7 +618,7 @@ WRITE_LINE_MEMBER( s7_state::pia_irq )
 	}
 }
 
-void s7_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s7_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1063,8 +1064,8 @@ ROM_START(fpwr2_l2)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
-/*--------------------------------
-/ Wild Texas
+/*-------------------------------
+/ Wild Texas (displays as #521L1)
 /-------------------------------*/
 // Conversion of Firepower II
 // http://www.ipdb.org/machine.cgi?id=5500

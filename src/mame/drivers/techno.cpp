@@ -80,7 +80,7 @@ private:
 	void audio_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -314,7 +314,7 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Fix top left target middle")
 INPUT_PORTS_END
 
-void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == IRQ_ADVANCE_TIMER)
 	{

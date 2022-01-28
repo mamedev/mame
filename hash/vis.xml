@@ -23,8 +23,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controls don't seem to work after selecting a region -->
-	<software name="amparks" supported="no">
+	<software name="amparks">
 		<!--
 		Origin: redump.org
 		<rom name="America's National Parks (USA).bin" size="565855920" crc="383b22e0" sha1="025351481a5ab366d9def2554d49e55427d4b494"/>
@@ -40,8 +39,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Some options result in disc read errors -->
-	<software name="amspace" supported="no">
+	<software name="amspace">
 		<!--
 		Origin: redump.org
 		<rom name="Americans in Space (USA).bin" size="709057440" crc="37ed9e1a" sha1="b05862291f097a569eeafb847b14ea187d50dd54"/>
@@ -143,8 +141,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Most sections display a "YUV 422 mode" message over a blank screen -->
-	<software name="columbus" supported="no">
+	<!-- Some images only fill half the screen -->
+	<software name="columbus" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Sail with Columbus (USA).bin" size="392929824" crc="2521d521" sha1="109b605bf3614e8a4cb8334645b758d533afab3e"/>
@@ -266,8 +264,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't recognize the disc -->
-	<software name="grandma" supported="no">
+	<software name="grandma">
 		<!--
 		Origin: redump.org
 		<rom name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es) (Track 1).bin" size="100230480" crc="b2f78b3f" sha1="1a11fd435f8370c47f91172c696f52e1f1651aa2"/>
@@ -636,8 +633,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't recognize the disc -->
-	<software name="lguitar" supported="no">
+	<software name="lguitar">
 		<!--
 		Origin: redump.org
 		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 01).bin" size="56812560" crc="9223be52" sha1="570f3205b44455e760d10d6a5ff2c318259cebcd"/>
@@ -683,8 +679,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't recognize the disc -->
-	<software name="manhole" supported="no">
+	<software name="manhole">
 		<!--
 		Origin: redump.org
 		<rom name="Manhole, The - New and Enhanced! (USA) (Track 01).bin" size="20109600" crc="340ac00b" sha1="a6dd42a5f94afcf576b3516add857990a486c4e6"/>
@@ -778,8 +773,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't recognize the disc -->
-	<software name="mutaword" supported="no">
+	<software name="mutaword">
 		<!--
 		Origin: redump.org
 		<rom name="Mutanoid Word Challenge (USA) (Track 01).bin" size="4003104" crc="6223a654" sha1="deb62c101b98f207ae61c4e8658569d64cb45f4c"/>
@@ -860,8 +854,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't recognize the disc -->
-	<software name="peterwolf" supported="no">
+	<software name="peterwolf">
 		<!--
 		Origin: redump.org
 		<rom name="Peter and the Wolf - A Multimedia Storybook (USA) (Track 1).bin" size="7890960" crc="7b7175ed" sha1="bed37f3d9944540e4b088c80923e4d2599bdbd74"/>
@@ -981,8 +974,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't seem to respond to any inputs -->
-	<software name="rickribbit" supported="no">
+	<software name="rickribbit">
 		<!--
 		Origin: redump.org
 		<rom name="Rick Ribbit - Adventures in Early Learning (USA).bin" size="34390944" crc="a79510c7" sha1="089052ac80a25880d6aba860dc4014dc9e7e2633"/>
@@ -1102,8 +1094,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs after the title screen -->
-	<software name="survey" supported="no">
+	<software name="survey">
 		<!--
 		Origin: redump.org
 		<rom name="Survey of Western Art, A - The Electronic Library of Art (USA).bin" size="184549680" crc="4c46180f" sha1="025d34e55785ba2dbd118e68b5b339ec81c51156"/>
@@ -1120,8 +1111,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Hangs immediately after starting -->
-	<software name="stepstones" supported="no">
+	<software name="stepstones">
 		<!--
 		Origin: redump.org
 		<rom name="Talking Stepping Stones - Bonus Pack (USA).bin" size="3697344" crc="3de7af11" sha1="29d7eaa479fd5fb0d8fa3d637c517a7400fa83fc"/>
@@ -1129,7 +1119,7 @@ license:CC0
 		-->
 		<description>Talking Stepping Stones - Bonus Pack</description>
 		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Compu-Teach</publisher>
 		<info name="serial" value="25-6113 / 600146-D100"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1138,8 +1128,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't seem to respond to any inputs -->
-	<software name="time92" supported="no">
+	<software name="time92">
 		<!--
 		Origin: redump.org
 		<rom name="Time Magazine Compact Almanac 1992 (USA).bin" size="450666720" crc="1650c69e" sha1="393a4235bc0c87911ad14d2c58bf46e0b9232fe3"/>

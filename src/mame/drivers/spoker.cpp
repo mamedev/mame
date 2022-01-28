@@ -28,12 +28,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -58,9 +60,11 @@ public:
 	{ }
 
 	void spoker(machine_config &config);
+	void spokeru(machine_config &config);
 	void _3super8(machine_config &config);
 
 	void init_spkleftover();
+	void init_spk114it();
 	void init_spk116it();
 	void init_3super8();
 
@@ -113,7 +117,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void _3super8_portmap(address_map &map);
 	void spoker_map(address_map &map);
+	void spokeru_map(address_map &map);
 	void spoker_portmap(address_map &map);
+	void spokeru_portmap(address_map &map);
 };
 
 
@@ -281,6 +287,12 @@ void spoker_state::spoker_map(address_map &map)
 	map(0x0f400, 0x0ffff).ram().share("nvram");
 }
 
+void spoker_state::spokeru_map(address_map &map) // TODO: implement other differences
+{
+	map(0x00000, 0x0efff).rom();
+	map(0x0f000, 0x0ffff).ram().share("nvram");
+}
+
 void spoker_state::spoker_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
@@ -295,6 +307,28 @@ void spoker_state::spoker_portmap(address_map &map)
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x64d0, 0x64d1).rw(FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
 	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void spoker_state::spokeru_portmap(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // should be good
+	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext"); // should be good
+	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram); // should be good
+	map(0x4000, 0x4000).portr("DSW1"); // should be good
+	map(0x4001, 0x4001).portr("DSW2"); // should be good
+	map(0x4002, 0x4002).portr("DSW3"); // should be good
+	map(0x5080, 0x5080).portr("BUTTONS2"); // should be good
+	map(0x5081, 0x5081).portr("SERVICE"); // should be good
+	map(0x5082, 0x5082).portr("COINS"); // should be good
+	//map(0x5083, 0x5083).portr("");
+	map(0x5090, 0x5090).w(FUNC(spoker_state::nmi_and_coins_w)); // ?
+	map(0x5091, 0x5091).w(FUNC(spoker_state::leds_w)); // ?
+	map(0x5092, 0x5092).portr("BUTTONS1").w(FUNC(spoker_state::video_and_leds_w)); // ??
+	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // should be good
+	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // should be good
+	map(0x6000, 0x6fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram); // ?
+	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram); // should be good
 }
 
 void spoker_state::_3super8_portmap(address_map &map)
@@ -330,7 +364,7 @@ void spoker_state::_3super8_portmap(address_map &map)
                                 Input Ports
 ***************************************************************************/
 
-static INPUT_PORTS_START( spoker )
+static INPUT_PORTS_START( spoker ) // this has every hold key which also does another function (i. e. bet, take)
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -440,6 +474,31 @@ static INPUT_PORTS_START( spoker )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Red / Black")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk114it ) // this has dedicated keys for every function
+	PORT_INCLUDE(spoker)
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no payout here
+
+	PORT_MODIFY("BUTTONS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("BUTTONS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // Small
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Big
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( 3super8 )
 	PORT_START("DSW1")
@@ -648,6 +707,18 @@ void spoker_state::spoker(machine_config &config)
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.4);
 
 	OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+
+void spoker_state::spokeru(machine_config &config)
+{
+	spoker(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spokeru_map);
+	m_maincpu->set_addrmap(AS_IO, &spoker_state::spokeru_portmap);
+
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
 }
 
 
@@ -950,6 +1021,18 @@ void spoker_state::init_spk116it()
 	}
 }
 
+void spoker_state::init_spk114it()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int A = 0; A < 0x10000; A++)
+	{
+		rom[A] ^= 0x02;
+		if ((A & 0x0120) == 0x0020) rom[A] ^= 0x20;
+		if ((A & 0x04a0) == 0x04a0) rom[A] ^= 0x02;
+		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
+	}
+}
+
 void spoker_state::init_3super8()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -995,15 +1078,15 @@ void spoker_state::init_3super8()
                               Game Drivers
 ***************************************************************************/
 
-/*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT         ROT     COMPANY      FULLNAME                   FLAGS  */
-GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk102u,    spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v102U)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs decryption, proper machine driver
-GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+//    YEAR   NAME        PARENT    MACHINE   INPUT     STATE          INIT              ROT    COMPANY      FULLNAME                    FLAGS
+GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk102u,    spk306us, spokeru,  spoker,   spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v102U)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs decryption, proper machine driver
+GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

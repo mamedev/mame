@@ -60,7 +60,7 @@ template<typename T> void generic_fifo_device_base<T>::device_start()
 	save_item(NAME(m_full_triggered));
 }
 
-template<typename T> void generic_fifo_device_base<T>::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+template<typename T> void generic_fifo_device_base<T>::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id) {
 	case T_FULL: {

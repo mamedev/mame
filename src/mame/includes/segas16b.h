@@ -211,7 +211,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);

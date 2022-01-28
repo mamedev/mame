@@ -79,7 +79,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	u8 sound_r();
@@ -251,7 +251,7 @@ void s6a_state::sol0_w(u8 data)
 
 void s6a_state::sol1_w(u8 data)
 {
-	u8 sound_data = data & 0x1f;
+	u8 sound_data = data & 0x7f;
 
 	m_s6sound->write(~sound_data);
 
@@ -357,7 +357,7 @@ void s6a_state::machine_reset()
 		m_io_outputs[i] = 0;
 }
 
-void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

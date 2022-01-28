@@ -71,7 +71,7 @@ void acan_sound_device::device_reset()
 	m_dma_irq_handler(0);
 }
 
-void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (m_regs[0x14] & 0x40)
 	{

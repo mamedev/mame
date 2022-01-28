@@ -137,7 +137,7 @@ static INPUT_PORTS_START( wpc_dot )
 	PORT_DIPSETTING(0xf0,"USA 2")
 INPUT_PORTS_END
 
-void wpc_dot_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wpc_dot_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

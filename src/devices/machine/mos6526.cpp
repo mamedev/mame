@@ -762,7 +762,7 @@ void mos6526_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	tod_w(1);
 	tod_w(0);

@@ -81,11 +81,11 @@ bool mcd_isa_device::read_sector(bool first)
 	uint32_t lba = msf_to_lba(m_readmsf);
 	if(m_drvmode == DRV_MODE_CDDA)
 	{
-		if(cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, lba - 150)) == CD_TRACK_AUDIO)
+		if(cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, lba)) == CD_TRACK_AUDIO)
 		{
 			m_cdda->stop_audio();
 			m_cdda->set_cdrom(m_cdrom_handle);
-			m_cdda->start_audio(lba - 150, m_readcount);
+			m_cdda->start_audio(lba, m_readcount);
 			return true;
 		}
 		else
@@ -295,19 +295,20 @@ void mcd_isa_device::cmd_w(uint8_t data)
 			if(m_cdrom_handle)
 			{
 				int tracks = cdrom_get_last_track(m_cdrom_handle);
-				uint32_t start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
-				uint32_t end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < (tracks - 1) ? m_curtoctrk + 1 : 0xaa));
+				uint32_t start = cdrom_get_track_start(m_cdrom_handle, m_curtoctrk);
+				uint32_t len = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < (tracks - 1) ? m_curtoctrk + 1 : 0xaa) - start);
+				start = lba_to_msf(start);
 				m_cmdbuf[1] = (cdrom_get_adr_control(m_cdrom_handle, m_curtoctrk) << 4) & 0xf0;
 				m_cmdbuf[2] = 0; // track num except when reading toc
 				m_cmdbuf[3] = dec_2_bcd(m_curtoctrk + 1); // index
-				m_cmdbuf[4] = (start >> 16) & 0xff;
-				m_cmdbuf[5] = (start >> 8) & 0xff;
-				m_cmdbuf[6] = start & 0xff;
+				m_cmdbuf[4] = (len >> 16) & 0xff;
+				m_cmdbuf[5] = (len >> 8) & 0xff;
+				m_cmdbuf[6] = len & 0xff;
 				m_cmdbuf[7] = 0;
-				m_cmdbuf[8] = (end >> 16) & 0xff;
-				m_cmdbuf[9] = (end >> 8) & 0xff;
-				m_cmdbuf[10] = end & 0xff;
-				if(m_curtoctrk > tracks)
+				m_cmdbuf[8] = (start >> 16) & 0xff;
+				m_cmdbuf[9] = (start >> 8) & 0xff;
+				m_cmdbuf[10] = start & 0xff;
+				if(m_curtoctrk >= tracks)
 					m_curtoctrk = 0;
 				else if(m_mode & MODE_GET_TOC)
 					m_curtoctrk++;

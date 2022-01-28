@@ -419,7 +419,7 @@ void mos7360_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mos7360_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mos7360_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

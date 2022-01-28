@@ -295,7 +295,7 @@ void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_PROTECT)
 	{

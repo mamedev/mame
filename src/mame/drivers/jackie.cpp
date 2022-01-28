@@ -3,6 +3,7 @@
 /*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.
+IGS PCB N0-T0039-4
 
 Driver by David Haywood and Mirko Buffoni
 */

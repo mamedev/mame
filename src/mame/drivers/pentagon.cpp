@@ -34,7 +34,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -130,15 +130,15 @@ void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
-void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_IRQ_ON:
-		irq_on(ptr, param);
+		irq_on(param);
 		break;
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pentagon_state::device_timer");

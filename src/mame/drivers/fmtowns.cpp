@@ -439,7 +439,7 @@ uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 	return 0xff;
 }
 
-void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -462,7 +462,7 @@ void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		towns_cd_status_ready();
 		break;
 	case TIMER_CDDA:
-		towns_delay_cdda((cdrom_image_device*)ptr);
+		towns_delay_cdda(m_cdrom.target());
 		break;
 	case TIMER_SPRITES:
 		draw_sprites();
@@ -1455,7 +1455,7 @@ uint8_t towns_state::towns_cd_get_track()
 
 TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 {
-	upd71071_device* device = (upd71071_device* )ptr;
+	upd71071_device* device = m_dma_1.target();
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
@@ -1674,7 +1674,6 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 				break;
 			case 0x04:  // Play Audio Track
 				if(LOG_CD) logerror("CD: Command 0x04: PLAY CD-DA\n");
-				m_towns_cdda_timer->set_ptr(device);
 				m_towns_cdda_timer->adjust(attotime::from_msec(1),0,attotime::never);
 				break;
 			case 0x05:  // Read TOC
@@ -2747,7 +2746,7 @@ void towns_state::driver_start()
 	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)m_dma_1.target());
+	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this));
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);

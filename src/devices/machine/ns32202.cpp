@@ -252,7 +252,7 @@ template void ns32202_device::ir_w<15>(int state);
  *     - unmasked pending interrupt has priority > in-service interrupt; or
  *     - unmasked pending cascade interrupt has priorty >= in-service interrupt
  */
-void ns32202_device::interrupt(void *ptr, s32 param)
+void ns32202_device::interrupt(s32 param)
 {
 	// check for unmasked pending interrupts
 	if (!(m_ipnd & ~m_imsk))
@@ -472,7 +472,7 @@ void ns32202_device::interrupt_update()
 }
 
 // N=0 -> l-counter
-template <unsigned N> void ns32202_device::counter(void *buf, s32 param)
+template <unsigned N> void ns32202_device::counter(s32 param)
 {
 	u32 const scaled_clock = clock() / ((m_cctl & CCTL_CFNPS) ? 1 : 4);
 

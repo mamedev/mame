@@ -13,7 +13,7 @@ midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const 
 {
 }
 
-void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!id)
 	{

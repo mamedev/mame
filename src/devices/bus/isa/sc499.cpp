@@ -334,8 +334,8 @@ void sc499_device::device_start()
 
 	LOG1(("start sc499"));
 
-	m_timer = timer_alloc(0, nullptr);
-	m_timer1 = timer_alloc(1, nullptr);
+	m_timer = timer_alloc(0);
+	m_timer1 = timer_alloc(1);
 
 	m_installed = false;
 
@@ -489,7 +489,7 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG2(("timer_func param=%d status=%x", param, m_status));
 

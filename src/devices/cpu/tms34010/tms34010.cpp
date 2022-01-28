@@ -1023,7 +1023,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(nullptr, TMS34010_DI);
+		internal_interrupt_callback(TMS34010_DI);
 	}
 
 	/* at the start of VBLANK, load the starting display address */

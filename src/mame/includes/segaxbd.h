@@ -93,7 +93,7 @@ protected:
 	// device overrides
 //  virtual void machine_reset();
 	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void update_main_irqs();

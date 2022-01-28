@@ -74,7 +74,7 @@ void upd800468_timer_device::device_reset()
 	m_rate = m_control = 0;
 }
 
-void upd800468_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd800468_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (BIT(m_control, 0))
 		m_irq_cb(1);

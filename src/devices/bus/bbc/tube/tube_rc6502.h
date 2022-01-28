@@ -13,7 +13,7 @@
 #define MAME_BUS_BBC_TUBE_RC6502_H
 
 #include "tube.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "cpu/g65816/g65816.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"

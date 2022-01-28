@@ -145,7 +145,7 @@ void bsmt2000_device::device_reset()
 //  resets as a timer callback
 //-------------------------------------------------
 
-void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

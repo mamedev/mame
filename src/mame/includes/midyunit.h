@@ -175,7 +175,7 @@ private:
 	void main_map(address_map &map);
 	void yawdim_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16s_delegate hack_w);

@@ -1483,7 +1483,7 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)m_pic_slave);
+	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this));
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if((m_video.towns_sprite_reg[1] & 0x80) && !m_video.towns_sprite_flag)

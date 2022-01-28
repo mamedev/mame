@@ -149,7 +149,7 @@ private:
 
 	ioport_port *m_intv_keyboard[10];
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_INTV_H

@@ -30,19 +30,13 @@ Each game consists of a flat board with an air-driven puck and 10 bowling pins.
  way, so in fact the puck never touches the pins at all.
 
 Status:
-- All games (except s11a/b) are playable.
-- s9,s11/a/b: No sound.
+- All games are playable.
 - To play: 5,1,(optional: 3 to select game type), any of keys A-W,Y,Z,comma,period
     to activate puck detectors, X to signal end. Press it twice to end a frame.
-- s11a/b games: stuck in the boot-up sequence, non-functional.
 - To score a strike, press ABCDFGIX one at a time.
 
 ToDo:
 - Only 2 manuals found, and only one schematic, so it's largely guesswork.
-- Layout (s11a/b)
-- Outputs
-- Displays (s11a/b)
-- Sound (s9/s11/a/b)
 - Roms missing
 
 ************************************************************************************/
@@ -73,6 +67,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
 		, m_s4sound(*this, "s4sound")
+		, m_s9sound(*this, "s9sound")
+		, m_s11sound(*this, "s11sound")
 		, m_pia21(*this, "pia21")
 		, m_pia22(*this, "pia22")
 		, m_pia24(*this, "pia24")
@@ -84,7 +80,6 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_dips(*this, "DS%d", 1U)
 		, m_digits(*this, "digit%d", 0U)
-		, m_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -104,15 +99,13 @@ private:
 	void lamp1_w(u8 data);
 	void sol0_w(u8 data);
 	void sol1_w(u8 data);
-	void sol2_w(u8 data) { };
-	void sol3_w(u8 data) { };
-	void sound_w(u8);
+	void sol2_w(u8 data);
+	void sol3_w(u8 data);
 	void pia2c_pa_w(u8 data) { }
 	void pia2c_pb_w(u8 data) { }
-	void pia34_pa_w(u8 data) { }
+	void pia34_pa_w(u8 data) { m_data_ok = false; }
 	void pia34_pb_w(u8 data) { }
 	u8 dips_r();
-	u8 sound_r();
 	u8 switch_r();
 	void switch_w(u8 data);
 	void clockcnt_w(u16 data);
@@ -121,7 +114,7 @@ private:
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = 0;
-	u8 m_sound_data = 0U;
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
@@ -138,6 +131,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	optional_device<williams_s4_sound_device> m_s4sound;
+	optional_device<williams_s9_sound_device> m_s9sound;
+	optional_device<williams_s11_sound_device> m_s11sound;
 	optional_device<pia6821_device> m_pia21;
 	optional_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
@@ -149,8 +144,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 	required_ioport_array<2> m_dips;
 	output_finder<32> m_digits;
-	output_finder<2> m_leds;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<96> m_io_outputs; // 32 solenoids + 64 lamps
 };
 
 
@@ -360,6 +354,18 @@ void shuffle_state::sol1_w(u8 data)
 		m_io_outputs[8U+i] = BIT(data, i);
 }
 
+void shuffle_state::sol2_w(u8 data)
+{
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[16U+i] = BIT(data, i);
+}
+
+void shuffle_state::sol3_w(u8 data)
+{
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[24U+i] = BIT(data, i);
+}
+
 void shuffle_state::lamp0_w(u8 data)
 {
 	m_mainirq->in_clear<0>();
@@ -372,7 +378,7 @@ void shuffle_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[32U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 u8 shuffle_state::dips_r()
@@ -385,10 +391,11 @@ u8 shuffle_state::dips_r()
 
 void shuffle_state::dig0_w(u8 data)
 {
-	m_strobe = data & 15;
-	m_data_ok = true;
-	m_leds[0] = !BIT(data, 4);
-	m_leds[1] = !BIT(data, 5);
+	if (data < 0x90)
+	{
+		m_strobe = data & 15;
+		m_data_ok = true;
+	}
 }
 
 void shuffle_state::dig1_w(u8 data)
@@ -400,16 +407,6 @@ void shuffle_state::dig1_w(u8 data)
 		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
-}
-
-u8 shuffle_state::sound_r()
-{
-	return m_sound_data;
-}
-
-void shuffle_state::sound_w(u8 data)
-{
-	m_sound_data = data;
 }
 
 u8 shuffle_state::switch_r()
@@ -438,14 +435,12 @@ void shuffle_state::machine_start()
 	genpin_class::machine_start();
 	m_io_outputs.resolve();
 	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_sound_data));
 }
 
 void shuffle_state::machine_reset()
@@ -488,7 +483,6 @@ void shuffle_state::s4(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(shuffle_state::dips_r));
-	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set_ioport("DIAGS").bit(2); // advance button
 	m_pia28->readcb1_handler().set_ioport("DIAGS").bit(3); // auto/manual switch
 	m_pia28->writepa_handler().set(FUNC(shuffle_state::dig0_w));
@@ -525,27 +519,34 @@ void shuffle_state::s4(machine_config &config)
 void shuffle_state::s9(machine_config &config)
 {
 	s4(config);
+	config.device_remove("maincpu");
 	config.device_remove("pia22");
 	config.device_remove("s4sound");
+
+	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s9_map);
 
 	config.set_default_layout(layout_shuffle9);
 
 	PIA6821(config, m_pia21, 0);
-	m_pia21->readpa_handler().set(FUNC(shuffle_state::sound_r));
-	m_pia21->set_port_a_input_overrides_output_mask(0xff);
-	m_pia21->writepa_handler().set(FUNC(shuffle_state::sound_w));
+	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(shuffle_state::sol2_w));
-	//m_pia21->ca2_handler().set(FUNC(shuffle_state::pia21_ca2_w));
-	//m_pia21->cb2_handler().set(FUNC(shuffle_state::pia21_cb2_w));
+	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
+	m_pia21->cb2_handler().set(FUNC(shuffle_state::pia21_cb2_w));
 	m_pia21->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<9>));
 	m_pia21->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<10>));
+
+	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s11(machine_config &config)
 {
 	s9(config);
+	config.device_remove("s9sound");
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s11_map);
+
+	m_pia21->writepa_handler().set("s11sound", FUNC(williams_s11_sound_device::write));
+	m_pia21->ca2_handler().set("s11sound", FUNC(williams_s11_sound_device::strobe));
 
 	config.set_default_layout(layout_shuffle11);
 
@@ -561,6 +562,8 @@ void shuffle_state::s11(machine_config &config)
 	//m_pia34->cb2_handler().set(FUNC(shuffle_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<13>));
 	m_pia34->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<14>));
+
+	WILLIAMS_S11_SOUND(config, m_s11sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -651,8 +654,12 @@ ROM_START(bstrk_l1)
 	ROM_LOAD("b_ic20.716",   0x3000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x05dd,1,0x7e)
+	ROM_FILL(0x05de,2,0xdd)
+	ROM_FILL(0x07fe,2,0xdd)
 ROM_END
 
 /*----------------------------
@@ -664,8 +671,12 @@ ROM_START(tstrk_l1)
 	ROM_LOAD("ic20.716",     0x3000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
 	ROM_LOAD("b_ic17.716",   0x3800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("sound.716",    0x0000, 0x0800, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x05dd,1,0x7e)
+	ROM_FILL(0x05de,2,0xdd)
+	ROM_FILL(0x07fe,2,0xdd)
 ROM_END
 
 /*--------------------------------
@@ -676,7 +687,7 @@ ROM_START(szone_l5)
 	ROM_LOAD("sz_u19r5.732", 0x1000, 0x1000, CRC(c79c46cb) SHA1(422ba74ae67bebbe02f85a9a8df0e3072f3cebc0))
 	ROM_LOAD("sz_u20r5.764", 0x2000, 0x2000, CRC(9b5b3be2) SHA1(fce051a60b6eecd9bc07273892b14046b251b372))
 
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
 ROM_END
 
@@ -685,7 +696,7 @@ ROM_START(szone_l2)
 	ROM_LOAD("sz_u19r2.732", 0x1000, 0x1000, CRC(c0e4238b) SHA1(eae60ccd5b5001671cd6d2685fd588494d052d1e))
 	ROM_LOAD("sz_u20r2.764", 0x2000, 0x2000, CRC(91c08137) SHA1(86da08f346f85810fceceaa7b9824ab76a68da54))
 
-	ROM_REGION(0x8000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("szs_u49.128",  0x4000, 0x4000, CRC(144c3c07) SHA1(57be6f336f200079cd698b13f8fa4755cf694274))
 ROM_END
 
@@ -697,30 +708,38 @@ ROM_START(alcat_l7)
 	ROM_LOAD("u26_rev7.rom", 0x1000, 0x1000, CRC(4d274dd3) SHA1(80d72bd0f85ce2cac04f6d9f59dc1fcccc86d402))
 	ROM_LOAD("u27_rev7.rom", 0x2000, 0x2000, CRC(9c7faf8a) SHA1(dc1a561948b9a303f7924d7bebcd972db766827b))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("acs_u21.bin", 0x18000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
-	ROM_LOAD("acs_u22.bin", 0x10000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("acs_u21.bin", 0x8000, 0x8000, CRC(c54cd329) SHA1(4b86b10e60a30c4de5d97129074f5657447be676))
+	ROM_LOAD("acs_u22.bin", 0x0000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
 ROM_END
 
-/*--------------------
+/*-------------------------
 / Tic-Tac-Strike (#919)
-/--------------------*/
+/-------------------------*/
 ROM_START(tts_l2)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27_l2.128", 0x0000, 0x4000, CRC(edbcab92) SHA1(0f6b2dc01874984f9a17ee873f2fa0b6c9bba5be))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x9ddd,1,0x7e)
+	ROM_FILL(0x9dde,2,0xdd)
+	ROM_FILL(0xbffe,2,0xdd)
 ROM_END
 
 ROM_START(tts_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u27.128", 0x0000, 0x4000, CRC(f540c53c) SHA1(1c7a318278ad1afdcbe6aaf81f9b774882b069d6))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
-	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tts_u21.256", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x0000, 0x8000, NO_DUMP)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x9ddd,1,0x7e)
+	ROM_FILL(0x9dde,2,0xdd)
+	ROM_FILL(0xbffe,2,0xdd)
 ROM_END
 
 /*-------------------------------
@@ -730,9 +749,9 @@ ROM_START(gmine_l2)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27.128", 0x0000, 0x4000, CRC(99c6e049) SHA1(356faec0598a54892050a28857e9eb5cdbf35833))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21.256", 0x18000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
-	ROM_LOAD("u22.256", 0x10000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u21.256", 0x8000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
+	ROM_LOAD("u22.256", 0x0000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
 ROM_END
 
 /*-------------------------
@@ -742,9 +761,9 @@ ROM_START(tdawg_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tdu27r1.128", 0x0000, 0x4000, CRC(0b4bb586) SHA1(a927ebf7167609cc84b38c22aa35d0c4d259dd8b))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tdsu21r1.256", 0x18000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
-	ROM_LOAD("tdsu22r1.256", 0x10000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("tdsu21r1.256", 0x8000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
+	ROM_LOAD("tdsu22r1.256", 0x0000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
 ROM_END
 
 /*----------------------------
@@ -754,9 +773,9 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u27rom-1.rv1", 0x0000, 0x4000, CRC(40cfb74a) SHA1(8cee4212ea8bb6b360060391df3208e1e129d7e5))
 
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u21snd-2.rv1", 0x18000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
-	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
+	ROM_REGION(0x10000, "s11sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u21snd-2.rv1", 0x8000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
+	ROM_LOAD("u22snd-2.rv1", 0x0000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
 ROM_END
 
 } // Anonymous namespace

@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 }
 
 
-void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch( id )
 	{

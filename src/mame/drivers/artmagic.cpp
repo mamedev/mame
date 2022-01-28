@@ -119,7 +119,7 @@ void artmagic_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

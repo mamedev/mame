@@ -48,7 +48,7 @@
 
   Video :
   No scrolling , no sprites.
-  32x32 Tilemap stored in VRAM (10 bits/tile (tile numebr 0-1023))
+  32x32 Tilemap stored in VRAM (10 bits/tile (tile number 0-1023))
 
   3 gfx ROMS
   ROM1 - R component (ROM ->(parallel in) shift register 74166 (serial out) -> jamma output
@@ -87,7 +87,7 @@
   around the center. (each ghost represent a number).
 
   Bet using START, and once done, press UP (deal), to allow the pacman eat all
-  ghosts, revealing the five numbers (like italian poker games without cards).
+  ghosts, revealing the five numbers (like Italian poker games without cards).
 
   Now you have an arrow as cursor. Place it under the each number you want to
   discard and press START to eliminate the number and place the representative
@@ -102,7 +102,7 @@
   If you're playing the Double-Up, choose left or right for Big and Small.
   If you win, you'll get the bet amount x2. If you lose, your pacman will die.
 
-  Coin with A or B to exit the gambling game and play the ultra-adictive
+  Coin with A or B to exit the gambling game and play the ultra-addictive
   pacman front game again!...
 
 ***************************************************************************
@@ -142,7 +142,7 @@
   1x oscillator 18.432 MHz.
 
   1x 8 DIP Switches bank (near ay8910).
-  1x Volume Pot (betweeen the audio amp and ay8910).
+  1x Volume Pot (between the audio amp and ay8910).
   1x Motorola MCT1413 (High Current Darlington Transistor Array, same as ULN2003).
 
   1x 2x28 Edge connector (pins 1-2-27-28 from component side are GND).
@@ -764,6 +764,17 @@ ROM_START(unkpacgb)
 	ROM_IGNORE(0x4000)
 ROM_END
 
+ROM_START(unkpacgc)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "4",   0x0000, 0x2000, CRC(9f620694) SHA1(957d5c6636d40a74579d3f20be8f0b7e58516935) )
+	ROM_LOAD( "5",   0x8000, 0x2000, CRC(b107ad7e) SHA1(33ab0a63f8a57dd7efd5c5efae7c6e8bda1a65cc) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "1",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
+	ROM_LOAD( "2",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
+	ROM_LOAD( "3",   0x0000, 0x2000, CRC(f7cd9de0) SHA1(e0a6b316811ef7c3d3aeb853a9c50f9fdf1f2ff2) )
+ROM_END
+
 /*
   Unknown 'Space Invaders' gambling game.
   All roms are 0x8000 but only the last 0x2000 of each is used.
@@ -860,9 +871,10 @@ GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, R
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, strker,   0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
 
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga, unkpacg, unkpacga, unkpacg, unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc, unkpacg, unkpacg,  unkpacg, unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                              MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga, unkpacg, unkpacga, unkpacg, unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                  MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
