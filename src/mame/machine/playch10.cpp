@@ -293,7 +293,7 @@ uint8_t playch10_state::pc10_chr_r(offs_t offset)
 	return m_chr_page[bank].chr[offset & 0x3ff];
 }
 
-void playch10_state::pc10_set_mirroring(int mirroring )
+void playch10_state::pc10_set_mirroring(int mirroring)
 {
 	switch (mirroring)
 	{
@@ -396,7 +396,7 @@ void playch10_state::init_playch10()
 	m_pc10_gun_controller = 0;
 
 	/* default mirroring */
-	m_mirroring = PPU_MIRROR_NONE;
+	m_mirroring = PPU_MIRROR_VERT;
 }
 
 /**********************************************************************************
@@ -1001,6 +1001,7 @@ void playch10_state::init_pcgboard_type2()
 
 	/* enable 4 screen mirror */
 	m_gboard_4screen = 1;
+	m_mirroring = PPU_MIRROR_NONE;
 }
 
 /**********************************************************************************/
