@@ -91,19 +91,14 @@ private:
 	required_shared_ptr<u8> m_ram;
 
 	required_device<applefdintf_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_floppy;
-
-	floppy_image_device *m_cur_floppy;
 
 	uint8_t m_bank_select;
 	uint8_t m_side;
 };
 
 
-
 #define SUPERDRIVE_ROM_REGION  "superdrive_rom"
 #define SUPERDRIVE_RAM_TAG "superdrive_ram"
-
 
 
 ROM_START( superdrive )
@@ -133,9 +128,8 @@ void a2bus_superdrive_device::device_add_mconfig(machine_config &config)
 
 	SWIM1(config, m_fdc, C16M);
 
-	for (auto &floppy: m_floppy)
-		applefdintf_device::add_35_hd(config, floppy);
-
+	applefdintf_device::add_35_hd(config, "fdc:0");
+	applefdintf_device::add_35_hd(config, "fdc:1");
 
 	m_fdc->devsel_cb().set(FUNC(a2bus_superdrive_device::devsel_w));
 	m_fdc->hdsel_cb().set(FUNC(a2bus_superdrive_device::hdsel_w));
@@ -152,8 +146,6 @@ a2bus_superdrive_device::a2bus_superdrive_device(const machine_config &mconfig, 
 	m_rom(*this, SUPERDRIVE_ROM_REGION),
 	m_ram(*this, SUPERDRIVE_RAM_TAG),
 	m_fdc(*this, "fdc"),
-	m_floppy(*this, "%u", 0U),
-	m_cur_floppy(nullptr),
 	m_bank_select(0),
 	m_side(0)
 { }
@@ -206,7 +198,6 @@ void a2bus_superdrive_device::write_cnxx(uint8_t offset, uint8_t data)
  */
 uint8_t a2bus_superdrive_device::read_c800(uint16_t offset)
 {
-
 	unsigned address;
 
 	if (offset < 0x400)
@@ -239,6 +230,8 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 	// $80 = diagnostic led on
 	// $81 = diagnostic led off
 
+	floppy_image_device *floppy = nullptr;
+
 	if (offset < 16)
 	{
 		m_fdc->write(offset, value);
@@ -249,12 +242,14 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 	{
 		case 0x40:
 			m_side = 0;
-			if (m_cur_floppy) m_cur_floppy->ss_w(0);
+			floppy = m_fdc->get_floppy();
+			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x41:
 			m_side = 1;
-			if (m_cur_floppy) m_cur_floppy->ss_w(1);
+			floppy = m_fdc->get_floppy();
+			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x80:
@@ -267,11 +262,13 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 
 		default:
 			logerror("write($0a%02x,%02x)\n", offset, value);
+			break;
 	}
 }
 
 uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
 {
+	floppy_image_device *floppy = nullptr;
 
 	if (offset < 16)
 		return m_fdc->read(offset);
@@ -281,13 +278,15 @@ uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
 		case 0x40:
 			if (machine().side_effects_disabled()) break;
 			m_side = 0;
-			if (m_cur_floppy) m_cur_floppy->ss_w(0);
+			floppy = m_fdc->get_floppy();
+			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x41:
 			if (machine().side_effects_disabled()) break;
 			m_side = 1;
-			if (m_cur_floppy) m_cur_floppy->ss_w(1);
+			floppy = m_fdc->get_floppy();
+			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x80:
@@ -300,6 +299,7 @@ uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
 
 		default:
 			logerror("read($0a%02x)\n", offset);
+			break;
 	}
 	return 0;
 }
@@ -307,26 +307,26 @@ uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
 
 void a2bus_superdrive_device::devsel_w(uint8_t devsel)
 {
+	floppy_image_device *floppy = nullptr;
 
 	switch (devsel)
 	{
 		case 1:
-			m_cur_floppy = m_floppy[0]->get_device();
+			floppy = m_fdc->subdevice<floppy_connector>("0")->get_device();
 			break;
 		case 2:
-			m_cur_floppy = m_floppy[1]->get_device();
+			floppy = m_fdc->subdevice<floppy_connector>("1")->get_device();
 			break;
-		default:
-			m_cur_floppy = nullptr;
 	}
 
-	m_fdc->set_floppy(m_cur_floppy);
+	m_fdc->set_floppy(floppy);
 }
 
 void a2bus_superdrive_device::phases_w(uint8_t phases)
 {
-	if (m_cur_floppy)
-		m_cur_floppy->seek_phase_w(phases);
+	floppy_image_device *floppy = m_fdc->get_floppy();
+	if (floppy)
+		floppy->seek_phase_w(phases);
 }
 
 
