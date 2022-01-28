@@ -1351,7 +1351,7 @@ GAME( 1991, atompunk,  dynablst, bombrman, atompunk, m90_state, empty_init,    R
 GAME( 1992, dynablstb, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dynablstb2,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dynablstb3,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
-GAME( 1991, dicegame,  0,        dicegame, dicegame, m90_state, empty_init,    ROT0, "bootleg (Tuning)", "The Dice Game!", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // German bootleg of Irem Dice Dice Dice
+GAME( 1991, dicegame,  0,        dicegame, dicegame, m90_state, empty_init,    ROT0, "bootleg (Tuning)", "Dice - The Dice Game!", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // German bootleg of Irem Dice Dice Dice
 GAME( 1992, bbmanw,    0,        bbmanw,   bbmanw,   m90_state, empty_init,    ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bbmanwj,   bbmanw,   bbmanw,   bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bbmanwja,  bbmanw,   bbmanwj,  bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
