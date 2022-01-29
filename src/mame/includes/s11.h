@@ -3,7 +3,7 @@
 /*
  * s11.h
  *
- *  Created on: 1/01/2013
+ *  Created on: 2013-01-01
  */
 
 #ifndef MAME_INCLUDES_S11_H
@@ -61,6 +61,7 @@ public:
 		, m_ps88(*this, "ps88")
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_keyboard(*this, "X%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void s11(machine_config &config);
@@ -79,9 +80,9 @@ protected:
 	void bank_w(u8 data);
 	void dig1_w(u8 data);
 	void lamp0_w(u8 data);
-	void lamp1_w(u8 data) { }
-	void sol2_w(u8 data) { } // solenoids 8-15
-	void sol3_w(u8 data); // solenoids 0-7
+	void lamp1_w(u8 data);
+	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
+	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	void sound_w(u8 data);
 
 	void pia2c_pa_w(u8 data);
@@ -108,9 +109,9 @@ protected:
 	void s11_main_map(address_map &map);
 	void s11_audio_map(address_map &map);
 
-	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -135,6 +136,7 @@ protected:
 	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
 	required_ioport_array<8> m_io_keyboard;
+	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
 
 	// getters/setters
 	u8 get_strobe() { return m_strobe; }
@@ -142,25 +144,27 @@ protected:
 	u8 get_diag() { return m_diag; }
 	void set_diag(u8 d) { m_diag = d; }
 	u32 get_segment1() { return m_segment1; }
-	void set_segment1(uint32_t s) { m_segment1 = s; }
+	void set_segment1(u32 s) { m_segment1 = s; }
 	u32 get_segment2() { return m_segment2; }
-	void set_segment2(uint32_t s) { m_segment2 = s; }
+	void set_segment2(u32 s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
 	static const device_timer_id TIMER_IRQ = 0;
 
-private:
-	void dig0_w(u8 data);
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
 	u8 m_diag = 0U;
+	u8 m_lamp_data = 0U;
 	u32 m_segment1 = 0U;
 	u32 m_segment2 = 0U;
 	u32 m_timer_count = 0U;
 	emu_timer* m_irq_timer;
 	bool m_timer_irq_active = false;
 	bool m_pia_irq_active = false;
+
+private:
+	void dig0_w(u8 data);
 };
 
 
@@ -193,19 +197,22 @@ public:
 	void s11b(machine_config &config);
 	void s11b_jokerz(machine_config &config);
 
-	void init_s11b();
-	void init_s11b_invert();
+	void init_s11bnn();  // normal
+	void init_s11bin();  // invert
+	void init_s11bn7();  // 7seg34
+	void init_s11bi7();  // invert and 7seg34
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void set_invert(bool inv) { m_invert = inv; }
+	void set_invert(bool i) { m_invert = i; }
+	void set_7seg(bool i) { m_is7seg34 = i; }
 
 	void s11b_dig1_w(u8 data);
 	void s11b_pia2c_pa_w(u8 data);
 	void s11b_pia2c_pb_w(u8 data);
 	void s11b_pia34_pa_w(u8 data);
-
-private:
+	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
 	bool m_invert = false;  // later System 11B games start expecting inverted data to the display LED segments.
 };
 
@@ -220,6 +227,7 @@ public:
 	void s11c(machine_config &config);
 
 	void init_s11c();
+	void init_s11c7();
 
 protected:
 	virtual void machine_reset() override;

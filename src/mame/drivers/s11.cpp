@@ -25,7 +25,7 @@ Status:
 - All machines are playable
 
 ToDo:
-- Outputs
+- Machanical sounds
 
 
 *****************************************************************************************/
@@ -170,10 +170,10 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		{
 #ifndef S11_W15
 			// W14 jumper present (Q7), W15 absent (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 7) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+			m_timer_irq_active = (BIT(m_timer_count, 7, 3) == 7);
 #else
 			// W14 jumper absent (Q7), W15 present (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 10) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+			m_timer_irq_active = (BIT(m_timer_count, 8, 3) == 7);
 #endif
 		}
 
@@ -183,12 +183,6 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 		break;
 	}
-}
-
-void s11_state::machine_reset()
-{
-	membank("bank0")->set_entry(0);
-	membank("bank1")->set_entry(0);
 }
 
 INPUT_CHANGED_MEMBER( s11_state::main_nmi )
@@ -228,10 +222,6 @@ WRITE_LINE_MEMBER( s11_state::main_irq )
 	m_maincpu->set_input_line(M6802_IRQ_LINE, state);
 }
 
-void s11_state::sol3_w(u8 data)
-{
-}
-
 void s11_state::sound_w(u8 data)
 {
 	m_sound_data = data;
@@ -246,14 +236,23 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 
 void s11_state::lamp0_w(u8 data)
 {
+	m_lamp_data = data ^ 0xff;
+}
+
+void s11_state::lamp1_w(u8 data)
+{
+	// find out which row is active
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(data, i))
+			for (u8 j = 0; j < 8; j++)
+				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s11_state::dig0_w(u8 data)
 {
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
-	data &= 0x7f;
 	m_strobe = data & 15;
-	m_diag = (data & 0x70) >> 4;
+	m_diag = BIT(data, 4, 3);
 	m_digits[60] = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -263,11 +262,6 @@ void s11_state::dig1_w(u8 data)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x20000;
-	if ((m_segment2 & 0x70000) == 0x30000)
-	{
-		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment2 |= 0x40000;
-	}
 }
 
 u8 s11_state::pia28_w7_r()
@@ -298,18 +292,13 @@ void s11_state::pia2c_pb_w(u8 data)
 {
 	m_segment1 |= data;
 	m_segment1 |= 0x20000;
-	if ((m_segment1 & 0x70000) == 0x30000)
-	{
-		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment1 |= 0x40000;
-	}
 }
 
 u8 s11_state::switch_r()
 {
 	u8 data = 0;
 	// scan all 8 input columns, since multiple can be selected at once
-	for (int i = 0; i < 8; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (BIT(m_row, i))
 			data |= m_io_keyboard[i]->read();
 
@@ -319,8 +308,6 @@ u8 s11_state::switch_r()
 
 void s11_state::switch_w(u8 data)
 {
-	// this drives the pulldown 2N3904 NPN transistors Q42-Q49, each of which drives one column of the switch matrix low
-	// it is possible for multiple columns to be enabled at once, this is handled in switch_r above.
 	m_row = data;
 }
 
@@ -376,6 +363,38 @@ u8 s11_state::sound_r()
 	return m_sound_data;
 }
 
+void s11_state::machine_start()
+{
+	genpin_class::machine_start();
+	m_io_outputs.resolve();
+	m_digits.resolve();
+
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_diag));
+	save_item(NAME(m_segment1));
+	save_item(NAME(m_segment2));
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_irq_active));
+	save_item(NAME(m_pia_irq_active));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_row));
+	//save_item(NAME(m_data_ok));
+	save_item(NAME(m_lamp_data));
+
+	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+}
+
+void s11_state::machine_reset()
+{
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
+	membank("bank0")->set_entry(0);
+	membank("bank1")->set_entry(0);
+}
+
 void s11_state::init_s11()
 {
 	u8 *ROM = memregion("audiocpu")->base();
@@ -383,11 +402,8 @@ void s11_state::init_s11()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
-	m_timer_count = 0;
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-	m_timer_irq_active = false;
-	m_pia_irq_active = false;
 }
 
 void s11_state::s11(machine_config &config)

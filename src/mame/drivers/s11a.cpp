@@ -132,13 +132,12 @@ static INPUT_PORTS_START( s11a )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11a_state::s11a_dig0_w(uint8_t data)
+void s11a_state::s11a_dig0_w(u8 data)
 {
-	data &= 0x7f;
 	set_strobe(data & 15);
-	set_diag((data & 0x70) >> 4);
+	set_diag(BIT(data, 4, 3));
 	m_digits[60] = 0;  // +5VDC (always on)
-	m_digits[61] = get_diag() & 0x01;  // connected to PA4
+	m_digits[61] = BIT(data, 4);  // connected to PA4
 	m_digits[62] = 0;  // Blanking (pretty much always on)
 	set_segment1(0);
 	set_segment2(0);
