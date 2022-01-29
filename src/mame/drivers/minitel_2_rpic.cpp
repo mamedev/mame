@@ -51,6 +51,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "machine/timer.h"
+#include "machine/i2cmem.h"
 #include "video/ef9345.h"
 
 #include "emupal.h"
@@ -90,6 +91,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ts9347(*this, "ts9347")
 		, m_palette(*this, "palette")
+		, m_i2cmem(*this, "i2cmem")
 		, m_io_kbd(*this, "Y%u", 0)
 		{
 		}
@@ -100,6 +102,7 @@ private:
 	required_device<i80c32_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
+	optional_device<i2cmem_device> m_i2cmem;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
@@ -108,7 +111,7 @@ private:
 	uint8_t port1_r();
 	uint8_t port3_r();
 
-	void dev_crtl_reg_w(offs_t offset, uint8_t data);
+	void dev_ctrl_reg_w(offs_t offset, uint8_t data);
 	uint8_t dev_keyb_ser_r(offs_t offset);
 
 	uint8_t ts9347_io_r(offs_t offset);
@@ -182,11 +185,13 @@ void minitel_state::port1_w(uint8_t data)
 	if( (port1 ^ data) & PORT_1_SCL )
 	{
 		LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
+		m_i2cmem->write_scl( (data & PORT_1_SCL) ? 1 : 0);
 	}
 
 	if( (port1 ^ data) & PORT_1_SDA )
 	{
 		LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
+		m_i2cmem->write_sda( (data & PORT_1_SDA) ? 1 : 0);
 	}
 
 	port1 = data;
@@ -200,8 +205,14 @@ void minitel_state::port3_w(uint8_t data)
 
 uint8_t minitel_state::port1_r()
 {
+	uint8_t data;
+
 	LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
-	return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
+
+	data = ( ( (port1 & (0xFE & ~PORT_1_SDA) ) | ( (keyboard_x_row_reg>>7)&1) ) );
+	data |= (m_i2cmem->read_sda() ? PORT_1_SDA : 0);
+
+	return data;
 }
 
 uint8_t minitel_state::port3_r()
@@ -210,7 +221,7 @@ uint8_t minitel_state::port3_r()
 	return port3;
 }
 
-void minitel_state::dev_crtl_reg_w(offs_t offset, uint8_t data)
+void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
 {
 	if( last_ctrl_reg != data)
 	{
@@ -288,7 +299,7 @@ void minitel_state::mem_prg(address_map &map)
 
 void minitel_state::mem_io(address_map &map)
 {
-	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
+	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_ctrl_reg_w));
 	/* ts9347 */
 	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
 }
@@ -411,6 +422,8 @@ void minitel_state::minitel2(machine_config &config)
 	m_maincpu->port_out_cb<1>().set(FUNC(minitel_state::port1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(minitel_state::port3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(minitel_state::port3_w));
+
+	I2C_24C02(config, m_i2cmem);
 
 	TS9347(config, m_ts9347, 0);
 	m_ts9347->set_palette_tag(m_palette);
