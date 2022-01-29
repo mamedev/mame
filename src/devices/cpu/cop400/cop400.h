@@ -113,11 +113,14 @@ public:
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
+	// output pin state accessors
+	int so_r() { return m_so_output; }
+	int sk_r() { return m_sk_output; }
+	uint8_t l_r() { return m_l_output; }
+
+	// microbus
 	uint8_t microbus_r();
 	void microbus_w(uint8_t data);
-
-	int so_r() { return m_so_output; }
-	int sk_r() { return m_so_output; }
 
 	void data_128b(address_map &map);
 	void data_32b(address_map &map);
@@ -219,6 +222,7 @@ protected:
 	uint8_t m_si;              // serial input
 	int m_so_output;           // SO pin output state
 	int m_sk_output;           // SK pin output state
+	uint8_t m_l_output;        // L pins output state
 
 	// skipping logic
 	bool m_skip;               // skip next instruction
