@@ -3,10 +3,13 @@
 /***********************************************************************************
 
 PINBALL
-Williams System 8: Still Crazy
+Williams System 8: Still Crazy (#543)
 
-The first time run, the display will show the model number (543).
-Press F3 to clear this.
+The first time run, the display will show the model number. Press F3 to clear this.
+
+IMDB shows the number as 534, however both the game and the manual say 543. The
+undumped System 10 game 4-in-1 (Pigskin/Poker/Willy at the Bat/Willy's Cup) also
+was assigned number 543.
 
 A novelty game where the playfield is completely vertical. It has 4 flippers and the
   idea is to get the ball up to the alcohol 'still' before the 'revenuers' do. The

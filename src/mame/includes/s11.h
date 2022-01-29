@@ -59,10 +59,8 @@ public:
 		, m_pia34(*this, "pia34")
 		, m_bg(*this, "bg")
 		, m_ps88(*this, "ps88")
-		, m_digits(*this, "digit%u", 0U)
-		, m_swarray(*this, "SW.%u", 0U)
-		, m_timer_irq_active(false)
-		, m_pia_irq_active(false)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		{ }
 
 	void s11(machine_config &config);
@@ -118,7 +116,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_piairq;
-	// the following devices are optional because certain board variants (i.e. system 11c) do not have the audio section on the mainboard populated
+	// the following devices are optional because certain board variants (i.e. system 11c)
+	//  do not have the audio section on the mainboard populated
 	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<input_merger_device> m_audioirq;
 	optional_device<hc55516_device> m_hc55516;
@@ -135,16 +134,16 @@ protected:
 	optional_device<s11c_bg_device> m_bg;
 	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
-	required_ioport_array<8> m_swarray;
+	required_ioport_array<8> m_io_keyboard;
 
 	// getters/setters
 	u8 get_strobe() { return m_strobe; }
 	void set_strobe(u8 s) { m_strobe = s; }
 	u8 get_diag() { return m_diag; }
 	void set_diag(u8 d) { m_diag = d; }
-	uint32_t get_segment1() { return m_segment1; }
+	u32 get_segment1() { return m_segment1; }
 	void set_segment1(uint32_t s) { m_segment1 = s; }
-	uint32_t get_segment2() { return m_segment2; }
+	u32 get_segment2() { return m_segment2; }
 	void set_segment2(uint32_t s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
@@ -152,16 +151,16 @@ protected:
 
 private:
 	void dig0_w(u8 data);
-	u8 m_sound_data;
-	u8 m_strobe;
-	u8 m_switch_col;
-	u8 m_diag;
-	uint32_t m_segment1;
-	uint32_t m_segment2;
-	uint32_t m_timer_count;
+	u8 m_sound_data = 0U;
+	u8 m_strobe = 0U;
+	u8 m_row = 0U;
+	u8 m_diag = 0U;
+	u32 m_segment1 = 0U;
+	u32 m_segment2 = 0U;
+	u32 m_timer_count = 0U;
 	emu_timer* m_irq_timer;
-	bool m_timer_irq_active;
-	bool m_pia_irq_active;
+	bool m_timer_irq_active = false;
+	bool m_pia_irq_active = false;
 };
 
 
@@ -207,7 +206,7 @@ protected:
 	void s11b_pia34_pa_w(u8 data);
 
 private:
-	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
+	bool m_invert = false;  // later System 11B games start expecting inverted data to the display LED segments.
 };
 
 
