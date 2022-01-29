@@ -20,12 +20,12 @@
     - Main MCU
     - Video output
     - Keyboard
-    - 24C02 EPROM
 
     What is not yet implemented :
 
     - Modem and sound output.
     - The rear serial port.
+    - Parameters I2C 24C02 EEPROM.
     - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
@@ -40,8 +40,8 @@
     F6 -> Guide
     F7 -> Sommaire
     F8 -> Connexion/Fin
+    F9 -> Fonction
     F10-> ON / OFF
-    Alt Gr -> Fonction
 
     With the official ROM you need to press F10 to switch on the CRT.
 
@@ -50,8 +50,8 @@
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "machine/i2cmem.h"
 #include "machine/timer.h"
+#include "machine/i2cmem.h"
 #include "video/ef9345.h"
 
 #include "emupal.h"
@@ -63,11 +63,11 @@
 // IO expander latch usage definitions
 enum
 {
-	CTRL_REG_MCBC  = 0x01,
-	CTRL_REG_DTMF  = 0x02,
-	CTRL_REG_CRTON = 0x08,
-	CTRL_REG_OPTO  = 0x10,
-	CTRL_REG_RELAY = 0x20
+	CTRL_REG_DTMF = 0x02,
+	CTRL_REG_MCBC = 0x04,
+	CTRL_REG_OPTO = 0x08,
+	CTRL_REG_RELAY = 0x10,
+	CTRL_REG_CRTON = 0x20
 };
 
 // 80C32 Port IO usage definitions
@@ -102,7 +102,7 @@ private:
 	required_device<i80c32_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
-	required_device<i2cmem_device> m_i2cmem;
+	optional_device<i2cmem_device> m_i2cmem;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( minitel2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Connexion/Fin") PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fonction") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fonction") PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) // Right maj
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) // Left maj
 
