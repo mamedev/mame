@@ -173,7 +173,7 @@ uint8_t newbrain_state::iorq_r(offs_t offset)
 				break;
 
 			case 2: // COP
-				data = m_cop->microbus_rd();
+				data = m_cop->microbus_r();
 				break;
 			}
 			break;
@@ -216,7 +216,7 @@ void newbrain_state::iorq_w(offs_t offset, uint8_t data)
 				break;
 
 			case 2: // COP
-				m_cop->microbus_wr(data);
+				m_cop->microbus_w(data);
 				break;
 
 			case 3: // ENRG1
