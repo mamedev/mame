@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(bml3_kanji_r);
-	DECLARE_WRITE8_MEMBER(bml3_kanji_w);
+	uint8_t bml3_kanji_r(offs_t offset);
+	void bml3_kanji_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;

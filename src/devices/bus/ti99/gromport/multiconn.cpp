@@ -49,9 +49,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::gromport, ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_MULTI,  bus::ti99::gromport::ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 #define AUTO -1
 
@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER(ti99_multi_cart_conn_device::gclock_in)
 	}
 }
 
-READ8Z_MEMBER(ti99_multi_cart_conn_device::readz)
+void ti99_multi_cart_conn_device::readz(offs_t offset, uint8_t *value)
 {
 	int slot = get_active_slot(true, offset);
 
@@ -237,7 +237,7 @@ void ti99_multi_cart_conn_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(ti99_multi_cart_conn_device::crureadz)
+void ti99_multi_cart_conn_device::crureadz(offs_t offset, uint8_t *value)
 {
 	int slot = get_active_slot(false, offset);
 	/* Sanity check. Higher slots are always empty. */
@@ -330,5 +330,5 @@ ioport_constructor ti99_multi_cart_conn_device::device_input_ports() const
 	return INPUT_PORTS_NAME(multi_slot);
 }
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 

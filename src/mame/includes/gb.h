@@ -32,7 +32,9 @@ public:
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
 		m_ppu(*this, "ppu"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_cart_low(*this, "cartlow"),
+		m_cart_high(*this, "carthigh")
 	{ }
 
 	uint8_t       m_gb_io[0x10];
@@ -63,17 +65,15 @@ public:
 	uint8_t       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
 	uint8_t       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
 
-	bool m_bios_disable;
-
-	DECLARE_WRITE8_MEMBER(gb_io_w);
-	DECLARE_WRITE8_MEMBER(gb_io2_w);
-	DECLARE_WRITE8_MEMBER(sgb_io_w);
-	DECLARE_READ8_MEMBER(gb_ie_r);
-	DECLARE_WRITE8_MEMBER(gb_ie_w);
-	DECLARE_READ8_MEMBER(gb_io_r);
-	DECLARE_WRITE8_MEMBER(gbc_io_w);
-	DECLARE_WRITE8_MEMBER(gbc_io2_w);
-	DECLARE_READ8_MEMBER(gbc_io2_r);
+	void gb_io_w(offs_t offset, uint8_t data);
+	void gb_io2_w(offs_t offset, uint8_t data);
+	void sgb_io_w(offs_t offset, uint8_t data);
+	uint8_t gb_ie_r();
+	void gb_ie_w(uint8_t data);
+	uint8_t gb_io_r(offs_t offset);
+	void gbc_io_w(offs_t offset, uint8_t data);
+	void gbc_io2_w(offs_t offset, uint8_t data);
+	uint8_t gbc_io2_r(offs_t offset);
 	void gb_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
@@ -82,15 +82,9 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	void gbc_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	void gb_timer_callback(uint8_t data);
 
-	DECLARE_READ8_MEMBER(gb_cart_r);
-	DECLARE_READ8_MEMBER(gbc_cart_r);
-	DECLARE_WRITE8_MEMBER(gb_bank_w);
-	DECLARE_READ8_MEMBER(gb_ram_r);
-	DECLARE_WRITE8_MEMBER(gb_ram_w);
-	DECLARE_READ8_MEMBER(gb_echo_r);
-	DECLARE_WRITE8_MEMBER(gb_echo_w);
+	uint8_t gb_bios_r(offs_t offset);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 	void supergb(machine_config &config);
@@ -108,6 +102,10 @@ protected:
 		SIO_FAST_CLOCK = 0x02,
 		SIO_INTERNAL_CLOCK = 0x01
 	};
+	static constexpr u8 NO_CART = 0x00;
+	static constexpr u8 BIOS_ENABLED = 0x00;
+	static constexpr u8 CART_PRESENT = 0x01;
+	static constexpr u8 BIOS_DISABLED = 0x02;
 
 	required_device<lr35902_cpu_device> m_maincpu;
 	required_device<gameboy_sound_device> m_apu;
@@ -118,6 +116,8 @@ protected:
 	optional_device<ram_device> m_ram;
 	required_device<dmg_ppu_device> m_ppu;
 	required_device<palette_device> m_palette;
+	memory_view m_cart_low;
+	memory_view m_cart_high;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
@@ -149,18 +149,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(megaduck_video_r);
-	DECLARE_WRITE8_MEMBER(megaduck_video_w);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
-	DECLARE_READ8_MEMBER(megaduck_sound_r1);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
-	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	void megaduck_palette(palette_device &palette) const;;
+	uint8_t megaduck_video_r(offs_t offset);
+	void megaduck_video_w(offs_t offset, uint8_t data);
+	void megaduck_sound_w1(offs_t offset, uint8_t data);
+	uint8_t megaduck_sound_r1(offs_t offset);
+	void megaduck_sound_w2(offs_t offset, uint8_t data);
+	uint8_t megaduck_sound_r2(offs_t offset);
+	void megaduck_palette(palette_device &palette) const;
 	void megaduck_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(cart_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
 	required_device<megaduck_cart_slot_device> m_cartslot;
 };
 

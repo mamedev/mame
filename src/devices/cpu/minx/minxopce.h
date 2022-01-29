@@ -367,7 +367,7 @@ void minx_cpu_device::execute_one_ce()
 			break;
 		case 0xAE: { /* HALT */ m_halted = 1; }
 			break;
-		case 0xAF: { }
+		case 0xAF: { /* STOP */ }
 			break;
 
 		case 0xB0: { m_BA = ( m_BA & 0x00FF ) | ( AND8( ( m_BA >> 8 ), rdop() ) << 8 ); }

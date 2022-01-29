@@ -9,7 +9,7 @@ Atari Orbit video emulation
 #include "emu.h"
 #include "includes/orbit.h"
 
-WRITE8_MEMBER(orbit_state::playfield_w)
+void orbit_state::playfield_w(offs_t offset, uint8_t data)
 {
 	m_playfield_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -26,13 +26,13 @@ TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 	if (m_flip_screen)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flags);
+	tileinfo.set(3, code & 0x3f, 0, flags);
 }
 
 
 void orbit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(orbit_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(orbit_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
 }
 
 

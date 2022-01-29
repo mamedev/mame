@@ -77,9 +77,11 @@ static void ql_trump_card_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( ql_trump_card_device::floppy_formats )
-	FLOPPY_QL_FORMAT
-FLOPPY_FORMATS_END
+void ql_trump_card_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_QL_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -114,7 +116,7 @@ ql_trump_card_device::ql_trump_card_device(const machine_config &mconfig, device
 	m_floppy0(*this, WD1772_TAG":0"),
 	m_floppy1(*this, WD1772_TAG":1"),
 	m_rom(*this, "rom"),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", ram_size, ENDIANNESS_BIG),
 	m_ram_size(ram_size),
 	m_rom_en(false)
 {
@@ -142,9 +144,6 @@ ql_trump_card_768k_device::ql_trump_card_768k_device(const machine_config &mconf
 
 void ql_trump_card_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(m_ram_size);
-
 	// state saving
 	save_item(NAME(m_rom_en));
 }

@@ -8,13 +8,14 @@
 #include "tilemap.h"
 
 
-typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
 #define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
 
 
 class k051316_device : public device_t, public device_gfx_interface
 {
 public:
+	using zoom_delegate = device_delegate<void (int *code, int *color, int *flags)>;
+
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static const gfx_layout charlayout4;
@@ -26,7 +27,7 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 
 	// configuration
-	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb = k051316_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb.set(std::forward<T>(args)...); }
 	void set_wrap(int wrap) { m_wrap = wrap; }
 	void set_bpp(int bpp);
 	void set_layermask(int mask) { m_layermask = mask; }
@@ -75,7 +76,7 @@ private:
 	int m_wrap;
 	int m_pixels_per_byte;
 	int m_layermask;
-	k051316_cb_delegate m_k051316_cb;
+	zoom_delegate m_k051316_cb;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };

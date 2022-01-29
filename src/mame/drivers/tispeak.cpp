@@ -87,7 +87,7 @@ above expectations. TI continued to manufacture many products for this line.
     - VSM(2/2): 16KB CD2320
     - VFD: 8 digits with 14 segments, DP and accent mark
 
-    Speak & Spell (France) "La Dictee Magique", 1980
+    Speak & Spell (France) "La Dictée Magique", 1980
     - MCU: CD2702, label CD2702AN2L (die label TMC0270F 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
@@ -398,6 +398,16 @@ K28 modules:
   - emulate other known devices
 
 
+Dick Smith catalog numbers, taken from advertisements:
+
+X-1300, Y-1300 : T.I. Speak & Spell
+X-1301 : Super Stumper 1 (for Speak & Spell)
+X-1302 : Super Stumper 2 (for Speak & Spell)
+X-1305 : Vowell Power (for Speak & Spell)
+Y-1310 : T.I. Speak & Math
+Y-1313 : T.I. Speak & Read
+Y-1320 : T.I. Dataman
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -408,7 +418,7 @@ K28 modules:
 #include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "render.h"
 
@@ -466,21 +476,21 @@ private:
 	virtual void power_off() override;
 	void update_display();
 
-	DECLARE_READ8_MEMBER(snspell_read_k);
-	DECLARE_WRITE16_MEMBER(snmath_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_r);
-	DECLARE_WRITE16_MEMBER(lantutor_write_r);
+	u8 snspell_read_k();
+	void snmath_write_o(u16 data);
+	void snspell_write_o(u16 data);
+	void snspell_write_r(u16 data);
+	void lantutor_write_r(u16 data);
 
-	DECLARE_READ8_MEMBER(snspellc_read_k);
-	DECLARE_WRITE16_MEMBER(snspellc_write_o);
-	DECLARE_WRITE16_MEMBER(snspellc_write_r);
-	DECLARE_READ8_MEMBER(tntell_read_k);
+	u8 snspellc_read_k();
+	void snspellc_write_o(u16 data);
+	void snspellc_write_r(u16 data);
+	u8 tntell_read_k();
 
 	void k28_update_display(u8 old, u8 data);
-	DECLARE_READ8_MEMBER(k28_read_k);
-	DECLARE_WRITE16_MEMBER(k28_write_o);
-	DECLARE_WRITE16_MEMBER(k28_write_r);
+	u8 k28_read_k();
+	void k28_write_o(u16 data);
+	void k28_write_r(u16 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -541,7 +551,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tispeak_state::cart_load)
 
 	if (size > m_cart_max_size)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
 		return image_init_result::FAIL;
 	}
 
@@ -592,7 +602,7 @@ void tispeak_state::update_display()
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_r)
+void tispeak_state::snspell_write_r(u16 data)
 {
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
@@ -606,7 +616,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_o)
+void tispeak_state::snspell_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
@@ -615,7 +625,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	update_display();
 }
 
-READ8_MEMBER(tispeak_state::snspell_read_k)
+u8 tispeak_state::snspell_read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[8]->read() | read_inputs(8);
@@ -624,7 +634,7 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 
 // snmath specific
 
-WRITE16_MEMBER(tispeak_state::snmath_write_o)
+void tispeak_state::snmath_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
@@ -635,7 +645,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 
 // lantutor specific
 
-WRITE16_MEMBER(tispeak_state::lantutor_write_r)
+void tispeak_state::lantutor_write_r(u16 data)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
@@ -646,7 +656,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 
 // snspellc specific
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_r)
+void tispeak_state::snspellc_write_r(u16 data)
 {
 	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10 & 1);
@@ -659,17 +669,17 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 	m_r = m_inp_mux = data;
 }
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_o)
+void tispeak_state::snspellc_write_o(u16 data)
 {
 	// O3210: TMS5100 CTL8124
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
+	m_tms5100->ctl_w(bitswap<4>(data,3,0,1,2));
 	m_o = data;
 }
 
-READ8_MEMBER(tispeak_state::snspellc_read_k)
+u8 tispeak_state::snspellc_read_k()
 {
 	// K4: TMS5100 CTL1
-	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+	u8 k4 = m_tms5100->ctl_r() << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return k4 | m_inputs[9]->read() | read_inputs(9);
@@ -678,13 +688,13 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 
 // tntell specific
 
-READ8_MEMBER(tispeak_state::tntell_read_k)
+u8 tispeak_state::tntell_read_k()
 {
 	// K8: overlay code from R5,O4-O7
 	u8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
 
 	// rest is same as snpellc
-	return k8 | snspellc_read_k(space, offset);
+	return k8 | snspellc_read_k();
 }
 
 u8 tispeak_state::tntell_get_hexchar(const char c)
@@ -733,11 +743,11 @@ void tispeak_state::k28_update_display(u8 old, u8 data)
 	// ?
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_r)
+void tispeak_state::k28_write_r(u16 data)
 {
 	// R1234: TMS5100 CTL8421
 	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
-	m_tms5100->ctl_w(space, 0, r & 0xf);
+	m_tms5100->ctl_w(r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -754,16 +764,16 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 	m_r = r;
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_o)
+void tispeak_state::k28_write_o(u16 data)
 {
 	// O0-O7: input mux low
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-READ8_MEMBER(tispeak_state::k28_read_k)
+u8 tispeak_state::k28_read_k()
 {
 	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
+	return m_tms5100->ctl_r() | read_inputs(9) | (m_r & 0xf);
 }
 
 
@@ -821,7 +831,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
@@ -832,7 +842,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellfr ) // French button names
@@ -844,8 +854,8 @@ static INPUT_PORTS_START( snspellfr ) // French button names
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Essaie")
 
 	PORT_MODIFY("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Arr" e_ACUTE "t") // -> auto_power_off
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("D" e_ACUTE "part")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME(u8"Arrét") // -> auto_power_off
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME(u8"Départ")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Rejoue")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repete")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Aide")
@@ -855,7 +865,7 @@ static INPUT_PORTS_START( snspellfr ) // French button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Code Secret")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Lettre")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Dis-le")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellit ) // Italian button names
@@ -867,7 +877,7 @@ static INPUT_PORTS_START( snspellit ) // Italian button names
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Controllo")
 
 	PORT_MODIFY("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Stop") // -> auto_power_off
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Stop") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Via")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Ritorno")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Replica")
@@ -878,7 +888,7 @@ static INPUT_PORTS_START( snspellit ) // Italian button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Codice")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Alfabeto")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ripeti")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabet
@@ -905,7 +915,7 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME(N_TILDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME(u8"Ñ")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
@@ -938,8 +948,8 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Otra Vez")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Palabra Secreta")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Dilo")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 
@@ -969,7 +979,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R4
@@ -982,8 +992,8 @@ static INPUT_PORTS_START( snmath )
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Mix It")
 
 	PORT_START("IN.6") // R6
@@ -991,7 +1001,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1013,7 +1023,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 INPUT_PORTS_END
 
 
@@ -1103,17 +1113,17 @@ static INPUT_PORTS_START( snspellc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
 
 	PORT_START("IN.9") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellcuk )
 	PORT_INCLUDE( snspellc )
 
 	PORT_MODIFY("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true) // just the label changed from Spell to Write
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F1) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true) // just the label changed from Spell to Write
 INPUT_PORTS_END
 
 
@@ -1167,14 +1177,14 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Grid 1-6")
 
 	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Grid 6-1 (Off)") // -> auto_power_off
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_F2) PORT_NAME("Grid 6-1 (Off)") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Grid 6-2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Grid 6-4")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Grid 6-3")
 
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_F1) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -1218,13 +1228,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( k28m2 )
 	PORT_START("IN.0") // O0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A/1")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('J') PORT_NAME("J/0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B/2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('K') PORT_NAME("K/+")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
@@ -1238,13 +1248,13 @@ static INPUT_PORTS_START( k28m2 )
 	PORT_START("IN.3") // O3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Prompt")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('D') PORT_NAME("D/4")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('M') PORT_NAME("M/" UTF8_MULTIPLY)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('M') PORT_NAME(u8"M/×")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 
 	PORT_START("IN.4") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("Menu")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('E') PORT_NAME("E/5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('N') PORT_NAME("N/" UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('N') PORT_NAME(u8"N/÷")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 
 	PORT_START("IN.5") // O5
@@ -1328,7 +1338,7 @@ void tispeak_state::sns_cd2801(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1379,7 +1389,7 @@ void tispeak_state::snread(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snread");
 }
@@ -1398,7 +1408,7 @@ void tispeak_state::lantutor(machine_config &config)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("lantutor");
 }
@@ -1423,7 +1433,7 @@ void tispeak_state::snspellc(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1463,7 +1473,7 @@ void tispeak_state::tntell(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
 }
@@ -1488,7 +1498,7 @@ void tispeak_state::k28m2(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
 }
@@ -1877,7 +1887,7 @@ COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, in
 COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

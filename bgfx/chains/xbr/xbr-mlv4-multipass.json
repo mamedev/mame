@@ -3,7 +3,7 @@
 
 /*
    Hyllian's xBR MultiLevel4 Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,6 +49,7 @@
 	"passes": [
 		{
 			"effect": "xbr/xbr-mlv4-multipass/xbr-mlv4-pass1",
+			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2DHT_H_
-#define _A2DHT_H_
+#ifndef MAME_CPU_ALTO2_A2DHT_H
+#define MAME_CPU_ALTO2_A2DHT_H
 
 //! F2 functions for display horizontal task
 enum {
@@ -23,5 +23,5 @@ void activate_dht();                            //!< called by the CPU when the 
 void init_dht(int task = task_dht);             //!< initialize display horizontal task
 void exit_dht();                                //!< deinitialize display horizontal task
 void reset_dht();                               //!< reset the display horizontal task
-#endif // _A2DHT_H_
+#endif // MAME_CPU_ALTO2_A2DHT_H
 #endif  // ALTO2_DEFINE_CONSTANTS

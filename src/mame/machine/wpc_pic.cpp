@@ -22,7 +22,7 @@ void wpc_pic_device::set_serial(const char *_serial)
 	serial = _serial;
 }
 
-READ8_MEMBER(wpc_pic_device::read)
+uint8_t wpc_pic_device::read()
 {
 	uint8_t data = 0x00;
 	if(curcmd == 0x0d)
@@ -54,7 +54,7 @@ void wpc_pic_device::check_game_id()
 	}
 }
 
-WRITE8_MEMBER(wpc_pic_device::write)
+void wpc_pic_device::write(uint8_t data)
 {
 	if(chk_count) {
 		cmpchk[3-chk_count] = data;

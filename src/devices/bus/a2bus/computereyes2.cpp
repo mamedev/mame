@@ -11,15 +11,43 @@
 #include "emu.h"
 #include "computereyes2.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#include "imagedev/picture.h"
+
+#include "bitmap.h"
+
+
+namespace {
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_COMPUTEREYES2, a2bus_computereyes2_device, "a2ceyes2", "Digital Vision ComputerEyes/2")
+class a2bus_computereyes2_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_computereyes2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_computereyes2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+private:
+	required_device<picture_image_device> m_picture;
+	int m_x, m_y, m_cer0, m_cer1, m_cer2;
+	u8 m_a2_bitmap[280*193];
+	u8 m_threshold;
+	bool m_bActive;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -196,22 +224,22 @@ void a2bus_computereyes2_device::write_c0nx(uint8_t offset, uint8_t data)
 				m_x = m_y = 0;
 				std::fill_n(m_a2_bitmap, 280*193, 0);
 
-				m_bitmap = &m_picture->get_bitmap();
-				if (m_bitmap)
+				const bitmap_argb32 &bitmap = m_picture->get_bitmap();
+				if (bitmap.valid())
 				{
 					// convert arbitrary sized ARGB32 image to a 188x193 image with 256 levels of grayscale
-					double stepx = (double)m_bitmap->width() / 188.0;
-					double stepy = (double)m_bitmap->height() / 193.0;
+					double stepx = (double)bitmap.width() / 188.0;
+					double stepy = (double)bitmap.height() / 193.0;
 
 					for (int y = 0; y < 193; y++)
 					{
 						for (int x = 0; x < 280; x++)
 						{
-							u32 pixel = m_bitmap->pix((int)((double)y * stepy), (int)((double)x * stepx));
-							double mono = ((0.2126 * (double)(((pixel>>16) & 0xff) / 255.0)) +
-								   (0.7152 * (double)(((pixel>>8) & 0xff) / 255.0)) +
-								   (0.0722 * (double)((pixel& 0xff) / 255.0)));
-							m_a2_bitmap[(y*280)+x] = (u8)(mono * 255.0);
+							u32 pixel = bitmap.pix(int((double)y * stepy), int((double)x * stepx));
+							double mono = ((0.2126 * double(((pixel>>16) & 0xff) / 255.0)) +
+								   (0.7152 * double(((pixel>>8) & 0xff) / 255.0)) +
+								   (0.0722 * double((pixel& 0xff) / 255.0)));
+							m_a2_bitmap[(y*280)+x] = u8(mono * 255.0);
 						}
 					}
 				}
@@ -230,3 +258,12 @@ void a2bus_computereyes2_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_COMPUTEREYES2, device_a2bus_card_interface, a2bus_computereyes2_device, "a2ceyes2", "Digital Vision ComputerEyes/2")

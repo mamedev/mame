@@ -23,6 +23,9 @@ public:
 
 	virtual void ExecCommand() override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

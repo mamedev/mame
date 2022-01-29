@@ -82,8 +82,8 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW(esprit_state::crtc_update_row)
 {
-	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{
@@ -160,7 +160,7 @@ void esprit_state::esprit(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(9);
-	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row));
 }
 
 void esprit_state::esprit3(machine_config &config)
@@ -181,7 +181,7 @@ void esprit_state::esprit3(machine_config &config)
 	acia2.set_xtal(1.8432_MHz_XTAL);
 	acia2.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	via6522_device &via(VIA6522(config, "via", 17.9712_MHz_XTAL / 18));
+	via6522_device &via(MOS6522(config, "via", 17.9712_MHz_XTAL / 18));
 	via.irq_handler().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 	via.writepb_handler().set("acia", FUNC(acia6850_device::write_rxc)).bit(7);
 	via.writepb_handler().append("acia", FUNC(acia6850_device::write_txc)).bit(7);
@@ -199,8 +199,8 @@ void esprit_state::esprit3(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(9);
-	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr), this);
+	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr));
 	crtc.out_hsync_callback().set("via", FUNC(via6522_device::write_pb6)).invert();
 }
 

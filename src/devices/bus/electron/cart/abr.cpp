@@ -39,6 +39,9 @@ void electron_abr_device::device_start()
 {
 	m_bank_locked[0] = false;
 	m_bank_locked[1] = false;
+
+	// register for save states
+	save_item(NAME(m_bank_locked));
 }
 
 

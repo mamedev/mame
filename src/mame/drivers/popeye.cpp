@@ -84,7 +84,7 @@ void tpp2_state::decrypt_rom()
 	std::copy_n(buffer.begin(), len, rom);
 }
 
-WRITE8_MEMBER(tnx1_state::refresh_w)
+void tnx1_state::refresh_w(offs_t offset, uint8_t data)
 {
 	const bool nmi_enabled = ((offset >> 8) & 1) != 0;
 	if (m_nmi_enabled != nmi_enabled)
@@ -96,9 +96,9 @@ WRITE8_MEMBER(tnx1_state::refresh_w)
 	}
 }
 
-WRITE8_MEMBER(tpp2_state::refresh_w)
+void tpp2_state::refresh_w(offs_t offset, uint8_t data)
 {
-	tnx1_state::refresh_w(space, offset, data, mem_mask);
+	tnx1_state::refresh_w(offset, data);
 
 	m_watchdog_enabled = ((offset >> 9) & 1) != 0;
 }
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(tpp2_state::screen_vblank)
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-READ8_MEMBER(tnx1_state::protection_r)
+uint8_t tnx1_state::protection_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(tnx1_state::protection_r)
 	}
 }
 
-WRITE8_MEMBER(tnx1_state::protection_w)
+void tnx1_state::protection_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -171,11 +171,9 @@ WRITE8_MEMBER(tnx1_state::protection_w)
 }
 
 
-void tnx1_state::maincpu_program_map(address_map &map)
+void tnx1_state::maincpu_common_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu",0);
-	map(0x8000, 0x87ff).ram().share("ramlow");
-	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
 	map(0x8c00, 0x8e7f).ram().share("dmasource");
 	map(0x8e80, 0x8fff).ram().share("ramhigh");
 	map(0xa000, 0xa3ff).w(FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
@@ -184,10 +182,17 @@ void tnx1_state::maincpu_program_map(address_map &map)
 	map(0xe000, 0xe001).rw(FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
 }
 
+void tnx1_state::maincpu_program_map(address_map &map)
+{
+	maincpu_common_map(map);
+	map(0x8000, 0x87ff).ram().share("ramlow");
+	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
+}
+
 void tpp2_state::maincpu_program_map(address_map &map)
 {
-	tpp1_state::maincpu_program_map(map);
-	map(0x8000, 0x87ff).unmaprw(); // 7f (unpopulated)
+	maincpu_common_map(map);
+	// 8000-87ff is unpopulated (7f)
 	map(0x8800, 0x8bff).ram().share("ramlow"); // 7h
 	map(0xc000, 0xdfff).w(FUNC(tpp2_state::background_w));
 }
@@ -231,6 +236,7 @@ public:
 	{
 	}
 
+	virtual ~brazehs() override = default;
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
@@ -254,12 +260,12 @@ protected:
 		std::copy_n(buffer.begin(), len, rom);
 	}
 
-	DECLARE_READ8_MEMBER(eeprom_r)
+	uint8_t eeprom_r()
 	{
 		return m_eeprom->do_read();
 	}
 
-	DECLARE_WRITE8_MEMBER(eeprom_w)
+	void eeprom_w(uint8_t data)
 	{
 		m_eeprom->di_write(data & 0x01);
 		m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -277,7 +283,7 @@ protected:
 
 READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
-	return ioport("DSW1")->read() >> m_dswbit;
+	return m_io_dsw1->read() >> m_dswbit;
 }
 
 
@@ -355,6 +361,12 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
 INPUT_PORTS_END
 
 READ_LINE_MEMBER( tnx1_state::pop_field_r )
@@ -434,6 +446,13 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
+
 INPUT_PORTS_END
 
 
@@ -501,7 +520,7 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(tnx1_state::popeye_portB_w)
+void tnx1_state::popeye_portB_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);
@@ -519,13 +538,14 @@ void tnx1_state::config(machine_config &config)
 	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
-	screen.set_screen_update(FUNC(tnx1_state::screen_update));
-	screen.set_palette(m_palette);
+	// FIXME: 59.94 screen refresch is the NTSC standard
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.94)
+		.set_vblank_time(ATTOSECONDS_IN_USEC(0))
+		.set_size(32*16, 32*16)
+		.set_visarea(0*16, 32*16-1, 2*16, 30*16-1)
+		.set_palette(m_palette)
+		.set_screen_update(FUNC(tnx1_state::screen_update));
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
@@ -561,7 +581,7 @@ void tpp2_state::config(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(30000.0, -65000.0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(1.0, -2.0);
 }
 
 void popeyebl_state::config(machine_config& config)

@@ -9,11 +9,9 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "zippath.h"
+#include <algorithm>
+#include <cctype>
 
-
-// -------------------------------------------------
-// ctor
-// -------------------------------------------------
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "slot"),
@@ -24,19 +22,10 @@ device_slot_interface::device_slot_interface(const machine_config &mconfig, devi
 {
 }
 
-
-// -------------------------------------------------
-// dtor
-// -------------------------------------------------
-
 device_slot_interface::~device_slot_interface()
 {
 }
 
-
-// -------------------------------------------------
-// device_slot_option ctor
-// -------------------------------------------------
 
 device_slot_interface::slot_option::slot_option(const char *name, const device_type &devtype, bool selectable) :
 	m_name(name),
@@ -50,43 +39,74 @@ device_slot_interface::slot_option::slot_option(const char *name, const device_t
 }
 
 
-// -------------------------------------------------
-// option_add
-// -------------------------------------------------
+void device_slot_interface::interface_validity_check(validity_checker &valid) const
+{
+	if (m_default_option && (m_options.find(m_default_option) == m_options.end()))
+		osd_printf_error("Default option '%s' does not correspond to any configured option\n", m_default_option);
+}
+
 
 device_slot_interface::slot_option &device_slot_interface::option_add(const char *name, const device_type &devtype)
 {
+	if (!name || !*name)
+		throw emu_fatalerror("slot '%s' attempt to add option without name\n", device().tag());
+
 	const slot_option *const existing = option(name);
 	if (existing)
 		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device().tag(), name);
-
-	if (m_options.count(name))
-		throw tag_add_exception(name);
 
 	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, true)).first->second->clock(m_default_clock);
 }
 
 
-// -------------------------------------------------
-// option_add_internal
-// -------------------------------------------------
-
 device_slot_interface::slot_option &device_slot_interface::option_add_internal(const char *name, const device_type &devtype)
 {
+	if (!name || !*name)
+		throw emu_fatalerror("slot '%s' attempt to add option without name\n", device().tag());
+
 	const slot_option *const existing = option(name);
 	if (existing)
 		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device().tag(), name);
-
-	if (m_options.count(name))
-		throw tag_add_exception(name);
 
 	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, false)).first->second->clock(m_default_clock);
 }
 
 
-// -------------------------------------------------
-// option
-// -------------------------------------------------
+device_slot_interface::slot_option &device_slot_interface::option_replace(const char *name, const device_type &devtype)
+{
+	if (!name || !*name)
+		throw emu_fatalerror("slot '%s' attempt to replace option without name\n", device().tag());
+
+	auto search = m_options.find(name);
+	if (search == m_options.end())
+		throw emu_fatalerror("slot '%s' attempt to replace nonexistent option '%s'\n", device().tag(), name);
+
+	return (search->second = std::make_unique<slot_option>(name, devtype, true))->clock(m_default_clock);
+}
+
+
+device_slot_interface::slot_option &device_slot_interface::option_replace_internal(const char *name, const device_type &devtype)
+{
+	if (!name || !*name)
+		throw emu_fatalerror("slot '%s' attempt to replace option without name\n", device().tag());
+
+	auto search = m_options.find(name);
+	if (search == m_options.end())
+		throw emu_fatalerror("slot '%s' attempt to replace nonexistent option '%s'\n", device().tag(), name);
+
+	return (search->second = std::make_unique<slot_option>(name, devtype, false))->clock(m_default_clock);
+}
+
+
+void device_slot_interface::option_remove(const char *name)
+{
+	if (!name || !*name)
+		throw emu_fatalerror("slot '%s' attempt to remove option without name\n", device().tag());
+
+	if (m_options.erase(name) == 0)
+		throw emu_fatalerror("slot '%s' attempt to remove nonexistent option '%s'\n", device().tag(), name);
+}
+
 
 device_slot_interface::slot_option *device_slot_interface::config_option(const char *name)
 {
@@ -97,10 +117,6 @@ device_slot_interface::slot_option *device_slot_interface::config_option(const c
 	throw emu_fatalerror("slot '%s' has no option '%s'\n", device().tag(), name);
 }
 
-
-// -------------------------------------------------
-// has_selectable_options
-// -------------------------------------------------
 
 bool device_slot_interface::has_selectable_options() const
 {
@@ -114,10 +130,6 @@ bool device_slot_interface::has_selectable_options() const
 }
 
 
-// -------------------------------------------------
-// option
-// -------------------------------------------------
-
 const device_slot_interface::slot_option *device_slot_interface::option(const char *name) const
 {
 	if (name)
@@ -129,15 +141,6 @@ const device_slot_interface::slot_option *device_slot_interface::option(const ch
 	return nullptr;
 }
 
-
-device_slot_card_interface::device_slot_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "slot")
-{
-}
-
-device_slot_card_interface::~device_slot_card_interface()
-{
-}
 
 get_default_card_software_hook::get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo)
 	: m_get_hashfile_extrainfo(std::move(get_hashfile_extrainfo))
@@ -163,4 +166,10 @@ bool get_default_card_software_hook::hashfile_extrainfo(std::string &extrainfo)
 	}
 	extrainfo = m_hash_extrainfo;
 	return m_has_hash_extrainfo;
+}
+
+bool get_default_card_software_hook::is_filetype(std::string_view candidate_filetype) const
+{
+	return std::equal(m_file_type.begin(), m_file_type.end(), candidate_filetype.begin(), candidate_filetype.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
 }

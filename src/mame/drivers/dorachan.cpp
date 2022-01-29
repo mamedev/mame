@@ -38,10 +38,10 @@ public:
 	void dorachan(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(v128_r);
+	void control_w(uint8_t data);
+	void protection_w(uint8_t data);
+	uint8_t protection_r();
+	uint8_t v128_r();
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void dorachan_io_map(address_map &map);
 	void dorachan_map(address_map &map);
@@ -74,8 +74,6 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 {
 	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		uint8_t fore_color;
-
 		uint8_t x = offs >> 8 << 3;
 		uint8_t y = offs & 0xff;
 
@@ -84,6 +82,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 
 		uint8_t data = m_videoram[offs];
 
+		uint8_t fore_color;
 		if (m_flip_screen)
 			fore_color = (m_colors[color_address] >> 3) & 0x07;
 		else
@@ -92,7 +91,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t color = BIT(data, i) ? fore_color : 0;
-			bitmap.pix32(y, x++) = m_palette->pen_color(color);
+			bitmap.pix(y, x++) = m_palette->pen_color(color);
 		}
 	}
 
@@ -107,7 +106,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(dorachan_state::protection_w)
+void dorachan_state::protection_w(uint8_t data)
 {
 	// e0 seems like some sort of control byte?
 	// ignore f3 writes, written after every command?
@@ -118,7 +117,7 @@ WRITE8_MEMBER(dorachan_state::protection_w)
 	}
 }
 
-READ8_MEMBER(dorachan_state::protection_r)
+uint8_t dorachan_state::protection_r()
 {
 	switch (m_prot_value)
 	{
@@ -135,13 +134,13 @@ READ8_MEMBER(dorachan_state::protection_r)
 	return 0;
 }
 
-READ8_MEMBER(dorachan_state::v128_r)
+uint8_t dorachan_state::v128_r()
 {
 	// to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped
 	return 0xfe | (BIT(m_screen->vpos(), 7) ^ m_flip_screen);
 }
 
-WRITE8_MEMBER(dorachan_state::control_w)
+void dorachan_state::control_w(uint8_t data)
 {
 	// d6: flip screen
 	// other: ?

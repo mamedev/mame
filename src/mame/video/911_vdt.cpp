@@ -106,10 +106,10 @@ static const unsigned short vdt911_pens[] =
 */
 void vdt911_device::vdt911_palette(palette_device &palette) const
 {
-	for (int i = 0; i < ARRAY_LENGTH(vdt911_colors); i++)
+	for (int i = 0; i < std::size(vdt911_colors); i++)
 		palette.set_indirect_color(i, vdt911_colors[i]);
 
-	for (int i = 0; i < ARRAY_LENGTH(vdt911_pens); i++)
+	for (int i = 0; i < std::size(vdt911_pens); i++)
 		palette.set_pen_indirect(i, vdt911_pens[i]);
 }
 
@@ -255,7 +255,7 @@ void vdt911_device::device_reset()
 /*
     Timer callbacks
 */
-void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -276,7 +276,7 @@ void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param
 /*
     CRU interface read
 */
-READ8_MEMBER( vdt911_device::cru_r )
+uint8_t vdt911_device::cru_r(offs_t offset)
 {
 	int reply=0;
 
@@ -327,7 +327,7 @@ READ8_MEMBER( vdt911_device::cru_r )
 /*
     CRU interface write
 */
-WRITE8_MEMBER( vdt911_device::cru_w )
+void vdt911_device::cru_w(offs_t offset, uint8_t data)
 {
 	offset &= 0xf;
 
@@ -804,7 +804,7 @@ void vdt911_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "speaker", 0.50);
 
-	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), ARRAY_LENGTH(vdt911_pens), ARRAY_LENGTH(vdt911_colors));
+	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), std::size(vdt911_pens), std::size(vdt911_colors));
 }
 
 ioport_constructor vdt911_device::device_input_ports() const

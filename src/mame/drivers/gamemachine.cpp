@@ -99,11 +99,11 @@ private:
 	void main_io(address_map &map);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux1_w);
-	DECLARE_WRITE8_MEMBER(mux2_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void mux1_w(u8 data);
+	void mux2_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
+	void sound_w(u8 data);
 
 	u16 m_inp_mux;
 	u16 m_digit_select;
@@ -137,7 +137,7 @@ void tgm_state::update_display()
 	m_display->matrix(m_digit_select, m_digit_data);
 }
 
-WRITE8_MEMBER(tgm_state::mux1_w)
+void tgm_state::mux1_w(u8 data)
 {
 	// P00-P06: input mux part
 	m_inp_mux = (m_inp_mux & 7) | (data << 3 & 0x3f8);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(tgm_state::mux1_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tgm_state::mux2_w)
+void tgm_state::mux2_w(u8 data)
 {
 	// P15-P17: input mux part
 	m_inp_mux = (m_inp_mux & 0x3f8) | (data >> 5 & 7);
@@ -157,14 +157,14 @@ WRITE8_MEMBER(tgm_state::mux2_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tgm_state::digit_w)
+void tgm_state::digit_w(u8 data)
 {
 	// P50-P57: digit 7seg data
 	m_digit_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	update_display();
 }
 
-READ8_MEMBER(tgm_state::input_r)
+u8 tgm_state::input_r()
 {
 	u8 data = 0;
 
@@ -176,7 +176,7 @@ READ8_MEMBER(tgm_state::input_r)
 	return data << 2;
 }
 
-WRITE8_MEMBER(tgm_state::sound_w)
+void tgm_state::sound_w(u8 data)
 {
 	// P40-P47: 555 to speaker (see netlist above)
 	for (int i = 0; i < 8; i++)
@@ -214,11 +214,11 @@ static INPUT_PORTS_START( tgm )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME(u8"÷")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_ASTERISK) PORT_CODE(KEYCODE_UP) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_ASTERISK) PORT_CODE(KEYCODE_UP) PORT_NAME(u8"×")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("7")
 
 	PORT_START("IN.3")
@@ -278,7 +278,7 @@ void tgm_state::tgm(machine_config &config)
 		.set_source(NETLIST_NAME(gamemachine))
 		.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0, 10000.0 * 3.75);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
 
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p08", "P08.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p09", "P09.IN", 0);

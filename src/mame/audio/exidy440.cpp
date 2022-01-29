@@ -21,7 +21,6 @@
 
 
 /* internal caching */
-#define MAX_CACHE_ENTRIES       1024                /* maximum separate samples we expect to ever see */
 #define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
 
 /* FIR digital filter parameters */
@@ -74,11 +73,6 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		m_samples(*this, "samples"),
 		m_sound_command(0),
 		m_sound_command_ack(0),
-		m_mixer_buffer_left(nullptr),
-		m_mixer_buffer_right(nullptr),
-		m_sound_cache(nullptr),
-		m_sound_cache_end(nullptr),
-		m_sound_cache_max(nullptr),
 		m_m6844_priority(0x00),
 		m_m6844_interrupt(0x00),
 		m_m6844_chain(0x00),
@@ -118,7 +112,7 @@ void exidy440_sound_device::device_add_mconfig(machine_config &config)
 
 void exidy440_sound_device::device_start()
 {
-	int i, length;
+	int i;
 
 	/* reset the system */
 	m_sound_command = 0;
@@ -146,19 +140,11 @@ void exidy440_sound_device::device_start()
 	m_channel_frequency[3] = clock()/2;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
-
-	/* allocate the sample cache */
-	length = m_samples.bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
-	m_sound_cache = (sound_cache_entry *)auto_alloc_array_clear(machine(), uint8_t, length);
-
-	/* determine the hard end of the cache and reset */
-	m_sound_cache_max = (sound_cache_entry *)((uint8_t *)m_sound_cache + length);
-	reset_sound_cache();
+	m_stream = stream_alloc(0, 2, clock());
 
 	/* allocate the mixer buffer */
-	m_mixer_buffer_left = make_unique_clear<int32_t[]>(clock());
-	m_mixer_buffer_right = make_unique_clear<int32_t[]>(clock());
+	m_mixer_buffer_left.resize(clock()/50);
+	m_mixer_buffer_right.resize(clock()/50);
 
 	if (SOUND_LOG)
 		m_debuglog = fopen("sound.log", "w");
@@ -224,24 +210,15 @@ void exidy440_sound_device::add_and_scale_samples(int ch, int32_t *dest, int sam
  *
  *************************************/
 
-void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right)
+void exidy440_sound_device::mix_to_16(write_stream_view &dest_left, write_stream_view &dest_right)
 {
-	int32_t *mixer_left = m_mixer_buffer_left.get();
-	int32_t *mixer_right = m_mixer_buffer_right.get();
-	int i, clippers = 0;
+	int32_t *mixer_left = &m_mixer_buffer_left[0];
+	int32_t *mixer_right = &m_mixer_buffer_right[0];
 
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < dest_left.samples(); i++)
 	{
-		int32_t sample_left = *mixer_left++;
-		int32_t sample_right = *mixer_right++;
-
-		if (sample_left < -32768) { sample_left = -32768; clippers++; }
-		else if (sample_left > 32767) { sample_left = 32767; clippers++; }
-		if (sample_right < -32768) { sample_right = -32768; clippers++; }
-		else if (sample_right > 32767) { sample_right = 32767; clippers++; }
-
-		*dest_left++ = sample_left;
-		*dest_right++ = sample_right;
+		dest_left.put_int_clamp(i, *mixer_left++, 32768);
+		dest_right.put_int_clamp(i, *mixer_right++, 32768);
 	}
 }
 
@@ -251,7 +228,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
  *
  *************************************/
 
-READ8_MEMBER(exidy440_sound_device::sound_command_r)
+uint8_t exidy440_sound_device::sound_command_r()
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
@@ -282,12 +259,12 @@ uint8_t exidy440_sound_device::exidy440_sound_command_ack()
  *
  *************************************/
 
-READ8_MEMBER(exidy440_sound_device::sound_volume_r)
+uint8_t exidy440_sound_device::sound_volume_r(offs_t offset)
 {
 	return m_sound_volume[offset];
 }
 
-WRITE8_MEMBER(exidy440_sound_device::sound_volume_w)
+void exidy440_sound_device::sound_volume_w(offs_t offset, uint8_t data)
 {
 	if (SOUND_LOG && m_debuglog)
 		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
@@ -313,7 +290,7 @@ WRITE_LINE_MEMBER(exidy440_sound_device::sound_interrupt_w)
 		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(exidy440_sound_device::sound_interrupt_clear_w)
+void exidy440_sound_device::sound_interrupt_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
@@ -360,7 +337,7 @@ void exidy440_sound_device::m6844_finished(m6844_channel_data *channel)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_sound_device::m6844_r)
+uint8_t exidy440_sound_device::m6844_r(offs_t offset)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int result = 0;
@@ -445,7 +422,7 @@ READ8_MEMBER(exidy440_sound_device::m6844_r)
 }
 
 
-WRITE8_MEMBER(exidy440_sound_device::m6844_w)
+void exidy440_sound_device::m6844_w(offs_t offset, uint8_t data)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int i;
@@ -556,46 +533,26 @@ WRITE8_MEMBER(exidy440_sound_device::m6844_w)
  *
  *************************************/
 
-void exidy440_sound_device::reset_sound_cache()
-{
-	m_sound_cache_end = m_sound_cache;
-}
-
-
 int16_t *exidy440_sound_device::add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency)
 {
-	sound_cache_entry *current = m_sound_cache_end;
-
-	/* compute where the end will be once we add this entry */
-	m_sound_cache_end = (sound_cache_entry *)((uint8_t *)current + sizeof(sound_cache_entry) + length * 16);
-
-	/* if this will overflow the cache, reset and re-add */
-	if (m_sound_cache_end > m_sound_cache_max)
-	{
-		reset_sound_cache();
-		return add_to_sound_cache(input, address, length, bits, frequency);
-	}
-
 	/* fill in this entry */
-	current->next = m_sound_cache_end;
-	current->address = address;
-	current->length = length;
-	current->bits = bits;
-	current->frequency = frequency;
+	auto &current = m_sound_cache.emplace_back();
+	current.address = address;
+	current.length = length;
+	current.bits = bits;
+	current.frequency = frequency;
 
 	/* decode the data into the cache */
-	decode_and_filter_cvsd(input, length, bits, frequency, current->data);
-	return current->data;
+	decode_and_filter_cvsd(input, length, bits, frequency, current.data);
+	return &current.data[0];
 }
 
 
 int16_t *exidy440_sound_device::find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
 {
-	sound_cache_entry *current;
-
-	for (current = m_sound_cache; current < m_sound_cache_end; current = current->next)
-		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
-			return current->data;
+	for (auto &current : m_sound_cache)
+		if (current.address == address && current.length == length && current.bits == bits && current.frequency == frequency)
+			return &current.data[0];
 
 	return add_to_sound_cache(&m_samples[address], address, length, bits, frequency);
 }
@@ -709,7 +666,7 @@ void exidy440_sound_device::fir_filter(int32_t *input, int16_t *output, int coun
  *
  *************************************/
 
-void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, int maskbits, int frequency, int16_t *output)
+void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, int maskbits, int frequency, std::vector<int16_t> &output)
 {
 	int32_t buffer[SAMPLE_BUFFER_LENGTH + FIR_HISTORY_LENGTH];
 	int total_samples = bytes * 8;
@@ -736,6 +693,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 	integrator = 0.0;
 
 	/* loop over chunks */
+	output.resize(total_samples);
 	for (chunk_start = 0; chunk_start < total_samples; chunk_start += SAMPLE_BUFFER_LENGTH)
 	{
 		int32_t *bufptr = &buffer[FIR_HISTORY_LENGTH];
@@ -820,7 +778,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 		int16_t *data;
 
 		chunk_start = (total_samples > 512) ? total_samples - 512 : 0;
-		data = output + chunk_start;
+		data = &output[chunk_start];
 		for ( ; chunk_start < total_samples; chunk_start++)
 		{
 			*data = (*data * ((total_samples - chunk_start) >> 9));
@@ -830,7 +788,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 }
 
 
-WRITE8_MEMBER(exidy440_sound_device::sound_banks_w)
+void exidy440_sound_device::sound_banks_w(offs_t offset, uint8_t data)
 {
 	m_sound_banks[offset] = data;
 }
@@ -839,19 +797,19 @@ WRITE8_MEMBER(exidy440_sound_device::sound_banks_w)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void exidy440_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int ch;
 
 	/* reset the mixer buffers */
-	memset(m_mixer_buffer_left.get(), 0, samples * sizeof(int32_t));
-	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(int32_t));
+	std::fill_n(&m_mixer_buffer_left[0], outputs[0].samples(), 0);
+	std::fill_n(&m_mixer_buffer_right[0], outputs[0].samples(), 0);
 
 	/* loop over channels */
 	for (ch = 0; ch < 4; ch++)
 	{
 		sound_channel_data *channel = &m_sound_channel[ch];
-		int length, volume, left = samples;
+		int length, volume, left = outputs[0].samples();
 		int effective_offset;
 
 		/* if we're not active, bail */
@@ -864,12 +822,12 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		/* get a pointer to the sample data and copy to the left */
 		volume = m_sound_volume[2 * ch + 0];
 		if (volume)
-			add_and_scale_samples(ch, m_mixer_buffer_left.get(), length, volume);
+			add_and_scale_samples(ch, &m_mixer_buffer_left[0], length, volume);
 
 		/* get a pointer to the sample data and copy to the left */
 		volume = m_sound_volume[2 * ch + 1];
 		if (volume)
-			add_and_scale_samples(ch, m_mixer_buffer_right.get(), length, volume);
+			add_and_scale_samples(ch, &m_mixer_buffer_right[0], length, volume);
 
 		/* update our counters */
 		channel->offset += length;
@@ -889,5 +847,5 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	}
 
 	/* all done, time to mix it */
-	mix_to_16(samples, outputs[0], outputs[1]);
+	mix_to_16(outputs[0], outputs[1]);
 }

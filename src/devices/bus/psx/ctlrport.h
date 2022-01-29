@@ -16,7 +16,7 @@ DECLARE_DEVICE_TYPE(PSX_STANDARD_CONTROLLER, psx_standard_controller_device)
 
 class psx_controller_port_device;
 
-class device_psx_controller_interface : public device_slot_card_interface
+class device_psx_controller_interface : public device_interface
 {
 	friend class psx_multitap_device;
 public:
@@ -31,8 +31,9 @@ public:
 protected:
 	device_psx_controller_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void interface_pre_reset() override;
 	virtual void interface_pre_start() override;
+	virtual void interface_pre_reset() override;
+	virtual void interface_post_stop() override;
 
 	enum
 	{
@@ -43,7 +44,7 @@ protected:
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) = 0;
 	virtual void do_pad();
-	void ack_timer(void *ptr, int param);
+	void ack_timer(int32_t param);
 
 	uint8_t m_odata;
 	uint8_t m_idata;
@@ -104,7 +105,7 @@ private:
 };
 
 class psx_controller_port_device :  public device_t,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_psx_controller_interface>
 {
 public:
 	template <typename T>

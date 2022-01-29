@@ -70,10 +70,10 @@ void v550_state::io_map(address_map &map)
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x23).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x31).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x40, 0x40).rw("mpsc", FUNC(upd7201_new_device::da_r), FUNC(upd7201_new_device::da_w));
-	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_new_device::ca_r), FUNC(upd7201_new_device::ca_w));
-	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_new_device::db_r), FUNC(upd7201_new_device::db_w));
-	map(0x49, 0x49).rw("mpsc", FUNC(upd7201_new_device::cb_r), FUNC(upd7201_new_device::cb_w));
+	map(0x40, 0x40).rw("mpsc", FUNC(upd7201_device::da_r), FUNC(upd7201_device::da_w));
+	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_device::ca_r), FUNC(upd7201_device::ca_w));
+	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_device::db_r), FUNC(upd7201_device::db_w));
+	map(0x49, 0x49).rw("mpsc", FUNC(upd7201_device::cb_r), FUNC(upd7201_device::cb_w));
 	map(0x50, 0x50).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x60, 0x67).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x70, 0x70).rw("pvtc", FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
@@ -117,20 +117,20 @@ void v550_state::v550(machine_config &config)
 	m_usart->txd_handler().set("keyboard", FUNC(v550_keyboard_device::write_rxd));
 	m_usart->rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
+	upd7201_device& mpsc(UPD7201(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
 	mpsc.out_int_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	com8116_device &brg1(COM8116_020(config, "brg1", 1.8432_MHz_XTAL)); // SMC COM8116T-020
-	brg1.ft_handler().set("mpsc", FUNC(upd7201_new_device::txcb_w));
-	brg1.ft_handler().append("mpsc", FUNC(upd7201_new_device::rxcb_w));
+	brg1.ft_handler().set("mpsc", FUNC(upd7201_device::txcb_w));
+	brg1.ft_handler().append("mpsc", FUNC(upd7201_device::rxcb_w));
 	brg1.fr_handler().set("usart", FUNC(i8251_device::write_txc));
 	brg1.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
 
 	com8116_device &brg2(COM8116_020(config, "brg2", 1.8432_MHz_XTAL)); // SMC COM8116T-020
-	brg2.ft_handler().set("mpsc", FUNC(upd7201_new_device::txca_w));
-	brg2.fr_handler().set("mpsc", FUNC(upd7201_new_device::rxca_w));
+	brg2.ft_handler().set("mpsc", FUNC(upd7201_device::txca_w));
+	brg2.fr_handler().set("mpsc", FUNC(upd7201_device::rxca_w));
 
 	v550_keyboard_device &keyboard(V550_KEYBOARD(config, "keyboard"));
 	keyboard.txd_callback().set(m_usart, FUNC(i8251_device::write_rxd));

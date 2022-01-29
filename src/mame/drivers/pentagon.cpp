@@ -8,17 +8,19 @@
 #include "sound/ay8910.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/tzx_cas.h"
 
 
-class pentagon_state : public spectrum_state
+namespace {
+
+class pentagon_state : public spectrum_128_state
 {
 public:
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
+		: spectrum_128_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
@@ -29,6 +31,11 @@ public:
 	void pent1024(machine_config &config);
 	void pentagon(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	enum
 	{
@@ -36,14 +43,12 @@ private:
 		TIMER_IRQ_OFF
 	};
 
-	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
-	DECLARE_READ8_MEMBER(beta_neutral_r);
-	DECLARE_READ8_MEMBER(beta_enable_r);
-	DECLARE_READ8_MEMBER(beta_disable_r);
-	DECLARE_MACHINE_RESET(pentagon);
-	DECLARE_VIDEO_START(pentagon);
+	void pentagon_port_7ffd_w(uint8_t data);
+	void pentagon_scr_w(offs_t offset, uint8_t data);
+	void pentagon_scr2_w(offs_t offset, uint8_t data);
+	uint8_t beta_neutral_r(offs_t offset);
+	uint8_t beta_enable_r(offs_t offset);
+	uint8_t beta_disable_r(offs_t offset);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -56,7 +61,6 @@ private:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	address_space *m_program;
 	uint8_t *m_p_ram;
@@ -95,7 +99,7 @@ void pentagon_state::pentagon_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
+void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -111,14 +115,14 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	pentagon_update_memory();
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
+void pentagon_state::pentagon_scr_w(offs_t offset, uint8_t data)
 {
 	spectrum_UpdateScreenBitmap();
 
 	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
+void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 {
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
@@ -126,15 +130,15 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
 	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
-void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_IRQ_ON:
-		irq_on(ptr, param);
+		irq_on(param);
 		break;
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pentagon_state::device_timer");
@@ -157,12 +161,12 @@ INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 	timer_set(attotime::from_ticks(179, XTAL(14'000'000) / 4), TIMER_IRQ_ON, 0);
 }
 
-READ8_MEMBER(pentagon_state::beta_neutral_r)
+uint8_t pentagon_state::beta_neutral_r(offs_t offset)
 {
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER(pentagon_state::beta_enable_r)
+uint8_t pentagon_state::beta_enable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_ROMSelection == 1) {
@@ -177,7 +181,7 @@ READ8_MEMBER(pentagon_state::beta_enable_r)
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-READ8_MEMBER(pentagon_state::beta_disable_r)
+uint8_t pentagon_state::beta_disable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_beta->started() && m_beta->is_active()) {
@@ -201,15 +205,15 @@ void pentagon_state::pentagon_mem(address_map &map)
 void pentagon_state::pentagon_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).w(FUNC(pentagon_state::pentagon_port_7ffd_w)).mirror(0x7ffd);  // (A15 | A1) == 0
-	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
-	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
-	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
-	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(FUNC(pentagon_state::spectrum_port_fe_r), FUNC(pentagon_state::spectrum_port_fe_w)).select(0xff00);
-	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
-	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(pentagon_state::pentagon_port_7ffd_w));  // (A15 | A1) == 0
+	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(pentagon_state::spectrum_ula_r), FUNC(pentagon_state::spectrum_ula_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
 
 void pentagon_state::pentagon_switch(address_map &map)
@@ -219,14 +223,14 @@ void pentagon_state::pentagon_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(pentagon_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(pentagon_state,pentagon)
+void pentagon_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(FUNC(pentagon_state::pentagon_scr_w), this));
-	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(FUNC(pentagon_state::pentagon_scr2_w), this));
+	m_program->install_write_handler(0x4000, 0x5aff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
+	m_program->install_write_handler(0xc000, 0xdaff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
 
 	if (m_beta->started())
 	{
@@ -246,7 +250,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	pentagon_update_memory();
 }
 
-VIDEO_START_MEMBER(pentagon_state,pentagon)
+void pentagon_state::video_start()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -290,11 +294,9 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
-	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	//m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304);
 	m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287);
-	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	BETA_DISK(config, m_beta, 0);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
@@ -394,6 +396,9 @@ ROM_START(pent1024)
 	ROM_SYSTEM_BIOS(8, "v9", "Gluk 5.1")
 	ROMX_LOAD("gluk51.rom",   0x018000, 0x4000, CRC(ea8c760b) SHA1(adaab28066ca46fbcdcf084c3b53d5a1b82d94a9), ROM_BIOS(8))
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY      FULLNAME         FLAGS
 COMP( 1989, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon",      0 )

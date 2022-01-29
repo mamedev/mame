@@ -31,8 +31,8 @@ class h89_state : public driver_device
 {
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -41,7 +41,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER( port_f2_w );
+	void port_f2_w(uint8_t data);
 
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
@@ -167,7 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 }
 
-WRITE8_MEMBER( h89_state::port_f2_w )
+void h89_state::port_f2_w(uint8_t data)
 {
 	// Bit 0 - Single-step
 	// Bit 1 - Enable timer interrupt (2mSec Clock)
@@ -178,7 +178,6 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	// TODO - baud rate should be controlled by SW501 setting
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -199,7 +198,7 @@ void h89_state::h89(machine_config & config)
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(h89_state::h89_irq_timer), this), attotime::from_hz(100));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 }
 
 /* ROM definition */

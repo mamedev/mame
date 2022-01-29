@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "mcd.h"
 #include "coreutil.h"
+#include "speaker.h"
 
 void mcd_isa_device::map(address_map &map)
 {
@@ -11,27 +12,24 @@ void mcd_isa_device::map(address_map &map)
 	map(0x1, 0x1).rw(FUNC(mcd_isa_device::flag_r), FUNC(mcd_isa_device::reset_w));
 }
 
-static INPUT_PORTS_START( ide )
-INPUT_PORTS_END
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ISA16_MCD, mcd_isa_device, "mcd_isa", "Mitsumi ISA CD-ROM Adapter")
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor mcd_isa_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( ide );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
+
+void mcd_isa_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lheadphone").front_left();
+	SPEAKER(config, "rheadphone").front_right();
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, "lheadphone", 1.0);
+	m_cdda->add_route(1, "rheadphone", 1.0);
+}
 
 //-------------------------------------------------
 //  mcd_isa_device - constructor
@@ -39,8 +37,10 @@ ioport_constructor mcd_isa_device::device_input_ports() const
 
 mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cdrom_image_device(mconfig, ISA16_MCD, tag, owner, clock),
-	device_isa16_card_interface( mconfig, *this )
+	device_isa16_card_interface( mconfig, *this ),
+	m_cdda(*this, "cdda")
 {
+	set_interface("cdrom");
 }
 
 //-------------------------------------------------
@@ -65,7 +65,7 @@ void mcd_isa_device::device_reset()
 	m_cmdrd_count = 0;
 	m_cmdbuf_count = 0;
 	m_buf_count = 0;
-	m_curtoctrk = 1;
+	m_curtoctrk = 0;
 	m_dma = 0;
 	m_irq = 0;
 	m_conf = 0;
@@ -78,6 +78,19 @@ void mcd_isa_device::device_reset()
 
 bool mcd_isa_device::read_sector(bool first)
 {
+	uint32_t lba = msf_to_lba(m_readmsf);
+	if(m_drvmode == DRV_MODE_CDDA)
+	{
+		if(cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, lba)) == CD_TRACK_AUDIO)
+		{
+			m_cdda->stop_audio();
+			m_cdda->set_cdrom(m_cdrom_handle);
+			m_cdda->start_audio(lba, m_readcount);
+			return true;
+		}
+		else
+			m_drvmode = DRV_MODE_READ;
+	}
 	if((m_irq & IRQ_DATACOMP) && !first)
 		m_isa->irq5_w(ASSERT_LINE);
 	if(!m_readcount)
@@ -86,7 +99,7 @@ bool mcd_isa_device::read_sector(bool first)
 		m_data = false;
 		return false;
 	}
-	uint32_t lba = msf_to_lba(m_readmsf);
+	m_cdda->stop_audio();
 	cdrom_read_data(m_cdrom_handle, lba - 150, m_buf, m_mode & 0x40 ? CD_TRACK_MODE1_RAW : CD_TRACK_MODE1);
 	if(m_mode & 0x40)
 	{
@@ -106,10 +119,11 @@ bool mcd_isa_device::read_sector(bool first)
 	return true;
 }
 
-READ8_MEMBER(mcd_isa_device::flag_r)
+uint8_t mcd_isa_device::flag_r()
 {
 	uint8_t ret = 0;
-	m_isa->irq5_w(CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_isa->irq5_w(CLEAR_LINE);
 	if(!m_buf_count || !m_data || m_dma) // if dma enabled the cpu will never not see that flag as it will be halted
 		ret |= FLAG_NODATA;
 	if(!m_cmdbuf_count || !m_newstat)
@@ -117,19 +131,28 @@ READ8_MEMBER(mcd_isa_device::flag_r)
 	return ret | FLAG_UNK;
 }
 
-READ8_MEMBER(mcd_isa_device::data_r)
+uint8_t mcd_isa_device::data_r()
 {
 	if(m_cmdbuf_count)
 	{
-		m_cmdbuf_count--;
-		return m_cmdbuf[m_cmdbuf_idx++];
+		if(machine().side_effects_disabled())
+			return m_cmdbuf[m_cmdbuf_idx];
+		else
+		{
+			m_cmdbuf_count--;
+			return m_cmdbuf[m_cmdbuf_idx++];
+		}
 	}
 	else if(m_buf_count)
 	{
-		uint8_t ret = m_buf_idx < 2352 ? m_buf[m_buf_idx++] : 0;
-		m_buf_count--;
-		if(!m_buf_count)
-			read_sector();
+		uint8_t ret = m_buf_idx < 2352 ? m_buf[m_buf_idx] : 0;
+		if(!machine().side_effects_disabled())
+		{
+			m_buf_idx++;
+			m_buf_count--;
+			if(!m_buf_count)
+				read_sector();
+		}
 		return ret;
 	}
 	return m_stat;
@@ -153,12 +176,12 @@ uint16_t mcd_isa_device::dack16_r(int line)
 	return 0;
 }
 
-WRITE8_MEMBER(mcd_isa_device::reset_w)
+void mcd_isa_device::reset_w(uint8_t data)
 {
 	reset();
 }
 
-WRITE8_MEMBER(mcd_isa_device::cmd_w)
+void mcd_isa_device::cmd_w(uint8_t data)
 {
 	if(m_cmdrd_count)
 	{
@@ -214,6 +237,7 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 				{
 					case 5:
 						m_readmsf = 0;
+						[[fallthrough]];
 					case 4:
 					case 3:
 						m_readmsf |= bcd_2_dec(data) << ((m_cmdrd_count - 3) * 8);
@@ -251,12 +275,12 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 				uint32_t first = lba_to_msf(150), last = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, 0xaa));
 				m_cmdbuf[1] = 1;
 				m_cmdbuf[2] = dec_2_bcd(cdrom_get_last_track(m_cdrom_handle));
-				m_cmdbuf[3] = dec_2_bcd((last >> 16) & 0xff);
-				m_cmdbuf[4] = dec_2_bcd((last >> 8) & 0xff);
-				m_cmdbuf[5] = dec_2_bcd(last & 0xff);
-				m_cmdbuf[6] = dec_2_bcd((first >> 16) & 0xff);
-				m_cmdbuf[7] = dec_2_bcd((first >> 8) & 0xff);
-				m_cmdbuf[8] = dec_2_bcd(first & 0xff);
+				m_cmdbuf[3] = (last >> 16) & 0xff;
+				m_cmdbuf[4] = (last >> 8) & 0xff;
+				m_cmdbuf[5] = last & 0xff;
+				m_cmdbuf[6] = (first >> 16) & 0xff;
+				m_cmdbuf[7] = (first >> 8) & 0xff;
+				m_cmdbuf[8] = first & 0xff;
 				m_cmdbuf[9] = 0;
 				m_cmdbuf_count = 10;
 				m_readcount = 0;
@@ -271,20 +295,23 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 			if(m_cdrom_handle)
 			{
 				int tracks = cdrom_get_last_track(m_cdrom_handle);
-				uint32_t start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
-				uint32_t end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < tracks ? m_curtoctrk + 1 : 0xaa));
+				uint32_t start = cdrom_get_track_start(m_cdrom_handle, m_curtoctrk);
+				uint32_t len = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < (tracks - 1) ? m_curtoctrk + 1 : 0xaa) - start);
+				start = lba_to_msf(start);
 				m_cmdbuf[1] = (cdrom_get_adr_control(m_cdrom_handle, m_curtoctrk) << 4) & 0xf0;
 				m_cmdbuf[2] = 0; // track num except when reading toc
-				m_cmdbuf[3] = dec_2_bcd(m_curtoctrk); // index
-				m_cmdbuf[4] = dec_2_bcd((start >> 16) & 0xff);
-				m_cmdbuf[5] = dec_2_bcd((start >> 8) & 0xff);
-				m_cmdbuf[6] = dec_2_bcd(start & 0xff);
+				m_cmdbuf[3] = dec_2_bcd(m_curtoctrk + 1); // index
+				m_cmdbuf[4] = (len >> 16) & 0xff;
+				m_cmdbuf[5] = (len >> 8) & 0xff;
+				m_cmdbuf[6] = len & 0xff;
 				m_cmdbuf[7] = 0;
-				m_cmdbuf[8] = dec_2_bcd((end >> 16) & 0xff);
-				m_cmdbuf[9] = dec_2_bcd((end >> 8) & 0xff);
-				m_cmdbuf[10] = dec_2_bcd(end & 0xff);
+				m_cmdbuf[8] = (start >> 16) & 0xff;
+				m_cmdbuf[9] = (start >> 8) & 0xff;
+				m_cmdbuf[10] = start & 0xff;
 				if(m_curtoctrk >= tracks)
-					m_curtoctrk = 1;
+					m_curtoctrk = 0;
+				else if(m_mode & MODE_GET_TOC)
+					m_curtoctrk++;
 				m_cmdbuf_count = 11;
 				m_readcount = 0;
 			}
@@ -302,8 +329,9 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 			break;
 		case CMD_STOPCDDA:
 		case CMD_STOP:
+			m_cdda->stop_audio();
 			m_drvmode = DRV_MODE_STOP;
-			m_curtoctrk = 1;
+			m_curtoctrk = 0;
 			break;
 		case CMD_CONFIG:
 			m_cmdrd_count = 2;
@@ -313,7 +341,7 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 			if(m_cdrom_handle)
 			{
 				m_readcount = 0;
-				m_drvmode = DRV_MODE_READ;
+				m_drvmode = data == CMD_READ1X ? DRV_MODE_CDDA : DRV_MODE_READ;
 				m_cmdrd_count = 6;
 			}
 			else

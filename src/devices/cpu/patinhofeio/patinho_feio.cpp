@@ -64,10 +64,9 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 	, m_icount(0)
 	, m_rc_read_cb(*this)
 	, m_buttons_read_cb(*this)
-	// These arrays of *this are very ugly. I wonder if there's a better way of coding this...
-	, m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
-	, m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
-	, m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	, m_iodev_read_cb(*this)
+	, m_iodev_write_cb(*this)
+	, m_iodev_status_cb(*this)
 {
 }
 
@@ -129,22 +128,16 @@ void patinho_feio_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
 
+	m_rc_read_cb.resolve();
 	if (m_rc_read_cb.isnull()){
 		fatalerror("Panel keys register not found!");
-	} else {
-		m_rc_read_cb.resolve();
 	}
 
-	if (!m_buttons_read_cb.isnull()){
-		m_buttons_read_cb.resolve();
-	}
+	m_buttons_read_cb.resolve();
 
-	for (int i=0; i<16; i++){
-		if (!m_iodev_read_cb[i].isnull())
-			m_iodev_read_cb[i].resolve();
-		if (!m_iodev_write_cb[i].isnull())
-			m_iodev_write_cb[i].resolve();
-	}
+	m_iodev_read_cb.resolve_all();
+	m_iodev_write_cb.resolve_all();
+	m_iodev_status_cb.resolve_all(); // unused?
 
 	set_icountptr(m_icount);
 }

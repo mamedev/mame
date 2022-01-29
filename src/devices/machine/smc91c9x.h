@@ -22,8 +22,8 @@ class smc91c9x_device : public device_t,public device_network_interface
 public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	u16 read(offs_t offset, u16 mem_mask = ~0);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_link_connected(bool connected) { m_link_unconnected = !connected; };
 
@@ -215,9 +215,9 @@ private:
 		PTR         = 0x07ff
 	};
 
+	static constexpr u32 FCS_RESIDUE = 0xdebb20e3;
 	static constexpr unsigned ETHER_BUFFER_SIZE = 256 * 6;
 	static const u8 ETH_BROADCAST[];
-	static const u8 WMS_OUI[];
 
 	// mmu
 
@@ -258,7 +258,7 @@ private:
 	int m_rx_active;
 	int m_tx_retry_count;
 	u8 m_rx_hash;
-	u8 m_loopback_result;
+	int m_loopback_result;
 
 	void update_ethernet_irq();
 	void update_stats();

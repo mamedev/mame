@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Thanks to http://www.zorba.z80.de for info!
 
 Attempting to load any td0 dump in this list throws a fatalerror,

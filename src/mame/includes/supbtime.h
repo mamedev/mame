@@ -15,8 +15,8 @@
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,7 +41,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ16_MEMBER(vblank_ack_r);
+	uint16_t vblank_ack_r();
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets);
 	uint32_t screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

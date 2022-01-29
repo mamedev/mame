@@ -68,9 +68,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 16; }
-	virtual uint32_t execute_input_lines() const override { return 5; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -108,7 +108,6 @@ protected:
 	uint8_t m_IF;
 	int m_irq_state;
 	bool m_handle_ei_delay;
-	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
 

@@ -5,7 +5,7 @@
 MMD-2 driver by Miodrag Milanovic
 
 2009-05-12 Initial version
-2011-01-12 MMD2 working {Robbbert]
+2011-01-12 MMD2 working [Robbbert]
 
 
 http://www.cs.unc.edu/~yakowenk/classiccmp/mmd2/
@@ -106,9 +106,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "X%u", 0)
+		, m_banks(*this, "bank%u", 1U)
+		, m_io_keyboard(*this, "X%u", 0U)
+		, m_io_dsw(*this, "DSW")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_p(*this, "p%u_%u", 0U, 0U)
+		, m_led_halt(*this, "led_halt")
+		, m_led_hold(*this, "led_hold")
+	{ }
 
 	void mmd2(machine_config &config);
 
@@ -116,68 +121,43 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port05_w);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port13_r);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(status_callback);
-	DECLARE_WRITE_LINE_MEMBER(inte_callback);
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+	void round_leds_w(offs_t, u8);
+	void port05_w(u8 data);
+	u8 port01_r();
+	u8 port13_r();
+	u8 bank_r(address_space &space, offs_t offset);
+	u8 keyboard_r();
+	void scanlines_w(u8 data);
+	void digit_w(u8 data);
+	void status_callback(u8 data);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	virtual void machine_reset() override;
 	void reset_banks();
-	uint8_t m_digit;
-	virtual void machine_start() override { m_digits.resolve(); }
+
+	u8 m_digit = 0U;
+	std::unique_ptr<u8[]> m_ram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	required_memory_bank_array<8> m_banks;
 	required_ioport_array<4> m_io_keyboard;
+	required_ioport m_io_dsw;
 	output_finder<9> m_digits;
+	output_finder<3, 8> m_p;
+	output_finder<> m_led_halt;
+	output_finder<> m_led_hold;
 };
 
 
-WRITE8_MEMBER( mmd2_state::port00_w )
+void mmd2_state::round_leds_w(offs_t offset, u8 data)
 {
-	output().set_value("p0_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p0_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p0_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p0_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p0_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p0_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p0_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p0_0", BIT(data,0) ? 0 : 1);
-}
-
-WRITE8_MEMBER( mmd2_state::port01_w )
-{
-	output().set_value("p1_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p1_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p1_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p1_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p1_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p1_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p1_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p1_0", BIT(data,0) ? 0 : 1);
-}
-
-WRITE8_MEMBER( mmd2_state::port02_w )
-{
-	output().set_value("p2_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p2_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p2_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p2_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p2_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p2_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p2_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p2_0", BIT(data,0) ? 0 : 1);
+	for (u8 i = 0; i < 8; i++)
+		m_p[offset][i] = BIT(~data, i);
 }
 
 void mmd2_state::mem_map(address_map &map)
@@ -187,15 +167,14 @@ void mmd2_state::mem_map(address_map &map)
 	map(0x0400, 0x0fff).bankr("bank3").bankw("bank4");
 	map(0xd800, 0xe3ff).bankr("bank5").bankw("bank6");
 	map(0xe400, 0xe7ff).bankr("bank7").bankw("bank8");
-	map(0xfc00, 0xfcff).ram(); // Scratchpad
+	map(0xfc00, 0xfcff).ram();
 }
 
 void mmd2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).w(FUNC(mmd2_state::port00_w));
-	map(0x01, 0x01).rw(FUNC(mmd2_state::port01_r), FUNC(mmd2_state::port01_w));
-	map(0x02, 0x02).w(FUNC(mmd2_state::port02_w));
+	map(0x00, 0x02).w(FUNC(mmd2_state::round_leds_w));
+	map(0x01, 0x01).r(FUNC(mmd2_state::port01_r));
 	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0x05, 0x07).r(FUNC(mmd2_state::bank_r));
@@ -274,68 +253,67 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 */
 
-READ8_MEMBER( mmd2_state::bank_r )
+u8 mmd2_state::bank_r(address_space &space, offs_t offset)
 {
-	membank("bank1")->set_entry(offset);
-	membank("bank2")->set_entry(offset);
-	membank("bank3")->set_entry(offset);
-	membank("bank4")->set_entry(offset);
-	membank("bank5")->set_entry(offset);
-	membank("bank6")->set_entry(offset);
-	membank("bank7")->set_entry(offset);
-	membank("bank8")->set_entry(offset);
-	return 0xff;
+	for (auto &bank : m_banks)
+		bank->set_entry(offset);
+	return space.unmap();
 }
 
-READ8_MEMBER( mmd2_state::port01_r )
+u8 mmd2_state::port01_r()
 {
 	// need to add ttyin bit 0
-	uint8_t data = 0x84;
-	data |= ioport("DSW")->read();
+	u8 data = 0x84;
+	data |= m_io_dsw->read();
 	data |= (m_cass->input() < 0.02) ? 0 : 2;
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::port05_w )
+void mmd2_state::port05_w(u8 data)
 {
 	// need to add ttyout bit 0
 	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( mmd2_state::scanlines_w )
+void mmd2_state::scanlines_w(u8 data)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( mmd2_state::digit_w )
+void mmd2_state::digit_w(u8 data)
 {
 	if (m_digit < 9)
 		m_digits[m_digit] = data;
 }
 
-READ8_MEMBER( mmd2_state::keyboard_r )
+u8 mmd2_state::keyboard_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
-	if (m_digit < 4)
-		data = m_io_keyboard[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		data = m_io_keyboard[m_digit & 7]->read();
 
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::status_callback )
+void mmd2_state::status_callback(u8 data)
 {
 	// operate the HALT LED
-	output().set_value("led_halt", ~data & i8080_cpu_device::STATUS_HLTA);
+	m_led_halt = (~data & i8080_cpu_device::STATUS_HLTA) ? 1 : 0;
 	// operate the HOLD LED - this should connect to the HLDA pin,
 	// but it isn't emulated, using WO instead (whatever that does).
-	output().set_value("led_hold", data & i8080_cpu_device::STATUS_WO);
+	m_led_hold = (data & i8080_cpu_device::STATUS_WO) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER( mmd2_state::inte_callback )
+void mmd2_state::machine_start()
 {
-	// operate the INTE LED
-	output().set_value("led_inte", state);
+	m_digits.resolve();
+	m_p.resolve();
+	m_led_halt.resolve();
+	m_led_hold.resolve();
+
+	save_pointer(NAME(m_ram), 0x1400);
+	save_item(NAME(m_digit));
 }
 
 void mmd2_state::machine_reset()
@@ -345,47 +323,41 @@ void mmd2_state::machine_reset()
 
 void mmd2_state::reset_banks()
 {
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
-	membank("bank3")->set_entry(0);
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(0);
-	membank("bank6")->set_entry(0);
-	membank("bank7")->set_entry(0);
-	membank("bank8")->set_entry(0);
+	for (auto &bank : m_banks)
+		bank->set_entry(0);
 }
 
 void mmd2_state::init_mmd2()
 {
-/*
-We preset all banks here, so that bankswitching will incur no speed penalty.
-0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
-*/
-	uint8_t *p_ram = memregion("maincpu")->base();
-	membank("bank1")->configure_entry(0, &p_ram[0x0000]);
-	membank("bank1")->configure_entry(1, &p_ram[0xd800]);
-	membank("bank1")->configure_entry(2, &p_ram[0x0c00]);
-	membank("bank2")->configure_entry(0, &p_ram[0x8000]);
-	membank("bank2")->configure_entry(1, &p_ram[0xd800]);
-	membank("bank2")->configure_entry(2, &p_ram[0x8000]);
-	membank("bank3")->configure_entry(0, &p_ram[0x0400]);
-	membank("bank3")->configure_entry(1, &p_ram[0xdc00]);
-	membank("bank3")->configure_entry(2, &p_ram[0xdc00]);
-	membank("bank4")->configure_entry(0, &p_ram[0x8000]);
-	membank("bank4")->configure_entry(1, &p_ram[0xdc00]);
-	membank("bank4")->configure_entry(2, &p_ram[0xdc00]);
-	membank("bank5")->configure_entry(0, &p_ram[0xd800]);
-	membank("bank5")->configure_entry(1, &p_ram[0x0000]);
-	membank("bank5")->configure_entry(2, &p_ram[0x0000]);
-	membank("bank6")->configure_entry(0, &p_ram[0xd800]);
-	membank("bank6")->configure_entry(1, &p_ram[0x8000]);
-	membank("bank6")->configure_entry(2, &p_ram[0x8000]);
-	membank("bank7")->configure_entry(0, &p_ram[0xe400]);
-	membank("bank7")->configure_entry(1, &p_ram[0x0c00]);
-	membank("bank7")->configure_entry(2, &p_ram[0xd800]);
-	membank("bank8")->configure_entry(0, &p_ram[0xe400]);
-	membank("bank8")->configure_entry(1, &p_ram[0x8000]);
-	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
+	// We preset all banks here, so that bankswitching will incur no speed penalty.
+	// ROM 0000/0400 indicate ROMs, RAM /0400/0C00 indicate RAM, 1000 is a dummy write area for ROM banks.
+	u8 *const ROM = memregion("maincpu")->base();
+	m_ram = make_unique_clear<u8[]>(0x1400);
+	u8 *RAM = m_ram.get();
+	m_banks[0]->configure_entry(0, &ROM[0x0000]);
+	m_banks[0]->configure_entry(1,  RAM);
+	m_banks[0]->configure_entry(2, &ROM[0x0c00]);
+	m_banks[1]->configure_entry(0,  RAM+0x1000);
+	m_banks[1]->configure_entry(1,  RAM);
+	m_banks[1]->configure_entry(2,  RAM+0x1000);
+	m_banks[2]->configure_entry(0, &ROM[0x0400]);
+	m_banks[2]->configure_entry(1,  RAM+0x0400);
+	m_banks[2]->configure_entry(2,  RAM+0x0400);
+	m_banks[3]->configure_entry(0,  RAM+0x1000);
+	m_banks[3]->configure_entry(1,  RAM+0x0400);
+	m_banks[3]->configure_entry(2,  RAM+0x0400);
+	m_banks[4]->configure_entry(0,  RAM);
+	m_banks[4]->configure_entry(1, &ROM[0x0000]);
+	m_banks[4]->configure_entry(2, &ROM[0x0000]);
+	m_banks[5]->configure_entry(0,  RAM);
+	m_banks[5]->configure_entry(1,  RAM+0x1000);
+	m_banks[5]->configure_entry(2,  RAM+0x1000);
+	m_banks[6]->configure_entry(0,  RAM+0x0c00);
+	m_banks[6]->configure_entry(1, &ROM[0x0c00]);
+	m_banks[6]->configure_entry(2,  RAM);
+	m_banks[7]->configure_entry(0,  RAM+0x0c00);
+	m_banks[7]->configure_entry(1,  RAM+0x1000);
+	m_banks[7]->configure_entry(2,  RAM);
 }
 
 void mmd2_state::mmd2(machine_config &config)
@@ -395,17 +367,17 @@ void mmd2_state::mmd2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmd2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mmd2_state::io_map);
 	m_maincpu->out_status_func().set(FUNC(mmd2_state::status_callback));
-	m_maincpu->out_inte_func().set(FUNC(mmd2_state::inte_callback));
+	m_maincpu->out_inte_func().set_output("led_inte");         // operate the INTE LED
 
 	/* video hardware */
 	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", 400000));        // based on divider
 	kbdc.out_sl_callback().set(FUNC(mmd2_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(mmd2_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set(FUNC(mmd2_state::keyboard_r));        // kbd RL lines
-	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_rl_callback().set(FUNC(mmd2_state::keyboard_r));   // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                  // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
 
 	// Cassette
@@ -417,7 +389,7 @@ void mmd2_state::mmd2(machine_config &config)
 
 /* ROM definition */
 ROM_START( mmd2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "mmd2330.bin", 0x0000, 0x0800, CRC(69a77199) SHA1(6c83093b2c32a558c969f4fe8474b234023cc348))
 	ROM_LOAD( "mmd2340.bin", 0x0800, 0x0800, CRC(70681bd6) SHA1(c37e3cf34a75e8538471030bb49b8aed45d00ec3))
 	ROM_LOAD( "mmd2350.bin", 0x1000, 0x0800, CRC(359f577c) SHA1(9405ca0c1977721e4540a4017907c06dab08d398))
@@ -427,4 +399,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME  FLAGS
-COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd2_state, init_mmd2,  "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd2_state, init_mmd2,  "E&L Instruments Inc", "MMD-2 Mini-Micro Designer",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

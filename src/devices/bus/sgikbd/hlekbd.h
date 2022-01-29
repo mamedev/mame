@@ -11,7 +11,7 @@
 #include "diserial.h"
 
 
-namespace bus { namespace sgikbd {
+namespace bus::sgikbd {
 
 class hle_device : public device_t
 	, public device_buffered_serial_interface<16U>
@@ -31,7 +31,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_buffered_serial_interface overrides
@@ -109,7 +109,7 @@ private:
 	uint8_t     m_led_state;
 };
 
-} } // namespace bus::sgikbd
+} // namespace bus::sgikbd
 
 
 DECLARE_DEVICE_TYPE_NS(SGI_HLE_KEYBOARD, bus::sgikbd, hle_device)

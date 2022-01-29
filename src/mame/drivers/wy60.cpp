@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/i2cmem.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -42,7 +42,7 @@ private:
 	void row_buffer_map(address_map &map);
 
 	required_device<scn2672_device> m_pvtc;
-	required_device<mc2661_device> m_sio;
+	required_device<scn2661b_device> m_sio;
 };
 
 
@@ -121,7 +121,7 @@ void wy60_state::wy60(machine_config &config)
 	//m_pvtc->intr_callback().set_inputline("maincpu", MCS51_T0_LINE);
 	//m_pvtc->breq_callback().set_inputline("maincpu", MCS51_INT0_LINE);
 
-	MC2661(config, m_sio, 4.9152_MHz_XTAL); // SCN2661B
+	SCN2661B(config, m_sio, 4.9152_MHz_XTAL);
 	//m_sio->rxrdy_handler().set_inputline("maincpu", MCS51_INT1_LINE);
 }
 

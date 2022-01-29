@@ -25,9 +25,11 @@ DEFINE_DEVICE_TYPE(ACORN_FDC, acorn_fdc_device, "acorn_fdc", "Acorn Floppy Disc 
 //  MACHINE_DRIVER( fdc )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(acorn_fdc_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT
-FLOPPY_FORMATS_END
+void acorn_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+}
 
 static void acorn_floppies(device_slot_interface &device)
 {
@@ -85,7 +87,7 @@ void acorn_fdc_device::device_reset()
 	address_space &space = m_bus->memspace();
 
 	space.install_device(0x0a00, 0x0a03, *m_fdc, &i8271_device::map);
-	space.install_readwrite_handler(0x0a04, 0x0a04, 0, 0x1f8, 0, read8smo_delegate(FUNC(i8271_device::data_r), m_fdc.target()), write8smo_delegate(FUNC(i8271_device::data_w), m_fdc.target()));
+	space.install_readwrite_handler(0x0a04, 0x0a04, 0, 0x1f8, 0, read8smo_delegate(*m_fdc, FUNC(i8271_device::data_r)), write8smo_delegate(*m_fdc, FUNC(i8271_device::data_w)));
 }
 
 

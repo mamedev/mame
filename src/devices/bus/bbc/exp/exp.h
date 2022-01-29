@@ -51,7 +51,7 @@
 
 class device_bbc_exp_interface;
 
-class bbc_exp_slot_device : public device_t, public device_slot_interface
+class bbc_exp_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_exp_interface>
 {
 public:
 	// construction/destruction
@@ -94,9 +94,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_exp_interface *m_card;
 
@@ -111,7 +109,7 @@ private:
 
 // ======================> device_bbc_exp_interface
 
-class device_bbc_exp_interface : public device_slot_card_interface
+class device_bbc_exp_interface : public device_interface
 {
 public:
 	virtual uint8_t fred_r(offs_t offset) { return 0xff; }

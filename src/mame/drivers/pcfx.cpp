@@ -19,6 +19,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pcfx_state : public driver_device
 {
 public:
@@ -29,6 +32,11 @@ public:
 
 	void pcfx(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	enum
 	{
@@ -36,29 +44,25 @@ private:
 	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( irq_read );
-	DECLARE_WRITE16_MEMBER( irq_write );
-	DECLARE_READ16_MEMBER( pad_r );
-	DECLARE_WRITE16_MEMBER( pad_w );
-	DECLARE_READ8_MEMBER( extio_r );
-	DECLARE_WRITE8_MEMBER( extio_w );
+	uint16_t irq_read(offs_t offset);
+	void irq_write(offs_t offset, uint16_t data);
+	uint16_t pad_r(offs_t offset);
+	void pad_w(offs_t offset, uint16_t data);
+	[[maybe_unused]] uint8_t extio_r(offs_t offset);
+	[[maybe_unused]] void extio_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq8_w );
-	DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	DECLARE_WRITE_LINE_MEMBER( irq10_w );
-	DECLARE_WRITE_LINE_MEMBER( irq11_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq8_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq9_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq10_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq11_w );
 	DECLARE_WRITE_LINE_MEMBER( irq12_w );
 	DECLARE_WRITE_LINE_MEMBER( irq13_w );
 	DECLARE_WRITE_LINE_MEMBER( irq14_w );
-	DECLARE_WRITE_LINE_MEMBER( irq15_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	virtual void machine_reset() override;
 
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask;
@@ -82,14 +86,14 @@ private:
 };
 
 
-READ8_MEMBER(pcfx_state::extio_r)
+uint8_t pcfx_state::extio_r(offs_t offset)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
 	return io_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(pcfx_state::extio_w)
+void pcfx_state::extio_w(offs_t offset, uint8_t data)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
@@ -106,7 +110,7 @@ void pcfx_state::pcfx_mem(address_map &map)
 	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
 }
 
-READ16_MEMBER( pcfx_state::pad_r )
+uint16_t pcfx_state::pad_r(offs_t offset)
 {
 	uint16_t res;
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
@@ -137,12 +141,12 @@ READ16_MEMBER( pcfx_state::pad_r )
 	return res;
 }
 
-void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PAD_FUNC:
-		pad_func(ptr, param);
+		pad_func(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");
@@ -160,7 +164,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	set_irq_line(11, 1);
 }
 
-WRITE16_MEMBER( pcfx_state::pad_w )
+void pcfx_state::pad_w(offs_t offset, uint16_t data)
 {
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
@@ -234,7 +238,7 @@ static INPUT_PORTS_START( pcfx )
 INPUT_PORTS_END
 
 
-READ16_MEMBER( pcfx_state::irq_read )
+uint16_t pcfx_state::irq_read(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -266,7 +270,7 @@ READ16_MEMBER( pcfx_state::irq_read )
 }
 
 
-WRITE16_MEMBER( pcfx_state::irq_write )
+void pcfx_state::irq_write(offs_t offset, uint16_t data)
 {
 	switch( offset )
 	{
@@ -403,6 +407,16 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 }
 
 
+void pcfx_state::machine_start()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_pad.ctrl[i] = 0;
+		m_pad.status[i] = 0;
+		m_pad.latch[i] = 0;
+	};
+}
+
 void pcfx_state::machine_reset()
 {
 	m_irq_mask = 0xFF;
@@ -455,30 +469,32 @@ void pcfx_state::pcfx(machine_config &config)
 	huc6230_device &huc6230(HuC6230(config, "huc6230", XTAL(21'477'272)));
 	huc6230.adpcm_update_cb<0>().set("huc6272", FUNC(huc6272_device::adpcm_update_0));
 	huc6230.adpcm_update_cb<1>().set("huc6272", FUNC(huc6272_device::adpcm_update_1));
-	huc6230.cdda_cb().set("huc6272", FUNC(huc6272_device::cdda_update));
+	huc6230.vca_callback().set("huc6272", FUNC(huc6272_device::cdda_update));
 	huc6230.add_route(0, "lspeaker", 1.0);
 	huc6230.add_route(1, "rspeaker", 1.0);
 }
 
 
 ROM_START( pcfx )
-	ROM_REGION( 0x100000, "ipl", 0 )
+	ROM_REGION32_LE( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
 	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
 	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
-	ROM_REGION( 0x80000, "scsi_rom", 0 )
+	ROM_REGION32_LE( 0x80000, "scsi_rom", 0 )
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
 ROM_END
 
 
 ROM_START( pcfxga )
-	ROM_REGION( 0x100000, "ipl", 0 )
+	ROM_REGION32_LE( 0x100000, "ipl", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
 
-	ROM_REGION( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
+
+} // Anonymous namespace
 
 
 /***************************************************************************

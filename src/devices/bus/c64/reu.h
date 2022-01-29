@@ -52,7 +52,7 @@ protected:
 
 	required_device<mos8726_device> m_dmac;
 	required_device<generic_slot_device> m_eprom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	int m_variant;
 	int m_jp1;

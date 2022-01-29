@@ -10,6 +10,8 @@
 class kaneko_view2_tilemap_device : public device_t, public device_gfx_interface
 {
 public:
+	typedef device_delegate<void (u8, u32*)> view2_cb_delegate;
+
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
 		: kaneko_view2_tilemap_device(mconfig, tag, owner, (u32)0)
 	{
@@ -28,18 +30,17 @@ public:
 	}
 	void set_invert_flip(int invert_flip) { m_invert_flip = invert_flip; } // for fantasia (bootleg)
 
-	typedef device_delegate<void (u8, u32*)> view2_cb_delegate;
-	void set_tile_callback(view2_cb_delegate cb) { m_view2_cb = cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_view2_cb.set(std::forward<T>(args)...); }
 
 	void vram_w(int _N_, offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
 	// call to do the rendering etc.
-	template<class _BitmapClass>
-	void prepare_common(_BitmapClass &bitmap, const rectangle &cliprect);
-	template<class _BitmapClass>
-	void render_tilemap_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri);
-	template<class _BitmapClass>
-	void render_tilemap_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	template<class BitmapClass>
+	void prepare_common(BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass>
+	void render_tilemap_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
+	template<class BitmapClass>
+	void render_tilemap_alt_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
 
 	void prepare(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect);

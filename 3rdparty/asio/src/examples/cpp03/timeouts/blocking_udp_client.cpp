@@ -2,42 +2,28 @@
 // blocking_udp_client.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "asio/deadline_timer.hpp"
+#include "asio/buffer.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/udp.hpp"
 #include <cstdlib>
-#include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/bind/bind.hpp>
 #include <iostream>
 
-using asio::deadline_timer;
 using asio::ip::udp;
 
 //----------------------------------------------------------------------
 
 //
-// This class manages socket timeouts by applying the concept of a deadline.
-// Each asynchronous operation is given a deadline by which it must complete.
-// Deadlines are enforced by an "actor" that persists for the lifetime of the
-// client object:
-//
-//  +----------------+
-//  |                |     
-//  | check_deadline |<---+
-//  |                |    |
-//  +----------------+    | async_wait()
-//              |         |
-//              +---------+
-//
-// If the actor determines that the deadline has expired, any outstanding
-// socket operations are cancelled. The socket operations themselves are
-// implemented as transient actors:
+// This class manages socket timeouts by running the io_context using the timed
+// io_context::run_for() member function. Each asynchronous operation is given
+// a timeout within which it must complete. The socket operations themselves
+// use boost::bind to specify the completion handler:
 //
 //   +---------------+
 //   |               |
@@ -51,73 +37,60 @@ using asio::ip::udp;
 //                |                |
 //                +----------------+
 //
-// The client object runs the io_context to block thread execution until the
-// actor completes.
+// For a given socket operation, the client object runs the io_context to block
+// thread execution until the operation completes or the timeout is reached. If
+// the io_context::run_for() function times out, the socket is closed and the
+// outstanding asynchronous operation is cancelled.
 //
 class client
 {
 public:
   client(const udp::endpoint& listen_endpoint)
-    : socket_(io_context_, listen_endpoint),
-      deadline_(io_context_)
+    : socket_(io_context_, listen_endpoint)
   {
-    // No deadline is required until the first socket operation is started. We
-    // set the deadline to positive infinity so that the actor takes no action
-    // until a specific deadline is set.
-    deadline_.expires_at(boost::posix_time::pos_infin);
-
-    // Start the persistent actor that checks for deadline expiry.
-    check_deadline();
   }
 
   std::size_t receive(const asio::mutable_buffer& buffer,
-      boost::posix_time::time_duration timeout, asio::error_code& ec)
+      asio::chrono::steady_clock::duration timeout,
+      asio::error_code& ec)
   {
-    // Set a deadline for the asynchronous operation.
-    deadline_.expires_from_now(timeout);
-
-    // Set up the variables that receive the result of the asynchronous
-    // operation. The error code is set to would_block to signal that the
-    // operation is incomplete. Asio guarantees that its asynchronous
-    // operations will never fail with would_block, so any other value in
-    // ec indicates completion.
-    ec = asio::error::would_block;
+    // Start the asynchronous operation. The handle_receive function used as a
+    // callback will update the ec and length variables.
     std::size_t length = 0;
-
-    // Start the asynchronous operation itself. The handle_receive function
-    // used as a callback will update the ec and length variables.
     socket_.async_receive(asio::buffer(buffer),
-        boost::bind(&client::handle_receive, _1, _2, &ec, &length));
+        boost::bind(&client::handle_receive,
+          boost::placeholders::_1, boost::placeholders::_2, &ec, &length));
 
-    // Block until the asynchronous operation has completed.
-    do io_context_.run_one(); while (ec == asio::error::would_block);
+    // Run the operation until it completes, or until the timeout.
+    run(timeout);
 
     return length;
   }
 
 private:
-  void check_deadline()
+  void run(asio::chrono::steady_clock::duration timeout)
   {
-    // Check whether the deadline has passed. We compare the deadline against
-    // the current time since a new asynchronous operation may have moved the
-    // deadline before this actor had a chance to run.
-    if (deadline_.expires_at() <= deadline_timer::traits_type::now())
+    // Restart the io_context, as it may have been left in the "stopped" state
+    // by a previous operation.
+    io_context_.restart();
+
+    // Block until the asynchronous operation has completed, or timed out. If
+    // the pending asynchronous operation is a composed operation, the deadline
+    // applies to the entire operation, rather than individual operations on
+    // the socket.
+    io_context_.run_for(timeout);
+
+    // If the asynchronous operation completed successfully then the io_context
+    // would have been stopped due to running out of work. If it was not
+    // stopped, then the io_context::run_for call must have timed out.
+    if (!io_context_.stopped())
     {
-      // The deadline has passed. The outstanding asynchronous operation needs
-      // to be cancelled so that the blocked receive() function will return.
-      //
-      // Please note that cancel() has portability issues on some versions of
-      // Microsoft Windows, and it may be necessary to use close() instead.
-      // Consult the documentation for cancel() for further information.
+      // Cancel the outstanding asynchronous operation.
       socket_.cancel();
 
-      // There is no longer an active deadline. The expiry is set to positive
-      // infinity so that the actor takes no action until a new deadline is set.
-      deadline_.expires_at(boost::posix_time::pos_infin);
+      // Run the io_context again until the operation completes.
+      io_context_.run();
     }
-
-    // Put the actor back to sleep.
-    deadline_.async_wait(boost::bind(&client::check_deadline, this));
   }
 
   static void handle_receive(
@@ -131,7 +104,6 @@ private:
 private:
   asio::io_context io_context_;
   udp::socket socket_;
-  deadline_timer deadline_;
 };
 
 //----------------------------------------------------------------------
@@ -144,7 +116,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-      std::cerr << "Usage: blocking_udp_timeout <listen_addr> <listen_port>\n";
+      std::cerr << "Usage: blocking_udp_client <listen_addr> <listen_port>\n";
       return 1;
     }
 
@@ -159,7 +131,7 @@ int main(int argc, char* argv[])
       char data[1024];
       asio::error_code ec;
       std::size_t n = c.receive(asio::buffer(data),
-          boost::posix_time::seconds(10), ec);
+          asio::chrono::seconds(10), ec);
 
       if (ec)
       {

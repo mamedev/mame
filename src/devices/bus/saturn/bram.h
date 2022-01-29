@@ -14,8 +14,8 @@ class saturn_bram_device : public device_t,
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_bram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) override;
+	virtual uint32_t read_ext_bram(offs_t offset) override;
+	virtual void write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	// construction/destruction

@@ -44,19 +44,19 @@ void xavix_io_device::device_reset()
 
 // direction: 1 is out, 0 is in
 
-WRITE8_MEMBER(xavix_io_device::xav_7a0x_dir_w)
+void xavix_io_device::xav_7a0x_dir_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: xavix IO xav_7a0x_dir_w (port %d) %02x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
 	{
 		m_dir[offset] = data;
 		// write back to the port
-		xav_7a0x_dat_w(space,offset,m_dat[offset]);
+		xav_7a0x_dat_w(offset,m_dat[offset]);
 	}
 
 }
 
-WRITE8_MEMBER(xavix_io_device::xav_7a0x_dat_w)
+void xavix_io_device::xav_7a0x_dat_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: xavix IO xav_7a0x_dat_w (port %d) %02x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
@@ -67,13 +67,13 @@ WRITE8_MEMBER(xavix_io_device::xav_7a0x_dat_w)
 
 		switch (offset)
 		{
-		case 0x0: m_out0_cb(space, 0, outdata); break;
-		case 0x1: m_out1_cb(space, 0, outdata); break;
+		case 0x0: m_out0_cb(outdata); break;
+		case 0x1: m_out1_cb(outdata); break;
 		}
 	}
 }
 
-READ8_MEMBER(xavix_io_device::xav_7a0x_dir_r)
+uint8_t xavix_io_device::xav_7a0x_dir_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 	LOG("%s: xavix IO xav_7a0x_dir_r (port %d)\n", machine().describe_context(), offset);
@@ -84,7 +84,7 @@ READ8_MEMBER(xavix_io_device::xav_7a0x_dir_r)
 	return ret;
 }
 
-READ8_MEMBER(xavix_io_device::xav_7a0x_dat_r)
+uint8_t xavix_io_device::xav_7a0x_dat_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 	LOG("%s: xavix IO xav_7a0x_dat_r (port %d)\n", machine().describe_context(), offset);
@@ -92,8 +92,8 @@ READ8_MEMBER(xavix_io_device::xav_7a0x_dat_r)
 	{
 		switch (offset)
 		{
-		case 0x0: ret = m_in0_cb(space, 0); break;
-		case 0x1: ret = m_in1_cb(space, 0); break;
+		case 0x0: ret = m_in0_cb(); break;
+		case 0x1: ret = m_in1_cb(); break;
 		}
 
 		ret &= ~m_dir[offset];

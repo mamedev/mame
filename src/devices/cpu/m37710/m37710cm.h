@@ -10,7 +10,7 @@
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#include <limits.h>
+#include <climits>
 #include "m37710.h"
 
 
@@ -21,12 +21,12 @@
 #undef M37710_CALL_DEBUGGER
 
 #define M37710_CALL_DEBUGGER(x)         debugger_instruction_hook(x)
-#define m37710_read_8(addr)             m_program->read_byte(addr)
-#define m37710_write_8(addr,data)       m_program->write_byte(addr,data)
-#define m37710_read_8_immediate(A)      m_cache->read_byte(A)
-#define m37710_read_16(addr)            m_program->read_word_unaligned(addr)
-#define m37710_write_16(addr,data)      m_program->write_word_unaligned(addr,data)
-#define m37710_read_16_immediate(A)     m_cache->read_word(A)
+#define m37710_read_8(addr)             m_program.read_byte(addr)
+#define m37710_write_8(addr,data)       m_program.write_byte(addr,data)
+#define m37710_read_8_immediate(A)      m_cache.read_byte(A)
+#define m37710_read_16(addr)            m_program.read_word_unaligned(addr)
+#define m37710_write_16(addr,data)      m_program.write_word_unaligned(addr,data)
+#define m37710_read_16_immediate(A)     m_cache.read_word(A)
 
 
 /* ======================================================================== */
@@ -73,9 +73,9 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define REG_S           m_s     /* Stack Pointer */
 #define REG_PC          m_pc        /* Program Counter */
 #define REG_PPC         m_ppc       /* Previous Program Counter */
-#define REG_PB          m_pb        /* Program Bank */
-#define REG_DB          m_db        /* Data Bank */
-#define REG_D           m_d     /* Direct Register */
+#define REG_PG          m_pg        /* Program Bank */
+#define REG_DT          m_dt        /* Data Bank */
+#define REG_DPR         m_dpr       /* Direct Page Register */
 #define FLAG_M          m_flag_m    /* Memory/Accumulator Select Flag */
 #define FLAG_X          m_flag_x    /* Index Select Flag */
 #define FLAG_N          m_flag_n    /* Negative Flag */

@@ -32,6 +32,10 @@
 #include <atomic.h>
 #endif
 
+#if defined(__MACOSX__)  /* !!! MAME change, not required when 2.0.14 is released? */
+#include <libkern/OSAtomic.h>
+#endif
+
 /* This function is where all the magic happens... */
 SDL_bool
 SDL_AtomicTryLock(SDL_SpinLock *lock)

@@ -30,7 +30,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	desc.length = 1U;
 	desc.cycles = 1U;
 
-	u16 const op(m_host.m_pcache->read_word(desc.physpc));
+	u16 const op(m_host.m_pcache.read_word(desc.physpc));
 	switch (op >> 11)
 	{
 	case 0x00: // goto JA
@@ -219,9 +219,9 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
     program fetch helpers
 ***********************************************************************/
 
-u16 dsp16_device_base::frontend::read_op(opcode_desc const &desc, u16 offset) const
+u16 dsp16_device_base::frontend::read_op(opcode_desc const &desc, u16 offset)
 {
-	return m_host.m_pcache->read_word((desc.physpc & XAAU_I_EXT) | ((desc.physpc + offset) & XAAU_I_MASK));
+	return m_host.m_pcache.read_word((desc.physpc & XAAU_I_EXT) | ((desc.physpc + offset) & XAAU_I_MASK));
 }
 
 /***********************************************************************
@@ -564,9 +564,9 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 	m_cache_cycles = cycles;
 	m_cache_last_cycles = cycles + (romcycles - cachecycles);
 	m_cache_flags = desc.flags & (OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY);
-	std::copy_n(desc.regin, ARRAY_LENGTH(desc.regin), m_cache_regin);
-	std::copy_n(desc.regout, ARRAY_LENGTH(desc.regout), m_cache_regout);
-	std::copy_n(desc.regreq, ARRAY_LENGTH(desc.regreq), m_cache_regreq);
+	std::copy_n(desc.regin, std::size(desc.regin), m_cache_regin);
+	std::copy_n(desc.regout, std::size(desc.regout), m_cache_regout);
+	std::copy_n(desc.regreq, std::size(desc.regreq), m_cache_regreq);
 	m_cache_valid = true;
 	desc.cycles += (2U - romcycles) + ((k - 1) * cycles) + (romcycles - cachecycles);
 	return true;
@@ -589,9 +589,9 @@ bool dsp16_device_base::frontend::describe_redo(opcode_desc &desc, u16 op)
 	{
 		desc.cycles += ((k - 1) * m_cache_cycles) + m_cache_last_cycles;
 		desc.flags |= m_cache_flags;
-		std::copy_n(m_cache_regin, ARRAY_LENGTH(desc.regin), desc.regin);
-		std::copy_n(m_cache_regout, ARRAY_LENGTH(desc.regout), desc.regout);
-		std::copy_n(m_cache_regreq, ARRAY_LENGTH(desc.regreq), desc.regreq);
+		std::copy_n(m_cache_regin, std::size(desc.regin), desc.regin);
+		std::copy_n(m_cache_regout, std::size(desc.regout), desc.regout);
+		std::copy_n(m_cache_regreq, std::size(desc.regreq), desc.regreq);
 		return true;
 	}
 }

@@ -154,6 +154,7 @@ z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, dev
 	, device_z80daisy_interface(mconfig, *this)
 	, m_out_busreq_cb(*this)
 	, m_out_int_cb(*this)
+	, m_out_ieo_cb(*this)
 	, m_out_bao_cb(*this)
 	, m_in_mreq_cb(*this)
 	, m_out_mreq_cb(*this)
@@ -172,6 +173,7 @@ void z80dma_device::device_start()
 	// resolve callbacks
 	m_out_busreq_cb.resolve_safe();
 	m_out_int_cb.resolve_safe();
+	m_out_ieo_cb.resolve_safe();
 	m_out_bao_cb.resolve_safe();
 	m_in_mreq_cb.resolve_safe(0);
 	m_out_mreq_cb.resolve_safe();
@@ -189,6 +191,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_dma_enabled));
 	save_item(NAME(m_vector));
+	save_item(NAME(m_iei));
 	save_item(NAME(m_ip));
 	save_item(NAME(m_ius));
 	save_item(NAME(m_addressA));
@@ -331,6 +334,7 @@ int z80dma_device::is_ready()
 void z80dma_device::interrupt_check()
 {
 	m_out_int_cb(m_ip ? ASSERT_LINE : CLEAR_LINE);
+	m_out_ieo_cb(m_iei && !m_ip);
 }
 
 

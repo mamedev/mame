@@ -18,19 +18,19 @@ public:
 
 	auto halt_callback() { return m_halt_out.bind(); }
 
-	DECLARE_READ16_MEMBER(pmem_r);
-	DECLARE_WRITE16_MEMBER(pmem_w);
-	DECLARE_READ16_MEMBER(dmem_r);
-	DECLARE_WRITE16_MEMBER(dmem_w);
-	DECLARE_READ16_MEMBER(i86_io_r);
-	DECLARE_WRITE16_MEMBER(i86_io_w);
-	DECLARE_WRITE8_MEMBER(irqctl_w);
-	DECLARE_WRITE8_MEMBER(serctl_w);
-	DECLARE_READ8_MEMBER(handshake_r);
-	DECLARE_WRITE8_MEMBER(handshake_w);
+	uint16_t pmem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pmem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dmem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dmem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t i86_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irqctl_w(uint8_t data);
+	void serctl_w(uint8_t data);
+	uint8_t handshake_r();
+	void handshake_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_z8000->set_input_line(INPUT_LINE_HALT, state); }
-	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(INPUT_LINE_IRQ1, state); }
+	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(z8001_device::VI_LINE, state); }
 
 	bool halted() const { return m_z8000_halt; }
 
@@ -55,7 +55,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(mo_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	IRQ_CALLBACK_MEMBER(int_cb);
+	uint16_t nviack_r();
+	uint16_t viack_r();
 };
 
 DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)

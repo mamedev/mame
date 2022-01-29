@@ -7,7 +7,7 @@
 
 DECLARE_DEVICE_TYPE(MSX_AUDIO_KBDC_PORT, msx_audio_kbdc_port_device)
 
-class msx_audio_kb_port_interface : public device_slot_card_interface
+class msx_audio_kb_port_interface : public device_interface
 {
 public:
 	virtual uint8_t read() { return 0xff; }
@@ -15,11 +15,11 @@ public:
 
 protected:
 	// construction/destruction
-	using device_slot_card_interface::device_slot_card_interface;
+	msx_audio_kb_port_interface(machine_config const &mconfig, device_t &device);
 };
 
 
-class msx_audio_kbdc_port_device : public device_t, public device_slot_interface
+class msx_audio_kbdc_port_device : public device_t, public device_single_card_slot_interface<msx_audio_kb_port_interface>
 {
 public:
 	// construction/destruction
@@ -34,20 +34,18 @@ public:
 	}
 	msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// Physical connection simply consists of 8 input and 8 output lines split across 2 connectors
 	void write(uint8_t data);
 	uint8_t read();
 
-
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	msx_audio_kb_port_interface *m_keyboard;
 };
 
 
 void msx_audio_keyboards(device_slot_interface &device);
-
 
 #endif // MAME_BUS_MSX_CART_MSX_AUDIO_KB_H

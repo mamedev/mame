@@ -28,7 +28,6 @@ At the moment it simply outputs all the speech strings, one after the other, the
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 class instantm_state : public driver_device
@@ -42,8 +41,8 @@ public:
 	void instantm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
+	u8 port01_r();
+	void port01_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	void main_map(address_map &map);
@@ -58,13 +57,13 @@ private:
 };
 
 // return instruction from main cpu
-READ8_MEMBER( instantm_state::port01_r )
+u8 instantm_state::port01_r()
 {
 	return m_port01;
 }
 
 // tell maincpu the speech is done
-WRITE8_MEMBER( instantm_state::port01_w )
+void instantm_state::port01_w(u8 data)
 {
 	// bump to next bit of speech for now
 	if ((m_port01 & 15) < 15)
@@ -142,9 +141,6 @@ void instantm_state::instantm(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

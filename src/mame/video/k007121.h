@@ -15,8 +15,8 @@ public:
 
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
-	uint8_t ctrlram_r(int offset);
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t ctrlram_r(offs_t offset);
+	void ctrl_w(offs_t offset, uint8_t data);
 
 	/* shall we move source in the interface? */
 	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */

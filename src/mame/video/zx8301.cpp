@@ -158,7 +158,7 @@ void zx8301_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -178,7 +178,7 @@ void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //  control_w - display control register
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8301_device::control_w )
+void zx8301_device::control_w(uint8_t data)
 {
 	/*
 
@@ -212,7 +212,7 @@ WRITE8_MEMBER( zx8301_device::control_w )
 //  data_r - RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( zx8301_device::data_r )
+uint8_t zx8301_device::data_r(offs_t offset)
 {
 	if (LOG) logerror("ZX8301 RAM Read: %06x\n", offset);
 
@@ -229,7 +229,7 @@ READ8_MEMBER( zx8301_device::data_r )
 //  data_w - RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8301_device::data_w )
+void zx8301_device::data_w(offs_t offset, uint8_t data)
 {
 	if (LOG) logerror("ZX8301 RAM Write: %06x = %02x\n", offset, data);
 
@@ -261,7 +261,7 @@ void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, uint16_t da)
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
 
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[ZX8301_COLOR_MODE4[color]];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[ZX8301_COLOR_MODE4[color]];
 
 			byte_high <<= 1;
 			byte_low <<= 1;
@@ -306,8 +306,8 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 				flash_color = color;
 			}
 
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[color];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[color];
 
 			byte_high <<= 2;
 			byte_low <<= 2;

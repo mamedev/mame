@@ -14,6 +14,7 @@
 
 #include "bus/nscsi/devices.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/aic580.h"
 #include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
 
@@ -29,10 +30,6 @@ aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, 
 	, m_scsic(*this, "scsi:7:scsic")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
-	, m_fifo_data(*this, "fifo_data")
-	, m_fifo_read_index(0)
-	, m_fifo_write_index(0)
-	, m_dma_mode(0)
 {
 }
 
@@ -49,85 +46,17 @@ aha1542b_device::aha1542b_device(const machine_config &mconfig, const char *tag,
 
 void aha154x_device::device_start()
 {
-	save_item(NAME(m_fifo_read_index));
-	save_item(NAME(m_fifo_write_index));
-	save_item(NAME(m_dma_mode));
 }
 
 void aha154x_device::device_reset()
 {
-	m_fifo_read_index = 0;
-	m_fifo_write_index = 0;
-	m_dma_mode = 0;
-}
-
-void aha154x_device::transfer_speed_w(u8 data)
-{
-	const unsigned div = BIT(data, 3) ? (data & 3) + 5 : 4;
-	logerror("Transfer speed = %.2f MB/s\n", 20.0 * 2 / div);
-}
-
-void aha154x_device::dma_mode_w(u8 data)
-{
-	m_dma_mode = data;
-}
-
-void aha154x_device::bus_on_time_w(u8 data)
-{
-	logerror("Bus on time = %d microseconds\n", data & 0x0f);
-}
-
-void aha154x_device::bus_off_time_w(u8 data)
-{
-	logerror("Bus off time = %d microseconds\n", std::max(1, (data & 0x0f) * 4));
-}
-
-u8 aha154x_device::fifo_data_r()
-{
-	const u8 data = m_fifo_data[m_fifo_read_index];
-	if (!machine().side_effects_disabled())
-		m_fifo_read_index = (m_fifo_read_index + 1) % 10;
-	return data;
-}
-
-void aha154x_device::fifo_data_w(u8 data)
-{
-	m_fifo_data[m_fifo_write_index] = data;
-	if (!machine().side_effects_disabled())
-		m_fifo_write_index = (m_fifo_write_index + 1) % 10;
-}
-
-WRITE_LINE_MEMBER(aha154x_device::aic_breq_w)
-{
-	if (state)
-	{
-		if (m_dma_mode == 0x80)
-		{
-			m_fifo_data[m_fifo_write_index] = m_scsic->dma_r();
-			m_fifo_write_index = (m_fifo_write_index + 1) % 10;
-			m_scsic->back_w(0);
-		}
-		else if (m_dma_mode == 0x90)
-		{
-			m_scsic->dma_w(m_fifo_data[m_fifo_read_index]);
-			m_fifo_read_index = (m_fifo_read_index + 1) % 10;
-			m_scsic->back_w(0);
-		}
-		else
-			logerror("AIC-6250 BREQ (DMA mode %02X)\n", m_dma_mode);
-	}
 }
 
 void aha154x_device::i8085_base_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("mcode", 0);
 	map(0x8000, 0x800f).m(m_scsic, FUNC(aic6250_device::map));
-	map(0xc080, 0xc080).w(FUNC(aha154x_device::transfer_speed_w));
-	map(0xc082, 0xc082).w(FUNC(aha154x_device::dma_mode_w));
-	map(0xc08c, 0xc08c).w(FUNC(aha154x_device::bus_on_time_w));
-	map(0xc08d, 0xc08d).w(FUNC(aha154x_device::bus_off_time_w));
-	map(0xc0ac, 0xc0ac).rw(FUNC(aha154x_device::fifo_data_r), FUNC(aha154x_device::fifo_data_w));
-	map(0xc0c0, 0xc0c9).ram().share("fifo_data");
+	map(0xc000, 0xc0ff).m("dmaaic", FUNC(aic580_device::mpu_map));
 	map(0xe000, 0xe7ff).ram();
 }
 
@@ -452,9 +381,9 @@ ioport_constructor aha1542b_device::device_input_ports() const
 
 void aha154x_device::scsic_config(device_t *device)
 {
-	device->set_clock(20'000'000);
+	device->set_clock(20_MHz_XTAL);
 	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST65_LINE);
-	downcast<aic6250_device &>(*device).breq_cb().set("^^", FUNC(aha154x_device::aic_breq_w));
+	downcast<aic6250_device &>(*device).breq_cb().set("^^dmaaic", FUNC(aic580_device::breq_w));
 	downcast<aic6250_device &>(*device).port_a_r_cb().set_ioport("^^SETUP");
 	downcast<aic6250_device &>(*device).port_b_r_cb().set_ioport("^^CONFIG");
 }
@@ -471,11 +400,16 @@ void aha154x_device::scsi_add(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6250)
 		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	aic580_device &dmaaic(AIC580(config, "dmaaic", 20_MHz_XTAL));
+	dmaaic.bdin_callback().set(m_scsic, FUNC(aic6250_device::dma_r));
+	dmaaic.bdout_callback().set(m_scsic, FUNC(aic6250_device::dma_w));
+	dmaaic.back_callback().set(m_scsic, FUNC(aic6250_device::back_w));
 }
 
 void aha1542a_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 10'000'000));
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
 	localcpu.set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
 
 	generic_latch_8_device &fromhost(GENERIC_LATCH_8(config, "fromhost"));
@@ -490,7 +424,7 @@ void aha1542a_device::device_add_mconfig(machine_config &config)
 
 void aha1542b_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 10'000'000));
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
 	localcpu.set_addrmap(AS_PROGRAM, &aha1542b_device::i8085_map);
 
 	AIC565(config, m_busaic);

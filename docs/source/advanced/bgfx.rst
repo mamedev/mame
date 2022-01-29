@@ -46,12 +46,14 @@ Configuration Settings
 |
 | **bgfx_backend**
 |
-|	Selects a rendering backend for BGFX to use. Possible choices include ``d3d9``, ``d3d11``, ``opengl``, and ``metal``. The default is ``**auto**``, which will let MAME choose the best selection for you.
+|	Selects a rendering backend for BGFX to use. Possible choices include ``d3d9``, ``d3d11``, ``d3d12``, ``opengl``, ``metal``, and ```vulkan``. The default is ``**auto**``, which will let MAME choose the best selection for you.
 |
 |	``d3d9`` -- Direct3D 9.0 Renderer (Requires Windows XP or higher)
 |	``d3d11`` -- Direct3D 11.0 Renderer (Requires Windows Vista with D3D11 update or Windows 7 or higher)
+|	``d3d12`` -- Direct3D 12.0 Renderer (Requires Windows 10)
 |	``opengl`` -- OpenGL Renderer (Requires OpenGL drivers, may work better on some poorly designed video cards, supported on Linux/Mac OS X)
 |	``metal`` -- Metal Apple Graphics API (Requires OS X 10.11 El Capitan or newer)
+|	``vulkan`` -- Vulkan Renderer
 |
 | **bgfx_debug**
 |

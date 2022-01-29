@@ -27,7 +27,7 @@ apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_confi
 
 apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_single_card_slot_interface<device_apricot_expansion_card_interface>(mconfig, *this)
 {
 }
 
@@ -37,7 +37,7 @@ apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_confi
 
 void apricot_expansion_slot_device::device_start()
 {
-	device_apricot_expansion_card_interface *dev = dynamic_cast<device_apricot_expansion_card_interface *>(get_card_device());
+	device_apricot_expansion_card_interface *dev = get_card_device();
 
 	if (dev)
 	{
@@ -136,7 +136,7 @@ void apricot_expansion_bus_device::install_ram(offs_t addrstart, offs_t addrend,
 //-------------------------------------------------
 
 device_apricot_expansion_card_interface::device_apricot_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "apricotexp"),
 	m_bus(nullptr),
 	m_next(nullptr)
 {

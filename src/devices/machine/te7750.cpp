@@ -177,6 +177,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(TE7750, te7750_device, "te7750", "TE7750 Super I/O Expander")
+DEFINE_DEVICE_TYPE(TE7751, te7751_device, "te7751", "TE7751 Super I/O Expander")
 DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 
 //**************************************************************************
@@ -189,8 +190,8 @@ DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 
 te7750_device::te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_input_cb(*this)
+	, m_output_cb(*this)
 	, m_ios_cb(*this)
 {
 	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
@@ -198,6 +199,15 @@ te7750_device::te7750_device(const machine_config &mconfig, device_type type, co
 
 te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: te7750_device(mconfig, TE7750, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  te7751_device - constructor
+//-------------------------------------------------
+
+te7751_device::te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: te7750_device(mconfig, TE7751, tag, owner, clock)
 {
 }
 
@@ -217,10 +227,8 @@ te7752_device::te7752_device(const machine_config &mconfig, const char *tag, dev
 void te7750_device::device_start()
 {
 	// resolve port callbacks
-	for (auto &cb : m_input_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_output_cb)
-		cb.resolve_safe();
+	m_input_cb.resolve_all_safe(0xff);
+	m_output_cb.resolve_all_safe();
 
 	// resolve IOS (assume soft mode unless specified)
 	m_ios_cb.resolve_safe(0);
@@ -288,7 +296,7 @@ void te7750_device::set_ios()
 //  read - read input port and/or output latch
 //-------------------------------------------------
 
-READ8_MEMBER(te7750_device::read)
+u8 te7750_device::read(offs_t offset)
 {
 	if (offset < 9)
 	{
@@ -305,7 +313,7 @@ READ8_MEMBER(te7750_device::read)
 	}
 
 	logerror("Attempt to read from register with offset %X\n", offset);
-	return space.unmap();
+	return 0xff;
 }
 
 //-------------------------------------------------
@@ -313,7 +321,7 @@ READ8_MEMBER(te7750_device::read)
 //  register
 //-------------------------------------------------
 
-WRITE8_MEMBER(te7750_device::write)
+void te7750_device::write(offs_t offset, u8 data)
 {
 	if (offset < 9)
 	{

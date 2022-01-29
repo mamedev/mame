@@ -51,7 +51,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	, m_status(0)
 	, m_power(0)
 	, m_timer(nullptr)
-	, m_output(*this, "led2") // TODO: probably shouldn't be hardcoded
+	, m_output(*this, tag) // TODO: change to "tag:status"
 {
 }
 
@@ -159,7 +159,7 @@ void ticket_dispenser_device::device_reset()
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// if we still have power, keep toggling ticket states
 	if (m_power)

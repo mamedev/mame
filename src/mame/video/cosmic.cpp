@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Lee Taylor
 /***************************************************************************
 
- cosmic.c
+ cosmic.cpp
 
  emulation of video hardware of cosmic machines of 1979-1980(ish)
 
@@ -12,7 +12,7 @@
 #include "includes/cosmic.h"
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
+void cosmic_state::cosmic_color_register_w(offs_t offset, uint8_t data)
 {
 	m_color_registers[offset] = data ? 1 : 0;
 }
@@ -38,15 +38,6 @@ pen_t cosmic_state::cosmica_map_color( uint8_t x, uint8_t y )
 		pen >>= 4;
 
 	return pen & 0x07;
-}
-
-pen_t cosmic_state::cosmicg_map_color( uint8_t x, uint8_t y )
-{
-	offs_t offs = (m_color_registers[0] << 8) | (m_color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = memregion("user1")->base()[offs];
-
-	/* the upper 4 bits are for cocktail mode support */
-	return pen & 0x0f;
 }
 
 pen_t cosmic_state::magspot_map_color( uint8_t x, uint8_t y )
@@ -130,30 +121,6 @@ void cosmic_state::cosmica_palette(palette_device &palette)
 }
 
 
-/*
- * Cosmic guerilla table setup
- *
- * Use AA for normal, FF for Full Red
- * Bit 0 = R, bit 1 = G, bit 2 = B, bit 4 = High Red
- *
- * It's possible that the background is dark gray and not black, as the
- * resistor chain would never drop to zero, Anybody know ?
- */
-void cosmic_state::cosmicg_palette(palette_device &palette)
-{
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		int const r = (i > 8) ? 0xff : 0xaa * BIT(i, 0);
-		int const g = 0xaa * BIT(i, 1);
-		int const b = 0xaa * BIT(i, 2);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-
-	m_map_color = &cosmic_state::cosmicg_map_color;
-}
-
-
 void cosmic_state::magspot_palette(palette_device &palette)
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -205,7 +172,7 @@ void cosmic_state::nomnlnd_palette(palette_device &palette)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
+void cosmic_state::cosmic_background_enable_w(uint8_t data)
 {
 	m_background_enable = data;
 }
@@ -227,9 +194,9 @@ void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect 
 			if (data & 0x80)
 			{
 				if (flip_screen())
-					bitmap.pix16(255-y, 255-x) = pen;
+					bitmap.pix(255-y, 255-x) = pen;
 				else
-					bitmap.pix16(y, x) = pen;
+					bitmap.pix(y, x) = pen;
 			}
 
 			x++;
@@ -308,7 +275,7 @@ void cosmic_state::cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &
 				/* RGB order is reversed -- bit 7=R, 6=G, 5=B */
 				int col = (map >> 7) | ((map >> 5) & 0x02) | ((map >> 3) & 0x04);
 
-				bitmap.pix16(y, x) = col;
+				bitmap.pix(y, x) = col;
 			}
 
 			x++;
@@ -323,23 +290,20 @@ void cosmic_state::cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &
 
 void cosmic_state::devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t y;
-	uint8_t *horz_PROM = memregion("user2")->base();
-	uint8_t *vert_PROM = memregion("user3")->base();
+	uint8_t const *const horz_PROM = memregion("user2")->base();
+	uint8_t const *const vert_PROM = memregion("user3")->base();
 	offs_t horz_addr = 0;
 
 	uint8_t count = 0;
 	uint8_t horz_data = 0;
 	uint8_t vert_data;
 
-	for (y = 32; y < 224; y++)
+	for (int y = 32; y < 224; y++)
 	{
 		uint8_t x = 0;
 
 		while (1)
 		{
-			int x1;
-
 			/* for the vertical lines, each bit indicates
 			   if there should be a line at the x position */
 			vert_data = vert_PROM[x >> 3];
@@ -356,15 +320,15 @@ void cosmic_state::devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cli
 			if (count == 0)
 				horz_data = horz_PROM[horz_addr++];
 
-			for (x1 = 0; x1 < 8; x1++)
+			for (int x1 = 0; x1 < 8; x1++)
 			{
 				if (!(vert_data & horz_data & 0x80))    /* NAND gate */
 				{
 					/* blue */
 					if (flip_screen())
-						bitmap.pix16(255-y, 255-x) = 4;
+						bitmap.pix(255-y, 255-x) = 4;
 					else
-						bitmap.pix16(y, x) = 4;
+						bitmap.pix(y, x) = 4;
 				}
 
 				horz_data = (horz_data << 1) | 0x01;
@@ -481,9 +445,9 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 			if (color != 0)
 			{
 				if (flip_screen())
-					bitmap.pix16(255-y, 255-x) = color;
+					bitmap.pix(255-y, 255-x) = color;
 				else
-					bitmap.pix16(y, x) = color;
+					bitmap.pix(y, x) = color;
 			}
 
 			x++;
@@ -498,14 +462,6 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 		y++;
 		if (y == 0)  break;
 	}
-}
-
-
-uint32_t cosmic_state::screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	draw_bitmap(bitmap, cliprect);
-	return 0;
 }
 
 

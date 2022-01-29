@@ -20,7 +20,7 @@ public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dram(*this, "dram"),
+		m_dram(*this, "dram", 0x200000, ENDIANNESS_BIG),
 		m_vram(*this, "vram"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -160,7 +160,7 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_dram;
+	memory_share_creator<uint32_t> m_dram;
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -174,16 +174,16 @@ private:
 	uint8_t m_nvmem[0x8000];
 
 //  uint8_t m_video_bits[512];
-	DECLARE_READ8_MEMBER(nvarea_r);
-	DECLARE_WRITE8_MEMBER(nvarea_w);
-	DECLARE_READ32_MEMBER(slow2_r);
-	DECLARE_WRITE32_MEMBER(slow2_w);
-	DECLARE_READ32_MEMBER(svf_r);
-	DECLARE_WRITE32_MEMBER(svf_w);
-	DECLARE_READ32_MEMBER(madam_r);
-	DECLARE_WRITE32_MEMBER(madam_w);
-	DECLARE_READ32_MEMBER(clio_r);
-	DECLARE_WRITE32_MEMBER(clio_w);
+	uint8_t nvarea_r(offs_t offset);
+	void nvarea_w(offs_t offset, uint8_t data);
+	uint32_t slow2_r(offs_t offset);
+	void slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t svf_r(offs_t offset);
+	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t madam_r(offs_t offset);
+	void madam_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t clio_r(offs_t offset);
+	void clio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );

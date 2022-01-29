@@ -64,19 +64,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(scroll_bg_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void scroll_bg_w(uint8_t data);
 
 	// sauro specific
-	DECLARE_WRITE8_MEMBER(sauro_sound_command_w);
-	DECLARE_READ8_MEMBER(sauro_sound_command_r);
+	void sauro_sound_command_w(uint8_t data);
+	uint8_t sauro_sound_command_r();
 	DECLARE_WRITE_LINE_MEMBER(sauro_palette_bank0_w);
 	DECLARE_WRITE_LINE_MEMBER(sauro_palette_bank1_w);
-	DECLARE_WRITE8_MEMBER(sauro_scroll_fg_w);
-	DECLARE_WRITE8_MEMBER(sauro_videoram2_w);
-	DECLARE_WRITE8_MEMBER(sauro_colorram2_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void sauro_scroll_fg_w(uint8_t data);
+	void sauro_videoram2_w(offs_t offset, uint8_t data);
+	void sauro_colorram2_w(offs_t offset, uint8_t data);
+	void adpcm_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);

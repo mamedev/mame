@@ -31,12 +31,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( status0_r );
-	DECLARE_READ8_MEMBER( status1_r );
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t status0_r();
+	uint8_t status1_r();
+	uint8_t status_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(c0_flag_w);
 	DECLARE_WRITE_LINE_MEMBER(c1_flag_w);

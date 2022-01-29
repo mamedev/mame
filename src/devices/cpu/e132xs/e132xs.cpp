@@ -215,6 +215,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
+	, m_interrupt_checks(nullptr)
 	, m_out_of_cycles(nullptr)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
@@ -226,6 +227,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_io_write32(nullptr)
 	, m_enable_drc(false)
 {
+	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 }
 
 hyperstone_device::~hyperstone_device()
@@ -1115,24 +1117,24 @@ void hyperstone_device::init(int scale_mask)
 	m_program = &space(AS_PROGRAM);
 	if (m_program->data_width() == 16)
 	{
-		auto cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
-		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		m_program->cache(m_cache16);
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache16.read_word(address); };
+		m_prptr = [this](offs_t address) -> const void * { return m_cache16.read_ptr(address); };
 	}
 	else
 	{
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		m_program->cache(m_cache32);
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word(address); };
 		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 				if(!(address & 2))
 					ptr++;
 				return ptr;
 			};
 		else
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 				if(address & 2)
 					ptr++;
 				return ptr;
@@ -1574,7 +1576,7 @@ void hyperstone_device::hyperstone_trap()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t hyperstone_device::execute_min_cycles() const
+uint32_t hyperstone_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -1585,7 +1587,7 @@ uint32_t hyperstone_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t hyperstone_device::execute_max_cycles() const
+uint32_t hyperstone_device::execute_max_cycles() const noexcept
 {
 	return 36;
 }
@@ -1596,7 +1598,7 @@ uint32_t hyperstone_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t hyperstone_device::execute_input_lines() const
+uint32_t hyperstone_device::execute_input_lines() const noexcept
 {
 	return 8;
 }

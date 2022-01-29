@@ -29,7 +29,7 @@ void polyplay_state::polyplay_palette(palette_device &palette) const
 	palette.set_pen_color(9, rgb_t(0xff, 0xff, 0xff));
 }
 
-WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
+void polyplay_state::polyplay_characterram_w(offs_t offset, uint8_t data)
 {
 	if (m_characterram[offset] != data)
 	{

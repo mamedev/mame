@@ -63,7 +63,7 @@ void aztarac_state::nvram_store_w(uint16_t data)
  *
  *************************************/
 
-READ16_MEMBER(aztarac_state::joystick_r)
+uint16_t aztarac_state::joystick_r()
 {
 	return (((ioport("STICKZ")->read() - 0xf) << 8) |
 			((ioport("STICKY")->read() - 0xf) & 0xff));

@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Peripheral expansion box
-    See peribox.c for documentation
+    See peribox.cpp for documentation
 
     Michael Zapf
 
@@ -16,10 +16,12 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/ioport.h"
 
-namespace bus { namespace ti99 { namespace peb {
+#define TI_PERIBOX_TAG     "peb"
+#define TI99_DSRROM        "dsrrom"
+
+namespace bus::ti99::peb {
 
 class peribox_slot_device;
 class device_ti99_peribox_card_interface;
@@ -35,11 +37,11 @@ public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Next eight methods are called from the console
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -49,6 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( msast_in ) override;
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in ) override;
+	DECLARE_WRITE_LINE_MEMBER( reset_in ) override;
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
@@ -107,9 +110,6 @@ protected:
 
 	// Configured as a slot device (of the ioport)
 	bool    m_ioport_connected;
-
-	// Used for Genmod
-	bool    m_genmod;
 };
 
 /************************************************************************
@@ -170,23 +170,24 @@ protected:
     The parent class for all expansion cards.
 ******************************************************************************/
 
-class device_ti99_peribox_card_interface : public device_slot_card_interface
+class device_ti99_peribox_card_interface : public device_interface
 {
 	friend class peribox_slot_device;
 
 public:
-	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
+	virtual void readz(offs_t offset, uint8_t *value) = 0;
 	virtual void write(offs_t offset, uint8_t data) = 0;
-	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
+	virtual void crureadz(offs_t offset, uint8_t *value) = 0;
 	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
+	virtual void setaddress_dbin(offs_t offset, int state) { };
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
+	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }
+
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
 	device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_config_complete() override;
 
@@ -197,22 +198,20 @@ protected:
 	// When true, card is accessible. Indicated by a LED.
 	bool    m_selected;
 
-	// When true, GenMod is selected. Modified by peribox_slot_device.
-	bool    m_genmod;
-
 	// CRU base. Used to configure the address by which a card is selected.
 	int     m_cru_base;
 
-	// Used to decide whether this card has been selected.
-	int     m_select_mask;
-	int     m_select_value;
+	// Methods to decide whether we are acccessing the 4000-5fff region (DSR)
+	// or the cartridge region
+	static bool in_dsr_space(offs_t offset, bool amadec);
+	static bool in_cart_space(offs_t offset, bool amadec);
 };
 
 /*****************************************************************************
     A single slot in the box.
 ******************************************************************************/
 
-class peribox_slot_device : public device_t, public device_slot_interface
+class peribox_slot_device : public device_t, public device_single_card_slot_interface<device_ti99_peribox_card_interface>
 {
 	friend class peribox_device;
 public:
@@ -230,13 +229,14 @@ public:
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Called from the box (direction to card)
-	DECLARE_READ8Z_MEMBER(readz);
+	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	void setaddress_dbin(offs_t offset, int state);
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 	DECLARE_WRITE_LINE_MEMBER(clock_in);
+	DECLARE_WRITE_LINE_MEMBER(reset_in);
 
 	// Called from the card (direction to box)
 	DECLARE_WRITE_LINE_MEMBER( set_inta );
@@ -244,11 +244,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lcp_line );
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
-	DECLARE_READ8Z_MEMBER(crureadz);
+	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// called from the box itself
-	void set_genmod(bool set);
 	void set_number(int number) { m_slotnumber = number; }
 
 protected:
@@ -262,7 +261,7 @@ private:
 	const char* card_name() { return m_card->device().tag(); }
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)

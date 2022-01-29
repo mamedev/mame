@@ -50,8 +50,8 @@ public:
 	void set_chrominance(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
 	void dma_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( bkg_w );
-	DECLARE_WRITE_LINE_MEMBER( con_w );
+	void bkg_w(int state);
+	void con_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

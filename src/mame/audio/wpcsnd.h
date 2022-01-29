@@ -12,8 +12,8 @@
 #pragma once
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ym2151.h"
 #include "sound/hc55516.h"
+#include "sound/ymopm.h"
 
 
 class wpcsnd_device : public device_t, public device_mixer_interface
@@ -28,13 +28,6 @@ public:
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
 	required_memory_region m_rom;
-
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
 
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
@@ -62,6 +55,13 @@ private:
 	devcb_write_line m_reply_cb;
 
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+
+	void bg_cvsd_clock_set_w(uint8_t data);
+	void bg_cvsd_digit_clock_clear_w(uint8_t data);
+	void rombank_w(uint8_t data);
+	uint8_t latch_r();
+	void latch_w(uint8_t data);
+	void volume_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)

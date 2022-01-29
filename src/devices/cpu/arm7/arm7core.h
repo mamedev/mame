@@ -48,7 +48,7 @@ enum
 	ARM7_R8, ARM7_R9, ARM7_R10, ARM7_R11, ARM7_R12, ARM7_R13, ARM7_R14, ARM7_R15,
 	ARM7_FR8, ARM7_FR9, ARM7_FR10, ARM7_FR11, ARM7_FR12, ARM7_FR13, ARM7_FR14,
 	ARM7_IR13, ARM7_IR14, ARM7_SR13, ARM7_SR14, ARM7_FSPSR, ARM7_ISPSR, ARM7_SSPSR,
-	ARM7_CPSR, ARM7_AR13, ARM7_AR14, ARM7_ASPSR, ARM7_UR13, ARM7_UR14, ARM7_USPSR
+	ARM7_CPSR, ARM7_AR13, ARM7_AR14, ARM7_ASPSR, ARM7_UR13, ARM7_UR14, ARM7_USPSR, ARM7_LOGTLB
 };
 
 /* There are 36 Unique - 32 bit processor registers */
@@ -83,6 +83,19 @@ enum
 };
 
 /* Coprocessor-related macros */
+#define COPRO_DOMAIN_NO_ACCESS              0
+#define COPRO_DOMAIN_CLIENT                 1
+#define COPRO_DOMAIN_RESV                   2
+#define COPRO_DOMAIN_MANAGER                3
+
+#define COPRO_FAULT_NONE                    0
+#define COPRO_FAULT_TRANSLATE_SECTION       5
+#define COPRO_FAULT_TRANSLATE_PAGE          7
+#define COPRO_FAULT_DOMAIN_SECTION          9
+#define COPRO_FAULT_DOMAIN_PAGE             11
+#define COPRO_FAULT_PERM_SECTION            13
+#define COPRO_FAULT_PERM_PAGE               15
+
 #define COPRO_TLB_BASE                      m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
@@ -99,6 +112,9 @@ enum
 #define COPRO_TLB_LARGE_PAGE_MASK           0xffff0000
 #define COPRO_TLB_SMALL_PAGE_MASK           0xfffff000
 #define COPRO_TLB_TINY_PAGE_MASK            0xfffffc00
+#define COPRO_TLB_STABLE_MASK               0xfff00000
+#define COPRO_TLB_LSTABLE_MASK              0xfffff000
+#define COPRO_TLB_TTABLE_MASK               0xfffffc00
 #define COPRO_TLB_UNMAPPED                  0
 #define COPRO_TLB_LARGE_PAGE                1
 #define COPRO_TLB_SMALL_PAGE                2
@@ -106,6 +122,10 @@ enum
 #define COPRO_TLB_COARSE_TABLE              1
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
+#define COPRO_TLB_TYPE_SECTION              0
+#define COPRO_TLB_TYPE_LARGE                1
+#define COPRO_TLB_TYPE_SMALL                2
+#define COPRO_TLB_TYPE_TINY                 3
 
 #define COPRO_CTRL                          m_control
 #define COPRO_CTRL_MMU_EN                   0x00000001
@@ -356,12 +376,14 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define INSN_RD_SHIFT               12
 #define INSN_COND_SHIFT             28
 
+#define INSN_COPRO_OP1      ((uint32_t) 0x00e00000u)
 #define INSN_COPRO_N        ((uint32_t) 0x00100000u)
 #define INSN_COPRO_CREG     ((uint32_t) 0x000f0000u)
 #define INSN_COPRO_AREG     ((uint32_t) 0x0000f000u)
 #define INSN_COPRO_CPNUM    ((uint32_t) 0x00000f00u)
 #define INSN_COPRO_OP2      ((uint32_t) 0x000000e0u)
 #define INSN_COPRO_OP3      ((uint32_t) 0x0000000fu)
+#define INSN_COPRO_OP1_SHIFT        21
 #define INSN_COPRO_N_SHIFT          20
 #define INSN_COPRO_CREG_SHIFT       16
 #define INSN_COPRO_AREG_SHIFT       12

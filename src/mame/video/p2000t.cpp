@@ -22,14 +22,14 @@ void p2000m_state::video_start()
 
 uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int offs, sx, sy, code, loop;
+	uint8_t const *const videoram = m_videoram;
 
-	for (offs = 0; offs < 80 * 24; offs++)
+	for (int offs = 0; offs < 80 * 24; offs++)
 	{
-		sy = (offs / 80) * 20;
-		sx = (offs % 80) * 12;
+		int sy = (offs / 80) * 20;
+		int sx = (offs % 80) * 12;
 
+		int code;
 		if ((m_frame_count > 25) && (videoram[offs + 2048] & 0x40))
 			code = 32;
 		else
@@ -49,10 +49,10 @@ uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 
 
 		if (videoram[offs] & 0x80)
 		{
-			for (loop = 0; loop < 12; loop++)
+			for (int loop = 0; loop < 12; loop++)
 			{
-				bitmap.pix16(sy + 18, sx + loop) = 0;   /* cursor */
-				bitmap.pix16(sy + 19, sx + loop) = 0;   /* cursor */
+				bitmap.pix(sy + 18, sx + loop) = 0;   /* cursor */
+				bitmap.pix(sy + 19, sx + loop) = 0;   /* cursor */
 			}
 		}
 	}

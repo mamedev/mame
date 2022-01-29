@@ -39,8 +39,7 @@ void a8sio_cards(device_slot_interface &device);
 
 class device_a8sio_card_interface;
 
-class a8sio_device : public device_t,
-							public device_slot_interface
+class a8sio_device : public device_t, public device_single_card_slot_interface<device_a8sio_card_interface>
 {
 public:
 	// construction/destruction
@@ -70,7 +69,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( command_w );   // pin 7
 	DECLARE_WRITE_LINE_MEMBER( motor_w );     // pin 8
 	DECLARE_WRITE_LINE_MEMBER( proceed_w );   // pin 9
-	DECLARE_WRITE8_MEMBER( audio_in_w );      // pin 11
+	void audio_in_w(uint8_t data);            // pin 11
 	DECLARE_WRITE_LINE_MEMBER( interrupt_w ); // pin 13
 
 protected:
@@ -94,7 +93,7 @@ protected:
 DECLARE_DEVICE_TYPE(A8SIO, a8sio_device)
 
 
-class device_a8sio_card_interface : public device_slot_card_interface
+class device_a8sio_card_interface : public device_interface
 {
 	friend class a8sio_device;
 public:

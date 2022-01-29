@@ -111,7 +111,7 @@ TODO:
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 /*
   rtc interrupt irq 2
@@ -503,23 +503,22 @@ INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 
 uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = (uint8_t *)m_vram.target();
-	int x, y;
-	for (y=0; y<240; y++)
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	for (int y=0; y<240; y++)
 	{
-		for (x=0; x<(320/8); x++)
+		for (int x=0; x<(320/8); x++)
 		{
-			int a = (y & 3) * 0x2000;
-			uint8_t d1 = vram[a + (y >> 2) * 80 + x];
-			uint16_t *line = &bitmap.pix16(y, x << 3);
-			*line++ = ((d1 >> 7) & 1);
-			*line++ = ((d1 >> 6) & 1);
-			*line++ = ((d1 >> 5) & 1);
-			*line++ = ((d1 >> 4) & 1);
-			*line++ = ((d1 >> 3) & 1);
-			*line++ = ((d1 >> 2) & 1);
-			*line++ = ((d1 >> 1) & 1);
-			*line++ = ((d1 >> 0) & 1);
+			int const a = (y & 3) * 0x2000;
+			uint8_t const d1 = vram[a + (y >> 2) * 80 + x];
+			uint16_t *line = &bitmap.pix(y, x << 3);
+			*line++ = BIT(d1, 7);
+			*line++ = BIT(d1, 6);
+			*line++ = BIT(d1, 5);
+			*line++ = BIT(d1, 4);
+			*line++ = BIT(d1, 3);
+			*line++ = BIT(d1, 2);
+			*line++ = BIT(d1, 1);
+			*line++ = BIT(d1, 0);
 		}
 	}
 	return 0;
@@ -554,7 +553,10 @@ void pasogo_state::pasogo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 

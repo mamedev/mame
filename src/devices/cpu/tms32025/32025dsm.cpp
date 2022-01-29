@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "32025dsm.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 

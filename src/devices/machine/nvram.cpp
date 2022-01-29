@@ -27,6 +27,7 @@ nvram_device::nvram_device(const machine_config &mconfig, const char *tag, devic
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_default_value(DEFAULT_ALL_1),
+		m_custom_handler(*this),
 		m_base(nullptr),
 		m_length(0)
 {
@@ -40,7 +41,7 @@ nvram_device::nvram_device(const machine_config &mconfig, const char *tag, devic
 void nvram_device::device_start()
 {
 	// bind our handler
-	m_custom_handler.bind_relative_to(*owner());
+	m_custom_handler.resolve();
 }
 
 

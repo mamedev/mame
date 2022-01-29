@@ -49,9 +49,9 @@ public:
 private:
 	required_shared_ptr<uint8_t> m_led_vram_lo;
 	required_shared_ptr<uint8_t> m_led_vram_hi;
-	DECLARE_READ8_MEMBER(test1_r);
-	DECLARE_READ8_MEMBER(test2_r);
-	DECLARE_READ8_MEMBER(in_r);
+	uint8_t test1_r();
+	uint8_t test2_r();
+	uint8_t in_r();
 	virtual void video_start() override;
 	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -71,19 +71,19 @@ uint32_t timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ8_MEMBER(timetrv_state::test1_r)
+uint8_t timetrv_state::test1_r()
 {
 	return ioport("IN0")->read();//machine().rand();
 }
 
-READ8_MEMBER(timetrv_state::test2_r)
+uint8_t timetrv_state::test2_r()
 {
 	/*bit 7,eeprom read bit*/
 	return (ioport("IN1")->read() & 0x7f);//machine().rand();
 }
 
 
-READ8_MEMBER(timetrv_state::in_r)
+uint8_t timetrv_state::in_r()
 {
 	return 0xff;
 }

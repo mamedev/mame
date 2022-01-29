@@ -33,10 +33,10 @@ public:
 
 	agat9video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(apple_read);
-	DECLARE_WRITE8_MEMBER(apple_write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t apple_read(offs_t offset);
+	void apple_write(offs_t offset, uint8_t data);
 
 	bool m_page2;
 	bool m_flash;

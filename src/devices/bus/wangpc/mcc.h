@@ -12,7 +12,7 @@
 #pragma once
 
 #include "wangpc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 
 
 
@@ -42,7 +42,7 @@ protected:
 private:
 	inline void set_irq(int state);
 
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<z80dart_device> m_dart;
 
 	uint8_t m_option;

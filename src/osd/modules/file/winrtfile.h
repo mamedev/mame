@@ -8,7 +8,7 @@
 #ifndef MAME_OSD_WINDOWS_WINFILE_H
 #define MAME_OSD_WINDOWS_WINFILE_H
 
-#include "osdcore.h"
+#include "osdfile.h"
 
 #include <cstdint>
 #include <string>

@@ -17,8 +17,8 @@ public:
 	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_READ16_MEMBER(protection_r);
+	void protection_w(uint16_t data);
+	uint16_t protection_r(offs_t offset);
 	int m_prot_state;
 	uint16_t m_default_rom[2];
 

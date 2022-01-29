@@ -20,6 +20,7 @@ enum
 {
 	I8086_PC = STATE_GENPC,
 	I8086_IP = 1, I8086_AX, I8086_CX, I8086_DX, I8086_BX, I8086_SP, I8086_BP, I8086_SI, I8086_DI,
+	I8086_AL, I8086_AH, I8086_CL, I8086_CH, I8086_DL, I8086_DH, I8086_BL, I8086_BH,
 	I8086_FLAGS, I8086_ES, I8086_CS, I8086_SS, I8086_DS,
 	I8086_VECTOR, I8086_HALT
 };
@@ -114,10 +115,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 50; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 50; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -294,6 +295,9 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	std::function<u8 (offs_t)> m_or8;
 	address_space *m_io;
 	int m_icount;
@@ -354,7 +358,7 @@ protected:
 
 	virtual void execute_run() override;
 	virtual void device_start() override;
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual uint8_t fetch() override;
 	inline address_space *sreg_to_space(int sreg) const;
 	virtual uint8_t read_byte(uint32_t addr) override;

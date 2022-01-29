@@ -36,8 +36,8 @@ private:
 
 	optional_memory_bank m_okibank;
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	void eeprom_w(uint8_t data);
+	void oki_bank_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -21,7 +21,9 @@ public:
 		: pocketc_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_keys(*this, "KEY%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void pc1350(machine_config &config);
 
@@ -32,14 +34,14 @@ protected:
 
 	void pc1350_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(out_b_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
+	void out_b_w(uint8_t data);
+	void out_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(in_a_r);
-	DECLARE_READ8_MEMBER(in_b_r);
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
-	DECLARE_READ8_MEMBER(keyboard_line_r);
+	uint8_t in_a_r();
+	uint8_t in_b_r();
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
+	uint8_t keyboard_line_r();
 
 private:
 	required_device<ram_device> m_ram;

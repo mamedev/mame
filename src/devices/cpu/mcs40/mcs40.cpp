@@ -102,11 +102,10 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 			{ "ramport", ENDIANNESS_LITTLE, 8, u8(5),             0 },
 			{ "program", ENDIANNESS_LITTLE, 8, u8(rom_width - 3), 0 }, }
 	, m_spaces{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
-	, m_cache(nullptr)
-	, m_bus_cycle_cb()
+	, m_bus_cycle_cb(*this)
 	, m_sync_cb(*this)
-	, m_cm_rom_cb{ { *this }, { *this } }
-	, m_cm_ram_cb{ { *this }, { *this }, { *this }, { *this }, }
+	, m_cm_rom_cb(*this)
+	, m_cm_ram_cb(*this)
 	, m_cy_cb(*this), m_stp_ack_cb(*this)
 	, m_4289_pm_cb(*this), m_4289_f_l_cb(*this)
 	, m_extended_cm(extended_cm)
@@ -142,16 +141,12 @@ void mcs40_cpu_device_base::device_start()
 	m_spaces[AS_RAM_STATUS]     = &space(AS_RAM_STATUS);
 	m_spaces[AS_RAM_PORTS]      = &space(AS_RAM_PORTS);
 	m_spaces[AS_PROGRAM_MEMORY] = &space(AS_PROGRAM_MEMORY);
-	m_cache = m_spaces[AS_ROM]->cache<0, 0, ENDIANNESS_LITTLE>();
+	m_spaces[AS_ROM]->cache(m_cache);
 
-	m_bus_cycle_cb.bind_relative_to(*owner());
+	m_bus_cycle_cb.resolve();
 	m_sync_cb.resolve_safe();
-	m_cm_rom_cb[0].resolve_safe();
-	m_cm_rom_cb[1].resolve_safe();
-	m_cm_ram_cb[0].resolve_safe();
-	m_cm_ram_cb[1].resolve_safe();
-	m_cm_ram_cb[2].resolve_safe();
-	m_cm_ram_cb[3].resolve_safe();
+	m_cm_rom_cb.resolve_all_safe();
+	m_cm_ram_cb.resolve_all_safe();
 	m_cy_cb.resolve_safe();
 	m_stp_ack_cb.resolve_safe();
 	m_4289_pm_cb.resolve_safe();
@@ -637,7 +632,7 @@ inline void mcs40_cpu_device_base::do_m1()
 		update_cm_rom(0x0fU);
 	}
 	// TODO: just read the high nybble here - MAME doesn't support this
-	u8 const read = m_cache->read_byte(rom_bank() | m_rom_addr);
+	u8 const read = m_cache.read_byte(rom_bank() | m_rom_addr);
 	if (cycle::OP == m_cycle)
 	{
 		m_opr = (m_stop_ff) ? 0x0U : (read >> 4);
@@ -655,7 +650,7 @@ inline void mcs40_cpu_device_base::do_m1()
 inline void mcs40_cpu_device_base::do_m2()
 {
 	// TODO: just read the low nybble here - MAME doesn't support this
-	u8 const read = m_cache->read_byte(rom_bank() | m_rom_addr);
+	u8 const read = m_cache.read_byte(rom_bank() | m_rom_addr);
 	if (cycle::OP == m_cycle)
 		m_opa = (m_stop_ff) ? 0x0U : (read & 0x0fU);
 	else
@@ -838,7 +833,7 @@ i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *ta
     device_execute_interface implementation
 ***********************************************************************/
 
-u32 i4004_cpu_device::execute_input_lines() const
+u32 i4004_cpu_device::execute_input_lines() const noexcept
 {
 	return 1U;
 }
@@ -1148,7 +1143,7 @@ i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *ta
     device_execute_interface implementation
 ***********************************************************************/
 
-u32 i4040_cpu_device::execute_input_lines() const
+u32 i4040_cpu_device::execute_input_lines() const noexcept
 {
 	return 3U;
 }

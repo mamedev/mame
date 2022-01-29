@@ -15,7 +15,7 @@ public:
 	void set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
 	auto gate() { return m_gate_handler_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 	void set_clock(int clock);
 
 protected:
@@ -26,7 +26,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct VOICE {

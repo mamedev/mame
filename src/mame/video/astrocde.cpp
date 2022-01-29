@@ -26,6 +26,8 @@ void astrocde_state::machine_start()
 {
 	save_item(NAME(m_ram_write_enable));
 	save_item(NAME(m_input_select));
+
+	m_input_select = 0;
 }
 
 void seawolf2_state::machine_start()
@@ -111,9 +113,9 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 			int b = (by + y) * 255;
 
 			// clamp and store
-			r = (std::min)((std::max)(r, 0), 255);
-			g = (std::min)((std::max)(g, 0), 255);
-			b = (std::min)((std::max)(b, 0), 255);
+			r = std::clamp(r, 0, 255);
+			g = std::clamp(g, 0, 255);
+			b = std::clamp(b, 0, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
@@ -211,6 +213,11 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	save_item(NAME(m_profpac_writemode));
 	save_item(NAME(m_profpac_writemask));
 	save_item(NAME(m_profpac_vw));
+
+	std::fill(std::begin(m_profpac_palette), std::end(m_profpac_palette), 0);
+
+	m_pattern_height = 0;
+	m_pattern_width = 0;
 }
 
 
@@ -256,11 +263,10 @@ void astrocde_state::init_savestate()
 
 uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
+	uint8_t const *const videoram = m_videoram;
 	uint32_t sparklebase = 0;
 	const int colormask = (m_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
 	int xystep = 2 - m_video_mode;
-	int y;
 
 	/* compute the starting point of sparkle for the current frame */
 	int width = screen.width();
@@ -270,13 +276,12 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 		sparklebase = (screen.frame_number() * (uint64_t)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix(y);
 		int effy = mame_vpos_to_astrocade_vpos(y);
 		uint16_t offset = (effy / xystep) * (80 / xystep);
 		uint32_t sparkleoffs = 0, staroffs = 0;
-		int x;
 
 		/* compute the star and sparkle offset at the start of this line */
 		if (m_video_config & AC_STARS)
@@ -288,23 +293,20 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 		}
 
 		/* iterate over groups of 4 pixels */
-		for (x = 0; x < 456/4; x += xystep)
+		for (int x = 0; x < 456/4; x += xystep)
 		{
 			int effx = x - HORZ_OFFSET/4;
 			const uint8_t *colorbase = &m_colors[(effx < m_colorsplit) ? 4 : 0];
-			uint8_t data;
-			int xx;
 
 			/* select either video data or background data */
-			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < m_vblank) ? videoram[offset++] : m_bgdata;
+			uint8_t data = (effx >= 0 && effx < 80 && effy >= 0 && effy < m_vblank) ? videoram[offset++] : m_bgdata;
 
 			/* iterate over the 4 pixels */
-			for (xx = 0; xx < 4; xx++)
+			for (int xx = 0; xx < 4; xx++)
 			{
 				uint8_t pixdata = (data >> 6) & 3;
 				int colordata = colorbase[pixdata] << 1;
 				int luma = colordata & 0x0f;
-				rgb_t color;
 
 				/* handle stars/sparkle */
 				if (m_video_config & AC_STARS)
@@ -324,7 +326,7 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 					if (++sparkleoffs >= RNG_PERIOD)
 						sparkleoffs = 0;
 				}
-				color = (colordata & colormask) | luma;
+				rgb_t const color = (colordata & colormask) | luma;
 
 				/* store the final color to the destination and shift */
 				*dest++ = color;
@@ -341,20 +343,17 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 
 uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	/* iterate over scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = mame_vpos_to_astrocade_vpos(y);
-		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix(y);
 		uint16_t offset = m_profpac_vispage * 0x4000 + effy * 80;
-		int x;
 
 		/* star with black */
 
 		/* iterate over groups of 4 pixels */
-		for (x = 0; x < 456/4; x++)
+		for (int x = 0; x < 456/4; x++)
 		{
 			int effx = x - HORZ_OFFSET/4;
 
@@ -380,7 +379,7 @@ uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -388,7 +387,7 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		scanline_callback(ptr, param);
+		scanline_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in astrocde_state::device_timer");
@@ -484,7 +483,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::video_register_r)
+uint8_t astrocde_state::video_register_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -509,7 +508,7 @@ READ8_MEMBER(astrocde_state::video_register_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::video_register_w)
+void astrocde_state::video_register_w(offs_t offset, uint8_t data)
 {
 	/* these are the core registers */
 	switch (offset & 0xff)
@@ -589,7 +588,7 @@ WRITE8_MEMBER(astrocde_state::video_register_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
+void astrocde_state::astrocade_funcgen_w(address_space &space, offs_t offset, uint8_t data)
 {
 	uint8_t prev_data;
 
@@ -677,7 +676,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
 }
 
 
-WRITE8_MEMBER(astrocde_state::expand_register_w)
+void astrocde_state::expand_register_w(uint8_t data)
 {
 	m_funcgen_expand_color[0] = data & 0x03;
 	m_funcgen_expand_color[1] = (data >> 2) & 0x03;
@@ -818,7 +817,7 @@ void astrocde_state::execute_blit()
 }
 
 
-WRITE8_MEMBER(astrocde_state::astrocade_pattern_board_w)
+void astrocde_state::astrocade_pattern_board_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -933,7 +932,7 @@ void astrocde_state::init_sparklestar()
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::profpac_page_select_w)
+void astrocde_state::profpac_page_select_w(uint8_t data)
 {
 	m_profpac_readpage = data & 3;
 	m_profpac_writepage = (data >> 2) & 3;
@@ -941,13 +940,13 @@ WRITE8_MEMBER(astrocde_state::profpac_page_select_w)
 }
 
 
-READ8_MEMBER(astrocde_state::profpac_intercept_r)
+uint8_t astrocde_state::profpac_intercept_r()
 {
 	return m_profpac_intercept;
 }
 
 
-WRITE8_MEMBER(astrocde_state::profpac_screenram_ctrl_w)
+void astrocde_state::profpac_screenram_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -988,7 +987,7 @@ WRITE8_MEMBER(astrocde_state::profpac_screenram_ctrl_w)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::profpac_videoram_r)
+uint8_t astrocde_state::profpac_videoram_r(offs_t offset)
 {
 	uint16_t temp = m_profpac_videoram[m_profpac_readpage * 0x4000 + offset] >> m_profpac_readshift;
 	return ((temp >> 6) & 0xc0) | ((temp >> 4) & 0x30) | ((temp >> 2) & 0x0c) | ((temp >> 0) & 0x03);
@@ -996,7 +995,7 @@ READ8_MEMBER(astrocde_state::profpac_videoram_r)
 
 
 /* All this information comes from decoding the PLA at U39 on the screen ram board */
-WRITE8_MEMBER(astrocde_state::profpac_videoram_w)
+void astrocde_state::profpac_videoram_w(offs_t offset, uint8_t data)
 {
 	uint16_t oldbits = m_profpac_videoram[m_profpac_writepage * 0x4000 + offset];
 	uint16_t newbits, result = 0;

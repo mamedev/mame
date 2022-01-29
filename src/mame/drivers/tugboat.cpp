@@ -42,8 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_ram(*this, "ram")
+		m_palette(*this, "palette")
 	{ }
 
 	void tugboat(machine_config &config);
@@ -58,7 +57,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +65,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_ram;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	uint8_t m_hd46505_0_reg[18];
 	uint8_t m_hd46505_1_reg[18];
@@ -75,11 +74,11 @@ private:
 	int m_ctrl;
 	emu_timer *m_interrupt_timer;
 
-	DECLARE_WRITE8_MEMBER(hd46505_0_w);
-	DECLARE_WRITE8_MEMBER(hd46505_1_w);
-	DECLARE_WRITE8_MEMBER(score_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void hd46505_0_w(offs_t offset, uint8_t data);
+	void hd46505_1_w(offs_t offset, uint8_t data);
+	void score_w(offs_t offset, uint8_t data);
+	uint8_t input_r();
+	void ctrl_w(uint8_t data);
 
 	void tugboat_palette(palette_device &palette) const;
 
@@ -93,6 +92,7 @@ private:
 void tugboat_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_hd46505_0_reg));
 	save_item(NAME(m_hd46505_1_reg));
@@ -125,24 +125,24 @@ void tugboat_state::tugboat_palette(palette_device &palette) const
 
 
 
-/* see mc6845.c. That file is only a placeholder, I process the writes here
+/* see mc6845.cpp. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
-WRITE8_MEMBER(tugboat_state::hd46505_0_w)
+void tugboat_state::hd46505_0_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0) m_reg0 = data & 0x0f;
 	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
 }
-WRITE8_MEMBER(tugboat_state::hd46505_1_w)
+void tugboat_state::hd46505_1_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0) m_reg1 = data & 0x0f;
 	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
 }
 
 
-WRITE8_MEMBER(tugboat_state::score_w)
+void tugboat_state::score_w(offs_t offset, uint8_t data)
 {
-		if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
-		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
+	if (offset>=0x8) m_program.write_byte(0x291d + 32*offset + 32*(1-8), data ^ 0x0f);
+	if (offset<0x8 ) m_program.write_byte(0x291d + 32*offset + 32*9,     data ^ 0x0f);
 }
 
 void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect,
@@ -152,8 +152,8 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			int attr = m_ram[addr + 0x400];
-			int code = ((attr & 0x01) << 8) | m_ram[addr];
+			int attr = m_program.read_byte(addr + 0x400);
+			int code = ((attr & 0x01) << 8) | m_program.read_byte(addr);
 			int color = (attr & 0x3c) >> 2;
 
 			int rgn, transpen;
@@ -193,7 +193,7 @@ uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 
 
-READ8_MEMBER(tugboat_state::input_r)
+uint8_t tugboat_state::input_r()
 {
 	if (~m_ctrl & 0x80)
 		return ioport("IN0")->read();
@@ -207,12 +207,12 @@ READ8_MEMBER(tugboat_state::input_r)
 		return ioport("IN4")->read();
 }
 
-WRITE8_MEMBER(tugboat_state::ctrl_w)
+void tugboat_state::ctrl_w(uint8_t data)
 {
 	m_ctrl = data;
 }
 
-void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -234,7 +234,7 @@ void tugboat_state::machine_reset()
 void tugboat_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x01ff).ram().share("ram");
+	map(0x0000, 0x01ff).ram();
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
 	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));

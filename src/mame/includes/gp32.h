@@ -105,7 +105,12 @@ public:
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+		{
+			std::fill(std::begin(m_s3c240x_lcd_regs), std::end(m_s3c240x_lcd_regs), 0);
+			std::fill(std::begin(m_s3c240x_uart_0_regs), std::end(m_s3c240x_uart_0_regs), 0);
+			std::fill(std::begin(m_s3c240x_uart_1_regs), std::end(m_s3c240x_uart_1_regs), 0);
+		}
 
 	void gp32(machine_config &config);
 
@@ -144,44 +149,44 @@ private:
 	uint32_t m_s3c240x_spi_regs[0x18/4];
 	uint32_t m_s3c240x_mmc_regs[0x40/4];
 	bitmap_rgb32 m_bitmap;
-	DECLARE_READ32_MEMBER(s3c240x_lcd_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_lcd_w);
-	DECLARE_READ32_MEMBER(s3c240x_lcd_palette_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_lcd_palette_w);
-	DECLARE_READ32_MEMBER(s3c240x_clkpow_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_clkpow_w);
-	DECLARE_READ32_MEMBER(s3c240x_irq_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_irq_w);
-	DECLARE_READ32_MEMBER(s3c240x_pwm_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_pwm_w);
-	DECLARE_READ32_MEMBER(s3c240x_dma_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_dma_w);
-	DECLARE_READ32_MEMBER(s3c240x_gpio_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_gpio_w);
-	DECLARE_READ32_MEMBER(s3c240x_memcon_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_memcon_w);
-	DECLARE_READ32_MEMBER(s3c240x_usb_host_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_usb_host_w);
-	DECLARE_READ32_MEMBER(s3c240x_uart_0_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_uart_0_w);
-	DECLARE_READ32_MEMBER(s3c240x_uart_1_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_uart_1_w);
-	DECLARE_READ32_MEMBER(s3c240x_usb_device_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_usb_device_w);
-	DECLARE_READ32_MEMBER(s3c240x_watchdog_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_watchdog_w);
-	DECLARE_READ32_MEMBER(s3c240x_iic_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_iic_w);
-	DECLARE_READ32_MEMBER(s3c240x_iis_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_iis_w);
-	DECLARE_READ32_MEMBER(s3c240x_rtc_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_rtc_w);
-	DECLARE_READ32_MEMBER(s3c240x_adc_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_adc_w);
-	DECLARE_READ32_MEMBER(s3c240x_spi_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_spi_w);
-	DECLARE_READ32_MEMBER(s3c240x_mmc_r);
-	DECLARE_WRITE32_MEMBER(s3c240x_mmc_w);
+	uint32_t s3c240x_lcd_r(offs_t offset);
+	void s3c240x_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_lcd_palette_r(offs_t offset);
+	void s3c240x_lcd_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_clkpow_r(offs_t offset);
+	void s3c240x_clkpow_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_irq_r(offs_t offset);
+	void s3c240x_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_pwm_r(offs_t offset);
+	void s3c240x_pwm_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_dma_r(offs_t offset);
+	void s3c240x_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_gpio_r(offs_t offset);
+	void s3c240x_gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_memcon_r(offs_t offset);
+	void s3c240x_memcon_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_usb_host_r(offs_t offset);
+	void s3c240x_usb_host_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_uart_0_r(offs_t offset);
+	void s3c240x_uart_0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_uart_1_r(offs_t offset);
+	void s3c240x_uart_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_usb_device_r(offs_t offset);
+	void s3c240x_usb_device_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_watchdog_r(offs_t offset);
+	void s3c240x_watchdog_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_iic_r(offs_t offset);
+	void s3c240x_iic_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_iis_r(offs_t offset);
+	void s3c240x_iis_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_rtc_r(offs_t offset);
+	void s3c240x_rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_adc_r(offs_t offset);
+	void s3c240x_adc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_spi_r(offs_t offset);
+	void s3c240x_spi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t s3c240x_mmc_r(offs_t offset);
+	void s3c240x_mmc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

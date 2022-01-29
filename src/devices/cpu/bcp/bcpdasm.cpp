@@ -387,7 +387,7 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			// C900-C9FF: SHL Rsd,b (2 T-states)
 			util::stream_format(stream, "%-8s", "shl");
 			format_register(stream, inst & 0x001f);
-			util::stream_format(stream, ",%d", (inst & 0x00e0) >> 5);
+			util::stream_format(stream, ",%d", (inst & 0x00e0) == 0 ? 0 : 8 - ((inst & 0x00e0) >> 5));
 			break;
 
 		case 0xa00: case 0xa80:

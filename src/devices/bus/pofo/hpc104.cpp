@@ -100,8 +100,8 @@ pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, device_typ
 	device_portfolio_expansion_slot_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_B_TAG),
-	m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
-	m_nvram(*this, "nvram"),
+	m_exp(*this, "exp"),
+	m_nvram(*this, "nvram", 0x40000, ENDIANNESS_LITTLE),
 	m_io_sw1(*this, "SW1")
 {
 }
@@ -128,8 +128,6 @@ pofo_hpc104_2_device::pofo_hpc104_2_device(const machine_config &mconfig, const 
 
 void pofo_hpc104_device::device_start()
 {
-	// allocate memory
-	m_nvram.allocate(0x40000);
 }
 
 
@@ -171,7 +169,7 @@ uint8_t pofo_hpc104_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool b
 		{
 			if (offset >= 0x1f000 && offset < 0x5f000)
 			{
-				data = m_nvram[offset - 0x1f000] = data;
+				data = m_nvram[offset - 0x1f000];
 			}
 		}
 	}

@@ -43,7 +43,7 @@ protected:
 	virtual void s100_phantom_w(int state) override;
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 };
 
 

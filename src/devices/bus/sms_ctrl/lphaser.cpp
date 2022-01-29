@@ -289,7 +289,7 @@ void sms_light_phaser_device::sensor_check()
 }
 
 
-void sms_light_phaser_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sms_light_phaser_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -43,18 +43,15 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int xi,gfx;
-	uint8_t pen;
+	int gfx = m_video_ram[address];
 
-	gfx = m_video_ram[address >> 1];
-
-	for(xi=0;xi<16;xi++)
+	for(int xi=0;xi<16;xi++)
 	{
-		pen = ((gfx >> xi) & 1) ? 1 : 0;
+		uint8_t pen = BIT(gfx, xi);
 
-		bitmap.pix32(y, x + xi) = palette[pen];
+		bitmap.pix(y, x + xi) = palette[pen];
 	}
 }
 
@@ -118,7 +115,7 @@ void if800_state::if800(machine_config &config)
 
 /* ROM definition */
 ROM_START( if800 )
-	ROM_REGION( 0x2000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(36212491) SHA1(6eaa8885e2dccb6dd86def6c0c9be1870cee957f))
 ROM_END
 

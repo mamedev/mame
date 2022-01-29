@@ -23,8 +23,8 @@ public:
 	// construction/destruction
 	cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	uint8_t rtc_w(offs_t offset);
+	uint8_t rtc_r();
 
 protected:
 	// device-level overrides

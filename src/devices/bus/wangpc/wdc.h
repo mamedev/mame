@@ -50,16 +50,16 @@ protected:
 private:
 	inline void set_irq(int state);
 
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( status_w );
-	DECLARE_READ8_MEMBER( ctc_ch0_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch0_w );
-	DECLARE_READ8_MEMBER( ctc_ch1_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch1_w );
-	DECLARE_READ8_MEMBER( ctc_ch2_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch2_w );
-	DECLARE_READ8_MEMBER( ctc_ch3_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch3_w );
+	uint8_t port_r();
+	void status_w(uint8_t data);
+	uint8_t ctc_ch0_r();
+	void ctc_ch0_w(uint8_t data);
+	uint8_t ctc_ch1_r();
+	void ctc_ch1_w(uint8_t data);
+	uint8_t ctc_ch2_r();
+	void ctc_ch2_w(uint8_t data);
+	uint8_t ctc_ch3_r();
+	void ctc_ch3_w(uint8_t data);
 
 	void wangpc_wdc_io(address_map &map);
 	void wangpc_wdc_mem(address_map &map);

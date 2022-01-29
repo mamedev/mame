@@ -15,6 +15,12 @@
  [*] the version number is written in the flash roms at the beginning of the game settings
 
 Note: There is known to exist an alternate version of The X-Files titled The Sex Files which is undumped
+The following additional games are also known to be undumped
+
+- Beat Player 2000, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Let's Dance, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Fishing Maniac, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
+- Fishing Maniac 2, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
 
  Original bugs:
  - In King of Dynast Gear, Roger's fast attack shows some blank lines
@@ -57,7 +63,7 @@ Elfin
 The X-Files (Korean region)
 Fishing Maniac 3
 
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 |-----------------------------------------------------|
 |TDA1515                C-O-N-N-1                     |
 |   DA1545A                                       C   |
@@ -95,7 +101,7 @@ The X-Files (uncensored version)
 Jump Jump
 King of Dynast Gear
 
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 |-----------------------------------------------------|
 |TDA1515                C-O-N-N-1                     |
 |   DA1545A                                       C   |
@@ -153,9 +159,11 @@ Notes:
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
+#include "sound/ks0164.h"
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class dgpix_state : public driver_device
@@ -165,6 +173,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
+		m_sound(*this, "ks0164"),
 		m_vblank(*this, "VBLANK")
 	{ }
 
@@ -183,9 +192,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_memory_region m_flash;
+	required_shared_ptr<uint32_t> m_flash;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ks0164_device> m_sound;
 	required_ioport m_vblank;
 
 	std::unique_ptr<u16[]> m_vram;
@@ -206,12 +216,40 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
+	void mpu401_data_w(offs_t, u32 data, u32 mem_mask);
+	void mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask);
+	u32 mpu401_data_r(offs_t, u32 mem_mask);
+	u32 mpu401_status_r();
 };
 
+void dgpix_state::mpu401_data_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_data_w(data);
+}
+
+void dgpix_state::mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_ctrl_w(data);
+}
+
+u32 dgpix_state::mpu401_data_r(offs_t, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		return m_sound->mpu401_data_r();
+	return 0;
+}
+
+u32 dgpix_state::mpu401_status_r()
+{
+	return m_sound->mpu401_status_r();
+}
 
 u32 dgpix_state::flash_r(offs_t offset)
 {
-	u32 *ROM = (u32 *)m_flash->base();
+	u32 *ROM = m_flash;
 
 	if (offset >= (0x2000000 - m_flash_roms * 0x400000) / 4)
 	{
@@ -248,7 +286,7 @@ void dgpix_state::flash_w(offs_t offset, u32 data, u32 mem_mask)
 		if (data == 0xd0d00000)
 		{
 			// point to game settings
-			u8 *rom = (u8 *)m_flash->base() + offset*4;
+			u8 *rom = (u8 *)(u32 *)m_flash + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -266,7 +304,7 @@ void dgpix_state::flash_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 		else
 		{
-			u16 *rom = (u16 *)m_flash->base();
+			u16 *rom = (u16 *)(u32 *)m_flash;
 
 			// write game settings
 
@@ -327,7 +365,7 @@ void dgpix_state::mem_map(address_map &map)
 	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
 	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
+	map(0xfe000000, 0xffffffff).rom().share("flash");
 }
 
 void dgpix_state::io_map(address_map &map)
@@ -337,11 +375,9 @@ void dgpix_state::io_map(address_map &map)
 	map(0x0a10, 0x0a13).portr("INPUTS");
 	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
-	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
-	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE
-	map(0x0c84, 0x0c87).nopr(); // sound status, checks bit 0x40 and 0x80
+	map(0x0c80, 0x0c83).rw(FUNC(dgpix_state::mpu401_data_r), FUNC(dgpix_state::mpu401_data_w));
+	map(0x0c84, 0x0c87).rw(FUNC(dgpix_state::mpu401_status_r), FUNC(dgpix_state::mpu401_ctrl_w));
 }
-
 
 static INPUT_PORTS_START( dgpix )
 	PORT_START("VBLANK")
@@ -389,8 +425,8 @@ u32 dgpix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int x = cliprect.left();
-		u16 *src = &m_vram[(m_vbuffer ? 0 : 0x20000) | (y << 9) | x];
-		u16 *dest = &bitmap.pix16(y, x);
+		u16 const *src = &m_vram[(m_vbuffer ? 0 : 0x20000) | (y << 9) | x];
+		u16 *dest = &bitmap.pix(y, x);
 
 		for (; x <= cliprect.right(); x++)
 		{
@@ -424,12 +460,7 @@ void dgpix_state::dgpix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
-/*
-    unknown 16bit sound cpu, embedded inside the KS0164 sound chip
-    running at 16.9MHz
-*/
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, "flash", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -442,8 +473,12 @@ void dgpix_state::dgpix(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::BGR_555);
 
-	/* sound hardware */
-	// KS0164 sound chip
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	KS0164(config, m_sound, 16.9344_MHz_XTAL);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -452,7 +487,7 @@ Elfin
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -462,7 +497,7 @@ ROM_START( elfin )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(eb56d7ca) SHA1(7c1cfcc68579cf3bdd9707da7d745a410223b8d9) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(cbf64ef4) SHA1(1a231872ee14e6d718c3f8888185ede7483e79dd) ) /* game settings & highscores are saved in here */
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(d378fe55) SHA1(5cc7bc5ae258cd48816857793a262e7c6c330795) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -474,7 +509,7 @@ Jump Jump
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -484,7 +519,7 @@ ROM_START( jumpjump )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -497,7 +532,7 @@ The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Uncensored World version
@@ -509,7 +544,7 @@ ROM_START( xfiles )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(231ad82a) SHA1(a1cc5c4122605e564d51137f1dca2afa82616202) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(d68994b7) SHA1(c1752d6795f7aaa6beef73643327205a1c32f0f5) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(1af33cda) SHA1(9bbcfb07a4a5bcff3efc1c7bcc51bc16c47ca9e6) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -522,7 +557,7 @@ The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Contrary to what you might think on first hearing the title, this game
@@ -542,7 +577,7 @@ ROM_START( xfilesk )
 	ROM_LOAD16_WORD_SWAP( "u8.bin",  0x1800000, 0x400000, CRC(3b2c2bc1) SHA1(1c07fb5bd8a8c9b5fb169e6400fef845f3aee7aa) )
 	ROM_LOAD16_WORD_SWAP( "u9.bin",  0x1c00000, 0x400000, CRC(6ecdd1eb) SHA1(e26c9711e589865cc75ec693d382758fa52528b8) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -554,7 +589,7 @@ King of Dynast Gear
 EZ Graphics, 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -566,7 +601,7 @@ ROM_START( kdynastg )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(1016b61c) SHA1(eab4934e1f41cc26259e5187a94ceebd45888a94) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(093d9243) SHA1(2a643acc7144193aaa3606a84b0c67aadb4c543b) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(3f103cb1) SHA1(2ff9bd73f3005f09d872018b81c915b01d6703f5) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -578,7 +613,7 @@ Fishing Maniac 3
 Saero Entertainment, 2002
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
  U100 18 pin socket for the PIC chip is unused
@@ -590,7 +625,7 @@ ROM_START( fmaniac3 )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(dc08a224) SHA1(4d14145eb84ad13674296f81e90b9d60403fa0de) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(c1fee95f) SHA1(0ed5ed9fa18e7da9242a6df2c210c46de25a2281) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(dfeb91a0) SHA1(a4a79073c3f6135957ea8a4a66a9c71a3a39893c) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -601,7 +636,7 @@ ROM_END
 
 void dgpix_state::init_elfin()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9e94)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9e95)] = 0;
@@ -615,7 +650,7 @@ void dgpix_state::init_elfin()
 
 void dgpix_state::init_jumpjump()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
@@ -629,7 +664,7 @@ void dgpix_state::init_jumpjump()
 
 void dgpix_state::init_xfiles()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9a2a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9a2b)] = 0;
@@ -643,7 +678,7 @@ void dgpix_state::init_xfiles()
 
 void dgpix_state::init_xfilesk()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -660,7 +695,7 @@ void dgpix_state::init_xfilesk()
 
 void dgpix_state::init_kdynastg()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

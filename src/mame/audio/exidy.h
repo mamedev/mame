@@ -7,6 +7,8 @@
 
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
 
@@ -37,9 +39,9 @@ public:
 	exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~exidy_sound_device() {}
 
-	DECLARE_READ8_MEMBER(sh6840_r);
-	DECLARE_WRITE8_MEMBER(sh6840_w);
-	DECLARE_WRITE8_MEMBER(sfxctrl_w);
+	uint8_t sh6840_r(offs_t offset);
+	void sh6840_w(offs_t offset, uint8_t data);
+	void sfxctrl_w(offs_t offset, uint8_t data);
 
 protected:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -54,8 +56,8 @@ protected:
 	void sh6840_register_state_globals();
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual stream_sample_t generate_music_sample();
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual s32 generate_music_sample();
 
 	static inline void sh6840_apply_clock(sh6840_timer_channel *t, int clocks);
 
@@ -102,14 +104,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual stream_sample_t generate_music_sample() override;
+	virtual s32 generate_music_sample() override;
 
-	DECLARE_WRITE8_MEMBER(r6532_porta_w);
-	DECLARE_READ8_MEMBER(r6532_porta_r);
-	DECLARE_WRITE8_MEMBER(r6532_portb_w);
-	DECLARE_READ8_MEMBER(r6532_portb_r);
+	void r6532_porta_w(uint8_t data);
+	uint8_t r6532_porta_r();
+	void r6532_portb_w(uint8_t data);
+	uint8_t r6532_portb_r();
 
-	DECLARE_WRITE8_MEMBER(sh8253_w);
+	void sh8253_w(offs_t offset, uint8_t data);
 
 	void sh8253_register_state_globals();
 
@@ -120,7 +122,9 @@ protected:
 	required_device<riot6532_device> m_riot;
 
 	/* 5220/CVSD variables */
-	optional_device<hc55516_device> m_cvsd;
+	optional_device<mc3417_device> m_cvsd;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	optional_device<cpu_device> m_cvsdcpu;
 	optional_device<tms5220_device> m_tms;
 	required_device<pia6821_device> m_pia;
@@ -138,8 +142,8 @@ public:
 	auto cb2_callback() { return m_cb2_callback.bind(); }
 
 	// external access
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ca_w);
 	DECLARE_WRITE_LINE_MEMBER(cb_w);
 
@@ -153,10 +157,10 @@ protected:
 	void venture_audio_map(address_map &map);
 
 private:
-	DECLARE_WRITE8_MEMBER(filter_w);
+	void filter_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(pia_pa_w);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	void pia_pa_w(uint8_t data);
+	void pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 
@@ -177,11 +181,15 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(voiceio_w);
-	DECLARE_READ8_MEMBER(voiceio_r);
+	required_device<timer_device> m_cvsd_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cvsd_timer);
+	void voiceio_w(offs_t offset, uint8_t data);
+	uint8_t voiceio_r(offs_t offset);
+	bool m_cvsd_clk;
 
 	void cvsd_map(address_map &map);
 	void cvsd_iomap(address_map &map);
@@ -195,9 +203,9 @@ public:
 	victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external access
-	DECLARE_READ8_MEMBER(response_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(command_w);
+	uint8_t response_r();
+	uint8_t status_r();
+	void command_w(uint8_t data);
 
 protected:
 	// device-level overrides

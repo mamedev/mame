@@ -10,6 +10,9 @@
  *
  *   http://bitsavers.org/components/intel/_dataBooks/1996_Intel_Peripheral_Components.pdf
  *
+ *   https://web.archive.org/web/20040214013557/http://www.techfest.com/hardware/bus/eisa.htm
+ *   https://web.archive.org/web/20040405230259/http://www.mindshare.com/pdf/eisabook.pdf
+ *
  * TODO
  *   - expose everything to an actual EISA bus
  *   - 32-bit dma functionality
@@ -43,12 +46,12 @@ void i82357_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(
-		[this](offs_t offset)
+		[this](offs_t offset) -> u8
 		{
 			if (offset == 2)
 				return m_pic[1]->acknowledge();
 
-			return u32(0);
+			return 0;
 		});
 
 	PIC8259(config, m_pic[1], 0);
@@ -122,15 +125,15 @@ void i82357_device::map(address_map &map)
 	map(0x061, 0x061).rw(FUNC(i82357_device::nmi_reg_r), FUNC(i82357_device::nmi_reg_w));
 
 	// NMI Enable Register (0x70, 72, 74, 76)
-	map(0x070, 0x077).lw8("nmi_rtc",
-		[this](offs_t offset, u8 data)
-		{
-			m_nmi_enabled = !BIT(data, 7);
+	map(0x070, 0x077).lw8(
+			[this] (offs_t offset, u8 data)
+			{
+				m_nmi_enabled = !BIT(data, 7);
 
-			m_out_rtc(0, data & 0x7f);
+				m_out_rtc(0, data & 0x7f);
 
-			m_nmi_check->adjust(attotime::zero);
-		}).umask64(0xff);
+				m_nmi_check->adjust(attotime::zero);
+			}, "nmi_rtc").umask64(0xff);
 
 	map(0x081, 0x081).rw(m_dma[0], FUNC(eisa_dma_device::get_address_page<2>), FUNC(eisa_dma_device::set_address_page<2>));
 	map(0x082, 0x082).rw(m_dma[0], FUNC(eisa_dma_device::get_address_page<3>), FUNC(eisa_dma_device::set_address_page<3>));
@@ -151,23 +154,23 @@ void i82357_device::map(address_map &map)
 	map(0x407, 0x407).rw(m_dma[0], FUNC(eisa_dma_device::get_count_high<3>), FUNC(eisa_dma_device::set_count_high<3>));
 
 	//map(0x40a, 0x40a); // DMA1 Set Chaining Mode (w)/Interrupt Status (r)
-	//map(0x40b, 0x40b); // DMA1 Ext Write Mode (w)
+	map(0x40b, 0x40b).w(m_dma[0], FUNC(eisa_dma_device::set_ext_mode));
 	//map(0x40c, 0x40c); // Chain Buffer Control
 	//map(0x40d, 0x40d); // Stepping Level Register (ro)
 	//map(0x40e, 0x40e); // ISP Test Register
 	//map(0x40f, 0x40f); // ISP Test Register
 
 	map(0x461, 0x461).rw(FUNC(i82357_device::nmi_ext_r), FUNC(i82357_device::nmi_ext_w));
-	map(0x462, 0x462).lw8("nmi_ioport",
-		[this](u8 data)
-		{
-			if (m_nmi_ext & NMI_EXT_EN_IOPORT)
+	map(0x462, 0x462).lw8(
+			[this] (u8 data)
 			{
-				m_nmi_ext |= NMI_EXT_IOPORT;
+				if (m_nmi_ext & NMI_EXT_EN_IOPORT)
+				{
+					m_nmi_ext |= NMI_EXT_IOPORT;
 
-				m_nmi_check->adjust(attotime::zero);
-			}
-		});
+					m_nmi_check->adjust(attotime::zero);
+				}
+			}, "nmi_ioport");
 	//map(0x464, 0x464); // Last 32-bit bus master granted (L)
 
 	map(0x481, 0x481).rw(m_dma[0], FUNC(eisa_dma_device::get_address_page_high<2>), FUNC(eisa_dma_device::set_address_page_high<2>));
@@ -183,12 +186,12 @@ void i82357_device::map(address_map &map)
 	map(0x4c6, 0x4c6).rw(m_dma[1], FUNC(eisa_dma_device::get_count_high<1>), FUNC(eisa_dma_device::set_count_high<1>));
 	map(0x4ca, 0x4ca).rw(m_dma[1], FUNC(eisa_dma_device::get_count_high<2>), FUNC(eisa_dma_device::set_count_high<2>));
 	map(0x4ce, 0x4ce).rw(m_dma[1], FUNC(eisa_dma_device::get_count_high<3>), FUNC(eisa_dma_device::set_count_high<3>));
-	map(0x4d0, 0x4d1).lrw8("elcr",
-		[this](offs_t offset) { return m_elcr[offset]; },
-		[this](offs_t offset, u8 data) { m_elcr[offset] = data; });
+	map(0x4d0, 0x4d1).lrw8(
+			NAME([this] (offs_t offset) { return m_elcr[offset]; }),
+			NAME([this] (offs_t offset, u8 data) { m_elcr[offset] = data; }));
 
 	//map(0x4d4, 0x4d4); // DMA2 Set Chaining Mode
-	//map(0x4d6, 0x4d6); // DMA2 Ext Write Mode Register
+	map(0x4d6, 0x4d6).w(m_dma[1], FUNC(eisa_dma_device::set_ext_mode));
 
 	map(0x4e0, 0x4e3).rw(m_dma[0], FUNC(eisa_dma_device::get_stop<0>), FUNC(eisa_dma_device::set_stop<0>));
 	map(0x4e4, 0x4e7).rw(m_dma[0], FUNC(eisa_dma_device::get_stop<1>), FUNC(eisa_dma_device::set_stop<1>));
@@ -218,6 +221,12 @@ void i82357_device::device_reset()
 	m_nmi_enabled = true;
 	m_nmi_reg = 0;
 	m_nmi_ext = 0;
+
+	for (unsigned i = 0; i < 4; i++)
+		m_dma[0]->set_ext_mode(0x00 | i);
+
+	for (unsigned i = 0; i < 4; i++)
+		m_dma[1]->set_ext_mode(0x04 | i);
 
 	m_nmi_check->adjust(attotime::zero);
 }

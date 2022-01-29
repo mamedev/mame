@@ -26,7 +26,7 @@
 
     - bar code reader (!RxDB -> RST5.5, Hewlett-Packard HREDS-3050 interface)
     - un-Y2K-hack tandy200
-    - keyboard is unresponsive for couple of seconds after boot
+    - keyboard is unresponsive for couple of seconds after boot, and rather slow thereafter
     - soft power on/off
     - pc8201 48K RAM option
     - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
@@ -39,6 +39,7 @@
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
     - cassette is not working on pc8201, pc8201a, npc8300
+    - natural keyboard is far too slow to be usable; paste is useless
 
     10 FOR A=0 TO 255
     20 PRINT CHR$(A);
@@ -60,12 +61,12 @@
 
 #include "emu.h"
 #include "includes/kyocera.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( pc8201_state::bank_r )
+uint8_t pc8201_state::bank_r()
 {
 	/*
 
@@ -97,28 +98,28 @@ void pc8201_state::bankswitch(uint8_t data)
 	if (rom_bank > 1)
 	{
 		/* RAM */
-		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, m_bank1);
 	}
 	else
 	{
 		/* ROM */
-		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.install_read_bank(0x0000, 0x7fff, m_bank1);
 		program.unmap_write(0x0000, 0x7fff);
 	}
 
-	membank("bank1")->set_entry(rom_bank);
+	m_bank1->set_entry(rom_bank);
 
 	switch (ram_bank)
 	{
 	case 0:
 		if (m_ram->size() > 16 * 1024)
 		{
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		}
 		else
 		{
 			program.unmap_readwrite(0x8000, 0xbfff);
-			program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+			program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		}
 		break;
 
@@ -128,23 +129,23 @@ void pc8201_state::bankswitch(uint8_t data)
 
 	case 2:
 		if (m_ram->size() > 32 * 1024)
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		else
 			program.unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 3:
 		if (m_ram->size() > 64 * 1024)
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		else
 			program.unmap_readwrite(0x8000, 0xffff);
 		break;
 	}
 
-	membank("bank2")->set_entry(ram_bank);
+	m_bank2->set_entry(ram_bank);
 }
 
-WRITE8_MEMBER( pc8201_state::bank_w )
+void pc8201_state::bank_w(uint8_t data)
 {
 	/*
 
@@ -160,11 +161,11 @@ WRITE8_MEMBER( pc8201_state::bank_w )
 	    7
 
 	*/
-printf("bank %02x\n",data);
+//printf("bank %02x\n",data);
 	bankswitch(data);
 }
 
-WRITE8_MEMBER( pc8201_state::scp_w )
+void pc8201_state::scp_w(uint8_t data)
 {
 	/*
 
@@ -194,7 +195,18 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 	m_iosel = data >> 5;
 }
 
-WRITE8_MEMBER( kc85_state::uart_ctrl_w )
+uint8_t kc85_state::uart_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_uart->drr_w(0);
+		m_uart->drr_w(1);
+	}
+
+	return m_uart->read();
+}
+
+void kc85_state::uart_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -220,7 +232,7 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
 	m_uart->crl_w(1);
 }
 
-READ8_MEMBER( kc85_state::uart_status_r )
+uint8_t kc85_state::uart_status_r()
 {
 	/*
 
@@ -263,7 +275,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	return data;
 }
 
-READ8_MEMBER( pc8201_state::uart_status_r )
+uint8_t pc8201_state::uart_status_r()
 {
 	/*
 
@@ -306,7 +318,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc8201_state::romah_w )
+void pc8201_state::romah_w(uint8_t data)
 {
 	/*
 
@@ -330,7 +342,7 @@ WRITE8_MEMBER( pc8201_state::romah_w )
 	m_rom_sel = BIT(data, 1);
 }
 
-WRITE8_MEMBER( pc8201_state::romal_w )
+void pc8201_state::romal_w(uint8_t data)
 {
 	/*
 
@@ -350,7 +362,7 @@ WRITE8_MEMBER( pc8201_state::romal_w )
 	m_rom_addr = (m_rom_addr & 0x1ff00) | data;
 }
 
-WRITE8_MEMBER( pc8201_state::romam_w )
+void pc8201_state::romam_w(uint8_t data)
 {
 	/*
 
@@ -370,7 +382,7 @@ WRITE8_MEMBER( pc8201_state::romam_w )
 	m_rom_addr = (m_rom_addr & 0x100ff) | (data << 8);
 }
 
-READ8_MEMBER( pc8201_state::romrd_r )
+uint8_t pc8201_state::romrd_r()
 {
 	uint8_t data = 0xff;
 
@@ -380,7 +392,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::modem_w )
+void kc85_state::modem_w(uint8_t data)
 {
 	/*
 
@@ -400,7 +412,7 @@ WRITE8_MEMBER( kc85_state::modem_w )
 	//m_modem->en_w(BIT(data, 1));
 }
 
-WRITE8_MEMBER( kc85_state::ctrl_w )
+void kc85_state::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -418,7 +430,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	*/
 
 	/* ROM bank selection */
-	membank("bank1")->set_entry(BIT(data, 0));
+	m_bank1->set_entry(BIT(data, 0));
 
 	/* printer strobe */
 	m_centronics->write_strobe(BIT(data, 1));
@@ -430,14 +442,12 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::keyboard_r )
+uint8_t kc85_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
-	for (int i = 0; i < 9; i++)
-	{
+	for (u8 i = 0; i < 9; i++)
 		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
-	}
 
 	return data;
 }
@@ -458,9 +468,9 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 	else
 	{
-		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.install_read_bank(0x0000, 0x7fff, m_bank1);
 		program.unmap_write(0x0000, 0x7fff);
-		membank("bank1")->set_entry(rom_bank);
+		m_bank1->set_entry(rom_bank);
 	}
 
 	if (m_ram->size() < ((ram_bank + 1) * 24 * 1024))
@@ -470,34 +480,32 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 	else
 	{
-		program.install_readwrite_bank(0xa000, 0xffff, "bank2");
-		membank("bank2")->set_entry(ram_bank);
+		program.install_readwrite_bank(0xa000, 0xffff, m_bank2);
+		m_bank2->set_entry(ram_bank);
 	}
 }
 
-READ8_MEMBER( tandy200_state::bank_r )
+uint8_t tandy200_state::bank_r()
 {
 	return m_bank;
 }
 
-WRITE8_MEMBER( tandy200_state::bank_w )
+void tandy200_state::bank_w(uint8_t data)
 {
 	bankswitch(data);
 }
 
-READ8_MEMBER( tandy200_state::stbk_r )
+uint8_t tandy200_state::stbk_r()
 {
 	uint8_t data = 0xff;
 
-	for (int i = 0; i < 9; i++)
-	{
+	for (u8 i = 0; i < 9; i++)
 		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
-	}
 
 	return data;
 }
 
-WRITE8_MEMBER( tandy200_state::stbk_w )
+void tandy200_state::stbk_w(uint8_t data)
 {
 	/*
 
@@ -521,20 +529,20 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::lcd_r )
+uint8_t kc85_state::lcd_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	for (uint8_t i = 0; i < 10; i++)
-		data |= m_lcdc[i]->read(space, offset);
+		data |= m_lcdc[i]->read(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::lcd_w )
+void kc85_state::lcd_w(offs_t offset, uint8_t data)
 {
 	for (uint8_t i = 0; i < 10; i++)
-		m_lcdc[i]->write(space, offset, data);
+		m_lcdc[i]->write(offset, data);
 }
 
 /* Memory Maps */
@@ -569,7 +577,7 @@ void kc85_state::kc85_io(address_map &map)
 //  map(0x90, 0x90).mirror(0x0f); optional answering telephone unit
 //  map(0xa0, 0xa0).mirror(0x0f); optional modem
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(kc85_state::uart_r)).w(m_uart, FUNC(im6402_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
 	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(kc85_state::keyboard_r), FUNC(kc85_state::ctrl_w));
 	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
@@ -592,7 +600,7 @@ void pc8201_state::pc8201_io(address_map &map)
 	map(0x90, 0x90).mirror(0x0f).w(FUNC(pc8201_state::scp_w));
 	map(0xa0, 0xa0).mirror(0x0f).rw(FUNC(pc8201_state::bank_r), FUNC(pc8201_state::bank_w));
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc8201_state::uart_r)).w(m_uart, FUNC(im6402_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).r(FUNC(pc8201_state::uart_status_r)).w(FUNC(pc8201_state::uart_ctrl_w));
 	map(0xe0, 0xe0).mirror(0x0f).r(FUNC(pc8201_state::keyboard_r));
 	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(pc8201_state::lcd_r), FUNC(pc8201_state::lcd_w));
@@ -714,12 +722,12 @@ static INPUT_PORTS_START( pc8201 )
 	PORT_INCLUDE( kc85 )
 
 	PORT_MODIFY("Y3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR('^') PORT_CHAR('_')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(165) PORT_CHAR(']')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('[')
 
 	PORT_MODIFY("Y4")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
@@ -728,23 +736,24 @@ static INPUT_PORTS_START( pc8201 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 
 	PORT_MODIFY("Y5")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAST INS") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL  BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAST  INS") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 
 	PORT_MODIFY("Y6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92|") PORT_CODE(KEYCODE_TAB)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL BKSP") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 
 	PORT_MODIFY("Y7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
@@ -761,7 +770,7 @@ static INPUT_PORTS_START( pc8201 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("JIS") PORT_CODE(KEYCODE_0_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8201a )
@@ -818,36 +827,41 @@ static INPUT_PORTS_START( pc8201a )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+/* There's more than one keyboard layout for the m10. A quick search showed
+- QWERTZ with +* (in top left corner) [Germany?]
+- QWERTY with [{ [UK and US versions]
+- QZERTY with $& [Italy?]
+but our machine is different again, unable to find a specific photo of it. Could be French. */
 static INPUT_PORTS_START( olivm10 )
 	PORT_START("Y0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('(') PORT_CHAR('5')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('\'') PORT_CHAR('4')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('"') PORT_CHAR('3')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR(233) PORT_CHAR('2')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR(163) PORT_CHAR('1')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('$') PORT_CHAR('*')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('a') PORT_CHAR('A')
 
 	PORT_START("Y1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(')') PORT_CHAR(176)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR(224) PORT_CHAR('0')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR(199) PORT_CHAR('9')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('_') PORT_CHAR('8')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR(232) PORT_CHAR('7')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('-') PORT_CHAR('6')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 
 	PORT_START("Y2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('`')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR(',') PORT_CHAR('?')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(';') PORT_CHAR('.')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR(':') PORT_CHAR('/')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('!') PORT_CHAR(167)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(249) PORT_CHAR('%')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('^') PORT_CHAR(168)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('`') PORT_CHAR('&')
 
 	PORT_START("Y3")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
@@ -855,9 +869,9 @@ static INPUT_PORTS_START( olivm10 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('q') PORT_CHAR('Q')
 
 	PORT_START("Y4")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
@@ -882,7 +896,7 @@ static INPUT_PORTS_START( olivm10 )
 	PORT_START("Y6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PASTE") PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(F9))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92|") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92|") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
@@ -918,7 +932,7 @@ INPUT_PORTS_END
 
 /* 8155 Interface */
 
-WRITE8_MEMBER( kc85_state::i8155_pa_w )
+void kc85_state::i8155_pa_w(uint8_t data)
 {
 	/*
 
@@ -950,7 +964,7 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_rtc->data_in_w(BIT(data, 4));
 }
 
-WRITE8_MEMBER( kc85_state::i8155_pb_w )
+void kc85_state::i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -995,7 +1009,7 @@ WRITE_LINE_MEMBER( kc85_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( kc85_state::i8155_pc_r )
+uint8_t kc85_state::i8155_pc_r()
 {
 	/*
 
@@ -1037,7 +1051,7 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 	m_uart->rrc_w(state);
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pa_w )
+void tandy200_state::i8155_pa_w(uint8_t data)
 {
 	/*
 
@@ -1059,7 +1073,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pb_w )
+void tandy200_state::i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -1096,7 +1110,7 @@ WRITE_LINE_MEMBER( tandy200_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( tandy200_state::i8155_pc_r )
+uint8_t tandy200_state::i8155_pc_r()
 {
 	/*
 
@@ -1145,27 +1159,27 @@ void kc85_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	program.install_read_bank(0x0000, 0x7fff, "bank1");
+	program.install_read_bank(0x0000, 0x7fff, m_bank1);
 	program.unmap_write(0x0000, 0x7fff);
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
 	{
 	case 16 * 1024:
 		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		break;
 
 	case 32 * 1024:
-		program.install_readwrite_bank(0x8000, 0xffff,"bank2");
+		program.install_readwrite_bank(0x8000, 0xffff,m_bank2);
 		break;
 	}
 
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, m_ram->pointer());
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1188,15 +1202,15 @@ void pc8201_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->configure_entries(2, 2, ram + 0x8000, 0x8000);
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
-	membank("bank2")->configure_entry(0, ram);
-	membank("bank2")->configure_entries(2, 2, ram + 0x8000, 0x8000);
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, ram);
+	m_bank2->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	m_bank2->set_entry(0);
 
 	bankswitch(0);
 
@@ -1207,6 +1221,8 @@ void pc8201_state::machine_start()
 	save_item(NAME(m_bell));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_rom_sel));
+	save_item(NAME(m_rom_addr));
 	save_item(NAME(m_iosel));
 }
 
@@ -1222,37 +1238,37 @@ void trsm100_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	program.install_read_bank(0x0000, 0x7fff, "bank1");
+	program.install_read_bank(0x0000, 0x7fff, m_bank1);
 	program.unmap_write(0x0000, 0x7fff);
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
 	{
 	case 8 * 1024:
 		program.unmap_readwrite(0x8000, 0xcfff);
-		program.install_readwrite_bank(0xe000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xe000, 0xffff, m_bank2);
 		break;
 
 	case 16 * 1024:
 		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		break;
 
 	case 24 * 1024:
 		program.unmap_readwrite(0x8000, 0x9fff);
-		program.install_readwrite_bank(0xa000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xa000, 0xffff, m_bank2);
 		break;
 
 	case 32 * 1024:
-		program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+		program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		break;
 	}
 
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, m_ram->pointer());
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1265,18 +1281,20 @@ void trsm100_state::machine_start()
 
 void tandy200_state::machine_start()
 {
-	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(std::string(m_opt_cart->tag()) + GENERIC_ROM_REGION_TAG);
+
+	m_bank = 0;
+	m_tp = 0;
 
 	/* configure ROM banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_rom->base() + 0x10000);
-	membank("bank1")->configure_entry(2, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_rom->base() + 0x10000);
+	m_bank1->configure_entry(2, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
-	membank("bank2")->configure_entries(0, 3, m_ram->pointer(), 0x6000);
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entries(0, 3, m_ram->pointer(), 0x6000);
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1343,6 +1361,7 @@ void kc85_state::kc85(machine_config &config)
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
@@ -1352,7 +1371,8 @@ void kc85_state::kc85(machine_config &config)
 	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "trsm100_cart", "bin,rom");
@@ -1370,8 +1390,8 @@ void pc8201_state::pc8201(machine_config &config)
 	I8085A(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8201_state::pc8201_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8201_state::pc8201_io);
-	m_maincpu->in_sid_func().set(FUNC(kc85_state::kc85_sid_r));
-	m_maincpu->out_sod_func().set(FUNC(kc85_state::kc85_sod_w));
+	m_maincpu->in_sid_func().set(FUNC(pc8201_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(pc8201_state::kc85_sod_w));
 
 	/* video hardware */
 	kc85_video(config);
@@ -1382,26 +1402,28 @@ void pc8201_state::pc8201(machine_config &config)
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
-	i8155.out_pa_callback().set(FUNC(kc85_state::i8155_pa_w));
-	i8155.out_pb_callback().set(FUNC(kc85_state::i8155_pb_w));
-	i8155.in_pc_callback().set(FUNC(kc85_state::i8155_pc_r));
-	i8155.out_to_callback().set(FUNC(kc85_state::i8155_to_w));
+	i8155.out_pa_callback().set(FUNC(pc8201_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(pc8201_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(pc8201_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(pc8201_state::i8155_to_w));
 
 	UPD1990A(config, m_rtc);
 	m_rtc->tp_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(kc85_state::write_centronics_busy));
-	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
+	m_centronics->busy_handler().set(FUNC(pc8201_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(pc8201_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "pc8201_cart", "bin,rom");
@@ -1428,8 +1450,8 @@ void trsm100_state::trsm100(machine_config &config)
 	I8085A(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &trsm100_state::kc85_mem);
 	m_maincpu->set_addrmap(AS_IO, &trsm100_state::trsm100_io);
-	m_maincpu->in_sid_func().set(FUNC(kc85_state::kc85_sid_r));
-	m_maincpu->out_sod_func().set(FUNC(kc85_state::kc85_sod_w));
+	m_maincpu->in_sid_func().set(FUNC(trsm100_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(trsm100_state::kc85_sod_w));
 
 	/* video hardware */
 	kc85_video(config);
@@ -1440,16 +1462,17 @@ void trsm100_state::trsm100(machine_config &config)
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
-	i8155.out_pa_callback().set(FUNC(kc85_state::i8155_pa_w));
-	i8155.out_pb_callback().set(FUNC(kc85_state::i8155_pb_w));
-	i8155.in_pc_callback().set(FUNC(kc85_state::i8155_pc_r));
-	i8155.out_to_callback().set(FUNC(kc85_state::i8155_to_w));
+	i8155.out_pa_callback().set(FUNC(trsm100_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(trsm100_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(trsm100_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(trsm100_state::i8155_to_w));
 
 	UPD1990A(config, m_rtc);
 	m_rtc->tp_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
@@ -1457,7 +1480,8 @@ void trsm100_state::trsm100(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
 
@@ -1508,10 +1532,11 @@ void tandy200_state::tandy200(machine_config &config)
 
 	RP5C01(config, m_rtc, XTAL(32'768));
 
-	i8251_device &i8251(I8251(config, I8251_TAG, 0)); /*XTAL(4'915'200)/2,*/
+	i8251_device &i8251(I8251(config, I8251_TAG, XTAL(4'915'200)/2));
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	i8251.rxrdy_handler().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
@@ -1526,7 +1551,8 @@ void tandy200_state::tandy200(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "tandy200_cart", "bin,rom");
@@ -1574,7 +1600,7 @@ ROM_END
 
 ROM_START( m10 )
 	// 3256C02-4B3/I        Italian
-	ROM_REGION( 0x8010, I8085_TAG, 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 ROM_END
 
@@ -1595,12 +1621,12 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME */
-COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", 0 )
-COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 0 )
-//COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      0 )
-COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     0 )
-COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102",            0 )
-COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_NOT_WORKING ) // keyboard layout wrong
-COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             0 )
-COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_NOT_WORKING )
-COMP( 1984, tandy200, 0,       0,      tandy200, kc85,    tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            0 )
+COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 MACHINE_SUPPORTS_SAVE )
+//COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102",            MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tandy200, 0,       0,      tandy200, kc85,    tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            MACHINE_SUPPORTS_SAVE )

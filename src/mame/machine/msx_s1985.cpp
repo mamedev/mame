@@ -48,7 +48,7 @@ void msx_s1985_device::nvram_write(emu_file &file)
 }
 
 
-READ8_MEMBER(msx_s1985_device::switched_read)
+uint8_t msx_s1985_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
@@ -83,7 +83,7 @@ READ8_MEMBER(msx_s1985_device::switched_read)
 }
 
 
-WRITE8_MEMBER(msx_s1985_device::switched_write)
+void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

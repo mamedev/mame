@@ -5,22 +5,24 @@
 
 #pragma once
 
+#include "dirom.h"
+
 // #define SEGA315_DUMP_DEBUG // dump stuff to files to help with decryption efforts
 
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
 class sega_315_5838_comp_device :  public device_t,
-								   public device_rom_interface
+								   public device_rom_interface<23>
 {
 public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(data_r);
+	uint16_t data_r();
 
-	DECLARE_WRITE32_MEMBER(data_w_doa);
-	DECLARE_WRITE32_MEMBER(data_w);
-	DECLARE_WRITE32_MEMBER(srcaddr_w);
+	void data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void debug_helper(int id);
 

@@ -50,14 +50,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	DECLARE_READ8_MEMBER(address_r);
-	DECLARE_WRITE8_MEMBER(address_w);
-	virtual DECLARE_READ8_MEMBER(palette_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) = 0;
-	DECLARE_READ8_MEMBER(register_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	virtual DECLARE_READ8_MEMBER(overlay_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) = 0;
+	u8 address_r();
+	void address_w(u8 data);
+	virtual u8 palette_r(address_space &space) = 0;
+	virtual void palette_w(u8 data) = 0;
+	u8 register_r(address_space &space);
+	void register_w(u8 data);
+	virtual u8 overlay_r(address_space &space) = 0;
+	virtual void overlay_w(u8 data) = 0;
 
 	// helpers
 	virtual void increment_address(const bool side_effects = false);
@@ -86,10 +86,10 @@ protected:
 
 	virtual u32 palette_entries() const override { return m_palette_colors + m_overlay_colors; }
 
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	std::unique_ptr<std::array<u8, 3>[]> m_color_ram;
 };
@@ -111,10 +111,10 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	std::unique_ptr<u8[]> m_color_ram;
 };
@@ -162,10 +162,10 @@ public:
 	bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	virtual void increment_address(const bool side_effects = false) override;
 };

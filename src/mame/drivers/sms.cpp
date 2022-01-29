@@ -246,7 +246,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "includes/sms.h"
 
 #include "cpu/z80/z80.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "sms1.lh"
@@ -517,7 +517,7 @@ void sms_state::sms_ntsc_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 }
 
 /*
@@ -665,7 +665,7 @@ void sms_state::sms_pal_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 }
 
 void sms_state::sms2_pal(machine_config &config)
@@ -734,7 +734,7 @@ void sms_state::sms_paln_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 }
 
 void sms_state::sms3_paln(machine_config &config)
@@ -804,7 +804,7 @@ void sms_state::sms_br_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
 	// PAL-M has near the same frequency of NTSC
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 }
 
 void sms_state::sms3_br(machine_config &config)
@@ -952,7 +952,7 @@ void gamegear_state::gamegear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamegear_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &gamegear_state::gg_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_main_scr, SCREEN_TYPE_LCD);
@@ -973,7 +973,7 @@ void gamegear_state::gamegear(machine_config &config)
 	m_vdp->add_route(1, "rspeaker", 1.00);
 
 	/* cartridge */
-	GAMEGEAR_CART_SLOT(config, "slot", gg_cart, nullptr);
+	GAMEGEAR_CART_SLOT(config, "slot", gg_cart, nullptr).set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 

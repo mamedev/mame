@@ -16,7 +16,6 @@
 #include "bus/abckb/abc800kb.h"
 #include "machine/e0516.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -45,7 +44,6 @@
 #define ABC800_VIDEO_RAM_SIZE   0x4000
 #define ABC802_CHAR_RAM_SIZE    0x800
 #define ABC806_CHAR_RAM_SIZE    0x800
-#define ABC806_ATTR_RAM_SIZE    0x800
 #define ABC806_VIDEO_RAM_SIZE   0x20000
 
 #define ABC800_CHAR_WIDTH   6
@@ -78,7 +76,7 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800_state(const machine_config &mconfig, device_type type, const char *tag, size_t char_ram_size) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -88,15 +86,16 @@ public:
 		m_cassette(*this, CASSETTE_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_char_ram(*this, "char_ram"),
+		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
+		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_io_sb(*this, "SB"),
 		m_ctc_z0(0),
 		m_sio_txcb(0),
 		m_sio_txdb(1),
 		m_sio_rtsb(1),
 		m_dfd_out(0),
-		m_tape_ctr(4)
+		m_tape_ctr(4),
+		m_char_ram_size(char_ram_size)
 	{ }
 
 	required_device<z80_device> m_maincpu;
@@ -107,31 +106,35 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	void bankswitch();
 	void cassette_output_tick(int state);
 
-	virtual DECLARE_READ8_MEMBER( m1_r );
-	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	virtual uint8_t m1_r(offs_t offset);
+	uint8_t pling_r();
+	void hrs_w(uint8_t data);
+	void hrc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
+	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( cassette_input_tick );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	// memory state
+	int m_keydtr;               // keyboard DTR
 	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// serial state
@@ -145,6 +148,7 @@ public:
 	int m_tape_ctr;
 
 	// video state
+	size_t m_char_ram_size;
 	uint8_t m_hrs;                    // HR picture start scanline
 	uint8_t m_fgctl;                  // HR foreground control
 
@@ -152,10 +156,10 @@ public:
 	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
 	void abc800_m1(address_map &map);
+	void abc800_mem(address_map &map);
 	void abc800_io(address_map &map);
-	void abc800c_io(address_map &map);
 	void abc800m_io(address_map &map);
-	void abc800m_mem(address_map &map);
+	void abc800c_io(address_map &map);
 };
 
 
@@ -165,7 +169,7 @@ class abc800m_state : public abc800_state
 {
 public:
 	abc800m_state(const machine_config &mconfig, device_type type, const char *tag) :
-		abc800_state(mconfig, type, tag),
+		abc800_state(mconfig, type, tag, ABC800M_CHAR_RAM_SIZE),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_fgctl_prom(*this, "hru2"),
@@ -193,7 +197,7 @@ class abc800c_state : public abc800_state
 {
 public:
 	abc800c_state(const machine_config &mconfig, device_type type, const char *tag) :
-		abc800_state(mconfig, type, tag),
+		abc800_state(mconfig, type, tag, ABC800C_CHAR_RAM_SIZE),
 		m_trom(*this, SAA5052_TAG),
 		m_palette(*this, "palette"),
 		m_fgctl_prom(*this, "hru2")
@@ -207,12 +211,10 @@ public:
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( m1_r ) override;
-	DECLARE_READ8_MEMBER( char_ram_r );
+	uint8_t char_ram_r(offs_t offset);
 	void abc800c_palette(palette_device &palette) const;
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);
-	void abc800c_mem(address_map &map);
 };
 
 
@@ -222,7 +224,7 @@ class abc802_state : public abc800_state
 {
 public:
 	abc802_state(const machine_config &mconfig, device_type type, const char *tag) :
-		abc800_state(mconfig, type, tag),
+		abc800_state(mconfig, type, tag, ABC802_CHAR_RAM_SIZE),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_char_rom(*this, MC6845_TAG),
@@ -236,10 +238,10 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	void bankswitch();
-
-	DECLARE_READ8_MEMBER( m1_r ) override;
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
@@ -255,8 +257,9 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
-	void abc802_io(address_map &map);
+	void abc802_m1(address_map &map);
 	void abc802_mem(address_map &map);
+	void abc802_io(address_map &map);
 };
 
 
@@ -266,14 +269,14 @@ class abc806_state : public abc800_state
 {
 public:
 	abc806_state(const machine_config &mconfig, device_type type, const char *tag) :
-		abc800_state(mconfig, type, tag),
+		abc800_state(mconfig, type, tag, ABC806_CHAR_RAM_SIZE),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_rtc(*this, E0516_TAG),
 		m_rad_prom(*this, "rad"),
 		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
-		m_attr_ram(*this, "attr_ram")
+		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -282,40 +285,38 @@ public:
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_attr_ram;
+	memory_share_creator<uint8_t> m_attr_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
 	virtual void video_start() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, bool &romd, bool &ramd, bool &hre, bool &vr);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( m1_r ) override;
-	DECLARE_READ8_MEMBER( mai_r );
-	DECLARE_WRITE8_MEMBER( mao_w );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
-	DECLARE_READ8_MEMBER( charram_r );
-	DECLARE_WRITE8_MEMBER( charram_w );
-	DECLARE_READ8_MEMBER( ami_r );
-	DECLARE_WRITE8_MEMBER( amo_w );
-	DECLARE_READ8_MEMBER( cli_r );
-	DECLARE_WRITE8_MEMBER( sso_w );
-	DECLARE_READ8_MEMBER( sti_r );
-	DECLARE_WRITE8_MEMBER( sto_w );
-	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t m1_r(offs_t offset) override;
+	uint8_t mai_r(offs_t offset);
+	void mao_w(offs_t offset, uint8_t data);
+	void hrs_w(uint8_t data);
+	void hrc_w(offs_t offset, uint8_t data);
+	uint8_t charram_r(offs_t offset);
+	void charram_w(offs_t offset, uint8_t data);
+	uint8_t ami_r();
+	void amo_w(uint8_t data);
+	uint8_t cli_r(offs_t offset);
+	void sso_w(uint8_t data);
+	uint8_t sti_r();
+	void sto_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	void abc806_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state
-	int m_keydtr;               // keyboard DTR
 	int m_eme;                  // extended memory enable
 	uint8_t m_map[16];            // memory page register
 

@@ -136,12 +136,12 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(spbactn_state::main_irq_ack_w)
+void spbactn_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
@@ -214,10 +214,7 @@ void spbactn_state::spbactnp_map(address_map &map)
 	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
 	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
-
-
 	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
-
 }
 
 void spbactn_state::spbactn_sound_map(address_map &map)

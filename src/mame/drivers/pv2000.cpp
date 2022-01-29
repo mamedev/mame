@@ -37,7 +37,7 @@ For BIOS CRC confirmation
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class pv2000_state : public driver_device
@@ -57,14 +57,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
-	DECLARE_WRITE8_MEMBER(cass_conf_w);
-	DECLARE_WRITE8_MEMBER(keys_w);
-	DECLARE_READ8_MEMBER(keys_hi_r);
-	DECLARE_READ8_MEMBER(keys_lo_r);
-	DECLARE_READ8_MEMBER(keys_mod_r);
+	void cass_conf_w(uint8_t data);
+	void keys_w(uint8_t data);
+	uint8_t keys_hi_r();
+	uint8_t keys_lo_r();
+	uint8_t keys_mod_r();
 	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
-	DECLARE_READ8_MEMBER(cass_in);
-	DECLARE_WRITE8_MEMBER(cass_out);
+	uint8_t cass_in();
+	void cass_out(uint8_t data);
 	bool m_last_state;
 	uint8_t m_key_pressed;
 	uint8_t m_keyb_column;
@@ -77,7 +77,7 @@ private:
 };
 
 
-WRITE8_MEMBER( pv2000_state::cass_conf_w )
+void pv2000_state::cass_conf_w(uint8_t data)
 {
 	logerror( "%s: cass_conf_w %02x\n", machine().describe_context(), data );
 
@@ -90,7 +90,7 @@ WRITE8_MEMBER( pv2000_state::cass_conf_w )
 }
 
 
-WRITE8_MEMBER( pv2000_state::keys_w )
+void pv2000_state::keys_w(uint8_t data)
 {
 	logerror( "%s: keys_w %02x\n", machine().describe_context(), data );
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER( pv2000_state::keys_w )
 }
 
 
-READ8_MEMBER( pv2000_state::keys_hi_r )
+uint8_t pv2000_state::keys_hi_r()
 {
 	uint8_t data = 0;
 	char kbdrow[6];
@@ -124,7 +124,7 @@ READ8_MEMBER( pv2000_state::keys_hi_r )
 }
 
 
-READ8_MEMBER( pv2000_state::keys_lo_r )
+uint8_t pv2000_state::keys_lo_r()
 {
 	uint8_t data = 0;
 	char kbdrow[6];
@@ -151,12 +151,12 @@ READ8_MEMBER( pv2000_state::keys_lo_r )
 }
 
 
-READ8_MEMBER( pv2000_state::keys_mod_r )
+uint8_t pv2000_state::keys_mod_r()
 {
 	return 0xf0 | ioport( "MOD" )->read();
 }
 
-READ8_MEMBER( pv2000_state::cass_in )
+uint8_t pv2000_state::cass_in()
 {
 	// from what i can tell,
 	// 0 = data in
@@ -168,7 +168,7 @@ READ8_MEMBER( pv2000_state::cass_in )
 	return 2 | ((m_cass->input() > +0.03) ? 1 : 0);
 }
 
-WRITE8_MEMBER( pv2000_state::cass_out )
+void pv2000_state::cass_out(uint8_t data)
 {
 	// it outputs 8-bit values here which are not the bytes in the file
 	// result is not readable
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pv2000_state::machine_reset()
@@ -373,7 +373,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state::cart_load )
 
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -408,7 +408,7 @@ void pv2000_state::pv2000(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");

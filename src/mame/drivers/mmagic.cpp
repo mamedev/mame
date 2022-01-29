@@ -87,11 +87,11 @@ public:
 	void mmagic(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(ball_x_w);
-	DECLARE_WRITE8_MEMBER(ball_y_w);
-	DECLARE_WRITE8_MEMBER(color_w);
-	DECLARE_WRITE8_MEMBER(audio_w);
+	uint8_t vblank_r();
+	void ball_x_w(uint8_t data);
+	void ball_y_w(uint8_t data);
+	void color_w(uint8_t data);
+	void audio_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -181,7 +181,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( mmagic_state::vblank_r )
+uint8_t mmagic_state::vblank_r()
 {
 	uint8_t data = 0;
 
@@ -194,17 +194,17 @@ READ8_MEMBER( mmagic_state::vblank_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_x_w )
+void mmagic_state::ball_x_w(uint8_t data)
 {
 	m_ball_x = data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_y_w )
+void mmagic_state::ball_y_w(uint8_t data)
 {
 	m_ball_y = data;
 }
 
-WRITE8_MEMBER( mmagic_state::color_w )
+void mmagic_state::color_w(uint8_t data)
 {
 	// bit 3 is always set
 	// bit 6 switches the palette (actually there is only a single differently colored tile)
@@ -229,15 +229,15 @@ uint32_t mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				uint8_t gfx = m_tiles[(code << 4) + tx];
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black() : m_palette->pen_color(color);
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black() : m_palette->pen_color(color);
 			}
 		}
 	}
@@ -272,7 +272,7 @@ static const char *const mmagic_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER( mmagic_state::audio_w )
+void mmagic_state::audio_w(uint8_t data)
 {
 	if (LOG_AUDIO)
 		logerror("audio_w: %02x\n", data);

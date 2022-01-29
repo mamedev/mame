@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="laser2001_flop" description="V-Tech Laser 2001 / Salora Manager disks">
+
+	<software name="kaarme" supported="no">
+		<description>Käärmepeli (Finland)</description>
+		<year>198?</year>
+		<publisher>Salora</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kaarmepeli.img" size="143360" crc="5c32d1ee" sha1="0ab36be0f2bb9c690b5210b20b95a1159246abb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

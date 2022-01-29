@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 Created by Robbbert on 2019-09-25.
 
 For the VZ-200, it's recommended that you use the 16k RAM pack to avoid running out of memory.

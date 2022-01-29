@@ -130,7 +130,7 @@ std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_cache->read_word(m_pc++)
+#define ROPCODE()       m_cache.read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -139,22 +139,22 @@ void tms32051_device::CHANGE_PC(uint16_t new_pc)
 
 uint16_t tms32051_device::PM_READ16(uint16_t address)
 {
-	return m_program->read_word(address);
+	return m_program.read_word(address);
 }
 
 void tms32051_device::PM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_program->write_word(address, data);
+	m_program.write_word(address, data);
 }
 
 uint16_t tms32051_device::DM_READ16(uint16_t address)
 {
-	return m_data->read_word(address);
+	return m_data.read_word(address);
 }
 
 void tms32051_device::DM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_data->write_word(address, data);
+	m_data.write_word(address, data);
 }
 
 #include "32051ops.hxx"
@@ -186,10 +186,10 @@ void tms32051_device::delay_slot(uint16_t startpc)
 
 void tms32051_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	m_pcstack_ptr = 0;
 	m_op = 0;
@@ -218,6 +218,99 @@ void tms32051_device::device_start()
 	m_cber2 = 0;
 	memset(&m_timer, 0, sizeof(m_timer));
 	memset(&m_serial, 0, sizeof(m_serial));
+
+	save_item(NAME(m_pc));
+	save_item(NAME(m_op));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_accb));
+	save_item(NAME(m_preg));
+	save_item(NAME(m_treg0));
+	save_item(NAME(m_treg1));
+	save_item(NAME(m_treg2));
+	save_pointer(NAME(&m_ar[0]), std::size(m_ar));
+	save_item(NAME(m_rptc));
+	save_item(NAME(m_bmar));
+	save_item(NAME(m_brcr));
+	save_item(NAME(m_paer));
+	save_item(NAME(m_pasr));
+	save_item(NAME(m_indx));
+	save_item(NAME(m_dbmr));
+	save_item(NAME(m_arcr));
+
+	save_item(STRUCT_MEMBER(m_st0, dp));
+	save_item(STRUCT_MEMBER(m_st0, intm));
+	save_item(STRUCT_MEMBER(m_st0, ovm));
+	save_item(STRUCT_MEMBER(m_st0, ov));
+	save_item(STRUCT_MEMBER(m_st0, arp));
+
+	save_item(STRUCT_MEMBER(m_st1, arb));
+	save_item(STRUCT_MEMBER(m_st1, cnf));
+	save_item(STRUCT_MEMBER(m_st1, tc));
+	save_item(STRUCT_MEMBER(m_st1, sxm));
+	save_item(STRUCT_MEMBER(m_st1, c));
+	save_item(STRUCT_MEMBER(m_st1, hm));
+	save_item(STRUCT_MEMBER(m_st1, xf));
+	save_item(STRUCT_MEMBER(m_st1, pm));
+
+	save_item(STRUCT_MEMBER(m_pmst, iptr));
+	save_item(STRUCT_MEMBER(m_pmst, avis));
+	save_item(STRUCT_MEMBER(m_pmst, ovly));
+	save_item(STRUCT_MEMBER(m_pmst, ram));
+	save_item(STRUCT_MEMBER(m_pmst, mpmc));
+	save_item(STRUCT_MEMBER(m_pmst, ndx));
+	save_item(STRUCT_MEMBER(m_pmst, trm));
+	save_item(STRUCT_MEMBER(m_pmst, braf));
+
+	save_item(NAME(m_ifr));
+	save_item(NAME(m_imr));
+	save_pointer(NAME(&m_pcstack[0]), std::size(m_pcstack));
+	save_item(NAME(m_pcstack_ptr));
+	save_item(NAME(m_rpt_start));
+	save_item(NAME(m_rpt_end));
+	save_item(NAME(m_cbcr));
+	save_item(NAME(m_cbsr1));
+	save_item(NAME(m_cber1));
+	save_item(NAME(m_cbsr2));
+	save_item(NAME(m_cber2));
+
+	save_item(STRUCT_MEMBER(m_timer, tddr));
+	save_item(STRUCT_MEMBER(m_timer, psc));
+	save_item(STRUCT_MEMBER(m_timer, tim));
+	save_item(STRUCT_MEMBER(m_timer, prd));
+
+	save_item(STRUCT_MEMBER(m_serial, drr));
+	save_item(STRUCT_MEMBER(m_serial, dxr));
+	save_item(STRUCT_MEMBER(m_serial, spc));
+
+	save_item(STRUCT_MEMBER(m_shadow, acc));
+	save_item(STRUCT_MEMBER(m_shadow, accb));
+	save_item(STRUCT_MEMBER(m_shadow, arcr));
+	save_item(STRUCT_MEMBER(m_shadow, indx));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, iptr));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, avis));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ovly));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ram));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, mpmc));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ndx));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, trm));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, braf));
+	save_item(STRUCT_MEMBER(m_shadow.st0, dp));
+	save_item(STRUCT_MEMBER(m_shadow.st0, intm));
+	save_item(STRUCT_MEMBER(m_shadow.st0, ovm));
+	save_item(STRUCT_MEMBER(m_shadow.st0, ov));
+	save_item(STRUCT_MEMBER(m_shadow.st0, arp));
+	save_item(STRUCT_MEMBER(m_shadow.st1, arb));
+	save_item(STRUCT_MEMBER(m_shadow.st1, cnf));
+	save_item(STRUCT_MEMBER(m_shadow.st1, tc));
+	save_item(STRUCT_MEMBER(m_shadow.st1, sxm));
+	save_item(STRUCT_MEMBER(m_shadow.st1, c));
+	save_item(STRUCT_MEMBER(m_shadow.st1, hm));
+	save_item(STRUCT_MEMBER(m_shadow.st1, xf));
+	save_item(STRUCT_MEMBER(m_shadow.st1, pm));
+	save_item(STRUCT_MEMBER(m_shadow, preg));
+	save_item(STRUCT_MEMBER(m_shadow, treg0));
+	save_item(STRUCT_MEMBER(m_shadow, treg1));
+	save_item(STRUCT_MEMBER(m_shadow, treg2));
 
 	state_add( TMS32051_PC,    "PC", m_pc).formatstr("%04X");
 	state_add( TMS32051_ACC,   "ACC", m_acc).formatstr("%08X");
@@ -444,7 +537,7 @@ void tms32051_device::execute_run()
 
 /*****************************************************************************/
 
-READ16_MEMBER( tms32051_device::cpuregs_r )
+uint16_t tms32051_device::cpuregs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -519,7 +612,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			return m_io->read_word(offset);
+			return m_io.read_word(offset);
 
 		default:
 			if (!machine().side_effects_disabled())
@@ -529,7 +622,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 	return 0;
 }
 
-WRITE16_MEMBER( tms32051_device::cpuregs_w )
+void tms32051_device::cpuregs_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -630,7 +723,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			m_io->write_word(offset, data);
+			m_io.write_word(offset, data);
 			break;
 
 		default:

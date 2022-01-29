@@ -21,7 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,25 +32,25 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-READ8_MEMBER(blktiger_state::blktiger_from_mcu_r)
+uint8_t blktiger_state::blktiger_from_mcu_r()
 {
 	return m_i8751_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
+void blktiger_state::blktiger_to_mcu_w(uint8_t data)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 	m_z80_latch = data;
 }
 
-READ8_MEMBER(blktiger_state::blktiger_from_main_r)
+uint8_t blktiger_state::blktiger_from_main_r()
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return m_z80_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
+void blktiger_state::blktiger_to_main_w(uint8_t data)
 {
 	//printf("%02x write\n",data);
 	m_i8751_latch = data;
@@ -58,12 +58,12 @@ WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
 
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
+void blktiger_state::blktiger_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
+void blktiger_state::blktiger_coinlockout_w(uint8_t data)
 {
 	if (ioport("COIN_LOCKOUT")->read() & 0x01)
 	{
@@ -310,10 +310,7 @@ void blktiger_state::blktiger(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(blktiger_state::screen_update_blktiger));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -586,7 +583,7 @@ ROM_START( blktigerb3 )
 	ROM_LOAD( "10.9a",  0x20000, 0x10000, CRC(fc33ccc6) SHA1(d492626a88565c2626f98ecb1d74535f1ad68e4c) )
 	ROM_LOAD( "9.8a",   0x30000, 0x10000, CRC(f449de01) SHA1(f6b40e9eb2471b89c42ab84f4214295d284db0c3) )
 
-	ROM_REGION( 0x0400, "proms", 0 )    /* PROMs (function unknown) */ // misisng in this dump
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown), missing in this dump
 	ROM_LOAD( "bd01.8j",   0x0000, 0x0100, CRC(29b459e5) SHA1(0034734a533df3dea16b7b48e072485d7f26f850) )
 	ROM_LOAD( "bd02.9j",   0x0100, 0x0100, CRC(8b741e66) SHA1(6c1fda59936a7217b05949f5c54b1f91f4b49dbe) )
 	ROM_LOAD( "bd03.11k",  0x0200, 0x0100, CRC(27201c75) SHA1(c54d87f06bfe0b0908389c005014d97156e272c2) )

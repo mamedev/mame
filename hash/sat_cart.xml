@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Note: a Chinese pirate mahjong game is rumored to exist -->
-<!-- Kof95 and Ultraman require additional ROM cartridges to work! -->
+Note: a Chinese pirate mahjong game is rumored to exist
+Kof95 and Ultraman require additional ROM cartridges to work!
+-->
 
 <softwarelist name="sat_cart" description="Sega Saturn cartridges">
 

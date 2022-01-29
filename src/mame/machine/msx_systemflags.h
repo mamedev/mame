@@ -28,8 +28,8 @@ public:
 	template <typename T> void set_maincpu_tag(T &&maincpu_tag) { m_maincpu.set_tag(std::forward<T>(maincpu_tag)); }
 	void set_initial_value(uint8_t initial_value) { m_initial_value = initial_value; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 
 protected:
 	virtual void device_start() override;

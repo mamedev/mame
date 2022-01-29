@@ -65,6 +65,9 @@ public:
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	struct math_t
 	{
@@ -174,33 +177,31 @@ private:
 	void tx1_update_state();
 	void buggyboy_update_state();
 
-	DECLARE_READ16_MEMBER(tx1_math_r);
-	DECLARE_WRITE16_MEMBER(tx1_math_w);
-	DECLARE_READ16_MEMBER(tx1_spcs_rom_r);
-	DECLARE_READ16_MEMBER(tx1_spcs_ram_r);
-	DECLARE_WRITE16_MEMBER(tx1_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_math_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_math_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_rom_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_ram_r);
-	DECLARE_READ16_MEMBER(tx1_crtc_r);
-	DECLARE_WRITE16_MEMBER(tx1_crtc_w);
-	DECLARE_WRITE16_MEMBER(tx1_bankcs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slincs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slock_w);
-	DECLARE_WRITE16_MEMBER(tx1_scolst_w);
-	DECLARE_WRITE16_MEMBER(tx1_flgcs_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
-	DECLARE_WRITE16_MEMBER(resume_math_w);
-	DECLARE_WRITE16_MEMBER(halt_math_w);
-	DECLARE_READ16_MEMBER(dipswitches_r);
-	DECLARE_MACHINE_RESET(tx1);
+	uint16_t tx1_math_r(offs_t offset);
+	void tx1_math_w(offs_t offset, uint16_t data);
+	uint16_t tx1_spcs_rom_r(offs_t offset);
+	uint16_t tx1_spcs_ram_r(offs_t offset);
+	void tx1_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t buggyboy_math_r(offs_t offset);
+	void buggyboy_math_w(offs_t offset, uint16_t data);
+	uint16_t buggyboy_spcs_rom_r(offs_t offset);
+	void buggyboy_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t buggyboy_spcs_ram_r(offs_t offset);
+	uint16_t tx1_crtc_r();
+	void tx1_crtc_w(offs_t offset, uint16_t data);
+	void tx1_bankcs_w(offs_t offset, uint16_t data);
+	void tx1_slincs_w(offs_t offset, uint16_t data);
+	void tx1_slock_w(uint16_t data);
+	void tx1_scolst_w(uint16_t data);
+	void tx1_flgcs_w(uint16_t data);
+	void buggyboy_gas_w(offs_t offset, uint16_t data);
+	void buggyboy_sky_w(uint16_t data);
+	void buggyboy_scolst_w(uint16_t data);
+	void resume_math_w(uint16_t data);
+	void halt_math_w(uint16_t data);
+	u16 dipswitches_r();
 	DECLARE_VIDEO_START(tx1);
 	void tx1_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(buggyboy);
 	DECLARE_VIDEO_START(buggyboy);
 	void buggyboy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(buggybjr);

@@ -140,7 +140,7 @@ void iq151_video64_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 	{
 		for (int ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (int x = ma; x < ma + 64; x++)
 			{

@@ -194,8 +194,6 @@ enum
 
 void tms9995_device::device_start()
 {
-	// TODO: Restore save state suport
-
 	m_prgspace = &space(AS_PROGRAM);
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
@@ -216,9 +214,13 @@ void tms9995_device::device_start()
 	m_nmi_active = false;
 	m_int_overflow = false;
 
+	m_reset = false;
+
 	m_idle_state = false;
 
 	m_source_value = 0;
+
+	m_index = 0;
 
 	// add the states for the debugger
 	for (int i=0; i < 20; i++)
@@ -227,8 +229,8 @@ void tms9995_device::device_start()
 		// callexport = need to use the state_export method to read the state variable
 		state_add(i, s_statename[i], m_state_any).callimport().callexport().formatstr("%04X");
 	}
-	state_add(STATE_GENPC, "GENPC", PC_debug).formatstr("%4s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", PC_debug).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC_debug).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC_debug).noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	// Set up the lookup table for command decoding
@@ -242,7 +244,7 @@ void tms9995_device::device_start()
 	save_item(NAME(PC));
 	save_item(NAME(ST));
 	// save_item(NAME(PC_debug)); // only for debugger output
-	save_pointer(NAME(m_onchip_memory),256);
+	save_item(NAME(m_onchip_memory));
 	save_item(NAME(m_idle_state));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_hold_state));
@@ -285,7 +287,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_cru_address));
 	save_item(NAME(m_cru_value));
 	save_item(NAME(m_cru_first_read));
-	save_pointer(NAME(m_flag),16);
+	save_item(NAME(m_flag));
 	save_item(NAME(IR));
 	save_item(NAME(m_pre_IR));
 	save_item(NAME(m_command));
@@ -381,7 +383,7 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
 {
 	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
-	memset(flags, 0x00, ARRAY_LENGTH(flags));
+	std::fill(std::begin(flags), std::end(flags), 0x00);
 	uint16_t val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{
@@ -1228,7 +1230,7 @@ void tms9995_device::execute_run()
 		if (m_check_ready && m_ready == false)
 		{
 			// We are in a wait state
-			LOGMASKED(LOG_WAIT, "wait state\n");
+			LOGMASKED(LOG_WAIT, "wait\n");
 			// The clock output should be used to change the state of an outer
 			// device which operates the READY line
 			pulse_clock(1);
@@ -1632,11 +1634,13 @@ void tms9995_device::command_completed()
 	// Pseudo state at the end of the current instruction cycle sequence
 	if (LOG_CYCLES & VERBOSE)
 	{
-		logerror("+++++ Instruction %04x (%s) completed", IR, opname[m_command]);
+		// logerror("+++++ Instruction %04x (%s) completed", IR, opname[m_command]);
 		int cycles =  m_first_cycle - m_icount;
 		// Avoid nonsense values due to expired and resumed main loop
-		if (cycles > 0 && cycles < 10000) logerror(", consumed %d cycles", cycles);
-		logerror(" +++++\n");
+		// if (cycles > 0 && cycles < 10000) logerror(", consumed %d cycles", cycles);
+		// logerror(" +++++\n");
+		if (cycles > 0 && cycles < 10000) logerror("%04x %s [%02d]\n", PC_debug, opname[m_command], cycles);
+		else logerror("%04x %s [ ?]\n", PC_debug, opname[m_command]);
 	}
 
 	if (m_int_pending != 0)
@@ -1827,12 +1831,22 @@ void tms9995_device::mem_read()
 
 		// Ignore the READY state
 		m_check_ready = false;
+
 		// We put fffc-ffff back into the f000-f0ff area
-		m_current_value = m_onchip_memory[m_address & 0x00ff]<<8;
-		if (m_word_access || !m_byteop)
+		offs_t intaddr = m_address & 0x00fe;
+
+		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
+		// but only on word boundary, as only full words are read.
+		if (m_setaddr)
+			m_setaddr->write_byte(m_address & 0xfffe, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+
+		// Always read a word from internal memory
+		m_current_value = (m_onchip_memory[intaddr] << 8) | m_onchip_memory[intaddr + 1];
+
+		if (!m_word_access && m_byteop)
 		{
-			// We have a word operation; add the low byte right here (just 1 cycle)
-			m_current_value |= (m_onchip_memory[(m_address & 0x00ff)+1] & 0xff);
+			if ((m_address & 1)==1) m_current_value = m_current_value << 8;
+			m_current_value &= 0xff00;
 		}
 		pulse_clock(1);
 	}
@@ -1963,6 +1977,12 @@ void tms9995_device::mem_write()
 		if (m_word_access || !m_byteop) m_address &= 0xfffe;
 
 		LOGMASKED(LOG_MEM, "write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
+
+		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
+		// but only on word boundary
+		if (m_setaddr)
+				m_setaddr->write_byte(m_address & 0xfffe, TMS99xx_BUS_WRITE);
+
 		m_check_ready = false;
 		m_onchip_memory[m_address & 0x00ff] = (m_current_value >> 8) & 0xff;
 		if (m_word_access || !m_byteop)
@@ -3481,7 +3501,7 @@ void tms9995_device::alu_int()
     The minimum number of cycles applies to a command like SETO R0 with
     R0 in on-chip RAM.
 */
-uint32_t tms9995_device::execute_min_cycles() const
+uint32_t tms9995_device::execute_min_cycles() const noexcept
 {
 	return 3;
 }
@@ -3490,12 +3510,12 @@ uint32_t tms9995_device::execute_min_cycles() const
     The maximum number of cycles applies to a STCR command with the destination
     operand off-chip and 16 bits of transfer.
 */
-uint32_t tms9995_device::execute_max_cycles() const
+uint32_t tms9995_device::execute_max_cycles() const noexcept
 {
 	return 47;
 }
 
-uint32_t tms9995_device::execute_input_lines() const
+uint32_t tms9995_device::execute_input_lines() const noexcept
 {
 	return 2;
 }

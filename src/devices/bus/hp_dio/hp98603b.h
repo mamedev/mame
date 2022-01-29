@@ -8,8 +8,7 @@
 
 #include "hp_dio.h"
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98603b_device :
 		public device_t,
@@ -18,8 +17,8 @@ class dio16_98603b_device :
 public:
 	// construction/destruction
 	dio16_98603b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(rom_w);
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
 
 protected:
 	dio16_98603b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -37,7 +36,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device)
 

@@ -41,7 +41,7 @@ thought to be a watchdog before.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gng_state::gng_bankswitch_w)
+void gng_state::gng_bankswitch_w(uint8_t data)
 {
 	if (data == 4)
 		membank("bank1")->set_entry(4);
@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 	}
 }
 
-READ8_MEMBER(gng_state::diamond_hack_r)
+uint8_t gng_state::diamond_hack_r()
 {
 	return 0;
 }
@@ -408,10 +408,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.59);    /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(XTAL(12'000'000)/2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gng_state::screen_update_gng));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -836,7 +833,7 @@ GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Cap
 GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngc,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngt,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision C)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision G)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )

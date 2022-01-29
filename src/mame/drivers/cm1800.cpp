@@ -49,18 +49,18 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
-	DECLARE_READ8_MEMBER(uart_status_r);
-
 	void cm1800(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	virtual void machine_reset() override;
+	u8 uart_status_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 };
 
-READ8_MEMBER(cm1800_state::uart_status_r)
+u8 cm1800_state::uart_status_r()
 {
 	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
@@ -127,4 +127,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME   FLAGS */
-COMP( 1981, cm1800, 0,      0,      cm1800,  cm1800, cm1800_state, empty_init, "<unknown>", "CM-1800", MACHINE_NO_SOUND_HW)
+COMP( 1981, cm1800, 0,      0,      cm1800,  cm1800, cm1800_state, empty_init, "<unknown>", "CM-1800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

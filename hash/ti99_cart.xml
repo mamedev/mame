@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ti99_cart" description="TI-99/4A cartridges">
 
 <!-- Cartridge content from Texas Instruments usually contains a CRC16 checksum

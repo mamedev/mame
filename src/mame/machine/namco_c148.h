@@ -42,41 +42,41 @@ public:
 	auto out_ext1_callback() { return m_out_ext1_cb.bind(); }
 	auto out_ext2_callback() { return m_out_ext2_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( vblank_irq_level_r );
-	DECLARE_WRITE8_MEMBER( vblank_irq_level_w );
-	DECLARE_READ16_MEMBER( vblank_irq_ack_r );
-	DECLARE_WRITE16_MEMBER( vblank_irq_ack_w );
+	uint8_t vblank_irq_level_r();
+	void vblank_irq_level_w(uint8_t data);
+	uint16_t vblank_irq_ack_r();
+	void vblank_irq_ack_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( pos_irq_level_r );
-	DECLARE_WRITE8_MEMBER( pos_irq_level_w );
-	DECLARE_READ16_MEMBER( pos_irq_ack_r );
-	DECLARE_WRITE16_MEMBER( pos_irq_ack_w );
+	uint8_t pos_irq_level_r();
+	void pos_irq_level_w(uint8_t data);
+	uint16_t pos_irq_ack_r();
+	void pos_irq_ack_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( cpu_irq_level_r );
-	DECLARE_WRITE8_MEMBER( cpu_irq_level_w );
-	DECLARE_READ16_MEMBER( cpu_irq_ack_r );
-	DECLARE_WRITE16_MEMBER( cpu_irq_ack_w );
+	uint8_t cpu_irq_level_r();
+	void cpu_irq_level_w(uint8_t data);
+	uint16_t cpu_irq_ack_r();
+	void cpu_irq_ack_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( ex_irq_level_r );
-	DECLARE_WRITE8_MEMBER( ex_irq_level_w );
-	DECLARE_READ16_MEMBER( ex_irq_ack_r );
-	DECLARE_WRITE16_MEMBER( ex_irq_ack_w );
+	uint8_t ex_irq_level_r();
+	void ex_irq_level_w(uint8_t data);
+	uint16_t ex_irq_ack_r();
+	void ex_irq_ack_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( sci_irq_level_r );
-	DECLARE_WRITE8_MEMBER( sci_irq_level_w );
-	DECLARE_READ16_MEMBER( sci_irq_ack_r );
-	DECLARE_WRITE16_MEMBER( sci_irq_ack_w );
+	uint8_t sci_irq_level_r();
+	void sci_irq_level_w(uint8_t data);
+	uint16_t sci_irq_ack_r();
+	void sci_irq_ack_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( ext_posirq_line_r );
-	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
-	DECLARE_WRITE16_MEMBER( cpu_irq_assert_w );
+	uint8_t ext_posirq_line_r();
+	void ext_posirq_line_w(uint8_t data);
+	void cpu_irq_assert_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER( bus_ctrl_r );
-	DECLARE_WRITE8_MEMBER( bus_ctrl_w );
+	uint8_t bus_ctrl_r();
+	void bus_ctrl_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( ext_r );
-	DECLARE_WRITE8_MEMBER( ext1_w );
-	DECLARE_WRITE8_MEMBER( ext2_w );
+	uint8_t ext_r();
+	void ext1_w(uint8_t data);
+	void ext2_w(uint8_t data);
 	void vblank_irq_trigger();
 	void pos_irq_trigger();
 	void ex_irq_trigger();

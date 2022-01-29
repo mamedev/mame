@@ -13,17 +13,18 @@ class ims_cvc_device
 	, public device_palette_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+	static u32 const MASK24 = 0xffffffU;
 
 	// configuration
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_vram(T &&tag) { m_vram.set_tag(std::forward<T>(tag)); }
 
 	virtual void map(address_map &map) = 0;
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) = 0;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) = 0;
+	virtual void set_swapped(bool swapped) { m_swap = swapped ? 3 : 0; };
 
 protected:
-	ims_cvc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -32,39 +33,41 @@ protected:
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const override { return 256; }
 
-	u32 colour_palette_r(const offs_t offset);
-	void colour_palette_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU);
+	virtual void boot_w(u32 data) { m_boot = data & MASK24; }
+
+	// register read handlers
 	u32 halfsync_r() { return m_halfsync; }
-	void halfsync_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_halfsync); }
 	u32 backporch_r() { return m_backporch; }
-	void backporch_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_backporch); }
 	u32 display_r() { return m_display; }
-	void display_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_display); }
 	u32 shortdisplay_r() { return m_shortdisplay; }
-	void shortdisplay_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_shortdisplay); }
 	u32 broadpulse_r() { return m_broadpulse; }
-	void broadpulse_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_broadpulse); }
 	u32 vsync_r() { return m_vsync; }
-	void vsync_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_vsync); }
 	u32 vblank_r() { return m_vblank; }
-	void vblank_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_vblank); }
 	u32 vdisplay_r() { return m_vdisplay; }
-	void vdisplay_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_vdisplay); }
 	u32 linetime_r() { return m_linetime; }
-	void linetime_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_linetime); }
-	//u32 tos_r() { return m_tos; }
-	//void tos_w(const u32 data) { m_tos = data; }
 	u32 meminit_r() { return m_meminit; }
-	void meminit_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_meminit); }
 	u32 transferdelay_r() { return m_transferdelay; }
-	void transferdelay_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_transferdelay); }
-
 	u32 mask_r() { return m_mask; }
-	void mask_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_mask); }
 	u32 tos_r() { return m_tos; }
-	void tos_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_tos); }
 
-	virtual void boot_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_boot); }
+	// register write handlers
+	void halfsync_w(u32 data) { m_halfsync = data & MASK24; }
+	void backporch_w(u32 data) { m_backporch = data & MASK24; }
+	void display_w(u32 data) { m_display = data & MASK24; }
+	void shortdisplay_w(u32 data) { m_shortdisplay = data & MASK24; }
+	void broadpulse_w(u32 data) { m_broadpulse = data & MASK24; }
+	void vsync_w(u32 data) { m_vsync = data & MASK24; }
+	void vblank_w(u32 data) { m_vblank = data & MASK24; }
+	void vdisplay_w(u32 data) { m_vdisplay = data & MASK24; }
+	void linetime_w(u32 data) { m_linetime = data & MASK24; }
+	void meminit_w(u32 data) { m_meminit = data & MASK24; }
+	void transferdelay_w(u32 data) { m_transferdelay = data & MASK24; }
+	void mask_w(u32 data) { m_mask = data & MASK24; }
+	void tos_w(u32 data) { m_tos = data & MASK24; }
+
+	// colour palette handlers
+	u32 colour_palette_r(offs_t offset) { return u32(pen_color(offset >> 1)) & MASK24; }
+	void colour_palette_w(offs_t offset, u32 data) { set_pen_color(offset >> 1, data >> 16, data >> 8, data >> 0); }
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_vram;
@@ -86,22 +89,24 @@ protected:
 	u32 m_mask;
 	u32 m_tos;
 	u32 m_boot;
+
+	unsigned m_swap = 0;
 };
 
 class g300_device : public ims_cvc_device
 {
 public:
-	g300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g300_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	virtual void map(address_map &map) override;
 
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) override;
 
 protected:
 	virtual void device_start() override;
 
 	u32 control_r() { return m_control; }
-	void control_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_control); }
+	void control_w(u32 data) { m_control = data & MASK24; }
 
 private:
 	u32 m_control;
@@ -110,11 +115,11 @@ private:
 class g332_device : public ims_cvc_device
 {
 public:
-	g332_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	virtual void map(address_map &map) override;
 
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) override;
 
 	enum boot_mask : u32
 	{
@@ -163,7 +168,7 @@ public:
 	};
 
 protected:
-	g332_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -175,21 +180,29 @@ protected:
 
 	virtual void microport_map(address_map &map);
 
-	virtual void boot_w(offs_t offset, u32 data, u32 mem_mask = 0x00ffffffU) override;
+	virtual void boot_w(u32 data) override;
 
-	u32 cursor_palette_r(const offs_t offset);
-	void cursor_palette_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU);
-
+	// register read handlers
 	u32 vpreequalise_r() { return m_vpreequalise; }
-	void vpreequalise_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_vpreequalise); }
 	u32 vpostequalise_r() { return m_vpostequalise; }
-	void vpostequalise_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_vpostequalise); }
 	u32 linestart_r() { return m_linestart; }
-	void linestart_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_linestart); }
 	u32 control_a_r() { return m_control_a; }
-	void control_a_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU);
 	u32 control_b_r() { return m_control_b; }
-	void control_b_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffffU) { COMBINE_DATA(&m_control_b); }
+	u32 cursor_start_r() { return m_cursor_start; }
+
+	// register write handlers
+	void vpreequalise_w(u32 data) { m_vpreequalise = data & MASK24; }
+	void vpostequalise_w(u32 data) { m_vpostequalise = data & MASK24; }
+	void linestart_w(u32 data) { m_linestart = data & MASK24; }
+	void control_a_w(u32 data);
+	void control_b_w(u32 data) { m_control_b = data & MASK24; }
+	void cursor_start_w(u32 data) { m_cursor_start = data & MASK24; }
+
+	// cursor handlers
+	u32 cursor_palette_r(offs_t offset) { return u32(pen_color(256 + (offset >> 1)))& MASK24; }
+	u32 cursor_store_r(offs_t offset) { return m_cursor_store[offset >> 1]; }
+	void cursor_palette_w(offs_t offset, u32 data) { set_pen_color(256 + (offset >> 1), data >> 16, data >> 8, data >> 0); }
+	void cursor_store_w(offs_t offset, u32 data) { m_cursor_store[offset >> 1] = u16(data); }
 
 private:
 	required_device<address_map_bank_device> m_microport;
@@ -199,12 +212,17 @@ private:
 	u32 m_linestart;
 	u32 m_control_a;
 	u32 m_control_b;
+	u32 m_cursor_start;
+
+	std::unique_ptr<u16[]> m_cursor_store;
 };
 
 class g364_device : public g332_device
 {
 public:
-	g364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g364_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	virtual void set_swapped(bool swapped) override { m_swap = swapped ? 7 : 0; };
 };
 
 DECLARE_DEVICE_TYPE(G300, g300_device)

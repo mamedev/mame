@@ -39,14 +39,14 @@ public:
 
 	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
 
-	DECLARE_READ8_MEMBER(tcr_r);
-	DECLARE_WRITE8_MEMBER(tcr_w);
-	DECLARE_READ8_MEMBER(tcsr_r);
-	DECLARE_WRITE8_MEMBER(tcsr_w);
-	DECLARE_READ8_MEMBER(tcor_r);
-	DECLARE_WRITE8_MEMBER(tcor_w);
-	DECLARE_READ8_MEMBER(tcnt_r);
-	DECLARE_WRITE8_MEMBER(tcnt_w);
+	uint8_t tcr_r();
+	void tcr_w(uint8_t data);
+	uint8_t tcsr_r();
+	void tcsr_w(uint8_t data);
+	uint8_t tcor_r(offs_t offset);
+	void tcor_w(offs_t offset, uint8_t data);
+	uint8_t tcnt_r();
+	void tcnt_w(uint8_t data);
 
 	uint64_t internal_update(uint64_t current_time);
 	void set_extra_clock_bit(bool bit);

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+#ifndef MAME_VIDEO_PIN64_H
+#define MAME_VIDEO_PIN64_H
+
 #pragma once
 
-#ifndef PIN64_H
-#define PIN64_H
-
 #include <cstdio>
-#include <vector>
 #include <map>
+#include <vector>
+
 
 #define PIN64_ENABLE_CAPTURE (0)
 
@@ -176,4 +177,4 @@ private:
 	static const uint8_t CAP_ID[8];
 };
 
-#endif // PIN64_H
+#endif // MAME_VIDEO_PIN64_H

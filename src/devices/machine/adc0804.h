@@ -70,6 +70,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(intr_r) { return m_intr_active ? 0 : 1; }
 
 protected:
+	adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -102,7 +104,22 @@ private:
 	bool m_intr_active;
 };
 
+// ======================> adc0803_device
+
+class adc0803_device : public adc0804_device
+{
+public:
+	// device type constructors
+	adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, double r, double c)
+		: adc0803_device(mconfig, tag, owner, 0U)
+	{
+		set_rc(r, c);
+	}
+};
+
 // device type declarations
+DECLARE_DEVICE_TYPE(ADC0803, adc0803_device)
 DECLARE_DEVICE_TYPE(ADC0804, adc0804_device)
 
 #endif // MAME_MACHINE_ADC0804_H

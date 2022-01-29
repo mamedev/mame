@@ -46,25 +46,25 @@
 #include "includes/shootout.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "machine/deco222.h"
 #include "screen.h"
 #include "speaker.h"
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(shootout_state::bankswitch_w)
+void shootout_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-READ8_MEMBER(shootout_state::sound_cpu_command_r)
+uint8_t shootout_state::sound_cpu_command_r()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
-WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
+void shootout_state::sound_cpu_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -73,9 +73,9 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_maincpu->spin_until_time(attotime::from_usec(200));
 }
 
-WRITE8_MEMBER(shootout_state::flipscreen_w)
+void shootout_state::flipscreen_w(uint8_t data)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(~data & 0x01);
 }
 
 /*
@@ -89,7 +89,7 @@ WRITE8_MEMBER(shootout_state::flipscreen_w)
     This should be an input for a BCD to 7-segment decoder (e.g. a 74LS47), but all the PCBs I've seen don't have 'onboard'
     display(s), so this was implemented as normal "coin counter" (after all, they both have the same goal: count credits ;))
 */
-WRITE8_MEMBER(shootout_state::coincounter_w)
+void shootout_state::coincounter_w(uint8_t data)
 {
 	if (data != m_ccnt_old_val)
 	{
@@ -432,7 +432,7 @@ void shootout_state::init_shootout()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
-
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, init_shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, init_shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, init_shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )
+// ROT180 confirmed by Kold
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, init_shootout, ROT180, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, init_shootout, ROT180, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, init_shootout, ROT180, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )

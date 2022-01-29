@@ -32,10 +32,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ32_MEMBER(cb264_r);
-	DECLARE_WRITE32_MEMBER(cb264_w);
-	DECLARE_READ32_MEMBER(cb264_ramdac_r);
-	DECLARE_WRITE32_MEMBER(cb264_ramdac_w);
+	uint32_t cb264_r(offs_t offset, uint32_t mem_mask = ~0);
+	void cb264_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cb264_ramdac_r(offs_t offset);
+	void cb264_ramdac_w(offs_t offset, uint32_t data);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

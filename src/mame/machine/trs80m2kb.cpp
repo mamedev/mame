@@ -281,7 +281,7 @@ READ_LINE_MEMBER( trs80m2_keyboard_device::kb_t1_r )
 //  kb_p0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
+uint8_t trs80m2_keyboard_device::kb_p0_r()
 {
 	uint8_t data = 0xff;
 
@@ -298,7 +298,7 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
+void trs80m2_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -333,7 +333,7 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
+void trs80m2_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

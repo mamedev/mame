@@ -242,6 +242,7 @@ void hd61700_disassembler::dasm_arg(std::ostream &stream, uint8_t op, offs_t pc,
 
 		case OP_IM8_:
 			pos ++;
+			[[fallthrough]];
 		case OP_IM8:
 			util::stream_format( stream, "0x%02x", opread(pc, pos, opcodes) );
 			pos ++;

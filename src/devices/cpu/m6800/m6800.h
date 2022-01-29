@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "6800dasm.h"
-
 enum
 {
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,
@@ -52,10 +50,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 12; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 12; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -81,11 +79,11 @@ protected:
 	uint8_t   m_wai_state;      /* WAI opcode state ,(or sleep opcode state) */
 	uint8_t   m_nmi_state;      /* NMI line state */
 	uint8_t   m_nmi_pending;    /* NMI pending */
-	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
+	uint8_t   m_irq_state[4];   /* IRQ line state [IRQ1,TIN,SC1,IS] */
 
 	/* Memory spaces */
-	address_space *m_program, *m_opcodes;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */
@@ -105,11 +103,11 @@ protected:
 	void WM16(uint32_t Addr, PAIR *p );
 	void enter_interrupt(const char *message,uint16_t irq_vector);
 	virtual void m6800_check_irq2() { }
-	void CHECK_IRQ_LINES();
+	void check_irq_lines();
 	virtual void increment_counter(int amount);
-	virtual void EAT_CYCLES();
-	virtual void CLEANUP_COUNTERS() { }
-	virtual void TAKE_TRAP() { }
+	virtual void eat_cycles();
+	virtual void cleanup_counters() { }
+	virtual void take_trap() { }
 
 	void aba();
 	void abx();
@@ -368,12 +366,19 @@ class m6802_cpu_device : public m6800_cpu_device
 public:
 	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_ram_enable(bool re) { assert(!configured()); m_ram_enable = re; }
+
 protected:
 	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles);
 
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	bool m_ram_enable;
+
+private:
+	void ram_map(address_map &map);
 };
 
 
@@ -384,6 +389,7 @@ public:
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 };
 
 

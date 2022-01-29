@@ -25,14 +25,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> interpod_t
+// ======================> cbm_interpod_device
 
-class interpod_t : public device_t,
+class cbm_interpod_device : public device_t,
 				   public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	interpod_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm_interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -56,7 +56,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(INTERPOD, interpod_t)
+DECLARE_DEVICE_TYPE(CBM_INTERPOD, cbm_interpod_device)
 
 
 #endif // MAME_BUS_CBMIEC_INTERPOD_H

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 /******************************************************************************
-Consolidation and enhancment of documentation by Manfred Schneider based on previous work from
+Consolidation and enhancement of documentation by Manfred Schneider based on previous work from
  PeT mess@utanet.at and Paul Robson (autismuk@aol.com)
 
  Schematics, manuals and anything you can desire for at http://amigan.1emu.net/
 
- TODO: find a dump of the charactyer ROM
+ TODO: find a dump of the character ROM
              convert the drawing code to tilemap
 
   emulation of signetics 2637 video/audio device
@@ -14,7 +14,7 @@ Consolidation and enhancment of documentation by Manfred Schneider based on prev
 General
 The UVI is capable of controlling 512 Bytes of RAM. It also generates a select signal
 for a 128 byte wide area.
-This whole addres space maps in the arcadia and compatible machines from $1800 - $1AFF.
+This whole address space maps in the arcadia and compatible machines from $1800 - $1AFF.
 
 1. Video Memory
 
@@ -34,7 +34,7 @@ going to D when in vertical blank. The 4 most significant bits are always
 is the routine at $010F in Alien Invaders which scrolls the various bits of
 the screen about using the memory locations $18FF and $18FE.
 
-The screen can be scrolled upto 7 pixels to the left using the high 3 bits
+The screen can be scrolled up to 7 pixels to the left using the high 3 bits
 of $18FE. This is used in Alien Invaders.
 
 A line beginning with $C0 contains block graphics. Each square contains
@@ -288,9 +288,8 @@ static const uint8_t chars[0x40][8]={
 
 void arcadia_state::video_start()
 {
-	int i;
 	memcpy(&m_chars, chars, sizeof(chars));
-	for (i=0; i<0x40; i++)
+	for (int i=0; i<0x40; i++)
 	{
 		m_rectangle[i][0]=0;
 		m_rectangle[i][4]=0;
@@ -309,9 +308,13 @@ void arcadia_state::video_start()
 		int height = m_screen->height();
 		m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	}
+
+	m_line = 0;
+	std::fill(std::begin(m_reg.d.pal), std::end(m_reg.d.pal), 0);
+	m_shift = 0;
 }
 
-READ8_MEMBER( arcadia_state::video_r )
+uint8_t arcadia_state::video_r(offs_t offset)
 {
 	uint8_t data=0;
 	switch (offset)
@@ -373,7 +376,7 @@ READ8_MEMBER( arcadia_state::video_r )
 	return data;
 }
 
-WRITE8_MEMBER( arcadia_state::video_w )
+void arcadia_state::video_w(offs_t offset, uint8_t data)
 {
 	m_reg.data[offset]=data;
 	switch (offset)
@@ -382,11 +385,11 @@ WRITE8_MEMBER( arcadia_state::video_w )
 			m_ypos=255-data+YPOS;
 			break;
 		case 0xfd:
-			m_custom->write(space, offset&3, data);
+			m_custom->write(offset&3, data);
 			m_multicolor = data & 0x80;
 			break;
 		case 0xfe:
-			m_custom->write(space, offset&3, data);
+			m_custom->write(offset&3, data);
 			m_shift = (data>>5);
 			break;
 		case 0xf0:
@@ -584,7 +587,7 @@ void arcadia_state::draw_sprites()
 				for (j=0,m=0x80; j<8; j++, m>>=1)
 				{
 					if (b & m)
-						m_bitmap->pix16(y, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
 				}
 			}
 			else
@@ -594,8 +597,8 @@ void arcadia_state::draw_sprites()
 				{
 					if (b & m)
 					{
-						m_bitmap->pix16(y, x + j) = color;
-						m_bitmap->pix16(y+1, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
+						m_bitmap->pix(y+1, x + j) = color;
 					}
 				}
 			}

@@ -278,6 +278,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mathbox.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
@@ -310,7 +311,7 @@ public:
 		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
 		m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
-		m_in1(*this, "IN1/DSW0"),
+		m_in1(*this, "IN1_DSW0"),
 		m_in2(*this, "IN2"),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -322,17 +323,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(clock_r);
 
 protected:
-	DECLARE_WRITE8_MEMBER(wdclr_w);
-	DECLARE_WRITE8_MEMBER(tempest_led_w);
-	DECLARE_WRITE8_MEMBER(tempest_coin_w);
-	DECLARE_READ8_MEMBER(input_port_1_bit_r);
-	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+	void wdclr_w(uint8_t data);
+	void tempest_led_w(uint8_t data);
+	void tempest_coin_w(uint8_t data);
+	uint8_t input_port_1_bit_r(offs_t offset);
+	uint8_t input_port_2_bit_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(rom_ae1f_r);
+	uint8_t rom_ae1f_r();
 
 	virtual void machine_start() override;
 	void main_map(address_map &map);
@@ -340,7 +341,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<avg_tempest_device> m_avg;
+	required_device<avg_device> m_avg;
 	required_device<er2055_device> m_earom;
 	required_region_ptr<uint8_t> m_rom;
 
@@ -368,7 +369,7 @@ void tempest_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::wdclr_w)
+void tempest_state::wdclr_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_watchdog->watchdog_reset();
@@ -398,13 +399,13 @@ READ_LINE_MEMBER(tempest_state::clock_r)
 }
 
 
-READ8_MEMBER(tempest_state::input_port_1_bit_r)
+uint8_t tempest_state::input_port_1_bit_r(offs_t offset)
 {
 	return (m_in1->read() & (1 << offset)) ? 0 : 228;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_2_bit_r)
+uint8_t tempest_state::input_port_2_bit_r(offs_t offset)
 {
 	return (m_in2->read() & (1 << offset)) ? 0 : 228;
 }
@@ -417,7 +418,7 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::tempest_led_w)
+void tempest_state::tempest_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(~data, 1);
 	m_leds[1] = BIT(~data, 0);
@@ -426,7 +427,7 @@ WRITE8_MEMBER(tempest_state::tempest_led_w)
 }
 
 
-WRITE8_MEMBER(tempest_state::tempest_coin_w)
+void tempest_state::tempest_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x01));
 	machine().bookkeeping().coin_counter_w(1, (data & 0x02));
@@ -443,18 +444,18 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::earom_read)
+uint8_t tempest_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(tempest_state::earom_write)
+void tempest_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(tempest_state::earom_control_w)
+void tempest_state::earom_control_w(uint8_t data)
 {
 	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -469,7 +470,7 @@ WRITE8_MEMBER(tempest_state::earom_control_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::rom_ae1f_r)
+uint8_t tempest_state::rom_ae1f_r()
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
 	// config.m_perfect_cpu_quantum = subtag("maincpu"); would be very taxing on this driver.
@@ -487,12 +488,12 @@ void tempest_state::main_map(address_map &map)
 	map(0x0c00, 0x0c00).portr("IN0");
 	map(0x0d00, 0x0d00).portr("DSW1");
 	map(0x0e00, 0x0e00).portr("DSW2");
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
-	map(0x3000, 0x3fff).rom();
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x3fff).rom().region("vectorrom", 0);
 	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
-	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
+	map(0x4800, 0x4800).w(m_avg, FUNC(avg_device::go_w));
 	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
-	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
+	map(0x5800, 0x5800).w(m_avg, FUNC(avg_device::reset_w));
 	map(0x6000, 0x603f).w(FUNC(tempest_state::earom_write));
 	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w(FUNC(tempest_state::earom_control_w));
 	map(0x6050, 0x6050).r(FUNC(tempest_state::earom_read));
@@ -524,11 +525,11 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tempest_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
 	/* bit 7 is tied to a 3kHz (?) clock */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tempest_state, clock_r)
 
-	PORT_START("IN1/DSW0")
+	PORT_START("IN1_DSW0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_knob_r)
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although
@@ -651,7 +652,8 @@ void tempest_state::tempest(machine_config &config)
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	AVG_TEMPEST(config, m_avg, 0);
-	m_avg->set_vector_tag("vector");
+	m_avg->set_vector("vector");
+	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
 	MATHBOX(config, m_mathbox, 0);
@@ -693,16 +695,18 @@ void tempest_state::tempest(machine_config &config)
  *************************************/
 
 ROM_START( tempest ) /* rev 3 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A037383-04 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-133.d1",  0x9000, 0x1000, CRC(1d0cc503) SHA1(7bef95db9b1102d6b1166bda0ccb276ef4cc3764) ) /* 136002-113 + 136002-114 */
 	ROM_LOAD( "136002-134.f1",  0xa000, 0x1000, CRC(c88e3524) SHA1(89144baf1efc703b2336774793ce345b37829ee7) ) /* 136002-115 + 136002-316 */
 	ROM_LOAD( "136002-235.j1",  0xb000, 0x1000, CRC(a4b2ce3f) SHA1(a5f5fb630a48c5d25346f90d4c13aaa98f60b228) ) /* 136002-217 + 136002-118 */
 	ROM_LOAD( "136002-136.lm1", 0xc000, 0x1000, CRC(65a9a9f9) SHA1(73aa7d6f4e7093ccb2d97f6344f354872bcfd72a) ) /* 136002-119 + 136002-120 */
 	ROM_LOAD( "136002-237.p1",  0xd000, 0x1000, CRC(de4e9e34) SHA1(04be074e45bf5cd95a852af97cd04e35b7f27fc4) ) /* 136002-121 + 136002-222 */
 	ROM_RELOAD(                 0xf000, 0x1000 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-138.np3", 0x0000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -710,29 +714,31 @@ ROM_START( tempest ) /* rev 3 */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 
 ROM_START( tempest1r ) /* rev 1 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A037383-04 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-133.d1",  0x9000, 0x1000, CRC(1d0cc503) SHA1(7bef95db9b1102d6b1166bda0ccb276ef4cc3764) ) /* 136002-113 + 136002-114 */
 	ROM_LOAD( "136002-134.f1",  0xa000, 0x1000, CRC(c88e3524) SHA1(89144baf1efc703b2336774793ce345b37829ee7) ) /* 136002-115 + 136002-316 */
 	ROM_LOAD( "136002-135.j1",  0xb000, 0x1000, CRC(1ca27781) SHA1(cafbec28d682e98a74fdd5b8dfcfa33c64ff6a93) ) /* 136002-117 + 136002-118 */
 	ROM_LOAD( "136002-136.lm1", 0xc000, 0x1000, CRC(65a9a9f9) SHA1(73aa7d6f4e7093ccb2d97f6344f354872bcfd72a) ) /* 136002-119 + 136002-120 */
 	ROM_LOAD( "136002-137.p1",  0xd000, 0x1000, CRC(d75fd2ef) SHA1(19f611a77989d201d346b3e89fac5789663a01ce) ) /* 136002-121 + 136002-122 */
 	ROM_RELOAD(                 0xf000, 0x1000 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-138.np3", 0x0000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -740,21 +746,21 @@ ROM_START( tempest1r ) /* rev 1 */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 
 ROM_START( tempest3 ) /* rev 3 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
 	ROM_LOAD( "136002-115.f1",   0xa000, 0x0800, CRC(f3e2827a) SHA1(bd04fcfbbba995e08c3144c1474fcddaaeb1c700) )
@@ -766,9 +772,11 @@ ROM_START( tempest3 ) /* rev 3 */
 	ROM_LOAD( "136002-121.p1",   0xd000, 0x0800, CRC(73d38e47) SHA1(9980606376a79ba94f8e2a325871a6c8d10d83fc) )
 	ROM_LOAD( "136002-222.r1",   0xd800, 0x0800, CRC(707bd5c3) SHA1(2f0af6fb7154c244c794f7247e5c16a1e06ddf7d) )
 	ROM_RELOAD(                  0xf800, 0x0800 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-123.np3",  0x3000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
-	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-123.np3",  0x0000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
+	ROM_LOAD( "136002-124.r3",   0x0800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -776,21 +784,21 @@ ROM_START( tempest3 ) /* rev 3 */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 
 ROM_START( tempest2 ) /* rev 2 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
 	ROM_LOAD( "136002-115.f1",   0xa000, 0x0800, CRC(f3e2827a) SHA1(bd04fcfbbba995e08c3144c1474fcddaaeb1c700) )
@@ -802,9 +810,11 @@ ROM_START( tempest2 ) /* rev 2 */
 	ROM_LOAD( "136002-121.p1",   0xd000, 0x0800, CRC(73d38e47) SHA1(9980606376a79ba94f8e2a325871a6c8d10d83fc) )
 	ROM_LOAD( "136002-222.r1",   0xd800, 0x0800, CRC(707bd5c3) SHA1(2f0af6fb7154c244c794f7247e5c16a1e06ddf7d) )
 	ROM_RELOAD(                  0xf800, 0x0800 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-123.np3",  0x3000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
-	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-123.np3",  0x0000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
+	ROM_LOAD( "136002-124.r3",   0x0800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -812,21 +822,21 @@ ROM_START( tempest2 ) /* rev 2 */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 
 ROM_START( tempest1 ) /* rev 1 */
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
 	ROM_LOAD( "136002-115.f1",   0xa000, 0x0800, CRC(f3e2827a) SHA1(bd04fcfbbba995e08c3144c1474fcddaaeb1c700) )
@@ -838,9 +848,11 @@ ROM_START( tempest1 ) /* rev 1 */
 	ROM_LOAD( "136002-121.p1",   0xd000, 0x0800, CRC(73d38e47) SHA1(9980606376a79ba94f8e2a325871a6c8d10d83fc) )
 	ROM_LOAD( "136002-122.r1",   0xd800, 0x0800, CRC(796a9918) SHA1(c862a0d4ea330161e4c3cc8e5e9ad38893fffbd4) )
 	ROM_RELOAD(                  0xf800, 0x0800 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-123.np3",  0x3000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
-	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-123.np3",  0x0000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
+	ROM_LOAD( "136002-124.r3",   0x0800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -848,21 +860,21 @@ ROM_START( tempest1 ) /* rev 1 */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 
 ROM_START( temptube )
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
 	ROM_LOAD( "136002-115.f1",   0xa000, 0x0800, CRC(f3e2827a) SHA1(bd04fcfbbba995e08c3144c1474fcddaaeb1c700) )
@@ -874,9 +886,11 @@ ROM_START( temptube )
 	ROM_LOAD( "136002-121.p1",   0xd000, 0x0800, CRC(73d38e47) SHA1(9980606376a79ba94f8e2a325871a6c8d10d83fc) )
 	ROM_LOAD( "136002-222.r1",   0xd800, 0x0800, CRC(707bd5c3) SHA1(2f0af6fb7154c244c794f7247e5c16a1e06ddf7d) )
 	ROM_RELOAD(                  0xf800, 0x0800 ) /* for reset/interrupt vectors */
+
 	/* Vector ROM */
-	ROM_LOAD( "136002-123.np3",  0x3000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
-	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136002-123.np3",  0x0000, 0x0800, CRC(29f7e937) SHA1(686c8b9b8901262e743497cee7f2f7dd5cb3af7e) ) /* May be labeled "136002-111", same data */
+	ROM_LOAD( "136002-124.r3",   0x0800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )
@@ -884,15 +898,15 @@ ROM_START( temptube )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "136002.126",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+	ROM_LOAD( "136002-126.a1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
-	ROMX_LOAD( "136002.132", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.131", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.130", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.129", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
-	ROMX_LOAD( "136002.128", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
-	ROMX_LOAD( "136002.127", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-132.l1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-131.k1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-130.j1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-129.h1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
 

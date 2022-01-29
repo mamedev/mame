@@ -8,7 +8,7 @@
 
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
-	: poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
+	: poly_manager<float, gs_poly_data, 2>(state.machine())
 	, m_state(state)
 	, m_screenbits(state.m_screen->width(), state.m_screen->height())
 {
@@ -209,7 +209,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void galastrm_renderer::tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
 {
-	u16 *framebuffer = &m_screenbits.pix16(scanline);
+	u16 *const framebuffer = &m_screenbits.pix(scanline);
 	const s32 dudx = extent.param[0].dpdx;
 	const s32 dvdx = extent.param[1].dpdx;
 
@@ -217,7 +217,7 @@ void galastrm_renderer::tc0610_draw_scanline(s32 scanline, const extent_t& exten
 	s32 v = extent.param[1].start;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		framebuffer[x] = object.texbase->pix16(v >> 16, u >> 16);
+		framebuffer[x] = object.texbase->pix(v >> 16, u >> 16);
 		u += dudx;
 		v += dvdx;
 	}
@@ -403,10 +403,10 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	vert[3].p[0] = (float)(lx - 1) * 65536.0f;
 	vert[3].p[1] = 0.0;
 
-	gs_poly_data& extra = object_data_alloc();
+	gs_poly_data& extra = object_data().next();
 	extra.texbase = &srcbitmap;
 
-	render_polygon<4>(clip, render_delegate(&galastrm_renderer::tc0610_draw_scanline, this), 2, vert);
+	render_polygon<4, 2>(clip, render_delegate(&galastrm_renderer::tc0610_draw_scanline, this), vert);
 	wait();
 }
 
@@ -466,8 +466,8 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			for (int x = 0; x < priority_bitmap.width; x++)
 			{
-				u8 *pri = &priority_bitmap.pix8(y, x);
-				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
+				u8 *pri = &priority_bitmap.pix(y, x);
+				if (!(*pri & 0x02) && m_tmpbitmaps.pix(y, x))
 						*pri |= 0x04;
 			}
 		}
@@ -510,8 +510,8 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			for (int x=0; x < priority_bitmap.width(); x++)
 			{
-				u8 *pri = &priority_bitmap.pix8(y, x);
-				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
+				u8 *pri = &priority_bitmap.pix(y, x);
+				if (!(*pri & 0x02) && m_tmpbitmaps.pix(y, x))
 					*pri |= 0x04;
 			}
 		}

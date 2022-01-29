@@ -23,17 +23,24 @@
     The Next Space          A8004-1 PIC      SNK 1989
 
 TODO:
-- Super Champion Baseball "ball speed pitch" protection;
-- II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure 
+- II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure
   service mode enables "bright", it is actually same as NeoGeo device;
-- II & V board: Fix sound CPU crashes properly (nested NMIs)
-- Sky Soldiers: BGM Fade out before boss battle isn't implemented
-- Sky Adventure, probably others: on a real PCB reference BGM stutters when using 
-  30 Hz autofire (not enough sound resources?)
+- II & V board: Fix sound CPU crashes properly (nested NMIs);
+- Sky Soldiers: According to various references bosses should really time out after some time (reportedly ~80 secs.).
+  This is actually handled by the MCU, not unlike Gold Medalist;
+- Sky Soldiers: BGM Fade out before boss battle isn't implemented;
+- Sky Adventure, probably others: on a real PCB reference BGM stutters when using
+  30 Hz autofire (not enough sound resources?);
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
 - Gold Medalist: incorrect blank effect on shooting pistol for dash events (cfr. alpha68k_palette_device);
-- Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0 
+- Gold Medalist: dash events timers relies on MCU irq timings.
+  Previous emulation of 180 Hz was making it way too hard, and the timer was updating at 0.03 secs (-> 30 Hz refresh rate).
+  Using a timer of 100 Hz seems a better approximation compared to a stopwatch, of course fine tuning
+  this approximation needs HW probing and/or a MCU decap;
+- Gold Medalist: MCU irq routine has an event driven path that is never taken into account, what is it for?
+- Super Champion Baseball: "ball speed pitch" protection;
+- Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0
   but actually opaque on a reference shot, sounds like a btanb;
 - Fix layer tilemap should be a common device between this, snk68.cpp and other Alpha/SNK-based games;
 
@@ -327,9 +334,24 @@ u16 alpha68k_II_state::alpha_II_trigger_r(offs_t offset)
 			else
 			{
 				if (m_microcontroller_id == 0x8803)     /* Gold Medalist */
-					m_microcontroller_data = 0x21;              // timer
+				{
+					// TODO: dash events increments timer at 0x16c0 in irq routine (event driven?)
+					// There's also another unemulated event path if this is 0x5b, unknown purpose
+					m_microcontroller_data = 0x21;
+				}
 				else
+				{
+					// TODO: Sky Soldiers uses this thread dispatch as well for boss timing out and who knows what else
+					// cfr. PC=0x1d52, possible threads at ROM address $1e7e-$1e89 (in bytes)
+					// 0x34 should be the step counter handling while 0x37 is what actually times out (or even destroys) the boss on expiration.
+					// Notice that there are additional shared RAM checks (i.e. 0x1e6a, 0x1e32, 0x1e3a), which causes the game to soft lock if not satisfied.
+					// Apparently bosses should time out in ~80 seconds.
 					m_microcontroller_data = 0x00;
+
+					// Notice that a similar system is also used by Time Soldiers but most threads are actually NOP-ed out.
+					// (basically anything that is >0x24)
+					// Most likely left-overs that eventually were completed with aforementioned Sky Soldiers.
+				}
 				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
 			}
 
@@ -509,7 +531,7 @@ void alpha68k_II_state::alpha68k_II_map(address_map &map)
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
 	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_II_state::videoram_w)).share("videoram");
-	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram"); 
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");
 	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_II_state::alpha_II_trigger_r), FUNC(alpha68k_II_state::alpha_microcontroller_w));
 	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
@@ -522,13 +544,13 @@ void alpha68k_III_state::alpha68k_V_map(address_map &map)
 	map(0x080000, 0x080001).r(FUNC(alpha68k_III_state::control_1_r)); /* Joysticks */
 	map(0x080000, 0x080000).w(FUNC(alpha68k_III_state::video_bank_w));
 	map(0x080001, 0x080001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c0000, 0x0c0001).lr16("control_2_V_r", [this]() -> u16 { return m_in[3]->read(); }); /* Dip 2 */
+	map(0x0c0000, 0x0c0001).lr16(NAME([this] () -> u16 { return m_in[3]->read(); })); /* Dip 2 */
 	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_III_state::outlatch_w));
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
 	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_III_state::videoram_w)).share("videoram");
-	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram"); 
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");
 	map(0x300000, 0x303fff).r(FUNC(alpha68k_III_state::alpha_V_trigger_r));
 	map(0x300000, 0x3001ff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w));
 	map(0x303e00, 0x303fff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w)); /* Gang Wars mirror */
@@ -1003,42 +1025,42 @@ static INPUT_PORTS_START( sbasebal )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, "Freeze" )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" )                PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // Check code at 0x0089e6
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")  // Check code at 0x0089e6
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "3:30" )
 	PORT_DIPSETTING(    0x80, "3:00" )
 	PORT_DIPSETTING(    0x40, "2:30" )
 	PORT_DIPSETTING(    0xc0, "2:00" )
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   // Check code at 0x009d3a
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")  // Check code at 0x009d3a
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, "Price to Continue" )
+	PORT_DIPNAME( 0x10, 0x00, "Price to Continue" )     PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
 
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1059,19 +1081,19 @@ static INPUT_PORTS_START( sbasebalj )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, "Freeze" )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" )                PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // Check code at 0x0089e6
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")  // Check code at 0x0089e6
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "4:30" )
 	PORT_DIPSETTING(    0x80, "4:00" )
 	PORT_DIPSETTING(    0x40, "3:30" )
@@ -1079,14 +1101,21 @@ static INPUT_PORTS_START( sbasebalj )
 
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   // Check code at 0x009d3a
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")  // Check code at 0x009d3a
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	ALPHA68K_COINAGE_BITS_2TO4
-
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6") // Demo sounds seem to be always off in this version
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1243,7 +1272,7 @@ void alpha68k_II_state::base_config(machine_config &config)
 	LS259(config, m_outlatch); // 14A
 	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_II_state::video_control2_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_II_state::video_control3_w));
-	
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
@@ -1257,9 +1286,6 @@ void alpha68k_II_state::base_config(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // ALPHA-VOICE88 custom DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
@@ -1269,13 +1295,13 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(alpha68k_II_state::screen_update));
 	m_screen->set_palette(m_palette);
-	
+
 	// TODO: should really be same as snk68.cpp
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_II_state,alpha68k)
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback), this);
+	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback));
 	m_sprites->set_xpos_shift(15);
 	m_sprites->set_color_entry_mask((num_pens / 16) - 1);
 
@@ -1287,8 +1313,8 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 void alpha68k_II_state::alpha68k_II(machine_config &config)
 {
 	base_config(config);
-	m_outlatch->parallel_out_cb().set(FUNC(alpha68k_II_state::video_bank_w)).rshift(4).mask(0x07);	
-	
+	m_outlatch->parallel_out_cb().set(FUNC(alpha68k_II_state::video_bank_w)).rshift(4).mask(0x07);
+
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 8000000); // TODO: verify me
 	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_II_state::alpha68k_II_map);
@@ -1310,6 +1336,7 @@ void alpha68k_II_state::btlfieldb(machine_config &config)
 {
 	alpha68k_II(config);
 	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_II_state::irq1_line_hold));
+	// TODO: timing
 	m_maincpu->set_periodic_int(FUNC(alpha68k_II_state::irq2_line_hold), attotime::from_hz(60*4)); // MCU irq
 }
 
@@ -1317,7 +1344,8 @@ void goldmedal_II_state::goldmedal(machine_config &config)
 {
 	alpha68k_II(config);
 	m_maincpu->set_vblank_int("screen", FUNC(goldmedal_II_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(goldmedal_II_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+	// TODO: dash events relies on MCU irq timings
+	m_maincpu->set_periodic_int(FUNC(goldmedal_II_state::irq2_line_hold), attotime::from_hz(100)); // MCU irq
 }
 
 void alpha68k_III_state::alpha68k_III(machine_config &config)
@@ -1344,7 +1372,8 @@ void alpha68k_III_state::alpha68k_III(machine_config &config)
 void goldmedal_III_state::goldmedal(machine_config &config)
 {
 	alpha68k_III_state::alpha68k_III(config);
-	m_maincpu->set_periodic_int(FUNC(goldmedal_III_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+	// TODO: dash events relies on MCU irq timings
+	m_maincpu->set_periodic_int(FUNC(goldmedal_III_state::irq2_line_hold), attotime::from_hz(100)); // MCU irq
 }
 
 void alpha68k_V_state::alpha68k_V(machine_config &config)
@@ -1357,13 +1386,13 @@ void alpha68k_V_state::alpha68k_V(machine_config &config)
 void skyadventure_state::skyadventure(machine_config &config)
 {
 	alpha68k_V_state::alpha68k_V(config);
-	m_sprites->set_tile_indirect_cb(FUNC(skyadventure_state::tile_callback_noflipx), this);
+	m_sprites->set_tile_indirect_cb(FUNC(skyadventure_state::tile_callback_noflipx));
 }
 
 void gangwars_state::gangwars(machine_config &config)
 {
 	alpha68k_V_state::alpha68k_V(config);
-	m_sprites->set_tile_indirect_cb(FUNC(gangwars_state::tile_callback_noflipy), this);
+	m_sprites->set_tile_indirect_cb(FUNC(gangwars_state::tile_callback_noflipy));
 }
 
 /******************************************************************************/
@@ -1673,7 +1702,7 @@ ROM_START( goldmedla )
 	ROM_LOAD32_BYTE( "goldchr1.c44",   0x000002, 0x80000, CRC(55db41cd) SHA1(15fa192ea2b829dc6dc0cb88fc2c5e5a30af6c91) )
 	ROM_LOAD32_BYTE( "goldchr0.c43",   0x000003, 0x80000, CRC(76572c3f) SHA1(e7a1abf4240510810a0f9663295c0fbab9e55a63) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board? 
+	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board?
 	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, BAD_DUMP CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
 	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, BAD_DUMP CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
 ROM_END
@@ -1704,7 +1733,7 @@ ROM_START( goldmedlb )
 	ROM_LOAD32_BYTE( "goldchr1.c44",   0x000002, 0x80000, CRC(55db41cd) SHA1(15fa192ea2b829dc6dc0cb88fc2c5e5a30af6c91) )
 	ROM_LOAD32_BYTE( "goldchr0.c43",   0x000003, 0x80000, CRC(76572c3f) SHA1(e7a1abf4240510810a0f9663295c0fbab9e55a63) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board? 
+	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board?
 	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, BAD_DUMP CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
 	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, BAD_DUMP CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
 	// TODO: recover this!
@@ -2132,15 +2161,14 @@ GAME( 1987, timesold1, timesold, alpha68k_II,    timesold,  alpha68k_II_state, i
 GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield,  alpha68k_II_state, init_btlfield,  ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_II_state, init_btlfieldb, ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // unemulated boss time out behaviour
+GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // unknown if/how bootleggers handled boss time out, seems likely
 
-
-GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 // Alpha III HW
-GAME( 1988, goldmedla, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1988, goldmedla, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1988, goldmedlb, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 // Alpha V HW
 GAME( 1989, skyadvnt,  0,        skyadventure,     skyadvnt,  skyadventure_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )

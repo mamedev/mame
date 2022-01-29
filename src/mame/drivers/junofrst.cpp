@@ -6,7 +6,7 @@ Juno First :  memory map same as tutankham with some address changes
 Chris Hardy (chrish@kcbbs.gen.nz)
 
 Thanks to Rob Jarret for the original Tutankham memory map on which both the
-Juno First emu and the mame driver is based on.
+Juno First emu and the MAME driver is based on.
 
         Juno First memory map by Chris Hardy
 
@@ -93,10 +93,11 @@ Blitter source graphics
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class junofrst_state : public tutankhm_state
 {
@@ -108,24 +109,24 @@ public:
 		, m_filter_0_0(*this, "filter.0.0")
 		, m_filter_0_1(*this, "filter.0.1")
 		, m_filter_0_2(*this, "filter.0.2")
+		, m_blitrom(*this, "blitrom")
 	{
 	}
 
-	void init_junofrst();
-
 	void junofrst(machine_config &config);
 
-private:
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	void blitter_w(offs_t offset, uint8_t data);
+	void bankselect_w(uint8_t data);
+	void sh_irqtrigger_w(uint8_t data);
+	void i8039_irq_w(uint8_t data);
+	void i8039_irqen_and_status_w(uint8_t data);
+	uint8_t portA_r();
+	void portB_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(_30hz_irq);
 	void audio_map(address_map &map);
@@ -138,10 +139,11 @@ private:
 	required_device<filter_rc_device> m_filter_0_0;
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
+	required_region_ptr<uint8_t> m_blitrom;
 
 	uint8_t  m_blitterdata[4];
-	int      m_i8039_status;
-	int      m_last_irq;
+	uint8_t  m_i8039_status;
+	uint8_t  m_last_irq;
 };
 
 
@@ -163,34 +165,29 @@ private:
           We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
-WRITE8_MEMBER(junofrst_state::blitter_w)
+void junofrst_state::blitter_w(offs_t offset, uint8_t data)
 {
 	m_blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */
 	if (offset == 3)
 	{
-		int i;
-		uint8_t *gfx_rom = memregion("gfx1")->base();
-
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
 
 		int copy = m_blitterdata[3] & 0x01;
 
 		/* 16x16 graphics */
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			int j;
-
-			for (j = 0; j < 16; j++)
+			for (int j = 0; j < 16; j++)
 			{
 				uint8_t data;
 
 				if (src & 1)
-					data = gfx_rom[src >> 1] & 0x0f;
+					data = m_blitrom[src >> 1] & 0x0f;
 				else
-					data = gfx_rom[src >> 1] >> 4;
+					data = m_blitrom[src >> 1] >> 4;
 
 				src += 1;
 
@@ -216,13 +213,13 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::bankselect_w)
+void junofrst_state::bankselect_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 
-READ8_MEMBER(junofrst_state::portA_r)
+uint8_t junofrst_state::portA_r()
 {
 	int timer;
 
@@ -238,7 +235,7 @@ READ8_MEMBER(junofrst_state::portA_r)
 }
 
 
-WRITE8_MEMBER(junofrst_state::portB_w)
+void junofrst_state::portB_w(uint8_t data)
 {
 	filter_rc_device *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
 	int i;
@@ -253,12 +250,12 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
+		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
 
-WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
+void junofrst_state::sh_irqtrigger_w(uint8_t data)
 {
 	if (m_last_irq == 0 && data == 1)
 	{
@@ -270,13 +267,13 @@ WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irq_w)
+void junofrst_state::i8039_irq_w(uint8_t data)
 {
 	m_i8039->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
+void junofrst_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	if ((data & 0x80) == 0)
 		m_i8039->set_input_line(0, CLEAR_LINE);
@@ -300,7 +297,7 @@ void junofrst_state::main_map(address_map &map)
 	map(0x8060, 0x8060).w(FUNC(junofrst_state::bankselect_w));
 	map(0x8070, 0x8073).w(FUNC(junofrst_state::blitter_w));
 	map(0x8100, 0x8fff).ram();
-	map(0x9000, 0x9fff).bankr("bank1");
+	map(0x9000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xffff).rom();
 }
 
@@ -372,6 +369,9 @@ INPUT_PORTS_END
 void junofrst_state::machine_start()
 {
 	// note that base class version is not called
+
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
+
 	save_item(NAME(m_i8039_status));
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
@@ -390,6 +390,7 @@ void junofrst_state::machine_reset()
 	m_blitterdata[1] = 0;
 	m_blitterdata[2] = 0;
 	m_blitterdata[3] = 0;
+	m_irq_toggle = 0;
 }
 
 WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
@@ -451,9 +452,6 @@ void junofrst_state::junofrst(machine_config &config)
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 100K (R56-63)/200K (R64-71) ladder network
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	FILTER_RC(config, m_filter_0_0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter_0_1).add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -480,7 +478,7 @@ ROM_START( junofrst )
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
 	ROM_LOAD( "jfs2_p4.bin",  0x0000, 0x1000, CRC(d0fa5d5f) SHA1(9d0730d1d037bf96b0c933a32355602bf2d735dd) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* BLTROM, used at runtime */
+	ROM_REGION( 0x6000, "blitrom", 0 ) /* BLTROM, used at runtime */
 	ROM_LOAD( "jfs3_c7.bin",  0x00000, 0x2000, CRC(aeacf6db) SHA1(f99ef9f9153d7a83e1881d9181faac99cb8c8a57) )
 	ROM_LOAD( "jfs4_d7.bin",  0x02000, 0x2000, CRC(206d954c) SHA1(65494766676f18d8b5ae9a54cee00790e7b1e67e) )
 	ROM_LOAD( "jfs5_e7.bin",  0x04000, 0x2000, CRC(1eb87a6e) SHA1(f5471b9f6f1fa6d6e5d76300d89f71da3129516a) )
@@ -505,19 +503,14 @@ ROM_START( junofrstg )
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
 	ROM_LOAD( "jfs2_p4.bin",  0x0000, 0x1000, CRC(d0fa5d5f) SHA1(9d0730d1d037bf96b0c933a32355602bf2d735dd) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* BLTROM, used at runtime */
+	ROM_REGION( 0x6000, "blitrom", 0 ) /* BLTROM, used at runtime */
 	ROM_LOAD( "jfs3_c7.bin",  0x00000, 0x2000, CRC(aeacf6db) SHA1(f99ef9f9153d7a83e1881d9181faac99cb8c8a57) )
 	ROM_LOAD( "jfs4_d7.bin",  0x02000, 0x2000, CRC(206d954c) SHA1(65494766676f18d8b5ae9a54cee00790e7b1e67e) )
 	ROM_LOAD( "jfs5_e7.bin",  0x04000, 0x2000, CRC(1eb87a6e) SHA1(f5471b9f6f1fa6d6e5d76300d89f71da3129516a) )
 ROM_END
 
+} // Anonymous namespace
 
 
-void junofrst_state::init_junofrst()
-{
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
-}
-
-
-GAME( 1983, junofrst,  0,        junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junofrstg, junofrst, junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrst,  0,        junofrst, junofrst, junofrst_state, empty_init, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrstg, junofrst, junofrst, junofrst, junofrst_state, empty_init, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )

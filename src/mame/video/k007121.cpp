@@ -146,11 +146,9 @@ void k007121_device::device_start()
 
 void k007121_device::device_reset()
 {
-	int i;
-
 	m_flipscreen = 0;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_ctrlram[i] = 0;
 }
 
@@ -159,7 +157,7 @@ void k007121_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-uint8_t k007121_device::ctrlram_r(int offset)
+uint8_t k007121_device::ctrlram_r(offs_t offset)
 {
 	assert(offset < 8);
 
@@ -167,7 +165,7 @@ uint8_t k007121_device::ctrlram_r(int offset)
 }
 
 
-WRITE8_MEMBER( k007121_device::ctrl_w )
+void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 {
 	assert(offset < 8);
 

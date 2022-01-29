@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(DW_FDC, dw_fdc_device, "dw_fdc", "IBM Displaywriter Floppy")
 
 ROM_START( dw_fdc )
 	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD("4430030_FLP_8041.BIN", 0x0000, 0x400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
+	ROM_LOAD("4430030_flp_8041.bin", 0x0000, 0x400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
 ROM_END
 
 
@@ -69,26 +69,26 @@ void dw_fdc_device::device_reset()
 	m_p1 = m_p2 = m_t0 = m_t1 = 0;
 }
 
-void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER( dw_fdc_device::p1_w )
+void dw_fdc_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
 
 	LOGDBG("p1 <- %02x\n", data, m_p1);
 }
 
-WRITE8_MEMBER( dw_fdc_device::p2_w )
+void dw_fdc_device::p2_w(uint8_t data)
 {
 	m_p2 = data;
 
 	LOGDBG("p2 <- %02x\n", data);
 }
 
-READ8_MEMBER( dw_fdc_device::p2_r )
+uint8_t dw_fdc_device::p2_r()
 {
 	uint8_t data = m_p2;
 
@@ -111,12 +111,12 @@ READ_LINE_MEMBER( dw_fdc_device::t1_r )
 	return m_t1;
 }
 
-WRITE8_MEMBER( dw_fdc_device::bus_w )
+void dw_fdc_device::bus_w(uint8_t data)
 {
 	m_bus = data;
 }
 
-READ8_MEMBER( dw_fdc_device::bus_r )
+uint8_t dw_fdc_device::bus_r()
 {
 	return m_bus;
 }

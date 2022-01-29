@@ -43,7 +43,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// devices
@@ -56,8 +56,8 @@ private:
 	uint16_t m_dacval;
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 

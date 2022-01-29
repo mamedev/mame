@@ -118,7 +118,7 @@ void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char
 	connector.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
 	connector.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
 	connector.set_default_option("525qd");
-	connector.set_formats(victor_9000_fdc_device::floppy_formats);
+	connector.set_formats(floppy_formats);
 }
 
 image_init_result victor_9000_fdc_device::load0_cb(floppy_image_device *device)
@@ -149,10 +149,10 @@ void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(1);
 }
 
-FLOPPY_FORMATS_MEMBER( victor_9000_fdc_device::floppy_formats )
-	FLOPPY_VICTOR_9000_FORMAT
-FLOPPY_FORMATS_END
-
+void victor_9000_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_VICTOR_9000_FORMAT);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -169,7 +169,7 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(victor_9000_fdc_device::tach1_r));
 	m_maincpu->bus_out_cb().set(FUNC(victor_9000_fdc_device::da_w));
 
-	VIA6522(config, m_via4, XTAL(30'000'000)/30);
+	MOS6522(config, m_via4, XTAL(30'000'000)/30);
 	m_via4->readpa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_r));
 	m_via4->writepa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_w));
 	m_via4->readpb_handler().set(FUNC(victor_9000_fdc_device::via4_pb_r));
@@ -177,12 +177,12 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_via4->ca2_handler().set(FUNC(victor_9000_fdc_device::wrsync_w));
 	m_via4->irq_handler().set(FUNC(victor_9000_fdc_device::via4_irq_w));
 
-	VIA6522(config, m_via5, XTAL(30'000'000)/30);
+	MOS6522(config, m_via5, XTAL(30'000'000)/30);
 	m_via5->irq_handler().set(FUNC(victor_9000_fdc_device::via5_irq_w));
 	m_via5->readpa_handler().set(FUNC(victor_9000_fdc_device::via5_pa_r));
 	m_via5->writepb_handler().set(FUNC(victor_9000_fdc_device::via5_pb_w));
 
-	VIA6522(config, m_via6, XTAL(30'000'000)/30);
+	MOS6522(config, m_via6, XTAL(30'000'000)/30);
 	m_via6->readpa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_r));
 	m_via6->readpb_handler().set(FUNC(victor_9000_fdc_device::via6_pb_r));
 	m_via6->writepa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_w));
@@ -341,7 +341,7 @@ void victor_9000_fdc_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void victor_9000_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void victor_9000_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -367,7 +367,7 @@ void victor_9000_fdc_device::device_timer(emu_timer &timer, device_timer_id id, 
 //  floppy_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_device::floppy_p1_r )
+uint8_t victor_9000_fdc_device::floppy_p1_r()
 {
 	/*
 
@@ -392,7 +392,7 @@ READ8_MEMBER( victor_9000_fdc_device::floppy_p1_r )
 //  floppy_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_device::floppy_p1_w )
+void victor_9000_fdc_device::floppy_p1_w(uint8_t data)
 {
 	/*
 
@@ -418,7 +418,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::floppy_p1_w )
 //  floppy_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_device::floppy_p2_r )
+uint8_t victor_9000_fdc_device::floppy_p2_r()
 {
 	/*
 
@@ -448,7 +448,7 @@ READ8_MEMBER( victor_9000_fdc_device::floppy_p2_r )
 //  floppy_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_device::floppy_p2_w )
+void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 {
 	/*
 
@@ -528,7 +528,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::floppy_p2_w )
 //  tach0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( victor_9000_fdc_device::tach0_r )
+READ_LINE_MEMBER(victor_9000_fdc_device::tach0_r)
 {
 	if (LOG_SCP) logerror("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach0);
 	return m_tach0;
@@ -539,7 +539,7 @@ READ_LINE_MEMBER( victor_9000_fdc_device::tach0_r )
 //  tach1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( victor_9000_fdc_device::tach1_r )
+READ_LINE_MEMBER(victor_9000_fdc_device::tach1_r)
 {
 	if (LOG_SCP) logerror("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach1);
 	return m_tach1;
@@ -621,7 +621,7 @@ void victor_9000_fdc_device::update_rdy()
 //  da_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_device::da_w )
+void victor_9000_fdc_device::da_w(uint8_t data)
 {
 	if (LOG_SCP) logerror("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel0, m_sel1);
 
@@ -633,7 +633,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::da_w )
 	live_run();
 }
 
-READ8_MEMBER( victor_9000_fdc_device::via4_pa_r )
+uint8_t victor_9000_fdc_device::via4_pa_r()
 {
 	/*
 
@@ -653,7 +653,7 @@ READ8_MEMBER( victor_9000_fdc_device::via4_pa_r )
 	return m_scp_l0ms;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::via4_pa_w )
+void victor_9000_fdc_device::via4_pa_w(uint8_t data)
 {
 	/*
 
@@ -698,7 +698,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::via4_pa_w )
 	}
 }
 
-READ8_MEMBER( victor_9000_fdc_device::via4_pb_r )
+uint8_t victor_9000_fdc_device::via4_pb_r()
 {
 	/*
 
@@ -718,7 +718,7 @@ READ8_MEMBER( victor_9000_fdc_device::via4_pb_r )
 	return m_scp_l1ms;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::via4_pb_w )
+void victor_9000_fdc_device::via4_pb_w(uint8_t data)
 {
 	/*
 
@@ -783,7 +783,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::via4_irq_w )
 	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
-READ8_MEMBER( victor_9000_fdc_device::via5_pa_r )
+uint8_t victor_9000_fdc_device::via5_pa_r()
 {
 	/*
 
@@ -803,7 +803,7 @@ READ8_MEMBER( victor_9000_fdc_device::via5_pa_r )
 	return GCR_DECODE(checkpoint_live.e, checkpoint_live.i);
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::via5_pb_w )
+void victor_9000_fdc_device::via5_pb_w(uint8_t data)
 {
 	/*
 
@@ -841,7 +841,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::via5_irq_w )
 }
 
 
-READ8_MEMBER( victor_9000_fdc_device::via6_pa_r )
+uint8_t victor_9000_fdc_device::via6_pa_r()
 {
 	/*
 
@@ -877,7 +877,7 @@ READ8_MEMBER( victor_9000_fdc_device::via6_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::via6_pa_w )
+void victor_9000_fdc_device::via6_pa_w(uint8_t data)
 {
 	/*
 
@@ -929,7 +929,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::via6_pa_w )
 	}
 }
 
-READ8_MEMBER( victor_9000_fdc_device::via6_pb_r )
+uint8_t victor_9000_fdc_device::via6_pb_r()
 {
 	/*
 
@@ -966,7 +966,7 @@ READ8_MEMBER( victor_9000_fdc_device::via6_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::via6_pb_w )
+void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 {
 	/*
 
@@ -1055,7 +1055,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::via6_irq_w )
 	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
-READ8_MEMBER( victor_9000_fdc_device::cs7_r )
+uint8_t victor_9000_fdc_device::cs7_r(offs_t offset)
 {
 	m_lbrdy_cb(1);
 
@@ -1064,7 +1064,7 @@ READ8_MEMBER( victor_9000_fdc_device::cs7_r )
 	return m_via5->read(offset);
 }
 
-WRITE8_MEMBER( victor_9000_fdc_device::cs7_w )
+void victor_9000_fdc_device::cs7_w(offs_t offset, uint8_t data)
 {
 	m_lbrdy_cb(1);
 

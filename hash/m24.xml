@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="m24" description="Olivetti M24 floppies">
+
+<!-- Operative Systems -->
+
+	<software name="pcosm24">
+		<description>Olivetti PCOS 1.0 (for Olivetti M24)</description>
+		<year>19??</year>
+		<publisher>Olivetti</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="137326">
+				<rom name="pcos_m24.td0" size="137326" crc="e3681337" sha1="85de143c84b9015af899d59ccd7614bb2c219f69"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

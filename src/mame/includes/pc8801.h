@@ -5,11 +5,11 @@
     PC-8801 (c) 1981 NEC
 
 ********************************************************************************************/
+
 #ifndef MAME_INCLUDES_PC8801_H
 #define MAME_INCLUDES_PC8801_H
 
 #pragma once
-
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
@@ -20,10 +20,9 @@
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "machine/upd765.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
+#include "machine/pc80s31k.h"
 #include "sound/beep.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -42,9 +41,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_fdccpu(*this, "fdccpu")
-		, m_fdc(*this, "upd765")
-		, m_fdd(*this, "upd765:%u", 0U)
+		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_cassette(*this, "cassette")
@@ -54,15 +51,27 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void pc8801mc(machine_config &config);
-	void pc8801fh(machine_config &config);
 	void pc8801(machine_config &config);
+	void pc8801mk2mr(machine_config &config);
+	void pc8801fh(machine_config &config);
 	void pc8801ma(machine_config &config);
+	void pc8801mc(machine_config &config);
 
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<pc80s31_device> m_pc80s31;
+	optional_device<i8214_device> m_pic;
+	required_device<upd1990a_device> m_rtc;
+	required_device<cassette_image_device> m_cassette;
+	required_device<beep_device> m_beeper;
+	required_device<ym2608_device> m_opna;
+	required_device<ym2203_device> m_opn;
+	required_device<palette_device> m_palette;
 
 private:
 	struct crtc_t
@@ -78,19 +87,6 @@ private:
 		uint8_t x,y;
 		attotime time;
 	};
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_fdccpu;
-	required_device<upd765a_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_fdd;
-	optional_device<i8214_device> m_pic;
-	required_device<upd1990a_device> m_rtc;
-	required_device<cassette_image_device> m_cassette;
-	required_device<beep_device> m_beeper;
-	required_device<ym2608_device> m_opna;
-	required_device<ym2203_device> m_opn;
-	required_device<palette_device> m_palette;
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
@@ -152,79 +148,79 @@ private:
 	uint32_t m_extram_size;
 	uint8_t m_has_opna;
 
-	DECLARE_READ8_MEMBER(pc8801_alu_r);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
-	DECLARE_READ8_MEMBER(pc8801_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_wram_w);
-	DECLARE_READ8_MEMBER(pc8801_ext_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ext_wram_w);
-	DECLARE_READ8_MEMBER(pc8801_nbasic_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_n88basic_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_gvram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_gvram_w);
-	DECLARE_READ8_MEMBER(pc8801_high_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_high_wram_w);
-	DECLARE_READ8_MEMBER(pc8801ma_dic_r);
-	DECLARE_READ8_MEMBER(pc8801_cdbios_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_mem_r);
-	DECLARE_WRITE8_MEMBER(pc8801_mem_w);
-	DECLARE_READ8_MEMBER(pc8801_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_ext_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ext_rom_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_gfx_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_vram_select_r);
-	DECLARE_WRITE8_MEMBER(pc8801_vram_select_w);
-	DECLARE_WRITE8_MEMBER(pc8801_irq_level_w);
-	DECLARE_WRITE8_MEMBER(pc8801_irq_mask_w);
-	DECLARE_READ8_MEMBER(pc8801_window_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_window_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_window_bank_inc_w);
-	DECLARE_READ8_MEMBER(pc8801_misc_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc8801_misc_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pc8801_bgpal_w);
-	DECLARE_WRITE8_MEMBER(pc8801_palram_w);
-	DECLARE_WRITE8_MEMBER(pc8801_layer_masking_w);
-	DECLARE_READ8_MEMBER(pc8801_crtc_param_r);
-	DECLARE_WRITE8_MEMBER(pc88_crtc_param_w);
-	DECLARE_READ8_MEMBER(pc8801_crtc_status_r);
-	DECLARE_WRITE8_MEMBER(pc88_crtc_cmd_w);
-	DECLARE_READ8_MEMBER(pc8801_dmac_r);
-	DECLARE_WRITE8_MEMBER(pc8801_dmac_w);
-	DECLARE_READ8_MEMBER(pc8801_dmac_status_r);
-	DECLARE_WRITE8_MEMBER(pc8801_dmac_mode_w);
-	DECLARE_READ8_MEMBER(pc8801_extram_mode_r);
-	DECLARE_WRITE8_MEMBER(pc8801_extram_mode_w);
-	DECLARE_READ8_MEMBER(pc8801_extram_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_extram_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl2_w);
-	DECLARE_WRITE8_MEMBER(pc8801_pcg8100_w);
-	DECLARE_WRITE8_MEMBER(pc8801_txt_cmt_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_kanji_r);
-	DECLARE_WRITE8_MEMBER(pc8801_kanji_w);
-	DECLARE_READ8_MEMBER(pc8801_kanji_lv2_r);
-	DECLARE_WRITE8_MEMBER(pc8801_kanji_lv2_w);
-	DECLARE_WRITE8_MEMBER(pc8801_dic_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_dic_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_cdrom_r);
-	DECLARE_WRITE8_MEMBER(pc8801_cdrom_w);
-	DECLARE_READ8_MEMBER(pc8801_cpuclock_r);
-	DECLARE_READ8_MEMBER(pc8801_baudrate_r);
-	DECLARE_WRITE8_MEMBER(pc8801_baudrate_w);
-	DECLARE_WRITE8_MEMBER(pc8801_rtc_w);
-	DECLARE_WRITE8_MEMBER(upd765_mc_w);
-	DECLARE_READ8_MEMBER(upd765_tc_r);
-	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
-	DECLARE_WRITE8_MEMBER(fdc_drive_mode_w);
+	uint8_t pc8801_alu_r(offs_t offset);
+	void pc8801_alu_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_wram_r(offs_t offset);
+	void pc8801_wram_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_ext_wram_r(offs_t offset);
+	void pc8801_ext_wram_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_nbasic_rom_r(offs_t offset);
+	uint8_t pc8801_n88basic_rom_r(offs_t offset);
+	uint8_t pc8801_gvram_r(offs_t offset);
+	void pc8801_gvram_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_high_wram_r(offs_t offset);
+	void pc8801_high_wram_w(offs_t offset, uint8_t data);
+	uint8_t pc8801ma_dic_r(offs_t offset);
+	uint8_t pc8801_cdbios_rom_r(offs_t offset);
+	uint8_t pc8801_mem_r(offs_t offset);
+	void pc8801_mem_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_ctrl_r();
+	void pc8801_ctrl_w(uint8_t data);
+	uint8_t pc8801_ext_rom_bank_r();
+	void pc8801_ext_rom_bank_w(uint8_t data);
+	void pc8801_gfx_ctrl_w(uint8_t data);
+	uint8_t pc8801_vram_select_r();
+	void pc8801_vram_select_w(offs_t offset, uint8_t data);
+	void pc8801_irq_level_w(uint8_t data);
+	void pc8801_irq_mask_w(uint8_t data);
+	uint8_t pc8801_window_bank_r();
+	void pc8801_window_bank_w(uint8_t data);
+	void pc8801_window_bank_inc_w(uint8_t data);
+	uint8_t pc8801_misc_ctrl_r();
+	void pc8801_misc_ctrl_w(uint8_t data);
+	void pc8801_bgpal_w(uint8_t data);
+	void pc8801_palram_w(offs_t offset, uint8_t data);
+	void pc8801_layer_masking_w(uint8_t data);
+	uint8_t pc8801_crtc_param_r();
+	void pc88_crtc_param_w(uint8_t data);
+	uint8_t pc8801_crtc_status_r();
+	void pc88_crtc_cmd_w(uint8_t data);
+	uint8_t pc8801_dmac_r(offs_t offset);
+	void pc8801_dmac_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_dmac_status_r();
+	void pc8801_dmac_mode_w(uint8_t data);
+	uint8_t pc8801_extram_mode_r();
+	void pc8801_extram_mode_w(uint8_t data);
+	uint8_t pc8801_extram_bank_r();
+	void pc8801_extram_bank_w(uint8_t data);
+	void pc8801_alu_ctrl1_w(uint8_t data);
+	void pc8801_alu_ctrl2_w(uint8_t data);
+	void pc8801_pcg8100_w(offs_t offset, uint8_t data);
+	void pc8801_txt_cmt_ctrl_w(uint8_t data);
+	uint8_t pc8801_kanji_r(offs_t offset);
+	void pc8801_kanji_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_kanji_lv2_r(offs_t offset);
+	void pc8801_kanji_lv2_w(offs_t offset, uint8_t data);
+	void pc8801_dic_bank_w(uint8_t data);
+	void pc8801_dic_ctrl_w(uint8_t data);
+	uint8_t pc8801_cdrom_r(offs_t offset);
+	void pc8801_cdrom_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_cpuclock_r();
+	uint8_t pc8801_baudrate_r();
+	void pc8801_baudrate_w(uint8_t data);
+	void pc8801_rtc_w(uint8_t data);
+	void upd765_mc_w(uint8_t data);
+	uint8_t upd765_tc_r();
+	void fdc_irq_vector_w(uint8_t data);
+	void fdc_drive_mode_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_READ8_MEMBER(pc8801_sound_board_r);
-	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
-	DECLARE_READ8_MEMBER(pc8801_opna_r);
-	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
-	DECLARE_READ8_MEMBER(pc8801_unk_r);
-	DECLARE_WRITE8_MEMBER(pc8801_unk_w);
+	uint8_t pc8801_sound_board_r(offs_t offset);
+	void pc8801_sound_board_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_opna_r(offs_t offset);
+	void pc8801_opna_w(offs_t offset, uint8_t data);
+	uint8_t pc8801_unk_r();
+	void pc8801_unk_w(uint8_t data);
 
 	uint8_t pc8801_pixel_clock(void);
 	void pc8801_dynamic_res_change(void);
@@ -248,12 +244,13 @@ private:
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
-	DECLARE_READ8_MEMBER(cpu_8255_c_r);
-	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
-	DECLARE_READ8_MEMBER(fdc_8255_c_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_READ8_MEMBER(opn_portb_r);
+	uint8_t cpu_8255_c_r();
+	void cpu_8255_c_w(uint8_t data);
+	uint8_t fdc_8255_c_r();
+	void fdc_8255_c_w(uint8_t data);
+	uint8_t opn_porta_r();
+	uint8_t opn_portb_r();
+	void opna_map(address_map &map);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };

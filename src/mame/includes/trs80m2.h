@@ -15,13 +15,12 @@
 #include "machine/am9519.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/timer.h"
 #include "machine/trs80m2kb.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -59,7 +58,7 @@ public:
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, MC6845_TAG),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE)
 	{
 	}
 
@@ -67,29 +66,28 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( drvslt_w );
-	DECLARE_WRITE8_MEMBER( rom_enable_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( nmi_r );
-	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void drvslt_w(uint8_t data);
+	void rom_enable_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t rtc_r();
+	uint8_t nmi_r();
+	void nmi_w(uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( de_w );
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
 	void kbd_w(u8 data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
@@ -122,7 +120,7 @@ protected:
 	required_device<trs80m2_keyboard_device> m_kb;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	// memory state
 	int m_boot_rom;
@@ -159,8 +157,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( ual_w );
-	DECLARE_WRITE8_MEMBER( tcl_w );
+	void ual_w(uint8_t data);
+	void tcl_w(uint8_t data);
 
 	void trs80m16(machine_config &config);
 	void m16_z80_io(address_map &map);

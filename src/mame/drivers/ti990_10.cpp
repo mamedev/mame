@@ -101,8 +101,8 @@ private:
 	WRITE_LINE_MEMBER( tape_interrupt );
 	WRITE_LINE_MEMBER(ti990_set_int13);
 	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
-	READ8_MEMBER( ti990_panel_read );
-	WRITE8_MEMBER( ti990_panel_write );
+	uint8_t ti990_panel_read(offs_t offset);
+	void ti990_panel_write(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(clear_load);
 
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
     F: flag (according to 990 handbook)
 */
 
-READ8_MEMBER( ti990_10_state::ti990_panel_read )
+uint8_t ti990_10_state::ti990_panel_read(offs_t offset)
 {
 	if (offset == 1)
 		return 0x48;
@@ -238,7 +238,7 @@ READ8_MEMBER( ti990_10_state::ti990_panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_10_state::ti990_panel_write )
+void ti990_10_state::ti990_panel_write(uint8_t data)
 {
 }
 
@@ -353,10 +353,10 @@ ROM_START(ti990_10)
 	ROM_REGION16_BE(0x200000, "maincpu",0)
 
 	/* TI990/10 : older boot ROMs for floppy-disk */
-	ROM_LOAD16_BYTE("975383.31", 0x1FFC00, 0x100, CRC(64fcd040))
-	ROM_LOAD16_BYTE("975383.32", 0x1FFC01, 0x100, CRC(64277276))
-	ROM_LOAD16_BYTE("975383.29", 0x1FFE00, 0x100, CRC(af92e7bf))
-	ROM_LOAD16_BYTE("975383.30", 0x1FFE01, 0x100, CRC(b7b40cdc))
+	ROM_LOAD16_BYTE("975383.31", 0x1FFC00, 0x100, CRC(64fcd040) SHA1(6cde5b97f8681a7d83816af5cd1a5ec93809a150))
+	ROM_LOAD16_BYTE("975383.32", 0x1FFC01, 0x100, CRC(64277276) SHA1(b84c971714c3eef154f111292cc470376136cfa3))
+	ROM_LOAD16_BYTE("975383.29", 0x1FFE00, 0x100, CRC(af92e7bf) SHA1(b0a46632e797310340715ee44fca2f073a305d0a))
+	ROM_LOAD16_BYTE("975383.30", 0x1FFE01, 0x100, CRC(b7b40cdc) SHA1(ca520430b747505d54bbdb550b666ea3c4014dc5))
 
 #elif 1
 
@@ -373,8 +373,8 @@ ROM_START(ti990_10)
 	ROM_REGION16_BE(0x202000, "maincpu",0)
 
 	/* TI990/12 ROMs - actually incompatible with TI990/10, but I just wanted to disassemble them. */
-	ROM_LOAD16_BYTE("ti2025-7", 0x1FFC00, 0x1000, CRC(4824f89c))
-	ROM_LOAD16_BYTE("ti2025-8", 0x1FFC01, 0x1000, CRC(51fef543))
+	ROM_LOAD16_BYTE("ti2025-7", 0x1FFC00, 0x1000, CRC(4824f89c) SHA1(819a2d582afff4346898d9a32e687d4018987585))
+	ROM_LOAD16_BYTE("ti2025-8", 0x1FFC01, 0x1000, CRC(51fef543) SHA1(2594f43cc47f55cdf57e2ec2f38597af8c8d0af2))
 	/* the other half of this ROM is not loaded - it makes no sense as TI990/12 machine code, as
 	it is microcode... */
 

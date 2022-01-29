@@ -32,8 +32,8 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void base(machine_config &config);
 	void ginkun(machine_config &config);
-	void fstarfrc(machine_config &config);
 	void riot(machine_config &config);
 
 private:
@@ -68,18 +68,21 @@ private:
 	uint16_t m_scroll_char_x_w;
 	uint16_t m_scroll_char_y_w;
 
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(colorram_w);
-	DECLARE_WRITE16_MEMBER(videoram2_w);
-	DECLARE_WRITE16_MEMBER(colorram2_w);
-	DECLARE_WRITE16_MEMBER(charram_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(scroll_x_w);
-	DECLARE_WRITE16_MEMBER(scroll_y_w);
-	DECLARE_WRITE16_MEMBER(scroll2_x_w);
-	DECLARE_WRITE16_MEMBER(scroll2_y_w);
-	DECLARE_WRITE16_MEMBER(scroll_char_x_w);
-	DECLARE_WRITE16_MEMBER(scroll_char_y_w);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void colorram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void colorram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(uint16_t data);
+	void scroll_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll2_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll2_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll_char_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll_char_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void irq_150021_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void irq_150031_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
@@ -90,9 +93,10 @@ private:
 	DECLARE_VIDEO_START(riot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void save_state();
-
+	void common_map(address_map& map);
 	void fstarfrc_map(address_map &map);
 	void ginkun_map(address_map &map);
 	void sound_map(address_map &map);

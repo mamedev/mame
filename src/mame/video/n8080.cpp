@@ -33,11 +33,11 @@ void helifire_state::helifire_palette(palette_device &palette) const
 	{
 		int const level = 0xff * exp(-3 * i / 255.); // capacitor discharge
 
-		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level));   // shades of blue
-		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xc0, level));   // shades of blue w/ green star
+		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level)); // shades of blue
+		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xc0, level)); // shades of blue w/ green star
 
-		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   // shades of red
-		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xc0, 0x00));   // shades of red w/ green star
+		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00)); // shades of red
+		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xc0, 0x00)); // shades of red w/ green star
 	}
 }
 
@@ -126,22 +126,18 @@ void helifire_state::video_start()
 
 uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const bool mono = bool(m_video_conf->read());
 	uint8_t mask = flip_screen() ? 0xff : 0x00;
 
-	int x;
-	int y;
+	uint8_t const *pRAM = m_videoram;
+	uint8_t const *const pPROM = m_prom->base();
 
-	const uint8_t* pRAM = m_videoram;
-	const uint8_t* pPROM = memregion("proms")->base();
-
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* pLine = &bitmap.pix16(y ^ mask);
+		uint16_t *const pLine = &bitmap.pix(y ^ mask);
 
-		for (x = 0; x < 256; x += 8)
+		for (int x = 0; x < 256; x += 8)
 		{
-			int n;
-
 			uint8_t color = 0;
 
 			if (m_red_screen)
@@ -159,12 +155,12 @@ uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				{
 					static const uint8_t ufo_color[] =
 					{
-						1, /* red     */
-						2, /* green   */
-						7, /* white   */
-						3, /* yellow  */
-						5, /* magenta */
-						6, /* cyan    */
+						1, // red
+						2, // green
+						7, // white
+						3, // yellow
+						5, // magenta
+						6, // cyan
 					};
 
 					int cycle = screen.frame_number() / 32;
@@ -172,7 +168,7 @@ uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					color = ufo_color[cycle % 6];
 				}
 
-				for (n = color + 1; n < 8; n++)
+				for (int n = color + 1; n < 8; n++)
 				{
 					if (~val & (1 << n))
 					{
@@ -181,7 +177,10 @@ uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				}
 			}
 
-			for (n = 0; n < 8; n++)
+			if (mono)
+				color = 7; // force B&W here
+
+			for (int n = 0; n < 8; n++)
 			{
 				pLine[(x + n) ^ mask] = (pRAM[x >> 3] & (1 << n)) ? color : 0;
 			}
@@ -197,21 +196,15 @@ uint32_t sheriff_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	uint8_t mask = flip_screen() ? 0xff : 0x00;
 
-	const uint8_t* pPROM = memregion("proms")->base();
+	uint8_t const *pRAM = m_videoram;
+	uint8_t const *const pPROM = m_prom->base();
 
-	int x;
-	int y;
-
-	const uint8_t* pRAM = m_videoram;
-
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* pLine = &bitmap.pix16(y ^ mask);
+		uint16_t *const pLine = &bitmap.pix(y ^ mask);
 
-		for (x = 0; x < 256; x += 8)
+		for (int x = 0; x < 256; x += 8)
 		{
-			int n;
-
 			uint8_t color = pPROM[32 * (y >> 3) + (x >> 3)];
 
 			if (m_sheriff_color_mode == 1 && !(color & 8))
@@ -223,7 +216,7 @@ uint32_t sheriff_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			if (m_sheriff_color_mode == 3)
 				color = 7;
 
-			for (n = 0; n < 8; n++)
+			for (int n = 0; n < 8; n++)
 			{
 				pLine[(x + n) ^ mask] = ((pRAM[x >> 3] >> n) & 1) ? (color & 7) : 0;
 			}
@@ -237,33 +230,28 @@ uint32_t sheriff_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int SUN_BRIGHTNESS = ioport("POT0")->read();
-	int SEA_BRIGHTNESS = ioport("POT1")->read();
+	const int SUN_BRIGHTNESS = m_pot[0]->read();
+	const int SEA_BRIGHTNESS = m_pot[1]->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
 	unsigned saved_mv = m_mv;
 	unsigned saved_sc = m_sc;
 
-	int x;
-	int y;
-
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
 		int level = 120 + wave[m_mv & 7];
 
-		/* draw sky */
-
-		for (x = level; x < 256; x++)
+		// draw sky
+		for (int x = level; x < 256; x++)
 		{
 			pLine[x] = 0x200 + 8 + SUN_BRIGHTNESS + x - level;
 		}
 
-		/* draw stars */
-
-		if (m_mv % 8 == 4) /* upper half */
+		// draw stars
+		if (m_mv % 8 == 4) // upper half
 		{
 			int step = (320 * (m_mv - 0)) % sizeof m_LSFR;
 
@@ -276,7 +264,7 @@ uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			pLine[0x80 + data] |= 0x100;
 		}
 
-		if (m_mv % 8 == 5) /* lower half */
+		if (m_mv % 8 == 5) // lower half
 		{
 			int step = (320 * (m_mv - 1)) % sizeof m_LSFR;
 
@@ -289,22 +277,18 @@ uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			pLine[0x00 + data] |= 0x100;
 		}
 
-		/* draw sea */
-
-		for (x = 0; x < level; x++)
+		// draw sea
+		for (int x = 0; x < level; x++)
 		{
 			pLine[x] = 8 + SEA_BRIGHTNESS + x;
 		}
 
-		/* draw foreground */
-
-		for (x = 0; x < 256; x += 8)
+		// draw foreground
+		for (int x = 0; x < 256; x += 8)
 		{
 			int offset = 32 * y + (x >> 3);
 
-			int n;
-
-			for (n = 0; n < 8; n++)
+			for (int n = 0; n < 8; n++)
 			{
 				if (flip_screen())
 				{
@@ -323,8 +307,7 @@ uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 		}
 
-		/* next line */
-
+		// next line
 		next_line();
 	}
 

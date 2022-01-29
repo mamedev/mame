@@ -25,7 +25,8 @@ Dip locations and factory settings verified with manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2151.h"
+#include "machine/k007452.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -35,22 +36,22 @@ INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(contra_state::contra_bankswitch_w)
+void contra_state::contra_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
+void contra_state::contra_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(contra_state::sirq_clear_w)
+void contra_state::sirq_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(contra_state::contra_coin_counter_w)
+void contra_state::contra_coin_counter_w(uint8_t data)
 {
 	if (data & 0x01)
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -59,10 +60,10 @@ WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 		machine().bookkeeping().coin_counter_w(1, (data & 0x02) >> 1);
 }
 
-
 void contra_state::contra_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
+	map(0x0008, 0x000f).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
@@ -215,8 +216,9 @@ void contra_state::contra(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(24'000'000)/8); /* 3000000? (HD68B09EP) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* enough for the sound CPU to read all commands */
 
+	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -16,7 +16,7 @@
 
 #pragma once
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 class ibc_device : public device_t
 {
@@ -25,8 +25,8 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	// Callbacks
 	auto int_cb() { return m_int.bind(); }
@@ -63,11 +63,13 @@ private:
 	uint8_t m_data;
 	uint8_t m_transmit;
 
+	uint8_t m_last_status;
+
 	void set_disable_inhibit(bool dis, bool inh);
 	void set_lines(bool bav, bool hsk);
 };
 
-}   }
+} // namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device)
 #endif

@@ -43,51 +43,51 @@ void wolfpack_state::wolfpack_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(wolfpack_state::ship_size_w)
+void wolfpack_state::ship_size_w(uint8_t data)
 {
 	m_ship_size = data;
 }
-WRITE8_MEMBER(wolfpack_state::video_invert_w)
+void wolfpack_state::video_invert_w(uint8_t data)
 {
 	m_video_invert = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::ship_reflect_w)
+void wolfpack_state::ship_reflect_w(uint8_t data)
 {
 	m_ship_reflect = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::pt_pos_select_w)
+void wolfpack_state::pt_pos_select_w(uint8_t data)
 {
 	m_pt_pos_select = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::pt_horz_w)
+void wolfpack_state::pt_horz_w(uint8_t data)
 {
 	m_pt_horz = data;
 }
-WRITE8_MEMBER(wolfpack_state::pt_pic_w)
+void wolfpack_state::pt_pic_w(uint8_t data)
 {
 	m_pt_pic = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::ship_h_w)
+void wolfpack_state::ship_h_w(uint8_t data)
 {
 	m_ship_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_pic_w)
+void wolfpack_state::torpedo_pic_w(uint8_t data)
 {
 	m_torpedo_pic = data;
 }
-WRITE8_MEMBER(wolfpack_state::ship_h_precess_w)
+void wolfpack_state::ship_h_precess_w(uint8_t data)
 {
 	m_ship_h_precess = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::ship_pic_w)
+void wolfpack_state::ship_pic_w(uint8_t data)
 {
 	m_ship_pic = data & 0x0f;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_h_w)
+void wolfpack_state::torpedo_h_w(uint8_t data)
 {
 	m_torpedo_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_v_w)
+void wolfpack_state::torpedo_v_w(uint8_t data)
 {
 	m_torpedo_v = data;
 }
@@ -163,31 +163,24 @@ void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	int count = 0;
 
-	int x;
-	int y;
-
-
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 		m_torpedo_pic,
 		0,
 		0, 0,
 		2 * (244 - m_torpedo_h),
 		224 - m_torpedo_v, 0);
 
-	for (y = 16; y < 224 - m_torpedo_v; y++)
+	for (int y = 16; y < 224 - m_torpedo_v; y++)
 	{
-		int x1;
-		int x2;
-
 		if (y % 16 == 1)
 			count = (count - 1) & 7;
 
-		x1 = 248 - m_torpedo_h - count;
-		x2 = 248 - m_torpedo_h + count;
+		int const x1 = 248 - m_torpedo_h - count;
+		int const x2 = 248 - m_torpedo_h + count;
 
-		for (x = 2 * x1; x < 2 * x2; x++)
+		for (int x = 2 * x1; x < 2 * x2; x++)
 			if (m_LFSR[(m_current_index + 0x300 * y + x) % 0x8000])
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 	}
 }
 
@@ -220,7 +213,7 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 {
 	for (int y = cliprect.top(); y <= (std::min)(cliprect.bottom(), 127); y++)
 	{
-		uint16_t* p = &bitmap.pix16(y);
+		uint16_t *const p = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			p[x] = palette.pen_indirect(p[x]) | 0x08;
@@ -286,7 +279,7 @@ WRITE_LINE_MEMBER(wolfpack_state::screen_vblank)
 				if (y < 0 || y >= m_helper.height())
 					continue;
 
-				if (m_helper.pix16(y, x))
+				if (m_helper.pix(y, x))
 					m_collision = 1;
 			}
 		}

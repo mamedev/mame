@@ -51,7 +51,7 @@ void nereid_device::device_reset()
 	m_overlay_index = 0;
 }
 
-READ16_MEMBER(nereid_device::ctrl_r)
+uint16_t nereid_device::ctrl_r(offs_t offset, uint16_t mem_mask)
 {
 	LOG("NEREID ctrl_r: %02X\n", offset);
 
@@ -99,7 +99,7 @@ READ16_MEMBER(nereid_device::ctrl_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(nereid_device::ctrl_w)
+void nereid_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("NEREID: ctrl_w %02X = %02X\n", offset << 1, data);
 	data &= 0xff;

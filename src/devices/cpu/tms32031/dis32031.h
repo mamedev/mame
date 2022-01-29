@@ -2,8 +2,8 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dis32031.c
-    Disassembler for the portable TMS32C031 emulator.
+    dis32031.h
+    Disassembler for the portable TMS320C3x emulator.
     Written by Aaron Giles
 
 ***************************************************************************/

@@ -14,12 +14,12 @@ XX Mission (c) 1986 UPL
 #include "includes/xxmissio.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(xxmissio_state::bank_sel_w)
+void xxmissio_state::bank_sel_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 7);
 }
@@ -30,7 +30,7 @@ READ_LINE_MEMBER(xxmissio_state::status_r)
 	return (m_status & Mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(xxmissio_state::status_m_w)
+void xxmissio_state::status_m_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -49,7 +49,7 @@ WRITE8_MEMBER(xxmissio_state::status_m_w)
 	}
 }
 
-WRITE8_MEMBER(xxmissio_state::status_s_w)
+void xxmissio_state::status_s_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -275,7 +275,7 @@ void xxmissio_state::xxmissio(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map2);
 	m_subcpu->set_periodic_int(FUNC(xxmissio_state::interrupt_s), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

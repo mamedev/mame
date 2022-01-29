@@ -26,11 +26,6 @@
 
 
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
-DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
-
-void pc_fdc_family_device::map(address_map &map)
-{
-}
 
 // The schematics show address decoding is minimal
 void pc_fdc_xt_device::map(address_map &map)
@@ -43,16 +38,8 @@ void pc_fdc_xt_device::map(address_map &map)
 }
 
 
-// Decoding is through a PAL, so presumably complete
-void pc_fdc_at_device::map(address_map &map)
-{
-	map(0x2, 0x2).rw(FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
-	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
-	map(0x7, 0x7).rw(FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
-}
-
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
+	device_t(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
 {
@@ -109,7 +96,7 @@ void pc_fdc_family_device::device_reset()
 
 // Bit 4-7 control the drive motors
 
-WRITE8_MEMBER( pc_fdc_family_device::dor_w )
+void pc_fdc_family_device::dor_w(uint8_t data)
 {
 	LOG("dor = %02x\n", data);
 	uint8_t pdor = dor;
@@ -131,43 +118,31 @@ WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 		fdc->reset();
 }
 
-READ8_MEMBER( pc_fdc_family_device::dor_r )
+uint8_t pc_fdc_family_device::dor_r()
 {
 	return dor;
 }
 
-READ8_MEMBER( pc_fdc_family_device::dir_r )
-{
-	return do_dir_r();
-}
-
-WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
+void pc_fdc_family_device::ccr_w(uint8_t data)
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
 	LOG("ccr = %02x\n", data);
 	fdc->set_rate(rates[data & 3]);
 }
 
-uint8_t pc_fdc_family_device::do_dir_r()
-{
-	if(floppy[dor & 3])
-		return floppy[dor & 3]->dskchg_r() ? 0x00 : 0x80;
-	return 0x00;
-}
-
-WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
+void pc_fdc_xt_device::dor_fifo_w(uint8_t data)
 {
 	fdc->fifo_w(data);
-	dor_w(space, 0, data, mem_mask);
+	dor_w(data);
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::irq_w )
+void pc_fdc_family_device::irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::drq_w )
+void pc_fdc_family_device::drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();
@@ -192,9 +167,5 @@ void pc_fdc_family_device::check_drq()
 }
 
 pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
-{
-}
-
-pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, tag, owner, clock)
 {
 }

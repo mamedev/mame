@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "tms9902.h"
 
-#include <math.h>
+#include <cmath>
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_LINES   (1U << 1)
@@ -256,11 +256,11 @@ void tms9902_device::rcv_break(bool value)
 /*
     Timer callback
 */
-void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
-	// This call-back is called by the MESS timer system when the decrementer
+	// This call-back is called by the MAME timer system when the decrementer
 	// reaches 0.
 	case DECTIMER:
 		m_TIMERR = m_TIMELP;

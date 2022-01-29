@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 
+
+namespace {
+
 class alvg_state : public driver_device
 {
 public:
@@ -16,14 +19,15 @@ public:
 
 	void init_alvg();
 
+protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+
 private:
 	void alvg_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 };
 
 
@@ -56,6 +60,18 @@ void alvg_state::alvg(machine_config &config)
 / A.G. Soccer Ball - A.G. Football has identical ROMs but different playfield
 /----------------------------------------------------------------------------*/
 ROM_START(agsoccer)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("ags_snd.v24", 0x0000, 0x10000, CRC(4ba36e8d) SHA1(330dcb1eea8c311df0e57a3b74146601c26d63c0)) // label says 2.4, inside the ROM it says 2.5L though
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
+	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
+	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
+	ROM_RELOAD(0x000000 + 0xc0000, 0x40000)
+ROM_END
+
+ROM_START(agsoccera)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -377,8 +393,11 @@ ROM_START(usafootba)
 	ROM_RELOAD(0x000000 + 0xc0000, 0x40000)
 ROM_END
 
+} // Anonymous namespace
 
-GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+
+GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccera,  agsoccer, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1991, agsoccer07, agsoccer, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1992, wrldtour,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1992, wrldtour2,  wrldtour, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)

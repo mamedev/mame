@@ -47,11 +47,11 @@ public:
 
 private:
 	u8 status_r();
-	DECLARE_WRITE8_MEMBER(port30_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(key_row_w);
-	DECLARE_WRITE8_MEMBER(port48_w);
-	DECLARE_WRITE8_MEMBER(picu_w);
+	void port30_w(u8 data);
+	u8 keyboard_r();
+	void key_row_w(u8 data);
+	void port48_w(u8 data);
+	void picu_w(u8 data);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(picu_r_w);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	void ppi_porta_w(u8 data);
@@ -168,29 +168,29 @@ u8 v100_state::status_r()
 	return status;
 }
 
-WRITE8_MEMBER(v100_state::port30_w)
+void v100_state::port30_w(u8 data)
 {
 	// D6 = cursor/text blinking?
 
 	//logerror("Writing %02X to port 30\n", data);
 }
 
-READ8_MEMBER(v100_state::keyboard_r)
+u8 v100_state::keyboard_r()
 {
 	return m_key_row[m_active_row & 15].read_safe(0xff);
 }
 
-WRITE8_MEMBER(v100_state::key_row_w)
+void v100_state::key_row_w(u8 data)
 {
 	m_active_row = data;
 }
 
-WRITE8_MEMBER(v100_state::port48_w)
+void v100_state::port48_w(u8 data)
 {
 	//logerror("Writing %02X to port 48\n", data);
 }
 
-WRITE8_MEMBER(v100_state::picu_w)
+void v100_state::picu_w(u8 data)
 {
 	m_picu->b_w((data & 0x0e) >> 1);
 	m_picu->sgs_w(BIT(data, 4));

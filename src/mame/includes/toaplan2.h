@@ -75,6 +75,7 @@ public:
 	void truxton2(machine_config &config);
 	void vfive(machine_config &config);
 	void kbash2(machine_config &config);
+	void nprobowl(machine_config &config);
 
 	void init_bbakraid();
 	void init_pipibibsbl();
@@ -229,6 +230,7 @@ private:
 	void kbash_68k_mem(address_map &map);
 	void kbash_v25_mem(address_map &map);
 	void mahoudai_68k_mem(address_map &map);
+	void nprobowl_68k_mem(address_map &map);
 	void othldrby_68k_mem(address_map &map);
 	void pipibibi_bootleg_68k_mem(address_map &map);
 	void pipibibs_68k_mem(address_map &map);

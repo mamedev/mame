@@ -52,7 +52,7 @@ void crime_device::map(address_map &map)
 //  REGISTER ACCESS
 //**************************************************************************
 
-READ64_MEMBER(crime_device::base_r)
+uint64_t crime_device::base_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -85,7 +85,7 @@ READ64_MEMBER(crime_device::base_r)
 	return ret;
 }
 
-WRITE64_MEMBER(crime_device::base_w)
+void crime_device::base_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{

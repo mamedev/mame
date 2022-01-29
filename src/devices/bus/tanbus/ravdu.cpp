@@ -43,7 +43,7 @@ void tanbus_ravdu_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
 	m_crtc->out_vsync_callback().set(FUNC(tanbus_ravdu_device::vsync_changed));
-	m_crtc->set_update_row_callback(FUNC(tanbus_ravdu_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(tanbus_ravdu_device::crtc_update_row));
 
 	SAA5055(config, m_trom, DERIVED_CLOCK(1, 1));
 	m_trom->d_cb().set(FUNC(tanbus_ravdu_device::videoram_r));
@@ -154,21 +154,23 @@ void tanbus_ravdu_device::set_inhibit_lines(offs_t offset, int &inhram, int &inh
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(tanbus_ravdu_device::videoram_r)
+uint8_t tanbus_ravdu_device::videoram_r(offs_t offset)
 {
 	return m_videoram[offset & 0x7ff];
 }
 
 MC6845_UPDATE_ROW(tanbus_ravdu_device::crtc_update_row)
 {
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	m_trom->lose_w(1);
 	m_trom->lose_w(0);
 
 	for (int column = 0; column < x_count; column++)
 	{
-		m_trom->write(m_videoram[(ma + column) & 0x7ff]);
+		uint8_t code = m_videoram[(ma + column) & 0x7ff];
+
+		m_trom->write(code);
 
 		m_trom->f1_w(1);
 		m_trom->f1_w(0);
@@ -180,9 +182,11 @@ MC6845_UPDATE_ROW(tanbus_ravdu_device::crtc_update_row)
 
 			int col = m_trom->get_rgb() ^ ((column == cursor_x) ? 7 : 0);
 
-			int r = BIT(col, 0) * 0xff;
-			int g = BIT(col, 1) * 0xff;
-			int b = BIT(col, 2) * 0xff;
+			if (BIT(code, 7)) col ^= 0x07;
+
+			int const r = BIT(col, 0) * 0xff;
+			int const g = BIT(col, 1) * 0xff;
+			int const b = BIT(col, 2) * 0xff;
 
 			*p++ = rgb_t(r, g, b);
 		}

@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Alpha Denshi "NeoGeo" palette devices
+    Alpha Denshi "NeoGeo" palette devices
 
 ***************************************************************************/
 
@@ -37,14 +37,14 @@ public:
 	u16 get_backdrop_pen() { return m_entries-1; }
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 read(offs_t offset);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	virtual uint32_t palette_entries() const override { return m_entries; }
 private:
 	std::vector<uint16_t> m_paletteram;

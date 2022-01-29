@@ -30,7 +30,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_c140(*this, "c140"),
+		m_c219(*this, "c219"),
 		m_muxed_inputs(*this, { { "P4", "DSW", "P1", "P2" } }),
 		m_io_p3(*this, "P3"),
 		m_workram(*this, "workram"),
@@ -85,7 +85,7 @@ protected:
 	u16 gfxram_r(offs_t offset);
 	void gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -93,7 +93,7 @@ protected:
 	void scanline_interrupt(int scanline);
 
 	void namcona1_main_map(address_map &map);
-	void namcona1_c140_map(address_map &map);
+	void namcona1_c219_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -127,7 +127,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<c140_device> m_c140;
+	required_device<c219_device> m_c219;
 
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;
@@ -188,11 +188,19 @@ public:
 
 	void c70(machine_config &config);
 	void namcona2(machine_config &config);
+	void zelos(machine_config &config);
 
 	void init_knckhead();
 	void init_emeralda();
 	void init_numanath();
 	void init_quiztou();
+	void init_zelos();
+
+private:
+	u16 m_zelos_ctrl;
+
+	void zelos_ctrl_w(u16 data);
+	void zelos_main_map(address_map &map);
 };
 
 class xday2_namcona2_state : public namcona2_state

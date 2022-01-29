@@ -183,7 +183,7 @@ TIMER_CALLBACK_MEMBER(cdp1852_device::update_sr)
 //  read - data read
 //-------------------------------------------------
 
-READ8_MEMBER(cdp1852_device::read)
+uint8_t cdp1852_device::read()
 {
 	if (!m_read_mode() && m_clock_active)
 	{
@@ -201,7 +201,7 @@ READ8_MEMBER(cdp1852_device::read)
 //  write - data write
 //-------------------------------------------------
 
-WRITE8_MEMBER(cdp1852_device::write)
+void cdp1852_device::write(uint8_t data)
 {
 	if (m_read_mode() && m_clock_active)
 	{

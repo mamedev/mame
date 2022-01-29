@@ -21,12 +21,12 @@ class h8_adc_device : public device_t {
 public:
 	void set_info(const char *intc_tag, int vect);
 
-	DECLARE_READ8_MEMBER(addr8_r);
-	DECLARE_READ16_MEMBER(addr16_r);
-	DECLARE_READ8_MEMBER(adcsr_r);
-	DECLARE_READ8_MEMBER(adcr_r);
-	DECLARE_WRITE8_MEMBER(adcsr_w);
-	DECLARE_WRITE8_MEMBER(adcr_w);
+	uint8_t addr8_r(offs_t offset);
+	uint16_t addr16_r(offs_t offset);
+	uint8_t adcsr_r();
+	uint8_t adcr_r();
+	void adcsr_w(uint8_t data);
+	void adcr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
 
 	void set_suspend(bool suspend);

@@ -92,7 +92,7 @@ void agat7video_device::device_reset()
 }
 
 
-READ8_MEMBER(agat7video_device::read)
+uint8_t agat7video_device::read(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 		do_io(offset);
@@ -100,7 +100,7 @@ READ8_MEMBER(agat7video_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(agat7video_device::write)
+void agat7video_device::write(offs_t offset, uint8_t data)
 {
 	do_io(offset);
 }
@@ -112,32 +112,32 @@ void agat7video_device::do_io(int offset)
 	{
 	case 0:
 		m_video_mode = GRAPHICS_LORES;
-		m_start_address = (offset & 0x30) << 9;
-		logerror("offset %04X, video mode 0 (GRAPHICS_LORES)\n", m_start_address);
+		m_start_address = (offset & 0x3c) << 9;
+		logerror("offset %02X -> %04X, video mode 0 (GRAPHICS_LORES)\n", offset, m_start_address);
 		break;
 
 	case 1:
 		m_video_mode = GRAPHICS_HIRES;
-		m_start_address = ((offset & 0x3f) - 0x01) << 9;
-		logerror("offset %04X, video mode 1 (GRAPHICS_HIRES)\n", m_start_address);
+		m_start_address = ((offset & 0x31) - 0x01) << 9;
+		logerror("offset %02X -> %04X, video mode 1 (GRAPHICS_HIRES)\n", offset, m_start_address);
 		break;
 
 	case 2:
 		if (offset > 0x80) {
 			m_video_mode = TEXT_HIRES;
 			m_start_address = (offset - 0x82) << 9;
-			logerror("offset %04X, video mode 2 (TEXT_HIRES)\n", m_start_address);
+			logerror("offset %02X -> %04X, video mode 2 (TEXT_HIRES)\n", offset, m_start_address);
 		} else {
 			m_video_mode = TEXT_LORES;
 			m_start_address = (offset - 0x02) << 9;
-			logerror("offset %04X, video mode 2 (TEXT_LORES)\n", m_start_address);
+			logerror("offset %02X -> %04X, video mode 2 (TEXT_LORES)\n", offset, m_start_address);
 		}
 		break;
 
 	case 3:
 		m_video_mode = GRAPHICS_MONO;
 		m_start_address = ((offset - 0x03) & 0x30) << 9;
-		logerror("offset %04X, video mode 3 (GRAPHICS_MONO)\n", m_start_address);
+		logerror("offset %02X -> %04X, video mode 3 (GRAPHICS_MONO)\n", offset, m_start_address);
 		break;
 	}
 }
@@ -146,22 +146,18 @@ void agat7video_device::do_io(int offset)
 void agat7video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 8; x++)
+		for (int x = 0; x < 8; x++)
 		{
-			color = (chardata[y] & (1 << (7-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (7-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -226,26 +222,22 @@ void agat7video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 
 void agat7video_device::graph_update_mono(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
 	int fg = 7, bg = 0;
 
 	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 32; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 32; col++)
 		{
-			address = m_start_address + col + (row * 0x20);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + (row * 0x20);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				v = (gfx & 0x80);
+				uint8_t const v = (gfx & 0x80);
 				gfx <<= 1;
 				*(p++) = v ? fg : bg;
 				*(p++) = v ? fg : bg;
@@ -256,25 +248,20 @@ void agat7video_device::graph_update_mono(screen_device &screen, bitmap_ind16 &b
 
 void agat7video_device::graph_update_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
-
 	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 0x40; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 0x40; col++)
 		{
-			address = m_start_address + col + ((row/2) * 0x40);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + ((row/2) * 0x40);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 2; b++)
+			for (int b = 0; b < 2; b++)
 			{
-				v = (gfx & 0xf0) >> 4;
+				uint8_t const v = (gfx & 0xf0) >> 4;
 				gfx <<= 4;
 				*(p++) = v;
 				*(p++) = v;
@@ -287,25 +274,20 @@ void agat7video_device::graph_update_hires(screen_device &screen, bitmap_ind16 &
 
 void agat7video_device::graph_update_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
-
 	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 0x20; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 0x20; col++)
 		{
-			address = m_start_address + col + ((row/4) * 0x20);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + ((row/4) * 0x20);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 2; b++)
+			for (int b = 0; b < 2; b++)
 			{
-				v = (gfx & 0xf0) >> 4;
+				uint8_t const v = (gfx & 0xf0) >> 4;
 				gfx <<= 4;
 				*(p++) = v;
 				*(p++) = v;

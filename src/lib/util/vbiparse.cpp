@@ -8,9 +8,10 @@
 
 ***************************************************************************/
 
-#include "osdcore.h"
 #include "vbiparse.h"
-#include <math.h>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 #include <algorithm>
 
 

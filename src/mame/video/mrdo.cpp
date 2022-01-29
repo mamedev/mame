@@ -135,7 +135,7 @@ void mrdo_state::mrdo_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bgvideoram[tile_index + 0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -160,8 +160,8 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 
 void mrdo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mrdo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mrdo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mrdo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mrdo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -179,25 +179,71 @@ void mrdo_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mrdo_state::mrdo_bgvideoram_w)
+void mrdo_state::mrdo_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_fgvideoram_w)
+/* PAL16R6CN used for protection. The game doesn't clear the screen
+   if a read from this address doesn't return the value it expects. */
+uint8_t mrdo_state::mrdo_secre_r()
+{
+	return m_pal_u001;
+}
+
+void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+
+	// protection.  each write latches a new value on IC u001 (PAL16R6)
+	const uint8_t i9 = BIT(data,0);
+	const uint8_t i8 = BIT(data,1);
+//  const uint8_t i7 = BIT(data,2); pin 7 not used in equations
+	const uint8_t i6 = BIT(data,3);
+	const uint8_t i5 = BIT(data,4);
+	const uint8_t i4 = BIT(data,5);
+	const uint8_t i3 = BIT(data,6);
+	const uint8_t i2 = BIT(data,7);
+
+	// equations extracted from dump using jedutil
+	const uint8_t t1 =    i2  & (1^i3) &    i4  & (1^i5) & (1^i6) & (1^i8) &    i9;
+	const uint8_t t2 = (1^i2) & (1^i3) &    i4  &    i5  & (1^i6) &    i8  & (1^i9);
+	const uint8_t t3 =    i2  &    i3  & (1^i4) & (1^i5) &    i6  & (1^i8) &    i9;
+	const uint8_t t4 = (1^i2) &    i3  &    i4  & (1^i5) &    i6  &    i8  &    i9;
+
+	const uint8_t r12 = 0;
+	const uint8_t r13 = (1^( t1 ))      << 1 ;
+	const uint8_t r14 = (1^( t1 | t2 )) << 2 ;
+	const uint8_t r15 = (1^( t1 | t3 )) << 3 ;
+	const uint8_t r16 = (1^( t1 ))      << 4 ;
+	const uint8_t r17 = (1^( t1 | t3 )) << 5 ;
+	const uint8_t r18 = (1^( t3 | t4 )) << 6 ;
+	const uint8_t r19 = 0;
+
+	m_pal_u001 = r19 | r18 | r17 | r16 | r15 | r14 | r13 | r12  ;
 }
 
+/*
+/rf13 :=                                             i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t1
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrollx_w)
+/rf14 := /i2 & /i3 & i4 & i5 & /i6 & i8 & /i9   +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t2 | t1
+
+/rf15 := i2 & i3 & /i4 & /i5 & i6 & /i8 & i9    +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t3 | t1
+
+/rf16 :=                                             i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t1
+
+/rf17 := i2 & i3 & /i4 & /i5 & i6 & /i8 & i9    +    i2 & /i3 & i4 & /i5 & /i6 & /i8 & i9  t3 | t1
+
+/rf18 := /i2 & i3 & i4 & /i5 & i6 & i8 & i9     +    i2 & i3 & /i4 & /i5 & i6 & /i8 & i9   t4 | t2
+*/
+void mrdo_state::mrdo_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
+void mrdo_state::mrdo_scrolly_w(uint8_t data)
 {
 	/* This is NOT affected by flipscreen (so stop it happening) */
 	if (m_flipscreen)
@@ -207,7 +253,7 @@ WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
 }
 
 
-WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
+void mrdo_state::mrdo_flipscreen_w(uint8_t data)
 {
 	/* bits 1-3 control the playfield priority, but they are not used by */
 	/* Mr. Do! so we don't emulate them */

@@ -8,7 +8,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
 #include "formats/pyldin_dsk.h"
 
 pyldin_format::pyldin_format() : upd765_format(formats)

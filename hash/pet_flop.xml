@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pet_flop" description="Commodore PET diskettes">
 
 	<software name="2040demo">
@@ -93,7 +96,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="galaxy! (1981)(avalon hill).d64" size="174848" crc="ee09100e" sha1="e94add6ab81d706cf2812e23eb6039715bdad126"/>
+				<rom name="galaxy (1981)(avalon hill).d64" size="174848" crc="ee09100e" sha1="e94add6ab81d706cf2812e23eb6039715bdad126"/>
 			</dataarea>
 		</part>
 	</software>

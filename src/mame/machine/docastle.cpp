@@ -33,7 +33,7 @@ if it was a small shared buffer. The order of operations is:
    bytes and write its own 9 bytes
 4) resume execution of CPU 0.
 */
-READ8_MEMBER(docastle_state::docastle_shared0_r)
+uint8_t docastle_state::docastle_shared0_r(offs_t offset)
 {
 	if (offset == 8 && LOG)
 		logerror("CPU #0 shared0r  clock = %d\n", (uint32_t)m_maincpu->total_cycles());
@@ -42,7 +42,7 @@ READ8_MEMBER(docastle_state::docastle_shared0_r)
 }
 
 
-READ8_MEMBER(docastle_state::docastle_shared1_r)
+uint8_t docastle_state::docastle_shared1_r(offs_t offset)
 {
 	if (offset == 8 && LOG)
 		logerror("CPU #1 shared1r  clock = %d\n", (uint32_t)m_slave->total_cycles());
@@ -51,7 +51,7 @@ READ8_MEMBER(docastle_state::docastle_shared1_r)
 }
 
 
-WRITE8_MEMBER(docastle_state::docastle_shared0_w)
+void docastle_state::docastle_shared0_w(offs_t offset, uint8_t data)
 {
 	if (offset == 8 && LOG)
 		logerror("CPU #1 shared0w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
@@ -67,7 +67,7 @@ WRITE8_MEMBER(docastle_state::docastle_shared0_w)
 }
 
 
-WRITE8_MEMBER(docastle_state::docastle_shared1_w)
+void docastle_state::docastle_shared1_w(offs_t offset, uint8_t data)
 {
 	m_buffer1[offset] = data;
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 
 
 
-WRITE8_MEMBER(docastle_state::docastle_nmitrigger_w)
+void docastle_state::docastle_nmitrigger_w(uint8_t data)
 {
 	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }

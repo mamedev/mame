@@ -105,7 +105,7 @@ static INPUT_PORTS_START(mbc55x_kbd)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad 6  " UTF8_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('7') PORT_CHAR('$') PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('7') PORT_CHAR('&') PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('u') PORT_CHAR('U') PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('j') PORT_CHAR('J') PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('n') PORT_CHAR('N') PORT_CODE(KEYCODE_N)
@@ -210,13 +210,13 @@ const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 		{ 0x15, '>',  'A',  'Q',  '!',  0x00, 0x1b, '|'  },
 		{ 0x16, 'Z',  'S',  'W',  '@',  ' ',  0x05, 0x08 },
 		{ 0x17, 'X',  'D',  'E',  '#',  0x00, 0x0d, 0x07 },
-		{ 0x18, 'C',  'F',  'R',  '$',  '0',  '4',  0x00 },
-		{ 0x19, 'V',  'G',  'T',  '%',  0x00, '5',  0x00 },
-		{ '=',  'B',  'H',  'Y',  '^',  '.',  '6',  0x00 },
-		{ '/',  'N',  'J',  'U',  '&',  '1',  '7',  0x00 },
-		{ '*',  'M',  'K',  'I',  '*',  '2',  '8',  0x00 },
-		{ 0x03, ',',  'L',  'O',  '(',  '3',  '9',  0x00 },
-		{ '-',  '.',  ':',  'P',  ')',  0x00, 0x00, 0x00 },
+		{ 0x18, 'C',  'F',  'R',  '$',  0x00, 0x00, 0x00 },
+		{ 0x19, 'V',  'G',  'T',  '%',  '0',  '4',  0x00 },
+		{ '=',  'B',  'H',  'Y',  '^',  '0',  '5',  0x00 },
+		{ '/',  'N',  'J',  'U',  '&',  '.',  '6',  0x00 },
+		{ '*',  'M',  'K',  'I',  '*',  '1',  '7',  0x00 },
+		{ 0x03, ',',  'L',  'O',  '(',  '2',  '8',  0x00 },
+		{ '-',  '.',  ':',  'P',  ')',  '3',  '9',  0x00 },
 		{ '+',  '?',  '"',  '{',  '_',  0x00, 0x00, 0x00 },
 		{ 0x0d, '*',  '~',  '}',  '+',  0x00, 0x00, 0x00 }
 	},
@@ -224,13 +224,13 @@ const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 		{ 0x10, '<',  'a',  'q',  '1',  0x00, 0x1b, '\\' },
 		{ 0x11, 'z',  's',  'w',  '2',  ' ',  0x09, 0x08 },
 		{ 0x12, 'x',  'd',  'e',  '3',  0x00, 0x0d, 0x7f },
-		{ 0x13, 'c',  'f',  'r',  '4',  '0',  '4',  0x00 },
-		{ 0x14, 'v',  'g',  't',  '5',  0x00, '5',  0x00 },
-		{ '=',  'b',  'h',  'y',  '6',  '.',  '6',  0x00 },
-		{ '/',  'n',  'j',  'u',  '7',  '1',  '7',  0x00 },
-		{ '*',  'm',  'k',  'i',  '8',  '2',  '8',  0x00 },
-		{ 0x03, ',',  'l',  'o',  '9',  '3',  '9',  0x00 },
-		{ '-',  '.',  ';',  'p',  '0',  0x00, 0x00, 0x00 },
+		{ 0x13, 'c',  'f',  'r',  '4',  0x00, 0x00, 0x00 },
+		{ 0x14, 'v',  'g',  't',  '5',  '0',  '4',  0x00 },
+		{ '=',  'b',  'h',  'y',  '6',  '0',  '5',  0x00 },
+		{ '/',  'n',  'j',  'u',  '7',  '.',  '6',  0x00 },
+		{ '*',  'm',  'k',  'i',  '8',  '1',  '7',  0x00 },
+		{ 0x03, ',',  'l',  'o',  '9',  '2',  '8',  0x00 },
+		{ '-',  '.',  ';',  'p',  '0',  '3',  '9',  0x00 },
 		{ '+',  '/',  '\'', '[',  '-',  0x00, 0x00, 0x00 },
 		{ 0x0d, '*',  '`',  ']',  '=',  0x00, 0x00, 0x00 }
 	}

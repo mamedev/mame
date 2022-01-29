@@ -17,11 +17,13 @@ Not working because of banking issues.
 #include "machine/beta.h"
 
 
-class atm_state : public spectrum_state
+namespace {
+
+class atm_state : public spectrum_128_state
 {
 public:
 	atm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
+		: spectrum_128_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
@@ -32,12 +34,14 @@ public:
 	void atm(machine_config &config);
 	void atmtb2(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
-	DECLARE_READ8_MEMBER(beta_neutral_r);
-	DECLARE_READ8_MEMBER(beta_enable_r);
-	DECLARE_READ8_MEMBER(beta_disable_r);
-	DECLARE_MACHINE_RESET(atm);
+	void atm_port_7ffd_w(uint8_t data);
+	uint8_t beta_neutral_r(offs_t offset);
+	uint8_t beta_enable_r(offs_t offset);
+	uint8_t beta_disable_r(offs_t offset);
 
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
@@ -72,7 +76,7 @@ void atm_state::atm_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
+void atm_state::atm_port_7ffd_w(uint8_t data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -85,12 +89,12 @@ WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 	atm_update_memory();
 }
 
-READ8_MEMBER(atm_state::beta_neutral_r)
+uint8_t atm_state::beta_neutral_r(offs_t offset)
 {
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER(atm_state::beta_enable_r)
+uint8_t atm_state::beta_enable_r(offs_t offset)
 {
 	if(m_ROMSelection == 1) {
 		m_ROMSelection = 3;
@@ -102,7 +106,7 @@ READ8_MEMBER(atm_state::beta_enable_r)
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-READ8_MEMBER(atm_state::beta_disable_r)
+uint8_t atm_state::beta_disable_r(offs_t offset)
 {
 	if (m_beta->started() && m_beta->is_active()) {
 		m_ROMSelection = BIT(m_port_7ffd_data, 4);
@@ -123,15 +127,15 @@ void atm_state::atm_mem(address_map &map)
 void atm_state::atm_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
-	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
-	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
-	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
-	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x4000, 0x4000).w(FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
-	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
-	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(atm_state::spectrum_ula_r), FUNC(atm_state::spectrum_ula_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	map(0x4000, 0x4000).mirror(0x3ffd).w(FUNC(atm_state::atm_port_7ffd_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
 
 void atm_state::atm_switch(address_map &map)
@@ -141,7 +145,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(atm_state,atm)
+void atm_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -194,8 +198,6 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
-
-	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	BETA_DISK(config, m_beta, 0);
 
@@ -253,6 +255,9 @@ ROM_START( atmtb2 )
 	// Char gen rom
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME      FLAGS */
 COMP( 1991, atm,    spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM",        MACHINE_NOT_WORKING)

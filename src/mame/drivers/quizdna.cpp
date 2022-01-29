@@ -14,19 +14,19 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 #include "includes/quizdna.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 #define MCLK 16000000
 
-WRITE8_MEMBER(quizdna_state::rombank_w)
+void quizdna_state::rombank_w(uint8_t data)
 {
 	membank("mainbank")->set_entry(data & 0x3f);
 }
 
-WRITE8_MEMBER(quizdna_state::gekiretu_rombank_w)
+void quizdna_state::gekiretu_rombank_w(uint8_t data)
 {
 	membank("mainbank")->set_entry((data & 0x3f) ^ 0x0a);
 }

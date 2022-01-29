@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "konami.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -489,9 +488,6 @@ void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -903,9 +899,9 @@ void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
 void msx_cart_keyboard_master_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x00, 0x00, write8smo_delegate(FUNC(vlm5030_device::data_w), m_vlm5030.target()));
-	io_space().install_write_handler(0x20, 0x20, write8smo_delegate(FUNC(msx_cart_keyboard_master_device::io_20_w), this));
-	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(FUNC(msx_cart_keyboard_master_device::io_00_r), this));
+	io_space().install_write_handler(0x00, 0x00, write8smo_delegate(*m_vlm5030, FUNC(vlm5030_device::data_w)));
+	io_space().install_write_handler(0x20, 0x20, write8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_20_w)));
+	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_00_r)));
 }
 
 

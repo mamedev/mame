@@ -7,6 +7,7 @@
 
 #include "nxrom.h"
 #include "imagedev/flopdrv.h"
+#include "sound/rp2c33_snd.h"
 
 
 // ======================> nes_disksys_device
@@ -32,7 +33,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -45,6 +46,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_fds_data;    // here, we store a copy of the disk
 	required_device<legacy_floppy_image_device> m_disk;
+	required_device<rp2c33_sound_device> m_sound;
 
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
@@ -53,7 +55,9 @@ private:
 	void unload_disk(device_image_interface &image);
 
 	uint16_t m_irq_count, m_irq_count_latch;
-	int m_irq_enable, m_irq_transfer;
+	int m_irq_enable, m_irq_repeat, m_irq_transfer;
+	int m_disk_reg_enable;
+	bool m_sound_en;
 
 	uint8_t m_fds_motor_on;
 	uint8_t m_fds_door_closed;

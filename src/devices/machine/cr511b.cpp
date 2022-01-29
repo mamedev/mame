@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -71,7 +71,7 @@ void cr511b_device::device_start()
 	m_scor_handler.resolve_safe();
 	m_xaen_handler.resolve_safe();
 
-	m_frame_timer = timer_alloc(0, nullptr);
+	m_frame_timer = timer_alloc(0);
 	m_frame_timer->adjust(attotime::never);
 }
 
@@ -87,7 +87,7 @@ void cr511b_device::device_reset()
 //  device_timer - device-specific timer events
 //-------------------------------------------------
 
-void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 }
 
@@ -96,12 +96,12 @@ void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( cr511b_device::read )
+uint8_t cr511b_device::read()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER ( cr511b_device::write )
+void cr511b_device::write(uint8_t data)
 {
 }
 

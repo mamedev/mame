@@ -1197,9 +1197,9 @@ Addresses found at @0x510, cpu2
 
 */
 
-WRITE8_MEMBER(dkong_state::m58817_command_w)
+void dkong_state::m58817_command_w(uint8_t data)
 {
-	m_m58817->ctl_w(space, 0, data & 0x0f);
+	m_m58817->ctl_w(data & 0x0f);
 	m_m58817->pdc_w((data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
@@ -1211,7 +1211,7 @@ WRITE8_MEMBER(dkong_state::m58817_command_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_voice_w)
+void dkong_state::dkong_voice_w(uint8_t data)
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1219,7 +1219,7 @@ WRITE8_MEMBER(dkong_state::dkong_voice_w)
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
-READ8_MEMBER(dkong_state::dkong_voice_status_r)
+uint8_t dkong_state::dkong_voice_status_r()
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1227,13 +1227,13 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 	return 0;
 }
 
-READ8_MEMBER(dkong_state::dkong_tune_r)
+uint8_t dkong_state::dkong_tune_r(offs_t offset)
 {
-	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
+	uint8_t page = m_dev_vp2->read(0) & 0x47;
 
 	if ( page & 0x40 )
 	{
-		return (m_ls175_3d->read(space, 0) & 0x0F) | (dkong_voice_status_r(space, 0) << 4);
+		return (m_ls175_3d->read(0) & 0x0f) | (dkong_voice_status_r() << 4);
 	}
 	else
 	{
@@ -1242,7 +1242,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_p1_w)
+void dkong_state::dkong_p1_w(uint8_t data)
 {
 	m_discrete->write(DS_DAC,data);
 }
@@ -1254,7 +1254,7 @@ WRITE8_MEMBER(dkong_state::dkong_p1_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
+void dkong_state::dkong_audio_irq_w(uint8_t data)
 {
 	if (data)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
@@ -1343,13 +1343,13 @@ void dkong_state::dkong2b_audio(machine_config &config)
 	m_soundcpu->bus_in_cb().set(FUNC(dkong_state::dkong_tune_r));
 	m_soundcpu->bus_out_cb().set(FUNC(dkong_state::dkong_voice_w));
 	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
-	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
-	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
-	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
-	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
+	m_soundcpu->p2_in_cb().set(m_dev_vp2, FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set(m_dev_vp2, FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set(m_dev_6h, FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set(m_dev_6h, FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 0.9);
 }
 
 void dkong_state::radarscp_audio(machine_config &config)
@@ -1401,11 +1401,11 @@ void dkong_state::dkongjr_audio(machine_config &config)
 	latch8_device &dev_5h(LATCH8(config, "ls259.5h"));
 	dev_5h.write_cb<1>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND9_INP>));
 
-	latch8_device &dev_4h(LATCH8(config, "ls259.4h"));
+	LATCH8(config, "ls259.4h");
 
 	LATCH8(config, m_dev_vp2);      /* virtual latch for port B */
 	m_dev_vp2->set_xorvalue(0x70);  /* all signals are inverted */
-	m_dev_vp2->read_cb<6>().set(dev_4h, FUNC(latch8_device::bit1_r));
+	m_dev_vp2->read_cb<6>().set("ls259.4h", FUNC(latch8_device::bit1_r));
 	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	m_dev_vp2->read_cb<4>().set(m_dev_6h, FUNC(latch8_device::bit6_r));
 	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
@@ -1414,14 +1414,14 @@ void dkong_state::dkongjr_audio(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &dkong_state::dkongjr_sound_io_map);
 	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
-	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
-	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
-	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
-	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
+	m_soundcpu->p2_in_cb().set(m_dev_vp2, FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set(m_dev_vp2, FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set(m_dev_6h, FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set(m_dev_6h, FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void dkong_state::dkong3_audio(machine_config &config)

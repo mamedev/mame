@@ -7,10 +7,77 @@
     driver by Aaron Giles
 
     Games supported:
-        * Relief Pitcher (1990) [2 sets]
+        * Relief Pitcher (1990) [3 sets]
 
     Known bugs:
         * none at this time
+
+From Atari Games Bulletin:
+
+                              ATARI
+                              GAMES
+                            BULLENTIN
+                      From Atari field Service
+
+Attention Service Managers                    June 4th 1992
+
+               Relief Pitcher Software updates
+
+The codes on two EPROMS have been updated, the part numbers
+and locations are 13693-0011 Rev D location 19E and
+136093-0012 Rev D location 19J
+
+The main features of the NEW program are:
+
+REDUCE GAME TIME
+If you are experiencing long game time on your Relief Pitcher
+game these two new Rev D EPROMS will give you more difficulty
+settings to help eliminate that problem.
+
+Eight new difficulty settings have been added to the Rev D
+EPROMS, with the default set to Hard.
+
+RESET PROBLEM:
+There is a possibility the game my HANG UP and RESET if
+there is a problem with the base running or when the fielder
+catches a flyball.
+
+MISCELLANEOUS.
+When set to NO, AUDIO IN THE ATTRACT will be completely
+disabled
+
+In the two player game, the players were given a free second
+inning - this has been eliminated.
+
+Fix the various cosmetic problems in the newspaper and audio.
+
+Eprom updates will be available upon request through you
+Atari Distributor
+
+If you have any questions please call your
+Atari Distributor or Atari Games Customer Service
+
+
+ROM labels are in this format:
+
+  RELIEF PITCHER             RELIEF PITCHER
+ (c) 1992 ATARI       or    (c) 1992 ATARI
+   136093-0011                136093-0011D
+     CS ACFF REV D              CS ACFF
+
+ ROM number   Checksum    Revision
+----------------------------------
+136093-0011     ACFF      Rev. D
+136093-0012     E5FE
+
+136093-0011     BAFF      Rev. C
+136093-0012     8AFE
+
+136093-0011     23FF      Rev. B
+136093-0012     3CFE
+
+136093-0013     CBBF
+136093-0014     3EBE
 
 ****************************************************************************
 
@@ -26,7 +93,7 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -53,7 +120,7 @@ void relief_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(relief_state::special_port2_r)
+uint16_t relief_state::special_port2_r()
 {
 	int result = ioport("260010")->read();
 	if (!(result & 0x0080) || m_screen->hblank()) result ^= 0x0001;
@@ -68,7 +135,7 @@ READ16_MEMBER(relief_state::special_port2_r)
  *
  *************************************/
 
-WRITE16_MEMBER(relief_state::audio_control_w)
+void relief_state::audio_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -83,7 +150,7 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 }
 
 
-WRITE16_MEMBER(relief_state::audio_volume_w)
+void relief_state::audio_volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -271,8 +338,8 @@ void relief_state::relief(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield_tile_info));
-	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield2_tile_info));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(relief_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(relief_state::get_playfield2_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -305,10 +372,10 @@ void relief_state::relief(machine_config &config)
 // MAIN: 07 JUN 1992 20:12:30
 ROM_START( relief )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136093-0011d.19e", 0x00000, 0x20000, CRC(cb3f73ad) SHA1(533a96095e678b4a414d6d9b861b1d4010ced30f) )
-	ROM_LOAD16_BYTE( "136093-0012d.19j", 0x00001, 0x20000, CRC(90655721) SHA1(f50a2f317215a864d09e33a4acd927b873350425) )
-	ROM_LOAD16_BYTE( "136093-0013.17e", 0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
-	ROM_LOAD16_BYTE( "136093-0014.17j", 0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
+	ROM_LOAD16_BYTE( "136093-0011d_cs_acff.19e", 0x00000, 0x20000, CRC(cb3f73ad) SHA1(533a96095e678b4a414d6d9b861b1d4010ced30f) ) // checksum == ACFF
+	ROM_LOAD16_BYTE( "136093-0012d_cs_e5fe.19j", 0x00001, 0x20000, CRC(90655721) SHA1(f50a2f317215a864d09e33a4acd927b873350425) ) // checksum == E5FE
+	ROM_LOAD16_BYTE( "136093-0013_cs_cbbf.17e",  0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
+	ROM_LOAD16_BYTE( "136093-0014_cs_3ebe.17j",  0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
 
 	ROM_REGION( 0x280000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136093-0025a.14s",       0x000000, 0x80000, CRC(1b9e5ef2) SHA1(d7d14e75ca2d56c5c67154506096570c9ccbcf8e) )
@@ -322,7 +389,7 @@ ROM_START( relief )
 	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "relief-eeprom.bin", 0x0000, 0x800, CRC(66069f60) SHA1(fac3797888f7ffe972f642aca44c6ca7d208c814) )
+	ROM_LOAD( "relief_rev_d-eeprom.bin", 0x0000, 0x800, CRC(66069f60) SHA1(fac3797888f7ffe972f642aca44c6ca7d208c814) )
 
 	ROM_REGION( 0x001000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136093-0002.15f", 0x0000, 0x0117, CRC(b111d5f2) SHA1(0fe5b4ca786e839e6927a485109d33fe31c737a2) )
@@ -340,10 +407,10 @@ ROM_END
 // MAIN: 26 APR 1992 21:18:13
 ROM_START( relief2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "19e", 0x00000, 0x20000, CRC(41373e02) SHA1(1982be3d2b959f3504cd7e4afacd96bbebc27b8e) )
-	ROM_LOAD16_BYTE( "19j", 0x00001, 0x20000, CRC(8187b026) SHA1(1408b5482194161c1fbb30911bb5b64a14b8ffb0) )
-	ROM_LOAD16_BYTE( "136093-0013.17e", 0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
-	ROM_LOAD16_BYTE( "136093-0014.17j", 0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
+	ROM_LOAD16_BYTE( "136093-0011c_cs_baff.19e", 0x00000, 0x20000, CRC(41373e02) SHA1(1982be3d2b959f3504cd7e4afacd96bbebc27b8e) ) // checksum == BAFF
+	ROM_LOAD16_BYTE( "136093-0012c_cs_8afe.19j", 0x00001, 0x20000, CRC(8187b026) SHA1(1408b5482194161c1fbb30911bb5b64a14b8ffb0) ) // checksum == 8AFE
+	ROM_LOAD16_BYTE( "136093-0013_cs_cbbf.17e",  0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
+	ROM_LOAD16_BYTE( "136093-0014_cs_3ebe.17j",  0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
 
 	ROM_REGION( 0x280000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136093-0025a.14s",      0x000000, 0x80000, CRC(1b9e5ef2) SHA1(d7d14e75ca2d56c5c67154506096570c9ccbcf8e) )
@@ -357,7 +424,7 @@ ROM_START( relief2 )
 	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "relief2-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
+	ROM_LOAD( "relief-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
 
 	ROM_REGION( 0x001000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136093-0002.15f", 0x0000, 0x0117, CRC(b111d5f2) SHA1(0fe5b4ca786e839e6927a485109d33fe31c737a2) )
@@ -374,10 +441,10 @@ ROM_END
 // MAIN: 10 APR 1992 09:50:05
 ROM_START( relief3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136093-0011b.19e", 0x00000, 0x20000, CRC(794cea33) SHA1(6e9830ce04a505746dea5aafaf37c629c28b061d) )
-	ROM_LOAD16_BYTE( "136093-0012b.19j", 0x00001, 0x20000, CRC(577495f8) SHA1(f45b0928b13db7f49b7688620008fc03fca08cde) )
-	ROM_LOAD16_BYTE( "136093-0013.17e", 0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
-	ROM_LOAD16_BYTE( "136093-0014.17j", 0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
+	ROM_LOAD16_BYTE( "136093-0011b_cs_23ff.19e", 0x00000, 0x20000, CRC(794cea33) SHA1(6e9830ce04a505746dea5aafaf37c629c28b061d) ) // checksum == 23FF
+	ROM_LOAD16_BYTE( "136093-0012b_cs_3cfe.19j", 0x00001, 0x20000, CRC(577495f8) SHA1(f45b0928b13db7f49b7688620008fc03fca08cde) ) // checksum == 3CFE
+	ROM_LOAD16_BYTE( "136093-0013_cs_cbbf.17e",  0x40000, 0x20000, CRC(1e1e82e5) SHA1(d33c84ae950db9775f9db9bf953aa63188d3f2f9) )
+	ROM_LOAD16_BYTE( "136093-0014_cs_3ebe.17j",  0x40001, 0x20000, CRC(19e5decd) SHA1(8d93d93f966df46d59cf9f4cdaa689e4dcd2689a) )
 
 	ROM_REGION( 0x280000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136093-0025a.14s",      0x000000, 0x80000, CRC(1b9e5ef2) SHA1(d7d14e75ca2d56c5c67154506096570c9ccbcf8e) )
@@ -391,7 +458,7 @@ ROM_START( relief3 )
 	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "relief3-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
+	ROM_LOAD( "relief-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
 
 	ROM_REGION( 0x001000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136093-0002.15f", 0x0000, 0x0117, CRC(b111d5f2) SHA1(0fe5b4ca786e839e6927a485109d33fe31c737a2) )
@@ -427,6 +494,6 @@ void relief_state::init_relief()
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
-GAME( 1992, relief2, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
-GAME( 1992, relief3, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief,  0,      relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (Rev D, 07 Jun 1992 / 28 May 1992)", 0 )
+GAME( 1992, relief2, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (Rev C, 26 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief3, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (Rev B, 10 Apr 1992 / 08 Apr 1992)", 0 )

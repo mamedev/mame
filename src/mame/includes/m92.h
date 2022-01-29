@@ -47,7 +47,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_upd71059c(*this, "upd71059c"),
-		m_eeprom(*this, "eeprom", 16),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -86,7 +85,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
 
-	optional_shared_ptr<uint8_t> m_eeprom;
 	optional_memory_bank m_mainbank;
 
 	emu_timer *m_spritebuffer_timer;
@@ -99,19 +97,17 @@ private:
 	uint8_t m_palette_bank;
 	std::vector<uint16_t> m_paletteram;
 
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	DECLARE_WRITE16_MEMBER(spritecontrol_w);
-	DECLARE_WRITE16_MEMBER(videocontrol_w);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(pf_control_w);
-	DECLARE_WRITE16_MEMBER(master_control_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void coincounter_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void sound_reset_w(uint16_t data);
+	void spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t paletteram_r(offs_t offset);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void oki_bank_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	DECLARE_MACHINE_RESET(m92);
 	DECLARE_VIDEO_START(m92);
@@ -134,7 +130,7 @@ private:
 	void ppan_portmap(address_map &map);
 	void sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_M92_H

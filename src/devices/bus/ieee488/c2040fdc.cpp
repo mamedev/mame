@@ -152,7 +152,7 @@ void c2040_fdc_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c2040_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c2040_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 	live_run();
@@ -220,7 +220,7 @@ bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
+	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
 		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
 
 	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
@@ -443,7 +443,7 @@ int c2040_fdc_device::get_next_bit(attotime &tm, const attotime &limit)
 	return bit && cur_live.rw_sel;
 }
 
-READ8_MEMBER( c2040_fdc_device::read )
+uint8_t c2040_fdc_device::read()
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -455,7 +455,7 @@ READ8_MEMBER( c2040_fdc_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_fdc_device::write )
+void c2040_fdc_device::write(uint8_t data)
 {
 	if (m_pi != data)
 	{

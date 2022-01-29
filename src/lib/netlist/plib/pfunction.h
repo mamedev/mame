@@ -1,14 +1,14 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * pfunction.h
- *
- */
 
 #ifndef PFUNCTION_H_
 #define PFUNCTION_H_
 
-#include "pstate.h"
+///
+/// \file pfunction.h
+///
+
+#include "pmath.h"
 #include "pstring.h"
 
 #include <vector>
@@ -19,100 +19,163 @@ namespace plib {
 	//  function evaluation
 	//============================================================
 
-	/*! Class providing support for evaluating expressions
-	 *
-	 */
+	enum rpn_cmd
+	{
+		ADD,
+		MULT,
+		SUB,
+		DIV,
+		EQ,
+		NE,
+		LT,
+		GT,
+		LE,
+		GE,
+		IF,
+		NEG,    // unary minus
+		POW,
+		LOG,
+		SIN,
+		COS,
+		MIN,
+		MAX,
+		RAND, /// random number between 0 and 1
+		TRUNC,
+
+		PUSH_CONST,
+		PUSH_INPUT,
+
+		LP, // Left parenthesis - for infix parsing
+		RP  // right parenthesis - for infix parsing
+	};
+
+	/// \brief Class providing support for evaluating expressions
+	///
+	///  \tparam NT Number type, should be float or double
+	///
+	template <typename NT>
 	class pfunction
 	{
-		enum rpn_cmd
-		{
-			ADD,
-			MULT,
-			SUB,
-			DIV,
-			POW,
-			SIN,
-			COS,
-			RAND, /* random number between 0 and 1 */
-			TRUNC,
-			PUSH_CONST,
-			PUSH_INPUT
-		};
 		struct rpn_inst
 		{
-			rpn_inst() : m_cmd(ADD), m_param(0.0) { }
+			constexpr rpn_inst() : m_cmd(ADD)
+			{
+				m_param.val = plib::constants<NT>::zero();
+			}
+			constexpr rpn_inst(rpn_cmd cmd, std::size_t index = 0)
+			: m_cmd(cmd)
+			{
+				m_param.index = index;
+			}
+			constexpr rpn_inst(NT v) : m_cmd(PUSH_CONST)
+			{
+				m_param.val = v;
+			}
+			constexpr const rpn_cmd &cmd() const noexcept
+			{
+				return m_cmd;
+			}
+			constexpr const NT &value() const noexcept
+			{
+				return m_param.val; // NOLINT
+			}
+			constexpr const std::size_t &index() const noexcept
+			{
+				return m_param.index; // NOLINT
+			}
+		private:
 			rpn_cmd m_cmd;
-			double m_param;
+			union
+			{
+				NT          val;
+				std::size_t index;
+			} m_param;
 		};
 	public:
-		/*! Constructor with state saving support
-		 *
-		 * @param name Name of this object
-		 * @param owner Owner of this object
-		 * @param state_manager State manager to handle saving object state
-		 *
-		 */
-		pfunction(const pstring &name, const void *owner, state_manager_t &state_manager)
-		: m_lfsr(0xACE1u)
-		{
-			state_manager.save_item(owner, m_lfsr, name + ".lfsr");
-		}
 
-		/*! Constructor without state saving support
-		 *
-		 */
+		using value_type = NT;
+
+		using inputs_container = std::vector<pstring>;
+		using values_container = std::vector<value_type>;
+
+		/// \brief Constructor
+		///
 		pfunction()
-		: m_lfsr(0xACE1u)
+		: m_lfsr(0xace1U) // NOLINT
 		{
 		}
 
-		/*! Compile an expression
-		 *
-		 * @param inputs Vector of input variables, e.g. {"A","B"}
-		 * @param expr infix or postfix expression. default is infix, postrix
-		 *          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
-		 */
-		void compile(const std::vector<pstring> &inputs, const pstring &expr);
+		/// \brief Constructor with compile
+		///
+		pfunction(const pstring &expr, const inputs_container &inputs = inputs_container())
+		: m_lfsr(0xace1U) // NOLINT
+		{
+			compile(expr, inputs);
+		}
 
-		/*! Compile a rpn expression
-		 *
-		 * @param inputs Vector of input variables, e.g. {"A","B"}
-		 * @param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
-		 */
-		void compile_postfix(const std::vector<pstring> &inputs, const pstring &expr);
-		/*! Compile an infix expression
-		 *
-		 * @param inputs Vector of input variables, e.g. {"A","B"}
-		 * @param expr Infix expression, e.g. "(A+B)/1.3"
-		 */
-		void compile_infix(const std::vector<pstring> &inputs, const pstring &expr);
-		/*! Evaluate the expression
-		 *
-		 * @param values for input variables, e.g. {1.1, 2.2}
-		 * @return value of expression
-		 */
-		double evaluate(const std::vector<double> &values);
+		/// \brief Evaluate the expression
+		///
+		/// \param values for input variables, e.g. {1.1, 2.2}
+		/// \return value of expression
+		///
+		value_type operator()(const values_container &values = values_container()) noexcept
+		{
+			return evaluate(values);
+		}
+
+		/// \brief Compile an expression
+		///
+		/// \param expr infix or postfix expression. default is infix, postrix
+		///          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
+		///
+		void compile(const pstring &expr, const inputs_container &inputs = inputs_container()) noexcept(false);
+
+		/// \brief Compile a rpn expression
+		///
+		/// \param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
+		///
+		void compile_postfix(const pstring &expr, const inputs_container &inputs = inputs_container()) noexcept(false);
+
+		/// \brief Compile an infix expression
+		///
+		/// \param expr Infix expression, e.g. "(A+B)/1.3"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
+		///
+		void compile_infix(const pstring &expr, const inputs_container &inputs = inputs_container()) noexcept(false);
+
+		/// \brief Evaluate the expression
+		///
+		/// \param values for input variables, e.g. {1.1, 2.2}
+		/// \return value of expression
+		///
+		value_type evaluate(const values_container &values = values_container()) noexcept;
+
+		template <typename ST>
+		void save_state(ST &st)
+		{
+			st.save_item(m_lfsr, "m_lfsr");
+		}
 
 	private:
 
-		void compile_postfix(const std::vector<pstring> &inputs,
+		void compress();
+		void compile_postfix(const inputs_container &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
-
-		double lfsr_random()
-		{
-			std::uint16_t lsb = m_lfsr & 1;
-			m_lfsr >>= 1;
-			if (lsb)
-				m_lfsr ^= 0xB400u; // taps 15, 13, 12, 10
-			return static_cast<double>(m_lfsr) / static_cast<double>(0xffffu);
-		}
 
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression
 
 		std::uint16_t m_lfsr; //!< lfsr used for generating random numbers
 	};
 
+	extern template class pfunction<float>;
+	extern template class pfunction<double>;
+	extern template class pfunction<long double>;
+#if (PUSE_FLOAT128)
+	extern template class pfunction<FLOAT128>;
+#endif
 
 } // namespace plib
 
-#endif /* PEXCEPTION_H_ */
+#endif // PEXCEPTION_H_

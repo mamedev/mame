@@ -19,7 +19,7 @@
     Double Block
     Duck Shoot
     Erase
-    Fonz                                                           94789-P                   IC86.86 IC87.87 PR-09.49 PR-08.50
+    Fonz                                                             94789-P                   IC86.86 IC87.87 PR-09.49 PR-08.50
     Galaxy War
     Goal Kick
     Heavyweight Champ
@@ -33,7 +33,7 @@
     Pong-Tron II
     Pro Monaco GP
     Pro Racer
-    Road Race
+    Road Race                                                        94540Y-P
     Rock'n Bark
     Secret Base
     Secret War
@@ -134,7 +134,7 @@ void segattl_state::video_start()
 void segattl_state::segattl(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_segattl);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_segattl);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

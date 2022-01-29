@@ -18,11 +18,11 @@ public:
 
 	void init_patinho_feio();
 
-	DECLARE_WRITE8_MEMBER(decwriter_data_w);
+	void decwriter_data_w(uint8_t data);
 	void decwriter_kbd_input(u8 data);
 	TIMER_CALLBACK_MEMBER(decwriter_callback);
 
-	DECLARE_WRITE8_MEMBER(teletype_data_w);
+	void teletype_data_w(uint8_t data);
 	void teletype_kbd_input(u8 data);
 	TIMER_CALLBACK_MEMBER(teletype_callback);
 

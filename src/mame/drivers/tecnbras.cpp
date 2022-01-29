@@ -42,11 +42,11 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(set_x_position_w);
-	DECLARE_WRITE8_MEMBER(print_column_w);
+	void set_x_position_w(offs_t offset, uint8_t data);
+	void print_column_w(offs_t offset, uint8_t data);
 
-	//DECLARE_WRITE8_MEMBER(tecnbras_io_w);
-	//DECLARE_READ8_MEMBER(tecnbras_io_r);
+	//void tecnbras_io_w(uint8_t data);
+	//uint8_t tecnbras_io_r();
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
 
@@ -70,16 +70,16 @@ void tecnbras_state::i80c31_io(address_map &map)
 	map(0x06B8, 0x06BC).w(FUNC(tecnbras_state::print_column_w));
 }
 
-WRITE8_MEMBER(tecnbras_state::set_x_position_w)
+void tecnbras_state::set_x_position_w(offs_t offset, uint8_t data)
 {
 	m_xcoord = offset;
 }
 
-WRITE8_MEMBER(tecnbras_state::print_column_w)
+void tecnbras_state::print_column_w(offs_t offset, uint8_t data)
 {
 	int const x = m_xcoord + offset;
 	int const ch = x / 5;
-	if (ch < ARRAY_LENGTH(m_digit)) {
+	if (ch < std::size(m_digit)) {
 		int const row = x % 5;
 		for (int i = 0; i < 7; i++) {
 			m_digit[ch][i] &= ~(1 << row);
@@ -101,7 +101,7 @@ void tecnbras_state::machine_start()
 		std::fill(std::begin(elem), std::end(elem), 0);
 
 #if 0
-	for (int x = 0; x < ARRAY_LENGTH(m_digit); x++)
+	for (int x = 0; x < std::size(m_digit); x++)
 		for (int y = 0; y < 7; y++)
 			m_dmds[(x * 7) + y] = y;
 #endif

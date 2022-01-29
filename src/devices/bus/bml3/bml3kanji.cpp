@@ -43,12 +43,12 @@ const tiny_rom_entry *bml3bus_kanji_device::device_rom_region() const
 	return ROM_NAME( kanji );
 }
 
-READ8_MEMBER( bml3bus_kanji_device::bml3_kanji_r )
+uint8_t bml3bus_kanji_device::bml3_kanji_r(offs_t offset)
 {
 	return m_rom[((uint32_t)m_kanji_addr << 1) + offset];
 }
 
-WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )
+void bml3bus_kanji_device::bml3_kanji_w(offs_t offset, uint8_t data)
 {
 	m_kanji_addr &= (0xff << (offset*8));
 	m_kanji_addr |= (data << ((offset^1)*8));
@@ -72,14 +72,11 @@ bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const 
 
 void bml3bus_kanji_device::device_start()
 {
-	// set_bml3bus_device makes m_slot valid
-	set_bml3bus_device();
-
 	m_rom = memregion(KANJI_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = m_bml3bus->space();
-	space_prg.install_readwrite_handler(0xff75, 0xff76, read8_delegate( FUNC(bml3bus_kanji_device::bml3_kanji_r), this), write8_delegate(FUNC(bml3bus_kanji_device::bml3_kanji_w), this) );
+	address_space &space_prg = space();
+	space_prg.install_readwrite_handler(0xff75, 0xff76, read8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_r)), write8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_w)));
 }
 
 void bml3bus_kanji_device::device_reset()

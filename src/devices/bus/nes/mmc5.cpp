@@ -159,7 +159,7 @@ void nes_exrom_device::pcb_reset()
 
  iNES: mapper 5
 
- MESS status: Partially supported
+ MAME status: Partially supported
 
  -------------------------------------------------*/
 

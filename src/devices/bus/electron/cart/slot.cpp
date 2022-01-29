@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device, "electron_cartsl
 //-------------------------------------------------
 
 device_electron_cart_interface::device_electron_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_interface(device, "electroncart"),
 		m_rom(nullptr),
 		m_rom_size(0)
 {
@@ -89,13 +89,18 @@ void device_electron_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  electron_cartslot_device - constructor
 //-------------------------------------------------
-electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ELECTRON_CARTSLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_cartrom_image_interface(mconfig, *this),
+	device_single_card_slot_interface<device_electron_cart_interface>(mconfig, *this),
 	m_cart(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
+{
+}
+
+electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	electron_cartslot_device(mconfig, ELECTRON_CARTSLOT, tag, owner, clock)
 {
 }
 
@@ -105,19 +110,11 @@ electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig
 
 void electron_cartslot_device::device_start()
 {
-	m_cart = dynamic_cast<device_electron_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void electron_cartslot_device::device_reset()
-{
 }
 
 
@@ -135,7 +132,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if (size % 0x2000)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -155,7 +152,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if ((upsize % 0x2000 && upsize != 0) || (losize % 0x2000 && losize != 0) || (romsize % 0x2000 && romsize != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -268,7 +265,7 @@ void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int 
 #include "peg400.h"
 //#include "pmse2p.h"
 #include "romp144.h"
-//#include "rs423.h"
+#include "rs423.h"
 #include "sndexp.h"
 #include "sndexp3.h"
 #include "sp64.h"
@@ -290,7 +287,7 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("peg400", ELECTRON_PEG400);
 	//device.option_add_internal("pmse2p", ELECTRON_PMSE2P);
 	device.option_add_internal("romp144", ELECTRON_ROMP144);
-	//device.option_add_internal("rs423", ELECTRON_RS423);
+	device.option_add_internal("rs423", ELECTRON_RS423);
 	device.option_add_internal("sndexp", ELECTRON_SNDEXP);
 	device.option_add_internal("sndexp3", ELECTRON_SNDEXP3);
 	device.option_add_internal("sp64", ELECTRON_SP64);

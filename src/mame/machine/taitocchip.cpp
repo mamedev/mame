@@ -217,7 +217,7 @@ void taito_cchip_device::cchip_map(address_map &map)
 
 void taito_cchip_device::device_add_mconfig(machine_config &config)
 {
-	upd7811_device &upd(UPD7811(config, m_upd7811, DERIVED_CLOCK(1, 1)));
+	upd78c11_device &upd(UPD78C11(config, m_upd7811, DERIVED_CLOCK(1, 1)));
 	upd.set_addrmap(AS_PROGRAM, &taito_cchip_device::cchip_map);
 	upd.pa_in_cb().set([this] { return m_in_pa_cb(); });
 	upd.pb_in_cb().set([this] { return m_in_pb_cb(); });
@@ -226,14 +226,14 @@ void taito_cchip_device::device_add_mconfig(machine_config &config)
 	upd.pb_out_cb().set([this] (u8 data) { m_out_pb_cb(data); });
 	upd.pc_out_cb().set([this] (u8 data) { m_out_pc_cb(data); });
 	upd.pf_out_cb().set([this] (u8 data) { logerror("%s port F written %.2x\n", machine().describe_context(), data); }); // internal? related to locking out the 68k?
-	upd.an0_func().set([this] { return BIT(m_in_ad_cb(), 0); });
-	upd.an1_func().set([this] { return BIT(m_in_ad_cb(), 1); });
-	upd.an2_func().set([this] { return BIT(m_in_ad_cb(), 2); });
-	upd.an3_func().set([this] { return BIT(m_in_ad_cb(), 3); });
-	upd.an4_func().set([this] { return BIT(m_in_ad_cb(), 4); });
-	upd.an5_func().set([this] { return BIT(m_in_ad_cb(), 5); });
-	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6); });
-	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7); });
+	upd.an0_func().set([this] { return BIT(m_in_ad_cb(), 0) ? 0xff : 0; });
+	upd.an1_func().set([this] { return BIT(m_in_ad_cb(), 1) ? 0xff : 0; });
+	upd.an2_func().set([this] { return BIT(m_in_ad_cb(), 2) ? 0xff : 0; });
+	upd.an3_func().set([this] { return BIT(m_in_ad_cb(), 3) ? 0xff : 0; });
+	upd.an4_func().set([this] { return BIT(m_in_ad_cb(), 4) ? 0xff : 0; });
+	upd.an5_func().set([this] { return BIT(m_in_ad_cb(), 5) ? 0xff : 0; });
+	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6) ? 0xff : 0; });
+	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7) ? 0xff : 0; });
 
 	ADDRESS_MAP_BANK(config, m_upd4464_bank, 0);
 	m_upd4464_bank->set_map(&taito_cchip_device::cchip_ram_bank);

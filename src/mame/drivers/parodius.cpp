@@ -14,13 +14,13 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(parodius_state::parodius_videobank_w)
+void parodius_state::parodius_videobank_w(uint8_t data)
 {
 	if (data & 0xf8)
 		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
@@ -37,7 +37,7 @@ WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 	m_bank2000->set_bank((data & 2) >> 1);
 }
 
-WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
+void parodius_state::parodius_3fc0_w(uint8_t data)
 {
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
@@ -52,7 +52,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
+void parodius_state::parodius_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -66,7 +66,7 @@ void parodius_state::sound_nmi_callback( int param )
 }
 #endif
 
-void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -78,7 +78,7 @@ void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
+void parodius_state::sound_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(attotime::from_usec(50), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
@@ -214,7 +214,7 @@ void parodius_state::machine_reset()
 	m_bank2000->set_bank(0);
 }
 
-WRITE8_MEMBER( parodius_state::banking_callback )
+void parodius_state::banking_callback(uint8_t data)
 {
 	if (data & 0xf0)
 		logerror("%s: setlines %02x\n", machine().describe_context(), data);
@@ -251,12 +251,12 @@ void parodius_state::parodius(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette("palette");
-	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback), this);
+	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);
 

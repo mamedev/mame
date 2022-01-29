@@ -64,12 +64,12 @@ private:
 	bool            m_prog;         // previous PROG state
 	bool            m_cs;           // chip select
 
-	devcb_read8     m_readhandler[4];
-	devcb_write8    m_writehandler[4];
+	devcb_read8::array<4> m_readhandler;
+	devcb_write8::array<4> m_writehandler;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8243, i8243_device)
 
-#endif /* __I8243_H__ */
+#endif // MAME_MACHINE_I8243_H

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device, "vcs_control_port"
 //-------------------------------------------------
 
 device_vcs_control_port_interface::device_vcs_control_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "vcsctrl")
 {
 	m_port = dynamic_cast<vcs_control_port_device *>(device.owner());
 }

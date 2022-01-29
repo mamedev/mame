@@ -2,8 +2,8 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    esqkt.c - Ensoniq KT-76, KT-88, and E-Prime
-              Ensoniq TS-10 and TS-12
+    esqkt.cpp - Ensoniq KT-76, KT-88, and E-Prime
+                Ensoniq TS-10 and TS-12
 
     Driver by R. Belmont
 
@@ -102,6 +102,9 @@
 
 #include "speaker.h"
 
+
+namespace {
+
 class esqkt_state : public driver_device
 {
 public:
@@ -118,7 +121,9 @@ public:
 	void kt(machine_config &config);
 	void ts(machine_config &config);
 
-	void init_kt();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<m68000_base_device> m_maincpu;
@@ -128,30 +133,29 @@ private:
 	required_device<esqpanel_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(u8 data);
 
+	u16 *m_rom, *m_ram;
 	u8 m_duart_io;
-	bool  m_bCalibSecondByte;
+	bool  m_bCalibSecondByte; // only set to false on machine_reset()?
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
 	void ts_map(address_map &map);
-
-	u16  *m_rom, *m_ram;
 };
 
 void esqkt_state::machine_start()
 {
 	m_rom = (u16 *)(void *)memregion("osrom")->base();
 	m_ram = (u16 *)(void *)memshare("osram")->ptr();
+	m_duart_io = 0;
+
+	save_item(NAME(m_duart_io));
 }
 
 void esqkt_state::machine_reset()
@@ -190,7 +194,7 @@ WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 	#endif
 }
 
-READ16_MEMBER(esqkt_state::esq5506_read_adc)
+u16 esqkt_state::esq5506_read_adc()
 {
 	switch ((m_duart_io & 7) ^ 7)
 	{
@@ -204,6 +208,8 @@ READ16_MEMBER(esqkt_state::esq5506_read_adc)
 			return 0;
 	}
 
+#ifdef UNUSED
+	// Coverity 315636
 	if (m_duart_io & 1)
 	{
 		return 0x5b00;              // vRef
@@ -212,6 +218,7 @@ READ16_MEMBER(esqkt_state::esq5506_read_adc)
 	{
 		return 0x7f00;              // vBattery
 	}
+#endif
 }
 
 void esqkt_state::es5506_clock_changed(u32 data)
@@ -224,7 +231,7 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-WRITE8_MEMBER(esqkt_state::duart_output)
+void esqkt_state::duart_output(u8 data)
 {
 	m_duart_io = data;
 
@@ -360,9 +367,9 @@ static INPUT_PORTS_START( kt )
 INPUT_PORTS_END
 
 ROM_START( kt76 )
-	ROM_REGION(0x80000, "osrom", 0)
-	ROM_LOAD32_WORD( "kt76_162_lo.bin", 0x000000, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
-	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
+	ROM_REGION32_BE(0x80000, "osrom", 0)
+	ROM_LOAD32_WORD_SWAP( "kt76_162_lo.bin", 0x000002, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
+	ROM_LOAD32_WORD_SWAP( "kt76_162_hi.bin", 0x000000, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
 
 	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "1351000401_rom0.u103", 0x000001, 0x200000, CRC(425047af) SHA1(9680d1fc222b29ba24f0fbf6136982bee87a60ef) )
@@ -405,11 +412,9 @@ ROM_START( ts12 )
 	ROM_REGION(0x400000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-void esqkt_state::init_kt()
-{
-	m_duart_io = 0;
-}
+} // Anonymous namespace
 
-CONS( 1993, ts10, 0, 0, ts, kt, esqkt_state, init_kt, "Ensoniq", "TS-10", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-CONS( 1993, ts12, 0, 0, ts, kt, esqkt_state, init_kt, "Ensoniq", "TS-12", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, init_kt, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )
+
+CONS( 1993, ts10, 0, 0, ts, kt, esqkt_state, empty_init, "Ensoniq", "TS-10", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+CONS( 1993, ts12, 0, 0, ts, kt, esqkt_state, empty_init, "Ensoniq", "TS-12", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, empty_init, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )

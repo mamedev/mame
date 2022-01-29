@@ -59,7 +59,7 @@ void clowndwn_state::machine_reset()
 void clowndwn_state::clowndwn(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, 8000000); // unknown type and clock
+	M6808(config, m_maincpu, 8000000); // unknown type and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &clowndwn_state::clowndwn_map);
 
 	PIA6821(config, "pia0", 0);

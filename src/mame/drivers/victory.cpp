@@ -110,7 +110,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::lamp_control_w)
+void victory_state::lamp_control_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 7);
 	m_lamps[1] = BIT(data, 6);

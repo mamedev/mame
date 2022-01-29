@@ -270,16 +270,19 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define LOG     0
 
@@ -308,24 +311,16 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
-	DECLARE_READ8_MEMBER( irq_clear_r );
-	DECLARE_WRITE8_MEMBER( irq_clear_w );
-	DECLARE_READ8_MEMBER( irq_enable_r );
-	DECLARE_WRITE8_MEMBER( irq_enable_w );
-	DECLARE_READ8_MEMBER( unk_a0_r );
-	DECLARE_WRITE8_MEMBER( lcd_memory_start_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( banking_w );
+	uint8_t irq_clear_r();
+	void irq_clear_w(uint8_t data);
+	uint8_t irq_enable_r();
+	void irq_enable_w(uint8_t data);
+	uint8_t unk_a0_r();
+	void lcd_memory_start_w(uint8_t data);
+	uint8_t keyboard_r();
+	void banking_w(offs_t offset, uint8_t data);
 	void update_banks();
-	void bank_w(uint8_t banknr, offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( bank0_w );
-	DECLARE_WRITE8_MEMBER( bank1_w );
-	DECLARE_WRITE8_MEMBER( bank2_w );
-	DECLARE_WRITE8_MEMBER( bank3_w );
-	DECLARE_WRITE8_MEMBER( bank4_w );
-	DECLARE_WRITE8_MEMBER( bank5_w );
-	DECLARE_WRITE8_MEMBER( bank6_w );
-	DECLARE_WRITE8_MEMBER( bank7_w );
+	template <unsigned N> void bank_w(offs_t offset, uint8_t data);
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
@@ -376,44 +371,36 @@ void nakajies_state::update_banks()
 			m_bank_base[i] = &m_rom_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_rom_size];
 		}
 	}
-	membank( "bank0" )->set_base( m_bank_base[0] );
-	membank( "bank1" )->set_base( m_bank_base[1] );
-	membank( "bank2" )->set_base( m_bank_base[2] );
-	membank( "bank3" )->set_base( m_bank_base[3] );
-	membank( "bank4" )->set_base( m_bank_base[4] );
-	membank( "bank5" )->set_base( m_bank_base[5] );
-	membank( "bank6" )->set_base( m_bank_base[6] );
-	membank( "bank7" )->set_base( m_bank_base[7] );
+	membank( "bank0" )->set_base(m_bank_base[0]);
+	membank( "bank1" )->set_base(m_bank_base[1]);
+	membank( "bank2" )->set_base(m_bank_base[2]);
+	membank( "bank3" )->set_base(m_bank_base[3]);
+	membank( "bank4" )->set_base(m_bank_base[4]);
+	membank( "bank5" )->set_base(m_bank_base[5]);
+	membank( "bank6" )->set_base(m_bank_base[6]);
+	membank( "bank7" )->set_base(m_bank_base[7]);
 }
 
-void nakajies_state::bank_w( uint8_t banknr, offs_t offset, uint8_t data )
+template <unsigned N>
+void nakajies_state::bank_w(offs_t offset, uint8_t data)
 {
-	if ( m_bank[banknr] & 0x10 )
+	if (m_bank[N] & 0x10)
 	{
-		m_bank_base[banknr][offset] = data;
+		m_bank_base[N][offset] = data;
 	}
 }
-
-WRITE8_MEMBER( nakajies_state::bank0_w ) { bank_w( 0, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank1_w ) { bank_w( 1, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank2_w ) { bank_w( 2, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank3_w ) { bank_w( 3, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank4_w ) { bank_w( 4, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank5_w ) { bank_w( 5, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank6_w ) { bank_w( 6, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 
 void nakajies_state::nakajies_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank0_w));
-	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank1_w));
-	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank2_w));
-	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank3_w));
-	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank4_w));
-	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank5_w));
-	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank6_w));
-	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank7_w));
+	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank_w<0>));
+	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank_w<1>));
+	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank_w<2>));
+	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank_w<3>));
+	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank_w<4>));
+	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank_w<5>));
+	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank_w<6>));
+	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank_w<7>));
 }
 
 
@@ -449,26 +436,26 @@ void nakajies_state::nakajies_update_irqs()
 }
 
 
-READ8_MEMBER( nakajies_state::irq_clear_r )
+uint8_t nakajies_state::irq_clear_r()
 {
 	return 0x00;
 }
 
 
-WRITE8_MEMBER( nakajies_state::irq_clear_w )
+void nakajies_state::irq_clear_w(uint8_t data)
 {
 	m_irq_active &= ~data;
 	nakajies_update_irqs();
 }
 
 
-READ8_MEMBER( nakajies_state::irq_enable_r )
+uint8_t nakajies_state::irq_enable_r()
 {
 	return m_irq_enabled;
 }
 
 
-WRITE8_MEMBER( nakajies_state::irq_enable_w )
+void nakajies_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enabled = data;
 	nakajies_update_irqs();
@@ -481,25 +468,25 @@ WRITE8_MEMBER( nakajies_state::irq_enable_w )
   bit 3   - battery low (when set)
   bit 2-0 - unknown
 */
-READ8_MEMBER( nakajies_state::unk_a0_r )
+uint8_t nakajies_state::unk_a0_r()
 {
 	return 0xf7;
 }
 
-WRITE8_MEMBER( nakajies_state::lcd_memory_start_w )
+void nakajies_state::lcd_memory_start_w(uint8_t data)
 {
 	m_lcd_memory_start = data;
 }
 
 
-WRITE8_MEMBER( nakajies_state::banking_w )
+void nakajies_state::banking_w(offs_t offset, uint8_t data)
 {
 	m_bank[offset] = data;
 	update_banks();
 }
 
 
-READ8_MEMBER( nakajies_state::keyboard_r )
+uint8_t nakajies_state::keyboard_r()
 {
 	static const char *const bitnames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 											"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
@@ -685,7 +672,7 @@ uint32_t nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for (int px=0; px<8; px++)
 			{
-				bitmap.pix16(y, (x * 8) + px) = BIT(data, 7);
+				bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
 				data <<= 1;
 			}
 		}
@@ -842,6 +829,8 @@ ROM_START( es210_es )
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD("nakajima_es.ic303", 0x00000, 0x80000, CRC(214d73ce) SHA1(ce9967c5b2d122ebebe9401278d8ea374e8fb289))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS

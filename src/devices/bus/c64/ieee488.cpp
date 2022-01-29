@@ -23,14 +23,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
+uint8_t c64_ieee488_device::tpi_pa_r()
 {
 	/*
 
@@ -59,7 +59,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
+void c64_ieee488_device::tpi_pa_w(uint8_t data)
 {
 	/*
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
 	m_bus->host_nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
+uint8_t c64_ieee488_device::tpi_pc_r(offs_t offset)
 {
 	/*
 
@@ -111,7 +111,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
+void c64_ieee488_device::tpi_pc_w(uint8_t data)
 {
 	/*
 

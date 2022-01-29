@@ -49,6 +49,8 @@ public:
 		, m_soundbank(*this, "soundbank")
 		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
 		, m_romboard(ROM_BOARD_INVALID)
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_grayscale_enable(false)
 		, m_vdp_enable(false)
 		, m_vdp_mixing(0)
@@ -80,21 +82,21 @@ private:
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
-	DECLARE_WRITE16_MEMBER( rom_5987_bank_w );
-	DECLARE_WRITE16_MEMBER( rom_837_7525_bank_w );
-	DECLARE_WRITE8_MEMBER( misc_outputs_w );
-	DECLARE_READ16_MEMBER( misc_io_r );
-	DECLARE_WRITE16_MEMBER( misc_io_w );
-	DECLARE_WRITE8_MEMBER( soundbank_w );
+	void rom_5874_bank_w(uint8_t data);
+	void rom_5987_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rom_837_7525_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void misc_outputs_w(uint8_t data);
+	uint16_t misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void soundbank_w(uint8_t data);
 
 	// custom I/O
-	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
-	DECLARE_READ16_MEMBER( lghost_custom_io_r );
-	DECLARE_WRITE8_MEMBER( lghost_gun_recoil_w );
-	DECLARE_WRITE16_MEMBER( lghost_custom_io_w );
-	DECLARE_READ16_MEMBER( wwally_custom_io_r );
-	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );
+	uint16_t ddcrew_custom_io_r(offs_t offset);
+	uint16_t lghost_custom_io_r(offs_t offset);
+	void lghost_gun_recoil_w(uint8_t data);
+	void lghost_custom_io_w(offs_t offset, uint16_t data);
+	uint16_t wwally_custom_io_r(offs_t offset);
+	void wwally_custom_io_w(offs_t offset, uint16_t data);
 
 	// video rendering
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -103,10 +105,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
 
-	DECLARE_READ16_MEMBER( genesis_vdp_r ) { return m_vdp->vdp_r(offset, mem_mask); }
-	DECLARE_WRITE16_MEMBER( genesis_vdp_w ) { m_vdp->vdp_w(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space, offset, data, mem_mask); }
+	uint16_t genesis_vdp_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_vdp->vdp_r(offset, mem_mask); }
+	void genesis_vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_vdp->vdp_w(offset, data, mem_mask); }
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset, data, mem_mask); }
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset, data, mem_mask); }
 
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
@@ -138,7 +140,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void init_generic(segas18_rom_board rom_board);
@@ -170,8 +172,8 @@ private:
 
 	// configuration
 	segas18_rom_board   m_romboard;
-	read16_delegate     m_custom_io_r;
-	write16_delegate    m_custom_io_w;
+	read16sm_delegate   m_custom_io_r;
+	write16sm_delegate  m_custom_io_w;
 
 	// internal state
 	int                 m_grayscale_enable;

@@ -62,7 +62,7 @@ void tvcapcom_state::tvcapcom(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvcapcom_state::gc_map);
 	m_maincpu->set_disable();
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */

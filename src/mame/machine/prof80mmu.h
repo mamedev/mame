@@ -25,7 +25,7 @@ public:
 
 	virtual void z80_program_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER( par_w );
+	void par_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( mme_w );
 
 	void program_map(address_map &map);
@@ -36,8 +36,8 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_READ8_MEMBER( program_r );
-	DECLARE_WRITE8_MEMBER( program_w );
+	uint8_t program_r(offs_t offset);
+	void program_w(offs_t offset, uint8_t data);
 
 private:
 	const address_space_config m_program_space_config;

@@ -277,7 +277,7 @@ u8 ucom4_cpu_device::input_r(int index)
 		case PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
-			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+			logerror("read from unknown port %c at $%03X\n", 'A' + index, m_prev_pc);
 			break;
 	}
 
@@ -300,7 +300,7 @@ void ucom4_cpu_device::output_w(int index, u8 data)
 		case PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
-			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+			logerror("write to unknown port %c = $%X at $%03X\n", 'A' + index, data, m_prev_pc);
 			break;
 	}
 
@@ -315,7 +315,7 @@ u8 upd557l_cpu_device::input_r(int index)
 	index &= 0xf;
 
 	if (index == PORTB)
-		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+		logerror("read from unknown port %c at $%03X\n", 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
 
@@ -328,7 +328,7 @@ void upd557l_cpu_device::output_w(int index, u8 data)
 	data &= 0xf;
 
 	if (index == PORTH || index == PORTI)
-		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+		logerror("write to unknown port %c = $%X at $%03X\n", 'A' + index, data, m_prev_pc);
 	else
 	{
 		// only G0 for port G
@@ -402,18 +402,15 @@ void ucom4_cpu_device::execute_run()
 	{
 		// handle interrupt, but not during LI($9x) or EI($31) or while skipping
 		if (m_int_f && m_inte_f && (m_op & 0xf0) != 0x90 && m_op != 0x31 && !m_skip)
-		{
 			do_interrupt();
-			if (m_icount <= 0)
-				break;
-		}
 
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(m_pc);
+		if (!m_skip)
+			debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);

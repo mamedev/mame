@@ -36,15 +36,11 @@ DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_exp
 //-------------------------------------------------
 
 device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
-	m_c1l(*this, "c1l"),
-	m_c1h(*this, "c1h"),
-	m_c2l(*this, "c2l"),
-	m_c2h(*this, "c2h"),
-	m_c1l_mask(0),
-	m_c1h_mask(0),
-	m_c2l_mask(0),
-	m_c2h_mask(0)
+	device_interface(device, "plus4exp"),
+	m_c1l_size(0),
+	m_c1h_size(0),
+	m_c2l_size(0),
+	m_c2h_size(0)
 {
 	m_slot = dynamic_cast<plus4_expansion_slot_device *>(device.owner());
 }
@@ -70,25 +66,14 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PLUS4_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_single_card_slot_interface<device_plus4_expansion_card_interface>(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_read_dma_cd(*this),
 	m_write_dma_cd(*this),
-	m_write_aec(*this), m_card(nullptr)
+	m_write_aec(*this),
+	m_card(nullptr)
 {
-}
-
-
-//-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_plus4_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
 }
 
 
@@ -98,33 +83,13 @@ void plus4_expansion_slot_device::device_validity_check(validity_checker &valid)
 
 void plus4_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
 	m_read_dma_cd.resolve_safe(0xff);
 	m_write_dma_cd.resolve_safe();
 	m_write_aec.resolve_safe();
-
-	// inherit bus clock
-	if (clock() == 0)
-	{
-		plus4_expansion_slot_device *root = machine().device<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::device_reset()
-{
 }
 
 
@@ -146,6 +111,16 @@ image_init_result plus4_expansion_slot_device::call_load()
 			load_software_region("c1h", m_card->m_c1h);
 			load_software_region("c2l", m_card->m_c2l);
 			load_software_region("c2h", m_card->m_c2h);
+			m_card->m_c1l_size = get_software_region_length("c1l");
+			m_card->m_c1h_size = get_software_region_length("c1h");
+			m_card->m_c2l_size = get_software_region_length("c2l");
+			m_card->m_c2h_size = get_software_region_length("c2h");
+
+			if ((m_card->m_c1l_size & (m_card->m_c1l_size - 1)) || (m_card->m_c1h_size & (m_card->m_c1h_size - 1)) || (m_card->m_c2l_size & (m_card->m_c2l_size - 1)) || (m_card->m_c2h_size & (m_card->m_c2h_size - 1)))
+			{
+				seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
+				return image_init_result::FAIL;
+			}
 		}
 	}
 

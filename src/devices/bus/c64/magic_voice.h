@@ -48,10 +48,10 @@ private:
 	offs_t get_offset(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( tpi_irq_w );
-	DECLARE_READ8_MEMBER( tpi_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi_pa_w );
-	DECLARE_READ8_MEMBER( tpi_pb_r );
-	DECLARE_WRITE8_MEMBER( tpi_pb_w );
+	uint8_t tpi_pa_r();
+	void tpi_pa_w(uint8_t data);
+	uint8_t tpi_pb_r();
+	void tpi_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tpi_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi_cb_w );
 

@@ -16,32 +16,26 @@ Hewlett-Packard 9000/3xx Layout
 	</element>
 
 	<repeat count="8">
-	<param name="num" start="7" increment="-1" />
+		<param name="num" start="7" increment="-1" />
 		<element name="led_diag_~num~s"> <text string="~num~"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
 	</repeat>
 	<element name="led_power_s"> <text string="Power"> <color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<group name="panel">
-		<bezel element="background"><bounds x="0" y="0" width="~scr0width~" height="64"/></bezel>
+		<element ref="background"><bounds x="0" y="0" width="~scr0width~" height="64"/></element>
 		<repeat count="8">
-		<param name="left" start="100" increment="20" />
-		<param name="right" start="116" increment="20" />
-		<param name="num" start="7" increment="-1" />
-			<bezel name="led_diag_~num~s" element="led_diag_~num~s"><bounds left="~left~" right="~right~" top="8" bottom="24"/></bezel>
-			<bezel name="led_diag_~num~" element="ledr"><bounds left="~left~" right="~right~" top="32" bottom="48"/></bezel>
+			<param name="left" start="100" increment="20" />
+			<param name="right" start="116" increment="20" />
+			<param name="num" start="7" increment="-1" />
+			<element name="led_diag_~num~s" ref="led_diag_~num~s"><bounds left="~left~" right="~right~" top="8" bottom="24"/></element>
+			<element name="led_diag_~num~" ref="ledr"><bounds left="~left~" right="~right~" top="32" bottom="48"/></element>
 		</repeat>
-		<bezel name="led_power_s" element="led_power_s"><bounds left="20" top="8" right="56" bottom="24"/></bezel>
-		<bezel name="led_power"  element="ledg"><bounds left="28" right="44" top="32" bottom="48"/></bezel>
+		<element name="led_power_s" ref="led_power_s"><bounds left="20" top="8" right="56" bottom="24"/></element>
+		<element name="led_power"  ref="ledg"><bounds left="28" right="44" top="32" bottom="48"/></element>
 	</group>
 
 	<view name="HP9000/3xx">
 		<screen index="0"><bounds x="0" y="0" width="~scr0width~" height="~scr0height~"/></screen>
 		<group ref="panel"><bounds x="0" y="~scr0height~" width="~scr0width~" height="64"/></group>
-	</view>
-
-	<view name="Screen">
-		<screen index="0">
-			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
-		</screen>
 	</view>
 </mamelayout>

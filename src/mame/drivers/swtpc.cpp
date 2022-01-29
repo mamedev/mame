@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,68bit
+// copyright-holders:68bit
 /***************************************************************************
 
         SWTPC 6800 Computer System
@@ -109,13 +109,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
 		, m_brg(*this, "brg")
-		, m_maincpu_clock(*this, "maincpu_clock")
-		, m_swtbug_ready_wait(*this, "swtbug_ready_wait")
-		, m_swtbug_load_at_a100(*this, "swtbug_load_at_a100")
+		, m_maincpu_clock(*this, "MAINCPU_CLOCK")
+		, m_swtbug_load_at_a100(*this, "SWTBUG_LOAD_AT_A100")
 	{ }
 
 	void swtpcm(machine_config &config);
 	void swtpc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
 
 private:
 	virtual void machine_reset() override;
@@ -127,7 +128,6 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<mc14411_device> m_brg;
 	required_ioport m_maincpu_clock;
-	required_ioport m_swtbug_ready_wait;
 	required_ioport m_swtbug_load_at_a100;
 };
 
@@ -158,24 +158,13 @@ static INPUT_PORTS_START( swtpc )
 	// the CPU clock and the frequency was variable. The 6800 was
 	// available at speeds up to 2MHz so that might not have been
 	// impossible. An overclock option of 4MHz is also implemented.
-	PORT_START("maincpu_clock")
-	PORT_CONFNAME(0xffffff, 1000000, "CPU clock")
+	PORT_START("MAINCPU_CLOCK")
+	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc_state, maincpu_clock_change, 0)
 	PORT_CONFSETTING( 898550, "0.89855 MHz")  // MIKBUG
 	PORT_CONFSETTING( 921600, "0.92160 MHz")  // SWTPC
 	PORT_CONFSETTING(1000000, "1.0 MHz")
 	PORT_CONFSETTING(2000000, "2.0 MHz")
 	PORT_CONFSETTING(4000000, "4.0 MHz")
-
-	// Patch the SWTBUG to wait for the motor to start. The SWTBUG
-	// accesses the FDC control register and then waits a period for the
-	// motor to start. Unfortunately the DC series of FDCs do not trigger
-	// the motor when accessing the control register, the drive does not
-	// have time to become ready before commands are issued and the boot
-	// fails. This workaround is necessary in practice.
-	PORT_START("swtbug_ready_wait")
-	PORT_CONFNAME(0x1, 1, "SWTBUG ready wait patch")
-	PORT_CONFSETTING(0, "No")
-	PORT_CONFSETTING(1, "Yes - apply patch")
 
 	// Patch SWTBUG to load the disk boot code at 0xa100 rather than
 	// 0x2400. The disk boot code is typically position dependent and many
@@ -184,7 +173,7 @@ static INPUT_PORTS_START( swtpc )
 	// 0xa100 or perhaps better implement support for the high PROM to
 	// allow custom code to be used which is needed anyway as even NEWBUG
 	// appears to have issues and is not optimized for the DC5 FDC.
-	PORT_START("swtbug_load_at_a100")
+	PORT_START("SWTBUG_LOAD_AT_A100")
 	PORT_CONFNAME(0x1, 1, "SWTBUG disk boot patch, to load at 0xa100")
 	PORT_CONFSETTING(0, "No")
 	PORT_CONFSETTING(1, "Yes - apply patch")
@@ -192,8 +181,14 @@ static INPUT_PORTS_START( swtpc )
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( dc5 )
-	DEVICE_INPUT_DEFAULTS("address_mode", 0xf, 0)
+	DEVICE_INPUT_DEFAULTS("ADDRESS_MODE", 0x1, 0)
+	DEVICE_INPUT_DEFAULTS("FORCE_READY", 0x1, 1)
 DEVICE_INPUT_DEFAULTS_END
+
+INPUT_CHANGED_MEMBER(swtpc_state::maincpu_clock_change)
+{
+	m_maincpu->set_clock(newval);
+}
 
 void swtpc_state::machine_reset()
 {
@@ -202,13 +197,6 @@ void swtpc_state::machine_reset()
 		m_maincpu->set_clock(maincpu_clock);
 
 	// TODO make these SWTBUG patches conditional on using SWTBUG!
-
-	if (m_swtbug_ready_wait->read())
-	{
-		// Patch SWTBUG to also wait until the drive is ready.
-		uint8_t* swtbug = memregion("mcm6830")->base();
-		swtbug[0x029b] = 0x81;
-	}
 
 	if (m_swtbug_load_at_a100->read())
 	{

@@ -8,14 +8,14 @@
 
 *********************************************************************/
 
-#include <string.h>
-#include <time.h>
-#include <assert.h>
+#include <cstring>
+#include <ctime>
+#include <cassert>
 
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
 #include "formats/imageutl.h"
-#include "coretmpl.h"
+#include "opresolv.h"
 #include <algorithm>
 
 /* -----------------------------------------------------------------------

@@ -44,10 +44,10 @@ device_memory_interface::space_config_vector turrett_device::memory_space_config
 void turrett_device::device_start()
 {
 	// Find our direct access
-	m_cache = space().cache<1, 0, ENDIANNESS_LITTLE>();
+	space().cache(m_cache);
 
 	// Create the sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 44100);
 
 	// Create the volume table
 	for (int i = 0; i < 0x4f; ++i)
@@ -81,17 +81,14 @@ void turrett_device::device_reset()
 //  sound_stream_update - update sound stream
 //-------------------------------------------------
 
-void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void turrett_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// Silence the buffers
-	memset(outputs[0], 0x00, sizeof(stream_sample_t) * samples);
-	memset(outputs[1], 0x00, sizeof(stream_sample_t) * samples);
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (int ch = 0; ch < SOUND_CHANNELS; ++ch)
 	{
-		stream_sample_t *l = outputs[0];
-		stream_sample_t *r = outputs[1];
-
 		if (m_channels[ch].m_playing)
 		{
 			uint32_t &addr = m_channels[ch].m_address;
@@ -104,9 +101,9 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			// Channels 30 and 31 expect interleaved stereo samples
 			uint32_t incr = (ch >= 30) ? 2 : 1;
 
-			for (int s = 0; s < samples; ++s)
+			for (int s = 0; s < outputs[0].samples(); ++s)
 			{
-				int16_t sample = m_cache->read_word(addr << 1);
+				int16_t sample = m_cache.read_word(addr << 1);
 
 				if ((uint16_t)sample == 0x8000)
 				{
@@ -116,8 +113,8 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 				addr += incr;
 
-				*l++ += (sample * lvol) >> 17;
-				*r++ += (sample * rvol) >> 17;
+				outputs[0].add_int(s, (sample * lvol) >> 17, 32768);
+				outputs[1].add_int(s, (sample * rvol) >> 17, 32768);
 			}
 		}
 	}
@@ -128,7 +125,7 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read - host CPU read access
 //-------------------------------------------------
 
-READ32_MEMBER( turrett_device::read )
+uint32_t turrett_device::read(offs_t offset)
 {
 	m_stream->update();
 
@@ -142,7 +139,7 @@ READ32_MEMBER( turrett_device::read )
 //  write - host CPU write access
 //-------------------------------------------------
 
-WRITE32_MEMBER( turrett_device::write )
+void turrett_device::write(offs_t offset, uint32_t data)
 {
 	m_stream->update();
 

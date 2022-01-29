@@ -83,7 +83,7 @@
 #include "includes/laserbat.h"
 
 
-WRITE8_MEMBER(laserbat_state_base::videoram_w)
+void laserbat_state_base::videoram_w(offs_t offset, uint8_t data)
 {
 	if (!m_mpx_bkeff)
 		m_bg_ram[offset] = data;
@@ -91,19 +91,19 @@ WRITE8_MEMBER(laserbat_state_base::videoram_w)
 		m_eff_ram[offset & 0x1ff] = data; // A9 is not connected, only half the chip is used
 }
 
-WRITE8_MEMBER(laserbat_state_base::wcoh_w)
+void laserbat_state_base::wcoh_w(uint8_t data)
 {
 	// sprite horizontal offset
 	m_wcoh = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::wcov_w)
+void laserbat_state_base::wcov_w(uint8_t data)
 {
 	// sprite vertical offset
 	m_wcov = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::cnt_eff_w)
+void laserbat_state_base::cnt_eff_w(uint8_t data)
 {
 	/*
 	    +-----+-------------+-----------------------------------------------+
@@ -131,7 +131,7 @@ WRITE8_MEMBER(laserbat_state_base::cnt_eff_w)
 //  popmessage("effect: 0x%02X", data);
 }
 
-WRITE8_MEMBER(laserbat_state_base::cnt_nav_w)
+void laserbat_state_base::cnt_nav_w(uint8_t data)
 {
 	/*
 	    +-----+-----------+--------------------------------------+
@@ -157,18 +157,6 @@ WRITE8_MEMBER(laserbat_state_base::cnt_nav_w)
 }
 
 
-void laserbat_state_base::video_start()
-{
-	// we render straight from ROM
-	m_gfx1 = memregion("gfx1")->base();
-	m_gfx2 = memregion("gfx2")->base();
-
-	// start rendering scanlines
-	m_screen->register_screen_bitmap(m_bitmap);
-	m_scanline_timer->adjust(m_screen->time_until_pos(1, 0));
-}
-
-
 uint32_t laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool const flip_y = flip_screen_y(), flip_x = flip_screen_x();
@@ -177,8 +165,8 @@ uint32_t laserbat_state_base::screen_update_laserbat(screen_device &screen, bitm
 
 	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
 	{
-		uint16_t const *const src = &m_bitmap.pix16(flip_y ? (offs_y - y) : y);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &m_bitmap.pix(flip_y ? (offs_y - y) : y);
+		uint16_t *dst = &bitmap.pix(y);
 		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
 		{
 			dst[x] = uint16_t(m_gfxmix->read(src[flip_x ? (offs_x - x) : x]));
@@ -223,7 +211,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	int const max_x = m_screen->visible_area().max_x;
 	int const x_offset = min_x - (8 * 3);
 	int const y_offset = m_screen->visible_area().min_y - 8;
-	uint16_t *const row = &m_bitmap.pix16(y);
+	uint16_t *const row = &m_bitmap.pix(y);
 
 	// wait for next scanline
 	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
@@ -241,9 +229,9 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		m_pvi[1]->render_next_line();
 		m_pvi[2]->render_next_line();
 	}
-	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix16(y);
-	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix16(y);
-	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix16(y);
+	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix(y);
+	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix(y);
+	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix(y);
 
 	// don't draw outside the visible area
 	m_bitmap.plot_box(0, y, m_bitmap.width(), 1, 0);
@@ -281,16 +269,14 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	for (int x = 0, px = x_offset; max_x >= px; x++)
 	{
 		// calculate area effects
-		// I have no idea where the magical x offset comes from but it's necessary
-		bool const right_half = bool((x + 0) & 0x80);
-		bool const eff1_cmp = right_half ? (uint8_t((x + 0) & 0x7f) < (eff1_val & 0x7f)) : (uint8_t((x + 0) & 0x7f) > (~eff1_val & 0x7f));
-		bool const eff2_cmp = right_half ? (uint8_t((x + 0) & 0x7f) < (eff2_val & 0x7f)) : (uint8_t((x + 0) & 0x7f) > (~eff2_val & 0x7f));
+		bool const right_half = bool(x & 0x80);
+		bool const eff1_cmp = right_half ? (uint8_t(x & 0x7f) < (eff1_val & 0x7f)) : (uint8_t(x & 0x7f) > (~eff1_val & 0x7f));
+		bool const eff2_cmp = right_half ? ((uint8_t(x & 0x7f) | m_eff2_mask) < ((eff2_val & 0x7f) | m_eff2_mask)) : ((uint8_t(x & 0x7f) | m_eff2_mask) > ((~eff2_val & 0x7f) | m_eff2_mask));
 		bool const eff1 = m_abeff1 && (m_neg1 ? !eff1_cmp : eff1_cmp);
 		bool const eff2 = m_abeff2 && (m_neg2 ? !eff2_cmp : eff2_cmp) && m_mpx_eff2_sh;
 
 		// calculate shell point effect
-		// using the same magical offset as the area effects
-		bool const shell = m_abeff2 && (uint8_t((x + 0) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
+		bool const shell = m_abeff2 && ((uint8_t(x & 0xff) | m_eff2_mask) == ((eff2_val & 0xff) | m_eff2_mask)) && !m_mpx_eff2_sh;
 
 		// set effect bits, and mix in PVI graphics while we're here
 		uint16_t const effect_bits = (shell ? 0x0800 : 0x0000) | (eff1 ? 0x1000 : 0x0000) | (eff2 ? 0x2000 : 0x0000);
@@ -305,7 +291,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	}
 
 	// render the TTL-generated sprite
-	// more magic offsets here I don't understand the source of
+	// magic offsets here I don't understand the source of
 	if (m_nave)
 	{
 		int const sprite_row = y + y_offset - ((256 - m_wcov) & 0x0ff);
@@ -313,7 +299,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		{
 			for (unsigned byte = 0, x = x_offset + (3 * ((256 - m_wcoh + 5) & 0x0ff)); 8 > byte; byte++)
 			{
-				uint8_t bits = m_gfx2[((m_shp << 8) & 0x700) | ((sprite_row << 3) & 0x0f8) | (byte & 0x07)];
+				uint8_t bits = m_gfx2[m_gfx2_base | ((m_shp << 8) & 0x700) | ((sprite_row << 3) & 0x0f8) | (byte & 0x07)];
 				for (unsigned pixel = 0; 4 > pixel; pixel++, bits <<= 2)
 				{
 					if (max_x >= x) row[x++] |= (bits >> 6) & 0x03;

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="nes_datach" description="Nintendo Entertainment System - Datach Joint ROM System mini-cartridges">
 
 	<software name="dtc_brsh" supported="partial">
@@ -96,7 +99,7 @@
 			<feature name="slot" value="datach_rom" />
 			<feature name="pcb" value="BANDAI-DATACH" />
 			<dataarea name="rom" size="262144">
-				<rom name="datach - ultraman club - supokon fight! (japan).prg" size="262144" crc="5b457641" sha1="533170d5eb685231ccd27b9c136ffa4fad68a7b8" offset="00000" status="baddump" />
+				<rom name="datach - ultraman club - supokon fight (japan).prg" size="262144" crc="5b457641" sha1="533170d5eb685231ccd27b9c136ffa4fad68a7b8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

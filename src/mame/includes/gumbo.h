@@ -42,8 +42,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE16_MEMBER(gumbo_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(gumbo_fg_videoram_w);
+	void gumbo_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gumbo_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_gumbo_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_gumbo_fg_tile_info);
 	uint32_t screen_update_gumbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -38,6 +38,7 @@ public:
 
 	// configuration helpers
 	auto scanline_int_cb() { return m_scanline_int_cb.bind(); }
+	void set_xoffsets(int xoffset, int xoffset2) { m_pf_xoffset = xoffset; m_pf2_xoffset = xoffset2; }
 
 	// getters
 	tilemap_device &alpha() const { return *m_alpha_tilemap; }
@@ -46,21 +47,21 @@ public:
 	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
-	DECLARE_READ16_MEMBER(control_read);
-	DECLARE_WRITE16_MEMBER(control_write);
+	uint16_t control_read(offs_t offset);
+	void control_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER(alpha_w);
-	DECLARE_WRITE16_MEMBER(playfield_upper_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_lsb_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_msb_w);
-	DECLARE_WRITE16_MEMBER(playfield2_latched_msb_w);
+	void alpha_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_latched_lsb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield2_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// timer IDs
@@ -102,6 +103,9 @@ private:
 	uint32_t              m_mo_yscroll;              // sprite xscroll
 
 	uint16_t              m_control[0x40/2];          // control data
+
+	int m_pf_xoffset;
+	int m_pf2_xoffset;
 };
 
 

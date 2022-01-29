@@ -873,13 +873,13 @@ void arkanoid_state::hexa_map(address_map &map)
 	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 }
 
-READ8_MEMBER(arkanoid_state::hexaa_f000_r)
+uint8_t arkanoid_state::hexaa_f000_r()
 {
 //  return m_hexaa_from_sub;
 	return machine().rand();
 }
 
-WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
+void arkanoid_state::hexaa_f000_w(uint8_t data)
 {
 	m_hexaa_from_main = data;
 }
@@ -904,12 +904,12 @@ void arkanoid_state::hexaa_sub_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
+void arkanoid_state::hexaa_sub_80_w(uint8_t data)
 {
 	m_hexaa_from_sub = data;
 }
 
-READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
+uint8_t arkanoid_state::hexaa_sub_90_r()
 {
 	return m_hexaa_from_main;
 //  return machine().rand();
@@ -1350,7 +1350,7 @@ void arkanoid_state::arkanoid(machine_config &config)
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set(FUNC(arkanoid_state::input_mux_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
+	config.set_maximum_quantum(attotime::from_hz(6000));                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2112,12 +2112,12 @@ ROM_END
 
 /* Driver Initialization */
 
-void arkanoid_state::arkanoid_bootleg_init(  )
+void arkanoid_state::arkanoid_bootleg_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f000_r),this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f002_r),this) );
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d018_w),this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8smo_delegate(*this, FUNC(arkanoid_state::arkanoid_bootleg_f000_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8smo_delegate(*this, FUNC(arkanoid_state::arkanoid_bootleg_f002_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8smo_delegate(*this, FUNC(arkanoid_state::arkanoid_bootleg_d018_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8smo_delegate(*this, FUNC(arkanoid_state::arkanoid_bootleg_d008_r)));
 }
 
 void arkanoid_state::init_arkangc()
@@ -2195,12 +2195,12 @@ void arkanoid_state::init_tetrsark()
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8smo_delegate(*this, FUNC(arkanoid_state::tetrsark_d008_w)));
 }
 
 void arkanoid_state::init_tetrsark2()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8smo_delegate(*this, FUNC(arkanoid_state::tetrsark_d008_w)));
 }
 
 

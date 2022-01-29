@@ -11,8 +11,8 @@
 #define ALTO2_ETHER_PACKET_SIZE 0400            //!< size of a packet in words
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2ETHER_H_
-#define _A2ETHER_H_
+#ifndef MAME_CPU_ALTO2_A2ETHER_H
+#define MAME_CPU_ALTO2_A2ETHER_H
 //! BUS source for ethernet task
 enum {
 	bs_ether_eidfct     = bs_task_3             //!< ethernet task: Ethernet input data function
@@ -37,9 +37,9 @@ enum {
 												//!< f2 (1111): undefined
 };
 
-uint8_t* m_ether_a41;                             //!< BPROM; P3601-1; 256x4; enet.a41 "PE1"
-uint8_t* m_ether_a42;                             //!< BPROM; P3601-1; 256x4; enet.a42 "PE2"
-uint8_t* m_ether_a49;                             //!< BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
+std::unique_ptr<uint8_t[]> m_ether_a41;                             //!< BPROM; P3601-1; 256x4; enet.a41 "PE1"
+std::unique_ptr<uint8_t[]> m_ether_a42;                             //!< BPROM; P3601-1; 256x4; enet.a42 "PE2"
+std::unique_ptr<uint8_t[]> m_ether_a49;                             //!< BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
 enum {
 	ether_a49_BE    = (1 << 0),                 //!< buffer empty
 	ether_a49_BNE   = (1 << 1),                 //!< buffer next empty
@@ -112,5 +112,5 @@ void update_tclk(int tclk);                     //!< update all JK flip-flops fo
 void init_ether(int task = task_ether);         //!< initialize the ethernet task
 void exit_ether();                              //!< deinitialize the ethernet task
 void reset_ether();                             //!< reset the ethernet task
-#endif // _A2ETHER_H_
+#endif // MAME_CPU_ALTO2_A2ETHER_H
 #endif  // ALTO2_DEFINE_CONSTANTS

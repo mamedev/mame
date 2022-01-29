@@ -7,7 +7,6 @@
 
 #include "tilemap.h"
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
 
@@ -19,13 +18,15 @@ class k052109_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
+	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)>;
+
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto firq_handler() { return m_firq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb = k052109_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
 	void set_char_ram(bool ram);
 
 	/*
@@ -57,6 +58,8 @@ public:
 
 	void vblank_callback(screen_device &screen, bool state);
 
+	void set_xy_offset(int dx, int dy);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,9 +88,11 @@ private:
 	uint8_t    m_irq_enabled;
 	uint8_t    m_romsubbank, m_scrollctrl;
 
+	int        m_dx, m_dy;
+
 	optional_region_ptr<uint8_t> m_char_rom;
 
-	k052109_cb_delegate m_k052109_cb;
+	tile_delegate m_k052109_cb;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_firq_handler;

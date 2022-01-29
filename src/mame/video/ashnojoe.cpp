@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_highest)
 {
 	int code = m_tileram[0][tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code & 0xfff,
 			((code >> 12) & 0x0f),
 			0);
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midlow)
 	int code = m_tileram[1][tile_index * 2];
 	int attr = m_tileram[1][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(4,
+	tileinfo.set(4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x40,
 			0);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_high)
 {
 	int code = m_tileram[2][tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x10,
 			0);
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_low)
 {
 	int code = m_tileram[3][tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x60,
 			0);
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midhigh)
 	int code = m_tileram[4][tile_index * 2];
 	int attr = m_tileram[4][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(4,
+	tileinfo.set(4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x20,
 			0);
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_lowest)
 	int code = m_tileram[5 + buffer][tile_index * 2];
 	int attr = m_tileram[5 + buffer][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
 			0);
@@ -136,12 +136,12 @@ void ashnojoe_state::tilemap_regs_w(offs_t offset, u16 data, u16 mem_mask)
 
 void ashnojoe_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_highest),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_midlow),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_high),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_low),this),     TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_midhigh),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_lowest),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_highest)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midlow)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_high)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_low)),     TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midhigh)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_lowest)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(15);
 	m_tilemap[1]->set_transparent_pen(15);

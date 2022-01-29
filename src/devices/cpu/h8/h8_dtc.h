@@ -37,10 +37,10 @@ public:
 	}
 	void set_info(const char *intc, int irq);
 
-	DECLARE_READ8_MEMBER(dtcer_r);
-	DECLARE_WRITE8_MEMBER(dtcer_w);
-	DECLARE_READ8_MEMBER(dtvecr_r);
-	DECLARE_WRITE8_MEMBER(dtvecr_w);
+	uint8_t dtcer_r(offs_t offset);
+	void dtcer_w(offs_t offset, uint8_t data);
+	uint8_t dtvecr_r();
+	void dtvecr_w(uint8_t data);
 
 	bool trigger_dtc(int vector);
 	void count_done(int id);

@@ -42,7 +42,7 @@
     report can be identified by a fixed pattern in the five most
     significant bits.
 
-    Reports are five bytes long.  The first byte contains the the button
+    Reports are five bytes long.  The first byte contains the button
     state; the second and fourth bytes contain X delta; the third and
     fifth bytes contain Y delta.  The two delta values for each axis
     should be summed.  Delta values range from -120 to 127 to prevent
@@ -74,14 +74,14 @@
 //  Device type globals
 //**************************************************
 
-DEFINE_DEVICE_TYPE_NS(MSFT_HLE_SERIAL_MOUSE,      bus::rs232, hle_msft_mouse_device,      "rs232_mouse_hle_msft",      "Microsoft 2-Button Serial Mouse (HLE)")
-DEFINE_DEVICE_TYPE_NS(LOGITECH_HLE_SERIAL_MOUSE,  bus::rs232, hle_logitech_mouse_device,  "rs232_mouse_hle_logitech",  "Logitech 3-Button Serial Mouse (HLE)")
-DEFINE_DEVICE_TYPE_NS(WHEEL_HLE_SERIAL_MOUSE,     bus::rs232, hle_wheel_mouse_device,     "rs232_mouse_hle_wheel",     "Microsoft Serial Mouse with Wheel (HLE)")
-DEFINE_DEVICE_TYPE_NS(MSYSTEMS_HLE_SERIAL_MOUSE,  bus::rs232, hle_msystems_mouse_device,  "rs232_mouse_hle_msystems",  "Mouse Systems Non-rotatable Mouse (HLE)")
-DEFINE_DEVICE_TYPE_NS(ROTATABLE_HLE_SERIAL_MOUSE, bus::rs232, hle_rotatable_mouse_device, "rs232_mouse_hle_rotatable", "Mouse Systems Rotatable Mouse (HLE)")
-DEFINE_DEVICE_TYPE_NS(SGI_HLE_SERIAL_MOUSE,       bus::rs232, hle_sgi_mouse_device,       "rs232_mouse_hle_sgi",       "SGI IRIS Indigo Mouse (HLE)")
+DEFINE_DEVICE_TYPE(MSFT_HLE_SERIAL_MOUSE,      bus::rs232::hle_msft_mouse_device,      "rs232_mouse_hle_msft",      "Microsoft 2-Button Serial Mouse (HLE)")
+DEFINE_DEVICE_TYPE(LOGITECH_HLE_SERIAL_MOUSE,  bus::rs232::hle_logitech_mouse_device,  "rs232_mouse_hle_logitech",  "Logitech 3-Button Serial Mouse (HLE)")
+DEFINE_DEVICE_TYPE(WHEEL_HLE_SERIAL_MOUSE,     bus::rs232::hle_wheel_mouse_device,     "rs232_mouse_hle_wheel",     "Microsoft Serial Mouse with Wheel (HLE)")
+DEFINE_DEVICE_TYPE(MSYSTEMS_HLE_SERIAL_MOUSE,  bus::rs232::hle_msystems_mouse_device,  "rs232_mouse_hle_msystems",  "Mouse Systems Non-rotatable Mouse (HLE)")
+DEFINE_DEVICE_TYPE(ROTATABLE_HLE_SERIAL_MOUSE, bus::rs232::hle_rotatable_mouse_device, "rs232_mouse_hle_rotatable", "Mouse Systems Rotatable Mouse (HLE)")
+DEFINE_DEVICE_TYPE(SGI_HLE_SERIAL_MOUSE,       bus::rs232::hle_sgi_mouse_device,       "rs232_mouse_hle_sgi",       "SGI IRIS Indigo Mouse (HLE)")
 
-namespace bus { namespace rs232 {
+namespace bus::rs232 {
 
 namespace {
 
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(hle_msmouse_device_base::input_dtr)
 
 WRITE_LINE_MEMBER(hle_msmouse_device_base::input_rts)
 {
-	m_dtr = state ? 1U : 0U;
+	m_rts = state ? 1U : 0U;
 	check_enable();
 }
 
@@ -720,4 +720,4 @@ void hle_sgi_mouse_device::device_start()
 	transmit_register_reset();
 }
 
-} } // namespace bus::rs232
+} // namespace bus::rs232

@@ -66,19 +66,19 @@ public:
 	required_device<palette_device> m_palette;
 
 
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_d008_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
-	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
-	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
-	DECLARE_WRITE8_MEMBER(brixian_d008_w);
-	DECLARE_WRITE8_MEMBER(hexa_d008_w);
-	DECLARE_READ8_MEMBER(hexaa_f000_r);
-	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
-	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
-	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
+	uint8_t arkanoid_bootleg_f000_r();
+	uint8_t arkanoid_bootleg_f002_r();
+	void arkanoid_bootleg_d018_w(uint8_t data);
+	uint8_t arkanoid_bootleg_d008_r();
+	void arkanoid_videoram_w(offs_t offset, uint8_t data);
+	void arkanoid_d008_w(uint8_t data);
+	void tetrsark_d008_w(uint8_t data);
+	void brixian_d008_w(uint8_t data);
+	void hexa_d008_w(uint8_t data);
+	uint8_t hexaa_f000_r();
+	void hexaa_f000_w(uint8_t data);
+	void hexaa_sub_80_w(uint8_t data);
+	uint8_t hexaa_sub_90_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	uint8_t input_mux_r();
 	void init_block2();

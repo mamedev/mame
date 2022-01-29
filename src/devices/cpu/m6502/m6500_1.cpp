@@ -78,13 +78,13 @@ constexpr u8 CR_CTRO    = 0x80U;
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS M6500/1");
+DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS Technology 6500/1");
 
 
 m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: m6502_mcu_device(mconfig, M6500_1, tag, owner, clock)
-	, m_port_in_cb{ { *this }, { *this }, { *this }, { *this } }
-	, m_port_out_cb{ { *this }, { *this }, { *this }, { *this } }
+	, m_port_in_cb{ *this }
+	, m_port_out_cb{ *this }
 	, m_cntr_out_cb{ *this }
 	, m_cr{ 0x00U }
 	, m_port_in{ 0xffU, 0xffU, 0xffU, 0xffU }
@@ -103,22 +103,22 @@ m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-WRITE8_MEMBER(m6500_1_device::pa_w)
+void m6500_1_device::pa_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<0>), this), unsigned(data));
 }
 
-WRITE8_MEMBER(m6500_1_device::pb_w)
+void m6500_1_device::pb_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<1>), this), unsigned(data));
 }
 
-WRITE8_MEMBER(m6500_1_device::pc_w)
+void m6500_1_device::pc_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<2>), this), unsigned(data));
 }
 
-WRITE8_MEMBER(m6500_1_device::pd_w)
+void m6500_1_device::pd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<3>), this), unsigned(data));
 }
@@ -134,12 +134,8 @@ void m6500_1_device::device_resolve_objects()
 {
 	m6502_mcu_device::device_resolve_objects();
 
-	for (devcb_read8 &cb : m_port_in_cb)
-		cb.resolve();
-
-	for (devcb_write8 &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all();
+	m_port_out_cb.resolve_all_safe();
 	m_cntr_out_cb.resolve_safe();
 }
 
@@ -175,7 +171,7 @@ void m6500_1_device::device_reset()
 
 	m_cr = 0x00U;
 
-	for (unsigned i = 0; ARRAY_LENGTH(m_port_buf) > i; ++i)
+	for (unsigned i = 0; std::size(m_port_buf) > i; ++i)
 	{
 		if (0xffU != m_port_buf[i])
 			m_port_out_cb[i](m_port_buf[i] = 0xffU);
@@ -189,12 +185,12 @@ void m6500_1_device::device_reset()
 }
 
 
-u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const
+u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return (clocks + 1) / 2;
 }
 
-u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const
+u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles * 2;
 }
@@ -276,13 +272,13 @@ void m6500_1_device::internal_update(u64 current_time)
 }
 
 
-READ8_MEMBER(m6500_1_device::read_control_register)
+u8 m6500_1_device::read_control_register()
 {
 	internal_update();
 	return m_cr;
 }
 
-WRITE8_MEMBER(m6500_1_device::write_control_register)
+void m6500_1_device::write_control_register(u8 data)
 {
 	internal_update();
 	m_cr = (m_cr & (CR_A1ED | CR_A0ED | CR_CTRO)) | (data & (CR_CMC0 | CR_CMC1 | CR_A1IE | CR_A0IE | CR_CIE));
@@ -298,12 +294,12 @@ void m6500_1_device::update_irq()
 }
 
 
-READ8_MEMBER(m6500_1_device::read_port)
+u8 m6500_1_device::read_port(offs_t offset)
 {
 	if (!machine().side_effects_disabled() && m_port_in_cb[offset])
 	{
 		u8 const prev(m_port_in[offset]);
-		m_port_in[offset] = m_port_in_cb[offset](space);
+		m_port_in[offset] = m_port_in_cb[offset]();
 		if (!offset)
 		{
 			u8 const diff((prev ^ m_port_in[0]) & m_port_buf[0]);
@@ -318,16 +314,16 @@ READ8_MEMBER(m6500_1_device::read_port)
 	return m_port_in[offset] & m_port_buf[offset];
 }
 
-WRITE8_MEMBER(m6500_1_device::write_port)
+void m6500_1_device::write_port(offs_t offset, u8 data)
 {
 	u8 const prev(m_port_in[offset] & m_port_buf[offset]);
 	if (m_port_buf[offset] != data)
-		m_port_out_cb[offset](space, m_port_buf[offset] = data);
+		m_port_out_cb[offset](m_port_buf[offset] = data);
 
 	if (!offset)
 	{
 		if (!machine().side_effects_disabled() && m_port_in_cb[0])
-			m_port_in[0] = m_port_in_cb[0](space);
+			m_port_in[0] = m_port_in_cb[0]();
 		u8 const effective(m_port_in[0] & data);
 		u8 const diff(prev ^ effective);
 		if (BIT(diff, 0) && BIT(effective, 0))
@@ -338,7 +334,7 @@ WRITE8_MEMBER(m6500_1_device::write_port)
 	}
 }
 
-WRITE8_MEMBER(m6500_1_device::clear_edge)
+void m6500_1_device::clear_edge(offs_t offset, u8 data)
 {
 	m_cr &= BIT(offset, 0) ? ~CR_A1ED : ~CR_A0ED;
 	update_irq();
@@ -361,13 +357,13 @@ template <unsigned Port> TIMER_CALLBACK_MEMBER(m6500_1_device::set_port_in)
 }
 
 
-READ8_MEMBER(m6500_1_device::read_upper_count)
+u8 m6500_1_device::read_upper_count()
 {
 	internal_update();
 	return u8(m_counter >> 8);
 }
 
-READ8_MEMBER(m6500_1_device::read_lower_count)
+u8 m6500_1_device::read_lower_count()
 {
 	internal_update();
 	if (!machine().side_effects_disabled())
@@ -379,7 +375,7 @@ READ8_MEMBER(m6500_1_device::read_lower_count)
 	return u8(m_counter);
 }
 
-template <bool Transfer> WRITE8_MEMBER(m6500_1_device::write_upper_latch)
+template <bool Transfer> void m6500_1_device::write_upper_latch(u8 data)
 {
 	m_latch = (m_latch & 0x00ffU) | u16(data << 8);
 	if (Transfer)
@@ -393,7 +389,7 @@ template <bool Transfer> WRITE8_MEMBER(m6500_1_device::write_upper_latch)
 	}
 }
 
-WRITE8_MEMBER(m6500_1_device::write_lower_latch)
+void m6500_1_device::write_lower_latch(u8 data)
 {
 	m_latch = (m_latch & 0xff00U) | u16(data);
 }

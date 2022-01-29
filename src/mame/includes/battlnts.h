@@ -37,9 +37,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_memory_bank m_rombank;
 
-	DECLARE_WRITE8_MEMBER(battlnts_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(battlnts_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(battlnts_spritebank_w);
+	void battlnts_sh_irqtrigger_w(uint8_t data);
+	void battlnts_bankswitch_w(uint8_t data);
+	void battlnts_spritebank_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_battlnts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

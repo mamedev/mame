@@ -41,11 +41,11 @@ public:
 
 	/* misc */
 	int            m_bank;
-	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
-	DECLARE_WRITE8_MEMBER(compgolf_video_w);
-	DECLARE_WRITE8_MEMBER(compgolf_back_w);
-	DECLARE_WRITE8_MEMBER(compgolf_scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(compgolf_scrolly_lo_w);
+	void compgolf_ctrl_w(uint8_t data);
+	void compgolf_video_w(offs_t offset, uint8_t data);
+	void compgolf_back_w(offs_t offset, uint8_t data);
+	void compgolf_scrollx_lo_w(uint8_t data);
+	void compgolf_scrolly_lo_w(uint8_t data);
 	void init_compgolf();
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);

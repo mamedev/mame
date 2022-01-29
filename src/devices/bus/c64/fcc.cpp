@@ -45,8 +45,6 @@ void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
 	M65SC02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_final_chesscard_device::c64_fcc_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-
 	GENERIC_LATCH_8(config, m_mainlatch).data_pending_callback().set(FUNC(c64_final_chesscard_device::mainlatch_int));
 	GENERIC_LATCH_8(config, m_sublatch).data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
@@ -99,7 +97,10 @@ c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mco
 
 void c64_final_chesscard_device::device_start()
 {
+	m_nvram = std::make_unique<uint8_t[]>(0x2000);
+
 	// state saving
+	save_pointer(NAME(m_nvram), 0x2000);
 	save_item(NAME(m_bank));
 	save_item(NAME(m_hidden));
 }

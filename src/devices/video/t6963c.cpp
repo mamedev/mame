@@ -36,7 +36,7 @@ t6963c_device::t6963c_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, T6963C, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_display_config("display", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_cgrom(*this, "cgrom", 0x400)
+	, m_cgrom(*this, "cgrom")
 	, m_display_ram(nullptr)
 	, m_data(0)
 	, m_adp(0)
@@ -117,7 +117,7 @@ void t6963c_device::device_reset()
 
 u8 t6963c_device::read(offs_t offset)
 {
-	return BIT(offset, 0) ? 0x0b : 0x00;
+	return BIT(offset, 0) ? 0x2b : 0x00;
 }
 
 
@@ -308,7 +308,7 @@ void t6963c_device::set_md(u8 data)
 	// MD0, MD1
 	m_number_lines = 8 - (data & 3) * 2;
 
-	if (BIT(data, 4))   // MDS
+	if (BIT(data, 4)) // MDS
 		m_number_lines += 8;
 
 	switch((data >> 2) & 3) // MD2, MD3
@@ -346,7 +346,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						data = m_display_ram->read_byte(m_cgram_offset + c * 8 + cy);
 
 					for(int cx=0; cx<m_font_size; cx++)
-						bitmap.pix16(y * 8 + cy, x * m_font_size + cx) = BIT(data, m_font_size - 1 - cx);
+						bitmap.pix(y * 8 + cy, x * m_font_size + cx) = BIT(data, m_font_size - 1 - cx);
 				}
 			}
 
@@ -362,13 +362,13 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					switch(m_mode & 7)
 					{
 					case 0: // OR
-						bitmap.pix16(y, x * m_font_size + i) |= pix;
+						bitmap.pix(y, x * m_font_size + i) |= pix;
 						break;
 					case 1: // EXOR
-						bitmap.pix16(y, x * m_font_size + i) ^= pix;
+						bitmap.pix(y, x * m_font_size + i) ^= pix;
 						break;
 					case 3: // AND
-						bitmap.pix16(y, x * m_font_size + i) &= pix;
+						bitmap.pix(y, x * m_font_size + i) &= pix;
 						break;
 					case 4: // Text attribute
 						logerror("%s: Unimplemented Text attribute\n", machine().describe_context());
@@ -405,8 +405,8 @@ void lm24014h_device::device_start()
 {
 	save_item(NAME(m_fs));
 
-	m_lcdc->set_md(4);      // 8 lines x 40 columns
-	m_lcdc->set_fs(m_fs << 1);  // font size 6x8 or 8x8
+	m_lcdc->set_md(4); // 8 lines x 40 columns
+	m_lcdc->set_fs(m_fs << 1); // font size 6x8 or 8x8
 }
 
 
@@ -423,7 +423,7 @@ void lm24014h_device::ram_map(address_map &map)
 void lm24014h_device::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(1, rgb_t(69, 62, 66));
 }
 
 
@@ -438,10 +438,10 @@ void lm24014h_device::device_add_mconfig(machine_config &config)
 	m_lcdc->set_addrmap(0, &lm24014h_device::ram_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(240, 64);
-	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_visarea_full();
 	screen.set_screen_update("lcdc", FUNC(t6963c_device::screen_update));
 	screen.set_palette("palette");
 

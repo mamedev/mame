@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "harddisk.h"
+#include "harddriv.h"
 #include "softlist_dev.h"
 
 #define DIABLO_TAG(id) "diablo"#id
@@ -20,7 +20,7 @@
 
 // ======================> diablo_image_device
 
-class diablo_image_device : public device_t, public device_image_interface
+class diablo_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
@@ -35,17 +35,10 @@ public:
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return "chd,dsk"; }
+	virtual bool image_is_chd_type() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return m_interface; }
+	virtual const char *file_extensions() const noexcept override { return "chd,dsk"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
@@ -57,6 +50,9 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	image_init_result internal_load_dsk();
 

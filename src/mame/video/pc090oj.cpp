@@ -77,6 +77,7 @@ DEFINE_DEVICE_TYPE(PC090OJ, pc090oj_device, "pc090oj", "Taito PC090OJ")
 pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PC090OJ, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
+	, m_colpri_cb(*this)
 	, m_ctrl(0)
 	, m_sprite_ctrl(0)
 	, m_ram(nullptr)
@@ -105,6 +106,8 @@ void pc090oj_device::device_start()
 {
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colors(palette().entries() / 16);
+
+	m_colpri_cb.resolve();
 
 	m_ram = make_unique_clear<u16[]>(PC090OJ_RAM_SIZE / 2);
 	m_ram_buffered = make_unique_clear<u16[]>(PC090OJ_RAM_SIZE / 2);

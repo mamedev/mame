@@ -11,7 +11,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
@@ -20,14 +20,14 @@
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag, bool large = false) :
 		driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
 		m_dswb_io(*this, "DSWB"),
 		m_tjump_io(*this, "TJUMP"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", large ? 0x1000 : 0x800, ENDIANNESS_BIG),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ymsnd(*this, "ymsnd"),
@@ -56,7 +56,7 @@ protected:
 	optional_ioport m_dswb_io;
 	optional_ioport m_tjump_io;
 
-	int m_intenable;
+	u8 m_intenable;
 
 	std::unique_ptr<u16[]> m_tilevram[4];
 	/*
@@ -66,7 +66,7 @@ protected:
 	std::unique_ptr<u16[]> m_tilevram[0];   //  \/
 	*/
 
-	optional_shared_ptr<u16> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	std::unique_ptr<u16[]> m_buffered_spriteram;
 	std::unique_ptr<u16[]> m_spritesizeram;
 	std::unique_ptr<u16[]> m_buffered_spritesizeram;
@@ -97,7 +97,7 @@ protected:
 	void coin_w(u8 data);
 
 	u16 frame_done_r();
-	DECLARE_WRITE16_MEMBER(tile_offsets_w);
+	void tile_offsets_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bcu_flipscreen_w(u8 data);
 	void fcu_flipscreen_w(u8 data);
 	u16 spriteram_offs_r();
@@ -133,10 +133,7 @@ protected:
 	void set_scrolls();
 	void register_common();
 	void log_vram();
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int priority);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void reset_sound();
 	DECLARE_WRITE_LINE_MEMBER(reset_callback);
 	required_device<m68000_device> m_maincpu;
@@ -165,7 +162,7 @@ class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
 	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag) :
-		toaplan1_state(mconfig, type, tag),
+		toaplan1_state(mconfig, type, tag, true),
 		m_spritegen(*this, "scu")
 	{
 	}
@@ -181,6 +178,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	u16 tileram_r(offs_t offset);
+	void pri_cb(u8 priority, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 

@@ -62,10 +62,10 @@ public:
 	void init_ti990_4v();
 
 private:
-	DECLARE_READ8_MEMBER( panel_read );
-	DECLARE_WRITE8_MEMBER( panel_write );
-	DECLARE_WRITE8_MEMBER( external_operation );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	uint8_t panel_read(offs_t offset);
+	void panel_write(offs_t offset, uint8_t data);
+	void external_operation(offs_t offset, uint8_t data);
+	uint8_t interrupt_level();
 	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( asrkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
@@ -78,7 +78,7 @@ private:
 	void memmap(address_map &map);
 
 	void        hold_load();
-	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	int         m_intlines;
 	int         m_int_level;
 	emu_timer*  m_nmi_timer;
@@ -107,13 +107,13 @@ void ti990_4_state::hold_load()
 /*
     LOAD interrupt trigger callback
 */
-void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_maincpu->set_input_line(INT_9900_LOAD, CLEAR_LINE);
 	logerror("ti990_4: Released LOAD interrupt\n");
 }
 
-READ8_MEMBER( ti990_4_state::panel_read )
+uint8_t ti990_4_state::panel_read(offs_t offset)
 {
 	if (offset == 11 || offset == 14)
 		return 1;
@@ -121,7 +121,7 @@ READ8_MEMBER( ti990_4_state::panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_4_state::panel_write )
+void ti990_4_state::panel_write(offs_t offset, uint8_t data)
 {
 	logerror("ti990_4: writing to panel @CRU %04x: %02x\n", offset<<1, data);
 }
@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
 	set_int_line(6, state);
 }
 
-WRITE8_MEMBER( ti990_4_state::external_operation )
+void ti990_4_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	switch (offset)
@@ -206,7 +206,7 @@ WRITE8_MEMBER( ti990_4_state::external_operation )
 	}
 }
 
-READ8_MEMBER( ti990_4_state::interrupt_level )
+uint8_t ti990_4_state::interrupt_level()
 {
 	return m_int_level;
 }
@@ -337,16 +337,16 @@ ROM_START(ti990_4)
 	(cf 945401-9701 pp. 1-19) */
 
 	/* test ROM */
-	ROMX_LOAD("94519209.u39", 0xFC00, 0x100, CRC(0a0b0c42), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
-	ROMX_LOAD("94519210.u55", 0xFC00, 0x100, CRC(d078af61), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
-	ROMX_LOAD("94519211.u61", 0xFC01, 0x100, CRC(6cf7d4a0), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
-	ROMX_LOAD("94519212.u78", 0xFC01, 0x100, CRC(d9522458), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
+	ROMX_LOAD("94519209.u39", 0xFC00, 0x100, CRC(0a0b0c42) SHA1(bb1f0c611b640cccadeaf8fbbabac7343fcb2a99), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
+	ROMX_LOAD("94519210.u55", 0xFC00, 0x100, CRC(d078af61) SHA1(6f7e90b0972b97d3a3820b05ac8ffbd579910351), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
+	ROMX_LOAD("94519211.u61", 0xFC01, 0x100, CRC(6cf7d4a0) SHA1(c26f09cec612545c5c4511291b5eb432998c21b3), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
+	ROMX_LOAD("94519212.u78", 0xFC01, 0x100, CRC(d9522458) SHA1(8987e1f155da390ae39b45e41c2d847e62a3bc26), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
 
 	/* LOAD ROM */
-	ROMX_LOAD("94519113.u3", 0xFE00, 0x100, CRC(8719b04e), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
-	ROMX_LOAD("94519114.u4", 0xFE00, 0x100, CRC(72a040e0), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
-	ROMX_LOAD("94519115.u6", 0xFE01, 0x100, CRC(9ccf8cca), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
-	ROMX_LOAD("94519116.u7", 0xFE01, 0x100, CRC(fa387bf3), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
+	ROMX_LOAD("94519113.u3", 0xFE00, 0x100, CRC(8719b04e) SHA1(63bdf5d9c25147bb9b608df6e9dbc2cf3789569b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
+	ROMX_LOAD("94519114.u4", 0xFE00, 0x100, CRC(72a040e0) SHA1(3291ab8af7097f69f1c7c95c2c0eaf327d4e98d5), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
+	ROMX_LOAD("94519115.u6", 0xFE01, 0x100, CRC(9ccf8cca) SHA1(0e726ea76ef15274bb1a4475bfb672005dc05e00), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
+	ROMX_LOAD("94519116.u7", 0xFE01, 0x100, CRC(fa387bf3) SHA1(d91de2335e0bb03e14bc4a951ee0bc04c6fff5ab), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
 
 #else
 	/* ROM set 945121-4(?): "Floppy disc loader with self test" (cf 945401-9701 pp. 1-19) */

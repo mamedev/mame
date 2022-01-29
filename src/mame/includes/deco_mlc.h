@@ -30,12 +30,15 @@ public:
 		{ }
 
 	void init_mlc();
+	void init_acchi();
 	void init_avengrgs();
 
-	void mlc(machine_config &config);
-	void mlc_6bpp(machine_config &config);
+	void acchi(machine_config &config);
 	void avengrgs(machine_config &config);
+	void mlc(machine_config &config);
 	void mlc_5bpp(machine_config &config);
+	void mlc_6bpp(machine_config &config);
+	void stadhr96(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -59,11 +62,7 @@ private:
 	required_region_ptr<u8> m_gfx2;
 
 	int m_irqLevel;
-	u32 m_mlc_raster_table_1[4*256];
-	u32 m_mlc_raster_table_2[4*256];
-	u32 m_mlc_raster_table_3[4*256];
 	u32 m_vbl_i;
-	int m_lastScanline[9];
 	u32 m_colour_mask;
 	u32 m_shadow_mask;
 	u32 m_shadow_shift;
@@ -72,23 +71,23 @@ private:
 	std::unique_ptr<u16[]> m_spriteram_spare;
 	std::unique_ptr<u16[]> m_buffered_spriteram;
 
-	DECLARE_READ32_MEMBER(mlc_440008_r);
-	DECLARE_READ32_MEMBER(mlc_44001c_r);
-	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
+	u32 mlc_440008_r();
+	u32 mlc_44001c_r(offs_t offset);
+	void mlc_44001c_w(u32 data);
 
-	DECLARE_READ32_MEMBER(mlc_200000_r);
-	DECLARE_READ32_MEMBER(mlc_200004_r);
-	DECLARE_READ32_MEMBER(mlc_200070_r);
-	DECLARE_READ32_MEMBER(mlc_20007c_r);
-	DECLARE_READ32_MEMBER(mlc_scanline_r);
-	DECLARE_WRITE32_MEMBER(irq_ram_w);
-	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
+	u32 mlc_200000_r();
+	u32 mlc_200004_r();
+	u32 mlc_200070_r();
+	u32 mlc_20007c_r();
+	u32 mlc_scanline_r();
+	void irq_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 avengrgs_speedup_r();
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 spriteram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	u16 sh96_protection_region_0_146_r(offs_t offset);
+	void sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
@@ -101,5 +100,6 @@ private:
 	void descramble_sound();
 
 	void avengrgs_map(address_map &map);
-	void decomlc_map(address_map &map);
+	void decomlc_146_map(address_map &map);
+	void decomlc_no146_map(address_map &map);
 };

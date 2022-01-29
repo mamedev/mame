@@ -22,16 +22,8 @@ public:
 	// construction/destruction
 	acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	READ16_MEMBER( data_r );
-	WRITE16_MEMBER( data_w );
-
-	READ16_MEMBER(adsp_control_r);
-	WRITE16_MEMBER(adsp_control_w);
-	WRITE16_MEMBER(ram_bank_w);
-	WRITE16_MEMBER(rom_bank_w);
-
-	READ16_MEMBER(host_r);
-	WRITE16_MEMBER(host_w);
+	uint16_t data_r();
+	void data_w(uint16_t data);
 
 	void update_data_ram_bank();
 	void adsp_irq(int which);
@@ -50,8 +42,12 @@ protected:
 
 private:
 	required_device<adsp2181_device>    m_cpu;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+	required_device<timer_device>       m_reg_timer;
+	required_device<timer_device>       m_dma_timer;
 	required_shared_ptr<uint32_t>       m_adsp_pram;
 	required_memory_bank                m_adsp_data_bank;
+	required_region_ptr<uint8_t>        m_rom;
 
 	uint32_t m_adsp_snd_pf0;
 
@@ -67,15 +63,11 @@ private:
 	address_space *m_data;
 
 	uint16_t        m_control_regs[32];
-	uint8_t*        m_rom;
 
 
 	/* sound output */
 	uint16_t        m_size[2];
 	uint16_t        m_incs[2];
-	dmadac_sound_device *m_dmadac[2];
-	timer_device    *m_reg_timer[2];
-	timer_device    *m_sport_timer;
 	uint32_t        m_ireg[2];
 	uint16_t        m_ireg_base[2];
 
@@ -83,16 +75,24 @@ private:
 	uint32_t        m_rom_bank;
 	uint32_t        m_dmovlay_val;
 
+	std::unique_ptr<uint16_t[]> m_banked_ram;
+
 	required_device<generic_latch_16_device> m_data_in;
 	required_device<generic_latch_16_device> m_data_out;
 
-	timer_device *m_dma_timer;
-
-	WRITE32_MEMBER(adsp_sound_tx_callback);
+	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
 	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
-	WRITE32_MEMBER(dmovlay_callback);
+	void dmovlay_callback(uint32_t data);
+
+	uint16_t adsp_control_r(offs_t offset);
+	void adsp_control_w(offs_t offset, uint16_t data);
+	void ram_bank_w(uint16_t data);
+	void rom_bank_w(uint16_t data);
+
+	uint16_t host_r();
+	void host_w(uint16_t data);
 };
 
 // device type definition

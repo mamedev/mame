@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pasopia_cass" description="Toshiba Personal Computer Pasopia PA7010 cassettes">
+
+<!--
+    Undumped
+
+    T-1054 - オカルト ハウス
+ -->
+
+	<software name="gameshuu">
+		<description>Pasopia Game-shuu</description>
+		<year>1982</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="PA6002"/>
+		<info name="alt_title" value="パソピア ゲーム集"/>
+		<part name="cass1" interface="pasopia_cass">
+			<dataarea name="cass" size="68596062">
+				<rom name="pa6002.wav" size="68596062" crc="f8a3ea13" sha1="01436203bb2e7a1b7f3adec812f6d2edebcb2cc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smpleprg">
+		<description>Sample Program PA7010-you</description>
+		<year>1982</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="PZA-383"/>
+		<info name="alt_title" value="SAMPLE PROGRAM PA7010用"/>
+		<part name="cass1" interface="pasopia_cass">
+			<dataarea name="cass" size="22310064">
+				<rom name="pza-383.wav" size="22310064" crc="98069673" sha1="7500579c6b43736fdcb17d6929af8a7077ca72e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parttime">
+		<description>Part-Timer no Kyuuyo Keisan</description>
+		<year>1982</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="T-3010"/>
+		<info name="alt_title" value="パートタイマーの給与計算"/>
+		<part name="cass1" interface="pasopia_cass">
+			<dataarea name="cass" size="14950165">
+				<rom name="t-3010.wav" size="14950165" crc="d7c6745d" sha1="fc0ae43e62128e02000bf534c156ac1c0eebb63b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="derby">
+		<description>Pasopia Derby</description>
+		<year>1982</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="T-1030"/>
+		<info name="alt_title" value="パソピア ダービー"/>
+		<part name="cass1" interface="pasopia_cass">
+			<dataarea name="cass" size="13059875">
+				<rom name="t-1030.wav" size="13059875" crc="0c2702f7" sha1="544e120e0dc5d226072371841e5e1982f015353b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf">
+		<description>The Golf</description>
+		<year>1982</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="serial" value="T-201"/>
+		<info name="alt_title" value="ザ・ゴルフ"/>
+		<part name="cass1" interface="pasopia_cass">
+			<dataarea name="cass" size="19156507">
+				<rom name="t-201.wav" size="19156507" crc="916e814e" sha1="2e2c61129cc2359b35e1aa9d88130326b7b5ca66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hilight">
+		<description>Pasopia Game Highlight</description>
+		<year>1982</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="PZA-410"/>
+		<info name="alt_title" value="パソピアゲームハイライト"/>
+		<part name="cass1" interface="pasopia_cass">
+			<feature name="part_id" value="A - T-BASIC用"/>
+			<dataarea name="cass" size="80066535">
+				<rom name="pza-410.wav" size="80066535" crc="5849a0f8" sha1="7c64bb429033b0f39a703524546bc96ae706d3cf"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="pasopia_cass">
+			<feature name="part_id" value="B - OA-BASIC用"/>
+			<dataarea name="cass" size="80066535">
+				<rom name="pasopia game highlight oa-basic.wav" size="80066535" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

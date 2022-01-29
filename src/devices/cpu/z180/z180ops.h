@@ -27,7 +27,7 @@ inline u8 z180_device::IN(u16 port)
 	if (is_internal_io_address(port))
 		return z180_readcontrol(port);
 	m_extra_cycles += io_wait_states();
-	return m_iospace->read_byte(port);
+	return m_io.read_byte(port);
 }
 
 /***************************************************************
@@ -40,7 +40,7 @@ inline void z180_device::OUT(u16 port, u8 value)
 	else
 	{
 		m_extra_cycles += io_wait_states();
-		m_iospace->write_byte(port, value);
+		m_io.write_byte(port, value);
 	}
 }
 
@@ -117,7 +117,7 @@ uint8_t z180_device::ROP()
 	offs_t addr = _PCD;
 	_PC++;
 	m_extra_cycles += memory_wait_states();
-	return m_ocache->read_byte(MMU_REMAP_ADDR(addr));
+	return m_copcodes.read_byte(MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -131,7 +131,7 @@ uint8_t z180_device::ARG()
 	offs_t addr = _PCD;
 	_PC++;
 	m_extra_cycles += memory_wait_states();
-	return m_cache->read_byte(MMU_REMAP_ADDR(addr));
+	return m_cprogram.read_byte(MMU_REMAP_ADDR(addr));
 }
 
 uint32_t z180_device::ARG16()
@@ -139,7 +139,7 @@ uint32_t z180_device::ARG16()
 	offs_t addr = _PCD;
 	_PC += 2;
 	m_extra_cycles += memory_wait_states() * 2;
-	return m_cache->read_byte(MMU_REMAP_ADDR(addr)) | (m_cache->read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
+	return m_cprogram.read_byte(MMU_REMAP_ADDR(addr)) | (m_cprogram.read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /***************************************************************

@@ -68,7 +68,7 @@ void canyon_state::canyon_palette(palette_device &palette) const
  *
  *************************************/
 
-READ8_MEMBER(canyon_state::canyon_switches_r)
+uint8_t canyon_state::canyon_switches_r(offs_t offset)
 {
 	uint8_t val = 0;
 
@@ -82,7 +82,7 @@ READ8_MEMBER(canyon_state::canyon_switches_r)
 }
 
 
-READ8_MEMBER(canyon_state::canyon_options_r)
+uint8_t canyon_state::canyon_options_r(offs_t offset)
 {
 	return (ioport("DSW")->read() >> (2 * (~offset & 3))) & 3;
 }
@@ -96,7 +96,7 @@ READ8_MEMBER(canyon_state::canyon_options_r)
  *
  *************************************/
 
-WRITE8_MEMBER(canyon_state::output_latch_w)
+void canyon_state::output_latch_w(offs_t offset, uint8_t data)
 {
 	// ADR1 = D, ADR8 = A2, ADR7 = A1, ADR0 = A0
 	m_outlatch->write_bit((offset & 0x180) >> 6 | BIT(offset, 0), BIT(offset, 1));

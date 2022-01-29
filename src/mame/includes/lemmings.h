@@ -54,11 +54,11 @@ private:
 
 	required_ioport_array<4> m_trackball_io;
 
-	DECLARE_WRITE16_MEMBER(lemmings_control_w);
-	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
-	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
-	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
+	void lemmings_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lemmings_trackball_r(offs_t offset);
+	void lemmings_pixel_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lemmings_pixel_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lemmings_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -66,8 +66,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lemmings);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 
-	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );
+	uint16_t lem_protection_region_0_146_r(offs_t offset);
+	void lem_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lemmings_map(address_map &map);
 	void sound_map(address_map &map);
 };

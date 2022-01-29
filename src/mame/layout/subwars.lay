@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="gray"><rect><color red="0.3" green="0.3" blue="0.31" /></rect></element>
+	<element name="white"><rect><color red="0.78" green="0.78" blue="0.8" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+
+	<element name="text_l1">
+		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
+		<text string="RELOAD"><color red="0.01" green="0.01" blue="0.01" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
+		<text string="TIME"><color red="0.01" green="0.01" blue="0.01" /></text>
+	</element>
+	<element name="text_l3">
+		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
+		<text string="SCORE"><color red="0.01" green="0.01" blue="0.01" /></text>
+	</element>
+
+	<element name="text_w0"><text string="3000"><color red="0.78" green="0.78" blue="0.8" /></text></element>
+	<element name="text_w1"><text string="2000"><color red="0.78" green="0.78" blue="0.8" /></text></element>
+	<element name="text_w2"><text string="1000"><color red="0.78" green="0.78" blue="0.8" /></text></element>
+
+	<element name="ledd" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+	<element name="ledr" defstate="0">
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
+		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="23.5" right="139.9" top="18.5" bottom="133.3" />
+
+	<!-- bezel -->
+
+		<element ref="gray"><bounds x="23.4" y="46.4"  width="116.6" height="0.6" /></element>
+		<element ref="gray"><bounds x="23.4" y="62.4"  width="116.6" height="0.6" /></element>
+		<element ref="gray"><bounds x="23.4" y="78.4"  width="116.6" height="0.6" /></element>
+		<element ref="gray"><bounds x="23.4" y="94.4"  width="116.6" height="0.6" /></element>
+		<element ref="gray"><bounds x="23.4" y="105.4" width="116.6" height="0.6" /></element>
+		<element ref="gray"><bounds x="23.4" y="116.4" width="116.6" height="0.6" /></element>
+
+		<repeat count="7">
+			<param name="x" start="27.4" increment="18" />
+			<element ref="gray"><bounds x="~x~" y="30" width="0.6" height="100" /></element>
+		</repeat>
+
+		<repeat count="10">
+			<param name="x" start="27.4" increment="12" />
+			<element ref="white"><bounds x="~x~" y="76.7" width="0.6" height="4" /></element>
+		</repeat>
+		<repeat count="4">
+			<param name="x" start="33.4" increment="12" />
+			<element ref="white"><bounds x="~x~" y="77.7" width="0.6" height="2" /></element>
+		</repeat>
+		<repeat count="4">
+			<param name="x" start="93.4" increment="12" />
+			<element ref="white"><bounds x="~x~" y="77.7" width="0.6" height="2" /></element>
+		</repeat>
+
+		<repeat count="8">
+			<param name="y" start="36.4" increment="12" />
+			<element ref="white"><bounds x="79.7" y="~y~" width="4" height="0.6" /></element>
+		</repeat>
+		<repeat count="3">
+			<param name="y" start="42.4" increment="12" />
+			<element ref="white"><bounds x="80.7" y="~y~" width="2" height="0.6" /></element>
+		</repeat>
+		<repeat count="3">
+			<param name="y" start="90.4" increment="12" />
+			<element ref="white"><bounds x="80.7" y="~y~" width="2" height="0.6" /></element>
+		</repeat>
+		<repeat count="3">
+			<param name="y" start="44" increment="12" />
+			<param name="i" start="0" increment="1" />
+			<element ref="text_w~i~"><bounds x="75.7" y="~y~" width="12" height="3.4" /></element>
+		</repeat>
+
+		<element ref="gray"><bounds x="23.4" y="120" width="116.6" height="13.4" /></element>
+
+		<repeat count="6">
+			<param name="x" start="32.2" increment="18" />
+			<element ref="blackd"><bounds x="~x~" y="122.2" width="9" height="9" /></element>
+		</repeat>
+
+		<element ref="gray"><bounds x="23.4" y="18.4" width="116.6" height="25" /></element>
+		<element ref="text_l1"><bounds x="35.4" y="37.8" width="20" height="5" /></element>
+		<element ref="text_l2"><bounds x="57" y="37.8" width="17" height="5" /></element>
+		<element ref="text_l3"><bounds x="90" y="37.8" width="20" height="5" /></element>
+		<element ref="blackd"><bounds x="37.2" y="25.2" width="9" height="9" /></element>
+		<element ref="black"><bounds x="50" y="22.7" width="70" height="14" /></element>
+
+	<!-- leds -->
+
+		<element name="digit3" ref="digit"><bounds x="62" y="25.7" width="6" height="8" /></element>
+		<element name="digit2" ref="digit"><bounds x="80" y="25.7" width="6" height="8" /></element>
+		<element name="digit1" ref="digit"><bounds x="90" y="25.7" width="6" height="8" /></element>
+		<element name="digit0" ref="digit"><bounds x="100" y="25.7" width="6" height="8" /></element>
+
+		<element name="4.6" ref="ledd"><bounds x="41" y="29" width="1.4" height="1.4" /></element>
+
+		<element name="10.0" ref="ledr"><bounds x="35.3"  y="48.2" width="2.8" height="1" /></element>
+		<element name="10.1" ref="ledr"><bounds x="53.3"  y="48.2" width="2.8" height="1" /></element>
+		<element name="10.2" ref="ledr"><bounds x="71.3"  y="48.2" width="2.8" height="1" /></element>
+		<element name="10.3" ref="ledr"><bounds x="89.3"  y="48.2" width="2.8" height="1" /></element>
+		<element name="10.4" ref="ledr"><bounds x="107.3" y="48.2" width="2.8" height="1" /></element>
+		<element name="10.5" ref="ledr"><bounds x="125.3" y="48.2" width="2.8" height="1" /></element>
+
+		<element name="9.0" ref="ledd"><bounds x="36"  y="56" width="1.4" height="1.4" /></element>
+		<element name="9.1" ref="ledd"><bounds x="54"  y="56" width="1.4" height="1.4" /></element>
+		<element name="9.2" ref="ledd"><bounds x="72"  y="56" width="1.4" height="1.4" /></element>
+		<element name="9.3" ref="ledd"><bounds x="90"  y="56" width="1.4" height="1.4" /></element>
+		<element name="9.4" ref="ledd"><bounds x="108" y="56" width="1.4" height="1.4" /></element>
+		<element name="9.5" ref="ledd"><bounds x="126" y="56" width="1.4" height="1.4" /></element>
+
+		<element name="11.0" ref="ledr"><bounds x="35.3"  y="64.2" width="2.8" height="1" /></element>
+		<element name="11.1" ref="ledr"><bounds x="53.3"  y="64.2" width="2.8" height="1" /></element>
+		<element name="11.2" ref="ledr"><bounds x="71.3"  y="64.2" width="2.8" height="1" /></element>
+		<element name="11.3" ref="ledr"><bounds x="89.3"  y="64.2" width="2.8" height="1" /></element>
+		<element name="11.4" ref="ledr"><bounds x="107.3" y="64.2" width="2.8" height="1" /></element>
+		<element name="11.5" ref="ledr"><bounds x="125.3" y="64.2" width="2.8" height="1" /></element>
+
+		<element name="8.0" ref="ledd"><bounds x="36"  y="72" width="1.4" height="1.4" /></element>
+		<element name="8.1" ref="ledd"><bounds x="54"  y="72" width="1.4" height="1.4" /></element>
+		<element name="8.2" ref="ledd"><bounds x="72"  y="72" width="1.4" height="1.4" /></element>
+		<element name="8.3" ref="ledd"><bounds x="90"  y="72" width="1.4" height="1.4" /></element>
+		<element name="8.4" ref="ledd"><bounds x="108" y="72" width="1.4" height="1.4" /></element>
+		<element name="8.5" ref="ledd"><bounds x="126" y="72" width="1.4" height="1.4" /></element>
+
+		<element name="12.0" ref="ledr"><bounds x="35.3"  y="80.2" width="2.8" height="1" /></element>
+		<element name="12.1" ref="ledr"><bounds x="53.3"  y="80.2" width="2.8" height="1" /></element>
+		<element name="12.2" ref="ledr"><bounds x="71.3"  y="80.2" width="2.8" height="1" /></element>
+		<element name="12.3" ref="ledr"><bounds x="89.3"  y="80.2" width="2.8" height="1" /></element>
+		<element name="12.4" ref="ledr"><bounds x="107.3" y="80.2" width="2.8" height="1" /></element>
+		<element name="12.5" ref="ledr"><bounds x="125.3" y="80.2" width="2.8" height="1" /></element>
+
+		<element name="7.0" ref="ledd"><bounds x="36"  y="88" width="1.4" height="1.4" /></element>
+		<element name="7.1" ref="ledd"><bounds x="54"  y="88" width="1.4" height="1.4" /></element>
+		<element name="7.2" ref="ledd"><bounds x="72"  y="88" width="1.4" height="1.4" /></element>
+		<element name="7.3" ref="ledd"><bounds x="90"  y="88" width="1.4" height="1.4" /></element>
+		<element name="7.4" ref="ledd"><bounds x="108" y="88" width="1.4" height="1.4" /></element>
+		<element name="7.5" ref="ledd"><bounds x="126" y="88" width="1.4" height="1.4" /></element>
+
+		<element name="6.0" ref="ledd"><bounds x="36"  y="99" width="1.4" height="1.4" /></element>
+		<element name="6.1" ref="ledd"><bounds x="54"  y="99" width="1.4" height="1.4" /></element>
+		<element name="6.2" ref="ledd"><bounds x="72"  y="99" width="1.4" height="1.4" /></element>
+		<element name="6.3" ref="ledd"><bounds x="90"  y="99" width="1.4" height="1.4" /></element>
+		<element name="6.4" ref="ledd"><bounds x="108" y="99" width="1.4" height="1.4" /></element>
+		<element name="6.5" ref="ledd"><bounds x="126" y="99" width="1.4" height="1.4" /></element>
+
+		<element name="5.0" ref="ledd"><bounds x="36"  y="110" width="1.4" height="1.4" /></element>
+		<element name="5.1" ref="ledd"><bounds x="54"  y="110" width="1.4" height="1.4" /></element>
+		<element name="5.2" ref="ledd"><bounds x="72"  y="110" width="1.4" height="1.4" /></element>
+		<element name="5.3" ref="ledd"><bounds x="90"  y="110" width="1.4" height="1.4" /></element>
+		<element name="5.4" ref="ledd"><bounds x="108" y="110" width="1.4" height="1.4" /></element>
+		<element name="5.5" ref="ledd"><bounds x="126" y="110" width="1.4" height="1.4" /></element>
+
+		<element name="4.0" ref="ledd"><bounds x="36"  y="126" width="1.4" height="1.4" /></element>
+		<element name="4.1" ref="ledd"><bounds x="54"  y="126" width="1.4" height="1.4" /></element>
+		<element name="4.2" ref="ledd"><bounds x="72"  y="126" width="1.4" height="1.4" /></element>
+		<element name="4.3" ref="ledd"><bounds x="90"  y="126" width="1.4" height="1.4" /></element>
+		<element name="4.4" ref="ledd"><bounds x="108" y="126" width="1.4" height="1.4" /></element>
+		<element name="4.5" ref="ledd"><bounds x="126" y="126" width="1.4" height="1.4" /></element>
+
+	</view>
+</mamelayout>

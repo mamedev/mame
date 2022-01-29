@@ -81,14 +81,13 @@ DISCRETE_START( dso_wavlog )
 
 	log_num = m_device->same_module_index(*this);
 	sprintf(m_name, "%s_%d.csv", m_device->basetag(), log_num);
-	m_wavfile = wav_open(m_name, sample_rate(), active_inputs()/2);
+	m_wavfile = util::wav_open(m_name, sample_rate(), active_inputs()/2);
 }
 
 DISCRETE_STOP( dso_wavlog )
 {
 	/* close any wave files */
-	if (m_wavfile)
-		wav_close(m_wavfile);
+	m_wavfile.reset();
 }
 
 DISCRETE_STEP( dso_wavlog )
@@ -99,21 +98,19 @@ DISCRETE_STEP( dso_wavlog )
 	/* Dump any wave logs */
 	/* get nodes to be logged and apply gain, then clip to 16 bit */
 	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
-	val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
-	wave_data_l = (int16_t)val;
+	wave_data_l = (int16_t)std::clamp<double>(val, -32768, 32767);
 	if (this->active_inputs() == 2)
 	{
 		/* DISCRETE_WAVLOG1 */
-		wav_add_data_16(m_wavfile, &wave_data_l, 1);
+		util::wav_add_data_16(*m_wavfile, &wave_data_l, 1);
 	}
 	else
 	{
 		/* DISCRETE_WAVLOG2 */
 		val = DISCRETE_INPUT(2) * DISCRETE_INPUT(3);
-		val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
-		wave_data_r = (int16_t)val;
+		wave_data_r = (int16_t)std::clamp<double>(val, -32768, 32767);
 
-		wav_add_data_16lr(m_wavfile, &wave_data_l, &wave_data_r, 1);
+		util::wav_add_data_16lr(*m_wavfile, &wave_data_l, &wave_data_r, 1);
 	}
 }
 

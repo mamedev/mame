@@ -47,21 +47,24 @@ public:
 		, m_floppy2(*this, WD1795_TAG":2")
 		, m_floppy3(*this, WD1795_TAG":3")
 		, m_rom(*this, Z80_TAG)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
 	{ }
 
 	void xor100(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_WRITE8_MEMBER( prom_toggle_w );
-	DECLARE_READ8_MEMBER( prom_disable_r );
-	DECLARE_READ8_MEMBER( fdc_wait_r );
-	DECLARE_WRITE8_MEMBER( fdc_dcont_w );
-	DECLARE_WRITE8_MEMBER( fdc_dsel_w );
+	void mmu_w(uint8_t data);
+	void prom_toggle_w(uint8_t data);
+	uint8_t prom_disable_r();
+	uint8_t fdc_wait_r();
+	void fdc_dcont_w(uint8_t data);
+	void fdc_dsel_w(uint8_t data);
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 
-	DECLARE_READ8_MEMBER(i8255_pc_r);
+	uint8_t i8255_pc_r();
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -90,6 +93,9 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 	required_memory_region m_rom;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
 
 	// memory state
 	int m_mode;

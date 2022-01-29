@@ -4,14 +4,13 @@
 
 Bingo Circus (c) 1989 Sega
 
-A Bingo machine with a terminal for each player,maximum 8 players can play together.
+A Bingo machine with a terminal for each player, maximum 8 players can play together.
 
 preliminary driver by David Haywood & Angelo Salese
 
 TODO:
--terminal pcb(s) roms aren't dumped,so no video can be shown,a cabinet snap is here ->
- http://www.system16.com/hardware.php?id=840&page=1#2743 ,every player should have his own
- screen.
+-a cabinet snap is here -> http://www.system16.com/hardware.php?id=840&page=1#2743,
+ every player should have his own screen.
 -inconsistent (likely wrong) sound banking.
 
 ============================================================================================
@@ -27,20 +26,35 @@ SOUND : YM2151 uPD7759C
 12638.EPR   ;  /
 12639.EPR   ; SOUND PRG
 
+
+BINGO CIRCUS (TERMINAL PCB)
+(c)SEGA
+
+CPU   : MAIN Z-80 SOUND Z-80
+SOUND : 2 x ASSP 5C68A
+
+12646.ic20  ; MAIN PROGRAM
+12647.ic24  ; SOUND PRG + DATA
+12648.ic25  ;  /
+
 *******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/315_5338a.h"
+#include "machine/bingoct.h"
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
-#include "sound/ym2151.h"
+#include "sound/rf5c68.h"
 #include "sound/upd7759.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class bingoc_state : public driver_device
 {
@@ -52,22 +66,25 @@ public:
 		m_upd7759(*this, "upd"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	uint8_t m_x;
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
-	DECLARE_WRITE8_MEMBER(sound_play_w);
+
+	void bingoc(machine_config &config);
+
+protected:
 	virtual void video_start() override;
-	uint32_t screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	//uint8_t m_x;
+	[[maybe_unused]] void main_sound_latch_w(uint8_t data);
+	void sound_play_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void bingoc(machine_config &config);
 	void main_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
 };
-
 
 #define SOUND_TEST 0
 
@@ -75,14 +92,9 @@ void bingoc_state::video_start()
 {
 }
 
-uint32_t bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bingoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
-}
-
-READ16_MEMBER(bingoc_state::unknown_r)
-{
-	return 0xffff;
 }
 
 #if SOUND_TEST
@@ -92,7 +104,7 @@ READ16_MEMBER(bingoc_state::unknown_r)
 0x80-0x85 ym2151 bgm
 0x90-0x9b ym2151 sfx
 */
-READ8_MEMBER(bingoc_state::sound_test_r)
+uint8_t bingoc_state::sound_test_r()
 {
 	if(machine().input().code_pressed_once(KEYCODE_Z))
 		m_x++;
@@ -107,14 +119,14 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 	return m_x;
 }
 #else
-WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
+void bingoc_state::main_sound_latch_w(uint8_t data)
 {
-	m_soundlatch->write(data&0xff);
+	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 #endif
 
-WRITE8_MEMBER(bingoc_state::sound_play_w)
+void bingoc_state::sound_play_w(uint8_t data)
 {
 	/*
 	---- --x- sound rom banking
@@ -137,6 +149,7 @@ void bingoc_state::main_map(address_map &map)
 	map(0x100028, 0x10002b).rw("uart6", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x100030, 0x100033).rw("uart7", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x100038, 0x10003b).rw("uart8", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100070, 0x100071).noprw();
 	map(0x180000, 0x18001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff); //lamps?
 #if 0 // !SOUND_TEST
 	map(0x180010, 0x180011).w(FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...
@@ -198,7 +211,7 @@ void bingoc_state::bingoc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bingoc_state::screen_update_bingoc));
+	screen.set_screen_update(FUNC(bingoc_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x100);
@@ -214,15 +227,25 @@ void bingoc_state::bingoc(machine_config &config)
 	UPD7759(config, m_upd7759);
 	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	// terminals
+	BINGOCT(config, "term1");
+#if 0
+	BINGOCT(config, "term2");
+	BINGOCT(config, "term3");
+	BINGOCT(config, "term4");
+	BINGOCT(config, "term5");
+	BINGOCT(config, "term6");
+	BINGOCT(config, "term7");
+	BINGOCT(config, "term8");
+#endif
 }
+
 
 ROM_START( bingoc )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "12636a.epr", 0x00000, 0x20000, CRC(ef8dccff) SHA1(9eb6e55e2000b252647fc748cbbeedf4f119aed7) )
 	ROM_LOAD16_BYTE( "12635a.epr", 0x00001, 0x20000, CRC(a94cd74e) SHA1(0c3e157a5ddf34f4f1a2d30b9758bf067896371c) )
-
-	ROM_REGION( 0x10000, "ter_1", 0 ) //just as a re-dump reminder,might be either one sub-board or eight of them...
-	ROM_LOAD( "terminal.rom", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "12639.epr", 0x00000, 0x10000, CRC(4307f6ba) SHA1(f568930191cd31a2112ef8d4cf5ff340826d5877) )
@@ -233,4 +256,8 @@ ROM_START( bingoc )
 	ROM_COPY( "upd",       0x20000, 0x00000, 0x20000 )
 ROM_END
 
-GAME( 1989, bingoc, 0, bingoc, bingoc, bingoc_state, empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+
+} // Anonymous namespace
+
+
+GAME( 1989, bingoc,  0, bingoc,  bingoc, bingoc_state,  empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )

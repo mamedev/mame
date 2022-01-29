@@ -355,8 +355,8 @@ ldapa_imp
 	prefetch();
 
 cmppa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_full_data(m_pa);
+	do_cmp(A, TMP);
 	prefetch();
 
 sbcpa_imp

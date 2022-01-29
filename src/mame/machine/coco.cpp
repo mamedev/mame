@@ -51,10 +51,6 @@
     research that for you if you want an exact number for scanlines before the
     screen starts and the scanline that the v-interrupt triggers..etc.
 
-Added bi-directional bitbanger support. Also fixed reading PIA 1, port A. The
-DAC and bitbanger values written should be reflected in the read.
-    tim lindner, October 2010
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -98,6 +94,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_vhd_1(*this, VHD1_TAG),
 	m_beckerport(*this, DWSOCK_TAG),
 	m_beckerportconfig(*this, BECKERPORT_TAG),
+	m_irqs(*this, "irqs"),
+	m_firqs(*this, "firqs"),
 	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
 	m_joystick_hires_control(*this, HIRES_INTF_TAG),
@@ -157,6 +155,7 @@ void coco_state::device_start()
 	save_item(NAME(m_dclg_state));
 	save_item(NAME(m_dclg_timer));
 	save_item(NAME(m_vhd_select));
+	save_item(NAME(m_in_floating_bus_read));
 
 	// miscellaneous
 	m_in_floating_bus_read = false;
@@ -191,13 +190,15 @@ void coco_state::device_reset()
 //  device_timer
 //-------------------------------------------------
 
-void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
+		case TIMER_DIECOM_LIGHTGUN:
+			m_dclg_output_h |= 0x02;
+			[[fallthrough]];
 		case TIMER_HIRES_JOYSTICK_X:
 		case TIMER_HIRES_JOYSTICK_Y:
-		case TIMER_DIECOM_LIGHTGUN:
 			poll_keyboard();
 			break;
 	}
@@ -330,32 +331,10 @@ void coco_state::floating_space_write(offs_t offset, uint8_t data)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ff00_write
-//-------------------------------------------------
-
-READ8_MEMBER( coco_state::ff00_read )
-{
-	return pia_0().read(offset);
-}
-
-
-
-//-------------------------------------------------
-//  ff00_write
-//-------------------------------------------------
-
-WRITE8_MEMBER( coco_state::ff00_write )
-{
-	pia_0().write(offset, data);
-}
-
-
-
-//-------------------------------------------------
 //  pia0_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pa_w )
+void coco_state::pia0_pa_w(uint8_t data)
 {
 	poll_keyboard();
 }
@@ -366,7 +345,7 @@ WRITE8_MEMBER( coco_state::pia0_pa_w )
 //  pia0_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pb_w )
+void coco_state::pia0_pb_w(uint8_t data)
 {
 	poll_keyboard();
 }
@@ -396,29 +375,6 @@ WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 }
 
 
-
-//-------------------------------------------------
-//  pia0_irq_a
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
-{
-	recalculate_irq();
-}
-
-
-
-//-------------------------------------------------
-//  pia0_irq_b
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
-{
-	recalculate_irq();
-}
-
-
-
 /***************************************************************************
   PIA1 ($FF20-$FF3F) (Chip U4)
 
@@ -440,21 +396,10 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ff20_read
-//-------------------------------------------------
-
-READ8_MEMBER( coco_state::ff20_read )
-{
-	return pia_1().read(offset);
-}
-
-
-
-//-------------------------------------------------
 //  ff20_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff20_write )
+void coco_state::ff20_write(offs_t offset, uint8_t data)
 {
 	/* write to the PIA */
 	pia_1().write(offset, data);
@@ -469,12 +414,11 @@ WRITE8_MEMBER( coco_state::ff20_write )
 //  pia1_pa_r
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pa_r )
+uint8_t coco_state::pia1_pa_r()
 {
 	// Port A: we need to specify the values of all the lines, regardless of whether
 	// they are in input or output mode in the DDR
-	return (m_cassette->input() >= 0 ? 0x01 : 0x00)
-		| (dac_output() << 2);
+	return (m_cassette->input() >= 0 ? 0x01 : 0x00) | 0xfe;
 }
 
 
@@ -485,7 +429,7 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 //  serial-in (PB0)
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pb_r )
+uint8_t coco_state::pia1_pb_r()
 {
 	// Port B: lines in output mode are handled automatically by the PIA object.
 	// We only need to specify the input lines here
@@ -514,7 +458,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 //  pia1_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pa_w )
+void coco_state::pia1_pa_w(uint8_t data)
 {
 	pia1_pa_changed(data);
 }
@@ -525,7 +469,7 @@ WRITE8_MEMBER( coco_state::pia1_pa_w )
 //  pia1_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pb_w )
+void coco_state::pia1_pb_w(uint8_t data)
 {
 	pia1_pb_changed(data);
 }
@@ -555,29 +499,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 }
 
 
-
-//-------------------------------------------------
-//  pia1_firq_a
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
-{
-	recalculate_firq();
-}
-
-
-
-//-------------------------------------------------
-//  pia1_firq_b
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
-{
-	recalculate_firq();
-}
-
-
-
 /***************************************************************************
   CPU INTERRUPTS
 
@@ -597,56 +518,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
   -----
 
 ***************************************************************************/
-
-//-------------------------------------------------
-//  irq_get_line - gets the value of the FIRQ line
-//  passed into the CPU
-//-------------------------------------------------
-
-bool coco_state::irq_get_line(void)
-{
-	return pia_0().irq_a_state() || pia_0().irq_b_state();
-}
-
-
-
-//-------------------------------------------------
-//  recalculate_irq
-//-------------------------------------------------
-
-void coco_state::recalculate_irq(void)
-{
-	bool line = irq_get_line();
-	if (LOG_INTERRUPTS)
-		logerror("recalculate_irq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-//-------------------------------------------------
-//  firq_get_line - gets the value of the FIRQ line
-//  passed into the CPU
-//-------------------------------------------------
-
-bool coco_state::firq_get_line(void)
-{
-	return pia_1().irq_a_state() || pia_1().irq_b_state();
-}
-
-
-
-//-------------------------------------------------
-//  recalculate_firq
-//-------------------------------------------------
-
-void coco_state::recalculate_firq(void)
-{
-	bool line = firq_get_line();
-	if (LOG_INTERRUPTS)
-		logerror("recalculate_firq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
-}
 
 
 
@@ -790,7 +661,7 @@ bool coco_state::is_joystick_hires(int joystick_index)
 //  poll_joystick
 //-------------------------------------------------
 
-void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
+bool coco_state::poll_joystick(void)
 {
 	static const analog_input_t s_empty = {};
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -803,8 +674,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 	/* determine the JOYIN value */
 	const analog_input_t *analog;
 	bool joyin_value;
-	uint8_t joyval;
-	int dclg_vpos;
+	uint32_t joyval;
 	switch(joystick_type(joystick))
 	{
 		case JOYSTICK_NORMAL:
@@ -821,7 +691,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			{
 				/* conventional joystick */
 				joyval = analog->input(joystick, joystick_axis);
-				joyin_value = (dac_output() <= (joyval >> 2));
+				joyin_value = (dac_output() <= (joyval / 10));
 			}
 			break;
 
@@ -833,25 +703,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 
 		case JOYSTICK_DIECOM_LIGHT_GUN:
 			analog = &m_diecom_lightgun;
-
-			/* get the vertical position of the lightgun */
-			dclg_vpos = analog->input(joystick, 1);
-
-			if (m_screen->vpos() == dclg_vpos)
-			{
-				/* if gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
-				m_dclg_output_h |= 0x02;
-				m_dclg_timer = analog->input(joystick, 0) << 1;
-			}
-
 			joyin_value = (dac_output() <= dclg_table[(joystick_axis ? m_dclg_output_h : m_dclg_output_v) & 0x03]);
-
-			if (m_dclg_state == 7)
-			{
-				/* while in state 7, prepare to check next video frame for a hit */
-				attotime dclg_time = m_screen->time_until_pos(dclg_vpos, 0);
-				m_diecom_lightgun_timer->adjust(dclg_time);
-			}
 			break;
 
 		default: /* None */
@@ -860,10 +712,64 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			break;
 	}
 
-	*joyin = joyin_value;
-	*buttons = analog->buttons();
+	return joyin_value;
 }
 
+
+//-------------------------------------------------
+//  poll_joystick_buttons
+//-------------------------------------------------
+
+uint8_t coco_state::poll_joystick_buttons(void)
+{
+	static const analog_input_t s_empty = {};
+	const analog_input_t *analog;
+	uint8_t joy0, joy1;
+
+	switch(joystick_type(0))
+	{
+		case JOYSTICK_NORMAL:
+			analog = &m_joystick;
+			break;
+
+		case JOYSTICK_RAT_MOUSE:
+			analog = &m_rat_mouse;
+			break;
+
+		case JOYSTICK_DIECOM_LIGHT_GUN:
+			analog = &m_diecom_lightgun;
+			break;
+
+		default: /* None */
+			analog = &s_empty;
+			break;
+	}
+
+	joy0 = analog->buttons();
+
+	switch(joystick_type(1))
+	{
+		case JOYSTICK_NORMAL:
+			analog = &m_joystick;
+			break;
+
+		case JOYSTICK_RAT_MOUSE:
+			analog = &m_rat_mouse;
+			break;
+
+		case JOYSTICK_DIECOM_LIGHT_GUN:
+			analog = &m_diecom_lightgun;
+			break;
+
+		default: /* None */
+			analog = &s_empty;
+			break;
+	}
+
+	joy1 = analog->buttons();
+
+	return joy0 | joy1;
+}
 
 
 //-------------------------------------------------
@@ -891,13 +797,14 @@ void coco_state::poll_keyboard(void)
 
 	/* poll the joystick (*/
 	bool joyin;
-	uint8_t buttons;
-	poll_joystick(&joyin, &buttons);
+	joyin = poll_joystick();
 
 	/* PA7 comes from JOYIN */
 	pia0_pa |= joyin ? 0x80 : 0x00;
 
 	/* mask out the buttons */
+	uint8_t buttons;
+	buttons = poll_joystick_buttons();
 	pia0_pa &= ~buttons;
 
 	/* and write the result to PIA0 */
@@ -930,41 +837,54 @@ void coco_state::update_cassout(int cassout)
 
 
 //-------------------------------------------------
-//  diecom_lightgun_clock - called the diecom
-//  lightgun undergoes a high to low transition
+//  diecom_lightgun_clock - called when the diecom
+//  lightgun undergoes a clock transition
 //-------------------------------------------------
 
 void coco_state::diecom_lightgun_clock(void)
 {
-	/* clock Diecom Light gun interface on a high to low transistion */
 	m_dclg_state++;
-	m_dclg_state &= 0x0f;
+	m_dclg_state &= 0x1f;
+	int half_state = m_dclg_state >> 1;
 
 	/* clear hit bit for every transistion */
 	m_dclg_output_h &= ~0x02;
+	m_dclg_output_v = 0;
 
-	if (m_dclg_state > 7)
+	if (half_state > 7)
 	{
-		/* Bit shift timer data on state 8 thru 15 */
-		if (((m_dclg_timer >> (m_dclg_state - 8 + 1)) & 0x01) == 1)
+		/* bit shift timer data on half states 8 thru 15 */
+		if (m_dclg_timer & (1 << (half_state - 7)))
+		{
 			m_dclg_output_v |= 0x01;
-		else
-			m_dclg_output_v &= ~0x01;
+		}
 
-		/* Bit 9 of timer is only available if state == 8*/
-		if (m_dclg_state == 8 && (((m_dclg_timer >> 9) & 0x01) == 1))
+		/* bit 9 of timer is only available if half state == 8 */
+		if (half_state == 8 && (m_dclg_timer & (1 << 8)))
 			m_dclg_output_v |= 0x02;
-		else
-			m_dclg_output_v &= ~0x02;
 	}
 
-	/* During state 15, this bit is high. */
-	if (m_dclg_state == 15)
+	/* during half state 15, this bit is high. */
+	/* it is used to sync the state of the converter box with the computer */
+	if (half_state == 15)
 		m_dclg_output_h |= 0x01;
 	else
 		m_dclg_output_h &= ~0x01;
-}
 
+	/* while in full state 15, prepare to check next video frame for a hit */
+	if (m_dclg_state == 15)
+	{
+		int dclg_vpos = m_diecom_lightgun.input(sel2() ? 1 : 0, 1) - 12;
+		m_dclg_timer = m_diecom_lightgun.input(sel2() ? 1 : 0, 0);
+		int horizontal_pixel = ((m_dclg_timer - 105.) / (420. - 110.0)) * (639.0 - 0.0) + 0.0;
+		attotime dclg_time = m_screen->time_until_pos(dclg_vpos, horizontal_pixel);
+		m_diecom_lightgun_timer->adjust(dclg_time);
+	}
+	else
+	{
+		m_diecom_lightgun_timer->adjust(attotime::never);
+	}
+}
 
 
 //-------------------------------------------------
@@ -976,10 +896,11 @@ void coco_state::update_prinout(bool prinout)
 	if ((joystick_type(0) == JOYSTICK_DIECOM_LIGHT_GUN) || (joystick_type(1) == JOYSTICK_DIECOM_LIGHT_GUN))
 	{
 		/* printer port is connected to diecom light gun */
-		if (m_dclg_previous_bit && !prinout)
+		if (m_dclg_previous_bit != prinout)
 		{
 			diecom_lightgun_clock();
 		}
+
 		m_dclg_previous_bit = prinout;
 	}
 	else
@@ -1098,8 +1019,8 @@ void coco_state::poll_hires_joystick(void)
 		if (m_hiresjoy_ca && !newvalue)
 		{
 			/* hi to lo */
-			double value = m_joystick.input(joystick_index, axis) / 255.0;
-			value *= is_cocomax3 ? 2500.0 : 4160.0;
+			double value = m_joystick.input(joystick_index, axis) / 640.0;
+			value *= is_cocomax3 ? 2500.0 : 4250.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
 			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
@@ -1139,7 +1060,7 @@ coco_vhd_image_device *coco_state::current_vhd()
 //  ff60_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff60_read )
+uint8_t coco_state::ff60_read(offs_t offset)
 {
 	uint8_t result;
 
@@ -1161,7 +1082,7 @@ READ8_MEMBER( coco_state::ff60_read )
 //  ff60_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff60_write )
+void coco_state::ff60_write(offs_t offset, uint8_t data)
 {
 	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
@@ -1188,14 +1109,14 @@ WRITE8_MEMBER( coco_state::ff60_write )
 //  ff40_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff40_read )
+uint8_t coco_state::ff40_read(offs_t offset)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{
-		return m_beckerport->read(space, offset-1, mem_mask);
+		return m_beckerport->read(offset-1);
 	}
 
-	return m_cococart->scs_read(space, offset, mem_mask);
+	return m_cococart->scs_read(offset);
 }
 
 
@@ -1203,14 +1124,14 @@ READ8_MEMBER( coco_state::ff40_read )
 //  ff40_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff40_write )
+void coco_state::ff40_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{
-		return m_beckerport->write(space, offset-1, data, mem_mask);
+		return m_beckerport->write(offset-1, data);
 	}
 
-	m_cococart->scs_write(space, offset, data, mem_mask);
+	m_cococart->scs_write(offset, data);
 }
 
 
@@ -1402,7 +1323,7 @@ offs_t coco_state::os9_dasm_override(std::ostream &stream, offs_t pc, const util
 	if ((opcodes.r8(pc) == 0x10) && (opcodes.r8(pc+1) == 0x3F))
 	{
 		call = opcodes.r8(pc+2);
-		if ((call < ARRAY_LENGTH(os9syscalls)) && (os9syscalls[call] != nullptr))
+		if ((call < std::size(os9syscalls)) && (os9syscalls[call] != nullptr))
 		{
 			util::stream_format(stream, "OS9   %s", os9syscalls[call]);
 			result = 3;

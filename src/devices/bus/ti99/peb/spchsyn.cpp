@@ -36,9 +36,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+DEFINE_DEVICE_TYPE(TI99_SPEECH, bus::ti99::peb::ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /****************************************************************************/
 
@@ -47,7 +47,8 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(*this, "vsp"),
 	m_reading(false),
-	m_sbe(false)
+	m_sbe(false),
+	m_dec_high(false)
 {
 }
 
@@ -55,7 +56,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
     Memory read
 */
 
-READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
+void ti_speech_synthesizer_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -87,7 +88,7 @@ void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
+void ti_speech_synthesizer_device::setaddress_dbin(offs_t offset, int state)
 {
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
@@ -95,7 +96,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
-	m_sbe = ((offset & m_select_mask)==m_select_value) && valid;
+
+	if (m_dec_high)
+		m_sbe = ((offset & 0x7f801)==0x79000) && valid;
+	else
+		m_sbe = ((offset & 0x0f801)==0x09000) && valid;
 
 	if (m_sbe)
 	{
@@ -136,19 +141,9 @@ void ti_speech_synthesizer_device::device_start()
 
 void ti_speech_synthesizer_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1ff801;
-		m_select_value = 0x179000;
-	}
-	else
-	{
-		m_select_mask = 0x7f801;
-		m_select_value = 0x79000;
-	}
-
 	m_reading = false;
 	m_sbe = false;
+	m_dec_high = (ioport("AMADECODE")->read()!=0);
 }
 
 ROM_START( ti99_speech )
@@ -177,10 +172,22 @@ void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
 */
 }
 
+INPUT_PORTS_START( ti99_speech )
+	PORT_START( "AMADECODE" )
+	PORT_CONFNAME( 0x01, 0x01, "Decode AMA/AMB/AMC lines" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( 0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
+ioport_constructor ti_speech_synthesizer_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ti99_speech);
+}
+
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 

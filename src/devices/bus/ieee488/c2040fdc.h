@@ -34,8 +34,8 @@ public:
 	auto ready_wr_callback() { return m_write_ready.bind(); }
 	auto error_wr_callback() { return m_write_error.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ds0_w );
 	DECLARE_WRITE_LINE_MEMBER( ds1_w );
@@ -59,7 +59,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

@@ -11,7 +11,7 @@
   epoxy block which probably contains a standard Z80 + PALs.
 
   The encryption affects D3, D5, and D7, and depends on M1, A0, A4, A8 and A12.
-  D0, D1, D3, D4 and D6 are always unaffected.
+  D0, D1, D2, D4 and D6 are always unaffected.
 
   The encryption consists of a permutation of the three bits, which can also be
   inverted. Therefore there are 3! * 2^3 = 48 different possible encryptions.
@@ -123,7 +123,7 @@
   315-5064      Water Match             used Mister Viking for k.p.a.
   315-5065      Bull Fight
   315-5069      Star Force              game by Tehkan; same key as Super Locomotive
-  ???-????      Spatter
+  ???-????      Spatter                 same encryption scheme is used by the Falcon 03155096 CPU (Z80)
   315-5084      Jongkyo                 TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
   315-5098      Ninja Princess          unencrypted version available; same key as Up'n Down

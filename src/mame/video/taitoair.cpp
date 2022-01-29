@@ -172,7 +172,7 @@ void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 				while (xx1 <= xx2)
 				{
-					bitmap.pix16(y1, xx1) = base_color + grad_col;
+					bitmap.pix(y1, xx1) = base_color + grad_col;
 					xx1++;
 				}
 			}
@@ -396,6 +396,7 @@ u32 taitoair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	m_tc0080vco->tilemap_update();
 
+	// TODO: Convert TC0430GRW to device (tc0280grd.cpp)
 	u32 counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
 	u32 inc1x    = s16(m_tc0430grw[2]);
 	u32 inc1y    = s16(m_tc0430grw[3]);

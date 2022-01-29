@@ -14,8 +14,8 @@ struct AICADSP
 	void start();
 
 //Config
-	address_space *space;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *cache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache cache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::specific space;
 	u32 RBP; //Ring buf pointer
 	u32 RBL; //Delay ram (Ring buffer) size in words
 

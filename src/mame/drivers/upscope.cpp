@@ -55,13 +55,13 @@ private:
 	uint8_t m_nvram_address_latch;
 	uint8_t m_nvram_data_latch;
 
-	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
-	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
+	uint8_t upscope_cia_0_portb_r();
+	void upscope_cia_0_portb_w(uint8_t data);
+	uint8_t upscope_cia_1_porta_r();
+	void upscope_cia_1_porta_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	void lamps_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
 
 
 	void a500_mem(address_map &map);
@@ -99,12 +99,12 @@ void upscope_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( upscope_state::upscope_cia_0_portb_w )
+void upscope_state::upscope_cia_0_portb_w(uint8_t data)
 {
 	m_parallel_data = data;
 }
 
-READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
+uint8_t upscope_state::upscope_cia_0_portb_r()
 {
 	return m_nvram_data_latch;
 }
@@ -126,12 +126,12 @@ READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
  *
  *************************************/
 
-READ8_MEMBER( upscope_state::upscope_cia_1_porta_r )
+uint8_t upscope_state::upscope_cia_1_porta_r()
 {
 	return 0xf8 | (m_prev_cia1_porta & 0x07);
 }
 
-WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
+void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((m_prev_cia1_porta & 2) && !(data & 2))
@@ -185,7 +185,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 	m_prev_cia1_porta = data;
 }
 
-WRITE8_MEMBER( upscope_state::lamps_w )
+void upscope_state::lamps_w(uint8_t data)
 {
 	// 7-------  bubble light
 	// -6------  sight
@@ -197,7 +197,7 @@ WRITE8_MEMBER( upscope_state::lamps_w )
 	// -------0  enemy right
 }
 
-WRITE8_MEMBER( upscope_state::coin_counter_w )
+void upscope_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -330,25 +330,25 @@ void upscope_state::upscope(machine_config &config)
  *************************************/
 
 ROM_START( upscope )
-	ROM_REGION(0x80000, "kickstart", 0)
-	ROM_LOAD16_WORD_SWAP("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
+	ROM_REGION16_BE(0x80000, "kickstart", 0)
+	ROM_LOAD16_WORD("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
 	ROM_COPY("kickstart", 0x000000, 0x40000, 0x40000)
 
-	ROM_REGION(0x080000, "user2", 0)
-	ROM_LOAD16_BYTE( "upscope.u5",   0x000000, 0x008000, CRC(c109912e) SHA1(dcac9522e3c4818b2a02212b9173540fcf4bd463) )
-	ROM_LOAD16_BYTE( "upscope.u13",  0x000001, 0x008000, CRC(9c8b071a) SHA1(69f9f8c17630ed568975e65dadc03213677a12dd) )
-	ROM_LOAD16_BYTE( "upscope.u6",   0x010000, 0x008000, CRC(962f371e) SHA1(5682c62f34df2cc70f6125cf14203087670571db) )
-	ROM_LOAD16_BYTE( "upscope.u14",  0x010001, 0x008000, CRC(1231bfc1) SHA1(f99adfabb01c1a15130f82f6a09d5458109a28bb) )
+	ROM_REGION16_BE(0x080000, "user2", 0)
+	ROM_LOAD16_BYTE( "upscope.u5",   0x000001, 0x008000, CRC(c109912e) SHA1(dcac9522e3c4818b2a02212b9173540fcf4bd463) )
+	ROM_LOAD16_BYTE( "upscope.u13",  0x000000, 0x008000, CRC(9c8b071a) SHA1(69f9f8c17630ed568975e65dadc03213677a12dd) )
+	ROM_LOAD16_BYTE( "upscope.u6",   0x010001, 0x008000, CRC(962f371e) SHA1(5682c62f34df2cc70f6125cf14203087670571db) )
+	ROM_LOAD16_BYTE( "upscope.u14",  0x010000, 0x008000, CRC(1231bfc1) SHA1(f99adfabb01c1a15130f82f6a09d5458109a28bb) )
 
-	ROM_LOAD16_BYTE( "upscope.u1",   0x040000, 0x008000, CRC(7a8de1fb) SHA1(30b87f07e0e0f66699402dffaeb0ca00c554f23e) )
-	ROM_LOAD16_BYTE( "upscope.u9",   0x040001, 0x008000, CRC(5d16521e) SHA1(93e0a1644bd8adbb6f9fca6d4a252c11812c6ada) )
-	ROM_LOAD16_BYTE( "upscope.u2",   0x050000, 0x008000, CRC(2089ef6b) SHA1(a12d87c8b368ffbadb556aca2e43e50348d34839) )
-	ROM_LOAD16_BYTE( "upscope.u10",  0x050001, 0x008000, CRC(fbab44f5) SHA1(cd49f1f79e2181b3a9c40aebfba9d7c314dc909b) )
+	ROM_LOAD16_BYTE( "upscope.u1",   0x040001, 0x008000, CRC(7a8de1fb) SHA1(30b87f07e0e0f66699402dffaeb0ca00c554f23e) )
+	ROM_LOAD16_BYTE( "upscope.u9",   0x040000, 0x008000, CRC(5d16521e) SHA1(93e0a1644bd8adbb6f9fca6d4a252c11812c6ada) )
+	ROM_LOAD16_BYTE( "upscope.u2",   0x050001, 0x008000, CRC(2089ef6b) SHA1(a12d87c8b368ffbadb556aca2e43e50348d34839) )
+	ROM_LOAD16_BYTE( "upscope.u10",  0x050000, 0x008000, CRC(fbab44f5) SHA1(cd49f1f79e2181b3a9c40aebfba9d7c314dc909b) )
 
-	ROM_LOAD16_BYTE( "upscope.u3",   0x060000, 0x008000, CRC(9b325528) SHA1(5bde1a42b62dd810843349ee9edf76e1c7521653) )
-	ROM_LOAD16_BYTE( "upscope.u11",  0x060001, 0x008000, CRC(40e54449) SHA1(7d6ed97b87d74d80776cb682c78cd3b4a68633f4) )
-	ROM_LOAD16_BYTE( "upscope.u4",   0x070000, 0x008000, CRC(6585ef1d) SHA1(b95e5e424266a50d4b63501278eb5d618fde5ba2) )
-	ROM_LOAD16_BYTE( "upscope.u12",  0x070001, 0x008000, CRC(a909e388) SHA1(62acc30ab97d6a46a6d0782bb4ceb58061332724) )
+	ROM_LOAD16_BYTE( "upscope.u3",   0x060001, 0x008000, CRC(9b325528) SHA1(5bde1a42b62dd810843349ee9edf76e1c7521653) )
+	ROM_LOAD16_BYTE( "upscope.u11",  0x060000, 0x008000, CRC(40e54449) SHA1(7d6ed97b87d74d80776cb682c78cd3b4a68633f4) )
+	ROM_LOAD16_BYTE( "upscope.u4",   0x070001, 0x008000, CRC(6585ef1d) SHA1(b95e5e424266a50d4b63501278eb5d618fde5ba2) )
+	ROM_LOAD16_BYTE( "upscope.u12",  0x070000, 0x008000, CRC(a909e388) SHA1(62acc30ab97d6a46a6d0782bb4ceb58061332724) )
 ROM_END
 
 

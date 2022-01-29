@@ -29,8 +29,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -81,9 +81,9 @@ protected:
 
 	uint8_t m_PARITY[256];
 
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 5, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 };
 
 // device type definition

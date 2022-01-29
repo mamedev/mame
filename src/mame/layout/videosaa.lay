@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+license: CC0
+copyright-holders: Dirk Best
+
+Simple layout for games running on Videos A A hardware
+-->
+
+<mamelayout version="2">
+	<element name="background">
+	</element>
+	<element name="button" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+	<element name="start" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="START"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<view name="Buttons">
+		<element ref="background">
+			<bounds x="0" y="0" width="640" height="640" />
+		</element>
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<element name="lamp0" ref="button" inputtag="in1" inputmask="0x01">
+			<bounds x="80" y="505" width="70" height="35" />
+		</element>
+		<element name="lamp1" ref="button" inputtag="in1" inputmask="0x02">
+			<bounds x="180" y="505" width="70" height="35" />
+		</element>
+		<element name="lamp2" ref="button" inputtag="in1" inputmask="0x04">
+			<bounds x="280" y="505" width="70" height="35" />
+		</element>
+		<element name="lamp3" ref="button" inputtag="in1" inputmask="0x08">
+			<bounds x="380" y="505" width="70" height="35" />
+		</element>
+		<element name="lamp4" ref="button" inputtag="in1" inputmask="0x10">
+			<bounds x="480" y="505" width="70" height="35" />
+		</element>
+		<element name="lamp5" ref="start" inputtag="in1" inputmask="0x20">
+			<bounds x="250" y="565" width="130" height="35" />
+		</element>
+	</view>
+</mamelayout>

@@ -42,6 +42,9 @@ inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
 
 void artmagic_state::video_start()
 {
+	// assumes it can make an address mask from m_blitter_base.length() - 1
+	assert(!(m_blitter_base.length() & (m_blitter_base.length() - 1)));
+
 	save_item(NAME(m_xor));
 	save_item(NAME(m_is_stoneball));
 	save_item(NAME(m_blitter_data));
@@ -219,7 +222,7 @@ void artmagic_state::execute_blit()
 				}
 				else    /* following lines */
 				{
-					int val = m_blitter_base[offset & m_blitter_base.mask()];
+					int val = m_blitter_base[offset & (m_blitter_base.length() - 1)];
 
 					/* ultennis, stonebal */
 					last ^= 4;
@@ -234,7 +237,7 @@ void artmagic_state::execute_blit()
 
 				for (j = 0; j < w; j += 4)
 				{
-					uint16_t val = m_blitter_base[(offset + j/4) & m_blitter_base.mask()];
+					uint16_t val = m_blitter_base[(offset + j/4) & (m_blitter_base.length() - 1)];
 					if (sx < 508)
 					{
 						if (h == 1 && m_is_stoneball)
@@ -294,7 +297,7 @@ void artmagic_state::execute_blit()
 }
 
 
-READ16_MEMBER(artmagic_state::blitter_r)
+uint16_t artmagic_state::blitter_r()
 {
 	/*
 	    bit 1 is a busy flag; loops tightly if clear
@@ -310,7 +313,7 @@ READ16_MEMBER(artmagic_state::blitter_r)
 }
 
 
-WRITE16_MEMBER(artmagic_state::blitter_w)
+void artmagic_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_data[offset]);
 
@@ -334,13 +337,12 @@ WRITE16_MEMBER(artmagic_state::blitter_w)
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 {
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
-	uint16_t *vram = address_to_vram(&offset);
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *vram = address_to_vram(&offset);
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	vram += offset;
-	for (x = params->heblnk; x < params->hsblnk; x++)
+	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = pens[vram[coladdr++ & 0x1ff] & 0xff];
 }

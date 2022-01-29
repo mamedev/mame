@@ -4,7 +4,7 @@
 #ifndef MAME_MACHINE_PC9801_CD_H
 #define MAME_MACHINE_PC9801_CD_H
 
-#include "machine/atapicdr.h"
+#include "bus/ata/atapicdr.h"
 
 class pc9801_cd_device : public atapi_cdrom_device
 {

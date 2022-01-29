@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     Capcom CPS-3 Sound Hardware
@@ -38,15 +38,15 @@ public:
 
 	void set_base(int8_t* base) { m_base = base; }
 
-	DECLARE_WRITE32_MEMBER( cps3_sound_w );
-	DECLARE_READ32_MEMBER( cps3_sound_r );
+	void sound_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_r(offs_t offset, uint32_t mem_mask = ~0);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	sound_stream *m_stream;

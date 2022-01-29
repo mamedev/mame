@@ -59,23 +59,21 @@ public:
 
 private:
 	virtual void video_start() override;
-	DECLARE_WRITE32_MEMBER(scanline_cb);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(spriteram_r);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
+	void scanline_cb(uint32_t data);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint8_t data);
 	void update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(pia0_porta_w);
+	void pia0_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_irq_w);
-	DECLARE_READ8_MEMBER(pia1_porta_r);
-	DECLARE_WRITE8_MEMBER(pia1_porta_w);
-	DECLARE_READ8_MEMBER(pia1_portb_r);
-	DECLARE_READ8_MEMBER(pia2_porta_r);
+	void pia1_porta_w(uint8_t data);
+	uint8_t pia1_portb_r();
 
-	DECLARE_READ8_MEMBER(ptm_r);
+	uint8_t ptm_r(offs_t offset);
 
 	void zwackery_map(address_map &map);
 
@@ -195,10 +193,10 @@ void zwackery_state::video_start()
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
 	// initialize the background tilemap
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zwackery_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zwackery_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 
 	// initialize the foreground tilemap
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zwackery_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zwackery_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// allocate memory for the assembled gfx data
@@ -248,7 +246,7 @@ void zwackery_state::video_start()
 	gfx2->set_raw_layout(m_srcdata2.get(), gfx2->width(), gfx2->height(), gfx2->elements(), 8 * gfx2->width(), 8 * gfx2->width() * gfx2->height());
 }
 
-WRITE32_MEMBER(zwackery_state::scanline_cb)
+void zwackery_state::scanline_cb(uint32_t data)
 {
 	switch (data)
 	{
@@ -274,19 +272,19 @@ WRITE32_MEMBER(zwackery_state::scanline_cb)
 	m_ptm->set_c3(1);
 }
 
-WRITE16_MEMBER( zwackery_state::videoram_w )
+void zwackery_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER( zwackery_state::spriteram_r )
+uint8_t zwackery_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE8_MEMBER( zwackery_state::spriteram_w )
+void zwackery_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 }
@@ -365,14 +363,14 @@ TILE_GET_INFO_MEMBER( zwackery_state::get_bg_tile_info )
 {
 	uint16_t data = m_videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(0, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
+	tileinfo.set(0, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
 }
 
 TILE_GET_INFO_MEMBER( zwackery_state::get_fg_tile_info )
 {
 	uint16_t data = m_videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(2, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
+	tileinfo.set(2, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
 	tileinfo.category = (color != 0);
 }
 
@@ -413,7 +411,7 @@ GFXDECODE_END
 //  AUDIO
 //**************************************************************************
 
-WRITE8_MEMBER( zwackery_state::pia1_porta_w )
+void zwackery_state::pia1_porta_w(uint8_t data)
 {
 	m_cheap_squeak_deluxe->sr_w(data >> 4);
 }
@@ -423,7 +421,7 @@ WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 //  INPUTS/OUTPUTS
 //**************************************************************************
 
-WRITE8_MEMBER( zwackery_state::pia0_porta_w )
+void zwackery_state::pia0_porta_w(uint8_t data)
 {
 	// bits 0, 1 and 2 control meters?
 	// bits 3 and 4 control coin counters?
@@ -440,22 +438,12 @@ WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
 	m_maincpu->set_input_line(5, irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( zwackery_state::pia1_porta_r )
-{
-	return ioport("IN1")->read();
-}
-
-READ8_MEMBER( zwackery_state::pia1_portb_r )
+uint8_t zwackery_state::pia1_portb_r()
 {
 	uint8_t result = ioport("IN2")->read();
 	uint8_t wheel = ioport("IN5")->read();
 
 	return result | ((wheel >> 2) & 0x3e);
-}
-
-READ8_MEMBER( zwackery_state::pia2_porta_r )
-{
-	return ioport("IN3")->read();
 }
 
 
@@ -471,7 +459,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 // It expects D1 to end up between 0 and 5; in order to
 // make this happen, we must assume that reads from the
 // 6840 take 14 additional cycles
-READ8_MEMBER( zwackery_state::ptm_r )
+uint8_t zwackery_state::ptm_r(offs_t offset)
 {
 	m_maincpu->adjust_icount(-14);
 	return m_ptm->read(offset);
@@ -509,13 +497,13 @@ void zwackery_state::zwackery(machine_config &config)
 	m_pia0->irqb_handler().set(FUNC(zwackery_state::pia0_irq_w));
 
 	PIA6821(config, m_pia1, 0);
-	m_pia1->readpa_handler().set(FUNC(zwackery_state::pia1_porta_r));
+	m_pia1->readpa_handler().set_ioport("IN1");
 	m_pia1->writepa_handler().set(FUNC(zwackery_state::pia1_porta_w));
 	m_pia1->readpb_handler().set(FUNC(zwackery_state::pia1_portb_r));
 	m_pia1->ca2_handler().set(m_cheap_squeak_deluxe, FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
 
 	PIA6821(config, m_pia2, 0);
-	m_pia2->readpa_handler().set(FUNC(zwackery_state::pia2_porta_r));
+	m_pia2->readpa_handler().set_ioport("IN3");
 	m_pia2->readpb_handler().set_ioport("DSW");
 
 	// video hardware

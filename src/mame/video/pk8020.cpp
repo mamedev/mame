@@ -135,17 +135,17 @@ void pk8020_state::gzu_w(offs_t offset, uint8_t data)
 
 uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *ram = m_ram->pointer();
+	uint8_t const *const ram = m_ram->pointer();
 
 	for (int y = 0; y < 16; y++)
 	{
 		for (int x = 0; x < 64; x++)
 		{
-			uint8_t chr = ram[x +(y*64) + 0x40000];
-			uint8_t attr= ram[x +(y*64) + 0x40400];
+			uint8_t const chr = ram[x +(y*64) + 0x40000];
+			uint8_t const attr= ram[x +(y*64) + 0x40400];
 			for (int j = 0; j < 16; j++)
 			{
-				uint32_t addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
+				uint32_t const addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
 				uint8_t code1 = ram[addr];
 				uint8_t code2 = ram[addr + 0x4000];
 				uint8_t code3 = ram[addr + 0x8000];
@@ -157,7 +157,7 @@ uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 
 					col |= (((code3 >> b) & 0x01) ? 0x04 : 0x00);
 					col |= (((code2 >> b) & 0x01) ? 0x02 : 0x00);
 					col |= (((code1 >> b) & 0x01) ? 0x01 : 0x00);
-					bitmap.pix16((y*16)+j, x*8+(7-b)) =  col;
+					bitmap.pix((y*16)+j, x*8+(7-b)) =  col;
 				}
 			}
 		}

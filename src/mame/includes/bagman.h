@@ -7,6 +7,7 @@
 
 
 #include "machine/74259.h"
+#include "sound/ay8910.h"
 #include "sound/tms5110.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -26,29 +27,30 @@ public:
 		m_colorram(*this, "colorram")
 	{ }
 
-	void botanic(machine_config &config);
 	void sbagman(machine_config &config);
 	void bagman(machine_config &config);
-	void pickin(machine_config &config);
 	void sbagmani(machine_config &config);
+
+	void init_bagmans3();
+	void init_botanic2();
 
 protected:
 	// common
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
 
 	// bagman
-	DECLARE_WRITE8_MEMBER(ls259_w);
+	void ls259_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_bit_w);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq0_w);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq1_w);
-	DECLARE_WRITE8_MEMBER(pal16r6_w);
-	DECLARE_READ8_MEMBER(pal16r6_r);
+	void pal16r6_w(offs_t offset, uint8_t data);
+	uint8_t pal16r6_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -65,9 +67,7 @@ protected:
 	void bagman_base(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
-	void pickin_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -75,6 +75,7 @@ private:
 	optional_device<tmsprom_device> m_tmsprom;
 	optional_device<ls259_device> m_tmslatch;
 
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
@@ -94,11 +95,33 @@ private:
 };
 
 
-class squaitsa_state : public bagman_state
+class pickin_state : public bagman_state
+{
+public:
+	pickin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bagman_state(mconfig, type, tag),
+		m_aysnd(*this, {"aysnd", "ay2"})
+	{ }
+
+	void pickin(machine_config &config);
+	void botanic(machine_config &config);
+
+private:
+	uint8_t aysnd_r();
+	void aysnd_w(offs_t offset, uint8_t data);
+
+	void pickin_map(address_map &map);
+	void pickin_portmap(address_map &map);
+
+	required_device_array<ay8910_device, 2> m_aysnd;
+};
+
+
+class squaitsa_state : public pickin_state
 {
 public:
 	squaitsa_state(const machine_config &mconfig, device_type type, const char *tag) :
-		bagman_state(mconfig, type, tag),
+		pickin_state(mconfig, type, tag),
 		m_dial(*this, "DIAL_P%u", 1),
 		m_res{ 0, 0 },
 		m_old_val{ 0, 0 }

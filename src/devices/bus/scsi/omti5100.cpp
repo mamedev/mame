@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(OMTI5100, omti5100_device, "omti5100", "OMTI 5100")
 #if 0
 ROM_START( omti5100 )
 	ROM_REGION(0x1000, "mcu", 0) // Hitachi Z8
-	ROM_LOAD("100240-N.7a", 0x0000, 0x1000, CRC(d227d6cb) SHA1(3d6140764d3d043428c941826370ebf1597c63bd))
+	ROM_LOAD("100240-n.7a", 0x0000, 0x1000, CRC(d227d6cb) SHA1(3d6140764d3d043428c941826370ebf1597c63bd))
 ROM_END
 
 const tiny_rom_entry *omti5100_device::device_rom_region() const

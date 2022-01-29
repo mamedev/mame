@@ -23,7 +23,7 @@ struct gs_poly_data
 	bitmap_ind16* texbase;
 };
 
-class galastrm_renderer : public poly_manager<float, gs_poly_data, 2, 10000>
+class galastrm_renderer : public poly_manager<float, gs_poly_data, 2>
 {
 public:
 	galastrm_renderer(galastrm_state &state);

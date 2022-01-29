@@ -160,7 +160,7 @@ public:
 
   void deliver_to_all(std::string msg)
   {
-	for (auto client: m_clients)
+	for (const auto &client: m_clients)
 	  client->deliver(msg);
   }
 

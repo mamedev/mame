@@ -37,49 +37,53 @@ void lpc_rtc_device::map_extdevice(uint64_t memory_window_start, uint64_t memory
 void lpc_rtc_device::device_start()
 {
 	memset(ram, 0, 256);
+
+	save_item(NAME(cur_index));
+	save_item(NAME(cur_extindex));
+	save_item(NAME(ram));
 }
 
 void lpc_rtc_device::device_reset()
 {
 }
 
-READ8_MEMBER(  lpc_rtc_device::index_r)
+uint8_t lpc_rtc_device::index_r()
 {
 	return cur_index;
 }
 
-WRITE8_MEMBER( lpc_rtc_device::index_w)
+void lpc_rtc_device::index_w(uint8_t data)
 {
 	cur_index = data & 0x7f;
 }
 
-READ8_MEMBER(  lpc_rtc_device::target_r)
+uint8_t lpc_rtc_device::target_r()
 {
 	return ram[cur_index];
 }
 
-WRITE8_MEMBER( lpc_rtc_device::target_w)
+void lpc_rtc_device::target_w(uint8_t data)
 {
 	ram[cur_index] = data;
 	logerror("%s: ram[%02x] = %02x\n", tag(), cur_index, data);
 }
 
-READ8_MEMBER(  lpc_rtc_device::extindex_r)
+uint8_t lpc_rtc_device::extindex_r()
 {
 	return cur_extindex;
 }
 
-WRITE8_MEMBER( lpc_rtc_device::extindex_w)
+void lpc_rtc_device::extindex_w(uint8_t data)
 {
 	cur_extindex = data & 0x7f;
 }
 
-READ8_MEMBER(  lpc_rtc_device::exttarget_r)
+uint8_t lpc_rtc_device::exttarget_r()
 {
 	return ram[cur_extindex|128];
 }
 
-WRITE8_MEMBER( lpc_rtc_device::exttarget_w)
+void lpc_rtc_device::exttarget_w(uint8_t data)
 {
 	ram[cur_extindex|128] = data;
 	logerror("%s: ram[%02x] = %02x\n", tag(), cur_extindex|128, data);

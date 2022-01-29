@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txdb_w)
 	m_ipu_sio->rxb_w(state);
 }
 
-WRITE8_MEMBER(mcr_nflfoot_state::ipu_laserdisk_w)
+void mcr_nflfoot_state::ipu_laserdisk_w(offs_t offset, uint8_t data)
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
 	/* bit 2 enables (1) LD right channel audio */
@@ -179,16 +179,17 @@ TIMER_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_watchdog_reset)
 	m_ipu_sio->reset();
 }
 
-READ8_MEMBER(mcr_nflfoot_state::ipu_watchdog_r)
+uint8_t mcr_nflfoot_state::ipu_watchdog_r()
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
-	m_ipu_watchdog_timer->adjust(attotime::from_hz(7372800 / 16 / 32768));
+	if (!machine().side_effects_disabled())
+		m_ipu_watchdog_timer->adjust(attotime::from_hz(7372800 / 16 / 32768));
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(mcr_nflfoot_state::ipu_watchdog_w)
+void mcr_nflfoot_state::ipu_watchdog_w(uint8_t data)
 {
-	ipu_watchdog_r(space,0);
+	(void)ipu_watchdog_r();
 }

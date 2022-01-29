@@ -61,8 +61,8 @@ public:
 	void set_sby(uint8_t state) { m_sby = state; }
 	uint8_t get_sby() { return m_sby; }
 
-	DECLARE_READ8_MEMBER(ssa1_r);
-	DECLARE_WRITE8_MEMBER(ssa1_w);
+	uint8_t ssa1_r();
+	void ssa1_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -98,8 +98,8 @@ public:
 	void set_sby(uint8_t state) { m_sby = state; }
 	uint8_t get_sby() { return m_sby; }
 
-	DECLARE_READ8_MEMBER(dkspeech_r);
-	DECLARE_WRITE8_MEMBER(dkspeech_w);
+	uint8_t dkspeech_r();
+	void dkspeech_w(uint8_t data);
 
 protected:
 	// device-level overrides

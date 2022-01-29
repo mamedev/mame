@@ -40,9 +40,8 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
-	required_device<cpu_device> m_m68000;
-	required_device<via6522_device> m_via6522_0;
-	required_device<via6522_device> m_via6522_1;
+	required_device<m68000_base_device> m_m68000;
+	required_device_array<via6522_device, 2> m_via;
 	required_memory_region m_casper_rom;
 
 	void tube_casper_mem(address_map &map);

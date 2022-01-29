@@ -15,8 +15,8 @@
 #include "m6510.h"
 #include "m6510d.h"
 
-DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology M6510")
-DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology M6508")
+DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology 6510")
+DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology 6508")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)
@@ -57,10 +57,7 @@ void m6510_device::init_port()
 
 void m6510_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_6510_nd>(this);
-	else
-		mintf = std::make_unique<mi_6510_normal>(this);
+	mintf = std::make_unique<mi_6510>(this);
 
 	init();
 	init_port();
@@ -109,14 +106,14 @@ void m6510_device::port_w(uint8_t data)
 }
 
 
-m6510_device::mi_6510_normal::mi_6510_normal(m6510_device *_base)
+m6510_device::mi_6510::mi_6510(m6510_device *_base)
 {
 	base = _base;
 }
 
-uint8_t m6510_device::mi_6510_normal::read(uint16_t adr)
+uint8_t m6510_device::mi_6510::read(uint16_t adr)
 {
-	uint8_t res = program->read_byte(adr);
+	uint8_t res = program.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -124,9 +121,9 @@ uint8_t m6510_device::mi_6510_normal::read(uint16_t adr)
 	return res;
 }
 
-uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
+uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 {
-	uint8_t res = scache->read_byte(adr);
+	uint8_t res = csprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -134,9 +131,9 @@ uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
 	return res;
 }
 
-uint8_t m6510_device::mi_6510_normal::read_arg(uint16_t adr)
+uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -144,37 +141,13 @@ uint8_t m6510_device::mi_6510_normal::read_arg(uint16_t adr)
 	return res;
 }
 
-void m6510_device::mi_6510_normal::write(uint16_t adr, uint8_t val)
+void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 	if(adr == 0x0000)
 		base->dir_w(val);
 	else if(adr == 0x0001)
 		base->port_w(val);
-}
-
-m6510_device::mi_6510_nd::mi_6510_nd(m6510_device *_base) : mi_6510_normal(_base)
-{
-}
-
-uint8_t m6510_device::mi_6510_nd::read_sync(uint16_t adr)
-{
-	uint8_t res = sprogram->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	return res;
-}
-
-uint8_t m6510_device::mi_6510_nd::read_arg(uint16_t adr)
-{
-	uint8_t res = program->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	return res;
 }
 
 
@@ -185,10 +158,7 @@ m6508_device::m6508_device(const machine_config &mconfig, const char *tag, devic
 
 void m6508_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_6508_nd>(this);
-	else
-		mintf = std::make_unique<mi_6508_normal>(this);
+	mintf = std::make_unique<mi_6508>(this);
 
 	init();
 	init_port();
@@ -198,14 +168,14 @@ void m6508_device::device_start()
 }
 
 
-m6508_device::mi_6508_normal::mi_6508_normal(m6508_device *_base)
+m6508_device::mi_6508::mi_6508(m6508_device *_base)
 {
 	base = _base;
 }
 
-uint8_t m6508_device::mi_6508_normal::read(uint16_t adr)
+uint8_t m6508_device::mi_6508::read(uint16_t adr)
 {
-	uint8_t res = program->read_byte(adr);
+	uint8_t res = program.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -215,9 +185,9 @@ uint8_t m6508_device::mi_6508_normal::read(uint16_t adr)
 	return res;
 }
 
-uint8_t m6508_device::mi_6508_normal::read_sync(uint16_t adr)
+uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 {
-	uint8_t res = scache->read_byte(adr);
+	uint8_t res = csprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -227,9 +197,9 @@ uint8_t m6508_device::mi_6508_normal::read_sync(uint16_t adr)
 	return res;
 }
 
-uint8_t m6508_device::mi_6508_normal::read_arg(uint16_t adr)
+uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -239,43 +209,15 @@ uint8_t m6508_device::mi_6508_normal::read_arg(uint16_t adr)
 	return res;
 }
 
-void m6508_device::mi_6508_normal::write(uint16_t adr, uint8_t val)
+void m6508_device::mi_6508::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 	if(adr == 0x0000)
 		base->dir_w(val);
 	else if(adr == 0x0001)
 		base->port_w(val);
 	else if(adr < 0x0200)
 		base->ram_page[adr & 0x00ff] = val;
-}
-
-m6508_device::mi_6508_nd::mi_6508_nd(m6508_device *_base) : mi_6508_normal(_base)
-{
-}
-
-uint8_t m6508_device::mi_6508_nd::read_sync(uint16_t adr)
-{
-	uint8_t res = sprogram->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
-uint8_t m6508_device::mi_6508_nd::read_arg(uint16_t adr)
-{
-	uint8_t res = program->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
 }
 
 

@@ -163,24 +163,24 @@ WRITE_LINE_MEMBER(polyplay_state::ctc_zc2_w)
 	//osd_printf_verbose("ctc_z2_w: %02x\n", state);
 }
 
-READ8_MEMBER(polyplay_state::pio_porta_r)
+uint8_t polyplay_state::pio_porta_r()
 {
 	return m_in0_port->read();
 }
 
-WRITE8_MEMBER(polyplay_state::pio_porta_w)
+void polyplay_state::pio_porta_w(uint8_t data)
 {
 	//osd_printf_verbose("pio_porta_w: %02x\n", data);
 }
 
-READ8_MEMBER(polyplay_state::pio_portb_r)
+uint8_t polyplay_state::pio_portb_r()
 {
 	uint8_t result = 0x00;
 	//osd_printf_verbose("pio_portb_r: %02x\n", result);
 	return result;
 }
 
-WRITE8_MEMBER(polyplay_state::pio_portb_w)
+void polyplay_state::pio_portb_w(uint8_t data)
 {
 	uint8_t const lightState = data & 0x07;
 	//uint8_t soundState = data & 0xe0;

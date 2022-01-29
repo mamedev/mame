@@ -19,8 +19,8 @@ public:
 
 	auto turbo_callback() { return m_turbo_out_cb.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(switched_read) override;
-	virtual DECLARE_WRITE8_MEMBER(switched_write) override;
+	virtual uint8_t switched_read(offs_t offset) override;
+	virtual void switched_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

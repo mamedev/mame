@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
@@ -36,6 +37,7 @@ public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_ppi(*this, "ppi"),
 		m_speaker(*this, "speaker"),
 		m_spectrum_video_ram(*this, "spectrum_vram")
 	{ }
@@ -48,6 +50,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<speaker_sound_device> m_speaker;
 
 	required_shared_ptr<uint8_t> m_spectrum_video_ram;
@@ -57,10 +60,10 @@ private:
 	uint8_t m_spectrum_port_fe;
 	uint8_t m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(membank_w);
-	DECLARE_READ8_MEMBER(fe_r);
-	DECLARE_WRITE8_MEMBER(fe_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	void membank_w(uint8_t data);
+	uint8_t fe_r();
+	void fe_w(uint8_t data);
+	void misc_w(uint8_t data);
 
 	void photon2_palette(palette_device &palette) const;
 
@@ -75,7 +78,7 @@ private:
 
 /*************************************
  *
- *  Video (copied from MESS apart from support
+ *  Video (copied from spectrum driver apart from support
  *  for changing border color mid-frame)
  *
  *************************************/
@@ -163,48 +166,46 @@ WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
 
 static inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now do a full-refresh */
-	int x, y, b, scrx, scry;
-	unsigned short ink, pap;
-	unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-	scr=m_spectrum_video_ram;
+	unsigned char const *scr=m_spectrum_video_ram;
 
 	bitmap.fill(m_spectrum_port_fe & 0x07, cliprect);
 
-	for (y=0; y<192; y++)
+	for (int y=0; y<192; y++)
 	{
-		scrx=SPEC_LEFT_BORDER;
-		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-		attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
+		int scrx=SPEC_LEFT_BORDER;
+		int scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
+		unsigned char const *attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
 
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
-				/* Get ink and paper colour with bright */
-				if (m_spectrum_flash_invert && (*attr & 0x80))
-				{
-						ink=((*attr)>>3) & 0x0f;
-						pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-				}
-				else
-				{
-						ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-						pap=((*attr)>>3) & 0x0f;
-				}
+			/* Get ink and paper colour with bright */
+			unsigned short ink, pap;
+			if (m_spectrum_flash_invert && (*attr & 0x80))
+			{
+				ink=((*attr)>>3) & 0x0f;
+				pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+			}
+			else
+			{
+				ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+				pap=((*attr)>>3) & 0x0f;
+			}
 
-				for (b=0x80;b!=0;b>>=1)
-				{
-						if (*scr&b)
-								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
-						else
-								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
-				}
+			for (int b=0x80;b!=0;b>>=1)
+			{
+				if (*scr&b)
+					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
+				else
+					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
+			}
 			scr++;
 			attr++;
 		}
@@ -219,7 +220,7 @@ uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-WRITE8_MEMBER(photon2_state::membank_w)
+void photon2_state::membank_w(uint8_t data)
 {
 	int bank = 0;
 	if (data == 0)
@@ -242,18 +243,18 @@ WRITE8_MEMBER(photon2_state::membank_w)
 	membank("mainbank")->set_entry(bank);
 }
 
-READ8_MEMBER(photon2_state::fe_r)
+uint8_t photon2_state::fe_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon2_state::fe_w)
+void photon2_state::fe_w(uint8_t data)
 {
 	m_spectrum_port_fe = data;
 	m_speaker->level_w(BIT(data,4));
 }
 
-WRITE8_MEMBER(photon2_state::misc_w)
+void photon2_state::misc_w(uint8_t data)
 {
 	m_nmi_enable = !BIT(data,5);
 }
@@ -274,12 +275,12 @@ void photon2_state::spectrum_mem(address_map &map)
 void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
-	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x00, 0x00).mirror(0x7e).w(FUNC(photon2_state::membank_w));
+	map(0x01, 0x01).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(0); }), NAME([this](u8 data) { m_ppi->write(0, data); }));
+	map(0x21, 0x21).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(1); }), NAME([this](u8 data) { m_ppi->write(1, data); }));
+	map(0x41, 0x41).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(2); }), NAME([this](u8 data) { m_ppi->write(2, data); }));
+	map(0x61, 0x61).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(3); }), NAME([this](u8 data) { m_ppi->write(3, data); }));
+	map(0x80, 0x80).mirror(0x7e).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************
@@ -364,7 +365,13 @@ void photon2_state::photon2(machine_config &config)
 	Z80(config, m_maincpu, 3500000);        /* 3.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &photon2_state::spectrum_mem);
 	m_maincpu->set_addrmap(AS_IO, &photon2_state::spectrum_io);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
+
+	I8255(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set_ioport("JOY");
+	m_ppi->in_pc_callback().set_ioport("COIN");
+	m_ppi->out_pc_callback().set(FUNC(photon2_state::misc_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -419,4 +426,4 @@ ROM_END
 
 GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, empty_init, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
 GAME( 19??,  black, 0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software

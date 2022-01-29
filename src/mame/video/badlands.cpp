@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -68,7 +68,7 @@ const atari_motion_objects_config badlands_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(badlands_state,badlands)
+void badlands_state::video_start()
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -82,7 +82,7 @@ VIDEO_START_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
+void badlands_state::badlands_pf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		if (m_playfield_tile_bank != (data & 1))
@@ -114,13 +114,12 @@ uint32_t badlands_state::screen_update_badlands(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					/* not yet verified
-					*/
+					// not yet verified
 					if ((mo[x] & atari_motion_objects_device::PRIORITY_MASK) || !(pf[x] & 8))
 						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 				}

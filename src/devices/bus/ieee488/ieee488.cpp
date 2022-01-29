@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device, "ieee488_slot", "IEEE-488 
 //-------------------------------------------------
 
 device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_bus(nullptr), m_slot(nullptr), m_next(nullptr)
+	: device_interface(device, "ieee488"), m_bus(nullptr), m_slot(nullptr), m_next(nullptr)
 {
 }
 
@@ -164,7 +164,7 @@ void ieee488_device::device_stop()
 
 void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 {
-	auto entry = global_alloc(daisy_entry(target));
+	auto entry = new daisy_entry(target);
 
 	entry->m_interface->m_bus = this;
 	entry->m_interface->m_slot = slot;
@@ -449,4 +449,19 @@ void hp_ieee488_devices(device_slot_interface &device)
 void remote488_devices(device_slot_interface &device)
 {
 	device.option_add("remote488", REMOTE488);
+}
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( grid_ieee488_devices )
+//-------------------------------------------------
+
+// slot devices
+#include "grid2102.h"
+
+void grid_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("grid2102", GRID2102).clock(XTAL(4'000'000));
+	device.option_add("grid2101_floppy", GRID2101_FLOPPY).clock(XTAL(4'000'000));
+	device.option_add("grid2101_hdd", GRID2101_HDD).clock(XTAL(4'000'000));
 }

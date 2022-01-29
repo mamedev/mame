@@ -5,9 +5,10 @@
 //  disasmwininfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DISASMWININFO_H
+#define MAME_DEBUGGER_WIN_DISASMWININFO_H
 
-#ifndef __DEBUG_WIN_DISASM_WIN_INFO_H__
-#define __DEBUG_WIN_DISASM_WIN_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 

@@ -4,7 +4,7 @@
 // SM510 shared opcode handlers
 
 #include "emu.h"
-#include "sm510.h"
+#include "sm510base.h"
 
 
 // internal helpers
@@ -50,7 +50,6 @@ u8 sm510_base_device::bitmask(u16 param)
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);
 }
-
 
 
 // instruction set
@@ -154,7 +153,6 @@ void sm510_base_device::op_tm()
 }
 
 
-
 // Data transfer instructions
 
 void sm510_base_device::op_exc()
@@ -203,7 +201,7 @@ void sm510_base_device::op_lax()
 void sm510_base_device::op_ptw()
 {
 	// PTW: output W latch
-	m_write_s(0, m_w, 0xff);
+	m_write_s(m_w);
 }
 
 void sm510_base_device::op_wr()
@@ -226,7 +224,7 @@ void sm510_base_device::op_ws()
 void sm510_base_device::op_kta()
 {
 	// KTA: input K to ACC
-	m_acc = m_read_k(0, 0xff) & 0xf;
+	m_acc = m_read_k() & 0xf;
 }
 
 void sm510_base_device::op_atbp()
@@ -440,12 +438,6 @@ void sm510_base_device::op_idiv()
 	m_div = 0;
 }
 
-void sm510_base_device::op_dr()
-{
-	// DR: reset divider low 8 bits
-	m_div &= 0x7f;
-}
-
 void sm510_base_device::op_dta()
 {
 	// DTA: transfer divider low 4 bits to ACC
@@ -468,5 +460,5 @@ void sm510_base_device::op_clkhi()
 
 void sm510_base_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);
+	logerror("unknown opcode $%02X at $%04X\n", m_op, m_prev_pc);
 }

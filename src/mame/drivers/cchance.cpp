@@ -57,9 +57,9 @@ protected:
 	void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(output_0_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_WRITE8_MEMBER(output_1_w);
+	void output_0_w(uint8_t data);
+	uint8_t input_1_r();
+	void output_1_w(uint8_t data);
 	void main_map(address_map &map);
 
 	uint8_t m_hop_io;
@@ -67,7 +67,7 @@ private:
 };
 
 
-WRITE8_MEMBER(cchance_state::output_0_w)
+void cchance_state::output_0_w(uint8_t data)
 {
 	//---- --x- divider?
 	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
@@ -76,12 +76,12 @@ WRITE8_MEMBER(cchance_state::output_0_w)
 }
 
 
-READ8_MEMBER(cchance_state::input_1_r)
+uint8_t cchance_state::input_1_r()
 {
 	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
-WRITE8_MEMBER(cchance_state::output_1_w)
+void cchance_state::output_1_w(uint8_t data)
 {
 	m_hop_io = (data & 0x40)>>4;
 	m_bell_io = (data & 0x80)>>4;
@@ -223,10 +223,9 @@ void cchance_state::cchance(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_cchance);
-
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_cchance);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

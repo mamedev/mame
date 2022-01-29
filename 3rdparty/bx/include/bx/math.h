@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -50,11 +50,38 @@ namespace bx
 		};
 	};
 
+	/// Structure initializer types.
+	namespace init
+	{
+		/// Fields are left uninitialized.
+		///
+		struct NoneType {};
+		constexpr NoneType None;
+
+		/// Fields are initialized to zero.
+		///
+		struct ZeroType {};
+		constexpr ZeroType Zero;
+
+		/// Fields are initialized to identity value.
+		///
+		struct IdentityType {};
+		constexpr IdentityType Identity;
+	}
+
 	///
 	struct Vec3
 	{
+		Vec3() = delete;
+
 		///
-		Vec3();
+		Vec3(init::NoneType);
+
+		///
+		constexpr Vec3(init::ZeroType);
+
+		///
+		constexpr Vec3(init::IdentityType);
 
 		///
 		explicit constexpr Vec3(float _v);
@@ -68,6 +95,20 @@ namespace bx
 	///
 	struct Plane
 	{
+		Plane() = delete;
+
+		///
+		Plane(init::NoneType);
+
+		///
+		constexpr Plane(init::ZeroType);
+
+		///
+		constexpr Plane(init::IdentityType);
+
+		///
+		constexpr Plane(Vec3 _normal, float _dist);
+
 		Vec3  normal;
 		float dist;
 	};
@@ -75,6 +116,20 @@ namespace bx
 	///
 	struct Quaternion
 	{
+		Quaternion() = delete;
+
+		///
+		Quaternion(init::NoneType);
+
+		///
+		constexpr Quaternion(init::ZeroType);
+
+		///
+		constexpr Quaternion(init::IdentityType);
+
+		///
+		constexpr Quaternion(float _x, float _y, float _z, float _w);
+
 		float x, y, z, w;
 	};
 
@@ -145,6 +200,10 @@ namespace bx
 	/// Returns linear interpolation between two values _a and _b.
 	///
 	BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t);
+
+	/// Returns inverse linear interpolation of _value between two values _a and _b.
+	///
+	BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value);
 
 	/// Returns the sign of _a.
 	///
@@ -225,7 +284,8 @@ namespace bx
 
 	/// Returns the base 2 logarithm of _a.
 	///
-	BX_CONST_FUNC float log2(float _a);
+	template<typename Ty>
+	BX_CONST_FUNC Ty log2(Ty _a);
 
 	/// Returns the square root of _a.
 	///
@@ -244,9 +304,29 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float fract(float _a);
 
-	/// Returns result of multipla and add (_a * _b + _c).
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c).
+	///
+	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
+
+	/// Returns resul of addition (_a + _b).
+	///
+	BX_CONSTEXPR_FUNC float add(float _a, float _b);
+
+	/// Returns resul of subtracion (_a - _b).
+	///
+	BX_CONSTEXPR_FUNC float sub(float _a, float _b);
+
+	/// Returns result of multiply (_a * _b).
+	///
+	BX_CONSTEXPR_FUNC float mul(float _a, float _b);
+
+	/// Returns result of multiply and add (_a * _b + _c).
 	///
 	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);
+
+	/// Returns reciprocal of _a.
+	///
+	BX_CONSTEXPR_FUNC float rcp(float _a);
 
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
@@ -269,6 +349,9 @@ namespace bx
 
 	///
 	BX_CONSTEXPR_FUNC float smoothStep(float _a);
+
+	///
+	BX_CONST_FUNC float invSmoothStep(float _a);
 
 	///
 	BX_CONSTEXPR_FUNC float bias(float _time, float _bias);
@@ -319,6 +402,12 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, float _b);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b);
+
+	///
+	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c);
 
 	///
@@ -354,6 +443,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC Vec3 max(const Vec3 _a, const Vec3 _b);
 
+	/// Returns component wise reciprocal of _a.
 	///
 	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a);
 
@@ -376,6 +466,15 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 mulXyz(const Quaternion _a, const Quaternion _b);
 
 	///
+	BX_CONSTEXPR_FUNC Quaternion add(const Quaternion _a, const Quaternion _b);
+
+	///
+	BX_CONSTEXPR_FUNC Quaternion sub(const Quaternion _a, const Quaternion _b);
+
+	///
+	BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, float _b);
+
+	///
 	BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, const Quaternion _b);
 
 	///
@@ -388,7 +487,19 @@ namespace bx
 	BX_CONSTEXPR_FUNC Quaternion normalize(const Quaternion _a);
 
 	///
+	BX_CONSTEXPR_FUNC Quaternion lerp(const Quaternion _a, const Quaternion _b, float _t);
+
+	///
 	BX_CONST_FUNC Vec3 toEuler(const Quaternion _a);
+
+	///
+	BX_CONST_FUNC Vec3 toXAxis(const Quaternion _a);
+
+	///
+	BX_CONST_FUNC Vec3 toYAxis(const Quaternion _a);
+
+	///
+	BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a);
 
 	///
 	BX_CONST_FUNC Quaternion rotateAxis(const Vec3 _axis, float _angle);

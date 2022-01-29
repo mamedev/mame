@@ -308,7 +308,7 @@ uint8_t psi_hle_keyboard_device::translate(uint8_t row, uint8_t column)
 
 void psi_hle_keyboard_device::send_key(uint8_t code)
 {
-	m_host->key_data_w(machine().dummy_space(), 0, code);
+	m_host->key_data_w(code);
 	m_host->key_strobe_w(1);
 	m_host->key_strobe_w(0);
 }

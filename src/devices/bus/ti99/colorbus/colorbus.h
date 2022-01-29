@@ -18,26 +18,30 @@
 
 #include "video/v9938.h"
 
-namespace bus { namespace ti99 { namespace colorbus {
+#define TIGEN_V9938_TAG   "vdp"
+#define COLORBUS_TAG     "colorbus"
+
+namespace bus::ti99::colorbus {
 
 class v9938_colorbus_device;
 
 /********************************************************************
     Common parent class of all devices attached to the color bus
 ********************************************************************/
-class device_v9938_colorbus_interface : public device_slot_card_interface
+class device_v9938_colorbus_interface : public device_interface
 {
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
+	device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device);
 
 	virtual void interface_config_complete() override;
-	v9938_colorbus_device* m_colorbus = nullptr;
+
+	v9938_colorbus_device* m_colorbus;
 };
 
 /********************************************************************
     Color bus port
 ********************************************************************/
-class v9938_colorbus_device : public device_t, public device_slot_interface
+class v9938_colorbus_device : public device_t, public device_single_card_slot_interface<device_v9938_colorbus_interface>
 {
 public:
 	template <typename U>
@@ -68,7 +72,7 @@ private:
 	devcb_write_line   m_extra_button;
 };
 
-} } } // end namespace bus::ti99::colorbus
+} // end namespace bus::ti99::colorbus
 
 DECLARE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device)
 

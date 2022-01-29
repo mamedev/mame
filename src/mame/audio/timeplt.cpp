@@ -4,11 +4,11 @@
 
     This code is used by the following module:
 
-    timeplt.c
-    pooyan.c
-    rallyx.c (for locomotn)
-    tutankhm.c
-    rocnrope.c
+    timeplt.cpp
+    pooyan.cpp
+    rallyx.cpp (for locomotn)
+    tutankhm.cpp
+    rocnrope.cpp
 
 ***************************************************************************/
 
@@ -34,7 +34,6 @@ locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, cons
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")
 	, m_filter_0(*this, "filter.0.%u", 0)
@@ -77,7 +76,7 @@ void timeplt_audio_device::device_start()
 /* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-READ8_MEMBER( timeplt_audio_device::portB_r )
+uint8_t timeplt_audio_device::portB_r()
 {
 	static const int timeplt_timer[10] =
 	{
@@ -104,11 +103,11 @@ void timeplt_audio_device::set_filter(filter_rc_device &device, int data)
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
 
-	device.filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 5100, 0, CAP_P(C));
+	device.filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 5100, 0, CAP_P(C));
 }
 
 
-WRITE8_MEMBER( timeplt_audio_device::filter_w )
+void timeplt_audio_device::filter_w(offs_t offset, uint8_t data)
 {
 	set_filter(*m_filter_1[0], (offset >>  0) & 3);
 	set_filter(*m_filter_1[1], (offset >>  2) & 3);
@@ -126,7 +125,7 @@ WRITE8_MEMBER( timeplt_audio_device::filter_w )
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_audio_device::sound_data_w)
+void timeplt_audio_device::sound_data_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 }
@@ -225,14 +224,4 @@ void locomotn_audio_device::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &locomotn_audio_device::locomotn_sound_map);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

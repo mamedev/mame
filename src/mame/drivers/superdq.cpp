@@ -64,10 +64,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
-	DECLARE_WRITE8_MEMBER(superdq_io_w);
-	DECLARE_READ8_MEMBER(superdq_ld_r);
-	DECLARE_WRITE8_MEMBER(superdq_ld_w);
+	void superdq_videoram_w(offs_t offset, uint8_t data);
+	void superdq_io_w(uint8_t data);
+	uint8_t superdq_ld_r();
+	void superdq_ld_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void superdq_palette(palette_device &palette) const;
 	uint32_t screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -80,12 +80,12 @@ TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 {
 	int tile = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, tile, m_color_bank, 0);
+	tileinfo.set(0, tile, m_color_bank, 0);
 }
 
 void superdq_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superdq_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -162,15 +162,14 @@ INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(superdq_state::superdq_videoram_w)
+void superdq_state::superdq_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superdq_state::superdq_io_w)
+void superdq_state::superdq_io_w(uint8_t data)
 {
-	int             i;
 	static const uint8_t black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
@@ -181,7 +180,7 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 
 	m_color_bank = ( data & 2 ) ? 1 : 0;
 
-	for( i = 0; i < ARRAY_LENGTH( black_color_entries ); i++ )
+	for (int i = 0; i < std::size(black_color_entries); i++)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
@@ -197,12 +196,12 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	*/
 }
 
-READ8_MEMBER(superdq_state::superdq_ld_r)
+uint8_t superdq_state::superdq_ld_r()
 {
 	return m_ld_in_latch;
 }
 
-WRITE8_MEMBER(superdq_state::superdq_ld_w)
+void superdq_state::superdq_ld_w(uint8_t data)
 {
 	m_ld_out_latch = data;
 }

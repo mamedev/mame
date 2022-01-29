@@ -122,8 +122,8 @@ public:
 	auto out_iack2_callback() { return m_chn[CHN_2]->m_out_iack_cb.bind(); }
 	auto out_iack3_callback() { return m_chn[CHN_3]->m_out_iack_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 
 	DECLARE_WRITE_LINE_MEMBER( iackin_w ) { m_iackin = state; }

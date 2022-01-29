@@ -2,8 +2,6 @@
 // copyright-holders:Carlos A. Lozano
 /***************************************************************************
 
-  video.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
@@ -77,14 +75,14 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	if (attr & 0x10)
 		pri = 0;
 
-	SET_TILE_INFO_MEMBER(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
+	tileinfo.set(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
 	tileinfo.group = pri;
 }
 
 TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 {
 	int tile = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 }
 
 
@@ -97,8 +95,8 @@ TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 
 void cop01_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cop01_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cop01_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 
@@ -115,19 +113,19 @@ void cop01_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cop01_state::cop01_background_w)
+void cop01_state::cop01_background_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_foreground_w)
+void cop01_state::cop01_foreground_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_vreg_w)
+void cop01_state::cop01_vreg_w(offs_t offset, uint8_t data)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
 	 *        -----x-- flip screen

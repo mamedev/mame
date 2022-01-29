@@ -45,7 +45,7 @@ std::string s2650_disassembler::IMM(offs_t pc, const data_buffer &params)
 
 const char s2650_disassembler::cc[4] = { 'z', 'p', 'm', 'a' };
 
-void s2650_disassembler::add(std::string &buf, std::string str)
+void s2650_disassembler::add(std::string &buf, const std::string &str)
 {
 	if(!buf.empty())
 		buf += '+';

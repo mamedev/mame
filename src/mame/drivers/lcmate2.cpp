@@ -43,13 +43,13 @@
 class lcmate2_state : public driver_device
 {
 public:
-	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_lcdc(*this, "hd44780"),
-		m_rtc(*this, "rtc"),
-		m_speaker(*this, "speaker"),
-		m_kbdlines(*this, "LINE%u", 0U)
+	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "hd44780")
+		, m_rtc(*this, "rtc")
+		, m_speaker(*this, "speaker")
+		, m_kbdlines(*this, "LINE%u", 0U)
 	{ }
 
 	void lcmate2(machine_config &config);
@@ -64,23 +64,23 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_kbdlines;
 
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_WRITE8_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	u8 key_r(offs_t offset);
+	void speaker_w(u8 data);
+	void bankswitch_w(u8 data);
 	void lcmate2_palette(palette_device &palette) const;
-	void lcmate2_io(address_map &map);
-	void lcmate2_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
-WRITE8_MEMBER( lcmate2_state::speaker_w )
+void lcmate2_state::speaker_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 6));
 }
 
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
-READ8_MEMBER( lcmate2_state::key_r )
+u8 lcmate2_state::key_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -91,12 +91,12 @@ READ8_MEMBER( lcmate2_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( lcmate2_state::bankswitch_w )
+void lcmate2_state::bankswitch_w(u8 data)
 {
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-void lcmate2_state::lcmate2_mem(address_map &map)
+void lcmate2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
@@ -104,7 +104,7 @@ void lcmate2_state::lcmate2_mem(address_map &map)
 	map(0x8000, 0x9fff).ram().mirror(0x6000).share("nvram");
 }
 
-void lcmate2_state::lcmate2_io(address_map &map)
+void lcmate2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
@@ -118,12 +118,14 @@ void lcmate2_state::lcmate2_io(address_map &map)
 }
 
 /* Input ports */
+// Alternate keyboard layout exists. Different keys are 7&  `~  ?  +/  ,<  .>  ON/RESET, with removal of Numlock and [{ ]}
+// Machine starts up with capslock on - turn it off to access lowercase. Natural keyboard - use End key.
 static INPUT_PORTS_START( lcmate2 )
 	PORT_START("LINE0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER")  PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC")    PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")  PORT_CODE(KEYCODE_LSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC")    PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC),27)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")  PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")   PORT_CODE(KEYCODE_LCONTROL)     PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")      PORT_CODE(KEYCODE_Q)            PORT_CHAR('q')  PORT_CHAR('Q')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")      PORT_CODE(KEYCODE_1)            PORT_CHAR('1')  PORT_CHAR('!')
@@ -132,7 +134,8 @@ static INPUT_PORTS_START( lcmate2 )
 	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")      PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')  PORT_CHAR('/')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")      PORT_CODE(KEYCODE_K)            PORT_CHAR('k')  PORT_CHAR('K')
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")   PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+		// Natural keyboard: UCHAR_MAMEKEY(CAPSLOCK) does not disengage capslock on the emulated machine, so using END instead
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")   PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(END))
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")      PORT_CODE(KEYCODE_Z)            PORT_CHAR('z')  PORT_CHAR('Z')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")      PORT_CODE(KEYCODE_A)            PORT_CHAR('a')  PORT_CHAR('A')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")      PORT_CODE(KEYCODE_W)            PORT_CHAR('w')  PORT_CHAR('W')
@@ -161,7 +164,7 @@ static INPUT_PORTS_START( lcmate2 )
 
 	PORT_START("LINE4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'")      PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR('\'') PORT_CHAR('\"')
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BACKSPACE")  PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(UCHAR_MAMEKEY(DEL))
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")    PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(UCHAR_MAMEKEY(DEL),8)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")  PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")      PORT_CODE(KEYCODE_V)            PORT_CHAR('v')  PORT_CHAR('V')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")      PORT_CODE(KEYCODE_F)            PORT_CHAR('f')  PORT_CHAR('F')
@@ -172,7 +175,7 @@ static INPUT_PORTS_START( lcmate2 )
 	PORT_START("LINE5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")      PORT_CODE(KEYCODE_L)            PORT_CHAR('l')  PORT_CHAR('L')
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")      PORT_CODE(KEYCODE_P)            PORT_CHAR('p')  PORT_CHAR('P')
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)   PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")      PORT_CODE(KEYCODE_B)            PORT_CHAR('b')  PORT_CHAR('B')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")      PORT_CODE(KEYCODE_G)            PORT_CHAR('g')  PORT_CHAR('G')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")      PORT_CODE(KEYCODE_Y)            PORT_CHAR('y')  PORT_CHAR('Y')
@@ -182,7 +185,7 @@ static INPUT_PORTS_START( lcmate2 )
 	PORT_START("LINE6")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")      PORT_CODE(KEYCODE_0)            PORT_CHAR('0')  PORT_CHAR(')')
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)  PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")      PORT_CODE(KEYCODE_N)            PORT_CHAR('n')  PORT_CHAR('N')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")      PORT_CODE(KEYCODE_H)            PORT_CHAR('h')  PORT_CHAR('H')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")      PORT_CODE(KEYCODE_U)            PORT_CHAR('u')  PORT_CHAR('U')
@@ -192,7 +195,7 @@ static INPUT_PORTS_START( lcmate2 )
 	PORT_START("LINE7")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NUMLOck") PORT_CODE(KEYCODE_NUMLOCK)     PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)            PORT_CHAR('9')  PORT_CHAR('(')
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)   PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")      PORT_CODE(KEYCODE_M)            PORT_CHAR('m')  PORT_CHAR('M')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")      PORT_CODE(KEYCODE_J)            PORT_CHAR('j')  PORT_CHAR('J')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")      PORT_CODE(KEYCODE_I)            PORT_CHAR('i')  PORT_CHAR('I')
@@ -208,10 +211,10 @@ void lcmate2_state::lcmate2_palette(palette_device &palette) const
 
 void lcmate2_state::machine_start()
 {
-	membank("rombank")->configure_entries(0, 0x10, (uint8_t*)memregion("maincpu")->base(), 0x4000);
+	membank("rombank")->configure_entries(0, 0x10, (u8*)memregion("maincpu")->base(), 0x4000);
 }
 
-static const gfx_layout lcmate2_charlayout =
+static const gfx_layout charlayout =
 {
 	5, 8,   /* 5 x 8 characters */
 	256,    /* 256 characters */
@@ -223,7 +226,7 @@ static const gfx_layout lcmate2_charlayout =
 };
 
 static GFXDECODE_START( gfx_lcmate2 )
-	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -231,8 +234,8 @@ void lcmate2_state::lcmate2(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'579'545)); // confirmed
-	m_maincpu->set_addrmap(AS_PROGRAM, &lcmate2_state::lcmate2_mem);
-	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::lcmate2_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lcmate2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -269,4 +272,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -57,7 +57,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(beep_w);
+	void beep_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(latch_full_w);
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
@@ -96,7 +96,7 @@ private:
 	emu_timer *m_hsync_off_timer;
 };
 
-WRITE8_MEMBER(m79152pc_state::beep_w)
+void m79152pc_state::beep_w(offs_t offset, uint8_t data)
 {
 	m_beep->set_state(BIT(offset, 2));
 }
@@ -134,7 +134,7 @@ void m79152pc_state::lc_reset_w(u8 data)
 void m79152pc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);;
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8fff).ram().share("videoram");
 	map(0x9000, 0x9fff).ram().share("attributes");
@@ -185,10 +185,10 @@ TIMER_CALLBACK_MEMBER(m79152pc_state::hsync_off)
 
 void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 {
-	u16 ma = u16(m_line_base) << 4;
-	u8 ra = m_line_count & 0xf;
+	const u16 ma = u16(m_line_base) << 4;
+	const u8 ra = m_line_count & 0xf;
 
-	u16 *p = &bitmap.pix16(y++);
+	u16 *p = &bitmap.pix(y++);
 
 	for (u16 x = ma; x < ma + 80; x++)
 	{

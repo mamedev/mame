@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(ER1400, er1400_device, "er1400", "ER1400 Serial EAROM (100x14
 er1400_device::er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ER1400, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
-	, m_default_data(*this, DEVICE_SELF, 100)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_clock_input(0)
 	, m_code_input(0)
 	, m_data_input(0)
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(er1400_device::c3_w)
 //  fires
 //-------------------------------------------------
 
-void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

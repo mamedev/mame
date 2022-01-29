@@ -40,18 +40,7 @@ public:
 	uint16_t control_r();
 	void control_w(uint16_t data);
 
-	void update_dma_state(address_space &space);
-	void update_timer(int which);
-	void update_serial();
-	READ32_MEMBER( tms32031_io_r );
-	WRITE32_MEMBER( tms32031_io_w );
-	void update_control_lines();
-	READ32_MEMBER( cage_from_main_r );
-	WRITE32_MEMBER( cage_from_main_ack_w );
-	WRITE32_MEMBER( cage_to_main_w );
-	READ32_MEMBER( cage_io_status_r );
 	TIMER_CALLBACK_MEMBER( cage_deferred_w );
-	WRITE32_MEMBER( speedup_w );
 
 	void cage_map(address_map &map);
 protected:
@@ -65,6 +54,18 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
 
 	required_device<tms32031_device> m_cpu;
+
+	void update_dma_state();
+	void update_timer(int which);
+	void update_serial();
+	uint32_t tms32031_io_r(offs_t offset);
+	void tms32031_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void update_control_lines();
+	uint32_t cage_from_main_r();
+	void cage_from_main_ack_w(uint32_t data);
+	void cage_to_main_w(uint32_t data);
+	uint32_t cage_io_status_r();
+	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 private:
 	required_shared_ptr<uint32_t> m_cageram;

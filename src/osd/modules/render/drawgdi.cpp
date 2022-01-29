@@ -16,9 +16,6 @@
 
 renderer_gdi::~renderer_gdi()
 {
-	// free the bitmap memory
-	if (m_bmdata != nullptr)
-		global_free_array(m_bmdata);
 }
 
 //============================================================
@@ -83,13 +80,13 @@ int renderer_gdi::draw(const int update)
 	if (pitch * height * 4 > m_bmsize)
 	{
 		m_bmsize = pitch * height * 4 * 2;
-		global_free_array(m_bmdata);
-		m_bmdata = global_alloc_array(uint8_t, m_bmsize);
+		m_bmdata.reset();
+		m_bmdata = std::make_unique<uint8_t []>(m_bmsize);
 	}
 
 	// draw the primitives to the bitmap
 	win->m_primlist->acquire_lock();
-	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
+	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata.get(), width, height, pitch);
 	win->m_primlist->release_lock();
 
 	// fill in bitmap-specific info
@@ -97,8 +94,9 @@ int renderer_gdi::draw(const int update)
 	m_bminfo.bmiHeader.biHeight = -height;
 
 	// blit to the screen
-	StretchDIBits(win->m_dc, 0, 0, width, height,
-				0, 0, width, height,
-				m_bmdata, &m_bminfo, DIB_RGB_COLORS, SRCCOPY);
+	StretchDIBits(
+			win->m_dc, 0, 0, width, height,
+			0, 0, width, height,
+			m_bmdata.get(), &m_bminfo, DIB_RGB_COLORS, SRCCOPY);
 	return 0;
 }

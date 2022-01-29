@@ -16,8 +16,6 @@ class scn2674_device : public device_t,
 						public device_memory_interface
 {
 public:
-	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)> draw_character_delegate;
 
 	// static configuration
@@ -28,20 +26,9 @@ public:
 	auto mbc_attr_callback() { return m_mbc_attr_cb.bind(); }
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 
-	template <class FunctionClass>
-	void set_display_callback(void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint16_t, bool, bool, bool, bool, bool), const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_display_callback(const char *devname, void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint16_t, bool, bool, bool, bool, bool), const char *name)
-	{
-		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_display_callback(draw_character_delegate callback)
-	{
-		m_display_cb = callback;
-	}
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+
+	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -132,6 +119,7 @@ protected:
 	void write_interrupt_mask(bool enabled, uint8_t bits);
 	void write_delayed_command(uint8_t data);
 	void write_command(uint8_t data);
+	virtual void write_screen2_address(bool msb, uint8_t data);
 
 	void recompute_parameters();
 
@@ -154,6 +142,7 @@ public:
 
 protected:
 	virtual void write_init_regs(uint8_t data) override;
+	virtual void write_screen2_address(bool msb, uint8_t data) override;
 };
 
 

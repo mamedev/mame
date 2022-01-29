@@ -158,23 +158,13 @@ void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 
 uint64_t pentium4_device::opcode_rdmsr(bool &valid_msr)
 {
-	switch (REG32(ECX))
-	{
-	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
-		valid_msr = true;
-		return 0;
-	}
-	return -1;
+	logerror("RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
+	valid_msr = true;
+	return 0;
 }
 
 void pentium4_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 {
-	switch (REG32(ECX))
-	{
-	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
-		valid_msr = true;
-		break;
-	}
+	logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+	valid_msr = true;
 }

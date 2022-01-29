@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 List of games which were planned but never finished or released.
 
@@ -122,7 +122,7 @@ List of games which were planned but never finished or released.
 		<info name="serial" value="71-726" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="jeopardy! (1997).bin" size="1048576" crc="8c512912" sha1="c60ac5e59c3cc092506bc47adb60b40a9415bc97"/>
+				<rom name="jeopardy (1997).bin" size="1048576" crc="8c512912" sha1="c60ac5e59c3cc092506bc47adb60b40a9415bc97"/>
 			</dataarea>
 		</part>
 	</software>

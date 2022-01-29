@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 class osd_netdev;
 
 #define CREATE_NETDEV(name) class osd_netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
@@ -15,10 +17,16 @@ class osd_netdev
 public:
 	struct entry_t
 	{
-		int id;
+		entry_t()
+		{
+			std::fill(std::begin(name), std::end(name), 0);
+			std::fill(std::begin(description), std::end(description), 0);
+		}
+
+		int id = 0;
 		char name[256];
 		char description[256];
-		create_netdev func;
+		create_netdev func = nullptr;
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
@@ -36,7 +44,7 @@ protected:
 	virtual int recv_dev(uint8_t **buf);
 
 private:
-	void recv(void *ptr, int param);
+	void recv(int param);
 
 	class device_network_interface *m_dev;
 	emu_timer *m_timer;

@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="gl6000sl" description="VTech Genius Leader 6000SL cartridges">
 
-<!-- According to the boxart, this is compatible with: Leader 6000 SL -->
+	<!-- According to the boxart, this is compatible with: Leader 6000 SL -->
 	<software name="tabellen" supported="no">
 		<description>Tabellenkalkulation</description>
 		<year>199?</year>
@@ -15,7 +18,7 @@
 		</part>
 	</software>
 
-<!-- According to the boxart, this is compatible with: Leader 6000 SL -->
+	<!-- According to the boxart, this is compatible with: Leader 6000 SL -->
 	<software name="update" supported="no">
 		<description>Update - Rechtschreibreform</description>
 		<year>199?</year>

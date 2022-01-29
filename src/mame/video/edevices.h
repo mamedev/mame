@@ -32,11 +32,11 @@ public:
 		m_spritexoffs = offset;
 	}
 
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(sprites_commands_w);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mlow_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mhigh_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tx_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sprites_commands_w(uint16_t data);
 
 	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

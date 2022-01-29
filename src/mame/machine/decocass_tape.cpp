@@ -91,7 +91,7 @@ void decocass_tape_device::device_start()
 		if (m_tape_data[offs] != 0)
 			break;
 	numblocks = ((offs | 0xff) + 1) / 256;
-	assert(numblocks < ARRAY_LENGTH(m_crc16));
+	assert(numblocks < std::size(m_crc16));
 
 	/* compute the total length */
 	m_numclocks = REGION_BOT_GAP_END_CLOCK + numblocks * BYTE_BLOCK_TOTAL * 16 + REGION_BOT_GAP_END_CLOCK;

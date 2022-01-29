@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -16,7 +17,7 @@
 
 class segapcm_device : public device_t,
 					   public device_sound_interface,
-					   public device_rom_interface
+					   public device_rom_interface<21>
 {
 public:
 	static constexpr int BANK_256    = 11;
@@ -31,8 +32,8 @@ public:
 	// configuration
 	void set_bank(int bank) { m_bankshift = (bank & 0xf); m_bankmask = (0x70|((bank >> 16) & 0xfc)); }
 
-	DECLARE_WRITE8_MEMBER( sega_pcm_w );
-	DECLARE_READ8_MEMBER( sega_pcm_r );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 protected:
 	// device-level overrides
@@ -40,7 +41,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;

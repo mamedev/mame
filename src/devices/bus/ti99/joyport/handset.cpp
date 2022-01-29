@@ -49,10 +49,10 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
-DEFINE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
+DEFINE_DEVICE_TYPE(TI99_JOYSTICK, bus::ti99::joyport::ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
+DEFINE_DEVICE_TYPE(TI99_HANDSET, bus::ti99::joyport::ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
 
-namespace bus { namespace ti99 { namespace joyport {
+namespace bus::ti99::joyport {
 
 #define TRACE_HANDSET 0
 #define TRACE_JOYSTICK 0
@@ -100,7 +100,7 @@ void ti99_handset_device::write_dev(uint8_t data)
     of P0 is changed, because, in one occasion, the ISR asserts the line before
     it reads the data, so we need to delay the acknowledge process.
 */
-void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_clock_high = !m_clock_high;
 	m_buf >>= 4;
@@ -545,4 +545,5 @@ ioport_constructor ti99_twin_joystick_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( joysticks );
 }
-} } } // end namespace bus::ti99::joyport
+
+} // end namespace bus::ti99::joyport

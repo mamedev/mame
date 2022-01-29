@@ -48,9 +48,9 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
+DEFINE_DEVICE_TYPE(TI99_USBSM, bus::ti99::peb::nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define STRATA_TAG "strata"
 
@@ -88,7 +88,7 @@ nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_c
 /*
     CRU read
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
+void nouspikel_usb_smartmedia_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -188,11 +188,11 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, uint8_t data)
     Memory read
     TODO: Check whether AMA/B/C is actually checked
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
+void nouspikel_usb_smartmedia_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{
@@ -243,7 +243,7 @@ void nouspikel_usb_smartmedia_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		/* latch write */
 		if (offset & 1)
@@ -325,16 +325,6 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	m_enable_sm = false;
 	m_write_flash = false;
 
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_selected = false;
 
 	m_cru_base = ioport("CRUUSBSM")->read();
@@ -377,4 +367,5 @@ ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tn_usbsm);
 }
-} } } // end namespace bus::ti99::peb
+
+} // end namespace bus::ti99::peb

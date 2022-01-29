@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
+
+<!-- simplified layout for the leds (play-select leds are unused according to manual) -->
+
 	<element name="rswing" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -40,33 +46,33 @@
 		</text>
 	</element>
 
-	<view name="Lamps">
+	<view name="Internal Layout">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="ledleft0" element="rswing">
+		<element name="0.0" ref="rswing">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledleft1" element="lswing">
+		</element>
+		<element name="0.1" ref="lswing">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledleft2" element="rbunt">
+		</element>
+		<element name="0.2" ref="rbunt">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledleft3" element="lbunt">
+		</element>
+		<element name="0.3" ref="lbunt">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledright0" element="rswing">
+		</element>
+		<element name="2.0" ref="rswing">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledright1" element="lswing">
+		</element>
+		<element name="2.1" ref="lswing">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledright2" element="rbunt">
+		</element>
+		<element name="2.2" ref="rbunt">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="ledright3" element="lbunt">
+		</element>
+		<element name="2.3" ref="lbunt">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -21,8 +21,8 @@ public:
 	auto int_time() { return m_int_time_cb.bind(); }
 	void set_offsets(int offsx, int offsy) { m_offsx = offsx; m_offsy = offsy; }
 
-	DECLARE_READ8_MEMBER( read );  // CCU registers
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);  // CCU registers
+	void write(offs_t offset, uint8_t data);
 
 	void res_change();
 

@@ -154,7 +154,7 @@ void amiga_state::machine_start()
 	m_power_led.resolve();
 
 	// add callback for RESET instruction
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(amiga_state::m68k_reset), this));
+	m_maincpu->set_reset_callback(*this, FUNC(amiga_state::m68k_reset));
 
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
 
 WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
 {
-	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
+	set_interrupt((state ? INTENA_SETCLR : 0) | INTENA_DSKSYN);
 }
 
 WRITE_LINE_MEMBER( amiga_state::kbreset_w )
@@ -217,28 +217,28 @@ WRITE_LINE_MEMBER( amiga_state::kbreset_w )
 }
 
 // simple mirror of region 0xf80000 to 0xfbffff
-READ16_MEMBER( amiga_state::rom_mirror_r )
+uint16_t amiga_state::rom_mirror_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_word(offset + 0xf80000, mem_mask);
 }
 
-READ32_MEMBER( amiga_state::rom_mirror32_r )
+uint32_t amiga_state::rom_mirror32_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
 }
 
-void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SCANLINE:
-		scanline_callback(ptr, param);
+		scanline_callback(param);
 		break;
 	case TIMER_AMIGA_IRQ:
-		amiga_irq_proc(ptr, param);
+		amiga_irq_proc(param);
 		break;
 	case TIMER_AMIGA_BLITTER:
-		amiga_blitter_proc(ptr, param);
+		amiga_blitter_proc(param);
 		break;
 	case TIMER_SERIAL:
 		serial_shift();
@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 
 void amiga_state::set_interrupt(int interrupt)
 {
-	custom_chip_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, interrupt, 0xffff);
+	custom_chip_w(REG_INTREQ, interrupt);
 }
 
 bool amiga_state::int2_pending()
@@ -387,9 +387,9 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 	m_irq_timer->reset();
 }
 
-WRITE_LINE_MEMBER( amiga_state::paula_int_w )
+void amiga_state::paula_int_w (offs_t channel, u8 state)
 {
-	set_interrupt(INTENA_SETCLR | (0x80 << state));
+	set_interrupt(INTENA_SETCLR | (0x80 << channel));
 }
 
 
@@ -922,7 +922,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	// signal an interrupt
-	set_interrupt(0x8000 | INTENA_BLIT);
+	set_interrupt(INTENA_SETCLR | INTENA_BLIT);
 
 	/* reset the blitter timer */
 	m_blitter_timer->reset();
@@ -1027,7 +1027,7 @@ WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
 // CIA-A access: 101x xxxx xxx0 oooo xxxx xxx1
 // CIA-B access: 101x xxxx xx0x oooo xxxx xxx0
 
-READ16_MEMBER( amiga_state::cia_r )
+uint16_t amiga_state::cia_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1043,7 +1043,7 @@ READ16_MEMBER( amiga_state::cia_r )
 	return data;
 }
 
-WRITE16_MEMBER( amiga_state::cia_w )
+void amiga_state::cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -1055,7 +1055,7 @@ WRITE16_MEMBER( amiga_state::cia_w )
 		m_cia_1->write(offset >> 7, data >> 8);
 }
 
-WRITE16_MEMBER( amiga_state::gayle_cia_w )
+void amiga_state::gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// the first write to cia 0 after a reset switches in chip ram
 	if (m_gayle_reset && (offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
@@ -1065,7 +1065,7 @@ WRITE16_MEMBER( amiga_state::gayle_cia_w )
 	}
 
 	// hand down to the standard cia handler
-	cia_w(space, offset, data, mem_mask);
+	cia_w(offset, data, mem_mask);
 }
 
 CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
@@ -1073,7 +1073,7 @@ CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
 	return m_fdc->ciaapra_r();
 }
 
-WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
+void amiga_state::cia_0_port_a_write(uint8_t data)
 {
 	// bit 0, kickstart overlay
 	m_overlay->set_bank(BIT(data, 0));
@@ -1091,7 +1091,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 	update_int2();
 }
 
-READ8_MEMBER( amiga_state::cia_1_port_a_read )
+uint8_t amiga_state::cia_1_port_a_read()
 {
 	uint8_t data = 0;
 
@@ -1109,7 +1109,7 @@ READ8_MEMBER( amiga_state::cia_1_port_a_read )
 	return data;
 }
 
-WRITE8_MEMBER( amiga_state::cia_1_port_a_write )
+void amiga_state::cia_1_port_a_write(uint8_t data)
 {
 	if (m_rs232)
 	{
@@ -1143,7 +1143,7 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
-READ16_MEMBER( amiga_state::custom_chip_r )
+uint16_t amiga_state::custom_chip_r(offs_t offset)
 {
 	uint16_t temp;
 
@@ -1176,11 +1176,11 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 		case REG_JOY0DAT:
 			if (m_joy0dat_port.found())
 				return joy0dat_r();
-
+			[[fallthrough]]; // FIXME: Really?  Fall through to potentially reading the other joystick?
 		case REG_JOY1DAT:
 			if (m_joy1dat_port.found())
 				return joy1dat_r();
-
+			[[fallthrough]]; // TODO: check that this is correct
 		case REG_POTGOR:
 			return m_potgo_port.read_safe(0x5500);
 
@@ -1256,7 +1256,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( amiga_state::custom_chip_w )
+void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 {
 	uint16_t temp;
 	offset &= 0xff;
@@ -1265,7 +1265,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		logerror("%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
 
 	// paula will handle some of those registers
-	m_paula->reg_w(space, offset, data, mem_mask);
+	m_paula->reg_w(offset, data);
 
 	switch (offset)
 	{
@@ -1443,7 +1443,6 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
-
 			if (temp & INTENA_SETCLR)
 				// if we're enabling irq's, delay a bit
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
@@ -1495,6 +1494,13 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 				data &= ~BPLCON0_BPU0;
 			}
 			CUSTOM_REG(offset) = data;
+			break;
+
+		case REG_BPL1MOD:   case REG_BPL2MOD:
+			// bit 0 is implicitly ignored on writes,
+			// and wouldn't otherwise make sense with 68k inability of word reading with odd addresses.
+			// hpoker/hpokera would otherwise draw misaligned bottom GFX area without this (writes 0x27)
+			data &= ~1;
 			break;
 
 		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:

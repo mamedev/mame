@@ -10,8 +10,8 @@ class nereid_device : public device_t, public device_palette_interface
 public:
 	nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	uint16_t ctrl_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	rgb_t map_color(uint8_t input, uint8_t ovl = 0);
 

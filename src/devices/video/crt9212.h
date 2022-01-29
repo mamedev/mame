@@ -45,15 +45,15 @@ public:
 	auto rof() { return m_write_rof.bind(); }
 	auto wof() { return m_write_wof.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
-	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
-	DECLARE_WRITE_LINE_MEMBER( tog_w ) { m_tog = state; }
-	DECLARE_WRITE_LINE_MEMBER( ren_w ) { m_ren = state; }
-	DECLARE_WRITE_LINE_MEMBER( wen1_w ) { m_wen1 = state; }
-	DECLARE_WRITE_LINE_MEMBER( wen2_w ) { m_wen2 = state; }
-	DECLARE_WRITE_LINE_MEMBER( oe_w ) { m_oe = state; }
-	DECLARE_WRITE_LINE_MEMBER( rclk_w );
-	DECLARE_WRITE_LINE_MEMBER( wclk_w );
+	void write(uint8_t data) { m_data = data; }
+	void clrcnt_w(int state);
+	void tog_w(int state) { m_tog = state; }
+	void ren_w(int state) { m_ren = state; }
+	void wen1_w(int state) { m_wen1 = state; }
+	void wen2_w(int state) { m_wen2 = state; }
+	void oe_w(int state) { m_oe = state; }
+	void rclk_w(int state) ;
+	void wclk_w(int state) ;
 
 protected:
 	// device-level overrides

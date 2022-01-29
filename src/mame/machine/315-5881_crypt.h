@@ -17,13 +17,13 @@ public:
 	// construction/destruction
 	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(ready_r);
-	DECLARE_WRITE16_MEMBER(subkey_le_w);
-	DECLARE_WRITE16_MEMBER(subkey_be_w);
-	DECLARE_WRITE16_MEMBER(addrlo_w);
-	DECLARE_WRITE16_MEMBER(addrhi_w);
-	DECLARE_READ16_MEMBER(decrypt_le_r);
-	DECLARE_READ16_MEMBER(decrypt_be_r);
+	uint16_t ready_r();
+	void subkey_le_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void subkey_be_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void addrlo_w(uint16_t data);
+	void addrhi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t decrypt_le_r();
+	uint16_t decrypt_be_r();
 
 	void iomap_64be(address_map &map);
 	void iomap_le(address_map &map);
@@ -35,12 +35,7 @@ public:
 
 	sega_m2_read_delegate m_read;
 
-	template <typename Object> void set_read_cb(Object &&readcb) { m_read = std::forward<Object>(readcb); }
-	void set_read_cb(sega_m2_read_delegate callback) { m_read = callback; }
-	template <class FunctionClass> void set_read_cb(uint16_t (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_read_cb(sega_m2_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_read_cb(T &&... args) { m_read.set(std::forward<T>(args)...); }
 
 protected:
 	virtual void device_start() override;

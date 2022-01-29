@@ -31,11 +31,11 @@ public:
 		m_offy = offy;
 	}
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rom_r(offs_t offset);
 
 	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority );
 

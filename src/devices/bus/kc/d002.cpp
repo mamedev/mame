@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "d002.h"
 
+#include "machine/input_merger.h"
+
 #include "ram.h"
 #include "rom.h"
 #include "d004.h"
@@ -111,33 +113,39 @@ void kc_d002_device::device_reset()
 
 void kc_d002_device::device_add_mconfig(machine_config &config)
 {
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(FUNC(kc_d002_device::out_irq_w));
+	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set(FUNC(kc_d002_device::out_nmi_w));
+	INPUT_MERGER_ANY_HIGH(config, "halt").output_handler().set(FUNC(kc_d002_device::out_halt_w));
+
 	KCCART_SLOT(config, m_expansions[0], kc85_cart, nullptr);
-	m_expansions[0]->set_next_slot("m4");
-	m_expansions[0]->irq().set(FUNC(kc_d002_device::out_irq_w));
-	m_expansions[0]->nmi().set(FUNC(kc_d002_device::out_nmi_w));
-	m_expansions[0]->halt().set(FUNC(kc_d002_device::out_halt_w));
+	m_expansions[0]->set_next_slot(m_expansions[1]);
+	m_expansions[0]->irq().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->nmi().set("nmi", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->halt().set("halt", FUNC(input_merger_device::in_w<0>));
+
 	KCCART_SLOT(config, m_expansions[1], kc85_cart, nullptr);
-	m_expansions[1]->set_next_slot("m8");
-	m_expansions[1]->irq().set(FUNC(kc_d002_device::out_irq_w));
-	m_expansions[1]->nmi().set(FUNC(kc_d002_device::out_nmi_w));
-	m_expansions[1]->halt().set(FUNC(kc_d002_device::out_halt_w));
+	m_expansions[1]->set_next_slot(m_expansions[2]);
+	m_expansions[1]->irq().set("irq", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->nmi().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->halt().set("halt", FUNC(input_merger_device::in_w<1>));
+
 	KCCART_SLOT(config, m_expansions[2], kc85_cart, nullptr);
-	m_expansions[2]->set_next_slot("mc");
-	m_expansions[2]->irq().set(FUNC(kc_d002_device::out_irq_w));
-	m_expansions[2]->nmi().set(FUNC(kc_d002_device::out_nmi_w));
-	m_expansions[2]->halt().set(FUNC(kc_d002_device::out_halt_w));
+	m_expansions[2]->set_next_slot(m_expansions[3]);
+	m_expansions[2]->irq().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->nmi().set("nmi", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->halt().set("halt", FUNC(input_merger_device::in_w<2>));
+
 	KCCART_SLOT(config, m_expansions[3], kc85_cart, nullptr);
-	m_expansions[3]->set_next_slot("exp");
-	m_expansions[3]->irq().set(FUNC(kc_d002_device::out_irq_w));
-	m_expansions[3]->nmi().set(FUNC(kc_d002_device::out_nmi_w));
-	m_expansions[3]->halt().set(FUNC(kc_d002_device::out_halt_w));
+	m_expansions[3]->set_next_slot(m_expansions[4]);
+	m_expansions[3]->irq().set("irq", FUNC(input_merger_device::in_w<3>));
+	m_expansions[3]->nmi().set("nmi", FUNC(input_merger_device::in_w<3>));
+	m_expansions[3]->halt().set("halt", FUNC(input_merger_device::in_w<3>));
 
 	// expansion interface
 	KCCART_SLOT(config, m_expansions[4], kc85_exp, nullptr);
-	m_expansions[4]->set_next_slot(nullptr);
-	m_expansions[4]->irq().set(FUNC(kc_d002_device::out_irq_w));
-	m_expansions[4]->nmi().set(FUNC(kc_d002_device::out_nmi_w));
-	m_expansions[4]->halt().set(FUNC(kc_d002_device::out_halt_w));
+	m_expansions[4]->irq().set("irq", FUNC(input_merger_device::in_w<4>));
+	m_expansions[4]->nmi().set("nmi", FUNC(input_merger_device::in_w<4>));
+	m_expansions[4]->halt().set("halt", FUNC(input_merger_device::in_w<4>));
 }
 
 //-------------------------------------------------

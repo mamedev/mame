@@ -17,7 +17,7 @@
 #include "imagedev/floppy.h"
 #include "machine/fdc_pll.h"
 
-class hp9885_device : public hp98032_gpio_card_device
+class hp9885_device : public device_t, public device_hp98032_gpio_interface
 {
 public:
 	hp9885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -38,7 +38,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// FSM states

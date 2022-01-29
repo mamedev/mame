@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "machine/ds1994.h"
 
-#include <time.h>
+#include <ctime>
 
 #define VERBOSE_LEVEL 0
 
@@ -53,6 +53,7 @@ ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, dev
 	, m_rx(false)
 	, m_tx(false)
 	, m_state_ptr(0)
+	, m_offs_ro(false)
 {
 	memset(m_ram, 0, sizeof(m_ram));
 }
@@ -234,6 +235,7 @@ void ds1994_device::ds1994_rom_cmd(void)
 			case ROMCMD_SEARCHINT:
 				verboselog(0, "timer_main rom_command not implemented %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_COMMAND;
+				break;
 			default:
 				verboselog(0, "timer_main rom_command not found %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_IDLE;
@@ -351,7 +353,7 @@ void ds1994_device::ds1994_writemem(uint8_t value)
 /*                                               */
 /*************************************************/
 
-void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

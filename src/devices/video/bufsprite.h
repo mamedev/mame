@@ -56,8 +56,8 @@ public:
 	void write(address_space &space, offs_t offset, Type data, Type mem_mask = ~Type(0)) { copy(); }
 
 	// VBLANK handlers
-	DECLARE_WRITE_LINE_MEMBER(vblank_copy_rising) { if (state) copy(); }
-	DECLARE_WRITE_LINE_MEMBER(vblank_copy_falling) { if (!state) copy(); }
+	void vblank_copy_rising(int state) { if (state) copy(); }
+	void vblank_copy_falling(int state) { if (!state) copy(); }
 
 protected:
 	// construction

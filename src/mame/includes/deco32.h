@@ -11,10 +11,10 @@
 #include "machine/gen_latch.h"
 #include "sound/lc7535.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
-#include "video/deco_zoomspr.h"
+#include "video/namco_c355spr.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -123,6 +123,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x8);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
@@ -145,7 +146,7 @@ public:
 
 private:
 	required_ioport_array<2> m_io_in;
-//  DECLARE_WRITE32_MEMBER(sound_w);
+//  void sound_w(u32 data);
 	u32 unk_status_r();
 
 	virtual void video_start() override;
@@ -153,6 +154,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
 	void fghthist_map(address_map &map);
 	void fghthsta_memmap(address_map &map);
@@ -178,21 +180,27 @@ public:
 private:
 	required_device<deco_ace_device> m_deco_ace;
 
+	void tilemap_color_bank_w(u8 data);
+	void sprite1_color_bank_w(u8 data);
+	void sprite2_color_bank_w(u8 data);
 	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	u16 nslasher_debug_r();
 
 	virtual void video_start() override;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 port_b_tattass();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	u16 mix_callback(u16 p, u16 p2);
 
 	void nslasher_map(address_map &map);
 	void tattass_map(address_map &map);
 
-	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 
@@ -210,10 +218,12 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
-		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_sprgenzoom(*this, "c355spr")
 		, m_spriteram(*this, "spriteram")
-		, m_sprite_layout_ram(*this, "lay%u", 0)
-		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_sprite_spriteformat(*this, "lay%u", 0)
+		, m_sprite_spritetile(*this, "look%u", 0)
+		, m_sprite_cliptable(*this, "spclip")
+		, m_sprite_indextable(*this, "spindex")
 		, m_vol_main(*this, "vol_main")
 		, m_vol_gun(*this, "vol_gun")
 		, m_io_inputs(*this, "INPUTS")
@@ -233,11 +243,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
 private:
-	required_device<deco_zoomspr_device> m_sprgenzoom;
+	required_device<namco_c355spr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr_array<u32, 2> m_sprite_layout_ram;
-	required_shared_ptr_array<u32, 2> m_sprite_lookup_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_spriteformat;
+	required_shared_ptr_array<u32, 2> m_sprite_spritetile;
+	required_shared_ptr<u32> m_sprite_cliptable;
+	required_shared_ptr<u32> m_sprite_indextable;
+
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
@@ -268,6 +281,16 @@ private:
 	void lockload_okibank_hi_w(u8 data); // lockload
 
 	virtual void video_start() override;
+
+	int sprite_bank_callback(int sprite);
+	u16 read_spritetile(int lookupram_offset);
+	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
+	u16 read_spritetable(int offs, u8 attr, int whichlist);
+	u16 read_spritelist(int offs, int whichlist);
+	u16 read_cliptable(int offs, u8 attr);
+	int sprite_priority_callback(int priority);
+
+	void expand_sprite_data();
 	void dragngun_init_common();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -275,6 +298,9 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void namco_sprites(machine_config &config);
+
+	void namcosprite_map(address_map &map);
 	void dragngun_map(address_map &map);
 	void lockload_map(address_map &map);
 	void lockloadu_map(address_map &map);

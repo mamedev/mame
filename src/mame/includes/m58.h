@@ -53,9 +53,9 @@ private:
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_scroll_panel_bitmap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_panel_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void scroll_panel_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	virtual void video_start() override;
 	void m58_palette(palette_device &palette) const;

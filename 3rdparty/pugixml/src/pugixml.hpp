@@ -1,8 +1,8 @@
 /**
- * pugixml parser - version 1.7
+ * pugixml parser - version 1.10
  * --------------------------------------------------------
- * Copyright (C) 2006-2016, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
- * Report bugs and download new versions at http://pugixml.org/
+ * Copyright (C) 2006-2019, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+ * Report bugs and download new versions at https://pugixml.org/
  *
  * This library is distributed under the MIT License. See notice at the end
  * of this file.
@@ -12,8 +12,9 @@
  */
 
 #ifndef PUGIXML_VERSION
-// Define version macro; evaluates to major * 100 + minor so that it's safe to use in less-than comparisons
-#	define PUGIXML_VERSION 170
+// Define version macro; evaluates to major * 1000 + minor * 10 + patch so that it's safe to use in less-than comparisons
+// Note: pugixml used major * 100 + minor * 10 + patch format up until 1.9 (which had version identifier 190); starting from pugixml 1.10, the minor version number is two digits
+#	define PUGIXML_VERSION 1100
 #endif
 
 // Include user configuration file (this can define various configuration macros)
@@ -72,9 +73,38 @@
 #	endif
 #endif
 
+// If the platform is known to have move semantics support, compile move ctor/operator implementation
+#ifndef PUGIXML_HAS_MOVE
+#	if __cplusplus >= 201103
+#		define PUGIXML_HAS_MOVE
+#	elif defined(_MSC_VER) && _MSC_VER >= 1600
+#		define PUGIXML_HAS_MOVE
+#	endif
+#endif
+
+// If C++ is 2011 or higher, add 'noexcept' specifiers
+#ifndef PUGIXML_NOEXCEPT
+#	if __cplusplus >= 201103
+#		define PUGIXML_NOEXCEPT noexcept
+#	elif defined(_MSC_VER) && _MSC_VER >= 1900
+#		define PUGIXML_NOEXCEPT noexcept
+#	else
+#		define PUGIXML_NOEXCEPT
+#	endif
+#endif
+
+// Some functions can not be noexcept in compact mode
+#ifdef PUGIXML_COMPACT
+#	define PUGIXML_NOEXCEPT_IF_NOT_COMPACT
+#else
+#	define PUGIXML_NOEXCEPT_IF_NOT_COMPACT PUGIXML_NOEXCEPT
+#endif
+
 // If C++ is 2011 or higher, add 'override' qualifiers
 #ifndef PUGIXML_OVERRIDE
 #	if __cplusplus >= 201103
+#		define PUGIXML_OVERRIDE override
+#	elif defined(_MSC_VER) && _MSC_VER >= 1700
 #		define PUGIXML_OVERRIDE override
 #	else
 #		define PUGIXML_OVERRIDE
@@ -219,6 +249,15 @@ namespace pugi
 
 	// Write every attribute on a new line with appropriate indentation. This flag is off by default.
 	const unsigned int format_indent_attributes = 0x40;
+
+	// Don't output empty element tags, instead writing an explicit start and end tag even if there are no children. This flag is off by default.
+	const unsigned int format_no_empty_element_tags = 0x80;
+
+	// Skip characters belonging to range [0; 32) instead of "&#xNN;" encoding. This flag is off by default.
+	const unsigned int format_skip_control_chars = 0x100;
+
+	// Use single quotes ' instead of double quotes " for enclosing attribute values. This flag is off by default.
+	const unsigned int format_attribute_single_quote = 0x200;
 
 	// The default set of formatting flags.
 	// Nodes are indented depending on their depth in DOM tree, a default declaration is output if document has none.
@@ -619,8 +658,8 @@ namespace pugi
 		xpath_node_set select_nodes(const xpath_query& query) const;
 
 		// (deprecated: use select_node instead) Select single node by evaluating XPath query.
-		xpath_node select_single_node(const char_t* query, xpath_variable_set* variables = 0) const;
-		xpath_node select_single_node(const xpath_query& query) const;
+		PUGIXML_DEPRECATED xpath_node select_single_node(const char_t* query, xpath_variable_set* variables = 0) const;
+		PUGIXML_DEPRECATED xpath_node select_single_node(const xpath_query& query) const;
 
 	#endif
 
@@ -969,8 +1008,9 @@ namespace pugi
 		xml_document(const xml_document&);
 		xml_document& operator=(const xml_document&);
 
-		void create();
-		void destroy();
+		void _create();
+		void _destroy();
+		void _move(xml_document& rhs) PUGIXML_NOEXCEPT_IF_NOT_COMPACT;
 
 	public:
 		// Default constructor, makes empty document
@@ -978,6 +1018,12 @@ namespace pugi
 
 		// Destructor, invalidates all node/attribute handles to this document
 		~xml_document();
+
+	#ifdef PUGIXML_HAS_MOVE
+		// Move semantics support
+		xml_document(xml_document&& rhs) PUGIXML_NOEXCEPT_IF_NOT_COMPACT;
+		xml_document& operator=(xml_document&& rhs) PUGIXML_NOEXCEPT_IF_NOT_COMPACT;
+	#endif
 
 		// Removes all nodes, leaving the empty document
 		void reset();
@@ -992,7 +1038,7 @@ namespace pugi
 	#endif
 
 		// (deprecated: use load_string instead) Load document from zero-terminated string. No encoding conversions are applied.
-		xml_parse_result load(const char_t* contents, unsigned int options = parse_default);
+		PUGIXML_DEPRECATED xml_parse_result load(const char_t* contents, unsigned int options = parse_default);
 
 		// Load document from zero-terminated string. No encoding conversions are applied.
 		xml_parse_result load_string(const char_t* contents, unsigned int options = parse_default);
@@ -1117,10 +1163,10 @@ namespace pugi
 		xpath_variable_set(const xpath_variable_set& rhs);
 		xpath_variable_set& operator=(const xpath_variable_set& rhs);
 
-	#if __cplusplus >= 201103
+	#ifdef PUGIXML_HAS_MOVE
 		// Move semantics support
-		xpath_variable_set(xpath_variable_set&& rhs);
-		xpath_variable_set& operator=(xpath_variable_set&& rhs);
+		xpath_variable_set(xpath_variable_set&& rhs) PUGIXML_NOEXCEPT;
+		xpath_variable_set& operator=(xpath_variable_set&& rhs) PUGIXML_NOEXCEPT;
 	#endif
 
 		// Add a new variable or get the existing one, if the types match
@@ -1161,10 +1207,10 @@ namespace pugi
 		// Destructor
 		~xpath_query();
 
-	#if __cplusplus >= 201103
+	#ifdef PUGIXML_HAS_MOVE
 		// Move semantics support
-		xpath_query(xpath_query&& rhs);
-		xpath_query& operator=(xpath_query&& rhs);
+		xpath_query(xpath_query&& rhs) PUGIXML_NOEXCEPT;
+		xpath_query& operator=(xpath_query&& rhs) PUGIXML_NOEXCEPT;
 	#endif
 
 		// Get query expression return type
@@ -1212,6 +1258,12 @@ namespace pugi
 	};
 
 	#ifndef PUGIXML_NO_EXCEPTIONS
+        #if defined(_MSC_VER)
+          // C4275 can be ignored in Visual C++ if you are deriving
+          // from a type in the Standard C++ Library
+          #pragma warning(push)
+          #pragma warning(disable: 4275)
+        #endif
 	// XPath exception class
 	class PUGIXML_CLASS xpath_exception: public std::exception
 	{
@@ -1228,6 +1280,9 @@ namespace pugi
 		// Get parse result
 		const xpath_parse_result& result() const;
 	};
+        #if defined(_MSC_VER)
+          #pragma warning(pop)
+        #endif
 	#endif
 
 	// XPath node class (either xml_node or xml_attribute)
@@ -1302,10 +1357,10 @@ namespace pugi
 		xpath_node_set(const xpath_node_set& ns);
 		xpath_node_set& operator=(const xpath_node_set& ns);
 
-	#if __cplusplus >= 201103
+	#ifdef PUGIXML_HAS_MOVE
 		// Move semantics support
-		xpath_node_set(xpath_node_set&& rhs);
-		xpath_node_set& operator=(xpath_node_set&& rhs);
+		xpath_node_set(xpath_node_set&& rhs) PUGIXML_NOEXCEPT;
+		xpath_node_set& operator=(xpath_node_set&& rhs) PUGIXML_NOEXCEPT;
 	#endif
 
 		// Get collection type
@@ -1333,13 +1388,13 @@ namespace pugi
 	private:
 		type_t _type;
 
-		xpath_node _storage;
+		xpath_node _storage[1];
 
 		xpath_node* _begin;
 		xpath_node* _end;
 
 		void _assign(const_iterator begin, const_iterator end, type_t type);
-		void _move(xpath_node_set& rhs);
+		void _move(xpath_node_set& rhs) PUGIXML_NOEXCEPT;
 	};
 #endif
 
@@ -1397,7 +1452,7 @@ namespace std
 #endif
 
 /**
- * Copyright (c) 2006-2016 Arseny Kapoulkine
+ * Copyright (c) 2006-2019 Arseny Kapoulkine
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

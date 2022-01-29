@@ -71,10 +71,10 @@ public:
 
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
-	template<typename Object> void set_int_daisy_chain_callback(Object &&cb) { m_int_daisy_chain_callback = std::forward<Object>(cb); }
+	template <typename... T> void set_int_daisy_chain_callback(T &&... args) { m_int_daisy_chain_callback.set(std::forward<T>(args)...); }
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
 	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
@@ -130,16 +130,16 @@ public:
 	auto write_a() { return m_write_port[0].bind(); }
 	auto write_b() { return m_write_port[1].bind(); }
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
 
-	devcb_read8 m_read_port[2];
-	devcb_write8 m_write_port[2];
+	devcb_read8::array<2> m_read_port;
+	devcb_write8::array<2> m_write_port;
 };
 
 class f3856_device : public f3851_device
@@ -147,8 +147,8 @@ class f3856_device : public f3851_device
 public:
 	f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 	virtual TIMER_CALLBACK_MEMBER(timer_callback) override;
 
@@ -169,8 +169,8 @@ class f38t56_device : public f3856_device
 public:
 	f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 };
 
 // device type definition

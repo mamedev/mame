@@ -17,10 +17,12 @@ MAME Documentation
     :titlesonly:
 
     whatis
+    healthwarning
     initialsetup/index
 
     usingmame/index
     commandline/index
+    plugins/index
     advanced/index
 
     debugger/index

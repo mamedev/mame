@@ -92,23 +92,21 @@ void sonson_state::sonson_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(sonson_state::sonson_videoram_w)
+void sonson_state::sonson_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_colorram_w)
+void sonson_state::sonson_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
+void sonson_state::sonson_scrollx_w(uint8_t data)
 {
-	int row;
-
-	for (row = 5; row < 32; row++)
+	for (int row = 5; row < 32; row++)
 		m_bg_tilemap->set_scrollx(row, data);
 }
 
@@ -123,12 +121,12 @@ TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void sonson_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sonson_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sonson_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 

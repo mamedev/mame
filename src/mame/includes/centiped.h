@@ -24,15 +24,14 @@ class centiped_state : public driver_device
 public:
 	centiped_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
-		m_maincpu(*this, "maincpu"),
 		m_outlatch(*this, "outlatch"),
 		m_earom(*this, "earom"),
-		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -49,10 +48,27 @@ public:
 	void centipedj(machine_config &config);
 	void mazeinv(machine_config &config);
 	void warlords(machine_config &config);
-	void multiped(machine_config &config);
 
-	void init_multiped();
 	void init_bullsdrt();
+
+protected:
+	required_device<cpu_device> m_maincpu;
+
+	uint8_t m_gfx_bank;
+	tilemap_t *m_bg_tilemap;
+
+	// drivers/centiped.cpp
+	virtual void machine_start() override;
+
+	void irq_ack_w(uint8_t data);
+	uint8_t centiped_IN0_r();
+	uint8_t centiped_IN2_r();
+	uint8_t milliped_IN1_r();
+	uint8_t milliped_IN2_r();
+
+	// video/centiped.cpp
+	void centiped_videoram_w(offs_t offset, uint8_t data);
+	void milliped_paletteram_w(offs_t offset, uint8_t data);
 
 private:
 	optional_shared_ptr<uint8_t> m_rambase;
@@ -61,10 +77,8 @@ private:
 	optional_shared_ptr<uint8_t> m_paletteram;
 	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
-	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
 	optional_device<er2055_device> m_earom;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -75,51 +89,36 @@ private:
 	uint8_t m_dsw_select;
 	uint8_t m_control_select;
 	uint8_t m_flipscreen;
-	uint8_t m_prg_bank;
-	uint8_t m_gfx_bank;
 	uint8_t m_bullsdrt_sprites_bank;
 	uint8_t m_penmask[64];
-	tilemap_t *m_bg_tilemap;
 
 	// drivers/centiped.cpp
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(centiped_IN0_r);
-	DECLARE_READ8_MEMBER(centiped_IN2_r);
-	DECLARE_READ8_MEMBER(milliped_IN1_r);
-	DECLARE_READ8_MEMBER(milliped_IN2_r);
 	DECLARE_WRITE_LINE_MEMBER(input_select_w);
 	DECLARE_WRITE_LINE_MEMBER(control_select_w);
-	DECLARE_READ8_MEMBER(mazeinv_input_r);
-	DECLARE_WRITE8_MEMBER(mazeinv_input_select_w);
-	DECLARE_READ8_MEMBER(bullsdrt_data_port_r);
+	uint8_t mazeinv_input_r();
+	void mazeinv_input_select_w(offs_t offset, uint8_t data);
+	uint8_t bullsdrt_data_port_r();
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
-	DECLARE_READ8_MEMBER(caterplr_unknown_r);
-	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
-	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
-	DECLARE_READ8_MEMBER(multiped_eeprom_r);
-	DECLARE_WRITE8_MEMBER(multiped_eeprom_w);
-	DECLARE_WRITE8_MEMBER(multiped_prgbank_w);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
+	uint8_t caterplr_unknown_r();
+	void caterplr_AY8910_w(offs_t offset, uint8_t data);
+	uint8_t caterplr_AY8910_r(offs_t offset);
 
 	// video/centiped.cpp
-	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(multiped_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(bullsdrt_tilesbank_w);
-	DECLARE_WRITE8_MEMBER(bullsdrt_sprites_bank_w);
-	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
-	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
-	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
+	void bullsdrt_tilesbank_w(offs_t offset, uint8_t data);
+	void bullsdrt_sprites_bank_w(uint8_t data);
+	void centiped_paletteram_w(offs_t offset, uint8_t data);
+	void mazeinv_paletteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(centiped_get_tile_info);
 	TILE_GET_INFO_MEMBER(warlords_get_tile_info);
 	TILE_GET_INFO_MEMBER(milliped_get_tile_info);
 	TILE_GET_INFO_MEMBER(bullsdrt_get_tile_info);
-	DECLARE_MACHINE_START(centiped);
 	DECLARE_MACHINE_RESET(centiped);
 	DECLARE_VIDEO_START(centiped);
 	DECLARE_VIDEO_START(bullsdrt);
@@ -147,8 +146,43 @@ private:
 	void magworm_map(address_map &map);
 	void mazeinv_map(address_map &map);
 	void milliped_map(address_map &map);
-	void multiped_map(address_map &map);
 	void warlords_map(address_map &map);
+};
+
+
+class multiped_state : public centiped_state
+{
+public:
+	multiped_state(const machine_config &mconfig, device_type type, const char *tag) :
+		centiped_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom"),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void multiped(machine_config &config);
+
+	void init_multiped();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_memory_bank m_rombank;
+
+	uint8_t m_prg_bank;
+	uint16_t m_0xxx_base;
+
+	uint8_t multiped_0xxx_r(offs_t offset);
+	void multiped_0xxx_w(offs_t offset, uint8_t data);
+	uint8_t multiped_2xxx_r(offs_t offset);
+	uint8_t multiped_eeprom_r();
+	void multiped_eeprom_w(offs_t offset, uint8_t data);
+	void multiped_prgbank_w(uint8_t data);
+
+	void multiped_gfxbank_w(uint8_t data);
+
+	void multiped_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_CENTIPED_H

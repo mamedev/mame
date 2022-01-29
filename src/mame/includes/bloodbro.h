@@ -6,7 +6,7 @@
 #pragma once
 
 #include "audio/seibu.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -29,6 +29,16 @@ public:
 		m_txvideoram(*this, "txvideoram")
 	{ }
 
+	void init_weststry();
+
+	void bloodbro(machine_config &config);
+	void skysmash(machine_config &config);
+	void weststry(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -52,23 +62,21 @@ public:
 	bool m_weststry_opl_irq;
 	bool m_weststry_soundnmi_mask;
 
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(txvideoram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void weststry_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void weststry_soundlatch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
-	DECLARE_WRITE8_MEMBER(weststry_opl_w);
-	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);
+	void weststry_opl_w(offs_t offset, uint8_t data);
+	void weststry_soundnmi_ack_w(uint8_t data);
 	void weststry_soundnmi_update();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-
-	virtual void video_start() override;
 
 	uint32_t screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -76,10 +84,6 @@ public:
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_weststry();
-	void bloodbro(machine_config &config);
-	void skysmash(machine_config &config);
-	void weststry(machine_config &config);
 	void bloodbro_map(address_map &map);
 	void common_map(address_map &map);
 	void skysmash_map(address_map &map);

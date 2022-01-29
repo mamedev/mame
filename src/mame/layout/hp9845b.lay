@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
-  <!-- All dimensions are in 0.01 inch units -->
+	<!-- All dimensions are in 0.01 inch units -->
 	<view name="Text mode (1.92:1)">
 	  <bounds left="0" top="0" right="930" bottom="640" />
 		<screen index="0">

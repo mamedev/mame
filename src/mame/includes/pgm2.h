@@ -75,38 +75,38 @@ public:
 	void pgm2_ram_rom_map(address_map &map);
 	void pgm2_rom_map(address_map &map);
 private:
-	DECLARE_READ32_MEMBER(unk_startup_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_READ32_MEMBER(mcu_r);
-	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(mcu_w);
-	DECLARE_WRITE16_MEMBER(share_bank_w);
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_WRITE16_MEMBER(vbl_ack_w);
-	DECLARE_WRITE16_MEMBER(unk30120014_w);
+	u32 unk_startup_r();
+	u32 rtc_r();
+	u32 mcu_r(offs_t offset);
+	void fg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void mcu_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void share_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 shareram_r(offs_t offset);
+	void shareram_w(offs_t offset, u8 data);
+	void vbl_ack_w(u16 data);
+	void unk30120014_w(offs_t offset, u16 data);
 
-	DECLARE_WRITE32_MEMBER(pio_sodr_w);
-	DECLARE_WRITE32_MEMBER(pio_codr_w);
-	DECLARE_READ32_MEMBER(pio_pdsr_r);
-	DECLARE_WRITE16_MEMBER(module_rom_w);
-	DECLARE_READ16_MEMBER(module_rom_r);
+	void pio_sodr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pio_codr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pio_pdsr_r();
+	void module_rom_w(offs_t offset, u16 data);
+	u16 module_rom_r(offs_t offset);
 	int module_data_r();
 	void module_data_w(int state);
 	void module_clk_w(int state);
 
-	DECLARE_READ32_MEMBER(orleg2_speedup_r);
-	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
-	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojt_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojt_speedup2_r);
-	DECLARE_READ32_MEMBER(kov3_speedup_r);
+	u32 orleg2_speedup_r();
+	u32 kov2nl_speedup_r();
+	u32 kof98umh_speedup_r();
+	u32 ddpdojt_speedup_r();
+	u32 ddpdojt_speedup2_r();
+	u32 kov3_speedup_r();
 
-	DECLARE_READ8_MEMBER(encryption_r);
-	DECLARE_WRITE8_MEMBER(encryption_w);
-	DECLARE_WRITE32_MEMBER(encryption_do_w);
-	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
+	u8 encryption_r(offs_t offset);
+	void encryption_w(offs_t offset, u8 data);
+	void encryption_do_w(u32 data);
+	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -334,7 +334,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // E99, exists but no key above this position
 
 	PORT_START("KBD3") // Row P1-7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) // B00
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>') // B00
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // B02
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') // C02
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') // D02
@@ -394,7 +394,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD9") // Row P2-6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') // B08
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') // B08
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') // C08
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') // D08
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*') // E08
@@ -404,7 +404,7 @@ N/C = switch present, but officially unused?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD10") // Row P2-9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') // B09
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') // B09
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') // C09
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') // D09
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(') // E09
@@ -508,24 +508,11 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
 	m_speaker(*this, LK201_SPK_TAG),
-	m_kbd0(*this, "KBD0"),
-	m_kbd1(*this, "KBD1"),
-	m_kbd2(*this, "KBD2"),
-	m_kbd3(*this, "KBD3"),
-	m_kbd4(*this, "KBD4"),
-	m_kbd5(*this, "KBD5"),
-	m_kbd6(*this, "KBD6"),
-	m_kbd7(*this, "KBD7"),
-	m_kbd8(*this, "KBD8"),
-	m_kbd9(*this, "KBD9"),
-	m_kbd10(*this, "KBD10"),
-	m_kbd11(*this, "KBD11"),
-	m_kbd12(*this, "KBD12"),
-	m_kbd13(*this, "KBD13"),
-	m_kbd14(*this, "KBD14"),
-	m_kbd15(*this, "KBD15"),
-	m_kbd16(*this, "KBD16"),
-	m_kbd17(*this, "KBD17"),
+	m_kbd(*this, "KBD%u", 0U),
+	m_led_wait(*this, "led_wait"),
+	m_led_compose(*this, "led_compose"),
+	m_led_lock(*this, "led_lock"),
+	m_led_hold(*this, "led_hold"),
 	m_tx_handler(*this)
 {
 }
@@ -540,6 +527,11 @@ void lk201_device::device_start()
 	m_tx_handler.resolve_safe();
 
 	m_beeper = timer_alloc(2);
+
+	m_led_wait.resolve();
+	m_led_compose.resolve();
+	m_led_lock.resolve();
+	m_led_hold.resolve();
 }
 
 
@@ -572,9 +564,15 @@ void lk201_device::device_reset()
 
 	transmit_register_reset();
 	receive_register_reset();
+
+	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
+	m_led_wait = 0;    // led8
+	m_led_compose = 0; // led9
+	m_led_lock = 0;    // led10
+	m_led_hold = 0;    // led11
 }
 
-void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -630,7 +628,7 @@ void lk201_device::update_interrupts()
 	}
 }
 
-READ8_MEMBER( lk201_device::timer_r )
+uint8_t lk201_device::timer_r(offs_t offset)
 {
 	static uint16_t count;
 
@@ -655,7 +653,7 @@ READ8_MEMBER( lk201_device::timer_r )
 	return ret;
 }
 
-WRITE8_MEMBER( lk201_device::timer_w )
+void lk201_device::timer_w(offs_t offset, uint8_t data)
 {
 	static uint16_t count;
 	static int save_tsr;
@@ -679,21 +677,21 @@ WRITE8_MEMBER( lk201_device::timer_w )
 	}
 }
 
-READ8_MEMBER( lk201_device::ddr_r )
+uint8_t lk201_device::ddr_r(offs_t offset)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( lk201_device::ddr_w )
+void lk201_device::ddr_w(offs_t offset, uint8_t data)
 {
 //  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
 	uint8_t olddata = ddrs[offset];
 	ddrs[offset] = data;
-	send_port(space, offset, ports[offset] & olddata);
+	send_port(offset, ports[offset] & olddata);
 }
 
-READ8_MEMBER( lk201_device::ports_r )
+uint8_t lk201_device::ports_r(offs_t offset)
 {
 	uint8_t incoming = 0;
 
@@ -707,15 +705,15 @@ READ8_MEMBER( lk201_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::ports_w )
+void lk201_device::ports_w(offs_t offset, uint8_t data)
 {
 	uint8_t olddata = ports[offset];
 	ports[offset] = data;            //   "port writes are independent of DDRC"
-	send_port(space, offset, olddata & ddrs[offset]);
+	send_port(offset, olddata & ddrs[offset]);
 //  printf("\nPORT %c write %02x (OLD = %02x) (DDR = %02x) (PC=%x)\n", 'A' + offset, data, olddata, ddrs[offset], m_maincpu->pc());
 }
 
-void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t olddata)
+void lk201_device::send_port(uint8_t offset, uint8_t olddata)
 {
 	uint8_t porta = ports[0] & ddrs[0];
 	uint8_t portb = ports[1] & ddrs[1];
@@ -733,24 +731,24 @@ void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t oldda
 			// Check for keyboard read strobe
 			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
-				if (porta & 0x1) kbd_data = m_kbd0->read();
-				if (porta & 0x2) kbd_data = m_kbd1->read();
-				if (porta & 0x4) kbd_data = m_kbd2->read();
-				if (porta & 0x8) kbd_data = m_kbd3->read();
-				if (porta & 0x10) kbd_data = m_kbd4->read();
-				if (porta & 0x20) kbd_data = m_kbd5->read();
-				if (porta & 0x40) kbd_data = m_kbd6->read();
-				if (porta & 0x80) kbd_data = m_kbd7->read();
-				if (portb & 0x1) kbd_data = m_kbd8->read();
-				if (portb & 0x2) kbd_data = m_kbd9->read();
-				if (portb & 0x4) kbd_data = m_kbd10->read();
-				if (portb & 0x8) kbd_data = m_kbd11->read();
-				if (portb & 0x10) kbd_data = m_kbd12->read();
-				if (portb & 0x20) kbd_data = m_kbd13->read();
-				if (portb & 0x40) kbd_data = m_kbd14->read();
-				if (portb & 0x80) kbd_data = m_kbd15->read();
-				if (portc & 0x1) kbd_data = m_kbd16->read();
-				if (portc & 0x2) kbd_data = m_kbd17->read();
+				if (porta & 0x1) kbd_data = m_kbd[0]->read();
+				if (porta & 0x2) kbd_data = m_kbd[1]->read();
+				if (porta & 0x4) kbd_data = m_kbd[2]->read();
+				if (porta & 0x8) kbd_data = m_kbd[3]->read();
+				if (porta & 0x10) kbd_data = m_kbd[4]->read();
+				if (porta & 0x20) kbd_data = m_kbd[5]->read();
+				if (porta & 0x40) kbd_data = m_kbd[6]->read();
+				if (porta & 0x80) kbd_data = m_kbd[7]->read();
+				if (portb & 0x1) kbd_data = m_kbd[8]->read();
+				if (portb & 0x2) kbd_data = m_kbd[9]->read();
+				if (portb & 0x4) kbd_data = m_kbd[10]->read();
+				if (portb & 0x8) kbd_data = m_kbd[11]->read();
+				if (portb & 0x10) kbd_data = m_kbd[12]->read();
+				if (portb & 0x20) kbd_data = m_kbd[13]->read();
+				if (portb & 0x40) kbd_data = m_kbd[14]->read();
+				if (portb & 0x80) kbd_data = m_kbd[15]->read();
+				if (portc & 0x1) kbd_data = m_kbd[16]->read();
+				if (portc & 0x2) kbd_data = m_kbd[17]->read();
 			}
 
 			// Check for LED update strobe
@@ -758,10 +756,10 @@ void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t oldda
 			{
 			if(ddrs[2] != 0x00)
 			{   // Lower nibble contains the LED values (1 = on, 0 = off)
-				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
-				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
-				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
-				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
+				m_led_wait   = (led_data & 0x1) == 1;
+				m_led_compose= (led_data & 0x2) == 2;
+				m_led_lock   = (led_data & 0x4) == 4;
+				m_led_hold   = (led_data & 0x8) == 8;
 			}
 			if (led_data & 0xf0)
 			{
@@ -808,7 +806,7 @@ void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t oldda
 		} // outer switch
 }
 
-READ8_MEMBER( lk201_device::sci_r )
+uint8_t lk201_device::sci_r(offs_t offset)
 {
 	uint8_t incoming = 0;
 
@@ -841,7 +839,7 @@ READ8_MEMBER( lk201_device::sci_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::sci_w )
+void lk201_device::sci_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -871,7 +869,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
 //  printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
-READ8_MEMBER( lk201_device::spi_r )
+uint8_t lk201_device::spi_r(offs_t offset)
 {
 	uint8_t incoming = 0;
 
@@ -895,7 +893,7 @@ READ8_MEMBER( lk201_device::spi_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::spi_w )
+void lk201_device::spi_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

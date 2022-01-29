@@ -12,6 +12,7 @@ Floppies were 8 inch IBM format.
 ****************************************************************************/
 
 #include "emu.h"
+//#include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "emupal.h"
 #include "screen.h"
@@ -28,10 +29,10 @@ public:
 	void terak(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(terak_fdc_status_r);
-	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
-	DECLARE_READ16_MEMBER(terak_fdc_data_r);
-	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
+	uint16_t terak_fdc_status_r();
+	void terak_fdc_command_w(uint16_t data);
+	uint16_t terak_fdc_data_r();
+	void terak_fdc_data_w(uint16_t data);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
@@ -43,7 +44,7 @@ private:
 	required_device<t11_device> m_maincpu;
 };
 
-READ16_MEMBER( terak_state::terak_fdc_status_r )
+uint16_t terak_state::terak_fdc_status_r()
 {
 	logerror("terak_fdc_status_r\n");
 	if (m_cmd==3)
@@ -54,20 +55,20 @@ READ16_MEMBER( terak_state::terak_fdc_status_r )
 	return 0;
 }
 
-WRITE16_MEMBER( terak_state::terak_fdc_command_w )
+void terak_state::terak_fdc_command_w(uint16_t data)
 {
 	m_unit = (data >> 8) & 0x03;
 	m_cmd  = (data >> 1) & 0x07;
 	logerror("terak_fdc_command_w %04x [%d %d]\n",data,m_unit,m_cmd);
 }
 
-READ16_MEMBER( terak_state::terak_fdc_data_r )
+uint16_t terak_state::terak_fdc_data_r()
 {
 	logerror("terak_fdc_data_r\n");
 	return 0;
 }
 
-WRITE16_MEMBER( terak_state::terak_fdc_data_w )
+void terak_state::terak_fdc_data_w(uint16_t data)
 {
 	logerror("terak_fdc_data_w %04x\n",data);
 }
@@ -105,7 +106,7 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 void terak_state::terak(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, XTAL(4'000'000));
+	T11(config, m_maincpu, 4'000'000); // FIXME: actually LSI-11
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &terak_state::mem_map);
 

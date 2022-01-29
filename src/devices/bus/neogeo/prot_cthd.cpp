@@ -118,7 +118,7 @@ void cthd_prot_device::decrypt_cthd2003(uint8_t* sprrom, uint32_t sprrom_size, u
 
 // temporarily replaced by the get_bank_base functions below, until we clean up bankswitch implementation
 /*
-WRITE16_MEMBER( ngbootleg_prot_device::cthd2003_bankswitch_w )
+void ngbootleg_prot_device::cthd2003_bankswitch_w(offs_t offset, uint16_t data)
 {
     int bankaddress;
     static const int cthd2003_banks[8] =

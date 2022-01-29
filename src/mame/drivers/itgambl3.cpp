@@ -92,8 +92,7 @@ void itgambl3_state::video_start()
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
 uint32_t itgambl3_state::screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-	const uint8_t *blit_ram = memregion("gfx1")->base();
+	uint8_t const *const blit_ram = memregion("gfx1")->base();
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
@@ -123,18 +122,16 @@ uint32_t itgambl3_state::screen_update_itgambl3(screen_device &screen, bitmap_rg
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (m_start_offs);
+	int count = m_start_offs;
 
-	for(y=0;y<m_test_y;y++)
+	for(int y=0;y<m_test_y;y++)
 	{
-		for(x=0;x<m_test_x;x++)
+		for(int x=0;x<m_test_x;x++)
 		{
-			uint32_t color;
-
-			color = (blit_ram[count] & 0xff)>>0;
+			uint32_t color = (blit_ram[count] & 0xff)>>0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = m_palette->pen(color);
+				bitmap.pix(y, x) = m_palette->pen(color);
 
 			count++;
 		}

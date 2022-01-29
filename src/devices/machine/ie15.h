@@ -56,7 +56,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -75,29 +75,30 @@ private:
 
 	void ie15core(machine_config &config);
 
-	DECLARE_WRITE16_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(mem_w);
-	DECLARE_READ8_MEMBER(mem_r);
-	DECLARE_WRITE8_MEMBER(mem_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(mem_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(mem_addr_inc_w);
-	DECLARE_WRITE8_MEMBER(mem_addr_dec_w);
-	DECLARE_READ8_MEMBER(flag_r);
-	DECLARE_WRITE8_MEMBER(flag_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_READ8_MEMBER(kb_r);
-	DECLARE_READ8_MEMBER(kb_ready_r);
-	DECLARE_READ8_MEMBER(kb_s_red_r);
-	DECLARE_READ8_MEMBER(kb_s_sdv_r);
-	DECLARE_READ8_MEMBER(kb_s_dk_r);
-	DECLARE_READ8_MEMBER(kb_s_dupl_r);
-	DECLARE_READ8_MEMBER(kb_s_lin_r);
-	DECLARE_WRITE8_MEMBER(kb_ready_w);
-	DECLARE_READ8_MEMBER(serial_tx_ready_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(serial_rx_ready_r);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_speed_w);
+	void kbd_put(uint16_t data);
+	DECLARE_WRITE_LINE_MEMBER(kbd_sdv);
+	void mem_w(uint8_t data);
+	uint8_t mem_r();
+	void mem_addr_lo_w(uint8_t data);
+	void mem_addr_hi_w(uint8_t data);
+	void mem_addr_inc_w(uint8_t data);
+	void mem_addr_dec_w(uint8_t data);
+	uint8_t flag_r(offs_t offset);
+	void flag_w(offs_t offset, uint8_t data);
+	void beep_w(uint8_t data);
+	uint8_t kb_r();
+	uint8_t kb_ready_r();
+	uint8_t kb_s_red_r();
+	uint8_t kb_s_sdv_r();
+	uint8_t kb_s_dk_r();
+	uint8_t kb_s_dupl_r();
+	uint8_t kb_s_lin_r();
+	void kb_ready_w(uint8_t data);
+	uint8_t serial_tx_ready_r();
+	void serial_w(uint8_t data);
+	uint8_t serial_rx_ready_r();
+	uint8_t serial_r();
+	void serial_speed_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 
 	void ie15_io(address_map &map);
@@ -130,6 +131,7 @@ private:
 	int m_hblank;
 	int m_vpos;
 	int m_marker_scanline;
+	bool m_kbd_sdv;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_videoram;
@@ -138,6 +140,15 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<ie15_keyboard_device> m_keyboard;
 	required_ioport m_io_keyboard;
+
+	output_finder<> m_lat_led;
+	output_finder<> m_nr_led;
+	output_finder<> m_pch_led;
+	output_finder<> m_dup_led;
+	output_finder<> m_lin_led;
+	output_finder<> m_red_led;
+	output_finder<> m_sdv_led;
+	output_finder<> m_prd_led;
 
 	devcb_write_line m_rs232_conn_txd_handler;
 	devcb_write_line m_rs232_conn_dtr_handler;

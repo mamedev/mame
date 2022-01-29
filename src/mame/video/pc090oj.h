@@ -5,11 +5,11 @@
 
 #pragma once
 
-typedef device_delegate<void (u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)> pc090oj_colpri_cb_delegate;
-
 class pc090oj_device : public device_t, public device_gfx_interface
 {
 public:
+	typedef device_delegate<void (u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)> colpri_cb_delegate;
+
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
@@ -19,7 +19,7 @@ public:
 		m_x_offset = x_offset;
 		m_y_offset = y_offset;
 	}
-	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = pc090oj_colpri_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
 
 	u16 word_r(offs_t offset);
 	void word_w(offs_t offset, u16 data, u16 mem_mask = 0);
@@ -41,9 +41,9 @@ private:
 	includes color banking and (optionally) priority. It allows each game to
 	control these aspects of the sprites in different ways, while keeping the
 	routines here modular.
+	*/
 
-*/
-	pc090oj_colpri_cb_delegate m_colpri_cb;
+	colpri_cb_delegate m_colpri_cb;
 
 	// decoding info
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);

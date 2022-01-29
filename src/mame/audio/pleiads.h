@@ -12,9 +12,9 @@ class pleiads_sound_device : public device_t, public device_sound_interface
 public:
 	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE8_MEMBER( control_a_w );
-	DECLARE_WRITE8_MEMBER( control_b_w );
-	DECLARE_WRITE8_MEMBER( control_c_w );
+	void control_a_w(uint8_t data);
+	void control_b_w(uint8_t data);
+	void control_c_w(uint8_t data);
 
 protected:
 	struct pl_t_state
@@ -51,7 +51,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void common_start();
 	inline int tone1(int samplerate);
@@ -105,7 +105,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 
@@ -119,7 +119,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 

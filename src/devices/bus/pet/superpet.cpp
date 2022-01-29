@@ -135,14 +135,14 @@ inline void superpet_device::update_cpu()
 	if (cpu)
 	{
 		// 6502 active
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		// 6809 active
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -173,7 +173,7 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 	m_acia(*this, MOS6551_TAG),
 	m_dongle(*this, MOS6702_TAG),
 	m_rom(*this, M6809_TAG),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", 0x10000, ENDIANNESS_LITTLE),
 	m_io_sw1(*this, "SW1"),
 	m_io_sw2(*this, "SW2"),
 	m_system(0),
@@ -191,9 +191,6 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 
 void superpet_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x10000);
-
 	// state saving
 	save_item(NAME(m_system));
 	save_item(NAME(m_bank));
@@ -400,7 +397,7 @@ void superpet_device::pet_irq_w(int state)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( superpet_device::read )
+uint8_t superpet_device::read(offs_t offset)
 {
 	return m_slot->dma_bd_r(offset);
 }
@@ -410,7 +407,7 @@ READ8_MEMBER( superpet_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superpet_device::write )
+void superpet_device::write(offs_t offset, uint8_t data)
 {
 	m_slot->dma_bd_w(offset, data);
 }

@@ -55,14 +55,14 @@ void decocomn_device::device_reset()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE16_MEMBER( decocomn_device::buffered_palette_w )
+void decocomn_device::buffered_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	m_dirty_palette[offset / 2] = 1;
 }
 
-WRITE16_MEMBER( decocomn_device::palette_dma_w )
+void decocomn_device::palette_dma_w(uint16_t data)
 {
 	const int m = m_palette->entries();
 	int r, g, b, i;
@@ -85,12 +85,12 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 /*****************************************************************************************/
 
 /* */
-READ16_MEMBER( decocomn_device::d_71_r )
+uint16_t decocomn_device::d_71_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER( decocomn_device::priority_w )
+void decocomn_device::priority_w(uint16_t data)
 {
 	m_priority = data;
 }

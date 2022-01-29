@@ -178,6 +178,16 @@ WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
 void poly88_state::machine_start()
 {
 	m_onboard_ram = make_unique_clear<u8[]>(0x200);
+	save_pointer(NAME(m_onboard_ram), 0x200);
+	save_item(NAME(m_int_vector));
+	save_item(NAME(m_dtr));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_onboard_disable));
 }
 
 void poly88_state::machine_reset()
@@ -230,7 +240,7 @@ void poly88_state::intr_w(uint8_t data)
 SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t* data= auto_alloc_array(machine(), uint8_t, snapshot_size);
+	int snapshot_size = image.length();
 	uint16_t recordNum;
 	uint16_t recordLen;
 	uint16_t address;
@@ -241,7 +251,8 @@ SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 	int i = 0;
 	int theend = 0;
 
-	image.fread( data, snapshot_size);
+	std::vector<uint8_t> data(snapshot_size);
+	image.fread(&data[0], snapshot_size);
 
 	while (pos<snapshot_size) {
 		for(i=0;i<9;i++) {
@@ -250,7 +261,7 @@ SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 		pos+=8;
 		name[8] = 0;
 
-
+		// FIXME: this risks buffer overruns
 		recordNum = data[pos]+ data[pos+1]*256; pos+=2;
 		recordLen = data[pos]; pos++;
 		if (recordLen==0) recordLen=0x100;

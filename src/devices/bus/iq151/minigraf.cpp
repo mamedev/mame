@@ -162,7 +162,7 @@ void iq151_minigraf_device::plotter_update(uint8_t control)
 
 	// if pen is down draws a point
 	if (m_pen)
-		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+		m_paper->pix(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 
 	m_control = control;
 }

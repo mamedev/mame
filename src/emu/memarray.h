@@ -12,7 +12,7 @@
     arranged logically.
 
     A memory array is stored in "natural" order, i.e., read/writes to it
-    are done via AM_RAM, or standard COMBINE_DATA, even if the width of
+    are done via ram(), or standard COMBINE_DATA, even if the width of
     the CPU is different from the array width.
 
     The read_entry/write_entry functions serve to read/write entries of
@@ -22,10 +22,6 @@
 ***************************************************************************/
 
 #pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
 
 #ifndef MAME_EMU_MEMARRAY_H
 #define MAME_EMU_MEMARRAY_H
@@ -46,14 +42,12 @@ public:
 	memory_array();
 	memory_array(void *base, u32 bytes, int membits, endianness_t endianness, int bpe) { set(base, bytes, membits, endianness, bpe); }
 	template <typename _Type> memory_array(std::vector<_Type> &array, endianness_t endianness, int bpe) { set(array, endianness, bpe); }
-	memory_array(const address_space &space, void *base, u32 bytes, int bpe) { set(space, base, bytes, bpe); }
 	memory_array(const memory_share &share, int bpe) { set(share, bpe); }
 	memory_array(const memory_array &array) { set(array); }
 
 	// configuration
 	void set(void *base, u32 bytes, int membits, endianness_t endianness, int bpe);
 	template <typename _Type> void set(std::vector<_Type> &array, endianness_t endianness, int bpe) { set(&array[0], array.size(), 8*sizeof(_Type), endianness, bpe); }
-	void set(const address_space &space, void *base, u32 bytes, int bpe);
 	void set(const memory_share &share, int bpe);
 	void set(const memory_array &array);
 

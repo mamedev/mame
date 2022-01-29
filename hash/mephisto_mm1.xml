@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mephisto_mm1" description="Mephisto MM I Modules">
 
 <!-- HG 170 module is exclusively used with MM I -->
 
-<softwarelist name="mephisto_mm1" description="Mephisto MM I Modules">
 	<software name="hg170">
 		<description>Mephisto HG 170 Opening Library</description>
 		<year>1983</year>
@@ -14,4 +18,5 @@
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

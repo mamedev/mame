@@ -24,8 +24,8 @@ public:
 	auto portc_w() { return m_portc_w_cb.bind(); }
 	auto out_int() { return m_out_int_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

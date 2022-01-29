@@ -51,23 +51,23 @@ public:
 	DECLARE_READ_LINE_MEMBER(clock_r);
 
 private:
-	DECLARE_READ8_MEMBER(dual_pokey_r);
-	DECLARE_WRITE8_MEMBER(dual_pokey_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_alpha_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_gamma_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_gamma_w);
-	DECLARE_READ8_MEMBER(mhavoc_alpha_r);
-	DECLARE_WRITE8_MEMBER(mhavoc_alpha_w);
-	DECLARE_READ8_MEMBER(mhavoc_gamma_r);
-	DECLARE_WRITE8_MEMBER(mhavoc_ram_banksel_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_rom_banksel_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_out_0_w);
-	DECLARE_WRITE8_MEMBER(alphaone_out_0_w);
-	DECLARE_WRITE8_MEMBER(mhavoc_out_1_w);
-	DECLARE_WRITE8_MEMBER(mhavocrv_speech_data_w);
-	DECLARE_WRITE8_MEMBER(mhavocrv_speech_strobe_w);
-	DECLARE_READ8_MEMBER(quad_pokeyn_r);
-	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
+	uint8_t dual_pokey_r(offs_t offset);
+	void dual_pokey_w(offs_t offset, uint8_t data);
+	void mhavoc_alpha_irq_ack_w(uint8_t data);
+	void mhavoc_gamma_irq_ack_w(uint8_t data);
+	void mhavoc_gamma_w(uint8_t data);
+	uint8_t mhavoc_alpha_r();
+	void mhavoc_alpha_w(uint8_t data);
+	uint8_t mhavoc_gamma_r();
+	void mhavoc_ram_banksel_w(uint8_t data);
+	void mhavoc_rom_banksel_w(uint8_t data);
+	void mhavoc_out_0_w(uint8_t data);
+	void alphaone_out_0_w(uint8_t data);
+	void mhavoc_out_1_w(uint8_t data);
+	void mhavocrv_speech_data_w(uint8_t data);
+	void mhavocrv_speech_strobe_w(uint8_t data);
+	uint8_t quad_pokeyn_r(offs_t offset);
+	void quad_pokeyn_w(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);

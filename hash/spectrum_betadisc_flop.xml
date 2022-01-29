@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- ZX Spectrum Beta Disc / TR-DOS disk images
+    Sinclair ZX Spectrum Beta Disc / TR-DOS disk images
     (currently only hooked up to Pentagon machine, but interfaces available for older systems too)
 
     some original release TR-DOS images seem to be in SCL format, which does not appear to properly
@@ -10,7 +12,7 @@
     TODO: move Pentagon specific images to a different list?
 -->
 
-<softwarelist name="spectrum_betadisc_flop" description="ZX Spectrum Beta Disc / TR-DOS disk images">
+<softwarelist name="spectrum_betadisc_flop" description="Sinclair ZX Spectrum Beta Disc / TR-DOS disk images">
 
 	<software name="mightyff">
 		<description>Mighty Final Fight (v1.2)</description>

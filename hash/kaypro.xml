@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="kaypro" description="Kaypro CP/M disk images">
+
+<!-- A:ii -->
+
+<!-- Operating systems -->
+
+	<software name="cpmboot">
+		<description>CP/M 2.2 Boot Disk (Ger)</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="139911">
+				<rom name="cp-m 2.2 boot disk (19xx)(digital research)(de).td0" size="139911" crc="ab5d7ae0" sha1="b73622c17306e32b42cef31d58616378329605ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22">
+		<description>CP/M 2.2</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188479">
+				<rom name="cp-m 2.2 (19xx)(digital research).imd" size="188479" crc="602c4f18" sha1="c4158b4f84066514af2b74cb6d0915f661402819"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Programs -->
+
+	<software name="calc">
+		<description>Perfect Calc v1.00</description>
+		<year>1982</year>
+		<publisher>Perfect Software</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163451">
+				<rom name="perfect calc v1.00 (1982)(perfect software).imd" size="163451" crc="d7c79f18" sha1="3666da3855bfc9c82a328fee67906ac04b6bd75b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speller">
+		<description>Perfect Speller</description>
+		<year>1982</year>
+		<publisher>Perfect Software</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="150160">
+				<rom name="perfect speller (1982)(perfect software).imd" size="150160" crc="c03fc828" sha1="4a405c65a55b5ba9be17b638cfe9c0b539698fbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writer">
+		<description>Perfect Writer</description>
+		<year>1982</year>
+		<publisher>Perfect Software</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="197701">
+				<rom name="perfect writer (1982)(perfect software).imd" size="197701" crc="43cb00ac" sha1="67145d125f3f50e660ae8b2e299aad8200d59a7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writerdoc" cloneof="writer">
+		<description>Perfect Writer - Docs and Utilities</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="151202">
+				<rom name="perfect writer - docs and utilities (198x)(-).imd" size="151202" crc="94cda75d" sha1="46348510ff682ef3a8a1e5a27f1625beae21980e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writerless" cloneof="writer">
+		<description>Perfect Writer - Lessons</description>
+		<year>198?</year>
+		<publisher>Perfect Software</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="180829">
+				<rom name="perfect writer - lessons (198x)(perfect software).imd" size="180829" crc="b8bba8ca" sha1="6e18f014337efcb70248b8cff2483bc1d5c8ec4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profit">
+		<description>Profit Plan</description>
+		<year>1982</year>
+		<publisher>Chang Laboratories</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113909">
+				<rom name="profit plan (1982)(chang laboratories).imd" size="113909" crc="1d967882" sha1="03d00c14e57e0e84e0e1fa127ab36b47d1731ea4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teach">
+		<description>Select - Teach</description>
+		<year>1981</year>
+		<publisher>Select Information Systems</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="148661">
+				<rom name="select - teach (1981)(select information systems).imd" size="148661" crc="459b51f0" sha1="7bb16452689cbb39a9c8a2088306a98b2f3ca31a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workproc">
+		<description>Select - Work Processor</description>
+		<year>1981</year>
+		<publisher>Select Information Systems</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106254">
+				<rom name="select - work processor (1981)(select information systems).imd" size="106254" crc="ebcb98c5" sha1="1c8d1a3228e6ac5fdffe7409d921499db22fea72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar v3.3</description>
+		<year>1983</year>
+		<publisher>MicroPro</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="202296">
+				<rom name="wordstar v3.3 (1983)(micropro).imd" size="202296" crc="64e0f3d6" sha1="6abf468d538e65e82bc0b85cc5d656282048ce3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synhcs">
+		<description>Synergy Host Control System 10/11/85</description>
+		<year>1985</year>
+		<publisher>Digital Keyboards</publisher>
+		<sharedfeat name="compatibility" value="A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="191031">
+				<rom name="synhcs.imd" size="191031" crc="c87f1400" sha1="550c6c35e7605956498345df3c151b6abd89b62d"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- B: 284 -->
+
+	<software name="k28422g">
+		<description>CP/M 2.2G</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="B" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x01b508">
+				<rom name="k284-22g.td0" size="0x01b508" crc="d80ce9a0" sha1="0d3da88129ad7ff04079b2a7fe73f19f5da21681"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- C: 2X,484 -->
+
+	<software name="cpm22f">
+		<description>CP/M 2.2F (81-292)</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="C" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="270208">
+				<rom name="k4f-292.td0" size="270208" crc="8309cabe" sha1="7eb6829aaadae67b71bf4bfa19ce72f1e780747e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22g">
+		<description>CP/M 2.2G (81-292-A)</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="C" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="202620">
+				<rom name="kp22gdsd.td0" size="202620" crc="6ab35630" sha1="106fb294b719d620abd82ee74f0f16130264e3d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- D: iv -->
+
+	<software name="kiv22">
+		<description>CP/M 2.2 for Kaypro IV</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="D" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x056639">
+				<rom name="kiv-22.imd" size="0x056639" crc="99182539" sha1="d4b5a6a0a0038fc12aa39a7dd17006f1c71198df"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- E: 10 - kaypro10 disks are loadable by 2X,484 -->
+
+	<software name="kay10a0s">
+		<description>CP/M 2.2F</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<sharedfeat name="compatibility" value="E,C" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="0x05741e">
+				<rom name="kay10a0s.imd" size="0x05741e" crc="adfb4421" sha1="684758a5ddf467aba3be46c62f59bebcb97bbc1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kay10games">
+		<description>Kaypro 10 Games</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="E,C" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="0x05d7eb">
+				<rom name="kay10b0a.imd" size="0x05d7eb" crc="f52ac968" sha1="1acc4d20bc1bfd3db8adbc28226bffdf3940c350"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- F: 4X,robie (rom 1.7R) -->
+<!-- G: new2,1,omni4 (rom 2.01) -->
+
+</softwarelist>

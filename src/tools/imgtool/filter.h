@@ -11,9 +11,6 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "library.h"
 
 struct imgtool_filter;

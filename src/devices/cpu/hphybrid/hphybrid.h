@@ -87,6 +87,9 @@ public:
 	// Tap into fetched opcodes
 	auto opcode_cb() { return m_opcode_func.bind(); }
 
+	// Acknowledge interrupts
+	auto int_cb() { return m_int_func.bind(); }
+
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
@@ -95,9 +98,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return m_r_cycles; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return m_r_cycles; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -159,6 +162,7 @@ protected:
 	uint8_t m_last_pa;
 	devcb_write16 m_opcode_func;
 	devcb_write8 m_stm_func;
+	devcb_read8 m_int_func;
 
 	int m_icount;
 	uint32_t m_addr_mask;
@@ -194,14 +198,14 @@ protected:
 	uint16_t m_reg_r26;   // R26 register
 	uint16_t m_reg_r27;   // R27 register
 
-	address_space *m_program;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 6, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
 
 	uint32_t get_ea(uint16_t opcode);
 	void do_add(uint16_t& addend1 , uint16_t addend2);
@@ -227,7 +231,7 @@ public:
 protected:
 	hp_5061_3011_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 	// TODO: fix
-	virtual uint32_t execute_max_cycles() const override { return 25; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 25; }
 	virtual bool execute_no_bpc(uint16_t opcode , uint16_t& next_pc) override;
 	virtual bool read_non_common_reg(uint16_t addr , uint16_t& v) override;
 	virtual bool write_non_common_reg(uint16_t addr , uint16_t v) override;
@@ -249,7 +253,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// TODO: fix
-	virtual uint32_t execute_max_cycles() const override { return 237; }       // FMP 15
+	virtual uint32_t execute_max_cycles() const noexcept override { return 237; }       // FMP 15
 
 	virtual bool execute_no_bpc(uint16_t opcode , uint16_t& next_pc) override;
 	virtual uint32_t add_mae(aec_cases_t aec_case, uint16_t addr) override;
@@ -275,7 +279,7 @@ protected:
 
 	// device_execute_interface overrides
 	// TODO: fix
-	virtual uint32_t execute_max_cycles() const override { return 237; }       // FMP 15
+	virtual uint32_t execute_max_cycles() const noexcept override { return 237; }       // FMP 15
 
 	virtual bool execute_no_bpc(uint16_t opcode , uint16_t& next_pc) override;
 

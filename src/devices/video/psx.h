@@ -30,8 +30,8 @@ public:
 	auto vblank_callback() { return m_vblank_handler.bind(); }
 	void set_vram_size(int size) { vramSize = size; }
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void lightgun_set( int, int );

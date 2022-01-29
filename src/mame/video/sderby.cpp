@@ -12,10 +12,10 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 	tileno = m_videoram[tile_index*2];
 	colour = m_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	tileinfo.set(1,tileno,colour,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_videoram_w)
+void sderby_state::sderby_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tilemap->mark_tile_dirty(offset/2);
@@ -30,10 +30,10 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 	tileno = m_md_videoram[tile_index*2];
 	colour = m_md_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour+16,0);
+	tileinfo.set(1,tileno,colour+16,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
+void sderby_state::sderby_md_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset/2);
@@ -48,10 +48,10 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 	tileno = m_fg_videoram[tile_index*2];
 	colour = m_fg_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour+32,0);
+	tileinfo.set(0,tileno,colour+32,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
+void sderby_state::sderby_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
@@ -89,12 +89,12 @@ void sderby_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 
 void sderby_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sderby_state::get_sderby_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sderby_state::get_sderby_md_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_md_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sderby_state::get_sderby_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -117,7 +117,7 @@ uint32_t sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE16_MEMBER(sderby_state::sderby_scroll_w)
+void sderby_state::sderby_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 

@@ -59,9 +59,9 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -82,9 +82,9 @@ protected:
 	int m_icount;
 	bool m_increment_pc;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 9, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
 	devcb_write8 m_sc_callback;  // Select Command (address latch)
 

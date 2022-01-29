@@ -55,13 +55,13 @@ private:
 
 	uint16_t m_priority;
 
-	DECLARE_WRITE16_MEMBER(priority_w);
-	DECLARE_WRITE16_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(sub_irq_ack_w);
-	DECLARE_READ16_MEMBER(dassault_control_r);
-	DECLARE_WRITE16_MEMBER(dassault_control_w);
-	DECLARE_READ16_MEMBER(dassault_sub_control_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void main_irq_ack_w(uint16_t data);
+	void sub_irq_ack_w(uint16_t data);
+	uint16_t dassault_control_r(offs_t offset);
+	void dassault_control_w(uint16_t data);
+	uint16_t dassault_sub_control_r();
+	void sound_bankswitch_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

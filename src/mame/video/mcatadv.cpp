@@ -84,8 +84,8 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 				if ((drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y))
 				{
-					u16 *destline = &bitmap.pix16(drawypos);
-					u8 *priline = &screen.priority().pix8(drawypos);
+					u16 *const destline = &bitmap.pix(drawypos);
+					u8 *const priline = &screen.priority().pix(drawypos);
 
 					for (int xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{

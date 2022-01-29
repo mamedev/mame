@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device, "svi_expander", "SVI 318/3
 
 svi_expander_device::svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SVI_EXPANDER, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_svi_expander_interface>(mconfig, *this),
 	m_module(nullptr),
 	m_int_handler(*this),
 	m_romdis_handler(*this),
@@ -56,7 +56,7 @@ svi_expander_device::~svi_expander_device()
 void svi_expander_device::device_start()
 {
 	// get inserted module
-	m_module = dynamic_cast<device_svi_expander_interface *>(get_card_device());
+	m_module = get_card_device();
 
 	// resolve callbacks
 	m_int_handler.resolve_safe();
@@ -66,14 +66,6 @@ void svi_expander_device::device_start()
 	m_ctrl2_handler.resolve_safe();
 	m_excsr_handler.resolve_safe(0xff);
 	m_excsw_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void svi_expander_device::device_reset()
-{
 }
 
 //-------------------------------------------------
@@ -148,7 +140,7 @@ WRITE_LINE_MEMBER( svi_expander_device::bk32_w )
 //-------------------------------------------------
 
 device_svi_expander_interface::device_svi_expander_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "svi3x8exp")
 {
 	m_expander = dynamic_cast<svi_expander_device *>(device.owner());
 }

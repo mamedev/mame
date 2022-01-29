@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
     Microdrive 'cartridges'
     These are infinite tape loop based devices that act like discs
 -->

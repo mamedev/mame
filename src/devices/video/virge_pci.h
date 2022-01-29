@@ -37,16 +37,16 @@ public:
 	void lfb_map(address_map &map);
 	void mmio_map(address_map& map);
 
-	DECLARE_READ32_MEMBER(vga_3b0_r);
-	DECLARE_WRITE32_MEMBER(vga_3b0_w);
-	DECLARE_READ32_MEMBER(vga_3c0_r);
-	DECLARE_WRITE32_MEMBER(vga_3c0_w);
-	DECLARE_READ32_MEMBER(vga_3d0_r);
-	DECLARE_WRITE32_MEMBER(vga_3d0_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(base_address_r);
-	DECLARE_WRITE32_MEMBER(base_address_w);
+	uint32_t vga_3b0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vga_3c0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vga_3d0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint32_t base_address_r();
+	void base_address_w(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;

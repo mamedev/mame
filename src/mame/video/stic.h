@@ -18,26 +18,6 @@
 #define INTVKBD_X_SCALE             2
 #define INTVKBD_Y_SCALE             INTV_Y_SCALE
 
-struct intv_sprite_type
-{
-	int visible;
-	int xpos;
-	int ypos;
-	int coll;
-	int collision;
-	int doublex;
-	int doubley;
-	int quady;
-	int xflip;
-	int yflip;
-	int behind_foreground;
-	int grom;
-	int card;
-	int color;
-	int doubleyres;
-	int dirty;
-};
-
 
 // ======================> stic_device
 
@@ -84,11 +64,11 @@ public:
 	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~stic_device();
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_READ16_MEMBER(gram_read);
-	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(gram_write);
+	uint16_t read(offs_t offset);
+	uint16_t gram_read(offs_t offset);
+	uint16_t grom_read(offs_t offset) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
+	void write(offs_t offset, uint16_t data);
+	void gram_write(offs_t offset, uint16_t data);
 
 	void write_to_btb(int h, int w, uint16_t data) { m_backtab_buffer[h][w] = data; }
 	int read_row_delay() { return m_row_delay; }
@@ -136,6 +116,26 @@ private:
 		CSRS
 	};
 
+	struct intv_sprite_type
+	{
+		int visible;
+		int xpos;
+		int ypos;
+		int coll;
+		int collision;
+		int doublex;
+		int doubley;
+		int quady;
+		int xflip;
+		int yflip;
+		int behind_foreground;
+		int grom;
+		int card;
+		int color;
+		int doubleyres;
+		int dirty;
+	};
+
 
 	required_region_ptr<uint8_t> m_grom;
 
@@ -153,10 +153,8 @@ private:
 	void render_background(bitmap_ind16 &bitmap);
 	void draw_borders(bitmap_ind16 &bitmap);
 
-#ifdef UNUSED_CODE
-	void draw_background(bitmap_ind16 &bitmap, int transparency);
-	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
-#endif
+	[[maybe_unused]] void draw_background(bitmap_ind16 &bitmap, int transparency);
+	[[maybe_unused]] void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
 
 	bitmap_ind16 m_bitmap;
 

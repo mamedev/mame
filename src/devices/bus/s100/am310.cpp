@@ -23,7 +23,7 @@
 #include "machine/am9517a.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 
 class s100_am310_device : public device_t, public device_s100_card_interface
 {
@@ -62,7 +62,7 @@ private:
 	required_device<generic_latch_8_device> m_dilatch;
 	required_device<generic_latch_8_device> m_statlatch;
 	required_device<am9517a_device> m_dma;
-	required_device_array<mc2661_device, 4> m_pci;
+	required_device_array<scn_pci_device, 4> m_pci;
 	required_ioport m_adr;
 	required_ioport m_intr;
 };
@@ -187,14 +187,14 @@ void s100_am310_device::z80_map(address_map &map)
 	map(0x8000, 0x800f).mirror(0x3ff0).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0xc000, 0xc000).mirror(0x3fc7).w(m_statlatch, FUNC(generic_latch_8_device::write));
 	map(0xc008, 0xc008).mirror(0x3fc7).r(m_cmdlatch, FUNC(generic_latch_8_device::read));
-	map(0xc010, 0xc013).mirror(0x3fc0).r(m_pci[0], FUNC(mc2661_device::read));
-	map(0xc014, 0xc017).mirror(0x3fc0).w(m_pci[0], FUNC(mc2661_device::write));
-	map(0xc018, 0xc01b).mirror(0x3fc0).r(m_pci[1], FUNC(mc2661_device::read));
-	map(0xc01c, 0xc01f).mirror(0x3fc0).w(m_pci[1], FUNC(mc2661_device::write));
-	map(0xc020, 0xc023).mirror(0x3fc0).r(m_pci[2], FUNC(mc2661_device::read));
-	map(0xc024, 0xc027).mirror(0x3fc0).w(m_pci[2], FUNC(mc2661_device::write));
-	map(0xc028, 0xc02b).mirror(0x3fc0).r(m_pci[3], FUNC(mc2661_device::read));
-	map(0xc02c, 0xc02f).mirror(0x3fc0).w(m_pci[3], FUNC(mc2661_device::write));
+	map(0xc010, 0xc013).mirror(0x3fc0).r(m_pci[0], FUNC(scn_pci_device::read));
+	map(0xc014, 0xc017).mirror(0x3fc0).w(m_pci[0], FUNC(scn_pci_device::write));
+	map(0xc018, 0xc01b).mirror(0x3fc0).r(m_pci[1], FUNC(scn_pci_device::read));
+	map(0xc01c, 0xc01f).mirror(0x3fc0).w(m_pci[1], FUNC(scn_pci_device::write));
+	map(0xc020, 0xc023).mirror(0x3fc0).r(m_pci[2], FUNC(scn_pci_device::read));
+	map(0xc024, 0xc027).mirror(0x3fc0).w(m_pci[2], FUNC(scn_pci_device::write));
+	map(0xc028, 0xc02b).mirror(0x3fc0).r(m_pci[3], FUNC(scn_pci_device::read));
+	map(0xc02c, 0xc02f).mirror(0x3fc0).w(m_pci[3], FUNC(scn_pci_device::write));
 	map(0xc030, 0xc030).mirror(0x3fc7).select(8).rw(FUNC(s100_am310_device::int_r), FUNC(s100_am310_device::int_w));
 }
 
@@ -309,7 +309,7 @@ void s100_am310_device::device_add_mconfig(machine_config &config)
 	GENERIC_LATCH_8(config, m_dilatch); // U40
 	GENERIC_LATCH_8(config, m_statlatch); // U41
 
-	MC2661(config, m_pci[0], 5.0688_MHz_XTAL); // U30
+	SCN2651(config, m_pci[0], 5.0688_MHz_XTAL); // U30
 	m_pci[0]->rts_handler().set("ch1", FUNC(rs232_port_device::write_rts));
 	m_pci[0]->dtr_handler().set("ch1", FUNC(rs232_port_device::write_dtr));
 	m_pci[0]->txd_handler().set("ch1", FUNC(rs232_port_device::write_txd));
@@ -317,7 +317,7 @@ void s100_am310_device::device_add_mconfig(machine_config &config)
 	m_pci[0]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<1>));
 	m_pci[0]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<2>));
 
-	MC2661(config, m_pci[1], 5.0688_MHz_XTAL); // U28
+	SCN2651(config, m_pci[1], 5.0688_MHz_XTAL); // U28
 	m_pci[1]->rts_handler().set("ch2", FUNC(rs232_port_device::write_rts));
 	m_pci[1]->dtr_handler().set("ch2", FUNC(rs232_port_device::write_dtr));
 	m_pci[1]->txd_handler().set("ch2", FUNC(rs232_port_device::write_txd));
@@ -325,7 +325,7 @@ void s100_am310_device::device_add_mconfig(machine_config &config)
 	m_pci[1]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<4>));
 	m_pci[1]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<5>));
 
-	MC2661(config, m_pci[2], 5.0688_MHz_XTAL); // U27
+	SCN2651(config, m_pci[2], 5.0688_MHz_XTAL); // U27
 	m_pci[2]->rts_handler().set("ch3", FUNC(rs232_port_device::write_rts));
 	m_pci[2]->dtr_handler().set("ch3", FUNC(rs232_port_device::write_dtr));
 	m_pci[2]->txd_handler().set("ch3", FUNC(rs232_port_device::write_txd));
@@ -333,7 +333,7 @@ void s100_am310_device::device_add_mconfig(machine_config &config)
 	m_pci[2]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<7>));
 	m_pci[2]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<8>));
 
-	MC2661(config, m_pci[3], 5.0688_MHz_XTAL); // U29
+	SCN2651(config, m_pci[3], 5.0688_MHz_XTAL); // U29
 	m_pci[3]->rts_handler().set("ch4", FUNC(rs232_port_device::write_rts));
 	m_pci[3]->dtr_handler().set("ch4", FUNC(rs232_port_device::write_dtr));
 	m_pci[3]->txd_handler().set("ch4", FUNC(rs232_port_device::write_txd));
@@ -342,28 +342,28 @@ void s100_am310_device::device_add_mconfig(machine_config &config)
 	m_pci[3]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<11>));
 
 	rs232_port_device &ch1(RS232_PORT(config, "ch1", default_rs232_devices, nullptr)); // J2
-	ch1.rxd_handler().set(m_pci[0], FUNC(mc2661_device::rx_w));
-	ch1.dcd_handler().set(m_pci[0], FUNC(mc2661_device::dcd_w));
-	ch1.dsr_handler().set(m_pci[0], FUNC(mc2661_device::dsr_w));
-	ch1.cts_handler().set(m_pci[0], FUNC(mc2661_device::cts_w));
+	ch1.rxd_handler().set(m_pci[0], FUNC(scn_pci_device::rxd_w));
+	ch1.dcd_handler().set(m_pci[0], FUNC(scn_pci_device::dcd_w));
+	ch1.dsr_handler().set(m_pci[0], FUNC(scn_pci_device::dsr_w));
+	ch1.cts_handler().set(m_pci[0], FUNC(scn_pci_device::cts_w));
 
 	rs232_port_device &ch2(RS232_PORT(config, "ch2", default_rs232_devices, nullptr)); // J3
-	ch2.rxd_handler().set(m_pci[1], FUNC(mc2661_device::rx_w));
-	ch2.dcd_handler().set(m_pci[1], FUNC(mc2661_device::dcd_w));
-	ch2.dsr_handler().set(m_pci[1], FUNC(mc2661_device::dsr_w));
-	ch2.cts_handler().set(m_pci[1], FUNC(mc2661_device::cts_w));
+	ch2.rxd_handler().set(m_pci[1], FUNC(scn_pci_device::rxd_w));
+	ch2.dcd_handler().set(m_pci[1], FUNC(scn_pci_device::dcd_w));
+	ch2.dsr_handler().set(m_pci[1], FUNC(scn_pci_device::dsr_w));
+	ch2.cts_handler().set(m_pci[1], FUNC(scn_pci_device::cts_w));
 
 	rs232_port_device &ch3(RS232_PORT(config, "ch3", default_rs232_devices, nullptr)); // J4
-	ch3.rxd_handler().set(m_pci[2], FUNC(mc2661_device::rx_w));
-	ch3.dcd_handler().set(m_pci[2], FUNC(mc2661_device::dcd_w));
-	ch3.dsr_handler().set(m_pci[2], FUNC(mc2661_device::dsr_w));
-	ch3.cts_handler().set(m_pci[2], FUNC(mc2661_device::cts_w));
+	ch3.rxd_handler().set(m_pci[2], FUNC(scn_pci_device::rxd_w));
+	ch3.dcd_handler().set(m_pci[2], FUNC(scn_pci_device::dcd_w));
+	ch3.dsr_handler().set(m_pci[2], FUNC(scn_pci_device::dsr_w));
+	ch3.cts_handler().set(m_pci[2], FUNC(scn_pci_device::cts_w));
 
 	rs232_port_device &ch4(RS232_PORT(config, "ch4", default_rs232_devices, nullptr)); // J5
-	ch4.rxd_handler().set(m_pci[3], FUNC(mc2661_device::rx_w));
-	ch4.dcd_handler().set(m_pci[3], FUNC(mc2661_device::dcd_w));
-	ch4.dsr_handler().set(m_pci[3], FUNC(mc2661_device::dsr_w));
-	ch4.cts_handler().set(m_pci[3], FUNC(mc2661_device::cts_w));
+	ch4.rxd_handler().set(m_pci[3], FUNC(scn_pci_device::rxd_w));
+	ch4.dcd_handler().set(m_pci[3], FUNC(scn_pci_device::dcd_w));
+	ch4.dsr_handler().set(m_pci[3], FUNC(scn_pci_device::dsr_w));
+	ch4.cts_handler().set(m_pci[3], FUNC(scn_pci_device::cts_w));
 }
 
 

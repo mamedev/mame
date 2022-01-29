@@ -39,9 +39,31 @@ void namcos21_dsp_c67_device::device_start()
 
 	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	m_mpDspState = make_unique_clear<dsp_state>();
+	m_mpDspState = std::make_unique<dsp_state>();
 
 	save_item(NAME(m_dspram16));
+
+	save_item(NAME(m_mpDspState->masterSourceAddr));
+	save_item(NAME(m_mpDspState->slaveInputBuffer));
+	save_item(NAME(m_mpDspState->slaveBytesAvailable));
+	save_item(NAME(m_mpDspState->slaveBytesAdvertised));
+	save_item(NAME(m_mpDspState->slaveInputStart));
+	save_item(NAME(m_mpDspState->slaveOutputBuffer));
+	save_item(NAME(m_mpDspState->slaveOutputSize));
+	save_item(NAME(m_mpDspState->masterDirectDrawBuffer));
+	save_item(NAME(m_mpDspState->masterDirectDrawSize));
+	save_item(NAME(m_mpDspState->masterFinished));
+	save_item(NAME(m_mpDspState->slaveActive));
+
+	save_pointer(NAME(m_pointram), PTRAM_SIZE);
+	save_item(NAME(m_pointram_idx));
+	save_item(NAME(m_pointram_control));
+	save_item(NAME(m_pointrom_idx));
+	save_item(NAME(m_mPointRomMSB));
+	save_item(NAME(m_mbPointRomDataAvailable));
+	save_item(NAME(m_depthcue));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_mbNeedsKickstart));
 }
 
 void namcos21_dsp_c67_device::device_reset()
@@ -131,11 +153,11 @@ void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 }
 
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dspcuskey_w)
+void namcos21_dsp_c67_device::dspcuskey_w(uint16_t data)
 { /* TODO: proper cuskey emulation */
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dspcuskey_r)
+uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 {
 	uint16_t result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
@@ -349,12 +371,12 @@ uint16_t namcos21_dsp_c67_device::get_input_bytes_advertised_for_slave()
 	return m_mpDspState->slaveBytesAdvertised;
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dspram16_r)
+uint16_t namcos21_dsp_c67_device::dspram16_r(offs_t offset)
 {
 	return m_dspram16[offset];
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dspram16_hack_w)
+void namcos21_dsp_c67_device::dspram16_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dspram16[offset]);
 
@@ -370,7 +392,7 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dspram16_hack_w)
 	}
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dspram16_w)
+void namcos21_dsp_c67_device::dspram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dspram16[offset]);
 
@@ -389,7 +411,7 @@ int32_t namcos21_dsp_c67_device::read_pointrom_data(unsigned offset)
 }
 
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port0_r)
+uint16_t namcos21_dsp_c67_device::dsp_port0_r()
 {
 	int32_t data = read_pointrom_data(m_pointrom_idx++);
 	m_mPointRomMSB = (uint8_t)(data>>16);
@@ -397,12 +419,12 @@ READ16_MEMBER(namcos21_dsp_c67_device::dsp_port0_r)
 	return (uint16_t)data;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port0_w)
+void namcos21_dsp_c67_device::dsp_port0_w(uint16_t data)
 { /* unused? */
 	if (ENABLE_LOGGING) logerror( "PTRAM_LO(0x%04x)\n", data );
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port1_r)
+uint16_t namcos21_dsp_c67_device::dsp_port1_r()
 {
 	if( m_mbPointRomDataAvailable )
 	{
@@ -412,45 +434,45 @@ READ16_MEMBER(namcos21_dsp_c67_device::dsp_port1_r)
 	return 0x8000; /* IDC ack? */
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port1_w)
+void namcos21_dsp_c67_device::dsp_port1_w(uint16_t data)
 { /* unused? */
 	if (ENABLE_LOGGING) logerror( "PTRAM_HI(0x%04x)\n", data );
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port2_r)
+uint16_t namcos21_dsp_c67_device::dsp_port2_r()
 { /* IDC TRANSMIT ENABLE? */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port2_w)
+void namcos21_dsp_c67_device::dsp_port2_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	m_mpDspState->masterSourceAddr = data;
 	transfer_dsp_data();
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port3_idc_rcv_enable_r)
+uint16_t namcos21_dsp_c67_device::dsp_port3_idc_rcv_enable_r()
 { /* IDC RECEIVE ENABLE? */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port3_w)
+void namcos21_dsp_c67_device::dsp_port3_w(uint16_t data)
 {
 	m_pointrom_idx<<=16;
 	m_pointrom_idx|=data;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port4_w)
+void namcos21_dsp_c67_device::dsp_port4_w(uint16_t data)
 { /* receives $0B<<4 prior to IDC setup */
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port8_r)
+uint16_t namcos21_dsp_c67_device::dsp_port8_r()
 { /* SMU status */
 	return 1;
 }
 
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port8_w)
+void namcos21_dsp_c67_device::dsp_port8_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror( "port8_w(%d)\n", data );
 	if( data )
@@ -460,17 +482,17 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_port8_w)
 	m_irq_enable = data;
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_port9_r)
+uint16_t namcos21_dsp_c67_device::dsp_port9_r()
 { /* render-device-busy; used for direct-draw */
 	return 0;
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_porta_r)
+uint16_t namcos21_dsp_c67_device::dsp_porta_r()
 { /* config */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_porta_w)
+void namcos21_dsp_c67_device::dsp_porta_w(uint16_t data)
 {
 	/* boot: 1 */
 	/* IRQ0 end: 0 */
@@ -480,12 +502,12 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_porta_w)
 //  if (ENABLE_LOGGING) logerror( "dsp_porta_w(0x%04x)\n", data );
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_portb_r)
+uint16_t namcos21_dsp_c67_device::dsp_portb_r()
 { /* config */
 	return 1;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_portb_w)
+void namcos21_dsp_c67_device::dsp_portb_w(uint16_t data)
 {
 	if( data==0 )
 	{ /* only 0->1 transition triggers */
@@ -518,7 +540,7 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_portb_w)
 	m_mpDspState->masterDirectDrawSize = 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_portc_w)
+void namcos21_dsp_c67_device::dsp_portc_w(uint16_t data)
 {
 	if( m_mpDspState->masterDirectDrawSize < DSP_BUF_MAX )
 	{
@@ -530,12 +552,12 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_portc_w)
 	}
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::dsp_portf_r)
+uint16_t namcos21_dsp_c67_device::dsp_portf_r()
 { /* informs BIOS that this is Master DSP */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_xf_w)
+void namcos21_dsp_c67_device::dsp_xf_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror("xf(%d)\n",data);
 }
@@ -627,22 +649,22 @@ void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 	}
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::slave_port0_r)
+uint16_t namcos21_dsp_c67_device::slave_port0_r()
 {
 	return read_word_from_slave_input();
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::slave_port0_w)
+void namcos21_dsp_c67_device::slave_port0_w(uint16_t data)
 {
 	render_slave_output(data);
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::slave_port2_r)
+uint16_t namcos21_dsp_c67_device::slave_port2_r()
 {
 	return get_input_bytes_advertised_for_slave();
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::slave_port3_r)
+uint16_t namcos21_dsp_c67_device::slave_port3_r()
 { /* render-device queue size */
 	/* up to 0x1fe bytes?
 	 * slave blocks until free &space exists
@@ -650,16 +672,16 @@ READ16_MEMBER(namcos21_dsp_c67_device::slave_port3_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::slave_port3_w)
+void namcos21_dsp_c67_device::slave_port3_w(uint16_t data)
 { /* 0=busy, 1=ready? */
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::slave_XF_output_w)
+void namcos21_dsp_c67_device::slave_XF_output_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror( "%s :slaveXF(%d)\n", machine().describe_context(), data );
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::slave_portf_r)
+uint16_t namcos21_dsp_c67_device::slave_portf_r()
 { /* informs BIOS that this is Slave DSP */
 	return 1;
 }
@@ -701,7 +723,7 @@ void namcos21_dsp_c67_device::slave_dsp_io(address_map &map)
  * 0001   0007   0000000A
  * 0002   001A   03FFF1A0
  */
-WRITE16_MEMBER(namcos21_dsp_c67_device::pointram_control_w)
+void namcos21_dsp_c67_device::pointram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  uint16_t prev = m_pointram_control;
 	COMBINE_DATA( &m_pointram_control );
@@ -735,12 +757,12 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::pointram_control_w)
 	m_pointram_idx = 0; /* HACK */
 }
 
-READ16_MEMBER(namcos21_dsp_c67_device::pointram_data_r)
+uint16_t namcos21_dsp_c67_device::pointram_data_r()
 {
 	return m_pointram[m_pointram_idx];
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::pointram_data_w)
+void namcos21_dsp_c67_device::pointram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -752,12 +774,12 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::pointram_data_w)
 }
 
 
-READ16_MEMBER(namcos21_dsp_c67_device::namcos21_depthcue_r)
+uint16_t namcos21_dsp_c67_device::namcos21_depthcue_r(offs_t offset)
 {
 	int bank = (m_pointram_control&0x20)?1:0;
 	return m_depthcue[bank][offset];
 }
-WRITE16_MEMBER(namcos21_dsp_c67_device::namcos21_depthcue_w)
+void namcos21_dsp_c67_device::namcos21_depthcue_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{

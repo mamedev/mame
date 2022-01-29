@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
@@ -40,30 +40,36 @@ public:
 	void init_hmcompm2();
 	void init_bm5thmix();
 	void init_bm4thmix();
+	void init_bs4thmix();
 	void init_beatmania();
 	void init_bmdct();
 	void init_bmcompm2();
 	void init_bmcorerm();
 	void init_bmclubmx();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	DECLARE_WRITE32_MEMBER(sndram_bank_w);
-	DECLARE_READ32_MEMBER(sndram_r);
-	DECLARE_WRITE32_MEMBER(sndram_w);
-	DECLARE_READ32_MEMBER(obj_ctrl_r);
-	DECLARE_WRITE32_MEMBER(obj_ctrl_w);
-	DECLARE_READ32_MEMBER(obj_rom_r);
-	DECLARE_WRITE32_MEMBER(v_ctrl_w);
-	DECLARE_READ32_MEMBER(v_rom_r);
-	DECLARE_READ8_MEMBER(inp1_r);
-	DECLARE_READ8_MEMBER(inp2_r);
-	DECLARE_READ32_MEMBER(turntable_r);
-	DECLARE_WRITE32_MEMBER(turntable_select_w);
-	DECLARE_WRITE32_MEMBER(light_ctrl_1_w);
-	DECLARE_WRITE32_MEMBER(light_ctrl_2_w);
-	DECLARE_WRITE32_MEMBER(unknown590000_w);
-	DECLARE_WRITE32_MEMBER(unknown802000_w);
-	DECLARE_WRITE32_MEMBER(unknownc02000_w);
+	void sndram_bank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sndram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sndram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t obj_ctrl_r(offs_t offset);
+	void obj_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t obj_rom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void v_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t v_rom_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint8_t inp1_r(offs_t offset);
+	uint8_t inp2_r(offs_t offset);
+	uint32_t turntable_r(offs_t offset, uint32_t mem_mask = ~0);
+	void turntable_select_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void light_ctrl_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void light_ctrl_2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknown590000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknown802000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknownc02000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
@@ -75,10 +81,6 @@ private:
 	void maincpu_djmaina(address_map &map);
 	void maincpu_djmainj(address_map &map);
 	void maincpu_djmainu(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_shared_ptr<uint32_t> m_obj_ram;
 	required_device<cpu_device> m_maincpu;

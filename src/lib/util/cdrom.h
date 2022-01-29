@@ -7,14 +7,14 @@
     Generic MAME cd-rom implementation
 
 ***************************************************************************/
-
-#ifndef MAME_UTIL_CDROM_H
-#define MAME_UTIL_CDROM_H
+#ifndef MAME_LIB_UTIL_CDROM_H
+#define MAME_LIB_UTIL_CDROM_H
 
 #pragma once
 
-#include "osdcore.h"
 #include "chd.h"
+
+#include "osdcore.h"
 
 
 
@@ -82,11 +82,16 @@ struct cdrom_track_info
 
 	/* fields used in CHDMAN only */
 	uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
+	uint32_t splitframes; /* number of frames to read from the next file; needed for Redump split-bin GDI */
 
 	/* fields used in MAME/MESS only */
 	uint32_t logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
 	uint32_t physframeofs; /* physical frame of actual track data in CHD data */
 	uint32_t chdframeofs; /* frame number this track starts at on the CHD */
+	uint32_t logframes; /* number of frames from logframeofs until end of track data */
+
+	/* fields used in multi-cue GDI */
+	uint32_t multicuearea;
 };
 
 
@@ -132,8 +137,8 @@ void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_tr
 void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
 const char *cdrom_get_type_string(uint32_t trktype);
 const char *cdrom_get_subtype_string(uint32_t subtype);
-chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
-chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
+std::error_condition cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
+std::error_condition cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
 // ECC utilities
 bool ecc_verify(const uint8_t *sector);
@@ -179,4 +184,4 @@ static inline uint32_t lba_to_msf_alt(int lba)
 	return ret;
 }
 
-#endif // MAME_UTIL_CDROM_H
+#endif // MAME_LIB_UTIL_CDROM_H

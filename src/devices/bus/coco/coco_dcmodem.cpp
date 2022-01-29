@@ -37,7 +37,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_dc_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco_dc_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: device_t(mconfig, COCO_DCMODEM, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_uart(*this, UART_TAG)
@@ -59,24 +59,24 @@ namespace
 		virtual void device_start() override
 		{
 			install_readwrite_handler(0xFF6C, 0xFF6F,
-				read8sm_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
-				write8sm_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
+					read8sm_delegate(*m_uart, FUNC(mos6551_device::read)),
+					write8sm_delegate(*m_uart, FUNC(mos6551_device::write)));
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		// CoCo cartridge level overrides
-		virtual uint8_t *get_cart_base() override
+		virtual u8 *get_cart_base() override
 		{
 			return m_eprom->base();
 		}
 
-		virtual memory_region* get_cart_memregion() override
+		virtual memory_region *get_cart_memregion() override
 		{
 			return m_eprom;
 		}
 
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
+		virtual u8 cts_read(offs_t offset) override;
 
 	private:
 		// internal state
@@ -126,7 +126,7 @@ const tiny_rom_entry *coco_dc_modem_device::device_rom_region() const
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_dc_modem_device::cts_read)
+u8 coco_dc_modem_device::cts_read(offs_t offset)
 {
 	return m_eprom->base()[offset & 0x1fff];
 }

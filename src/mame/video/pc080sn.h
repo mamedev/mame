@@ -24,11 +24,11 @@ public:
 		m_y_offset = y_offset;
 	}
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_WRITE16_MEMBER( xscroll_word_w );
-	DECLARE_WRITE16_MEMBER( yscroll_word_w );
-	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void xscroll_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void yscroll_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ctrl_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

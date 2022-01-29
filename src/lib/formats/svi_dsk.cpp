@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -9,6 +9,9 @@
 ***************************************************************************/
 
 #include "svi_dsk.h"
+
+#include "ioprocs.h"
+
 
 svi_format::svi_format()
 {
@@ -29,9 +32,11 @@ const char *svi_format::extensions() const
 	return "dsk";
 }
 
-int svi_format::identify(io_generic *io, uint32_t form_factor)
+int svi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return 0;
 
 	if (size == 172032 || size == 346112)
 		return 50;
@@ -39,11 +44,13 @@ int svi_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint64_t size = io_generic_size(io);
-	int head_count;
+	uint64_t size;
+	if (io.length(size))
+		return false;
 
+	int head_count;
 	switch (size)
 	{
 	case 172032: head_count = 1; break;
@@ -51,7 +58,8 @@ bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	default: return false;
 	}
 
-	int file_offset = 0;
+	if (io.seek(0, SEEK_SET))
+		return false;
 
 	for (int track = 0; track < 40; track++)
 	{
@@ -75,10 +83,10 @@ bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sectors[i].bad_crc = false;
 				sectors[i].data = &sector_data[sector_offset];
 
-				io_generic_read(io, sectors[i].data, file_offset, sector_size);
+				size_t actual;
+				io.read(sectors[i].data, sector_size, actual);
 
 				sector_offset += sector_size;
-				file_offset += sector_size;
 			}
 
 			if (track == 0 && head == 0)
@@ -91,25 +99,22 @@ bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool svi_format::save(io_generic *io, floppy_image *image)
+bool svi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sector_data[50000];
-	desc_xs sectors[256];
-	int track_size;
-	uint64_t file_offset = 0;
+	if (io.seek(0, SEEK_SET))
+		return false;
 
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
 
 	// initial fm track
-	generate_bitstream_from_track(0, 0, 4000, bitstream, track_size, image);
-	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+	auto bitstream = generate_bitstream_from_track(0, 0, 4000, image);
+	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 
 	for (int i = 0; i < 18; i++)
 	{
-		io_generic_write(io, sectors[i + 1].data, file_offset, 128);
-		file_offset += 128;
+		size_t actual;
+		io.write(sectors[i + 1].data(), 128, actual);
 	}
 
 	// rest are mfm tracks
@@ -120,13 +125,13 @@ bool svi_format::save(io_generic *io, floppy_image *image)
 			// skip track 0, head 0
 			if (track == 0) { if (head_count == 1) break; else head++; }
 
-			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < 17; i++)
 			{
-				io_generic_write(io, sectors[i + 1].data, file_offset, 256);
-				file_offset += 256;
+				size_t actual;
+				io.write(sectors[i + 1].data(), 256, actual);
 			}
 		}
 	}

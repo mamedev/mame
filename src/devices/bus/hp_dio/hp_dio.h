@@ -17,13 +17,13 @@
 
 #pragma once
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class device_dio16_card_interface;
 class dio16_device;
 
 class dio16_slot_device : public device_t, public device_slot_interface
@@ -57,7 +57,6 @@ protected:
 	required_device<dio16_device> m_dio;
 };
 
-class device_dio16_card_interface;
 // ======================> dio16_device
 class dio16_device : public device_t
 {
@@ -78,14 +77,14 @@ public:
 	auto irq6_out_cb() { return m_irq6_out_cb.bind(); }
 	auto irq7_out_cb() { return m_irq7_out_cb.bind(); }
 
-	void install_memory(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
+	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler);
 
 	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
 	//         Either know what you're doing (m_prgwidth is available to cards for this purpose) or
 	//         only use these for 32-bit DIO-II cards.
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
@@ -162,7 +161,7 @@ protected:
 // ======================> device_dio16_card_interface
 
 // class representing interface-specific live dio16 card
-class device_dio16_card_interface : public device_slot_card_interface
+class device_dio16_card_interface : public device_interface
 {
 	friend class dio16_device;
 	template <class ElementType> friend class simple_list;
@@ -280,8 +279,8 @@ protected:
 
 	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
+
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)

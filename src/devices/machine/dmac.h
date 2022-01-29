@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( xdreq_w );
 
 	// dmac register access
-	DECLARE_READ16_MEMBER( register_read );
-	DECLARE_WRITE16_MEMBER( register_write );
+	uint16_t register_read(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void register_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

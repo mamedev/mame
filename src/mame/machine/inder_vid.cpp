@@ -36,17 +36,16 @@ void inder_vid_device::megaphx_tms_map(address_map &map)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 {
-	uint16_t *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 
 	const pen_t *paldata = m_palette->pens();
 
 	int coladdr = params->coladdr;
-	int x;
 
 	if (m_bpp_mode == 8)
 	{
-		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2)
 		{
 			uint16_t pixels = vram[coladdr++ & 0xff];
 			dest[x + 0] = paldata[pixels & 0xff];
@@ -55,7 +54,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 	}
 	else if (m_bpp_mode == 4)
 	{
-		for (x = params->heblnk; x < params->hsblnk; x += 4)
+		for (int x = params->heblnk; x < params->hsblnk; x += 4)
 		{
 			uint16_t pixels = vram[coladdr++ & 0xff];
 			dest[x + 3] = paldata[((pixels & 0xf000) >> 12)];

@@ -212,7 +212,7 @@ void im6402_device::rcv_complete()
 //  write - transmitter buffer register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( im6402_device::write )
+void im6402_device::write(uint8_t data)
 {
 	LOG("IM6402 Transmit Buffer Register %02x\n", data);
 
@@ -238,7 +238,7 @@ WRITE8_MEMBER( im6402_device::write )
 //  rrc_w - receiver register clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::rrc_w )
+void im6402_device::rrc_w(int state)
 {
 	if (state)
 	{
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER( im6402_device::rrc_w )
 //  trc_w - transmitter register clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::trc_w )
+void im6402_device::trc_w(int state)
 {
 	if (state)
 	{
@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER( im6402_device::trc_w )
 //  rrd_w - receiver register disable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::rrd_w )
+void im6402_device::rrd_w(int state)
 {
 }
 
@@ -275,7 +275,7 @@ WRITE_LINE_MEMBER( im6402_device::rrd_w )
 //  sfd_w - status flags disable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::sfd_w )
+void im6402_device::sfd_w(int state)
 {
 }
 
@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER( im6402_device::sfd_w )
 //  drr_w - data received reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::drr_w )
+void im6402_device::drr_w(int state)
 {
 	if (state)
 	{
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( im6402_device::drr_w )
 //  mr_w - master reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::mr_w )
+void im6402_device::mr_w(int state)
 {
 	if (state)
 	{
@@ -310,7 +310,7 @@ WRITE_LINE_MEMBER( im6402_device::mr_w )
 //  crl_w - control register load
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::crl_w )
+void im6402_device::crl_w(int state)
 {
 	if (state)
 	{
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 //  pi_w - parity inhibit
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::pi_w )
+void im6402_device::pi_w(int state)
 {
 	LOG("IM6402 Parity Inhibit %u\n", state);
 
@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER( im6402_device::pi_w )
 //  sbs_w - stop bit select
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::sbs_w )
+void im6402_device::sbs_w(int state)
 {
 	LOG("IM6402 Stop Bit Select %u\n", state);
 
@@ -360,7 +360,7 @@ WRITE_LINE_MEMBER( im6402_device::sbs_w )
 //  cls1_w - character length select 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::cls1_w )
+void im6402_device::cls1_w(int state)
 {
 	LOG("IM6402 Character Length Select 1 %u\n", state);
 
@@ -372,7 +372,7 @@ WRITE_LINE_MEMBER( im6402_device::cls1_w )
 //  cls2_w - character length select 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::cls2_w )
+void im6402_device::cls2_w(int state)
 {
 	LOG("IM6402 Character Length Select 2 %u\n", state);
 
@@ -384,14 +384,14 @@ WRITE_LINE_MEMBER( im6402_device::cls2_w )
 //  epe_w - even parity enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( im6402_device::epe_w )
+void im6402_device::epe_w(int state)
 {
 	LOG("IM6402 Even Parity Enable %u\n", state);
 
 	m_epe = state;
 }
 
-WRITE_LINE_MEMBER(im6402_device::write_rri)
+void im6402_device::write_rri(int state)
 {
 	// HACK derive clock from data line as wangpckb sends bytes instantly to make up for mcs51 serial implementation
 	receive_register_update_bit(state);

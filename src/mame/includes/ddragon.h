@@ -33,7 +33,6 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainbank(*this, "mainbank")
-		, m_rambase(*this, "rambase")
 		, m_bgvideoram(*this, "bgvideoram")
 		, m_fgvideoram(*this, "fgvideoram")
 		, m_comram(*this, "comram")
@@ -58,6 +57,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(subcpu_bus_free_r);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
@@ -67,7 +70,6 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	optional_memory_bank m_mainbank;
-	optional_shared_ptr<uint8_t> m_rambase;
 
 	/* video-related */
 	tilemap_t      *m_fg_tilemap;
@@ -85,19 +87,8 @@ protected:
 	bool           m_adpcm_idle[2];
 	int            m_adpcm_data[2];
 
-	/* for Sai Yu Gou Ma Roku */
-	int            m_adpcm_addr;
-	int            m_i8748_P1;
-	int            m_i8748_P2;
-	int            m_pcm_shift;
-	int            m_pcm_nibble;
-	int            m_mcu_command;
-#if 0
-	int            m_m5205_clk;
-#endif
-
-	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
+	void ddragon_bgvideoram_w(offs_t offset, uint8_t data);
+	void ddragon_fgvideoram_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(background_scan);
 
@@ -127,28 +118,23 @@ private:
 	void ddragon_interrupt_ack(offs_t offset, uint8_t data);
 	void dd_adpcm_int(int chip);
 
-	/* video/ddragon.c */
+	/* video/ddragon.cpp */
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	DECLARE_MACHINE_START(ddragon);
-	DECLARE_MACHINE_RESET(ddragon);
-	DECLARE_VIDEO_START(ddragon);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 
-	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
-	DECLARE_READ8_MEMBER(ddragon_interrupt_r);
-	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
-	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
-	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
-	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
-	DECLARE_READ8_MEMBER(ddragon_comram_r);
-	DECLARE_WRITE8_MEMBER(ddragon_comram_w);
-	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
-	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
-	DECLARE_WRITE8_MEMBER(ddragonba_port_w);
+	void ddragon_bankswitch_w(uint8_t data);
+	uint8_t ddragon_interrupt_r(offs_t offset);
+	void ddragon_interrupt_w(offs_t offset, uint8_t data);
+	void ddragon2_sub_irq_ack_w(uint8_t data);
+	void ddragon2_sub_irq_w(uint8_t data);
+	void sub_port6_w(uint8_t data);
+	uint8_t ddragon_comram_r(offs_t offset);
+	void ddragon_comram_w(offs_t offset, uint8_t data);
+	void dd_adpcm_w(offs_t offset, uint8_t data);
+	uint8_t dd_adpcm_status_r();
+	void ddragonba_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
@@ -158,7 +144,10 @@ private:
 	void ddragon_map(address_map &map);
 	void ddragonba_sub_map(address_map &map);
 	void sound_map(address_map &map);
+	void ddragon6809_sound_map(address_map &map);
 	void sub_map(address_map &map);
+	void sub_6309_map(address_map &map);
+	void sub_6809_map(address_map &map);
 };
 
 
@@ -169,6 +158,7 @@ public:
 		: ddragon_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
 		, m_darktowr_bank(*this, "darktowr_bank")
+		, m_rambase(*this, "rambase")
 		, m_mcu_port_a_out(0xff)
 	{
 	}
@@ -178,16 +168,17 @@ public:
 	void init_darktowr();
 
 private:
-	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
-	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
-	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
+	uint8_t darktowr_mcu_bank_r(offs_t offset);
+	void darktowr_mcu_bank_w(offs_t offset, uint8_t data);
+	void darktowr_bankswitch_w(uint8_t data);
+	void mcu_port_a_w(offs_t offset, uint8_t data);
 
 	void darktowr_map(address_map &map);
 	void darktowr_banked_map(address_map &map);
 
 	required_device<m68705p_device> m_mcu;
-	optional_device<address_map_bank_device> m_darktowr_bank;
+	required_device<address_map_bank_device> m_darktowr_bank;
+	required_shared_ptr<uint8_t> m_rambase;
 
 	uint8_t m_mcu_port_a_out;
 };
@@ -206,7 +197,7 @@ public:
 	void init_toffy();
 
 private:
-	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
+	void toffy_bankswitch_w(uint8_t data);
 
 	void toffy_map(address_map &map);
 };

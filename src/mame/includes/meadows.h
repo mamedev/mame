@@ -43,6 +43,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override { m_main_sense_state = 0; }
+	virtual void video_start() override;
+
 private:
 	required_device<s2650_device> m_maincpu;
 	optional_device<s2650_device> m_audiocpu;
@@ -68,16 +72,15 @@ private:
 	uint8_t m_0c02;
 	uint8_t m_0c03;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(hsync_chain_r);
-	DECLARE_READ8_MEMBER(vsync_chain_hi_r);
-	DECLARE_READ8_MEMBER(vsync_chain_lo_r);
-	DECLARE_WRITE8_MEMBER(meadows_audio_w);
-	DECLARE_WRITE8_MEMBER(audio_hardware_w);
-	DECLARE_READ8_MEMBER(audio_hardware_r);
-	DECLARE_WRITE8_MEMBER(meadows_videoram_w);
-	DECLARE_WRITE8_MEMBER(meadows_spriteram_w);
+	uint8_t hsync_chain_r();
+	uint8_t vsync_chain_hi_r();
+	uint8_t vsync_chain_lo_r();
+	void meadows_audio_w(offs_t offset, uint8_t data);
+	void audio_hardware_w(offs_t offset, uint8_t data);
+	uint8_t audio_hardware_r(offs_t offset);
+	void meadows_videoram_w(offs_t offset, uint8_t data);
+	void meadows_spriteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(meadows_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(minferno_vblank_irq);

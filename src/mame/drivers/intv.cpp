@@ -57,7 +57,7 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "cpu/cp1610/cp1610.h"
 #include "sound/ay8910.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -226,7 +226,7 @@ static INPUT_PORTS_START( intvkbd )
 
 	PORT_START("ROW6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)  PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('|')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('_') PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)       PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)       PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)       PORT_CHAR('5') PORT_CHAR('%')
@@ -424,18 +424,18 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTV_INTERRUPT2_COMPLETE:
-		intv_interrupt2_complete(ptr, param);
+		intv_interrupt2_complete(param);
 		break;
 	case TIMER_INTV_INTERRUPT_COMPLETE:
-		intv_interrupt_complete(ptr, param);
+		intv_interrupt_complete(param);
 		break;
 	case TIMER_INTV_BTB_FILL:
-		intv_btb_fill(ptr, param);
+		intv_btb_fill(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in intv_state::device_timer");
@@ -460,10 +460,11 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 void intv_state::intv(machine_config &config)
 {
 	/* basic machine hardware */
-	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	cp1610_cpu_device &maincpu(CP1610(config, m_maincpu, XTAL(3'579'545)/4));        /* Colorburst/4 */
+	maincpu.set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
+	maincpu.set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
+	maincpu.iab().set(FUNC(intv_state::iab_r));
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	STIC(config, m_stic, XTAL(3'579'545));
@@ -542,7 +543,7 @@ void intv_state::intvkbd(machine_config &config)
 	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
 	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intvkbd);

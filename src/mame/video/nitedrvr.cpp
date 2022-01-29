@@ -16,7 +16,7 @@ void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	{
 		for (int x = bx; x < ex; x++)
 			if (cliprect.contains(x, y))
-				bitmap.pix16(y, x) = 1;
+				bitmap.pix(y, x) = 1;
 	}
 }
 
@@ -46,7 +46,7 @@ void nitedrvr_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nitedrvr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_tiles(bitmap, cliprect);

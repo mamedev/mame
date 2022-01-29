@@ -38,25 +38,25 @@ enum
 };
 
 
-WRITE16_MEMBER(twin16_state::fixram_w)
+void twin16_state::fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fixram[offset]);
 	m_fixed_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram0_w)
+void twin16_state::videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[0][offset]);
 	m_scroll_tmap[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram1_w)
+void twin16_state::videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_scroll_tmap[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::zipram_w)
+void twin16_state::zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_zipram[offset];
 	COMBINE_DATA(&m_zipram[offset]);
@@ -69,7 +69,7 @@ void twin16_state::twin16_postload()
 	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fround_state::gfx_bank_w)
+void fround_state::gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int changed = 0;
 
@@ -96,7 +96,7 @@ WRITE16_MEMBER(fround_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::video_register_w)
+void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -189,7 +189,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
  *   3  | ------------xxxx | color
  */
 
-READ16_MEMBER(twin16_state::sprite_status_r)
+uint16_t twin16_state::sprite_status_r()
 {
 	// bit 0: busy, other bits: dunno
 	return m_sprite_busy;
@@ -260,7 +260,7 @@ void twin16_state::spriteram_process(  )
 	m_need_process_spriteram = 0;
 }
 
-void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
+void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const uint16_t *source = 0x1800+m_spriteram->buffer() + 0x800 - 4;
 	const uint16_t *finish = 0x1800+m_spriteram->buffer();
@@ -274,7 +274,6 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 		{
 			int xpos = source[1];
 			int ypos = source[2];
-			int x,y;
 
 			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height  = 16<<((attributes>>6)&0x3);
@@ -335,18 +334,18 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 			if( ypos>=256 ) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
-			for( y=0; y<height; y++, pen_data += width/4 )
+			for( int y=0; y<height; y++, pen_data += width/4 )
 			{
 				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
-				if( sy>=16 && sy<256-16 )
+				if( sy>=cliprect.min_y && sy<=cliprect.max_y )
 				{
-					uint16_t *dest = &bitmap.pix16(sy);
-					uint8_t *pdest = &screen.priority().pix8(sy);
+					uint16_t *const dest = &bitmap.pix(sy);
+					uint8_t *const pdest = &screen.priority().pix(sy);
 
-					for( x=0; x<width; x++ )
+					for( int x=0; x<width; x++ )
 					{
 						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
-						if( sx>=0 && sx<320 )
+						if( sx>=cliprect.min_x && sx<=cliprect.max_x )
 						{
 							uint16_t pen = pen_data[x>>2]>>((~x&3)<<2)&0xf;
 
@@ -390,7 +389,7 @@ TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void twin16_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_base)
@@ -403,7 +402,7 @@ void twin16_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	int color = color_base + (data >> 13);
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
 }
 
@@ -419,7 +418,7 @@ void fround_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	int color = color_base | (data >> 13);
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
 }
 
@@ -435,9 +434,9 @@ TILE_GET_INFO_MEMBER(twin16_state::layer1_tile_info)
 
 void twin16_state::video_start()
 {
-	m_fixed_tmap = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::fix_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_scroll_tmap[0] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::layer0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_scroll_tmap[1] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::layer1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fixed_tmap = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::fix_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_scroll_tmap[0] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_scroll_tmap[1] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_fixed_tmap->set_transparent_pen(0);
 	m_scroll_tmap[0]->set_transparent_pen(0);
@@ -538,7 +537,7 @@ uint32_t twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 
 			break;
 	}
 
-	draw_sprites( screen, bitmap );
+	draw_sprites( screen, bitmap, cliprect );
 
 	m_fixed_tmap->draw(screen, bitmap, cliprect, 0);
 	return 0;

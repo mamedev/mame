@@ -141,7 +141,10 @@ DEFINE_DEVICE_TYPE(HP_CAPRICORN , capricorn_cpu_device , "capricorn" , "HP-Capri
 
 capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, HP_CAPRICORN, tag, owner, clock),
-	  m_program_config("program" , ENDIANNESS_LITTLE , 8 , 16)
+	m_program_config("program" , ENDIANNESS_LITTLE , 8 , 16),
+	m_opcode_func(*this),
+	m_lma_out(*this),
+	m_intack_in(*this)
 {
 }
 
@@ -169,8 +172,8 @@ void capricorn_cpu_device::device_start()
 	// Flags
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%9s");
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_arp));
@@ -179,6 +182,10 @@ void capricorn_cpu_device::device_start()
 	save_item(NAME(m_flags));
 
 	set_icountptr(m_icount);
+
+	m_opcode_func.resolve_safe();
+	m_lma_out.resolve_safe();
+	m_intack_in.resolve_safe(0);
 }
 
 void capricorn_cpu_device::device_reset()
@@ -204,6 +211,7 @@ void capricorn_cpu_device::execute_run()
 			debugger_instruction_hook(m_genpc);
 
 			uint8_t opcode = fetch();
+			m_opcode_func(opcode);
 			execute_one(opcode);
 			offset_pc(1);
 		}
@@ -243,18 +251,21 @@ std::unique_ptr<util::disasm_interface> capricorn_cpu_device::create_disassemble
 	return std::make_unique<capricorn_disassembler>();
 }
 
-void capricorn_cpu_device::start_mem_burst(ea_addr_t addr)
+void capricorn_cpu_device::start_mem_burst(ea_addr_t addr , bool lmard)
 {
 	m_flatten = false;
-	// Only relevant for memory access (not for internal registers)
-	m_start_addr = (uint16_t)(addr & ADDR_MASK);
+	if (!BIT(addr , GP_REG_BIT)) {
+		// Only relevant for memory access (not for internal registers)
+		m_start_addr = (uint16_t)(addr & ADDR_MASK);
+		m_lma_out(lmard);
+	}
 }
 
-uint16_t capricorn_cpu_device::read_u16(ea_addr_t addr)
+uint16_t capricorn_cpu_device::read_u16(ea_addr_t addr , bool lmard)
 {
 	PAIR16 tmp;
 
-	start_mem_burst(addr);
+	start_mem_burst(addr , lmard);
 	tmp.b.l = RM(addr);
 	tmp.b.h = RM(addr);
 	return tmp.w;
@@ -279,7 +290,7 @@ uint8_t capricorn_cpu_device::RM(ea_addr_t& addr)
 		res = m_reg[ addr & ARP_DRP_MASK ];
 	} else {
 		m_curr_addr = (uint16_t)(addr & ADDR_MASK);
-		res = m_program->read_byte(m_flatten ? m_start_addr : m_curr_addr);
+		res = m_program.read_byte(m_flatten ? m_start_addr : m_curr_addr);
 	}
 	addr++;
 	return res;
@@ -291,7 +302,7 @@ void capricorn_cpu_device::WM(ea_addr_t& addr , uint8_t v)
 		m_reg[ addr & ARP_DRP_MASK ] = v;
 	} else {
 		m_curr_addr = (uint16_t)(addr & ADDR_MASK);
-		m_program->write_byte(m_flatten ? m_start_addr : m_curr_addr , v);
+		m_program.write_byte(m_flatten ? m_start_addr : m_curr_addr , v);
 	}
 	addr++;
 }
@@ -299,7 +310,8 @@ void capricorn_cpu_device::WM(ea_addr_t& addr , uint8_t v)
 uint8_t capricorn_cpu_device::fetch()
 {
 	m_genpc = read_u16(REG_PC | GP_REG_MASK);
-	return m_cache->read_byte(m_genpc);
+	start_mem_burst(m_genpc , false);
+	return m_cache.read_byte(m_genpc);
 }
 
 void capricorn_cpu_device::offset_pc(uint16_t offset)
@@ -416,9 +428,19 @@ capricorn_cpu_device::ea_addr_t capricorn_cpu_device::get_ea_idx_dir()
 	// Indexed direct addressing mode
 	m_icount -= 3;
 	offset_pc(1);
-	uint16_t res = read_u16(m_genpc) + read_u16(m_arp | GP_REG_MASK);
+	uint16_t res = read_u16(m_genpc , false) + read_u16(m_arp | GP_REG_MASK);
 	offset_pc(1);
 	write_u16(REG_INDEX_SCRATCH | GP_REG_MASK, res);
+	return res;
+}
+
+capricorn_cpu_device::ea_addr_t capricorn_cpu_device::get_ea_jsbx()
+{
+	// Indexed direct addressing mode in JSBX instruction
+	m_icount -= 3;
+	offset_pc(1);
+	uint16_t res = read_u16(m_genpc) + read_u16(m_arp | GP_REG_MASK);
+	offset_pc(1);
 	return res;
 }
 
@@ -437,7 +459,7 @@ capricorn_cpu_device::ea_addr_t capricorn_cpu_device::get_ea_idx_indir()
 	// Indexed indirect addressing mode
 	m_icount -= 5;
 	offset_pc(1);
-	uint16_t res = read_u16(m_genpc) + read_u16(m_arp | GP_REG_MASK);
+	uint16_t res = read_u16(m_genpc , false) + read_u16(m_arp | GP_REG_MASK);
 	offset_pc(1);
 	write_u16(REG_INDEX_SCRATCH | GP_REG_MASK, res);
 	return read_u16(res);
@@ -975,11 +997,11 @@ void capricorn_cpu_device::do_PAD_op()
 	byte = RM(ea);
 	m_arp = byte & ARP_DRP_MASK;
 	COPY_BIT(BIT(byte , 6), m_flags, FLAGS_CY_BIT);
-	COPY_BIT(BIT(byte , 7), m_flags, FLAGS_OVF_BIT);
 
 	byte = RM(ea);
 	m_drp = byte & ARP_DRP_MASK;
 	COPY_BIT(BIT(byte , 6), m_flags, FLAGS_DCM_BIT);
+	COPY_BIT(BIT(byte , 7), m_flags, FLAGS_OVF_BIT);
 
 	byte = RM(ea);
 	COPY_BIT(BIT(byte , 0), m_flags, FLAGS_LSB_BIT);
@@ -1163,7 +1185,7 @@ void capricorn_cpu_device::execute_one(uint8_t opcode)
 
 		case 0xc6:
 			// JSB
-			do_JSB_op(get_ea_idx_dir());
+			do_JSB_op(get_ea_jsbx());
 			break;
 
 		case 0xc7:
@@ -1511,9 +1533,12 @@ void capricorn_cpu_device::execute_one(uint8_t opcode)
 
 void capricorn_cpu_device::take_interrupt()
 {
-	// According to O. De Smet emulator interrupt handling takes 15 cycles
-	m_icount -= 15;
+	// Int. ack sequence takes 9 cycles
+	// Microcode FSM runs through this state sequence (see patent):
+	// 31-15-26-13-23-22-30-16-20
+	standard_irq_callback(0);
+	m_icount -= 9;
 	push_pc();
-	uint8_t vector = (uint8_t)standard_irq_callback(0);
+	uint8_t vector = m_intack_in();
 	vector_to_pc(vector);
 }

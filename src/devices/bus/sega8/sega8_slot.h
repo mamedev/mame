@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -34,7 +34,8 @@ enum
 	SEGA8_DAHJEE_TYPEB,
 	SEGA8_SEOJIN,
 	SEGA8_MULTICART,
-	SEGA8_MEGACART
+	SEGA8_MEGACART,
+	SEGA8_X_TERMINATOR
 };
 
 
@@ -44,23 +45,23 @@ DECLARE_DEVICE_TYPE(SEGA8_CARD_SLOT, sega8_card_slot_device)
 
 // ======================> device_sega8_cart_interface
 
-class device_sega8_cart_interface : public device_slot_card_interface
+class device_sega8_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_sega8_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) { }
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
+	virtual void write_mapper(offs_t offset, uint8_t data) { }
 	virtual int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) { }
 	// the SC3000 has I/OR, I/OW lines connected
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) { }
+	virtual uint8_t read_io(offs_t offset) { return 0xff; }
+	virtual void write_io(offs_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -106,8 +107,8 @@ protected:
 // ======================> sega8_cart_slot_device
 
 class sega8_cart_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_sega8_cart_interface>
 {
 public:
 	// construction/destruction
@@ -117,9 +118,13 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-	virtual const char *custom_instance_name() const override { return "cartridge"; }
-	virtual const char *custom_brief_instance_name() const override { return "cart"; }
+
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	int get_cart_type(const uint8_t *ROM, uint32_t len) const;
@@ -131,26 +136,14 @@ public:
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual const char *image_interface() const override { return "sms_cart"; }
-	virtual const char *file_extensions() const override { return "bin"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
+	uint8_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint8_t data);
+	void write_mapper(offs_t offset, uint8_t data);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t read_io(offs_t offset);
+	void write_io(offs_t offset, uint8_t data);
 
 	int get_lphaser_xoffs() { return m_cart ? m_cart->get_lphaser_xoffs() : -1; }
 	int get_sms_mode() { return m_cart->get_sms_mode(); }
@@ -174,8 +167,8 @@ public:
 	// construction/destruction
 	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const char *custom_instance_name() const override { return "card"; }
-	virtual const char *custom_brief_instance_name() const override { return "card"; }
+	virtual const char *image_type_name() const noexcept override { return "card"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "card"; }
 
 protected:
 	// construction/destruction
@@ -198,9 +191,8 @@ public:
 		set_fixed(false);
 	}
 	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return true; }
-	virtual const char *image_interface() const override { return "sg1000_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sg"; }
+	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };
 
 // ======================> omv_cart_slot_device
@@ -219,9 +211,8 @@ public:
 		set_fixed(false);
 	}
 	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return false; }
-	virtual const char *image_interface() const override { return "sg1000_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sg"; }
+	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };
 
 // ======================> sc3000_cart_slot_device
@@ -240,9 +231,8 @@ public:
 		set_fixed(false);
 	}
 	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return true; }
-	virtual const char *image_interface() const override { return "sg1000_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sg,sc"; }
+	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sg,sc"; }
 };
 
 // ======================> sg1000mk3_cart_slot_device
@@ -261,9 +251,8 @@ public:
 		set_fixed(false);
 	}
 	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return false; }
-	virtual const char *image_interface() const override { return "sms_cart,sg1000_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sms,sg"; }
+	virtual const char *image_interface() const noexcept override { return "sms_cart,sg1000_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sms,sg"; }
 };
 
 // ======================> sms_cart_slot_device
@@ -282,9 +271,8 @@ public:
 		set_fixed(false);
 	}
 	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return false; }
-	virtual const char *image_interface() const override { return "sms_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sms"; }
+	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sms"; }
 };
 
 // ======================> gamegear_cart_slot_device
@@ -303,9 +291,8 @@ public:
 		set_fixed(false);
 	}
 	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return true; }
-	virtual const char *image_interface() const override { return "gamegear_cart"; }
-	virtual const char *file_extensions() const override { return "bin,gg"; }
+	virtual const char *image_interface() const noexcept override { return "gamegear_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,gg"; }
 };
 
 
@@ -325,9 +312,8 @@ public:
 		set_fixed(false);
 	}
 	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual bool must_be_loaded() const override { return false; }
-	virtual const char *image_interface() const override { return "sms_card"; }
-	virtual const char *file_extensions() const override { return "bin"; }
+	virtual const char *image_interface() const noexcept override { return "sms_card"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
 };
 
 // ======================> sg1000_card_slot_device
@@ -346,8 +332,8 @@ public:
 		set_fixed(false);
 	}
 	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "sg1000_cart"; }
-	virtual const char *file_extensions() const override { return "bin,sg"; }
+	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };
 
 DECLARE_DEVICE_TYPE(SG1000_CART_SLOT,    sg1000_cart_slot_device)

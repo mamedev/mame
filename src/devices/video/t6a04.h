@@ -30,10 +30,10 @@ public:
 	}
 
 	// device interface
-	DECLARE_WRITE8_MEMBER(control_write);
-	DECLARE_READ8_MEMBER(control_read);
-	DECLARE_WRITE8_MEMBER(data_write);
-	DECLARE_READ8_MEMBER(data_read);
+	void control_write(uint8_t data);
+	uint8_t control_read();
+	void data_write(uint8_t data);
+	uint8_t data_read();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -292,7 +292,7 @@ bool wangpc_wdc_device::wangpcbus_have_dack(int line)
 //  port_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_wdc_device::port_r )
+uint8_t wangpc_wdc_device::port_r()
 {
 	/*
 
@@ -317,7 +317,7 @@ READ8_MEMBER( wangpc_wdc_device::port_r )
 //  status_w - status register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_wdc_device::status_w )
+void wangpc_wdc_device::status_w(uint8_t data)
 {
 	logerror("WDC status %02x\n", data);
 
@@ -325,11 +325,11 @@ WRITE8_MEMBER( wangpc_wdc_device::status_w )
 }
 
 
-READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(0); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(0, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(1); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(1, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(2); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(2, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(3); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(3, data); }
+uint8_t wangpc_wdc_device::ctc_ch0_r() { return m_ctc->read(0); }
+void wangpc_wdc_device::ctc_ch0_w(uint8_t data) { m_ctc->write(0, data); }
+uint8_t wangpc_wdc_device::ctc_ch1_r() { return m_ctc->read(1); }
+void wangpc_wdc_device::ctc_ch1_w(uint8_t data) { m_ctc->write(1, data); }
+uint8_t wangpc_wdc_device::ctc_ch2_r() { return m_ctc->read(2); }
+void wangpc_wdc_device::ctc_ch2_w(uint8_t data) { m_ctc->write(2, data); }
+uint8_t wangpc_wdc_device::ctc_ch3_r() { return m_ctc->read(3); }
+void wangpc_wdc_device::ctc_ch3_w(uint8_t data) { m_ctc->write(3, data); }

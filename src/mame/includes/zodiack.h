@@ -22,10 +22,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(master_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void nmi_mask_w(uint8_t data);
+	void sound_nmi_enable_w(uint8_t data);
+	void master_soundlatch_w(uint8_t data);
+	void control_w(uint8_t data);
 
 	// devices
 	required_device<z80_device> m_maincpu;
@@ -37,7 +37,7 @@ private:
 	uint8_t m_sound_nmi_enabled;
 
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
-	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_main_nmi_w);
 
 	void io_map(address_map &map);
 	void main_map(address_map &map);

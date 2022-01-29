@@ -2,7 +2,7 @@
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /***************************************************************************
 
-Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
+Driver by Jarek Burczynski, started by Tomasz Slanina
 Lots of hardware info from Guru
 
 memory map :
@@ -104,7 +104,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(semaphore_r);
+	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
 
@@ -217,7 +217,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
 
-			bitmap.pix16(255-sy, 255-(sx*4 + x)) = color*4 + data;
+			bitmap.pix(255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
 
@@ -265,7 +265,7 @@ void shougi_state::main_map(address_map &map)
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::semaphore_r)
+uint8_t shougi_state::semaphore_r()
 {
 	// d0: waits for it to be set before handling NMI routine
 	// hmm it must be a signal from maincpu, but what?
@@ -391,7 +391,7 @@ void shougi_state::shougi(machine_config &config)
 	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 

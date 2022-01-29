@@ -17,12 +17,12 @@ public:
 	qx10_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ioport_constructor device_input_ports() const override;
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
+	void mcu_p1_w(u8 data);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_start() override;
 
 private:

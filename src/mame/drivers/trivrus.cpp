@@ -19,14 +19,17 @@
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
+#include "machine/microtch.h"
 #include "machine/nvram.h"
 #include "machine/vrender0.h"
-#include "machine/microtch.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
+
+
+namespace {
 
 class trivrus_state : public driver_device
 {
@@ -38,102 +41,103 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainbank(*this, "mainbank"),
 		m_vr0soc(*this, "vr0soc"),
-		m_microtouch(*this, "microtouch")
+		m_microtouch(*this, "microtouch"),
+		m_inputs(*this, "IN%u", 1U),
+		m_dsw(*this, "DSW")
 	{ }
 
 
 	void trivrus(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	/* memory pointers */
+private:
+	// memory pointers
 	required_shared_ptr<uint32_t> m_workram;
 	required_region_ptr<uint32_t> m_flash;
 
-	/* devices */
+	// devices
 	required_device<se3208_device> m_maincpu;
-	optional_memory_bank m_mainbank;
+	required_memory_bank m_mainbank;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<microtouch_device> m_microtouch;
 
-	uint32_t    m_FlashCmd;
-	uint32_t    m_Bank;
-	uint32_t    m_maxbank;
+	// inputs
+	required_ioport_array<5> m_inputs;
+	required_ioport m_dsw;
 
-	DECLARE_READ32_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
-	DECLARE_WRITE32_MEMBER(Banksw_w);
+	uint32_t m_flashcmd;
+	uint32_t m_bank;
+	uint32_t m_maxbank;
 
-	IRQ_CALLBACK_MEMBER(icallback);
+	uint32_t flashcmd_r();
+	void flashcmd_w(uint32_t data);
+	void banksw_w(uint32_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void trivrus_mem(address_map &map);
 
-	// PIO
-	DECLARE_READ32_MEMBER(PIOldat_r);
-	uint32_t m_PIO;
-	DECLARE_WRITE32_MEMBER(PIOldat_w);
-	DECLARE_READ32_MEMBER(PIOedat_r);
+	// pio
+	uint32_t pioldat_r();
+	uint32_t m_pio;
+	void pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pioedat_r();
 
-	DECLARE_READ8_MEMBER(trivrus_input_r);
-	DECLARE_WRITE8_MEMBER(trivrus_input_w);
+	uint8_t trivrus_input_r();
+	void trivrus_input_w(uint8_t data);
 	uint8_t m_trivrus_input;
 };
 
-IRQ_CALLBACK_MEMBER(trivrus_state::icallback)
+
+void trivrus_state::flashcmd_w(uint32_t data)
 {
-	return m_vr0soc->irq_callback();
+	m_flashcmd = data;
 }
 
-WRITE32_MEMBER(trivrus_state::FlashCmd_w)
-{
-	m_FlashCmd = data;
-}
-
-READ32_MEMBER(trivrus_state::PIOedat_r)
+uint32_t trivrus_state::pioedat_r()
 {
 	return 0;
 }
 
-READ32_MEMBER(trivrus_state::PIOldat_r)
+uint32_t trivrus_state::pioldat_r()
 {
 	// ...
-	return m_PIO;
+	return m_pio;
 }
 
-// PIO Latched output DATa Register
-WRITE32_MEMBER(trivrus_state::PIOldat_w)
+// pio Latched output DATa Register
+void trivrus_state::pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// ...
-	COMBINE_DATA(&m_PIO);
+	COMBINE_DATA(&m_pio);
 }
 
-READ8_MEMBER(trivrus_state::trivrus_input_r)
+uint8_t trivrus_state::trivrus_input_r()
 {
 	switch (m_trivrus_input)
 	{
-		case 1: return ioport("IN1")->read();
-		case 2: return ioport("IN2")->read();
-		case 3: return ioport("IN3")->read();
-		case 4: return ioport("IN4")->read();
-		case 5: return ioport("IN5")->read();
-		case 6: return ioport("DSW")->read();
+		case 1: return m_inputs[0]->read();
+		case 2: return m_inputs[1]->read();
+		case 3: return m_inputs[2]->read();
+		case 4: return m_inputs[3]->read();
+		case 5: return m_inputs[4]->read();
+		case 6: return m_dsw->read();
 	}
 	logerror("%s: unknown input %02x read\n", machine().describe_context(), m_trivrus_input);
 	return 0xff;
 }
 
-WRITE8_MEMBER(trivrus_state::trivrus_input_w)
+void trivrus_state::trivrus_input_w(uint8_t data)
 {
-	m_trivrus_input = data & 0xff;
+	m_trivrus_input = data;
 }
 
-READ32_MEMBER(trivrus_state::FlashCmd_r)
+uint32_t trivrus_state::flashcmd_r()
 {
-	if ((m_FlashCmd & 0xff) == 0xff)
+	if ((m_flashcmd & 0xff) == 0xff)
 	{
-		if (m_Bank < m_maxbank)
+		if (m_bank < m_maxbank)
 		{
 			uint32_t *ptr = (uint32_t*)(m_mainbank->base());
 			return ptr[0];
@@ -141,9 +145,9 @@ READ32_MEMBER(trivrus_state::FlashCmd_r)
 		else
 			return 0xffffffff;
 	}
-	if ((m_FlashCmd & 0xff) == 0x90)
+	if ((m_flashcmd & 0xff) == 0x90)
 	{
-		if (m_Bank < m_maxbank)
+		if (m_bank < m_maxbank)
 			return 0x00180089;  //Intel 128MBit
 		else
 			return 0xffffffff;
@@ -152,17 +156,17 @@ READ32_MEMBER(trivrus_state::FlashCmd_r)
 }
 
 
-WRITE32_MEMBER(trivrus_state::Banksw_w)
+void trivrus_state::banksw_w(uint32_t data)
 {
-	m_Bank = (data >> 1) & 7;
-	m_mainbank->set_entry(m_Bank);
+	m_bank = (data >> 1) & 7;
+	m_mainbank->set_entry(m_bank);
 }
 
 void trivrus_state::trivrus_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
-	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::Banksw_w));
+	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::banksw_w));
 
 	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
 	// reads occurs by SELECTING the given register on successive ODD addresses then reading at 0x01500011
@@ -178,46 +182,43 @@ void trivrus_state::trivrus_mem(address_map &map)
 	map(0x01600000, 0x01607fff).ram().share("nvram");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
-	map(0x01802004, 0x01802007).rw(FUNC(trivrus_state::PIOldat_r), FUNC(trivrus_state::PIOldat_w));
-	map(0x01802008, 0x0180200b).r(FUNC(trivrus_state::PIOedat_r));
+	map(0x01802004, 0x01802007).rw(FUNC(trivrus_state::pioldat_r), FUNC(trivrus_state::pioldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(trivrus_state::pioedat_r));
 
-	map(0x02000000, 0x027fffff).ram().share("workram");
+	map(0x02000000, 0x027fffff).ram().share(m_workram);
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 
-	map(0x05000000, 0x05ffffff).bankr("mainbank");
-	map(0x05000000, 0x05000003).rw(FUNC(trivrus_state::FlashCmd_r), FUNC(trivrus_state::FlashCmd_w));
+	map(0x05000000, 0x05ffffff).bankr(m_mainbank);
+	map(0x05000000, 0x05000003).rw(FUNC(trivrus_state::flashcmd_r), FUNC(trivrus_state::flashcmd_w));
 //  0x06000000 accessed during POST during above check then discarded, probably a debug left-over
 }
 
 void trivrus_state::machine_start()
 {
-	if (m_mainbank)
+	m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
+	std::unique_ptr<uint8_t[]> dummy_region = std::make_unique<uint8_t[]>(0x1000000);
+	std::fill_n(&dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
+	uint8_t *rom = (m_flash) ? (uint8_t *)&m_flash[0] : dummy_region.get();
+	for (int i = 0; i < 8; i++)
 	{
-		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
-		uint8_t *dummy_region = auto_alloc_array(machine(), uint8_t, 0x1000000);
-		std::fill_n(&dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
-		uint8_t *ROM = (m_flash) ? (uint8_t *)&m_flash[0] : dummy_region;
-		for (int i = 0; i < 8; i++)
-		{
-			if ((i < m_maxbank))
-				m_mainbank->configure_entry(i, ROM + i * 0x1000000);
-			else
-				m_mainbank->configure_entry(i, dummy_region);
-		}
+		if (i < m_maxbank)
+			m_mainbank->configure_entry(i, rom + i * 0x1000000);
+		else
+			m_mainbank->configure_entry(i, dummy_region.get());
 	}
 
-	save_item(NAME(m_Bank));
-	save_item(NAME(m_FlashCmd));
-	save_item(NAME(m_PIO));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_flashcmd));
+	save_item(NAME(m_pio));
 	save_item(NAME(m_trivrus_input));
 }
 
 void trivrus_state::machine_reset()
 {
-	m_Bank = 0;
-	m_mainbank->set_entry(m_Bank);
-	m_FlashCmd = 0xff;
+	m_bank = 0;
+	m_mainbank->set_entry(m_bank);
+	m_flashcmd = 0xff;
 }
 
 static INPUT_PORTS_START( trivrus )
@@ -295,7 +296,7 @@ void trivrus_state::trivrus(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &trivrus_state::trivrus_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(trivrus_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -316,4 +317,7 @@ ROM_START( trivrus )
 	ROM_LOAD( "u3", 0x000000, 0x1000010, CRC(ba901707) SHA1(e281ba07024cd19ef1ab72d2197014f7b1f4d30f) )
 ROM_END
 
-GAME( 2009, trivrus,  0,        trivrus,  trivrus,  trivrus_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)", 0 )
+} // Anonymous namespace
+
+
+GAME( 2009, trivrus, 0, trivrus, trivrus, trivrus_state, empty_init, ROT0, "AGT", "Trivia R Us (v1.07)", 0 )

@@ -46,8 +46,8 @@ public:
 	auto ios_cb() { return m_ios_cb.bind(); }
 
 	// bus-compatible interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -62,8 +62,8 @@ private:
 	void set_ios();
 
 	// input/output callbacks
-	devcb_read8         m_input_cb[9];
-	devcb_write8        m_output_cb[9];
+	devcb_read8::array<9> m_input_cb;
+	devcb_write8::array<9> m_output_cb;
 
 	// mode callback
 	devcb_read8         m_ios_cb;
@@ -71,6 +71,14 @@ private:
 	// internal state
 	u8                  m_data_latch[9];
 	u8                  m_data_dir[9];
+};
+
+// ======================> te7751_device
+
+class te7751_device : public te7750_device
+{
+public:
+	te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> te7752_device
@@ -83,6 +91,7 @@ public:
 
 // device type definitions
 DECLARE_DEVICE_TYPE(TE7750, te7750_device)
+DECLARE_DEVICE_TYPE(TE7751, te7751_device)
 DECLARE_DEVICE_TYPE(TE7752, te7752_device)
 
 #endif // MAME_MACHINE_TE7750_H

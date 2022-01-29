@@ -28,12 +28,12 @@ gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, ch
 {
 }
 
-READ8_MEMBER(gaelco_ds5002fp_device::hostmem_r)
+uint8_t gaelco_ds5002fp_device::hostmem_r(offs_t offset)
 {
 	return m_hostmem->read_byte(offset);
 }
 
-WRITE8_MEMBER(gaelco_ds5002fp_device::hostmem_w)
+void gaelco_ds5002fp_device::hostmem_w(offs_t offset, uint8_t data)
 {
 	m_hostmem->write_byte(offset, data);
 }
@@ -43,8 +43,6 @@ void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
 	ds5002fp_device &mcu(DS5002FP(config, "mcu", DERIVED_CLOCK(1, 1)));
 	mcu.set_addrmap(AS_PROGRAM, &gaelco_ds5002fp_device::dallas_rom);
 	mcu.set_addrmap(AS_IO, &gaelco_ds5002fp_device::dallas_ram);
-
-	config.m_perfect_cpu_quantum = subtag("mcu");
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }

@@ -8,16 +8,16 @@
 
 /* C-CE while reset, program will not be destroyed! */
 
-WRITE8_MEMBER(pc1251_state::out_b_w)
+void pc1251_state::out_b_w(uint8_t data)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1251_state::out_c_w)
+void pc1251_state::out_c_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(pc1251_state::in_a_r)
+uint8_t pc1251_state::in_a_r()
 {
 	int data = m_outa;
 
@@ -43,7 +43,7 @@ READ8_MEMBER(pc1251_state::in_a_r)
 	return data;
 }
 
-READ8_MEMBER(pc1251_state::in_b_r)
+uint8_t pc1251_state::in_b_r()
 {
 	int data = m_outb;
 

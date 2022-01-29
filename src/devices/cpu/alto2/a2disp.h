@@ -190,29 +190,29 @@
  * </PRE>
  */
 
-#ifndef _A2DISP_H_
-#define _A2DISP_H_
+#ifndef MAME_CPU_ALTO2_A2DISP_H
+#define MAME_CPU_ALTO2_A2DISP_H
 struct {
-	uint32_t state;                           //!< current state of the display_state_machine()
-	uint32_t hlc;                             //!< horizontal line counter
-	uint32_t setmode;                         //!< value written by last SETMODE<-
-	uint32_t inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
-	uint32_t scanline;                        //!< current scanline
+	uint32_t state;                         //!< current state of the display_state_machine()
+	uint32_t hlc;                           //!< horizontal line counter
+	uint32_t setmode;                       //!< value written by last SETMODE<-
+	uint32_t inverse;                       //!< set to 0xffff if line is inverse, 0x0000 otherwise
+	uint32_t scanline;                      //!< current scanline
 	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
 	bool vblank;                            //!< true during vblank, false otherwise
-	uint16_t fifo[A2_DISP_FIFO];              //!< display word fifo
-	uint32_t wa;                              //!< fifo input pointer (write address; 4-bit)
-	uint32_t ra;                              //!< fifo output pointer (read address; 4-bit)
-	uint32_t a63;                             //!< most recent value read from the PROM a63
-	uint32_t a66;                             //!< most recent value read from the PROM a66
+	uint16_t fifo[A2_DISP_FIFO];            //!< display word fifo
+	uint32_t wa;                            //!< fifo input pointer (write address; 4-bit)
+	uint32_t ra;                            //!< fifo output pointer (read address; 4-bit)
+	uint32_t a63;                           //!< most recent value read from the PROM a63
+	uint32_t a66;                           //!< most recent value read from the PROM a66
 	bool dht_blocks;                        //!< set true, if the DHT executed BLOCK
 	bool dwt_blocks;                        //!< set true, if the DWT executed BLOCK
 	bool curt_blocks;                       //!< set true, if the CURT executed BLOCK
 	bool curt_wakeup;                       //!< set true, if CURT wakeups are generated
-	uint32_t xpreg;                           //!< cursor cursor x position register (10-bit)
-	uint32_t csr;                             //!< cursor shift register (16-bit)
-	std::unique_ptr<uint16_t[]> framebuf;     //!< array of words of the raw bitmap that is displayed
-	uint8_t *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
+	uint32_t xpreg;                         //!< cursor cursor x position register (10-bit)
+	uint32_t csr;                           //!< cursor shift register (16-bit)
+	std::unique_ptr<uint16_t[]> framebuf;   //!< array of words of the raw bitmap that is displayed
+	std::unique_ptr<uint8_t[]> patterns;    //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
 	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices
 }   m_dsp;
 
@@ -238,7 +238,7 @@ struct {
  *  O3 (010) = MBEMPTY'
  * </PRE>
  */
-uint8_t* m_disp_a38;
+std::unique_ptr<uint8_t[]> m_disp_a38;
 
 //! output bits of PROM A38
 enum {
@@ -273,7 +273,7 @@ enum {
  * which happens to be very close to every 7th CPU microcycle.
  * </PRE>
  */
-uint8_t* m_disp_a63;
+std::unique_ptr<uint8_t[]> m_disp_a63;
 
 enum {
 	disp_a63_HBLANK     = (1 << 0),         //!< PROM a63 B0 is latched as HBLANK signal
@@ -293,7 +293,7 @@ enum {
  * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * The PROM is enabled whenever H[256] and H[512] are both 0.
  */
-uint8_t* m_disp_a66;
+std::unique_ptr<uint8_t[]> m_disp_a66;
 
 enum {
 	disp_a66_VSYNC_ODD      = (1 << 0),     //!< Q1 (001) is VSYNC for the odd field (with H1024=1)
@@ -312,5 +312,5 @@ void init_disp();                   //!< initialize the display context
 void exit_disp();                   //!< deinitialize the display context
 void reset_disp();                  //!< reset the display context
 
-#endif  // _A2DISP_H_
+#endif  // MAME_CPU_ALTO2_A2DISP_H
 #endif  // ALTO2_DEFINE_CONSTANTS

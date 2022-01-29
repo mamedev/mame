@@ -147,11 +147,11 @@ void namco_c148_device::device_reset()
 //  IRQ section
 //**************************************************************************
 
-READ8_MEMBER( namco_c148_device::pos_irq_level_r )      { return m_irqlevel.pos & 7; }
-READ8_MEMBER( namco_c148_device::vblank_irq_level_r )   { return m_irqlevel.vblank & 7; }
-READ8_MEMBER( namco_c148_device::cpu_irq_level_r )      { return m_irqlevel.cpu & 7; }
-READ8_MEMBER( namco_c148_device::ex_irq_level_r )       { return m_irqlevel.ex & 7; }
-READ8_MEMBER( namco_c148_device::sci_irq_level_r )      { return m_irqlevel.sci & 7; }
+uint8_t namco_c148_device::pos_irq_level_r()      { return m_irqlevel.pos & 7; }
+uint8_t namco_c148_device::vblank_irq_level_r()   { return m_irqlevel.vblank & 7; }
+uint8_t namco_c148_device::cpu_irq_level_r()      { return m_irqlevel.cpu & 7; }
+uint8_t namco_c148_device::ex_irq_level_r()       { return m_irqlevel.ex & 7; }
+uint8_t namco_c148_device::sci_irq_level_r()      { return m_irqlevel.sci & 7; }
 
 inline void namco_c148_device::flush_irq_acks()
 {
@@ -162,56 +162,56 @@ inline void namco_c148_device::flush_irq_acks()
 		m_hostcpu->set_input_line(i,CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_c148_device::pos_irq_level_w )     { m_irqlevel.pos = data & 7;    flush_irq_acks(); if(data != 0) { LOG("%s: pos IRQ level = %02x\n",data); }   }
-WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w )  { m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG("%s: vblank IRQ level = %02x\n",data);  }
-WRITE8_MEMBER( namco_c148_device::cpu_irq_level_w )     { m_irqlevel.cpu = data & 7;    flush_irq_acks(); LOG("%s: cpu IRQ level = %02x\n",data); }
-WRITE8_MEMBER( namco_c148_device::ex_irq_level_w )      { m_irqlevel.ex = data & 7;     flush_irq_acks(); LOG("%s: ex IRQ level = %02x\n",data);  }
-WRITE8_MEMBER( namco_c148_device::sci_irq_level_w )     { m_irqlevel.sci = data & 7;    flush_irq_acks(); LOG("%s: sci IRQ level = %02x\n",data); }
+void namco_c148_device::pos_irq_level_w(uint8_t data)     { m_irqlevel.pos = data & 7;    flush_irq_acks(); if(data != 0) { LOG("%s: pos IRQ level = %02x\n",data); }   }
+void namco_c148_device::vblank_irq_level_w(uint8_t data)  { m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG("%s: vblank IRQ level = %02x\n",data);  }
+void namco_c148_device::cpu_irq_level_w(uint8_t data)     { m_irqlevel.cpu = data & 7;    flush_irq_acks(); LOG("%s: cpu IRQ level = %02x\n",data); }
+void namco_c148_device::ex_irq_level_w(uint8_t data)      { m_irqlevel.ex = data & 7;     flush_irq_acks(); LOG("%s: ex IRQ level = %02x\n",data);  }
+void namco_c148_device::sci_irq_level_w(uint8_t data)     { m_irqlevel.sci = data & 7;    flush_irq_acks(); LOG("%s: sci IRQ level = %02x\n",data); }
 
-READ16_MEMBER( namco_c148_device::vblank_irq_ack_r )    { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); return 0; }
-READ16_MEMBER( namco_c148_device::pos_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);    return 0; }
-READ16_MEMBER( namco_c148_device::cpu_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE);    return 0; }
-READ16_MEMBER( namco_c148_device::ex_irq_ack_r )        { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE);     return 0; }
-READ16_MEMBER( namco_c148_device::sci_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE);    return 0; }
+uint16_t namco_c148_device::vblank_irq_ack_r()    { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); return 0; }
+uint16_t namco_c148_device::pos_irq_ack_r()       { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);    return 0; }
+uint16_t namco_c148_device::cpu_irq_ack_r()       { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE);    return 0; }
+uint16_t namco_c148_device::ex_irq_ack_r()        { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE);     return 0; }
+uint16_t namco_c148_device::sci_irq_ack_r()       { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE);    return 0; }
 
-WRITE16_MEMBER( namco_c148_device::vblank_irq_ack_w )   { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::pos_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::cpu_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::ex_irq_ack_w )       { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::sci_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); }
+void namco_c148_device::vblank_irq_ack_w(uint16_t data)   { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); }
+void namco_c148_device::pos_irq_ack_w(uint16_t data)      { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE); }
+void namco_c148_device::cpu_irq_ack_w(uint16_t data)      { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE); }
+void namco_c148_device::ex_irq_ack_w(uint16_t data)       { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE); }
+void namco_c148_device::sci_irq_ack_w(uint16_t data)      { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); }
 
 //**************************************************************************
 //  Comm ports
 //**************************************************************************
 
-READ8_MEMBER( namco_c148_device::ext_r )
+uint8_t namco_c148_device::ext_r()
 {
 	return 0xff; // TODO: bit 0 EEPROM bit ready
 }
 
-WRITE8_MEMBER( namco_c148_device::ext1_w )
+void namco_c148_device::ext1_w(uint8_t data)
 {
 	m_out_ext1_cb(data & 7);
 }
 
-WRITE8_MEMBER( namco_c148_device::ext2_w )
+void namco_c148_device::ext2_w(uint8_t data)
 {
 	m_out_ext2_cb(data & 7);
 	// TODO: bit 1/2 in Winning Run GPU might be irq enable?
 }
 
-READ8_MEMBER( namco_c148_device::bus_ctrl_r )
+uint8_t namco_c148_device::bus_ctrl_r()
 {
 	return m_bus_reg;
 }
 
-WRITE8_MEMBER( namco_c148_device::bus_ctrl_w )
+void namco_c148_device::bus_ctrl_w(uint8_t data)
 {
 	m_bus_reg = data & 7;
 }
 
 
-WRITE16_MEMBER( namco_c148_device::cpu_irq_assert_w)
+void namco_c148_device::cpu_irq_assert_w(uint16_t data)
 {
 	// TODO: Starblade relies on this for showing large polygons, is it the right place?
 	m_linked_c148->cpu_irq_trigger();
@@ -248,13 +248,13 @@ void namco_c148_device::sci_irq_trigger()
 }
 
 // TODO: these doesn't belong here, needs C116 device
-READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
+uint8_t namco_c148_device::ext_posirq_line_r()
 {
 	// TODO: same as regular register? winrun91 reads here and subs with integer 0x39 for a new posirq that never gets triggered.
 	return (m_posirq_line) & 0xff;
 }
 
-WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
+void namco_c148_device::ext_posirq_line_w(uint8_t data)
 {
 	m_posirq_line = data;
 }

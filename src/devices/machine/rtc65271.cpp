@@ -162,10 +162,18 @@ static uint8_t BCD_to_binary(uint8_t data)
 
 void rtc65271_device::nvram_default()
 {
-	memset(m_regs,0, sizeof(m_regs));
-	memset(m_xram,0, sizeof(m_xram));
-
-	m_regs[reg_B] |= reg_B_DM;  // Firebeat assumes the chip factory defaults to non-BCD mode (or maybe Konami programs it that way?)
+	if (m_default_data.found())
+	{
+		emu_file file(OPEN_FLAG_READ);
+		file.open_ram(m_default_data, m_default_data.bytes());
+		nvram_read(file);
+	}
+	else
+	{
+		memset(m_regs, 0, sizeof(m_regs));
+		memset(m_xram, 0, sizeof(m_xram));
+		m_regs[reg_B] |= reg_B_DM;  // Firebeat assumes the chip factory defaults to non-BCD mode (or maybe Konami programs it that way?)
+	}
 }
 
 //-------------------------------------------------
@@ -462,6 +470,10 @@ void rtc65271_device::field_interrupts()
 	}
 }
 
+READ_LINE_MEMBER(rtc65271_device::intrq_r)
+{
+	return (m_regs[reg_C] & reg_C_IRQF)? ASSERT_LINE : CLEAR_LINE;
+}
 
 /*
     Update SQW output state each half-period and assert periodic interrupt each
@@ -656,6 +668,7 @@ rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, RTC65271, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_interrupt_cb(*this)
+	, m_default_data(*this, DEVICE_SELF)
 {
 }
 

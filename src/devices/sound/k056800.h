@@ -23,10 +23,10 @@ public:
 	// configuration helpers
 	auto int_callback() { return m_int_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( host_r );
-	DECLARE_WRITE8_MEMBER( host_w );
-	DECLARE_READ8_MEMBER( sound_r );
-	DECLARE_WRITE8_MEMBER( sound_w );
+	uint8_t host_r(offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
+	uint8_t sound_r(offs_t offset);
+	void sound_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

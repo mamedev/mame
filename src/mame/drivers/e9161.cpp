@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/hd63450.h"
+#include "machine/z80sio.h"
 #include "video/am8052.h"
 
 
@@ -62,7 +63,7 @@ void e9161_state::mem_map(address_map &map)
 	map(0xffe000, 0xffe03f).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xffe802, 0xffe803).w("crtc", FUNC(am8052_device::pointer_w));
 	map(0xffe804, 0xffe805).w("crtc", FUNC(am8052_device::data_w));
-	//map(0xfff600, 0xfff63f).rw("sio", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
+	map(0xfff600, 0xfff63f).rw("sio", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
 }
 
 
@@ -78,6 +79,8 @@ void e9161_state::e9161(machine_config &config)
 	HD63450(config, m_dmac, 8'000'000, m_maincpu);
 
 	AM8052(config, "crtc", 8'000'000);
+
+	MK68564(config, "sio", 4'000'000);
 }
 
 

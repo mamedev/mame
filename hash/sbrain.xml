@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="sbrain" description="Super Brain floppies">
+
+	<software name="boot">
+		<description>Boot disk</description>
+		<year>19??</year>
+		<publisher>Intertec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="336777">
+				<rom name="cboot.imd" size="336777" crc="0a7501db" sha1="90b97e2ab9840de8ac98e3302d2bd052edfa0189"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -24,18 +24,18 @@
 #include "machine/74259.h"
 #include "machine/74123.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class snug_bwg_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
@@ -48,7 +48,7 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -132,7 +132,7 @@ private:
 	required_device<ttl74123_device> m_motormf;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 

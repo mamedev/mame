@@ -20,10 +20,11 @@ class gp9001vdp_device : public device_t,
 	};
 
 public:
+	typedef device_delegate<void (u8 layer, u32 &code)> gp9001_cb_delegate;
+
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	typedef device_delegate<void (u8 layer, u32 &code)> gp9001_cb_delegate;
-	void set_tile_callback(gp9001_cb_delegate cb) { m_gp9001_cb = cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_gp9001_cb.set(std::forward<T>(args)...); }
 
 	auto vint_out_cb() { return m_vint_out_cb.bind(); }
 
@@ -65,7 +66,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 

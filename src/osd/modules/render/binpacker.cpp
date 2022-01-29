@@ -19,7 +19,7 @@ bool rectangle_packer::pack(const std::vector<packable_rectangle>& rects, std::v
 	// Add rects to member array, and check to make sure none is too big
 	for (size_t rect = 0; rect < rects.size(); rect++)
 	{
-		m_rects.push_back(rectangle(0, 0, rects[rect].width(), rects[rect].height(), rects[rect].hash(), rects[rect].format(), rects[rect].rowpixels(), rects[rect].palette(), rects[rect].base()));
+		m_rects.emplace_back(rectangle(0, 0, rects[rect].width(), rects[rect].height(), rects[rect].hash(), rects[rect].format(), rects[rect].rowpixels(), rects[rect].palette(), rects[rect].base()));
 	}
 
 	// Sort from greatest to least area
@@ -29,7 +29,7 @@ bool rectangle_packer::pack(const std::vector<packable_rectangle>& rects, std::v
 	while (m_num_packed < (int)m_rects.size())
 	{
 		int i = m_packs.size();
-		m_packs.push_back(rectangle(m_pack_size));
+		m_packs.emplace_back(rectangle(m_pack_size));
 		m_roots.push_back(i);
 		if (!fill(i))
 		{
@@ -179,7 +179,7 @@ void rectangle_packer::add_pack_to_array(int pack, std::vector<packed_rectangle>
 {
 	if (m_packs[pack].hash != 0)
 	{
-		array.push_back(packed_rectangle(m_packs[pack].hash, m_packs[pack].format,
+		array.emplace_back(packed_rectangle(m_packs[pack].hash, m_packs[pack].format,
 			m_packs[pack].w, m_packs[pack].h, m_packs[pack].x, m_packs[pack].y,
 			m_packs[pack].rowpixels, m_packs[pack].palette, m_packs[pack].base));
 

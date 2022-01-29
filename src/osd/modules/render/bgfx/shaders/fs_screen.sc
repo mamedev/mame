@@ -6,7 +6,7 @@ $input v_color0, v_texcoord0
 #include "common.sh"
 
 // Samplers
-SAMPLER2D(s_tex, 0); 
+SAMPLER2D(s_tex, 0);
 
 void main()
 {

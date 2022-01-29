@@ -45,12 +45,12 @@ private:
 	int m_charbank;
 	int m_palette_bank;
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(palettebank_w);
+	void ctrl_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charbank_w(uint8_t data);
+	void palettebank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

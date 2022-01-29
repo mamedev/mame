@@ -100,14 +100,13 @@ the Neogeo Pocket.
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c061.h"
 #include "cpu/z80/z80.h"
 #include "sound/t6w28.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/k1ge.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 enum flash_state
@@ -662,10 +661,8 @@ void ngp_state::machine_start()
 		std::string region_tag;
 		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x3fffff, "flash0");
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x9fffff, "flash1");
-		membank("flash0")->set_base(cart);
-		membank("flash1")->set_base(cart + 0x200000);
+		m_maincpu->space(AS_PROGRAM).install_rom(0x200000, 0x3fffff, cart);
+		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x9fffff, cart + 0x200000);
 
 		m_flash_chip[0].data = cart;
 		m_flash_chip[0].org_data[0] = m_flash_chip[0].data[0];
@@ -757,7 +754,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 
 	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -851,9 +848,6 @@ void ngp_state::ngp_common(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -868,8 +862,8 @@ void ngp_state::ngp(machine_config &config)
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
@@ -887,8 +881,8 @@ void ngp_state::ngpc(machine_config &config)
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");

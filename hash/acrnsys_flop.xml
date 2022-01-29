@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn System - Floppy disk images -->
+Acorn System - Floppy disk images
+-->
 
 <softwarelist name="acrnsys_flop" description="Acorn System disk images">
 

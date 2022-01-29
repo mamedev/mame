@@ -23,14 +23,14 @@ public:
 	// construction/destruction
 	isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(pc_ega8_3b0_r);
-	DECLARE_WRITE8_MEMBER(pc_ega8_3b0_w);
-	DECLARE_READ8_MEMBER(pc_ega8_3c0_r);
-	DECLARE_WRITE8_MEMBER(pc_ega8_3c0_w);
-	DECLARE_READ8_MEMBER(pc_ega8_3d0_r);
-	DECLARE_WRITE8_MEMBER(pc_ega8_3d0_w);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t pc_ega8_3b0_r(offs_t offset);
+	void pc_ega8_3b0_w(offs_t offset, uint8_t data);
+	uint8_t pc_ega8_3c0_r(offs_t offset);
+	void pc_ega8_3c0_w(offs_t offset, uint8_t data);
+	uint8_t pc_ega8_3d0_r(offs_t offset);
+	void pc_ega8_3d0_w(offs_t offset, uint8_t data);
 
 	CRTC_EGA_ROW_UPDATE(pc_ega_graphics);
 	CRTC_EGA_ROW_UPDATE(pc_ega_text);
@@ -62,8 +62,8 @@ public:
 
 	void install_banks();
 	void change_mode();
-	DECLARE_WRITE8_MEMBER(pc_ega8_3X0_w);
-	DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
+	void pc_ega8_3X0_w(offs_t offset, uint8_t data);
+	uint8_t pc_ega8_3X0_r(offs_t offset);
 
 	/* Video memory and related variables */
 	std::unique_ptr<uint8_t[]> m_vram;

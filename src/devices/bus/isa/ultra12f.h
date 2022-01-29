@@ -23,7 +23,10 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
+	ultra12f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -35,6 +38,16 @@ private:
 	required_region_ptr<u8> m_bios;
 };
 
+class ultra12f32_device : public ultra12f_device
+{
+public:
+	ultra12f32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
 DECLARE_DEVICE_TYPE(ULTRA12F, ultra12f_device)
+DECLARE_DEVICE_TYPE(ULTRA12F32, ultra12f32_device)
 
 #endif // MAME_BUS_ISA_ULTRA12F_H

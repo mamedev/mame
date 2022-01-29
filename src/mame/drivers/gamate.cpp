@@ -17,7 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/gamate.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class gamate_state : public driver_device
@@ -29,7 +29,7 @@ public:
 		, m_ay(*this, "ay8910")
 		, m_cartslot(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
-		, m_bios(*this, "bios")
+		, m_bios(*this, "maincpu")
 		, m_ram(*this, "ram")
 	{ }
 
@@ -38,15 +38,15 @@ public:
 	void init_gamate();
 
 private:
-	DECLARE_READ8_MEMBER(card_available_check);
-	DECLARE_READ8_MEMBER(card_available_set);
-	DECLARE_WRITE8_MEMBER(card_reset);
+	uint8_t card_available_check();
+	uint8_t card_available_set();
+	void card_reset(uint8_t data);
 
-	DECLARE_READ8_MEMBER(gamate_nmi_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(write_cart);
-	DECLARE_READ8_MEMBER(read_cart);
+	uint8_t gamate_nmi_r();
+	void sound_w(offs_t offset, uint8_t data);
+	uint8_t sound_r(offs_t offset);
+	void write_cart(offs_t offset, uint8_t data);
+	uint8_t read_cart(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
@@ -62,58 +62,59 @@ private:
 	required_device<ay8910_device> m_ay;
 	required_device<gamate_cart_slot_device> m_cartslot;
 	required_ioport m_io_joy;
-	required_shared_ptr<uint8_t> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 	required_shared_ptr<uint8_t> m_ram;
 	emu_timer *timer1;
 	emu_timer *timer2;
 };
 
 /* todo: what are these really, do they go to the cartridge slot? */
-READ8_MEMBER( gamate_state::card_available_check )
+uint8_t gamate_state::card_available_check()
 {
 	// bits 0 and 1 checked
 	return m_card_available ? 3: 1;
 }
 
-WRITE8_MEMBER( gamate_state::card_reset )
+void gamate_state::card_reset(uint8_t data)
 {
 	// might reset the card / protection?
 }
 
-READ8_MEMBER( gamate_state::card_available_set )
+uint8_t gamate_state::card_available_set()
 {
-	m_card_available = 1;
+	if (!machine().side_effects_disabled())
+		m_card_available = 1;
 	return 0;
 }
 
 // serial connection
-READ8_MEMBER( gamate_state::gamate_nmi_r )
+uint8_t gamate_state::gamate_nmi_r()
 {
 	uint8_t data=0;
 	logerror("nmi/4800 read\n");
 	return data;
 }
 
-READ8_MEMBER(gamate_state::sound_r)
+uint8_t gamate_state::sound_r(offs_t offset)
 {
 	m_ay->address_w(offset);
 	return m_ay->data_r();
 }
 
-WRITE8_MEMBER(gamate_state::sound_w)
+void gamate_state::sound_w(offs_t offset, uint8_t data)
 {
 	m_ay->address_w(offset);
 	m_ay->data_w(data);
 }
 
-WRITE8_MEMBER(gamate_state::write_cart)
+void gamate_state::write_cart(offs_t offset, uint8_t data)
 {
-	m_cartslot->write_cart(space, offset, data);
+	m_cartslot->write_cart(offset, data);
 }
 
-READ8_MEMBER(gamate_state::read_cart)
+uint8_t gamate_state::read_cart(offs_t offset)
 {
-	return m_cartslot->read_cart(space, offset);
+	return m_cartslot->read_cart(offset);
 }
 
 void gamate_state::gamate_mem(address_map &map)
@@ -128,7 +129,7 @@ void gamate_state::gamate_mem(address_map &map)
 	map(0x5a00, 0x5a00).r(FUNC(gamate_state::card_available_check));
 	map(0x6000, 0xdfff).rw(FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
 
-	map(0xe000, 0xefff).mirror(0x1000).rom().share("bios").region("maincpu", 0);
+	map(0xe000, 0xefff).mirror(0x1000).rom().region("maincpu", 0);
 }
 
 

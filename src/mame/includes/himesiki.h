@@ -52,11 +52,11 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(himesiki_rombank_w);
-	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
-	DECLARE_WRITE8_MEMBER(himesiki_bg_ram_w);
-	DECLARE_WRITE8_MEMBER(himesiki_scrollx_w);
-	DECLARE_WRITE8_MEMBER(himesiki_scrolly_w);
+	void himesiki_rombank_w(uint8_t data);
+	void himesiki_sound_w(uint8_t data);
+	void himesiki_bg_ram_w(offs_t offset, uint8_t data);
+	void himesiki_scrollx_w(offs_t offset, uint8_t data);
+	void himesiki_scrolly_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

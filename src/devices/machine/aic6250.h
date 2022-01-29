@@ -25,8 +25,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(back_w);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(address_space &space, offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	u8 dma_r();
 	u16 dma16_r();

@@ -71,7 +71,7 @@ public:
 private:
 	void create_console();
 	void build_menus();
-	void config_load(config_type cfgtype, util::xml::data_node const *parentnode);
+	void config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode);
 	void config_save(config_type cfgtype, util::xml::data_node *parentnode);
 
 	running_machine *m_machine;
@@ -129,8 +129,8 @@ void debugger_osx::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	machine.configuration().config_register(
 			"debugger",
-			config_load_delegate(&debugger_osx::config_load, this),
-			config_save_delegate(&debugger_osx::config_save, this));
+			configuration_manager::load_delegate(&debugger_osx::config_load, this),
+			configuration_manager::save_delegate(&debugger_osx::config_save, this));
 }
 
 
@@ -211,7 +211,7 @@ void debugger_osx::build_menus()
 	{
 		NSMenuItem *item;
 
-		NSMenu *const debugMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Debug"];
+		NSMenu *const debugMenu = [[NSMenu alloc] initWithTitle:@"Debug"];
 		item = [[NSApp mainMenu] insertItemWithTitle:@"Debug" action:NULL keyEquivalent:@"" atIndex:1];
 		[item setSubmenu:debugMenu];
 		[debugMenu release];
@@ -243,7 +243,7 @@ void debugger_osx::build_menus()
 					   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
 		 setKeyEquivalentModifierMask:NSShiftKeyMask];
 
-		NSMenu *const runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
+		NSMenu *const runMenu = [[NSMenu alloc] initWithTitle:@"Run"];
 		item = [[NSApp mainMenu] insertItemWithTitle:@"Run"
 											  action:NULL
 									   keyEquivalent:@""
@@ -305,9 +305,9 @@ void debugger_osx::build_menus()
 //  restore state based on configuration XML
 //============================================================
 
-void debugger_osx::config_load(config_type cfgtype, util::xml::data_node const *parentnode)
+void debugger_osx::config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode)
 {
-	if ((config_type::GAME == cfgtype) && parentnode)
+	if ((config_type::SYSTEM == cfgtype) && parentnode)
 	{
 		if (m_console)
 		{
@@ -331,7 +331,7 @@ void debugger_osx::config_load(config_type cfgtype, util::xml::data_node const *
 
 void debugger_osx::config_save(config_type cfgtype, util::xml::data_node *parentnode)
 {
-	if ((config_type::GAME == cfgtype) && m_console)
+	if ((config_type::SYSTEM == cfgtype) && m_console)
 	{
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:m_machine],

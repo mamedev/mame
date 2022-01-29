@@ -49,19 +49,19 @@ protected:
 private:
 	inline void update_ieee_signals();
 
-	DECLARE_READ8_MEMBER( dio_r );
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( riot1_pa_r );
-	DECLARE_WRITE8_MEMBER( riot1_pa_w );
-	DECLARE_READ8_MEMBER( riot1_pb_r );
-	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_READ8_MEMBER( fk5_r );
-	DECLARE_WRITE8_MEMBER( fk5_w );
+	uint8_t dio_r();
+	void dio_w(uint8_t data);
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	uint8_t fk5_r();
+	void fk5_w(uint8_t data);
 
 	void c8280_fdc_mem(address_map &map);
 	void c8280_main_mem(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;

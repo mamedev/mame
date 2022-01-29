@@ -143,6 +143,7 @@ Core Performance Options
 | :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
 | :ref:`numprocessors <mame-commandline-numprocessors>`
 | :ref:`bench <mame-commandline-bench>`
+| :ref:`lowlatency <mame-commandline-lowlatency>`
 
 
 Core Rotation Options
@@ -236,9 +237,9 @@ Core Video OpenGL GLSL Options
 Core Sound Options
 ~~~~~~~~~~~~~~~~~~
 
-
 | :ref:`samplerate <mame-commandline-samplerate>`
 | :ref:`[no]samples <mame-commandline-nosamples>`
+| :ref:`[no]compressor <mame-commandline-nocompressor>`
 | :ref:`volume <mame-commandline-volume>`
 | :ref:`sound <mame-commandline-sound>`
 | :ref:`audio_latency <mame-commandline-audiolatency>`

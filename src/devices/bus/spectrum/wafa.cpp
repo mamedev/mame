@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "wafa.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -52,6 +53,7 @@ void spectrum_wafa_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 
 	SOFTWARE_LIST(config, "wafadrive_list").set_original("spectrum_wafadrive");
 }
@@ -156,12 +158,6 @@ uint8_t spectrum_wafa_device::mreq_r(offs_t offset)
 		data &= m_exp->mreq_r(offset);
 
 	return data;
-}
-
-void spectrum_wafa_device::mreq_w(offs_t offset, uint8_t data)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_wafa_device::iorq_r(offs_t offset)

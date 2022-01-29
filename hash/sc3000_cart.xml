@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
-<softwarelist name="sc3000_cart" description="SEGA Computer 3000 cartridges">
+<softwarelist name="sc3000_cart" description="Sega Computer 3000 cartridges">
 
 	<software name="basic3">
 		<description>BASIC Level III (Jpn)</description>

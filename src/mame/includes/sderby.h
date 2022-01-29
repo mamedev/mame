@@ -31,18 +31,18 @@ public:
 	void luckboom(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(sderby_input_r);
-	DECLARE_READ16_MEMBER(sderbya_input_r);
-	DECLARE_READ16_MEMBER(roulette_input_r);
-	DECLARE_READ16_MEMBER(rprot_r);
-	DECLARE_WRITE16_MEMBER(rprot_w);
-	DECLARE_WRITE16_MEMBER(sderby_out_w);
-	DECLARE_WRITE16_MEMBER(scmatto_out_w);
-	DECLARE_WRITE16_MEMBER(roulette_out_w);
-	DECLARE_WRITE16_MEMBER(sderby_videoram_w);
-	DECLARE_WRITE16_MEMBER(sderby_md_videoram_w);
-	DECLARE_WRITE16_MEMBER(sderby_fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(sderby_scroll_w);
+	uint16_t sderby_input_r(offs_t offset);
+	uint16_t sderbya_input_r(offs_t offset);
+	uint16_t roulette_input_r(offs_t offset);
+	uint16_t rprot_r();
+	void rprot_w(uint16_t data);
+	void sderby_out_w(uint16_t data);
+	void scmatto_out_w(uint16_t data);
+	void roulette_out_w(uint16_t data);
+	void sderby_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sderby_md_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sderby_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sderby_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_sderby_tile_info);
 	TILE_GET_INFO_MEMBER(get_sderby_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sderby_fg_tile_info);

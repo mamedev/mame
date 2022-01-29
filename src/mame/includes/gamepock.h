@@ -35,10 +35,10 @@ private:
 	void hd44102ch_init(int which);
 	void lcd_update();
 
-	DECLARE_WRITE8_MEMBER( port_a_w );
-	DECLARE_READ8_MEMBER( port_b_r );
-	DECLARE_WRITE8_MEMBER( port_b_w );
-	DECLARE_READ8_MEMBER( port_c_r );
+	void port_a_w(uint8_t data);
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
+	uint8_t port_c_r();
 	uint32_t screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
 	void gamepock_mem(address_map &map);

@@ -39,7 +39,7 @@ void cmi_alphanumeric_keyboard_device::device_start()
 {
 }
 
-READ8_MEMBER( cmi_alphanumeric_keyboard_device::col_r )
+u8 cmi_alphanumeric_keyboard_device::col_r()
 {
 	int row = m_pia->b_output() ^ 0xff;
 
@@ -80,7 +80,6 @@ WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rts_w )
 void cmi_alphanumeric_keyboard_device::alphakeys_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram();
 	map(0x4000, 0x7fff).portr("OPTIONS");
 	map(0x8000, 0xbfff).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc000, 0xc3ff).rom().mirror(0x3c00);

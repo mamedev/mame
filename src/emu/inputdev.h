@@ -15,6 +15,21 @@
 
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+// relative devices return ~512 units per onscreen pixel
+constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
+
+// absolute devices return values between -65536 and +65536
+constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
+constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
+
+// invalid memory value for axis polling
+constexpr s32 INVALID_AXIS_VALUE = 0x7fffffff;
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -72,10 +87,6 @@ private:
 // a single item on an input device
 class input_device_item
 {
-protected:
-	// construction/destruction
-	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
-
 public:
 	virtual ~input_device_item();
 
@@ -83,25 +94,28 @@ public:
 	input_device &device() const { return m_device; }
 	input_manager &manager() const;
 	running_machine &machine() const;
-	const char *name() const { return m_name.c_str(); }
+	const std::string &name() const { return m_name; }
 	void *internal() const { return m_internal; }
 	input_item_id itemid() const { return m_itemid; }
 	input_item_class itemclass() const { return m_itemclass; }
 	input_code code() const;
-	const char *token() const { return m_token.c_str(); }
+	const std::string &token() const { return m_token; }
 	s32 current() const { return m_current; }
-	s32 memory() const { return m_memory; }
 
 	// helpers
 	s32 update_value();
-	void set_memory(s32 value) { m_memory = value; }
+	bool check_axis(input_item_modifier modifier, s32 memory);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) = 0;
 	virtual s32 read_as_relative(input_item_modifier modifier) = 0;
 	virtual s32 read_as_absolute(input_item_modifier modifier) = 0;
+	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) = 0;
 
 protected:
+	// construction/destruction
+	input_device_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
+
 	// internal state
 	input_device &          m_device;               // reference to our owning device
 	std::string             m_name;                 // string name of item
@@ -113,7 +127,6 @@ protected:
 
 	// live state
 	s32                     m_current;              // current raw value
-	s32                     m_memory;               // "memory" value, to remember where we started during polling
 };
 
 
@@ -126,15 +139,15 @@ class input_device
 
 public:
 	// construction/destruction
-	input_device(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 	virtual ~input_device();
 
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const { return m_manager.machine(); }
 	input_device_class devclass() const { return device_class(); }
-	const char *name() const { return m_name.c_str(); }
-	const char *id() const { return m_id.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &id() const { return m_id; }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
 	input_item_id maxitem() const { return m_maxitem; }
@@ -146,11 +159,11 @@ public:
 	void set_devindex(int devindex) { m_devindex = devindex; }
 
 	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
+	input_item_id add_item(std::string_view name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
-	bool match_device_id(const char *deviceid);
+	bool match_device_id(std::string_view deviceid) const;
 
 protected:
 	// specific overrides
@@ -178,7 +191,7 @@ class input_device_keyboard : public input_device
 {
 public:
 	// construction/destruction
-	input_device_keyboard(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 	// helpers
 	void apply_steadykey() const;
@@ -195,7 +208,7 @@ class input_device_mouse : public input_device
 {
 public:
 	// construction/destruction
-	input_device_mouse(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 protected:
 	// specific overrides
@@ -209,7 +222,7 @@ class input_device_lightgun : public input_device
 {
 public:
 	// construction/destruction
-	input_device_lightgun(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 protected:
 	// specific overrides
@@ -224,7 +237,7 @@ class input_device_joystick : public input_device
 {
 public:
 	// construction/destruction
-	input_device_joystick(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 	// getters
 	joystick_map &joymap() { return m_joymap; }
@@ -270,8 +283,7 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
-	input_device *add_device(std::unique_ptr<input_device> &&new_device);
+	input_device &add_device(std::string_view name, std::string_view id, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid) const;
@@ -279,10 +291,11 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) = 0;
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) = 0;
 
 private:
-	// indexing helpers
+	// internal helpers
+	input_device &add_device(std::unique_ptr<input_device> &&new_device);
 	int newindex(input_device &device);
 
 	// internal state
@@ -307,7 +320,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_keyboard>(manager(), name, id, internal);
 	}
@@ -329,7 +342,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_mouse>(manager(), name, id, internal);
 	}
@@ -347,7 +360,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_lightgun>(manager(), name, id, internal);
 	}
@@ -372,7 +385,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_joystick>(manager(), name, id, internal);
 	}

@@ -75,12 +75,12 @@ uint32_t pvc_prot_device::get_bank_base()
 	return bankaddress + 0x100000;
 }
 
-READ16_MEMBER( pvc_prot_device::protection_r )
+uint16_t pvc_prot_device::protection_r(offs_t offset)
 {
 	return m_cart_ram[offset];
 }
 
-WRITE16_MEMBER( pvc_prot_device::protection_w )
+void pvc_prot_device::protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cart_ram[offset]);
 	if (offset == 0xff0)

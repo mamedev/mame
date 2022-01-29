@@ -11,7 +11,6 @@
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
 
 #include "corestr.h"
-#include "corealloc.h"
 #include "fileio.h"
 #include "unicode.h"
 
@@ -90,8 +89,8 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	{
 		osd_printf_verbose("Searching font %s in -%s path/s\n", family, font_path);
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
-		emu_file file(font_path.c_str(), OPEN_FLAG_READ);
-		if (file.open(family.c_str()) == osd_file::error::NONE)
+		emu_file file(font_path, OPEN_FLAG_READ);
+		if (!file.open(family))
 		{
 			std::string full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
@@ -162,7 +161,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 {
 	SDL_Color const fcol = { 0xff, 0xff, 0xff };
 	char ustr[16];
-	ustr[utf8_from_uchar(ustr, ARRAY_LENGTH(ustr), chnum)] = '\0';
+	ustr[utf8_from_uchar(ustr, std::size(ustr), chnum)] = '\0';
 	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderUTF8_Solid(m_font.get(), ustr, fcol), &SDL_FreeSurface);
 
 	// was nothing returned?
@@ -174,7 +173,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		// copy the rendered character image into it
 		for (int y = 0; y < bitmap.height(); y++)
 		{
-			std::uint32_t *const dstrow = &bitmap.pix32(y);
+			std::uint32_t *const dstrow = &bitmap.pix(y);
 			std::uint8_t const *const srcrow = reinterpret_cast<std::uint8_t const *>(drawsurf->pixels) + (y * drawsurf->pitch);
 
 			for (int x = 0; x < drawsurf->w; x++)
@@ -194,7 +193,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &name, int fsize, long index)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name.c_str()) == osd_file::error::NONE)
+	if (!file.open(name))
 	{
 		unsigned char const ttf_magic[] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
 		unsigned char const ttc1_magic[] = { 0x74, 0x74, 0x63, 0x66, 0x00, 0x01, 0x00, 0x00 };
@@ -215,7 +214,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &n
 bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name.c_str()) == osd_file::error::NONE)
+	if (!file.open(name))
 	{
 		unsigned char const magic[] = { 'S', 'T', 'A', 'R', 'T', 'F', 'O', 'N', 'T' };
 		unsigned char buffer[sizeof(magic)];

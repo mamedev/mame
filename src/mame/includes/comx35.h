@@ -38,7 +38,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_exp(*this, EXPANSION_TAG),
 			m_rom(*this, CDP1802_TAG),
-			m_char_ram(*this, "char_ram"),
+			m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
 			m_d6(*this, "D6"),
 			m_modifiers(*this, "MODIFIERS")
 	{ }
@@ -50,11 +50,11 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_exp;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_d6;
 	required_ioport m_modifiers;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -67,16 +67,16 @@ public:
 
 	void check_interrupt();
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_WRITE8_MEMBER( cdp1869_w );
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	void cdp1869_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( sc_w );
+	void sc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );

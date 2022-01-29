@@ -39,6 +39,7 @@ vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, cons
 	: device_t(mconfig, VIC20_MEGACART, tag, owner, clock)
 	, device_vic20_expansion_card_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
+	, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_LITTLE)
 	, m_nvram_en(0)
 {
 }
@@ -50,8 +51,6 @@ vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, cons
 
 void vic20_megacart_device::device_start()
 {
-	m_nvram.allocate(0x2000);
-
 	// state saving
 	save_item(NAME(m_nvram_en));
 }

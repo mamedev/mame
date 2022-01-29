@@ -36,8 +36,8 @@ public:
 	// construction/destruction
 	cpc_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pio_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
+	uint8_t pio_r(offs_t offset);
+	void pio_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

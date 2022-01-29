@@ -3,6 +3,11 @@
 // PINBALL
 // Skeleton driver for Joctronic pinballs.
 
+/*
+  TODO:
+   Confirm "Pin Ball" exact hardware configuration, may be different from "Punky Willy" and "Walkyria".
+*/
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
@@ -34,32 +39,32 @@ public:
 	void bldyrolr(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(csin_r);
-	DECLARE_WRITE8_MEMBER(control_port_w);
-	DECLARE_WRITE8_MEMBER(display_1_w);
-	DECLARE_WRITE8_MEMBER(display_2_w);
-	DECLARE_WRITE8_MEMBER(display_3_w);
-	DECLARE_WRITE8_MEMBER(display_4_w);
-	DECLARE_WRITE8_MEMBER(display_a_w);
-	DECLARE_WRITE8_MEMBER(drivers_l_w);
-	DECLARE_WRITE8_MEMBER(drivers_b_w);
+	u8 csin_r(offs_t offset);
+	void control_port_w(offs_t offset, u8 data);
+	void display_1_w(offs_t offset, u8 data);
+	void display_2_w(offs_t offset, u8 data);
+	void display_3_w(offs_t offset, u8 data);
+	void display_4_w(offs_t offset, u8 data);
+	void display_a_w(offs_t offset, u8 data);
+	void drivers_l_w(offs_t offset, u8 data);
+	void drivers_b_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_READ8_MEMBER(csint_r);
-	DECLARE_WRITE8_MEMBER(display_strobe_w);
-	DECLARE_WRITE8_MEMBER(drivers_w);
-	DECLARE_WRITE8_MEMBER(display_ck_w);
+	u8 inputs_r();
+	u8 ports_r();
+	u8 csint_r(offs_t offset);
+	void display_strobe_w(offs_t offset, u8 data);
+	void drivers_w(offs_t offset, u8 data);
+	void display_ck_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(bldyrolr_unknown_r);
-	DECLARE_WRITE8_MEMBER(bldyrolr_unknown_w);
+	u8 bldyrolr_unknown_r();
+	void bldyrolr_unknown_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(soundlatch_nmi_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_nmi_pulse_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_READ8_MEMBER(soundlatch_nmi_r);
-	DECLARE_WRITE8_MEMBER(resint_w);
-	DECLARE_WRITE8_MEMBER(slalom03_oki_bank_w);
+	void soundlatch_nmi_w(u8 data);
+	void soundlatch_nmi_pulse_w(u8 data);
+	u8 soundlatch_r();
+	u8 soundlatch_nmi_r();
+	void resint_w(u8 data);
+	void slalom03_oki_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 
 	virtual void machine_start() override;
@@ -85,48 +90,48 @@ private:
 	bool m_adpcm_toggle;
 };
 
-READ8_MEMBER(joctronic_state::csin_r)
+u8 joctronic_state::csin_r(offs_t offset)
 {
 	logerror("csin_r[%d] read\n", offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(joctronic_state::control_port_w)
+void joctronic_state::control_port_w(offs_t offset, u8 data)
 {
 	logerror("control_port[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::display_1_w)
+void joctronic_state::display_1_w(offs_t offset, u8 data)
 {
 	logerror("display_1[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::display_2_w)
+void joctronic_state::display_2_w(offs_t offset, u8 data)
 {
 	logerror("display_2[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::display_3_w)
+void joctronic_state::display_3_w(offs_t offset, u8 data)
 {
 	logerror("display_3[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::display_4_w)
+void joctronic_state::display_4_w(offs_t offset, u8 data)
 {
 	logerror("display_4[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::display_a_w)
+void joctronic_state::display_a_w(offs_t offset, u8 data)
 {
 	logerror("display_a[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::drivers_l_w)
+void joctronic_state::drivers_l_w(offs_t offset, u8 data)
 {
 	logerror("drivers_l[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::drivers_b_w)
+void joctronic_state::drivers_b_w(offs_t offset, u8 data)
 {
 	logerror("drivers_b[%d] = $%02X\n", offset, data);
 }
@@ -149,35 +154,35 @@ void joctronic_state::maincpu_map(address_map &map)
 	map(0xe000, 0xe000).mirror(0x0fff).w(FUNC(joctronic_state::soundlatch_nmi_w)); // PSON
 }
 
-READ8_MEMBER(joctronic_state::inputs_r)
+u8 joctronic_state::inputs_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(joctronic_state::ports_r)
+u8 joctronic_state::ports_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(joctronic_state::csint_r)
+u8 joctronic_state::csint_r(offs_t offset)
 {
 	logerror("csint_r[%d] read\n", offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(joctronic_state::display_strobe_w)
+void joctronic_state::display_strobe_w(offs_t offset, u8 data)
 {
 	logerror("display_strobe[%d] = $%02X\n", offset, data);
 }
 
-WRITE8_MEMBER(joctronic_state::drivers_w)
+void joctronic_state::drivers_w(offs_t offset, u8 data)
 {
 	for (int i = 0; i < 6; ++i)
 		if (m_driver_latch[i].found())
 			m_driver_latch[i]->write_bit(offset, BIT(data, i));
 }
 
-WRITE8_MEMBER(joctronic_state::display_ck_w)
+void joctronic_state::display_ck_w(offs_t offset, u8 data)
 {
 	logerror("display_ck[%d] = $%02X\n", offset, data);
 }
@@ -199,13 +204,13 @@ void joctronic_state::slalom03_maincpu_map(address_map &map)
 	map(0xf000, 0xf000).mirror(0x0fff).w(FUNC(joctronic_state::soundlatch_nmi_pulse_w)); // CSSON
 }
 
-READ8_MEMBER(joctronic_state::bldyrolr_unknown_r)
+u8 joctronic_state::bldyrolr_unknown_r()
 {
 	logerror("bldyrolr_unknown read\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(joctronic_state::bldyrolr_unknown_w)
+void joctronic_state::bldyrolr_unknown_w(u8 data)
 {
 	logerror("bldyrolr_unknown = $%02X\n", data);
 }
@@ -222,36 +227,36 @@ void joctronic_state::maincpu_io_map(address_map &map)
 	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
-WRITE8_MEMBER(joctronic_state::soundlatch_nmi_w)
+void joctronic_state::soundlatch_nmi_w(u8 data)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(joctronic_state::soundlatch_nmi_pulse_w)
+void joctronic_state::soundlatch_nmi_pulse_w(u8 data)
 {
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_soundlatch = data;
 }
 
-READ8_MEMBER(joctronic_state::soundlatch_r)
+u8 joctronic_state::soundlatch_r()
 {
 	return m_soundlatch;
 }
 
-READ8_MEMBER(joctronic_state::soundlatch_nmi_r)
+u8 joctronic_state::soundlatch_nmi_r()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	return m_soundlatch;
 }
 
-WRITE8_MEMBER(joctronic_state::resint_w)
+void joctronic_state::resint_w(u8 data)
 {
 	// acknowledge INTR by clearing flip-flop
 	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
+void joctronic_state::slalom03_oki_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0xc0) >> 6);
 	m_oki->s1_w(BIT(data, 1));
@@ -337,7 +342,7 @@ INPUT_PORTS_END
 
 void joctronic_state::joctronic(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139
 	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
@@ -363,7 +368,7 @@ void joctronic_state::joctronic(machine_config &config)
 	LS259(config, "drivers3", 0); // IC2
 	LS259(config, "drivers4", 0); // IC1
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
@@ -380,7 +385,7 @@ void joctronic_state::joctronic(machine_config &config)
 
 void joctronic_state::slalom03(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::slalom03_maincpu_map); // 138, 368, 32
 	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
@@ -408,7 +413,7 @@ void joctronic_state::slalom03(machine_config &config)
 	HC259(config, "drivers5", 0); // IC5
 	HC259(config, "drivers6", 0); // IC6
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL(12'000'000)/8)); // 1.5 MHz
@@ -437,6 +442,16 @@ void joctronic_state::bldyrolr(machine_config & config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::bldyrolr_maincpu_map);
 }
 
+/*-------------------------------------------------------------------
+/ Pin Ball (1986)
+/-------------------------------------------------------------------*/
+ROM_START(jpinball)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("joctronic_pb.ic6", 0x0000, 0x4000, CRC(5a1415a7) SHA1(cdf036bd1816907b7bb905189482c56bde38c228))
+
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("joctronic_pb.ic8s", 0x0000, 0x4000, CRC(34a08640) SHA1(0b01eaea262d4d3bb168264e58ebde804452060e))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Punky Willy (1986)
@@ -486,6 +501,7 @@ ROM_START(slalom03)
 ROM_END
 
 
+GAME( 1986, jpinball, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Pin Ball",        MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1986, punkywil, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Punky Willy",     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1986, walkyria, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Walkyria",        MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, bldyrolr, 0, bldyrolr,  joctronic, joctronic_state, empty_init, ROT0, "Playbar",   "Bloody Roller",   MACHINE_IS_SKELETON_MECHANICAL )

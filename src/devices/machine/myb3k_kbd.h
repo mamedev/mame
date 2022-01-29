@@ -43,18 +43,11 @@ public:
 		TIMER_ID_SECOND_BYTE
 	};
 
-	template <class FunctionClass>
-	void set_keyboard_callback(void (FunctionClass::*callback)(u8 character), const char *name)
+	template <typename... T>
+	void set_keyboard_callback(T &&... args)
 	{
-		set_keyboard_callback(output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_keyboard_cb.set(std::forward<T>(args)...);
 	}
-	// FIXME: this should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_keyboard_callback(const char *devname, void (FunctionClass::*callback)(u8 character), const char *name)
-	{
-		set_keyboard_callback(output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_keyboard_callback(output_delegate callback) { m_keyboard_cb = callback; }
 
 protected:
 	myb3k_keyboard_device(
@@ -70,7 +63,7 @@ protected:
 	void key_changed(int x, int y, bool down);
 	void scan_keys();
 	void update_modifiers(int y, bool down);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	output_delegate             m_keyboard_cb;
 	required_ioport_array<12>   m_io_kbd_t;

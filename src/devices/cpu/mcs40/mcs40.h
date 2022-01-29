@@ -51,7 +51,7 @@ public:
 	template <typename... T> void set_ram_status_map(T &&... args) { set_addrmap(AS_RAM_STATUS, std::forward<T>(args)...); }
 	template <typename... T> void set_ram_ports_map(T &&... args) { set_addrmap(AS_RAM_PORTS, std::forward<T>(args)...); }
 	template <typename... T> void set_program_memory_map(T &&... args) { set_addrmap(AS_PROGRAM_MEMORY, std::forward<T>(args)...); }
-	template <typename... T> void set_bus_cycle_cb(T &&... args) { m_bus_cycle_cb = bus_cycle_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_bus_cycle_cb(T &&... args) { m_bus_cycle_cb.set(std::forward<T>(args)...); }
 	auto i4289_pm_cb() { return m_4289_pm_cb.bind(); }
 	auto i4289_f_l_cb() { return m_4289_f_l_cb.bind(); }
 
@@ -182,18 +182,19 @@ private:
 	// address spaces
 	address_space_config const  m_space_config[7];
 	address_space               *m_spaces[7];
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	// bus snooping callback
-	bus_cycle_delegate      m_bus_cycle_cb;
+	bus_cycle_delegate          m_bus_cycle_cb;
 
 	// output callbacks
-	devcb_write_line        m_sync_cb;
-	devcb_write_line        m_cm_rom_cb[2], m_cm_ram_cb[4];
-	devcb_write_line        m_cy_cb, m_stp_ack_cb;
+	devcb_write_line            m_sync_cb;
+	devcb_write_line::array<2>  m_cm_rom_cb;
+	devcb_write_line::array<4>  m_cm_ram_cb;
+	devcb_write_line            m_cy_cb, m_stp_ack_cb;
 
 	// 4008/4009 or 4289 output callbacks
-	devcb_write_line        m_4289_pm_cb, m_4289_f_l_cb;
+	devcb_write_line            m_4289_pm_cb, m_4289_f_l_cb;
 
 	// configuration
 	bool const  m_extended_cm;
@@ -258,7 +259,7 @@ protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
 
 	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const override;
+	virtual u32 execute_input_lines() const noexcept override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
@@ -288,7 +289,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const override;
+	virtual u32 execute_input_lines() const noexcept override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// mcs40_cpu_device_base implementation

@@ -120,9 +120,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(INTERPRO_HLE_EN_US_KEYBOARD, bus::interpro::keyboard, hle_en_us_device, "kbd_hle_en_us", "InterPro Keyboard (HLE, US English)")
+DEFINE_DEVICE_TYPE(INTERPRO_HLE_EN_US_KEYBOARD, bus::interpro::keyboard::hle_en_us_device, "kbd_hle_en_us", "InterPro Keyboard (HLE, US English)")
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 namespace {
 
@@ -316,7 +316,7 @@ void hle_device_base::device_reset()
 	start_processing(attotime::from_hz(1'200));
 }
 
-void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -461,4 +461,4 @@ u8 hle_en_us_device::translate(u8 row, u8 column)
 	return TRANSLATION_TABLE[map][row][column];
 }
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard

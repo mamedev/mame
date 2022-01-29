@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -189,7 +189,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 	const char* getName(Key::Enum _key)
 	{
-		BX_CHECK(_key < Key::Count, "Invalid key %d.", _key);
+		BX_ASSERT(_key < Key::Count, "Invalid key %d.", _key);
 		return s_keyName[_key];
 	}
 
@@ -352,9 +352,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::GamepadStart, entry::Modifier::None,      1, NULL, "graphics stats"                    },
 		{ entry::Key::F1,           entry::Modifier::LeftShift, 1, NULL, "graphics stats 0\ngraphics text 0" },
 		{ entry::Key::F3,           entry::Modifier::None,      1, NULL, "graphics wireframe"                },
-		{ entry::Key::F4,           entry::Modifier::None,      1, NULL, "graphics hmd"                      },
-		{ entry::Key::F4,           entry::Modifier::LeftShift, 1, NULL, "graphics hmdrecenter"              },
-		{ entry::Key::F4,           entry::Modifier::LeftCtrl,  1, NULL, "graphics hmddbg"                   },
 		{ entry::Key::F6,           entry::Modifier::None,      1, NULL, "graphics profiler"                 },
 		{ entry::Key::F7,           entry::Modifier::None,      1, NULL, "graphics vsync"                    },
 		{ entry::Key::F8,           entry::Modifier::None,      1, NULL, "graphics msaa"                     },
@@ -659,6 +656,8 @@ restart:
 
 	bool processEvents(uint32_t& _width, uint32_t& _height, uint32_t& _debug, uint32_t& _reset, MouseState* _mouse)
 	{
+		bool needReset = s_reset != _reset;
+
 		s_debug = _debug;
 		s_reset = _reset;
 
@@ -745,7 +744,8 @@ restart:
 						handle  = size->m_handle;
 						_width  = size->m_width;
 						_height = size->m_height;
-						_reset  = !s_reset; // force reset
+
+						needReset = true;
 					}
 					break;
 
@@ -771,8 +771,10 @@ restart:
 
 		} while (NULL != ev);
 
+		needReset |= _reset != s_reset;
+
 		if (handle.idx == 0
-		&&  _reset != s_reset)
+		&&  needReset)
 		{
 			_reset = s_reset;
 			bgfx::reset(_width, _height, _reset);
@@ -789,6 +791,8 @@ restart:
 
 	bool processWindowEvents(WindowState& _state, uint32_t& _debug, uint32_t& _reset)
 	{
+		bool needReset = s_reset != _reset;
+
 		s_debug = _debug;
 		s_reset = _reset;
 
@@ -897,10 +901,8 @@ restart:
 						win.m_handle = size->m_handle;
 						win.m_width  = size->m_width;
 						win.m_height = size->m_height;
-						_reset  = win.m_handle.idx == 0
-								? !s_reset
-								: _reset
-								; // force reset
+
+						needReset = win.m_handle.idx == 0 ? true : needReset;
 					}
 					break;
 
@@ -949,7 +951,9 @@ restart:
 			}
 		}
 
-		if (_reset != s_reset)
+		needReset |= _reset != s_reset;
+
+		if (needReset)
 		{
 			_reset = s_reset;
 			bgfx::reset(s_window[0].m_width, s_window[0].m_height, _reset);

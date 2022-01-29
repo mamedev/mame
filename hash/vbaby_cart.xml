@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cart info:
+
+Glob up, edge connector towards you.
+Pins 1-10 on top, left to right.  Pins 11-20 on bottom, pin 11 under pin 10, pin 20 under pin 1.
+
+1  VCC (3.3V)    20 cart grounds this to indicate inserted
+2  R/B           19 N/C
+3  GND           18 /RE
+4  /WE           17 ALE
+5  GND           16 IO7
+6  IO6           15 IO5
+7  IO4           14 IO3
+8  IO2           13 /CE
+9  IO0           12 IO1
+10 CLE           11 GND
+
+
+V.Smile Motion:               80-08****  (Smartridges are orange)
+V.Smile Smartbook Software:   80-089***  (Smartridges are red)
+V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
+V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with other V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
+
+Language:
+********0 = US                (White labels on back)
+********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
+********2 = Netherlands       (Red or white labels on back)
+********3 = UK                (Red labels on back)
+********4 = Germany           (Blue labels on back)
+********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
+********6 = Portugal          Apparently distributed by company 'Concentra' (white labels on back)
+********7 = Spain             (Green labels on back)
+*******10 = Korea
+*******13 = Denmark           Distributed by the company 'Top Toy A/S'
+*******14 = Sweden            Distributed by the company 'Top Toy A/S'
+*******15 = Norway
+*******?? = Finland
+*******?? = China
+
+VTech V.Baby cartridges.
++========+===================+============================================================================+
+| Dumped |      Serial       |                                    Name                                    |
++========+===================+============================================================================+
+|        | 80-107100-001(US) | Meet Me at the Zoo                                                         |
+|   NA   | 80-107122-022(SP) | Aventuras en el Zoo (cart without ROM)                                     |
++========+===================+============================================================================+
+|        | 80-220000(US)     | The World of Eric Carle - The Very Hungry Caterpillar                      |
++========+===================+============================================================================+
+|  YES   | 80-220507-022(SP) | El Jardín de los Sueños...                                                 |
++========+===================+============================================================================+
+|        | 80-220600(US)     | Backyardigans                                                              |
++========+===================+============================================================================+
+|        | 80-220700(US)     | Noah's Ark - Animal Adventures                                             |
++========+===================+============================================================================+
+|        | 80-220800(US)     | Mother Goose                                                               |
++========+===================+============================================================================+
+
+-->
+
+<softwarelist name="vbaby_cart" description="VTech V.Baby cartridges">
+	<!-- note these are NAND parts.
+	     the dump doesn't contain GPNANDNAND strings so probably not booted from? -->
+
+	<software name="eljardin" supported="no">
+		<description>El Jardín de los Sueños... (Spain)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-220507(SP)" />
+		<part name="cart" interface="vbaby_cart"> <!-- dumped as hy27us08121a, ident returned C2 5A -->
+			<dataarea name="rom" size="0x4200000">
+				<rom name="vbaby_eljardin_as_hy27us08121a.bin" size="0x4200000" crc="b7c946c5" sha1="16d80c914bcc279d131336b8194adb61558b05fa" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

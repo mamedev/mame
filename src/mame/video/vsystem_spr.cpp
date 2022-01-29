@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR, tag, owner, clock)
-	, m_newtilecb(FUNC(vsystem_spr_device::tile_callback_noindirect), this)
+	, m_newtilecb(*this, DEVICE_SELF, FUNC(vsystem_spr_device::tile_callback_noindirect))
 	, m_xoffs(0)
 	, m_yoffs(0)
 	, m_pdraw(false)
@@ -89,7 +89,7 @@ uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 void vsystem_spr_device::device_start()
 {
 	// bind our handler
-	m_newtilecb.bind_relative_to(*owner());
+	m_newtilecb.resolve();
 
 	save_item(NAME(m_pal_base));
 

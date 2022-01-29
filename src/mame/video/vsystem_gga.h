@@ -63,7 +63,7 @@ public:
 	auto write_cb() { return m_write_cb.bind(); }
 
 	// memory handlers
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, u8 data);
 
 	// temporary accessor
 	u8 reg(u8 offset) const { return m_regs[offset]; }

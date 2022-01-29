@@ -12,7 +12,7 @@
 #include "machine/bankdev.h"
 #include "sound/spkrdev.h"
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 class lle_device_base
 	: public device_t
@@ -34,10 +34,10 @@ protected:
 
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_WRITE8_MEMBER(bus_w);
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+	u8 bus_r();
+	void bus_w(u8 data);
 
 private:
 	required_device<i8049_device> m_mcu;
@@ -66,7 +66,7 @@ public:
 	virtual tiny_rom_entry const *device_rom_region() const override;
 };
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard
 
 DECLARE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device)
 

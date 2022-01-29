@@ -4,8 +4,8 @@
     DSPP disassembler shim
 */
 
-#ifndef DEVICES_CPU_DSPP_DSPPDASM_H
-#define DEVICES_CPU_DSPP_DSPPDASM_H
+#ifndef MAME_CPU_DSPP_DSPPDASM_H
+#define MAME_CPU_DSPP_DSPPDASM_H
 
 #pragma once
 
@@ -19,4 +19,4 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 };
 
-#endif // DEVICES_CPU_DSPP_DSPPDASM_H
+#endif // MAME_CPU_DSPP_DSPPDASM_H

@@ -85,7 +85,7 @@ void dsbz80_device::device_start()
 	m_rxd_handler.resolve_safe();
 	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
 	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
-	machine().sound().stream_alloc(*this, 0, 2, 32000);
+	stream_alloc(0, 2, 32000);
 }
 
 //-------------------------------------------------
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(dsbz80_device::output_txd)
 	m_rxd_handler(state);
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
+void dsbz80_device::mpeg_trigger_w(uint8_t data)
 {
 	mp_state = data;
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
 	}
 }
 
-READ8_MEMBER(dsbz80_device::mpeg_pos_r)
+uint8_t dsbz80_device::mpeg_pos_r(offs_t offset)
 {
 	int mp_prg = mp_pos >> 3;
 
@@ -156,7 +156,7 @@ READ8_MEMBER(dsbz80_device::mpeg_pos_r)
    (song #16 is a good example)
 */
 
-WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
+void dsbz80_device::mpeg_start_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -193,7 +193,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
+void dsbz80_device::mpeg_end_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -222,21 +222,23 @@ WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_volume_w)
+void dsbz80_device::mpeg_volume_w(uint8_t data)
 {
 	mp_vol = 0x7f - data;
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_stereo_w)
+void dsbz80_device::mpeg_stereo_w(uint8_t data)
 {
 	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
-void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *out_l = outputs[0];
-	stream_sample_t *out_r = outputs[1];
+	auto &out_l = outputs[0];
+	auto &out_r = outputs[1];
 
+	int samples = out_l.samples();
+	int sampindex = 0;
 	for(;;)
 	{
 		while(samples && audio_pos < audio_avail)
@@ -244,18 +246,21 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			switch (mp_pan)
 			{
 				case 0: // stereo
-					*out_l++ = audio_buf[audio_pos*2];
-					*out_r++ = audio_buf[audio_pos*2+1];
+					out_l.put_int(sampindex, audio_buf[audio_pos*2], 32768);
+					out_r.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
+					sampindex++;
 					break;
 
 				case 1: // left only
-					*out_l++ = audio_buf[audio_pos*2];
-					*out_r++ = audio_buf[audio_pos*2];
+					out_l.put_int(sampindex, audio_buf[audio_pos*2], 32768);
+					out_r.put_int(sampindex, audio_buf[audio_pos*2], 32768);
+					sampindex++;
 					break;
 
 				case 2: // right only
-					*out_l++ = audio_buf[audio_pos*2+1];
-					*out_r++ = audio_buf[audio_pos*2+1];
+					out_l.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
+					out_r.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
+					sampindex++;
 					break;
 			}
 			audio_pos++;
@@ -269,11 +274,8 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		if(mp_state == 0)
 		{
-			for(int i=0; i != samples; i++)
-			{
-				*out_l++ = 0;
-				*out_r++ = 0;
-			}
+			out_l.fill(0, sampindex);
+			out_r.fill(0, sampindex);
 			break;
 
 		}

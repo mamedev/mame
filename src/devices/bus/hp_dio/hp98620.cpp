@@ -13,10 +13,9 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device, "hp98620", "HP98620 DMA Controller")
+DEFINE_DEVICE_TYPE(HPDIO_98620, bus::hp_dio::dio16_98620_device, "hp98620", "HP98620 DMA Controller")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dio16_98620_device(mconfig, HPDIO_98620, tag, owner, clock)
@@ -24,9 +23,13 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char
 }
 
 dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_dio32_card_interface(mconfig, *this),
-	m_irq_state(false)
+	device_t{mconfig, type, tag, owner, clock},
+	device_dio32_card_interface{mconfig, *this},
+	m_installed_io{false},
+	m_control{0},
+	m_data{0},
+	m_irq_state{false},
+	m_dmar {false}
 {
 }
 
@@ -34,40 +37,25 @@ void dio16_98620_device::device_start()
 {
 	m_installed_io = false;
 
-	save_item(NAME(m_regs[0].address));
-	save_item(NAME(m_regs[0].tc));
-	save_item(NAME(m_regs[0].control));
-	save_item(NAME(m_regs[0].irq_level));
-	save_item(NAME(m_regs[0].tsz));
-	save_item(NAME(m_regs[0].subcount));
-	save_item(NAME(m_regs[0].irq));
-	save_item(NAME(m_regs[0].ie));
-	save_item(NAME(m_regs[0].armed));
-	save_item(NAME(m_regs[0].dma_out));
-	save_item(NAME(m_regs[0].dma_pri));
-	save_item(NAME(m_regs[0].lword));
-	save_item(NAME(m_regs[0].word));
-
-
-	save_item(NAME(m_regs[1].address));
-	save_item(NAME(m_regs[1].tc));
-	save_item(NAME(m_regs[1].control));
-	save_item(NAME(m_regs[1].irq_level));
-	save_item(NAME(m_regs[1].tsz));
-	save_item(NAME(m_regs[1].subcount));
-	save_item(NAME(m_regs[1].irq));
-	save_item(NAME(m_regs[1].ie));
-	save_item(NAME(m_regs[1].armed));
-	save_item(NAME(m_regs[1].dma_out));
-	save_item(NAME(m_regs[1].dma_pri));
-	save_item(NAME(m_regs[1].lword));
-	save_item(NAME(m_regs[1].word));
+	save_item(STRUCT_MEMBER(m_regs, address));
+	save_item(STRUCT_MEMBER(m_regs, tc));
+	save_item(STRUCT_MEMBER(m_regs, control));
+	save_item(STRUCT_MEMBER(m_regs, irq_level));
+	save_item(STRUCT_MEMBER(m_regs, tsz));
+	save_item(STRUCT_MEMBER(m_regs, subcount));
+	save_item(STRUCT_MEMBER(m_regs, irq));
+	save_item(STRUCT_MEMBER(m_regs, ie));
+	save_item(STRUCT_MEMBER(m_regs, armed));
+	save_item(STRUCT_MEMBER(m_regs, dma_out));
+	save_item(STRUCT_MEMBER(m_regs, dma_pri));
+	save_item(STRUCT_MEMBER(m_regs, lword));
+	save_item(STRUCT_MEMBER(m_regs, word));
 
 	save_item(NAME(m_installed_io));
 	save_item(NAME(m_control));
 	save_item(NAME(m_data));
 	save_item(NAME(m_irq_state));
-	save_item(NAME(dmar));
+	save_item(NAME(m_dmar));
 }
 
 void dio16_98620_device::device_reset()
@@ -75,8 +63,8 @@ void dio16_98620_device::device_reset()
 	if (!m_installed_io)
 	{
 		program_space().install_readwrite_handler(0x500000, 0x50020f,
-				read16_delegate(FUNC(dio16_98620_device::dma_r), this),
-				write16_delegate(FUNC(dio16_98620_device::dma_w), this));
+				read16sm_delegate(*this, FUNC(dio16_98620_device::dma_r)),
+				write16sm_delegate(*this, FUNC(dio16_98620_device::dma_w)));
 		m_installed_io = true;
 	}
 	m_control = 0;
@@ -103,7 +91,7 @@ uint16_t dio16_98620_device::get_ctrl(const int channel)
 	return ret;
 }
 
-READ16_MEMBER(dio16_98620_device::dma_r)
+uint16_t dio16_98620_device::dma_r(offs_t offset)
 {
 
 	uint16_t ret = 0;
@@ -228,12 +216,12 @@ void dio16_98620_device::update_ctrl(const int channel, const uint16_t data, con
 		m_regs[channel].subcount = m_regs[channel].tsz-1;
 		m_regs[channel].armed = true;
 		m_regs[channel].irq = false;
-		if (dmar[channel])
+		if (m_dmar[channel])
 			dma_transfer(channel);
 
 	}
 }
-WRITE16_MEMBER(dio16_98620_device::dma_w)
+void dio16_98620_device::dma_w(offs_t offset, uint16_t data)
 {
 	LOG("dma_w: offset=%02X, data=%02X\n", offset << 1, data);
 
@@ -369,7 +357,7 @@ void dio16_98620_device::dma_transfer(int channel)
 WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
-	dmar[0] = state;
+	m_dmar[0] = state;
 	if (!state)
 		return;
 
@@ -379,7 +367,7 @@ WRITE_LINE_MEMBER(dio16_98620_device::dmar0_in)
 WRITE_LINE_MEMBER(dio16_98620_device::dmar1_in)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
-	dmar[1] = state;
+	m_dmar[1] = state;
 
 	if (!state)
 		return;
@@ -388,5 +376,3 @@ WRITE_LINE_MEMBER(dio16_98620_device::dmar1_in)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus
-

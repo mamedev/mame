@@ -40,7 +40,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ABC_UNI800, abc_uni800_device, "uni800", "UNI-800")
+DEFINE_DEVICE_TYPE(ABC_UNI800, abc_uni800_device, "abc_uni800", "UNI-800")
 
 
 //-------------------------------------------------

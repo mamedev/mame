@@ -7,7 +7,7 @@
 
 class device_interpro_keyboard_port_interface;
 
-class interpro_keyboard_port_device : public device_t, public device_slot_interface
+class interpro_keyboard_port_device : public device_t, public device_single_card_slot_interface<device_interpro_keyboard_port_interface>
 {
 	friend class device_interpro_keyboard_port_interface;
 
@@ -40,7 +40,7 @@ private:
 	device_interpro_keyboard_port_interface *m_dev;
 };
 
-class device_interpro_keyboard_port_interface : public device_slot_card_interface
+class device_interpro_keyboard_port_interface : public device_interface
 {
 	friend class interpro_keyboard_port_device;
 

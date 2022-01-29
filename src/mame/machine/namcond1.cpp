@@ -52,7 +52,7 @@ void namcond1_state::machine_reset()
 }
 
 // $c3ff00-$c3ffff
-READ16_MEMBER(namcond1_state::cuskey_r)
+uint16_t namcond1_state::cuskey_r(offs_t offset)
 {
 	switch( offset )
 	{
@@ -70,7 +70,7 @@ READ16_MEMBER(namcond1_state::cuskey_r)
 	}
 }
 
-WRITE16_MEMBER(namcond1_state::cuskey_w)
+void namcond1_state::cuskey_w(offs_t offset, uint16_t data)
 {
 	switch( offset )
 	{

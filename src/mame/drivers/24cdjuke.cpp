@@ -73,6 +73,10 @@ public:
 
 	void midcoin24cdjuke(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_io_row0;
@@ -82,14 +86,11 @@ private:
 	required_region_ptr<uint16_t> m_charset;
 	output_finder<16> m_digits;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint8_t kb_row_r();
+	void kb_col_w(uint8_t data);
+	void digit_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(kb_row_r);
-	DECLARE_WRITE8_MEMBER(kb_col_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-
-	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
+	uint8_t unknown_r() { return machine().rand(); }
 
 	void midcoin24cdjuke_io(address_map &map);
 	void midcoin24cdjuke_map(address_map &map);
@@ -98,7 +99,7 @@ private:
 };
 
 
-READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
+uint8_t midcoin24cdjuke_state::kb_row_r()
 {
 	uint8_t data = 0xff;
 
@@ -114,12 +115,12 @@ READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
 	return data;
 }
 
-WRITE8_MEMBER(midcoin24cdjuke_state::kb_col_w)
+void midcoin24cdjuke_state::kb_col_w(uint8_t data)
 {
 	m_kb_col = data & 0xf0;
 }
 
-WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
+void midcoin24cdjuke_state::digit_w(offs_t offset, uint8_t data)
 {
 	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 

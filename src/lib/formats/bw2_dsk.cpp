@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/bw2_dsk.h"
 
 bw2_format::bw2_format() : upd765_format(formats)

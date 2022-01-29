@@ -43,24 +43,23 @@ public:
 
 	void vta2000(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(output_00);
+	void output_00(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vta2000_palette(palette_device &palette) const;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_mainpit;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-WRITE8_MEMBER(vta2000_state::output_00)
+void vta2000_state::output_00(uint8_t data)
 {
 	m_mainpit->write_gate0(BIT(data, 4));
 }
@@ -101,29 +100,28 @@ void vta2000_state::machine_reset()
 uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static uint8_t framecnt=0;
-	uint8_t y,ra,gfx,attr,fg,bg;
-	uint16_t sy=0,ma=0,x,xx=0,chr;
+	static uint8_t framecnt=0; // FIXME: static variable
+	uint16_t sy=0,ma=0;
 
 	framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (uint8_t ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			xx = ma << 1;
-			for (x = ma; x < ma + 80; x++)
+			uint16_t xx = ma << 1;
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[xx++];
-				attr = m_p_videoram[xx++];
+				uint16_t chr = m_p_videoram[xx++];
+				uint8_t const attr = m_p_videoram[xx++];
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;
 
-				gfx = m_p_chargen[(chr<<4) | ra ];
-				bg = 0;
+				uint8_t gfx = m_p_chargen[(chr<<4) | ra ];
+				uint8_t fg, bg = 0;
 
 				/* Process attributes */
 				if (BIT(attr, 4))
@@ -181,20 +179,13 @@ static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-void vta2000_state::vta2000_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
-}
-
 void vta2000_state::vta2000(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(4'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vta2000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vta2000_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	PIT8253(config, m_mainpit, 0);
 	m_mainpit->set_clk<0>(500'000);
@@ -214,7 +205,7 @@ void vta2000_state::vta2000(machine_config &config)
 	brgpit.out_handler<1>().set("usart", FUNC(i8251_device::write_txc)); // or vice versa?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(80*8, 25*12);
@@ -222,7 +213,7 @@ void vta2000_state::vta2000(machine_config &config)
 	screen.set_screen_update(FUNC(vta2000_state::screen_update_vta2000));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(vta2000_state::vta2000_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vta2000);
 
 	SPEAKER(config, "mono").front_center();
@@ -244,4 +235,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING )
+COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

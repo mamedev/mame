@@ -98,13 +98,13 @@ void redclash_state::palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER( redclash_state::videoram_w )
+void redclash_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( redclash_state::gfxbank_w )
+void redclash_state::gfxbank_w(uint8_t data)
 {
 	if (m_gfxbank != (data & 0x01))
 	{
@@ -113,12 +113,12 @@ WRITE8_MEMBER( redclash_state::gfxbank_w )
 	}
 }
 
-WRITE8_MEMBER( redclash_state::flipscreen_w )
+void redclash_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER( redclash_state::star_reset_w )
+void redclash_state::star_reset_w(uint8_t data)
 {
 	m_stars->set_enable(true);
 }
@@ -128,13 +128,13 @@ TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
 void redclash_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(redclash_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(redclash_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -232,7 +232,7 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		if (cliprect.contains(sx, sy))
-			bitmap.pix16(sy, sx) = 0x19;
+			bitmap.pix(sy, sx) = 0x19;
 	}
 }
 

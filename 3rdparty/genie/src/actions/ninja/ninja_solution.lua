@@ -123,6 +123,7 @@ end
 
 	function generate(prjcfgs)
 		local cfgs          = {}
+		local cfg_start     = nil
 		local cfg_first     = nil
 		local cfg_first_lib = nil
 
@@ -142,6 +143,9 @@ end
 			cfgs["all"] = cfgs["all"] .. cfg:getoutputfilename() .. " "
 
 			-- set first configuration name
+			if (cfg_start == nil) and (cfg.solution.startproject == key) then
+				cfg_start = key
+			end
 			if (cfg_first == nil) and (cfg.kind == "ConsoleApp" or cfg.kind == "WindowedApp") then
 				cfg_first = key
 			end
@@ -162,6 +166,6 @@ end
 		_p("")
 
 		_p("# default target")
-		_p("default " .. (cfg_first or cfg_first_lib))
+		_p("default " .. (cfg_start or cfg_first or cfg_first_lib))
 		_p("")
 	end

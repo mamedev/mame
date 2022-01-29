@@ -48,7 +48,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	struct slapshot_tempsprite
@@ -88,9 +88,12 @@ private:
 	s32       m_sprites_master_scrolly;
 	bool      m_sprites_flipscreen;
 	bool      m_prepare_sprites;
-	int       m_dislayer[5];
+#ifdef MAME_DEBUG
+	int       m_dislayer[5] = { 0, 0, 0, 0, 0 };
+#endif
 
 	emu_timer *m_int6_timer;
+	std::unique_ptr<u8[]> m_decoded_gfx;
 
 	// generic
 	u16 service_input_r(offs_t offset);

@@ -128,10 +128,10 @@ uint8_t a2bus_corvus_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return m_corvushd->read(machine().dummy_space(), 0);
+			return m_corvushd->read();
 
 		case 1:
-			return m_corvushd->status_r(machine().dummy_space(), 0);
+			return m_corvushd->status_r();
 
 		default:
 			logerror("Corvus: read unhandled c0n%x (%s)\n", offset, machine().describe_context());
@@ -150,7 +150,7 @@ void a2bus_corvus_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_corvushd->write(machine().dummy_space(), 0, data);
+		m_corvushd->write(data);
 	}
 }
 

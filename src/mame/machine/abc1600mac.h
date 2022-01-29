@@ -35,32 +35,34 @@ class abc1600_mac_device : public device_t,
 public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	auto fc_cb() { return m_read_fc.bind(); }
+	auto buserr_cb() { return m_write_buserr.bind(); }
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( cause_r );
-	DECLARE_WRITE8_MEMBER( task_w );
-	DECLARE_READ8_MEMBER( segment_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( page_r );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_WRITE8_MEMBER( dmamap_w );
+	uint8_t cause_r();
+	void task_w(offs_t offset, uint8_t data);
+	uint8_t segment_r(offs_t offset);
+	void segment_w(offs_t offset, uint8_t data);
+	uint8_t page_lo_r(offs_t offset);
+	void page_lo_w(offs_t offset, uint8_t data);
+	uint8_t page_hi_r(offs_t offset);
+	void page_hi_w(offs_t offset, uint8_t data);
+	void dmamap_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dma0_mreq_r ) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_mreq_w ) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma0_iorq_r ) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_iorq_w ) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_mreq_r ) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_mreq_w ) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_iorq_r ) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_iorq_w ) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_mreq_r ) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_mreq_w ) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_iorq_r ) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_iorq_w ) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
+	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma0_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
+	void dma0_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma1_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
+	void dma1_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma1_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
+	void dma1_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma2_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
+	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma2_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
+	void dma2_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
 
-	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,36 +86,32 @@ private:
 		DMAMAP_R0_HI
 	};
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	int get_current_task(offs_t offset);
-	offs_t get_segment_address(offs_t offset);
-	offs_t get_page_address(offs_t offset, uint8_t segd);
-	offs_t translate_address(offs_t offset, int *nonx, int *wp);
-	uint8_t read_user_memory(offs_t offset);
-	void write_user_memory(offs_t offset, uint8_t data);
-	int get_fc();
-	uint8_t read_supervisor_memory(address_space &space, offs_t offset);
-	void write_supervisor_memory(address_space &space, offs_t offset, uint8_t data);
+	offs_t translate_address(offs_t offset, int &nonx, int &wp);
 	offs_t get_dma_address(int index, uint16_t offset);
 	uint8_t dma_mreq_r(int index, uint16_t offset);
 	void dma_mreq_w(int index, uint16_t offset, uint8_t data);
 	uint8_t dma_iorq_r(int index, uint16_t offset);
 	void dma_iorq_w(int index, uint16_t offset, uint8_t data);
 
-	const address_space_config m_space_config;
+	void program_map(address_map &map);
+	const address_space_config m_program_config;
 
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_segment_ram;
-	optional_shared_ptr<uint16_t> m_page_ram;
+	memory_share_creator<uint8_t> m_segment_ram;
+	memory_share_creator<uint16_t> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
-	required_device<m68000_base_device> m_cpu;
+	devcb_read8        m_read_fc;
+	devcb_write_line   m_write_buserr;
 
-	int m_ifc2;
-	uint8_t m_task;
+	bool m_ifc2;
+	bool m_boote;
+	bool m_magic;
+	bool m_task;
 	uint8_t m_dmamap[8];
 	uint8_t m_cause;
 };

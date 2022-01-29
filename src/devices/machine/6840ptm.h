@@ -58,7 +58,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_resolve_objects() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void subtract_from_counter(int counter, int count);
@@ -102,7 +103,7 @@ private:
 
 	double m_external_clock[3];
 
-	devcb_write_line m_out_cb[3];
+	devcb_write_line::array<3> m_out_cb;
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];

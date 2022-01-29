@@ -13,7 +13,7 @@
 *******************************************************************/
 
 #include "emu.h"
-#include "cpu/h8/h83048.h"
+#include "cpu/h8500/h8510.h"
 //#include "sound/alesis_qs.h"
 
 class qs_state : public driver_device
@@ -29,7 +29,7 @@ public:
 private:
 	void qs7_prog_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<h8510_device> m_maincpu;
 };
 
 /* Input ports */
@@ -47,41 +47,43 @@ INPUT_PORTS_END
 
 void qs_state::qs7_prog_map(address_map &map)
 {
-	//map.global_mask(0x3ffff);
-	map(0x00000, 0x3ffff).rom();
+	map(0x00000, 0x3ffff).mirror(0x40000).rom().region("program", 0);
 }
 
 void qs_state::qs7(machine_config &config)
 {
 	/* basic machine hardware */
-	H83048(config, m_maincpu, XTAL(10'000'000)); /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
+	HD6415108(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qs_state::qs7_prog_map);
 
-		//MCFG_ALESIS_KEYSCAN_ASIC_ADD("keyscan")
+	//ALESIS_KEYSCAN(config, "keyscan", 20_MHz_XTAL / 2 / 8);
 
-		/* Alesis Sound Generator ASIC */
-		//MCFG_ALESIS_SG_ASIC_ADD("sndgen")
+	/* Alesis Sound Generator ASIC */
+	//ALESIS_SG(config, "sndgen");
 
-		/* Alesis Sound Effects Processor ASIC */
-		//MCFG_ALESIS_FX_ASIC_ADD("sfx")
+	/* Alesis Sound Effects Processor ASIC */
+	//ALESIS_FXCHIP(config, "sfx", 7.056_MHz_XTAL);
 
 	/* video hardware */
-		//TODO: add LCD display controller here
+	//TODO: add LCD display controller here
 
 	/* sound hardware */
-	//MCFG_SPEAKER_STANDARD_STEREO("stereo")
-	//MCFG_ALESIS_QS_SERIES_ADD("sound", SND_CLOCK)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "stereo", 1.0)
+	//SPEAKER(config, "left").front_left();
+	//SPEAKER(config, "right").front_right();
+	//alesis_qs_series_device &sound(ALESIS_QS_SERIES(config, "sound", SND_CLOCK));
+	//sound.add_route(0, "left", 1.0);
+	//sound.add_route(1, "right", 1.0);
 
 		/* Interfaces */
-		//MCFG_PCMCIA_ADD("pcmcia")
+		//PCMCIA
 		//MIDI
 		//RS232
 }
 
+// XTALs: 20 MHz (H8/510), 7.056 MHz (FXCHIP), 14.7456 MHz
 ROM_START( alesqs7 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "2-31-0069_q7_v1.02_alesis_sp_09_12_96_cs_dbcc.u18", 0x00000, 0x80000, CRC(6e5404cb) SHA1(f00598b66ab7a83b16105cbb73e09c66ce3493a7) )
+	ROM_REGION16_BE( 0x80000, "program", 0 )
+	ROM_LOAD16_WORD_SWAP( "2-31-0069_q7_v1.02_alesis_sp_09_12_96_cs_dbcc.u18", 0x00000, 0x80000, CRC(6e5404cb) SHA1(f00598b66ab7a83b16105cbb73e09c66ce3493a7) )
 
 //  ROM_REGION( 0x200000, "sound", 0 ) /* Samples ROMs (2Mbyte each) */
 //  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )

@@ -58,7 +58,7 @@ K051316_CB_MEMBER(ultraman_state::zoom_callback_3)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
+void ultraman_state::ultraman_gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

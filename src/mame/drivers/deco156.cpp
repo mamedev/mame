@@ -48,14 +48,14 @@ public:
 	void wcvol95(machine_config &config);
 
 private:
-	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
-	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
-	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
+	void hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pf1_rowscroll_r(offs_t offset);
+	uint32_t pf2_rowscroll_r(offs_t offset);
+	uint32_t spriteram_r(offs_t offset);
+	void pf1_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pf2_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hvysmsh_oki_0_bank_w(uint32_t data);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
@@ -110,7 +110,7 @@ uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /***************************************************************************/
 
-WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
+void deco156_state::hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -119,17 +119,17 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
+void deco156_state::hvysmsh_oki_0_bank_w(uint32_t data)
 {
 	m_oki1->set_rom_bank(data & 1);
 }
 
-READ32_MEMBER(deco156_state::pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(deco156_state::pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
+uint32_t deco156_state::pf1_rowscroll_r(offs_t offset) { return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::pf2_rowscroll_r(offs_t offset) { return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::spriteram_r(offs_t offset) { return m_spriteram[offset] ^ 0xffff0000; }
+void deco156_state::pf1_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+void deco156_state::pf2_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+void deco156_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 void deco156_state::hvysmsh_map(address_map &map)
@@ -336,21 +336,19 @@ void deco156_state::hvysmsh(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -388,21 +386,19 @@ void deco156_state::wcvol95(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */

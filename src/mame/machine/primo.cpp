@@ -39,21 +39,21 @@ WRITE_LINE_MEMBER(primo_state::vblank_irq)
 
 *******************************************************************************/
 
-void primo_state::primo_update_memory()
+void primo_state::update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	switch (m_port_FD & 0x03)
 	{
 		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
+			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 		case 0x01:  /* EPROM extension 1 */
 			space.unmap_write(0x0000, 0x3fff);
 			membank("bank1")->set_base(m_cart2_rom->base());
 			break;
 		case 0x02:  /* RAM */
-			space.install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_write_bank(0x0000, 0x3fff, membank("bank1"));
 			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 		case 0x03:  /* EPROM extension 2 */
@@ -70,10 +70,9 @@ void primo_state::primo_update_memory()
 
 *******************************************************************************/
 
-READ8_MEMBER(primo_state::primo_be_1_r)
+uint8_t primo_state::be_1_r(offs_t offset)
 {
 	uint8_t data = 0x00;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	// bit 7, 6 - not used
 
@@ -88,15 +87,15 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	data |= (m_cassette->input() < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (ioport("RESET")->read()) ? 0x02 : 0x00;
+	data |= (m_reset_port->read()) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (ioport(portnames[(offset & 0x0030) >> 4])->read() >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
+	data |= (m_keyboard_port[(offset & 0x0030) >> 4]->read() >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
 
-READ8_MEMBER(primo_state::primo_be_2_r)
+uint8_t primo_state::be_2_r()
 {
 	uint8_t data = 0xff;
 
@@ -126,10 +125,10 @@ READ8_MEMBER(primo_state::primo_be_2_r)
 	return data;
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_1_w)
+void primo_state::ki_1_w(uint8_t data)
 {
 	// bit 7 - NMI generator enable/disable
-	m_nmi = (data & 0x80) ? 1 : 0;
+	m_nmi = BIT(data, 7);
 
 	// bit 6 - joystick register shift (not emulated)
 
@@ -139,7 +138,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	m_speaker->level_w(BIT(data, 4));
 
 	// bit 3 - display buffer
-	if (data & 0x08)
+	if (BIT(data, 3))
 		m_video_memory_base |= 0x2000;
 	else
 		m_video_memory_base &= 0xdfff;
@@ -162,7 +161,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	}
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_2_w)
+void primo_state::ki_2_w(uint8_t data)
 {
 	// bit 7, 6 - not used
 
@@ -185,12 +184,12 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
-WRITE8_MEMBER(primo_state::primo_FD_w)
+void primo_state::FD_w(uint8_t data)
 {
-	if (!ioport("MEMORY_EXPANSION")->read())
+	if (!m_mem_exp_port->read())
 	{
 		m_port_FD = data;
-		primo_update_memory();
+		update_memory();
 	}
 }
 
@@ -200,27 +199,10 @@ WRITE8_MEMBER(primo_state::primo_FD_w)
 
 *******************************************************************************/
 
-void primo_state::primo_common_driver_init (primo_state *state)
+void primo_state::init_primo()
 {
 	m_port_FD = 0x00;
-}
-
-void primo_state::init_primo32()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0x6800;
-}
-
-void primo_state::init_primo48()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0xa800;
-}
-
-void primo_state::init_primo64()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0xe800;
+	m_video_memory_base = 0x2800;
 }
 
 /*******************************************************************************
@@ -229,16 +211,20 @@ void primo_state::init_primo64()
 
 *******************************************************************************/
 
-void primo_state::primo_common_machine_init()
+void primo_state::common_machine_init()
 {
 	if (m_mem_exp_port->read())
 		m_port_FD = 0x00;
-	primo_update_memory();
+	update_memory();
 	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_start()
 {
+	save_item(NAME(m_video_memory_base));
+	save_item(NAME(m_port_FD));
+	save_item(NAME(m_nmi));
+
 	std::string region_tag;
 	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -246,12 +232,12 @@ void primo_state::machine_start()
 
 void primo_state::machine_reset()
 {
-	primo_common_machine_init();
+	common_machine_init();
 }
 
 MACHINE_RESET_MEMBER(primo_state,primob)
 {
-	primo_common_machine_init();
+	common_machine_init();
 
 //removed   cbm_drive_0_config(SERIAL, 8);
 //removed   cbm_drive_1_config(SERIAL, 9);
@@ -263,7 +249,7 @@ MACHINE_RESET_MEMBER(primo_state,primob)
 
 *******************************************************************************/
 
-void primo_state::primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
+void primo_state::setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
 {
 	/* Z80 registers */
 	m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
@@ -290,17 +276,16 @@ void primo_state::primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_siz
 	// KI-1 bit 4 - speaker
 	m_speaker->level_w(BIT(snapshot_data[30], 4));
 
-
 	/* memory */
-	for (int i = 0; i < 0xc000; i++)
+	for (u16 i = 0; i < 0xc000; i++)
 		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, snapshot_data[i + 38]);
 }
 
 SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 {
-	std::vector<uint8_t> snapshot_data(snapshot_size);
+	std::vector<uint8_t> snapshot_data(image.length());
 
-	if (image.fread(&snapshot_data[0], snapshot_size) != snapshot_size)
+	if (image.fread(&snapshot_data[0], image.length()) != image.length())
 	{
 		return image_init_result::FAIL;
 	}
@@ -310,7 +295,7 @@ SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 		return image_init_result::FAIL;
 	}
 
-	primo_setup_pss(&snapshot_data[0], snapshot_size);
+	setup_pss(&snapshot_data[0], image.length());
 
 	return image_init_result::PASS;
 }
@@ -322,15 +307,12 @@ SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 *******************************************************************************/
 
 
-void primo_state::primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
+void primo_state::setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 {
-	uint16_t load_addr;
-	uint16_t start_addr;
+	u16 load_addr = quickload_data[0] + quickload_data[1]*256;
+	u16 start_addr = quickload_data[2] + quickload_data[3]*256;
 
-	load_addr = quickload_data[0] + quickload_data[1]*256;
-	start_addr = quickload_data[2] + quickload_data[3]*256;
-
-	for (int i = 4; i < quickload_size; i++)
+	for (u32 i = 4; i < quickload_size; i++)
 		m_maincpu->space(AS_PROGRAM).write_byte(start_addr+i-4, quickload_data[i]);
 
 	m_maincpu->set_state_int(Z80_PC, start_addr);
@@ -340,6 +322,7 @@ void primo_state::primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_siz
 
 QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 {
+	size_t quickload_size = image.length();
 	std::vector<uint8_t> quickload_data(quickload_size);
 
 	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
@@ -347,7 +330,26 @@ QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 		return image_init_result::FAIL;
 	}
 
-	primo_setup_pp(&quickload_data[0], quickload_size);
+	setup_pp(&quickload_data[0], quickload_size);
 
 	return image_init_result::PASS;
 }
+
+u32 primo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u32 ma = m_video_memory_base;
+
+	for (u8 y = 0; y < 192; y++)
+	{
+		u16 *p = &bitmap.pix(y);
+		for (u16 x = 0; x < 32; x++)
+		{
+			u8 data = m_vram[ma+x];
+			for (u8 i = 0; i < 8; i++)
+				*p++ = BIT(data, i^7);
+		}
+		ma += 32;
+	}
+	return 0;
+}
+

@@ -31,6 +31,8 @@ public:
 	void init_xevios();
 
 protected:
+	virtual void video_start() override;
+
 	required_shared_ptr<uint8_t> m_xevious_sr1;
 	required_shared_ptr<uint8_t> m_xevious_sr2;
 	required_shared_ptr<uint8_t> m_xevious_sr3;
@@ -39,25 +41,22 @@ protected:
 	required_shared_ptr<uint8_t> m_xevious_fg_videoram;
 	required_shared_ptr<uint8_t> m_xevious_bg_videoram;
 	optional_device<samples_device> m_samples;
+	optional_device<cpu_device> m_subcpu3;
 
 	int32_t m_xevious_bs[2];
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_VIDEO_START(xevious);
 	void xevious_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(xevios);
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER( xevious_fg_videoram_w );
-	DECLARE_WRITE8_MEMBER( xevious_fg_colorram_w );
-	DECLARE_WRITE8_MEMBER( xevious_bg_videoram_w );
-	DECLARE_WRITE8_MEMBER( xevious_bg_colorram_w );
-	DECLARE_WRITE8_MEMBER( xevious_vh_latch_w );
-	DECLARE_WRITE8_MEMBER( xevious_bs_w );
-	DECLARE_READ8_MEMBER( xevious_bb_r );
-
-	optional_device<cpu_device> m_subcpu3;
+	void xevious_fg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_fg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_bg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_bg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_vh_latch_w(offs_t offset, uint8_t data);
+	void xevious_bs_w(offs_t offset, uint8_t data);
+	uint8_t xevious_bb_r(offs_t offset);
 
 	void xevious_map(address_map &map);
 };
@@ -76,26 +75,27 @@ public:
 	void battles(machine_config &config);
 
 protected:
-	void machine_reset() override;
+	virtual void machine_reset() override;
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
 
 	void battles_mem4(address_map &map);
 
 	// Custom I/O
-	DECLARE_READ8_MEMBER( customio0_r );
-	DECLARE_READ8_MEMBER( customio_data0_r );
-	DECLARE_READ8_MEMBER( customio3_r );
-	DECLARE_READ8_MEMBER( customio_data3_r );
-	DECLARE_READ8_MEMBER( input_port_r );
+	uint8_t customio0_r();
+	uint8_t customio_data0_r(offs_t offset);
+	uint8_t customio3_r();
+	uint8_t customio_data3_r(offs_t offset);
+	uint8_t input_port_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER( customio0_w );
-	DECLARE_WRITE8_MEMBER( customio_data0_w );
-	DECLARE_WRITE8_MEMBER( customio3_w );
-	DECLARE_WRITE8_MEMBER( customio_data3_w );
-	DECLARE_WRITE8_MEMBER( cpu4_coin_w );
-	DECLARE_WRITE8_MEMBER( noise_sound_w );
+	void customio0_w(uint8_t data);
+	void customio_data0_w(offs_t offset, uint8_t data);
+	void customio3_w(uint8_t data);
+	void customio_data3_w(offs_t offset, uint8_t data);
+	void cpu4_coin_w(uint8_t data);
+	void noise_sound_w(offs_t offset, uint8_t data);
 
 	required_device<timer_device> m_nmi_timer;
 

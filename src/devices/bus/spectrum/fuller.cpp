@@ -55,6 +55,7 @@ void spectrum_fuller_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 //**************************************************************************
@@ -88,32 +89,6 @@ void spectrum_fuller_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_fuller_device::romcs)
-{
-	return m_exp->romcs();
-}
-
-void spectrum_fuller_device::pre_opcode_fetch(offs_t offset)
-{
-	m_exp->pre_opcode_fetch(offset);
-}
-
-uint8_t spectrum_fuller_device::mreq_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	if (m_exp->romcs())
-		data &= m_exp->mreq_r(offset);
-
-	return data;
-}
-
-void spectrum_fuller_device::mreq_w(offs_t offset, uint8_t data)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
-}
-
 uint8_t spectrum_fuller_device::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset);
@@ -121,10 +96,10 @@ uint8_t spectrum_fuller_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0x5f:
-		data &= m_psg->data_r();
+		data = m_psg->data_r();
 		break;
 	case 0x7f:
-		data &= m_joy->read() | (0xff ^ 0x8f);
+		data = m_joy->read() | (0xff ^ 0x8f);
 		break;
 	}
 	return data;

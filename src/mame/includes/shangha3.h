@@ -23,6 +23,7 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
+		m_cgrom(*this, "gfx1"),
 		m_okibank(*this, "okibank")
 	{ }
 
@@ -47,6 +48,7 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_ram;
+	required_region_ptr<uint8_t> m_cgrom;
 
 	optional_memory_bank m_okibank;
 
@@ -59,21 +61,22 @@ private:
 	bitmap_ind16 m_rawbitmap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(gfxlist_addr_w);
-	DECLARE_WRITE16_MEMBER(blitter_go_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	void flipscreen_w(uint8_t data);
+	void gfxlist_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blitter_go_w(uint16_t data);
+	void irq_ack_w(uint16_t data);
+	uint8_t cgrom_r(offs_t offset);
 
 	// shangha3 specific
-	DECLARE_READ16_MEMBER(shangha3_prot_r);
-	DECLARE_WRITE16_MEMBER(shangha3_prot_w);
-	DECLARE_WRITE8_MEMBER(shangha3_coinctrl_w);
+	uint16_t shangha3_prot_r();
+	void shangha3_prot_w(uint16_t data);
+	void shangha3_coinctrl_w(uint8_t data);
 
 	// heberpop specific
-	DECLARE_WRITE8_MEMBER(heberpop_coinctrl_w);
+	void heberpop_coinctrl_w(uint8_t data);
 
 	// blocken specific
-	DECLARE_WRITE8_MEMBER(blocken_coinctrl_w);
+	void blocken_coinctrl_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

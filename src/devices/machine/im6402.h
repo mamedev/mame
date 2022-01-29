@@ -64,29 +64,29 @@ public:
 	auto tbre_callback() { return m_write_tbre.bind(); }
 	auto tre_callback() { return m_write_tre.bind(); }
 
-	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read() { return m_rbr; }
+	void write(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( dr_r ) { return m_dr; }
-	DECLARE_READ_LINE_MEMBER( tbre_r ) { return m_tbre; }
-	DECLARE_READ_LINE_MEMBER( tre_r ) { return m_tre; }
-	DECLARE_READ_LINE_MEMBER( pe_r ) { return m_pe; }
-	DECLARE_READ_LINE_MEMBER( fe_r ) { return m_fe; }
-	DECLARE_READ_LINE_MEMBER( oe_r ) { return m_oe; }
+	int dr_r() { return m_dr; }
+	int tbre_r() { return m_tbre; }
+	int tre_r() { return m_tre; }
+	int pe_r() { return m_pe; }
+	int fe_r() { return m_fe; }
+	int oe_r() { return m_oe; }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rri ); // receiver register input
-	DECLARE_WRITE_LINE_MEMBER( rrc_w );
-	DECLARE_WRITE_LINE_MEMBER( trc_w );
-	DECLARE_WRITE_LINE_MEMBER( rrd_w );
-	DECLARE_WRITE_LINE_MEMBER( sfd_w );
-	DECLARE_WRITE_LINE_MEMBER( drr_w );
-	DECLARE_WRITE_LINE_MEMBER( mr_w );
-	DECLARE_WRITE_LINE_MEMBER( crl_w );
-	DECLARE_WRITE_LINE_MEMBER( pi_w );
-	DECLARE_WRITE_LINE_MEMBER( sbs_w );
-	DECLARE_WRITE_LINE_MEMBER( cls1_w );
-	DECLARE_WRITE_LINE_MEMBER( cls2_w );
-	DECLARE_WRITE_LINE_MEMBER( epe_w );
+	void write_rri(int state); // receiver register input
+	void rrc_w(int state);
+	void trc_w(int state);
+	void rrd_w(int state);
+	void sfd_w(int state);
+	void drr_w(int state);
+	void mr_w(int state);
+	void crl_w(int state);
+	void pi_w(int state);
+	void sbs_w(int state);
+	void cls1_w(int state);
+	void cls2_w(int state);
+	void epe_w(int state);
 
 protected:
 	// device-level overrides

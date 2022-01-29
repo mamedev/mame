@@ -55,8 +55,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
+	uint8_t pia_r(offs_t offset);
+	void pia_w(offs_t offset, uint8_t data);
 	void ob68k1a_mem(address_map &map);
 };
 

@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0+
+// copyright-holders:byuu
 #include "emu.h"
 #include "debugger.h"
 #include "superfx.h"

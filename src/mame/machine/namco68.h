@@ -61,37 +61,37 @@ private:
 	devcb_read8        m_in_ph_cb;
 	devcb_read8        m_in_pdsw_cb;
 
-	devcb_read8   m_port_analog_in_cb[8];
-	devcb_read8   m_port_dial_in_cb[4];
+	devcb_read8::array<8> m_port_analog_in_cb;
+	devcb_read8::array<4> m_port_dial_in_cb;
 
 	devcb_read8        m_dp_in;
 	devcb_write8       m_dp_out;
 
-	DECLARE_READ8_MEMBER(c68_p5_r);
-	DECLARE_WRITE8_MEMBER(c68_p3_w);
-	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
+	uint8_t c68_p5_r();
+	void c68_p3_w(uint8_t data);
+	uint8_t ack_mcu_vbl_r();
 
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(mcuc_r);
+	uint8_t unk_r();
+	uint8_t mcuc_r();
 
-	DECLARE_READ8_MEMBER(mcudsw_r) { return m_in_pdsw_cb(); }
+	uint8_t mcudsw_r() { return m_in_pdsw_cb(); }
 
-	DECLARE_READ8_MEMBER(mcudi0_r) { return m_port_dial_in_cb[0](); }
-	DECLARE_READ8_MEMBER(mcudi1_r) { return m_port_dial_in_cb[1](); }
-	DECLARE_READ8_MEMBER(mcudi2_r) { return m_port_dial_in_cb[2](); }
-	DECLARE_READ8_MEMBER(mcudi3_r) { return m_port_dial_in_cb[3](); }
+	uint8_t mcudi0_r() { return m_port_dial_in_cb[0](); }
+	uint8_t mcudi1_r() { return m_port_dial_in_cb[1](); }
+	uint8_t mcudi2_r() { return m_port_dial_in_cb[2](); }
+	uint8_t mcudi3_r() { return m_port_dial_in_cb[3](); }
 
-	DECLARE_READ8_MEMBER(mcuan0_r) { return m_port_analog_in_cb[0](); }
-	DECLARE_READ8_MEMBER(mcuan1_r) { return m_port_analog_in_cb[1](); }
-	DECLARE_READ8_MEMBER(mcuan2_r) { return m_port_analog_in_cb[2](); }
-	DECLARE_READ8_MEMBER(mcuan3_r) { return m_port_analog_in_cb[3](); }
-	DECLARE_READ8_MEMBER(mcuan4_r) { return m_port_analog_in_cb[4](); }
-	DECLARE_READ8_MEMBER(mcuan5_r) { return m_port_analog_in_cb[5](); }
-	DECLARE_READ8_MEMBER(mcuan6_r) { return m_port_analog_in_cb[6](); }
-	DECLARE_READ8_MEMBER(mcuan7_r) { return m_port_analog_in_cb[7](); }
+	uint8_t mcuan0_r() { return m_port_analog_in_cb[0](); }
+	uint8_t mcuan1_r() { return m_port_analog_in_cb[1](); }
+	uint8_t mcuan2_r() { return m_port_analog_in_cb[2](); }
+	uint8_t mcuan3_r() { return m_port_analog_in_cb[3](); }
+	uint8_t mcuan4_r() { return m_port_analog_in_cb[4](); }
+	uint8_t mcuan5_r() { return m_port_analog_in_cb[5](); }
+	uint8_t mcuan6_r() { return m_port_analog_in_cb[6](); }
+	uint8_t mcuan7_r() { return m_port_analog_in_cb[7](); }
 
 	uint8_t m_player_mux;
 };

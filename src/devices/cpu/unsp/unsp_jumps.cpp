@@ -149,6 +149,28 @@ void unsp_device::execute_jumps(const uint16_t op)
 			m_core->m_icount -= 2;
 		}
 		return;
+	case 12: // JVC (overflow clear, N == S)
+		if (((m_core->m_r[REG_SR] & UNSP_N) >> UNSP_N_SHIFT) == ((m_core->m_r[REG_SR] & UNSP_S) >> UNSP_S_SHIFT))
+		{
+			m_core->m_icount -= 4;
+			add_lpc((op1 == 0) ? opimm : (0 - opimm));
+		}
+		else
+		{
+			m_core->m_icount -= 2;
+		}
+		return;
+	case 13: // JVS (overflow set, N != S) (Wrlshunt uses this)
+		if (((m_core->m_r[REG_SR] & UNSP_N) >> UNSP_N_SHIFT) != ((m_core->m_r[REG_SR] & UNSP_S) >> UNSP_S_SHIFT))
+		{
+			m_core->m_icount -= 4;
+			add_lpc((op1 == 0) ? opimm : (0 - opimm));
+		}
+		else
+		{
+			m_core->m_icount -= 2;
+		}
+		return;
 	case 14: // JMP
 		add_lpc((op1 == 0) ? opimm : (0 - opimm));
 		m_core->m_icount -= 4;

@@ -86,7 +86,7 @@ const tiny_rom_entry *abc_fd2_device::device_rom_region() const
 //  status_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc_fd2_device::status_w )
+void abc_fd2_device::status_w(uint8_t data)
 {
 	/*
 
@@ -138,17 +138,17 @@ void abc_fd2_device::abc_fd2_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc_fd2_device::pio_pa_r )
+uint8_t abc_fd2_device::pio_pa_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( abc_fd2_device::pio_pa_w )
+void abc_fd2_device::pio_pa_w(uint8_t data)
 {
 	m_data = data;
 }
 
-READ8_MEMBER( abc_fd2_device::pio_pb_r )
+uint8_t abc_fd2_device::pio_pb_r()
 {
 	/*
 
@@ -174,7 +174,7 @@ READ8_MEMBER( abc_fd2_device::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc_fd2_device::pio_pb_w )
+void abc_fd2_device::pio_pb_w(uint8_t data)
 {
 	/*
 
@@ -228,9 +228,11 @@ static void abc_fd2_floppies(device_slot_interface &device)
 	device.option_add("525sssd", FLOPPY_525_SSSD);
 }
 
-FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
-	FLOPPY_ABC_FD2_FORMAT
-FLOPPY_FORMATS_END
+void abc_fd2_device::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_ABC_FD2_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -256,8 +258,8 @@ void abc_fd2_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_pio, FUNC(z80pio_device::pb5_w));
 	m_fdc->hld_wr_callback().set(m_pio, FUNC(z80pio_device::pb6_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats).enable_sound(true);
 }
 
 

@@ -47,12 +47,12 @@ private:
 
 	/* misc */
 	int        m_input_ports_hack;
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	template<int Xor> DECLARE_WRITE8_MEMBER(fg_scroll_w);
-	template<int Bit> DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void bankswitch_w(uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	template<int Xor> void fg_scroll_w(offs_t offset, uint8_t data);
+	template<int Bit> void flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(pagescan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

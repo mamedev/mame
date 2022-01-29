@@ -24,22 +24,22 @@ class vcs_control_port_device;
 
 // ======================> device_vcs_control_port_interface
 
-class device_vcs_control_port_interface : public device_slot_card_interface
+class device_vcs_control_port_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vcs_control_port_interface() { }
 
-	virtual uint8_t vcs_joy_r() { return 0xff; };
-	virtual uint8_t vcs_pot_x_r() { return 0xff; };
-	virtual uint8_t vcs_pot_y_r() { return 0xff; };
-	virtual void vcs_joy_w(uint8_t data) { };
+	virtual uint8_t vcs_joy_r() { return 0xff; }
+	virtual uint8_t vcs_pot_x_r() { return 0xff; }
+	virtual uint8_t vcs_pot_y_r() { return 0xff; }
+	virtual void vcs_joy_w(uint8_t data) { }
 
 	virtual bool has_pot_x() { return false; }
 	virtual bool has_pot_y() { return false; }
 
 protected:
+	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	vcs_control_port_device *m_port;
 };
 
@@ -79,11 +79,8 @@ public:
 	// bit 6 - pin 9 -
 	//
 	uint8_t read_joy() { return exists() ? m_device->vcs_joy_r() : 0xff; }
-	DECLARE_READ8_MEMBER( joy_r ) { return read_joy(); }
 	uint8_t read_pot_x() { return exists() ? m_device->vcs_pot_x_r() : 0xff; }
-	DECLARE_READ8_MEMBER( pot_x_r ) { return read_pot_x(); }
 	uint8_t read_pot_y() { return exists() ? m_device->vcs_pot_y_r() : 0xff; }
-	DECLARE_READ8_MEMBER( pot_y_r ) { return read_pot_y(); }
 
 	void joy_w(uint8_t data) { if (exists()) m_device->vcs_joy_w(data); }
 

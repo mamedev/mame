@@ -70,18 +70,18 @@ private:
 	int m_dsc0;
 	int m_dsc1;
 
-	DECLARE_READ8_MEMBER(wiz_protection_r);
-	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(wiz_char_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
-	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
-	DECLARE_WRITE8_MEMBER(stinger_shot_w);
+	uint8_t wiz_protection_r();
+	void wiz_coin_counter_w(offs_t offset, uint8_t data);
+	void wiz_main_nmi_mask_w(uint8_t data);
+	void wiz_sound_nmi_mask_w(uint8_t data);
+	void wiz_palette_bank_w(offs_t offset, uint8_t data);
+	void wiz_sprite_bank_w(uint8_t data);
+	void wiz_bgcolor_w(uint8_t data);
+	void wiz_char_bank_w(offs_t offset, uint8_t data);
+	void wiz_flipx_w(uint8_t data);
+	void wiz_flipy_w(uint8_t data);
+	void stinger_explosion_w(uint8_t data);
+	void stinger_shot_w(uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

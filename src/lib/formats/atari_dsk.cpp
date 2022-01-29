@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/atari_dsk.h"
 
 static FLOPPY_IDENTIFY( atari_dsk_identify )

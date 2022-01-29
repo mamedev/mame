@@ -12,16 +12,12 @@
 
 uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs, x, y;
-
 	/* redrawing the entire display is faster in this case */
 
-	for (offs = m_videoram.bytes(); offs >= 0; offs--)
+	for (int offs = m_videoram.bytes(); offs >= 0; offs--)
 	{
-		int sx,sy;
-
-		sx = 31 - (offs % 32);
-		sy = offs / 32;
+		int const sx = 31 - (offs % 32);
+		int const sy = offs / 32;
 
 		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				m_videoram[offs] & 0x3f,0,
@@ -66,7 +62,7 @@ uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_in
 	    care of the problem of displaying multiple beer trucks and of scrolling
 	    truck images smoothly off the top of the screen. */
 
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
 		/* y is going up the screen, but the truck window RAM locations
 		go down the screen. */
@@ -104,27 +100,25 @@ uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_in
 	   They are flickered on/off every frame by the software, so don't
 	   play it with frameskip 1 or 3, as they could become invisible */
 
-	for (x = 0; x < 256; x++)
+	for (int x = 0; x < 256; x++)
 	{
-		int bullet, mask1, mask2, val;
-
-		val = m_bulletsram[x];
+		int const val = m_bulletsram[x];
 
 		// Check for the most common case
 		if (!(val & 0x0f))
 			continue;
 
-		mask1 = 0x01;
-		mask2 = 0x10;
+		int mask1 = 0x01;
+		int mask2 = 0x10;
 
 		// Check each bullet
-		for (bullet = 0; bullet < 4; bullet++)
+		for (int bullet = 0; bullet < 4; bullet++)
 		{
 			if (val & mask1)
 			{
-				for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+				for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 					if (m_bulletsram[y] & mask2)
-						bitmap.pix16(y, 256 - x) = 1;
+						bitmap.pix(y, 256 - x) = 1;
 			}
 
 			mask1 <<= 1;

@@ -210,7 +210,7 @@ void naomi_m4_board::enc_fill()
 	}
 }
 
-READ16_MEMBER(naomi_m4_board::m4_id_r)
+uint16_t naomi_m4_board::m4_id_r()
 {
 	return m4id & 0xff80;
 }

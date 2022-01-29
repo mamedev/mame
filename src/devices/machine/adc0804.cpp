@@ -43,6 +43,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE(ADC0803, adc0803_device, "adc0803", "ADC0803 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0804, adc0804_device, "adc0804", "ADC0804 A/D Converter")
 
 ALLOW_SAVE_TYPE(adc0804_device::read_mode);
@@ -56,8 +57,8 @@ ALLOW_SAVE_TYPE(adc0804_device::read_mode);
 //  adc0804_device - constructor
 //-------------------------------------------------
 
-adc0804_device::adc0804_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ADC0804, tag, owner, clock)
+adc0804_device::adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_vin_callback(*this)
 	, m_intr_callback(*this)
 	, m_res(0.0)
@@ -69,6 +70,21 @@ adc0804_device::adc0804_device(const machine_config &mconfig, const char *tag, d
 	, m_wr_active(false)
 	, m_result(0)
 	, m_intr_active(false)
+{
+}
+
+adc0804_device::adc0804_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: adc0804_device(mconfig, ADC0804, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  adc0803_device - constructor
+//-------------------------------------------------
+
+adc0803_device::adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: adc0804_device(mconfig, ADC0803, tag, owner, clock)
 {
 }
 

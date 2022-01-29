@@ -42,15 +42,7 @@ public:
 	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
 
 	auto select() { return m_select_cb.bind(); }
-	void set_volume_callback(volume_delegate callback) { m_volume_cb = callback; }
-	template <class FunctionClass> void set_volume_callback(const char *devname, void (FunctionClass::*callback)(int, int, bool), const char *name)
-	{
-		set_volume_callback(volume_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_volume_callback(void (FunctionClass::*callback)(int, int, bool), const char *name)
-	{
-		set_volume_callback(volume_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_volume_callback(T &&... args) { m_volume_cb.set(std::forward<T>(args)...); }
 
 	// serial interface
 	DECLARE_WRITE_LINE_MEMBER( ce_w );

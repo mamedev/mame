@@ -1649,7 +1649,7 @@ void tms5220_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_timer_io_ready = timer_alloc(0);
 
@@ -1733,7 +1733,7 @@ void tms5220_device::device_reset()
 
 ***********************************************************************************************/
 
-void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1770,6 +1770,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			case 0x03:
 				/* High Impedance */
 				m_io_ready = param;
+				break;
 			case 0x00:
 				/* illegal */
 				m_io_ready = param;
@@ -2055,24 +2056,20 @@ READ_LINE_MEMBER( tms5220_device::intq_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms5220_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	stream_sample_t *buffer = outputs[0];
+	auto &output = outputs[0];
 
 	/* loop while we still have samples to generate */
-	while (samples)
+	for (int sampindex = 0; sampindex < output.samples(); )
 	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-		int index;
+		int length = (output.samples() > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : output.samples();
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
-		for (index = 0; index < length; index++)
-			*buffer++ = sample_data[index];
-
-		/* account for the samples */
-		samples -= length;
+		for (int index = 0; index < length; index++)
+			output.put_int(sampindex++, sample_data[index], 32768);
 	}
 }
 

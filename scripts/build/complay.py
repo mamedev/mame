@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -10,11 +10,6 @@ import sys
 import xml.sax
 import xml.sax.saxutils
 import zlib
-
-
-# workaround for version incompatibility
-if sys.version_info > (3, ):
-    long = int
 
 
 class ErrorHandler(object):
@@ -96,8 +91,7 @@ class LayoutChecker(Minifyer):
     BADTAGPATTERN = re.compile('[^abcdefghijklmnopqrstuvwxyz0123456789_.:^$]')
     VARPATTERN = re.compile('^.*~[0-9A-Za-z_]+~.*$')
     FLOATCHARS = re.compile('^.*[.eE].*$')
-    SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
-    OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
+    SHAPES = frozenset(('disk', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
     YESNO = frozenset(('yes', 'no'))
     BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
@@ -111,6 +105,8 @@ class LayoutChecker(Minifyer):
         self.views = { }
         self.referenced_elements = { }
         self.referenced_groups = { }
+        self.group_collections = { }
+        self.current_collections = None
 
     def formatLocation(self):
         return '%s:%d:%d' % (self.locator.getSystemId(), self.locator.getLineNumber(), self.locator.getColumnNumber())
@@ -218,16 +214,14 @@ class LayoutChecker(Minifyer):
                 self.variable_scopes[-1][attrs['name']] = False
 
     def checkBounds(self, attrs):
-        if self.have_bounds[-1]:
-            self.handleError('Duplicate element bounds')
-        else:
-            self.have_bounds[-1] = True
         left = self.checkFloatAttribute('bounds', attrs, 'left', 0.0)
         top = self.checkFloatAttribute('bounds', attrs, 'top', 0.0)
         right = self.checkFloatAttribute('bounds', attrs, 'right', 1.0)
         bottom = self.checkFloatAttribute('bounds', attrs, 'bottom', 1.0)
         x = self.checkFloatAttribute('bounds', attrs, 'x', 0.0)
         y = self.checkFloatAttribute('bounds', attrs, 'y', 0.0)
+        xc = self.checkFloatAttribute('bounds', attrs, 'xc', 0.0)
+        yc = self.checkFloatAttribute('bounds', attrs, 'yc', 0.0)
         width = self.checkFloatAttribute('bounds', attrs, 'width', 1.0)
         height = self.checkFloatAttribute('bounds', attrs, 'height', 1.0)
         if (left is not None) and (right is not None) and (left > right):
@@ -242,12 +236,14 @@ class LayoutChecker(Minifyer):
             self.handleError('Element bounds attribute width "%s" is negative' % (attrs['width'], ))
         if (height is not None) and (0.0 > height):
             self.handleError('Element bounds attribute height "%s" is negative' % (attrs['height'], ))
-        if ('left' not in attrs) and ('x' not in attrs):
-            self.handleError('Element bounds has neither attribute left nor attribute x')
-        has_ltrb = ('left' in attrs) or ('top' in attrs) or ('right' in attrs) or ('bottom' in attrs)
-        has_origin_size = ('x' in attrs) or ('y' in attrs) or ('width' in attrs) or ('height' in attrs)
-        if has_ltrb and has_origin_size:
-            self.handleError('Element bounds has both left/top/right/bottom and origin/size attributes')
+        if (('left' in attrs) and (('x' in attrs) or ('xc' in attrs))) or (('x' in attrs) and ('xc' in attrs)):
+            self.handleError('Element bounds has multiple horizontal origin attributes (left/x/xc)')
+        if (('left' in attrs) and ('width' in attrs)) or ((('x' in attrs) or ('xc' in attrs)) and ('right' in attrs)):
+            self.handleError('Element bounds has both left/right and x/xc/width attributes')
+        if (('top' in attrs) and (('y' in attrs) or ('yc' in attrs))) or (('y' in attrs) and ('yc' in attrs)):
+            self.handleError('Element bounds has multiple vertical origin attributes (top/y/yc)')
+        if (('top' in attrs) and ('height' in attrs)) or ((('y' in attrs) or ('yc' in attrs)) and ('bottom' in attrs)):
+            self.handleError('Element bounds has both top/bottom and y/yc/height attributes')
 
     def checkOrientation(self, attrs):
         if self.have_orientation[-1]:
@@ -257,8 +253,14 @@ class LayoutChecker(Minifyer):
         if self.checkIntAttribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handleError('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if attrs.get(name, 'no') not in self.YESNO:
+            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs[name])):
                 self.handleError('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
+
+    def checkColor(self, attrs):
+        self.checkColorChannel(attrs, 'red')
+        self.checkColorChannel(attrs, 'green')
+        self.checkColorChannel(attrs, 'blue')
+        self.checkColorChannel(attrs, 'alpha')
 
     def checkColorChannel(self, attrs, name):
         channel = self.checkFloatAttribute('color', attrs, name, None)
@@ -267,7 +269,7 @@ class LayoutChecker(Minifyer):
 
     def checkTag(self, tag, element, attr):
         if '' == tag:
-            self.handleError('Element %s attribute %s is empty', (element, attr))
+            self.handleError('Element %s attribute %s is empty' % (element, attr))
         else:
             if tag.find('^') >= 0:
                 self.handleError('Element %s attribute %s "%s" contains parent device reference' % (element, attr, tag))
@@ -277,12 +279,61 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element %s attribute %s "%s" contains double separator' % (element, attr, tag))
 
     def checkComponent(self, name, attrs):
-        state = self.checkIntAttribute(name, attrs, 'state', None)
-        if (state is not None) and (0 > state):
-            self.handleError('Element %s attribute state "%s" is negative' % (name, attrs['state']))
-        self.handlers.append((self.componentStartHandler, self.componentEndHandler))
-        self.have_bounds.append(False)
-        self.have_color.append(False)
+        statemask = self.checkIntAttribute(name, attrs, 'statemask', None)
+        stateval = self.checkIntAttribute(name, attrs, 'state', None)
+        if stateval is not None:
+            if 0 > stateval:
+                self.handleError('Element %s attribute state "%s" is negative' % (name, attrs['state']))
+            if (statemask is not None) and (stateval & ~statemask):
+                self.handleError('Element %s attribute state "%s" has bits set that are clear in attribute statemask "%s"' % (name, attrs['state'], attrs['statemask']))
+        if 'image' == name:
+            self.handlers.append((self.imageComponentStartHandler, self.imageComponentEndHandler))
+        else:
+            self.handlers.append((self.componentStartHandler, self.componentEndHandler))
+        self.have_bounds.append({ })
+        self.have_color.append({ })
+
+    def checkViewItem(self, name, attrs):
+        if 'id' in attrs:
+            if not attrs['id']:
+                self.handleError('Element %s attribute id is empty' % (name, ))
+            elif not self.VARPATTERN.match(attrs['id']):
+                if attrs['id'] in self.item_ids:
+                    self.handleError('Element %s has duplicate id "%s" (previous %s)' % (name, attrs['id'], self.item_ids[attrs['id']]))
+                else:
+                    self.item_ids[attrs['id']] = self.formatLocation()
+                if self.repeat_depth[-1]:
+                    self.handleError('Element %s attribute id "%s" in repeat contains no parameter references' % (name, attrs['id']))
+        if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
+            self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
+        if 'inputtag' in attrs:
+            if 'inputmask' not in attrs:
+                self.handleError('Element %s has inputtag attribute without inputmask attribute' % (name, ))
+            self.checkTag(attrs['inputtag'], name, 'inputtag')
+        elif 'inputmask' in attrs:
+            self.handleError('Element %s has inputmask attribute without inputtag attribute' % (name, ))
+        inputraw = None
+        if 'inputraw' in attrs:
+            if (attrs['inputraw'] not in self.YESNO) and (not self.VARPATTERN.match(attrs['inputraw'])):
+                self.handleError('Element %s attribute inputraw "%s" is not "yes" or "no"' % (name, attrs['inputraw']))
+            else:
+                inputraw = 'yes' == attrs['inputraw']
+            if 'inputmask' not in attrs:
+                self.handleError('Element %s has inputraw attribute without inputmask attribute' % (name, ))
+            if 'inputtag' not in attrs:
+                self.handleError('Element %s has inputraw attribute without inputtag attribute' % (name, ))
+        inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
+        if (inputmask is not None) and (not inputmask):
+            if (inputraw is None) or (not inputraw):
+                self.handleError('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+
+    def startViewItem(self, name):
+        self.handlers.append((self.viewItemStartHandler, self.viewItemEndHandler))
+        self.have_bounds.append(None if 'group' == name else { })
+        self.have_orientation.append(False)
+        self.have_color.append(None if 'group' == name else { })
+        self.have_xscroll.append(None if ('group' == name) or ('screen' == name) else False)
+        self.have_yscroll.append(None if ('group' == name) or ('screen' == name) else False)
 
     def rootStartHandler(self, name, attrs):
         if 'mamelayout' != name:
@@ -293,9 +344,10 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element mamelayout missing attribute version')
             else:
                 try:
-                    long(attrs['version'])
+                    int(attrs['version'])
                 except:
                     self.handleError('Element mamelayout attribute version "%s" is not an integer' % (attrs['version'], ))
+            self.have_script = None
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
             self.handlers.append((self.layoutStartHandler, self.layoutEndHandler))
@@ -320,6 +372,7 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element element attribute defstate "%s" is negative' % (attrs['defstate'], ))
             self.handlers.append((self.elementStartHandler, self.elementEndHandler))
         elif 'group' == name:
+            self.current_collections = { }
             if 'name' not in attrs:
                 self.handleError('Element group missing attribute name')
             else:
@@ -328,24 +381,29 @@ class LayoutChecker(Minifyer):
                     self.generated_group_names = True
                 if attrs['name'] not in self.groups:
                     self.groups[attrs['name']] = self.formatLocation()
+                    if not generated_name:
+                        self.group_collections[attrs['name']] = self.current_collections
                 elif not generated_name:
                     self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
-            self.have_bounds.append(False)
+            self.have_bounds.append(None)
         elif ('view' == name) and (not self.repeat_depth[-1]):
+            self.current_collections = { }
             if 'name' not in attrs:
                 self.handleError('Element view missing attribute name')
             else:
                 if attrs['name'] not in self.views:
                     self.views[attrs['name']] = self.formatLocation()
                 elif not self.VARPATTERN.match(attrs['name']):
-                    self.handleError('Element view has duplicate name (previous %s)' % (self.views[attrs['name']], ))
+                    self.handleError('Element view has duplicate name "%s" (previous %s)' % (attrs['name'], self.views[attrs['name']]))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
-            self.have_bounds.append(False)
+            self.have_bounds.append(None)
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -359,6 +417,10 @@ class LayoutChecker(Minifyer):
             self.checkParameter(attrs)
             self.ignored_depth = 1
         elif ('script' == name) and (not self.repeat_depth[-1]):
+            if self.have_script is None:
+                self.have_script = self.formatLocation()
+            else:
+                self.handleError('Duplicate script element (previous %s)' % (self.have_script, ))
             self.ignored_depth = 1
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
@@ -379,6 +441,7 @@ class LayoutChecker(Minifyer):
                         self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             if not self.views:
                 self.handleError('No view elements found')
+            del self.have_script
             self.handlers.pop()
 
     def elementStartHandler(self, name, attrs):
@@ -403,8 +466,8 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element simplecounter attribute align "%s" not in valid range 0-2' % (attrs['align'], ))
             self.checkComponent(name, attrs)
         elif 'image' == name:
-            if 'file' not in attrs:
-                self.handleError('Element image missing attribute file')
+            self.have_file = 'file' in attrs
+            self.have_data = None
             self.checkComponent(name, attrs)
         elif 'reel' == name:
             # TODO: validate symbollist and improve validation of other attributes
@@ -428,16 +491,25 @@ class LayoutChecker(Minifyer):
 
     def componentStartHandler(self, name, attrs):
         if 'bounds' == name:
+            state = self.checkIntAttribute(name, attrs, 'state', 0)
+            if state is not None:
+                if 0 > state:
+                    self.handleError('Element bounds attribute state "%s" is negative' % (attrs['state'], ))
+                if state in self.have_bounds[-1]:
+                    self.handleError('Duplicate bounds for state %d (previous %s)' % (state, self.have_bounds[-1][state]))
+                else:
+                    self.have_bounds[-1][state] = self.formatLocation()
             self.checkBounds(attrs)
         elif 'color' == name:
-            if self.have_color[-1]:
-                self.handleError('Duplicate color element')
-            else:
-                self.have_color[-1] = True
-            self.checkColorChannel(attrs, 'red')
-            self.checkColorChannel(attrs, 'green')
-            self.checkColorChannel(attrs, 'blue')
-            self.checkColorChannel(attrs, 'alpha')
+            state = self.checkIntAttribute(name, attrs, 'state', 0)
+            if state is not None:
+                if 0 > state:
+                    self.handleError('Element color attribute state "%s" is negative' % (attrs['state'], ))
+                if state in self.have_color[-1]:
+                    self.handleError('Duplicate color for state %d (previous %s)' % (state, self.have_color[-1][state]))
+                else:
+                    self.have_color[-1][state] = self.formatLocation()
+            self.checkColor(attrs)
         self.ignored_depth = 1
 
     def componentEndHandler(self, name):
@@ -445,36 +517,33 @@ class LayoutChecker(Minifyer):
         self.have_color.pop()
         self.handlers.pop()
 
+    def imageComponentStartHandler(self, name, attrs):
+        if 'data' == name:
+            if self.have_data is not None:
+                self.handleError('Element image has multiple data child elements (previous %s)' % (self.have_data))
+            else:
+                self.have_data = self.formatLocation()
+                if self.have_file:
+                    self.handleError('Element image has attribute file and child element data')
+            self.ignored_depth = 1
+        else:
+            self.componentStartHandler(name, attrs)
+
+    def imageComponentEndHandler(self, name):
+        if (not self.have_file) and (self.have_data is None):
+            self.handleError('Element image missing attribute file or child element data')
+        del self.have_file
+        del self.have_data
+        self.componentEndHandler(name)
+
     def groupViewStartHandler(self, name, attrs):
-        if (name in self.OBJECTS) or ('element' == name):
-            refattr = 'ref' if 'element' == name else 'element'
-            if refattr not in attrs:
-                self.handleError('Element %s missing attribute %s' % (name, refattr))
-            elif attrs[refattr] not in self.referenced_elements:
-                self.referenced_elements[attrs[refattr]] = self.formatLocation()
-            if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
-                self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
-            if 'inputtag' in attrs:
-                if 'inputmask' not in attrs:
-                    self.handleError('Element %s has inputtag attribute without inputmask attribute' % (name, ))
-                self.checkTag(attrs['inputtag'], name, 'inputtag')
-            elif 'inputmask' in attrs:
-                self.handleError('Element %s has inputmask attribute without inputtag attribute' % (name, ))
-            inputraw = self.checkIntAttribute(name, attrs, 'inputraw', None)
-            if (inputraw is not None):
-                if 'inputmask' not in attrs:
-                    self.handleError('Element %s has inputraw attribute without inputmask attribute' % (name, ))
-                if 'inputtag' not in attrs:
-                    self.handleError('Element %s has inputraw attribute without inputtag attribute' % (name, ))
-                if ((0 > inputraw) or (1 < inputraw)):
-                    self.handleError('Element %s attribute inputraw "%s" not in valid range 0-1' % (name, attrs['inputraw']))
-            inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
-            if (inputmask is not None) and (0 == inputmask):
-                if (inputraw is None) or (0 == inputraw):
-                    self.handleError('Element %s has attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+        if 'element' == name:
+            if 'ref' not in attrs:
+                self.handleError('Element %s missing attribute ref' % (name, ))
+            elif attrs['ref'] not in self.referenced_elements:
+                self.referenced_elements[attrs['ref']] = self.formatLocation()
+            self.checkViewItem(name, attrs)
+            self.startViewItem(name)
         elif 'screen' == name:
             if 'index' in attrs:
                 index = self.checkIntAttribute(name, attrs, 'index', None)
@@ -487,17 +556,21 @@ class LayoutChecker(Minifyer):
                 self.checkTag(tag, name, 'tag')
                 if self.BADTAGPATTERN.search(tag):
                     self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ))
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+            self.checkViewItem(name, attrs)
+            self.startViewItem(name)
         elif 'group' == name:
             if 'ref' not in attrs:
                 self.handleError('Element group missing attribute ref')
-            elif attrs['ref'] not in self.referenced_groups:
-                self.referenced_groups[attrs['ref']] = self.formatLocation()
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+            else:
+                if attrs['ref'] not in self.referenced_groups:
+                    self.referenced_groups[attrs['ref']] = self.formatLocation()
+                if (not self.VARPATTERN.match(attrs['ref'])) and (attrs['ref'] in self.group_collections):
+                    for n, l in self.group_collections[attrs['ref']].items():
+                        if n not in self.current_collections:
+                            self.current_collections[n] = l
+                        else:
+                            self.handleError('Element group instantiates collection with duplicate name "%s" from %s (previous %s)' % (n, l, self.current_collections[n]))
+            self.startViewItem(name)
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -507,13 +580,31 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element repeat attribute count "%s" is negative' % (attrs['count'], ))
             self.variable_scopes.append({ })
             self.repeat_depth[-1] += 1
+        elif 'collection' == name:
+            if 'name' not in attrs:
+                self.handleError('Element collection missing attribute name')
+            elif not self.VARPATTERN.match(attrs['name']):
+                if attrs['name'] not in self.current_collections:
+                    self.current_collections[attrs['name']] = self.formatLocation()
+                else:
+                    self.handleError('Element collection has duplicate name (previous %s)' % (self.current_collections[attrs['name']], ))
+            if attrs.get('visible', 'yes') not in self.YESNO:
+                self.handleError('Element collection attribute visible "%s" is not "yes" or "no"' % (attrs['visible'], ))
+            self.variable_scopes.append({ })
+            self.collection_depth += 1
         elif 'param' == name:
             self.checkParameter(attrs)
             self.ignored_depth = 1
         elif 'bounds' == name:
+            if self.have_bounds[-1] is not None:
+                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
+            else:
+                self.have_bounds[-1] = self.formatLocation()
             self.checkBounds(attrs)
             if self.repeat_depth[-1]:
                 self.handleError('Element bounds inside repeat')
+            elif self.collection_depth:
+                self.handleError('Element bounds inside collection')
             self.ignored_depth = 1
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
@@ -521,23 +612,89 @@ class LayoutChecker(Minifyer):
 
     def groupViewEndHandler(self, name):
         self.variable_scopes.pop()
-        if self.repeat_depth[-1]:
+        if 'collection' == name:
+            self.collection_depth -= 1
+        elif self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
+            del self.item_ids
+            self.current_collections = None
             self.repeat_depth.pop()
             self.have_bounds.pop()
             self.handlers.pop()
 
-    def objectStartHandler(self, name, attrs):
-        if 'bounds' == name:
+    def viewItemStartHandler(self, name, attrs):
+        if 'animate' == name:
+            if isinstance(self.have_bounds[-1], dict):
+                if 'inputtag' in attrs:
+                    if 'name' in attrs:
+                        self.handleError('Element animate has both attribute inputtag and attribute name')
+                    self.checkTag(attrs['inputtag'], name, 'inputtag')
+                elif 'name' not in attrs:
+                    self.handleError('Element animate has neither attribute inputtag nor attribute name')
+                self.checkIntAttribute(name, attrs, 'mask', None)
+            else:
+                self.handleError('Encountered unexpected element %s' % (name, ))
+        elif 'bounds' == name:
+            if self.have_bounds[-1] is None:
+                self.have_bounds[-1] = self.formatLocation()
+            elif isinstance(self.have_bounds[-1], dict):
+                state = self.checkIntAttribute(name, attrs, 'state', 0)
+                if state is not None:
+                    if 0 > state:
+                        self.handleError('Element bounds attribute state "%s" is negative' % (attrs['state'], ))
+                    if state in self.have_bounds[-1]:
+                        self.handleError('Duplicate bounds for state %d (previous %s)' % (state, self.have_bounds[-1][state]))
+                    else:
+                        self.have_bounds[-1][state] = self.formatLocation()
+            else:
+                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
             self.checkBounds(attrs)
         elif 'orientation' == name:
             self.checkOrientation(attrs)
+        elif 'color' == name:
+            if self.have_color[-1] is None:
+                self.have_color[-1] = self.formatLocation()
+            elif isinstance(self.have_color[-1], dict):
+                state = self.checkIntAttribute(name, attrs, 'state', 0)
+                if state is not None:
+                    if 0 > state:
+                        self.handleError('Element color attribute state "%s" is negative' % (attrs['state'], ))
+                    if state in self.have_color[-1]:
+                        self.handleError('Duplicate color for state %d (previous %s)' % (state, self.have_color[-1][state]))
+                    else:
+                        self.have_color[-1][state] = self.formatLocation()
+            else:
+                self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
+            self.checkColor(attrs)
+        elif ('xscroll' == name) or ('yscroll' == name):
+            have_scroll = self.have_xscroll if 'xscroll' == name else self.have_yscroll
+            if have_scroll[-1] is None:
+                self.handleError('Encountered unexpected element %s' % (name, ))
+            elif have_scroll[-1]:
+                self.handleError('Duplicate element %s' % (name, ))
+            else:
+                have_scroll[-1] = self.formatLocation()
+                self.checkFloatAttribute(name, attrs, 'size', 1.0)
+                if (attrs.get('wrap', 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['wrap'])):
+                    self.handleError('Element %s attribute wrap "%s" is not "yes" or "no"' % (name, attrs['wrap']))
+                if 'inputtag' in attrs:
+                    if 'name' in attrs:
+                        self.handleError('Element %s has both attribute inputtag and attribute name' % (name, ))
+                    self.checkTag(attrs['inputtag'], name, 'inputtag')
+                self.checkIntAttribute(name, attrs, 'mask', None)
+                self.checkIntAttribute(name, attrs, 'min', None)
+                self.checkIntAttribute(name, attrs, 'max', None)
+        else:
+            self.handleError('Encountered unexpected element %s' % (name, ))
         self.ignored_depth = 1
 
-    def objectEndHandler(self, name):
+    def viewItemEndHandler(self, name):
         self.have_bounds.pop()
         self.have_orientation.pop()
+        self.have_color.pop()
+        self.have_xscroll.pop()
+        self.have_yscroll.pop()
         self.handlers.pop()
 
     def setDocumentLocator(self, locator):
@@ -549,9 +706,12 @@ class LayoutChecker(Minifyer):
         self.ignored_depth = 0
         self.variable_scopes = [ ]
         self.repeat_depth = [ ]
+        self.collection_depth = 0
         self.have_bounds = [ ]
         self.have_orientation = [ ]
         self.have_color = [ ]
+        self.have_xscroll = [ ]
+        self.have_yscroll = [ ]
         self.generated_element_names = False
         self.generated_group_names = False
         super(LayoutChecker, self).startDocument()
@@ -563,13 +723,18 @@ class LayoutChecker(Minifyer):
         self.views.clear()
         self.referenced_elements.clear()
         self.referenced_groups.clear()
+        self.group_collections.clear()
+        self.current_collections = None
         del self.handlers
         del self.ignored_depth
         del self.variable_scopes
         del self.repeat_depth
+        del self.collection_depth
         del self.have_bounds
         del self.have_orientation
         del self.have_color
+        del self.have_xscroll
+        del self.have_yscroll
         del self.generated_element_names
         del self.generated_group_names
         super(LayoutChecker, self).endDocument()
@@ -649,14 +814,14 @@ if __name__ == '__main__':
             varname = base
         varname = 'layout_' + re.sub('[^0-9A-Za-z_]', '_', varname)
 
-    comp_type = 1
+    comp_type = 'internal_layout::compression::ZLIB'
     try:
         dst = open(dstfile,'w') if dstfile is not None else BlackHole()
         dst.write('static const unsigned char %s_data[] = {\n' % (varname))
         byte_count, comp_size = compressLayout(srcfile, lambda x: dst.write(x), zlib.compressobj())
         dst.write('};\n\n')
         dst.write('const internal_layout %s = {\n' % (varname))
-        dst.write('\t%d, sizeof(%s_data), %d, %s_data\n' % (byte_count, varname, comp_type, varname))
+        dst.write('\t%d, sizeof(%s_data), %s, %s_data\n' % (byte_count, varname, comp_type, varname))
         dst.write('};\n')
         dst.close()
     except XmlError:

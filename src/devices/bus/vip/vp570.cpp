@@ -63,7 +63,7 @@ ioport_constructor vp570_device::device_input_ports() const
 vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP570, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", 0x1000, ENDIANNESS_LITTLE),
 	m_base(*this, "BASE"),
 	m_sw1(*this, "SW1")
 {
@@ -76,7 +76,6 @@ vp570_device::vp570_device(const machine_config &mconfig, const char *tag, devic
 
 void vp570_device::device_start()
 {
-	m_ram.allocate(0x1000);
 }
 
 

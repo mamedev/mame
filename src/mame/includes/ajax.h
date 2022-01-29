@@ -33,16 +33,16 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_READ8_MEMBER(ls138_f10_r);
-	DECLARE_WRITE8_MEMBER(ls138_f10_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_2_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
+	void sound_bank_w(uint8_t data);
+	uint8_t ls138_f10_r(offs_t offset);
+	void ls138_f10_w(offs_t offset, uint8_t data);
+	void bankswitch_2_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void lamps_w(uint8_t data);
+	void k007232_extvol_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
-	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);

@@ -116,6 +116,7 @@ void psxcd_device::device_start()
 	{
 		m_timers[i] = timer_alloc(i);
 		m_timerinuse[i] = false;
+		m_results[i] = nullptr;
 	}
 
 	save_item(NAME(cmdbuf));
@@ -145,13 +146,13 @@ void psxcd_device::device_stop()
 {
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free((command_result *)m_timers[i]->ptr());
+		if(m_timerinuse[i] && m_results[i])
+			delete m_results[i];
 	}
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		global_free(res_queue);
+		delete res_queue;
 		res_queue = res;
 	}
 }
@@ -163,8 +164,8 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free((command_result *)m_timers[i]->ptr());
+		if(m_timerinuse[i] && m_results[i])
+			delete m_results[i];
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
@@ -175,7 +176,7 @@ void psxcd_device::device_reset()
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		global_free(res_queue);
+		delete res_queue;
 		res_queue = res;
 	}
 
@@ -209,7 +210,7 @@ void psxcd_device::call_unload()
 	send_result(intr_diskerror);
 }
 
-READ8_MEMBER( psxcd_device::read )
+uint8_t psxcd_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 	switch (offset & 3)
@@ -266,7 +267,7 @@ READ8_MEMBER( psxcd_device::read )
 	return ret;
 }
 
-WRITE8_MEMBER( psxcd_device::write )
+void psxcd_device::write(offs_t offset, uint8_t data)
 {
 	verboselog(*this, 2, "psxcd: write byte %08x = %02x\n",offset,data);
 
@@ -363,7 +364,7 @@ WRITE8_MEMBER( psxcd_device::write )
 						m_int1 = nullptr;
 
 					res_queue = res->next;
-					global_free(res);
+					delete res;
 					m_regs.sr &= ~0x20;
 					rdp = 0;
 					if(res_queue)
@@ -867,7 +868,7 @@ void psxcd_device::cmd_complete(command_result *res)
 
 psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t *data, int sz, uint8_t errcode)
 {
-	auto cr=global_alloc(command_result);
+	auto cr=new command_result;
 
 	cr->res=res;
 	if (sz)
@@ -1072,7 +1073,7 @@ void psxcd_device::play_sector()
 
 		if ((mode&mode_report) && !(sector & 15)) // slow the int rate
 		{
-			auto res=global_alloc(command_result);
+			auto res=new command_result;
 			uint8_t track = cdrom_get_track(m_cdrom_handle, sector) + 1;
 			res->res=intr_dataready;
 
@@ -1149,7 +1150,8 @@ void psxcd_device::start_play()
 
 	if (mode&mode_autopause)
 	{
-		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + cdrom_get_toc(m_cdrom_handle)->tracks[track].frames;
+		auto toc = cdrom_get_toc(m_cdrom_handle);
+		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + toc->tracks[track].logframes;
 //      printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 
@@ -1181,7 +1183,7 @@ void psxcd_device::stop_read()
 	m_spu->flush_cdda(sector);
 }
 
-void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (!m_timerinuse[tid])
 	{
@@ -1196,7 +1198,7 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 		{
 			verboselog(*this, 1, "psxcd: event cmd complete\n");
 
-			cmd_complete((command_result *)ptr);
+			cmd_complete(m_results[tid]);
 			break;
 		}
 
@@ -1224,7 +1226,7 @@ int psxcd_device::add_system_event(int type, uint64_t t, command_result *ptr)
 		if(!m_timerinuse[i])
 		{
 			m_timers[i]->adjust(attotime::from_hz(hz), type, attotime::never);
-			m_timers[i]->set_ptr(ptr);
+			m_results[i] = ptr;
 			m_timerinuse[i] = true;
 			return i;
 		}

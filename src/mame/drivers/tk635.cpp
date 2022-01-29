@@ -7,21 +7,21 @@
     Hardware:
     - AMD N80C188-25
     - TERMTEK TKA-200
-	- 128k + 32k RAM
+    - 128k + 32k RAM
     - 256 KB flash memory
 
     Features:
     - 31.5khz or 48.1khz horizontal
-	- 70/72 hz vertical
+    - 70/72 hz vertical
     - 16 background/foreground/border colors
     - 24x80/132, 25x80/132, 42x80/132, 43x80/132
-	- Standard PC/AT keyboard
+    - Standard PC/AT keyboard
 
-	Notes:
-	- Identical to the Qume QVT-72 Plus?
+    Notes:
+    - Identical to the Qume QVT-72 Plus?
 
-	TODO:
-	- Everything
+    TODO:
+    - Everything
 
 ****************************************************************************/
 
@@ -83,9 +83,9 @@ void tk635_state::io_map(address_map &map)
 	map(0x04, 0x04).w(FUNC(tk635_state::voffset_lsb_w));
 	map(0x05, 0x05).w(FUNC(tk635_state::voffset_msb_w));
 	map(0x11, 0x11).r(FUNC(tk635_state::unk_11_r));
-//	map(0x13, 0x13).ram(); // host port
+//  map(0x13, 0x13).ram(); // host port
 	map(0x19, 0x19).r(FUNC(tk635_state::unk_19_r));
-//	map(0x1b, 0x1b).ram(); // aux port
+//  map(0x1b, 0x1b).ram(); // aux port
 	map(0xf0, 0xf0).w(FUNC(tk635_state::unk_f0_w));
 }
 
@@ -122,10 +122,10 @@ uint32_t tk635_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				// 8 pixels of the character
 				for (int p = 0; p < 8; p++)
-					bitmap.pix32(y * 16 + i, x * 9 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y * 16 + i, x * 9 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
 
 				// 9th pixel empty
-				bitmap.pix32(y * 16 + i, x * 9 + 8) = rgb_t::black();
+				bitmap.pix(y * 16 + i, x * 9 + 8) = rgb_t::black();
 			}
 		}
 	}

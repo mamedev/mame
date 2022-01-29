@@ -236,9 +236,9 @@ local convert_text =
 }
 
 local function convert_char(str)
-	str = str:gsub("@([a-zA-Z%-]+)", function(s) if convert_text[s] then return utf8.char(convert_text[s] + 0xe000) end return s end)
-	str = str:gsub("_(.)", function(s) if default_text[s] then return utf8.char(default_text[s] + 0xe000) end return s end)
-	str = str:gsub("%^(.)", function(s) if expand_text[s] then return utf8.char(expand_text[s] + 0xe000) end return s end)
+	str = str:gsub("@(%g+)", function(s) if convert_text[s] then return utf8.char(convert_text[s] + 0xe000) end return s end)
+	str = str:gsub("_(%g)", function(s) if default_text[s] then return utf8.char(default_text[s] + 0xe000) end return s end)
+	str = str:gsub("%^(%g)", function(s) if expand_text[s] then return utf8.char(expand_text[s] + 0xe000) end return s end)
 	return str
 end
 

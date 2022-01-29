@@ -7,6 +7,7 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
+#define LOG_UNSUPPORTED (1U << 3)
 
 #define VERBOSE 0
 
@@ -119,8 +120,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_in(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(hard_disk_read(harddisk, lba, block)) {
+			scsi_data_in(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_WRITE_6:
@@ -468,8 +476,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ EXTENDED start=%08x blocks=%04x\n",lba, blocks);
 
-		scsi_data_in(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(hard_disk_read(harddisk, lba, block)) {
+			scsi_data_in(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_WRITE_10:
@@ -504,7 +519,12 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	case SC_MODE_SELECT_6:
-		LOG("command MODE SELECT\n");
+		LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+
+		// accept mode select parameter data
+		if(scsi_cmdbuf[4])
+			scsi_data_out(2, scsi_cmdbuf[4]);
+
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -517,7 +537,8 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	default:
-		LOG("command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
+		LOGMASKED(LOG_UNSUPPORTED, "command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
+		// Parent may handle this
 		nscsi_full_device::scsi_command();
 		break;
 	}

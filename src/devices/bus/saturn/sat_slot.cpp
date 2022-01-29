@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device, "sat_cart_slot", "Sat
 //-------------------------------------------------
 
 device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device, int cart_type) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "saturncart"),
 	m_cart_type(cart_type),
 	m_rom(nullptr),
 	m_rom_size(0)
@@ -104,8 +104,9 @@ void device_sat_cart_interface::dram1_alloc(uint32_t size)
 //-------------------------------------------------
 sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SATURN_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this), m_cart(nullptr)
+	device_cartrom_image_interface(mconfig, *this),
+	device_single_card_slot_interface<device_sat_cart_interface>(mconfig, *this),
+	m_cart(nullptr)
 {
 }
 
@@ -124,7 +125,7 @@ sat_cart_slot_device::~sat_cart_slot_device()
 
 void sat_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_sat_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -218,34 +219,34 @@ int sat_cart_slot_device::get_cart_type()
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(sat_cart_slot_device::read_rom)
+uint32_t sat_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset, mem_mask);
+		return m_cart->read_rom(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
+uint32_t sat_cart_slot_device::read_ext_dram0(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram0(space, offset, mem_mask);
+		return m_cart->read_ext_dram0(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
+uint32_t sat_cart_slot_device::read_ext_dram1(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram1(space, offset, mem_mask);
+		return m_cart->read_ext_dram1(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
+uint32_t sat_cart_slot_device::read_ext_bram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ext_bram(space, offset, mem_mask);
+		return m_cart->read_ext_bram(offset);
 	else
 		return 0xffffffff;
 }
@@ -254,20 +255,20 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram0)
+void sat_cart_slot_device::write_ext_dram0(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_dram0(space, offset, data, mem_mask);
+		m_cart->write_ext_dram0(offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram1)
+void sat_cart_slot_device::write_ext_dram1(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_dram1(space, offset, data, mem_mask);
+		m_cart->write_ext_dram1(offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_bram)
+void sat_cart_slot_device::write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ext_bram(space, offset, data, mem_mask);
+		m_cart->write_ext_bram(offset, data, mem_mask);
 }

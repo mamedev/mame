@@ -26,14 +26,14 @@ public:
 	// construction/destruction
 	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void internal_reg_write(uint8_t reg, uint8_t data);
 	virtual uint32_t get_phrase_offs(int phrase) { return m_rom[(4 * phrase) + 1] << 16 | m_rom[(4 * phrase) + 2] << 8 | m_rom[(4 * phrase) + 3]; };
@@ -113,13 +113,15 @@ public:
 	// construction/destruction
 	ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read(offs_t offset);
+
 protected:
 	virtual void internal_reg_write(uint8_t reg, uint8_t data) override;
 	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
 	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	uint32_t get_sqc_offs(int sqc) { int sq = sqc * 4 + 0x6000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	virtual void sequencer() override;
+
 private:
 	int m_bank;
 	uint32_t volinc[256];

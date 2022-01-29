@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="archimedes" description="Acorn Archimedes floppy images">
 
@@ -194,7 +197,7 @@ Zalaga by ProAction (RiscPC & StrongARM)
 Zelanites: The Onslaught by Micro Power (RiscOS2)
 -->
 
-	<!-- Boot OK, !Control throws a "sprite doesn't exist" exception -->
+	<!-- boot OK, !Control throws a "sprite doesn't exist" exception -->
 	<software name="2067bc" supported="partial">
 		<description>2067 BC</description>
 		<year>1992</year>
@@ -231,7 +234,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="airsuprm" supported="yes">
+	<software name="airsuprm">
 		<description>Air Supremacy</description>
 		<year>1991</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -255,7 +258,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="alerion" supported="yes">
+	<software name="alerion">
 		<description>Alerion</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -327,7 +330,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="allinbox" supported="yes">
+	<software name="allinbox">
 		<description>All-In Boxing</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -395,7 +398,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="alps" supported="yes">
+	<software name="alps">
 		<description>ALPS - Adventure Language Programming System</description>
 		<year>1994</year>
 		<publisher>Alpine Software</publisher>
@@ -477,7 +480,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="axis" supported="yes">
+	<software name="axis">
 		<description>Axis</description>
 		<year>1993</year>
 		<publisher>TBA Software</publisher>
@@ -496,7 +499,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="bigbang" supported="yes">
+	<software name="bigbang">
 		<description>Big Bang</description>
 		<year>1996</year>
 		<publisher>Psycore</publisher>
@@ -508,7 +511,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="blitz" supported="yes">
+	<software name="blitz">
 		<description>Blitz!</description>
 		<year>1991</year>
 		<publisher>Arxe Systems</publisher>
@@ -520,7 +523,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="blowpipe" supported="yes">
+	<software name="blowpipe">
 		<description>Blowpipe</description>
 		<year>1990</year>
 		<publisher>Eclipse</publisher>
@@ -551,7 +554,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="break147" supported="yes">
+	<software name="break147">
 		<description>Break 147</description>
 		<year>1991</year>
 		<publisher>Fourth Dimension</publisher>
@@ -649,7 +652,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="cataclys" supported="yes">
+	<software name="cataclys">
 		<description>Cataclysm</description>
 		<year>1991</year>
 		<publisher>Fourth Dimension</publisher>
@@ -668,8 +671,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Boot OK -->
-	<software name="caverns" supported="yes">
+	<!-- boot OK -->
+	<software name="caverns">
 		<description>Caverns</description>
 		<year>1991</year>
 		<publisher>Minerva</publisher>
@@ -681,7 +684,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has hacker note in !ChessInfo -->
-	<software name="chess3d" supported="yes">
+	<software name="chess3d">
 		<description>Chess 3D</description>
 		<year>1991</year>
 		<publisher>Micro Power</publisher>
@@ -693,7 +696,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has hacker note in !ChessInfo -->
-	<software name="chess3da" cloneof="chess3d" supported="yes">
+	<software name="chess3da" cloneof="chess3d">
 		<description>Chess 3D (Alt)</description>
 		<year>1991</year>
 		<publisher>Micro Power</publisher>
@@ -775,7 +778,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="chuckrck" supported="yes">
+	<software name="chuckrck">
 		<description>Chuck Rock</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
@@ -794,7 +797,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="conquer" supported="yes">
+	<software name="conquer">
 		<description>Conqueror</description>
 		<year>1988</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -1053,7 +1056,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="ego" supported="yes">
+	<software name="ego">
 		<description>EGO: Repton 4</description>
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
@@ -1065,7 +1068,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- Hangs at boot screen -->
-	<software name="egoc" cloneof="ego" supported="yes">
+	<software name="egoc" cloneof="ego" supported="no">
 		<description>EGO: Repton 4 [passwords]</description>
 		<year>1992</year>
 		<publisher>ProAction</publisher>
@@ -1113,7 +1116,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, Has trainer and passwords file -->
-	<software name="enigma" supported="yes">
+	<software name="enigma">
 		<description>Enigma</description>
 		<year>1993</year>
 		<publisher>Archimedes World</publisher>
@@ -1125,7 +1128,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, Has trainer and passwords file -->
-	<software name="enigmaa" cloneof="enigma" supported="yes">
+	<software name="enigmaa" cloneof="enigma">
 		<description>Enigma (Alt)</description>
 		<year>1993</year>
 		<publisher>Archimedes World</publisher>
@@ -1186,7 +1189,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="fireice" supported="yes">
+	<software name="fireice">
 		<description>Fire &amp; Ice</description>
 		<year>1995</year>
 		<publisher>Krisalis</publisher>
@@ -1205,7 +1208,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has unemulated printer -->
-	<software name="fish" supported="yes">
+	<software name="fish">
 		<description>Fish!</description>
 		<year>1990</year>
 		<publisher>Magnetic Scrolls</publisher>
@@ -1371,7 +1374,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="galacdan" supported="yes">
+	<software name="galacdan">
 		<description>Galactic Dan</description>
 		<year>1992</year>
 		<publisher>Fourth Dimension</publisher>
@@ -1383,7 +1386,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, title screen logo have few black dots -->
-	<software name="gods" supported="yes">
+	<software name="gods">
 		<description>Gods</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
@@ -1402,7 +1405,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, title screen logo have few black dots -->
-	<software name="godsc" cloneof="gods" supported="yes">
+	<software name="godsc" cloneof="gods">
 		<description>Gods [cracked]</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
@@ -1421,7 +1424,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="gorm" supported="yes">
+	<software name="gorm">
 		<description>Gorm</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -1445,7 +1448,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="gribblys" supported="yes">
+	<software name="gribblys">
 		<description>Gribbly's Day Out on the Arc</description>
 		<year>1992</year>
 		<publisher>Coin-Age</publisher>
@@ -1457,7 +1460,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="guildthvs" supported="yes">
+	<software name="guildthvs">
 		<description>The Guild of Thieves</description>
 		<year>1989</year>
 		<publisher>Magnetic Scrolls</publisher>
@@ -1481,7 +1484,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, only stage 1 (recheck on Arculator) -->
-	<software name="hamsters" supported="yes">
+	<software name="hamsters">
 		<description>Hamsters (Demo)</description>
 		<year>1994</year>
 		<publisher>Eclipse</publisher>
@@ -1544,7 +1547,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="hexatoms" supported="yes">
+	<software name="hexatoms">
 		<description>Hex Atoms</description>
 		<year>1992</year>
 		<publisher>BitBox</publisher>
@@ -1594,7 +1597,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has trainer -->
-	<software name="ironlord" supported="yes">
+	<software name="ironlord">
 		<description>Iron Lord</description>
 		<year>1990</year>
 		<publisher>Cygnus</publisher>
@@ -1607,7 +1610,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="ironlorda" cloneof="ironlord" supported="yes">
+	<software name="ironlorda" cloneof="ironlord">
 		<description>Iron Lord (Alt)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft</publisher>
@@ -1716,7 +1719,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="lander" supported="yes">
+	<software name="lander">
 		<description>Lander (Demo)</description>
 		<year>1987</year>
 		<publisher>Acorn</publisher>
@@ -1728,7 +1731,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="ldaydoom" supported="yes">
+	<software name="ldaydoom">
 		<description>The Last Days of Doom (includes Hezarin)</description>
 		<year>1993</year>
 		<publisher>Topologika</publisher>
@@ -1740,7 +1743,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="lastninja" supported="yes">
+	<software name="lastninja">
 		<description>The Last Ninja</description>
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
@@ -1753,7 +1756,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="lastninjac" cloneof="lastninja" supported="yes">
+	<software name="lastninjac" cloneof="lastninja">
 		<description>The Last Ninja [cracked]</description>
 		<year>1992</year>
 		<publisher>Superior Software</publisher>
@@ -1771,7 +1774,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="leeds utd - champions! (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" />
+				<rom name="leeds utd - champions (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1873,7 +1876,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="magpockets" supported="yes">
+	<software name="magpockets">
 		<description>Magic Pockets</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
@@ -1885,7 +1888,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="magscrolls" supported="yes">
+	<software name="magscrolls">
 		<description>The Magnetic Scrolls Collection</description>
 		<year>1991</year>
 		<publisher>Magnetic Scrolls</publisher>
@@ -1917,7 +1920,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="mariarti" supported="yes">
+	<software name="mariarti">
 		<description>Mad Professor Mariarti</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
@@ -1941,7 +1944,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="mariartib" cloneof="mariarti" supported="yes">
+	<software name="mariartib" cloneof="mariarti">
 		<description>Mad Professor Mariarti (Alt 2)</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
@@ -1977,7 +1980,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- Black screen after selecting a course and golfer -->
-	<software name="microdrv">
+	<software name="microdrv" supported="no">
 		<description>MicroDrive 3D</description>
 		<year>1990</year>
 		<publisher>CIS</publisher>
@@ -2008,7 +2011,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="moonquak" supported="yes">
+	<software name="moonquak">
 		<description>Moon Quake</description>
 		<year>1992</year>
 		<publisher>Archimedes World</publisher>
@@ -2021,7 +2024,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, main sprite cuts off when moving -->
-	<software name="mrdoo" supported="yes">
+	<software name="mrdoo">
 		<description>Mr. Doo</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -2033,7 +2036,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, main sprite cuts off when moving -->
-	<software name="mrdooa" cloneof="mrdoo" supported="yes">
+	<software name="mrdooa" cloneof="mrdoo">
 		<description>Mr. Doo (Alt)</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -2122,7 +2125,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="oh, no! more lemmings! (1992)(krisalis).adf" size="819200" crc="af17d81c" sha1="a8539dedd80abb6746df70b6ac590dfea655927c" />
+				<rom name="oh, no more lemmings (1992)(krisalis).adf" size="819200" crc="af17d81c" sha1="a8539dedd80abb6746df70b6ac590dfea655927c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2135,13 +2138,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="oh, no! more lemmings! (1992)(krisalis)[a].adf" size="819200" crc="f51f6a00" sha1="ad0928ba5625962fff1130d66b612a7143004f9a" />
+				<rom name="oh, no more lemmings (1992)(krisalis)[a].adf" size="819200" crc="f51f6a00" sha1="ad0928ba5625962fff1130d66b612a7143004f9a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- boot OK -->
-	<software name="pacmania" supported="yes">
+	<software name="pacmania">
 		<description>Pac-Mania</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -2191,7 +2194,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has Vertical Twist joystick utility -->
-	<software name="paradr2k" supported="yes">
+	<software name="paradr2k">
 		<description>Paradroid 2000</description>
 		<year>1993</year>
 		<publisher>Coin-Age</publisher>
@@ -2203,7 +2206,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has Vertical Twist joystick utility -->
-	<software name="paradr2ka" cloneof="paradr2k" supported="yes">
+	<software name="paradr2ka" cloneof="paradr2k">
 		<description>Paradroid 2000 (Alt)</description>
 		<year>1993</year>
 		<publisher>Coin-Age</publisher>
@@ -2307,7 +2310,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="populous" supported="yes">
+	<software name="populous">
 		<description>Populous</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
@@ -2319,7 +2322,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="populousc" cloneof="populous" supported="yes">
+	<software name="populousc" cloneof="populous">
 		<description>Populous [cracked]</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
@@ -2373,7 +2376,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="repton3" supported="yes">
+	<software name="repton3">
 		<description>Repton 3</description>
 		<year>1988</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -2384,6 +2387,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="repton3c" cloneof="repton3">
 		<description>Repton 3 [cracked]</description>
 		<year>1988</year>
@@ -2396,7 +2400,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="revelatn" supported="yes">
+	<software name="revelatn">
 		<description>Revelation</description>
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
@@ -2408,7 +2412,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="revolver" supported="yes">
+	<software name="revolver">
 		<description>Revolver</description>
 		<year>1995</year>
 		<publisher>Psycore</publisher>
@@ -2420,7 +2424,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, using a "c" command prints the floppy contents? -->
-	<software name="risecrime" supported="yes">
+	<software name="risecrime">
 		<description>Rise In Crime</description>
 		<year>1988</year>
 		<publisher>Robico</publisher>
@@ -2475,7 +2479,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="serpents" supported="yes">
+	<software name="serpents">
 		<description>Serpents</description>
 		<year>1993</year>
 		<publisher>CIS</publisher>
@@ -2566,7 +2570,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, initial speech pitch sounds very low (btanb) -->
-	<software name="small" supported="yes">
+	<software name="small">
 		<description>Small</description>
 		<year>1993</year>
 		<publisher>Virgo Software</publisher>
@@ -2584,7 +2588,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="337920">
-				<rom name="Speech! v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" />
+				<rom name="Speech v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2614,7 +2618,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="spheres" supported="yes">
+	<software name="spheres">
 		<description>Spheres of Chaos (Demo)</description>
 		<year>1992</year>
 		<publisher>Matt Black</publisher>
@@ -2626,7 +2630,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="spheresa" cloneof="spheres" supported="yes">
+	<software name="spheresa" cloneof="spheres">
 		<description>Spheres of Chaos (Demo)(Alt)</description>
 		<year>1992</year>
 		<publisher>Matt Black</publisher>
@@ -2638,7 +2642,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="spheresc" supported="yes">
+	<software name="spheresc">
 		<description>Spheres of Chaos</description>
 		<year>1993</year>
 		<publisher>Matt Black</publisher>
@@ -2737,7 +2741,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="suprpool" supported="yes">
+	<software name="suprpool">
 		<description>Super Pool</description>
 		<year>1991</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2785,7 +2789,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, joystick isn't detected -->
-	<software name="swiv" supported="yes">
+	<software name="swiv">
 		<description>SWIV</description>
 		<year>1992</year>
 		<publisher>Krisalis</publisher>
@@ -2809,7 +2813,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, mouse gfx on Frozen screen looks bad -->
-	<software name="talismana" cloneof="talisman" supported="yes">
+	<software name="talismana" cloneof="talisman">
 		<description>Talisman (Alt)</description>
 		<year>1989</year>
 		<publisher>Minerva</publisher>
@@ -2821,7 +2825,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="terramex" supported="yes">
+	<software name="terramex">
 		<description>Terramex</description>
 		<year>1988</year>
 		<publisher>Krisalis</publisher>
@@ -2834,7 +2838,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<!-- boot OK -->
 	<!-- Revised version means it can run on RiscOS 3.5+ -->
-	<software name="terramexa" cloneof="terramex" supported="yes">
+	<software name="terramexa" cloneof="terramex">
 		<description>Terramex (Revised Version, v2.05)</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
@@ -2846,7 +2850,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="topbanan" supported="yes">
+	<software name="topbanan">
 		<description>Top Banana</description>
 		<year>1988</year>
 		<publisher>Hex</publisher>
@@ -2858,7 +2862,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="topbanana" cloneof="topbanan" supported="yes">
+	<software name="topbanana" cloneof="topbanan">
 		<description>Top Banana (Alt)</description>
 		<year>1988</year>
 		<publisher>Hex</publisher>
@@ -2870,7 +2874,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="towbabel" supported="yes">
+	<software name="towbabel">
 		<description>Tower of Babel</description>
 		<year>1991</year>
 		<publisher>Cygnus</publisher>
@@ -2955,7 +2959,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has ZX Spectrum like raster effect when dying with the fan -->
-	<software name="wimpgame" supported="yes">
+	<software name="wimpgame">
 		<description>The Wimp Game</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2968,7 +2972,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has ZX Spectrum like raster effect when dying with the fan -->
-	<software name="wimpgamec" cloneof="wimpgame" supported="yes">
+	<software name="wimpgamec" cloneof="wimpgame">
 		<description>The Wimp Game [cracked]</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2981,7 +2985,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="wolf3d" supported="yes">
+	<software name="wolf3d">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>
 		<publisher>Powerslave Software</publisher>
@@ -3019,7 +3023,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="worldbox" supported="yes">
+	<software name="worldbox">
 		<description>World Championship Boxing Manager</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
@@ -3082,7 +3086,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="zarch" supported="yes">
+	<software name="zarch">
 		<description>Zarch</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -3095,7 +3099,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="zarchc" cloneof="zarch" supported="yes">
+	<software name="zarchc" cloneof="zarch">
 		<description>Zarch [cracked]</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -3107,12 +3111,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Has trainer and copy protection? -->
-	<software name="zool">
+	<!-- disc swap isn't recognized -->
+	<!-- Has trainer but uncracked copy protection? -->
+	<software name="zool" supported="no">
 		<description>Zool</description>
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
-		<info name="usage" value="Protection requires manual" />
+		<info name="usage" value="Protection requires code wheel" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -3130,7 +3135,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	<!-- Other disks to sort (homebrew?!?) -->
 
 	<!-- boot OK -->
-	<software name="3dtanks" supported="yes">
+	<software name="3dtanks">
 		<description>3D Tanks</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3193,7 +3198,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="bloxed" supported="yes">
+	<software name="bloxed">
 		<description>Bloxed (v1.09, 23 Feb 1995)</description>
 		<year>1995</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3206,7 +3211,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="blackhrt" supported="yes">
+	<software name="blackhrt">
 		<description>Castle Black Heart</description>
 		<year>1991</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3242,7 +3247,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="colourum" supported="yes">
+	<software name="colourum">
 		<description>Colour UMoria (v5.4.0)</description>
 		<year>1992</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3256,7 +3261,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<!-- boot OK -->
 	<!-- TBD: counter check contents of "other" folder with an anti-virus suite -->
-	<software name="corewars" supported="yes">
+	<software name="corewars">
 		<description>Core Wars (v1.17)</description>
 		<year>1990</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3268,7 +3273,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="creepie" supported="yes">
+	<software name="creepie">
 		<description>Creepie Crawlie 1 &amp; 2</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3306,7 +3311,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="dinosaw" supported="yes">
+	<software name="dinosaw">
 		<description>DinoSaw PD (v1.0)</description>
 		<year>1993</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3331,7 +3336,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="gyrinus2" supported="yes">
+	<software name="gyrinus2">
 		<description>Gyrinus II - Son of Gyrinus (v3.5)</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3351,7 +3356,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="hacker" supported="yes">
+	<software name="hacker">
 		<description>The Hacker (v3.05)</description>
 		<year>1993</year>
 		<publisher>DoggySoft</publisher>
@@ -3363,7 +3368,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="hackera" cloneof="hacker" supported="yes">
+	<software name="hackera" cloneof="hacker">
 		<description>The Hacker (Alt, v3.05)</description>
 		<year>1993</year>
 		<publisher>DoggySoft</publisher>
@@ -3405,7 +3410,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="lemings" supported="yes">
+	<software name="lemings">
 		<description>Lemings</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3430,7 +3435,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has minor RMW bug on second screen with text scroll -->
-	<software name="riscdrm" supported="yes">
+	<software name="riscdrm">
 		<description>RiscDream</description>
 		<year>1991</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3483,7 +3488,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="sysintd" supported="yes">
+	<software name="sysintd">
 		<description>System Interrupt Demos 1-5</description>
 		<year>1989</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -3509,7 +3514,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK -->
-	<software name="coconizr" supported="yes">
+	<software name="coconizr">
 		<description>Coconizer+ (v1.3)</description>
 		<year>1991</year>
 		<publisher>Playfield</publisher>

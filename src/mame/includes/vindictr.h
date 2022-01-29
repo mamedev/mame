@@ -10,17 +10,21 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
-class vindictr_state : public atarigen_state
+class vindictr_state : public driver_device
 {
 public:
 	vindictr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
@@ -36,17 +40,21 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(port1_r);
+	void scanline_interrupt();
+	void scanline_int_ack_w(uint16_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	uint16_t port1_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_vindictr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER( vindictr_paletteram_w );
+	void vindictr_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static const atari_motion_objects_config s_mob_config;
 	void main_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;

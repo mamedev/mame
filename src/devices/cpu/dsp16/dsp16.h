@@ -55,8 +55,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ose_r) { return m_ose_out; }
 
 	// high-level passive parallel I/O handlers
-	DECLARE_READ16_MEMBER(pio_r);
-	DECLARE_WRITE16_MEMBER(pio_w);
+	u16 pio_r();
+	void pio_w(u16 data);
 
 	// parallel I/O outputs
 	DECLARE_READ_LINE_MEMBER(psel_r) { return m_psel_out; }
@@ -81,9 +81,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface implementation
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) >> 1; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return cycles << 1; }
-	virtual u32 execute_input_lines() const override { return 5U; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) >> 1; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles << 1; }
+	virtual u32 execute_input_lines() const noexcept override { return 5U; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -105,7 +105,7 @@ protected:
 	// for specialisations to override
 	virtual void external_memory_enable(address_space &space, bool enable) = 0;
 
-	template <offs_t Base> DECLARE_READ16_MEMBER(external_memory_r);
+	template <offs_t Base> u16 external_memory_r(offs_t offset, u16 mem_mask = ~0);
 
 private:
 	// state registration indices
@@ -275,7 +275,7 @@ private:
 	// memory system access
 	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_pcache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_pcache;
 	u16                         m_workram_mask;
 
 	// recompiler stuff

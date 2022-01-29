@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER( ttl153_device::s1_w )
 	update_b();
 }
 
-WRITE8_MEMBER( ttl153_device::s_w )
+void ttl153_device::s_w(uint8_t data)
 {
 	m_s[0] = bool(BIT(data, 0));
 	m_s[1] = bool(BIT(data, 1));
@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER( ttl153_device::i3a_w )
 	update_a();
 }
 
-WRITE8_MEMBER( ttl153_device::ia_w )
+void ttl153_device::ia_w(uint8_t data)
 {
 	m_ia[0] = bool(BIT(data, 0));
 	m_ia[1] = bool(BIT(data, 1));
@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER( ttl153_device::i3b_w )
 	update_b();
 }
 
-WRITE8_MEMBER( ttl153_device::ib_w )
+void ttl153_device::ib_w(uint8_t data)
 {
 	m_ib[0] = bool(BIT(data, 0));
 	m_ib[1] = bool(BIT(data, 1));

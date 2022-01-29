@@ -32,15 +32,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 }
 
 
-WRITE8_MEMBER(fastlane_state::k007121_registers_w)
+void fastlane_state::k007121_registers_w(offs_t offset, uint8_t data)
 {
 	if (offset < 8)
-		m_k007121->ctrl_w(space, offset, data);
+		m_k007121->ctrl_w(offset, data);
 	else    /* scroll registers */
 		m_k007121_regs[offset] = data;
 }
 
-WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
+void fastlane_state::fastlane_bankswitch_w(uint8_t data)
 {
 	/* bits 0 & 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -58,24 +58,24 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 
-READ8_MEMBER(fastlane_state::fastlane_k1_k007232_r)
+uint8_t fastlane_state::fastlane_k1_k007232_r(offs_t offset)
 {
-	return m_k007232_1->read(space, offset ^ 1);
+	return m_k007232_1->read(offset ^ 1);
 }
 
-WRITE8_MEMBER(fastlane_state::fastlane_k1_k007232_w)
+void fastlane_state::fastlane_k1_k007232_w(offs_t offset, uint8_t data)
 {
-	m_k007232_1->write(space, offset ^ 1, data);
+	m_k007232_1->write(offset ^ 1, data);
 }
 
-READ8_MEMBER(fastlane_state::fastlane_k2_k007232_r)
+uint8_t fastlane_state::fastlane_k2_k007232_r(offs_t offset)
 {
-	return m_k007232_2->read(space, offset ^ 1);
+	return m_k007232_2->read(offset ^ 1);
 }
 
-WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
+void fastlane_state::fastlane_k2_k007232_w(offs_t offset, uint8_t data)
 {
-	m_k007232_2->write(space, offset ^ 1, data);
+	m_k007232_2->write(offset ^ 1, data);
 }
 void fastlane_state::fastlane_map(address_map &map)
 {
@@ -180,13 +180,13 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fastlane_state::volume_callback0)
+void fastlane_state::volume_callback0(uint8_t data)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE8_MEMBER(fastlane_state::volume_callback1)
+void fastlane_state::volume_callback1(uint8_t data)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);

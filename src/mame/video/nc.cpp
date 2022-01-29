@@ -69,7 +69,7 @@ uint32_t nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap,
 
 			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix16(y, x) = pens[(byte>>7) & 0x01];
+				bitmap.pix(y, x) = pens[(byte>>7) & 0x01];
 				byte = byte<<1;
 				x++;
 			}

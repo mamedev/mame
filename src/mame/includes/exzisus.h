@@ -37,10 +37,10 @@ private:
 	required_shared_ptr<uint8_t> m_objectram0;
 	required_shared_ptr<uint8_t> m_videoram0;
 
-	DECLARE_WRITE8_MEMBER(cpua_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cpub_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(cpub_reset_w);
+	void cpua_bankswitch_w(uint8_t data);
+	void cpub_bankswitch_w(uint8_t data);
+	void coincounter_w(uint8_t data);
+	void cpub_reset_w(uint8_t data);
 
 	virtual void machine_start() override;
 

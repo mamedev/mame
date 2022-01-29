@@ -37,7 +37,7 @@ protected:
 	virtual void abcbus_xmemw(offs_t offset, uint8_t data) override;
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 };
 
 

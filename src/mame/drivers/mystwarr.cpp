@@ -146,7 +146,7 @@ we have no way of knowing which is the later/corrected version.
 
 
 
-READ16_MEMBER(mystwarr_state::eeprom_r)
+uint16_t mystwarr_state::eeprom_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -158,7 +158,7 @@ READ16_MEMBER(mystwarr_state::eeprom_r)
 	return 0;
 }
 
-WRITE16_MEMBER(mystwarr_state::mweeprom_w)
+void mystwarr_state::mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -169,7 +169,7 @@ WRITE16_MEMBER(mystwarr_state::mweeprom_w)
 
 }
 
-READ16_MEMBER(mystwarr_state::dddeeprom_r)
+uint16_t mystwarr_state::dddeeprom_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -179,7 +179,7 @@ READ16_MEMBER(mystwarr_state::dddeeprom_r)
 	return ioport("P2")->read();
 }
 
-WRITE16_MEMBER(mystwarr_state::mmeeprom_w)
+void mystwarr_state::mmeeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -244,12 +244,12 @@ INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(mystwarr_state::sound_irq_w)
+void mystwarr_state::sound_irq_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE16_MEMBER(mystwarr_state::irq_ack_w)
+void mystwarr_state::irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_k056832->b_word_w(offset, data, mem_mask);
 
@@ -264,7 +264,7 @@ WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
+uint16_t mystwarr_state::k053247_scattered_word_r(offs_t offset)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -275,12 +275,12 @@ READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
+void mystwarr_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 	{
 //      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
-		COMBINE_DATA(m_spriteram+offset);
+		COMBINE_DATA(&m_spriteram[offset]);
 	}
 	else
 	{
@@ -377,15 +377,13 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
 	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
-	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
-	map(0x304000, 0x3041ff).ram();
+	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x6000);
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
 	map(0x330000, 0x331fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 // Martial Champion specific interfaces
-READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
+uint16_t mystwarr_state::k053247_martchmp_word_r(offs_t offset)
 {
 	if (offset & 0x0018)
 		return m_spriteram[offset];
@@ -396,11 +394,11 @@ READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
+void mystwarr_state::k053247_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0018)
 	{
-		COMBINE_DATA(m_spriteram+offset);
+		COMBINE_DATA(&m_spriteram[offset]);
 	}
 	else
 	{
@@ -410,13 +408,13 @@ WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
 	}
 }
 
-READ16_MEMBER(mystwarr_state::mccontrol_r)
+uint16_t mystwarr_state::mccontrol_r()
 {
 	// unknown, buggy watchdog reset code ?
 	return 0;
 }
 
-WRITE16_MEMBER(mystwarr_state::mccontrol_w)
+void mystwarr_state::mccontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -429,7 +427,7 @@ WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 //  else logerror("write %x to LSB of mccontrol\n", data);
 }
 
-WRITE16_MEMBER(mystwarr_state::mceeprom_w)
+void mystwarr_state::mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -537,7 +535,7 @@ void mystwarr_state::gaiapols_map(address_map &map)
 	map(0x48e000, 0x48e001).portr("IN0_P1");             // bit 3 (0x8) is test switch
 	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x660000, 0x66003f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
 	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
@@ -549,7 +547,7 @@ void mystwarr_state::gaiapols_map(address_map &map)
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
+void mystwarr_state::sound_ctrl_w(uint8_t data)
 {
 	if (!(data & 0x10))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -650,8 +648,8 @@ static INPUT_PORTS_START( metamrph )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -693,7 +691,7 @@ static INPUT_PORTS_START( viostorm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -932,7 +930,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	Z80(config, m_soundcpu, 8000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -957,14 +955,14 @@ void mystwarr_state::mystwarr(machine_config &config)
 	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback));
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
 	K055555(config, m_k055555, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -48, -24);
 	m_k055673->set_palette(m_palette);
 
@@ -1012,9 +1010,9 @@ void mystwarr_state::viostorm(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -62, -23);
 }
 
@@ -1039,9 +1037,9 @@ void mystwarr_state::metamrph(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 15, 15+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -51, -24);
 }
 
@@ -1068,9 +1066,9 @@ void mystwarr_state::dadandrn(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 17, 17+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -22);
 }
 
@@ -1100,9 +1098,9 @@ void mystwarr_state::gaiapols(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+376-1, 16, 16+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -61, -22); // stage2 brick walls
 }
 
@@ -1129,9 +1127,9 @@ void mystwarr_state::martchmp(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::martchmp_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::martchmp_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -58, -23);
 
 	config.device_remove("k054539_2");

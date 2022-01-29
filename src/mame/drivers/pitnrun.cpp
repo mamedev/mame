@@ -298,7 +298,7 @@ void pitnrun_state::pitnrun(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

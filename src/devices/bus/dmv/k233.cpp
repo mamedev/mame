@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K233 16K Shared RAM
@@ -43,6 +44,10 @@ dmv_k233_device::dmv_k233_device(const machine_config &mconfig, const char *tag,
 void dmv_k233_device::device_start()
 {
 	m_ram = machine().memory().region_alloc( "sharedram", 0x4000, 1, ENDIANNESS_LITTLE )->base();
+
+	// register for state saving
+	save_item(NAME(m_enabled));
+	save_pointer(NAME(m_ram), 0x4000);
 }
 
 //-------------------------------------------------

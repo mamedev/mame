@@ -21,16 +21,11 @@ public:
 	auto reset_cb() { return m_reset_cb.bind(); }
 
 	// host interface
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(uint8_t data);
+	uint8_t read();
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
 
-
-	DECLARE_WRITE8_MEMBER(nmk004_port4_w);
-	DECLARE_WRITE8_MEMBER(nmk004_oki0_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(nmk004_oki1_bankswitch_w);
-	DECLARE_READ8_MEMBER(nmk004_tonmk004_r);
-	DECLARE_WRITE8_MEMBER(nmk004_tomain_w);
+	void port4_w(uint8_t data);
 	void ym2203_irq_handler(int irq);
 
 	void nmk004_sound_mem_map(address_map &map);
@@ -47,6 +42,11 @@ private:
 
 	uint8_t to_nmk004;
 	uint8_t to_main;
+
+	void oki0_bankswitch_w(uint8_t data);
+	void oki1_bankswitch_w(uint8_t data);
+	uint8_t tonmk004_r();
+	void tomain_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(NMK004, nmk004_device)

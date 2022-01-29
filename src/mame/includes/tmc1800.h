@@ -59,9 +59,9 @@ public:
 		, m_vdc(*this, CDP1861_TAG)
 	{ }
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( dispoff_w );
+	void keylatch_w(uint8_t data);
+	uint8_t dispon_r();
+	void dispoff_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
@@ -77,7 +77,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cdp1861_device> m_vdc;
 	/* keyboard state */
@@ -94,7 +94,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
+	void keylatch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
@@ -119,18 +119,18 @@ public:
 	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_cti(*this, CDP1864_TAG)
-		, m_colorram(*this, "color_ram")
+		, m_colorram(*this, "color_ram", TMC2000_COLORRAM_SIZE, ENDIANNESS_LITTLE)
 		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 		, m_led(*this, "led1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -148,7 +148,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<cdp1864_device> m_cti;
-	optional_shared_ptr<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
 	output_finder<> m_led;
 
@@ -180,8 +180,8 @@ public:
 		TIMER_ID_EF4
 	};
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
@@ -195,7 +195,7 @@ public:
 	void nano_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

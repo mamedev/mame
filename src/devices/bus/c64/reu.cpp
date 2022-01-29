@@ -22,9 +22,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_REU1700, c64_reu1700_cartridge_device, "c64_1700reu", "1700 REU")
-DEFINE_DEVICE_TYPE(C64_REU1750, c64_reu1750_cartridge_device, "c64_1750reu", "1750 REU")
-DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "1764 REU")
+DEFINE_DEVICE_TYPE(C64_REU1700, c64_reu1700_cartridge_device, "c64_1700reu", "1700 RAM Expansion Unit")
+DEFINE_DEVICE_TYPE(C64_REU1750, c64_reu1750_cartridge_device, "c64_1750reu", "1750 RAM Expansion Unit")
+DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "1764 RAM Expansion Unit")
 
 
 //-------------------------------------------------
@@ -53,7 +53,7 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
 	m_eprom(*this, "rom"),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", ram_size, ENDIANNESS_LITTLE),
 	m_variant(variant),
 	m_jp1(jp1),
 	m_ram_size(ram_size)
@@ -76,9 +76,6 @@ c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config 
 
 void c64_reu_cartridge_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(m_ram_size);
-
 	// setup DMA controller
 	m_dmac->set_unscaled_clock(m_slot->phi2());
 	m_dmac->bs_w(m_jp1);

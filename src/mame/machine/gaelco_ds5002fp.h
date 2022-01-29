@@ -30,8 +30,8 @@ private:
 	address_space_config const m_hostmem_config;
 	address_space *m_hostmem;
 
-	DECLARE_READ8_MEMBER(hostmem_r);
-	DECLARE_WRITE8_MEMBER(hostmem_w);
+	uint8_t hostmem_r(offs_t offset);
+	void hostmem_w(offs_t offset, uint8_t data);
 };
 
 #endif // MAME_MACHINE_GAELCO_DS5002FP_H

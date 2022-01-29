@@ -7,13 +7,7 @@
 
 #pragma once
 
-#include "formats/flopimg.h"
-#include "softlist_dev.h"
-
-#define FLOPPY_0 "floppy0"
-#define FLOPPY_1 "floppy1"
-#define FLOPPY_2 "floppy2"
-#define FLOPPY_3 "floppy3"
+#include "formats/flopimg_legacy.h"
 
 #define FLOPPY_TYPE_REGULAR 0
 #define FLOPPY_TYPE_APPLE   1
@@ -108,35 +102,19 @@ public:
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
 	auto out_idx_cb() { return m_out_idx_func.bind(); }
 
-	static void add_4drives(machine_config &mconfig, const floppy_interface *config)
-	{
-		LEGACY_FLOPPY(mconfig, FLOPPY_0, 0, config);
-		LEGACY_FLOPPY(mconfig, FLOPPY_1, 0, config);
-		LEGACY_FLOPPY(mconfig, FLOPPY_2, 0, config);
-		LEGACY_FLOPPY(mconfig, FLOPPY_3, 0, config);
-	}
-
-	static void add_2drives(machine_config &mconfig, const floppy_interface *config)
-	{
-		LEGACY_FLOPPY(mconfig, FLOPPY_0, 0, config);
-		LEGACY_FLOPPY(mconfig, FLOPPY_1, 0, config);
-	}
-
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override;
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override;
-	virtual const char *file_extensions() const override { return m_extension_list; }
-	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override;
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override;
+	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
+	virtual const char *image_type_name() const noexcept override { return "floppydisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
+	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide(); }
 
 	floppy_image_legacy *flopimg_get_image();
 	void floppy_drive_set_geometry(floppy_type_t type);
@@ -159,11 +137,7 @@ public:
 	void floppy_drive_set_controller(device_t *controller);
 	int floppy_get_drive_type();
 	void floppy_set_type(int ftype);
-	WRITE_LINE_MEMBER( floppy_ds0_w );
-	WRITE_LINE_MEMBER( floppy_ds1_w );
-	WRITE_LINE_MEMBER( floppy_ds2_w );
-	WRITE_LINE_MEMBER( floppy_ds3_w );
-	WRITE8_MEMBER( floppy_ds_w );
+	WRITE_LINE_MEMBER( floppy_ds_w );
 	WRITE_LINE_MEMBER( floppy_mon_w );
 	WRITE_LINE_MEMBER( floppy_drtn_w );
 	WRITE_LINE_MEMBER( floppy_wtd_w );
@@ -195,6 +169,9 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override;
+
 	/* callbacks */
 	devcb_write_line m_out_idx_func;
 
@@ -212,8 +189,7 @@ protected:
 	int m_dskchg;     /* disk changed */
 
 	/* drive select logic */
-	int m_drive_id;
-	int m_active;
+	bool m_active;
 
 	const floppy_interface  *m_config;
 
@@ -246,9 +222,5 @@ protected:
 
 	char            m_extension_list[256];
 };
-
-legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive);
-legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
-int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
 
 #endif // MAME_DEVICES_IMAGEDV_FLOPDRV_H

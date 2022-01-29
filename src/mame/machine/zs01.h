@@ -27,7 +27,7 @@ public:
 	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// inline configuration helpers
-	void set_ds2401_tag( const char *ds2401_tag ) { m_ds2401_tag = ds2401_tag; }
+	template <typename T> void set_ds2401_tag( T &&tag ) { m_ds2401.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_cs );
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
@@ -73,7 +73,7 @@ private:
 	};
 
 	// internal state
-	const char *m_ds2401_tag;
+	optional_device<ds2401_device> m_ds2401;
 	optional_memory_region m_region;
 
 	int m_cs;
@@ -92,7 +92,6 @@ private:
 	uint8_t m_command_key[ 8 ];
 	uint8_t m_data_key[ 8 ];
 	uint8_t m_data[ 4096 ];
-	ds2401_device *m_ds2401;
 };
 
 

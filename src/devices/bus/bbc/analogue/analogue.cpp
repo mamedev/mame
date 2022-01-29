@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device, "bbc_analogue_sl
 //  device_bbc_analogue_interface - constructor
 //-------------------------------------------------
 
-device_bbc_analogue_interface::device_bbc_analogue_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_bbc_analogue_interface::device_bbc_analogue_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "bbcanalogue")
 {
 	m_slot = dynamic_cast<bbc_analogue_slot_device *>(device.owner());
 }
@@ -43,19 +43,12 @@ device_bbc_analogue_interface::device_bbc_analogue_interface(const machine_confi
 
 bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_ANALOGUE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_bbc_analogue_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_lpstb_handler(*this)
 {
 }
 
-
-void bbc_analogue_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_bbc_analogue_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_analogue_interface\n", carddev->tag(), carddev->name());
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -63,10 +56,7 @@ void bbc_analogue_slot_device::device_validity_check(validity_checker &valid) co
 
 void bbc_analogue_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_bbc_analogue_interface *>(get_card_device());
-	if (carddev && !m_card)
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_analogue_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_lpstb_handler.resolve_safe();
@@ -86,14 +76,6 @@ uint8_t bbc_analogue_slot_device::pb_r()
 		return m_card->pb_r();
 	else
 		return 0x30;
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_analogue_slot_device::device_reset()
-{
 }
 
 
@@ -120,5 +102,5 @@ void bbc_analogue_devices(device_slot_interface &device)
 	//device.option_add("micromike",   BBC_MICROMIKE);        /* Micro Mike */
 	device.option_add("voltmace3b",  BBC_VOLTMACE3B);       /* Voltmace Delta 3b "Twin" Joysticks */
 	//device.option_add("quinkey",     BBC_QUINKEY);          /* Microwriter Quinkey */
-	device.option_add("cfa3000a",    CFA3000_ANLG);         /* Hanson CFA 3000 Analogue */
+	device.option_add_internal("cfa3000a", CFA3000_ANLG);   /* Hanson CFA 3000 Analogue */
 }

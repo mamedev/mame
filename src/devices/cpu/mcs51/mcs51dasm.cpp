@@ -360,6 +360,295 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8xc751_names[] = {
 	{ -1 }
 };
 
+const mcs51_disassembler::mem_info mcs51_disassembler::ds80c320_names[] = {
+	{  0x84, "dpl1"   },
+	{  0x85, "dph1"   },
+	{  0x86, "dps"    },
+	{  0x8e, "ckcon"  },
+	{  0x91, "exif"   },
+	{  0x98, "scon0"  },
+	{  0x99, "sbuf0"  },
+	{  0xa9, "saddr0" },
+	{  0xaa, "saddr1" },
+	{  0xb9, "saden0" },
+	{  0xba, "saden1" },
+	{  0xc0, "scon1"  },
+	{  0xc1, "sbuf1"  },
+	{  0xc5, "status" },
+	{  0xc7, "ta"     },
+	{  0xc9, "t2mod"  },
+	{  0xd8, "wdcon"  },
+	{  0xe8, "eie"    },
+	{  0xf8, "eip"    },
+
+	{ 0x198, "sm0_0"  },
+	{ 0x199, "sm1_0"  },
+	{ 0x19a, "sm2_0"  },
+	{ 0x19b, "ren_0"  },
+	{ 0x19c, "tb8_0"  },
+	{ 0x19d, "rb8_0"  },
+	{ 0x19e, "ti_0"   },
+	{ 0x19f, "ri_0"   },
+
+	{ 0x1ac, "es0"    },
+	{ 0x1ae, "es1"    },
+
+	{ 0x1bc, "ps0"    },
+	{ 0x1be, "ps1"    },
+
+	{ 0x1c0, "sm0_1"  },
+	{ 0x1c1, "sm1_1"  },
+	{ 0x1c2, "sm2_1"  },
+	{ 0x1c3, "ren_1"  },
+	{ 0x1c4, "tb8_1"  },
+	{ 0x1c5, "rb8_1"  },
+	{ 0x1c6, "ti_1"   },
+	{ 0x1c7, "ri_1"   },
+
+	{ 0x1d5, "f1"     },
+
+	{ 0x1d8, "rwt"    },
+	{ 0x1d9, "ewt"    },
+	{ 0x1da, "wtrf"   },
+	{ 0x1db, "wdif"   },
+	{ 0x1dc, "pf1"    },
+	{ 0x1dd, "epf1"   },
+	{ 0x1de, "por"    },
+	{ 0x1df, "smod_1" },
+
+	{ 0x1e8, "ex2"    },
+	{ 0x1e9, "ex3"    },
+	{ 0x1ea, "ex4"    },
+	{ 0x1eb, "ex5"    },
+	{ 0x1ec, "ewdi"   },
+	{ 0x1ed, "eie.5"  },
+	{ 0x1ee, "eie.6"  },
+	{ 0x1ef, "eie.7"  },
+
+	{ 0x1f8, "px2"    },
+	{ 0x1f9, "px3"    },
+	{ 0x1fa, "px4"    },
+	{ 0x1fb, "px5"    },
+	{ 0x1fc, "pwdi"   },
+	{ 0x1fd, "eip.5"  },
+	{ 0x1fe, "eip.6"  },
+	{ 0x1ff, "eip.7"  },
+
+	{ -1 }
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::sab80515_names[] = {
+	{  0xa8, "ien0"   },
+	{  0xa9, "ip0"    },
+	{  0xb8, "ien1"   },
+	{  0xb9, "ip1"    },
+	{  0xc0, "ircon"  },
+	{  0xc1, "ccen"   },
+	{  0xc2, "ccl1"   },
+	{  0xc3, "cch1"   },
+	{  0xc4, "ccl2"   },
+	{  0xc5, "cch2"   },
+	{  0xc6, "ccl3"   },
+	{  0xc7, "cch3"   },
+	{  0xc8, "t2con"  },
+	{  0xca, "crcl"   },
+	{  0xcb, "crch"   },
+	{  0xcc, "tl2"    },
+	{  0xcd, "th2"    },
+	{  0xd8, "adcon"  },
+	{  0xd9, "addat"  },
+	{  0xda, "dapr"   },
+	{  0xe8, "p4"     },
+	{  0xf8, "p5"     },
+
+	{ 0x190, "cc0"    },
+	{ 0x191, "cc1"    },
+	{ 0x192, "cc2"    },
+	{ 0x193, "cc3"    },
+	{ 0x194, "int2"   },
+	{ 0x195, "t2ex"   },
+	{ 0x196, "clkout" },
+	{ 0x197, "t2"     },
+
+	{ 0x1ad, "et2"    },
+	{ 0x1ae, "wdt"    },
+
+	{ 0x1b8, "eadc"   },
+	{ 0x1b9, "ex2"    },
+	{ 0x1ba, "ex3"    },
+	{ 0x1bb, "ex4"    },
+	{ 0x1bc, "ex5"    },
+	{ 0x1bd, "ex6"    },
+	{ 0x1be, "swdt"   },
+	{ 0x1bf, "exen2"  },
+
+	{ 0x1c0, "iadc"   },
+	{ 0x1c1, "iex2"   },
+	{ 0x1c2, "iex3"   },
+	{ 0x1c3, "iex4"   },
+	{ 0x1c4, "iex5"   },
+	{ 0x1c5, "iex6"   },
+	{ 0x1c6, "tf2"    },
+	{ 0x1c7, "exf2"   },
+
+	{ 0x1c8, "t2i0"   },
+	{ 0x1c9, "t2i1"   },
+	{ 0x1ca, "t2cm"   },
+	{ 0x1cb, "t2r0"   },
+	{ 0x1cc, "t2r1"   },
+	{ 0x1cd, "i2fr"   },
+	{ 0x1ce, "i3fr"   },
+	{ 0x1cf, "t2ps"   },
+
+	{ 0x1d8, "mx0"    },
+	{ 0x1d9, "mx1"    },
+	{ 0x1da, "mx2"    },
+	{ 0x1db, "adm"    },
+	{ 0x1dc, "bsy"    },
+	{ 0x1dd, "adex"   },
+	{ 0x1de, "clk"    },
+	{ 0x1df, "bd"     },
+
+	{ -1 }
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::sab80c515_names[] = {
+	{  0xdb, "p6"     },
+
+	{ -1 }
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::rupi44_names[] = {
+	{  0x00, "rb0r0" },
+	{  0x01, "rb0r1" },
+	{  0x02, "rb0r2" },
+	{  0x03, "rb0r3" },
+	{  0x04, "rb0r4" },
+	{  0x05, "rb0r5" },
+	{  0x06, "rb0r6" },
+	{  0x07, "rb0r7" },
+	{  0x08, "rb1r0" },
+	{  0x09, "rb1r1" },
+	{  0x0a, "rb1r2" },
+	{  0x0b, "rb1r3" },
+	{  0x0c, "rb1r4" },
+	{  0x0d, "rb1r5" },
+	{  0x0e, "rb1r6" },
+	{  0x0f, "rb1r7" },
+	{  0x10, "rb2r0" },
+	{  0x11, "rb2r1" },
+	{  0x12, "rb2r2" },
+	{  0x13, "rb2r3" },
+	{  0x14, "rb2r4" },
+	{  0x15, "rb2r5" },
+	{  0x16, "rb2r6" },
+	{  0x17, "rb2r7" },
+	{  0x18, "rb3r0" },
+	{  0x19, "rb3r1" },
+	{  0x1a, "rb3r2" },
+	{  0x1b, "rb3r3" },
+	{  0x1c, "rb3r4" },
+	{  0x1d, "rb3r5" },
+	{  0x1e, "rb3r6" },
+	{  0x1f, "rb3r7" },
+
+	{  0x80, "p0"    },
+	{  0x81, "sp"    },
+	{  0x82, "dpl"   },
+	{  0x83, "dph"   },
+	{  0x87, "pcon"  },
+	{  0x88, "tcon"  },
+	{  0x89, "tmod"  },
+	{  0x8a, "tl0"   },
+	{  0x8b, "tl1"   },
+	{  0x8c, "th0"   },
+	{  0x8d, "th1"   },
+	{  0x90, "p1"    },
+	{  0xa0, "p2"    },
+	{  0xa8, "ie"    },
+	{  0xb0, "p3"    },
+	{  0xb8, "ip"    },
+	{  0xc8, "sts"   },
+	{  0xc9, "smd"   },
+	{  0xca, "rcb"   },
+	{  0xcb, "rbl"   },
+	{  0xcc, "rbs"   },
+	{  0xcd, "rfl"   },
+	{  0xce, "stad"  },
+	{  0xd0, "psw"   },
+	{  0xd8, "nsnr"  },
+	{  0xda, "tcb"   },
+	{  0xdb, "tbl"   },
+	{  0xdc, "tbc"   },
+	{  0xe0, "acc"   },
+	{  0xf0, "b"     },
+
+	{ 0x188, "it0"   },
+	{ 0x189, "ie0"   },
+	{ 0x18a, "it1"   },
+	{ 0x18b, "ie1"   },
+	{ 0x18c, "tr0"   },
+	{ 0x18d, "tf0"   },
+	{ 0x18e, "tr1"   },
+	{ 0x18f, "tf1"   },
+
+	{ 0x1a8, "ex0"   },
+	{ 0x1a9, "et0"   },
+	{ 0x1aa, "ex1"   },
+	{ 0x1ab, "et1"   },
+	{ 0x1ac, "es"    },
+	{ 0x1ad, "ie.5"  },
+	{ 0x1ae, "ie.6"  },
+	{ 0x1af, "ea"    },
+
+	{ 0x1b0, "io"    },
+	{ 0x1b1, "data"  },
+	{ 0x1b2, "int0"  },
+	{ 0x1b3, "int1"  },
+	{ 0x1b4, "t0"    },
+	{ 0x1b5, "t1"    },
+	{ 0x1b6, "wr"    },
+	{ 0x1b7, "rd"    },
+
+	{ 0x1b8, "px0"   },
+	{ 0x1b9, "pt0"   },
+	{ 0x1ba, "px1"   },
+	{ 0x1bb, "pt1"   },
+	{ 0x1bc, "ps"    },
+	{ 0x1bd, "ip.5"  },
+	{ 0x1be, "ip.6"  },
+	{ 0x1bf, "ip.7"  },
+
+	{ 0x1c8, "rbp"   },
+	{ 0x1c9, "am"    },
+	{ 0x1ca, "opb"   },
+	{ 0x1cb, "bov"   },
+	{ 0x1cc, "si"    },
+	{ 0x1cd, "rts"   },
+	{ 0x1ce, "rbe"   },
+	{ 0x1cf, "tbf"   },
+
+	{ 0x1d0, "p"     },
+	{ 0x1d1, "psw.1" },
+	{ 0x1d2, "ov"    },
+	{ 0x1d3, "rs0"   },
+	{ 0x1d4, "rs1"   },
+	{ 0x1d5, "f0"    },
+	{ 0x1d6, "ac"    },
+	{ 0x1d7, "cy"    },
+
+	{ 0x1d8, "ser"   },
+	{ 0x1d9, "nr0"   },
+	{ 0x1da, "nr1"   },
+	{ 0x1db, "nr2"   },
+	{ 0x1dc, "ses"   },
+	{ 0x1dd, "ns0"   },
+	{ 0x1de, "ns1"   },
+	{ 0x1df, "ns2"   },
+
+	{ -1 }
+};
+
 mcs51_disassembler::mcs51_disassembler()
 {
 }
@@ -1264,5 +1553,21 @@ i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(default_name
 }
 
 ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, ds5002fp_names, i8xc751_names)
+{
+}
+
+ds80c320_disassembler::ds80c320_disassembler() : mcs51_disassembler(default_names, i8052_names, ds80c320_names)
+{
+}
+
+sab80515_disassembler::sab80515_disassembler() : mcs51_disassembler(default_names, sab80515_names)
+{
+}
+
+sab80c515_disassembler::sab80c515_disassembler() : mcs51_disassembler(default_names, sab80515_names, sab80c515_names)
+{
+}
+
+rupi44_disassembler::rupi44_disassembler() : mcs51_disassembler(rupi44_names)
 {
 }

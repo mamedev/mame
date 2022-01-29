@@ -27,11 +27,11 @@
 #pragma once
 
 
-void a1000_expansion_cards(device_slot_interface &device);
-void a500_expansion_cards(device_slot_interface &device);
-void a2000_expansion_cards(device_slot_interface &device);
+void a1000_expansion_cards(device_slot_interface &device) ATTR_COLD;
+void a500_expansion_cards(device_slot_interface &device) ATTR_COLD;
+void a2000_expansion_cards(device_slot_interface &device) ATTR_COLD;
 
-void zorro2_cards(device_slot_interface &device);
-void zorro3_cards(device_slot_interface &device);
+void zorro2_cards(device_slot_interface &device) ATTR_COLD;
+void zorro3_cards(device_slot_interface &device) ATTR_COLD;
 
 #endif // MAME_BUS_AMIGA_ZORRO_CARDS_H

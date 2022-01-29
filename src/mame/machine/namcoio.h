@@ -14,8 +14,8 @@ public:
 	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
 	template <unsigned N> auto out_callback() { return m_out_cb[N].bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	WRITE_LINE_MEMBER( set_reset_line );
 	READ_LINE_MEMBER( read_reset_line );
@@ -38,16 +38,16 @@ protected:
 	// internal state
 	uint8_t          m_ram[16];
 
-	devcb_read8 m_in_cb[4];
-	devcb_write8 m_out_cb[2];
+	devcb_read8::array<4> m_in_cb;
+	devcb_write8::array<2> m_out_cb;
 
 	int            m_reset;
-	int32_t          m_lastcoins, m_lastbuttons;
-	int32_t          m_credits;
-	int32_t          m_coins[2];
-	int32_t          m_coins_per_cred[2];
-	int32_t          m_creds_per_coin[2];
-	int32_t          m_in_count;
+	int32_t        m_lastcoins, m_lastbuttons;
+	int32_t        m_credits;
+	int32_t        m_coins[2];
+	int32_t        m_coins_per_cred[2];
+	int32_t        m_creds_per_coin[2];
+	int32_t        m_in_count;
 
 	void handle_coins( int swap );
 

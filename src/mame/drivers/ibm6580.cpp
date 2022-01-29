@@ -9,7 +9,7 @@ disks. It could have up to 224k of ram.  Consists of:
     Electronics Module 6580
     Display 3300
     Keyboard 5330 [a "beamspring"-type]
-    Dual Diskette Unit 6360
+    Diskette Unit 6360
 Optional:
     Printers: 5215, 5218, 5228
     Printer Sharing feature
@@ -18,7 +18,8 @@ Optional:
     66-line display and adapter (800x1056 px, 8x16 character cell)
 
 
-All chips have IBM part numbers on them.  F.e. on system board:
+    All chips have IBM part numbers on them.  F.e. on system board:
+
     8493077 - 8086
     4178619 - 8251A
     4178617 - 8257-5
@@ -27,7 +28,14 @@ All chips have IBM part numbers on them.  F.e. on system board:
     4178625 - 8253-5
 
 
-IRQ levels per PSM p. 6-5
+    Useful parts of PSM Feb83 (document / PDF page numbers):
+
+    - 6-3/87 -- bus buffers ... separate ... into four sections during BAT
+    - 6-5/89 -- irq levels
+    - 6-6/90 -- timer tick is 50ms
+
+    IRQ levels:
+
     0   incoming data for printer sharing/3277 DE
     1   transfer data to commo data link
     2   printer and mag card data xfer
@@ -36,10 +44,11 @@ IRQ levels per PSM p. 6-5
     5   (not in use)
     6   software timer [50 ms period]
     7   error on commo data link
-    nmi "or when a dump switch operation is initiated" ["memory record" button]
+    NMI "when a dump switch operation is initiated" ["memory record" button]
 
 
 To do:
+
 - verify all frequency sources, document ROM revisions
 - memory size options
 - bus errors, interrupts
@@ -47,13 +56,12 @@ To do:
 - 92-key keyboard variant, keyboard click/beep, keyboard layouts
 
 - 25-line video board (instant scroll, sub/superscripts, graphics mode)
-- 66-line video board
+- 66-line video board (apparently requires 'new' ROM)
 
-- either emulate floppy board, or complete its HLE (drive select, etc.)
-- add support for 8" drives with no track 0 sensor
-  (recalibrate command is expected to return 0x70 in ST0)
-- double density floppies
+- floppy adapter board, single and double density floppies
 - "memory record" (system dump) generation to floppies
+- printer
+- speaker
 
 - pass BAT with no errors (Basic Assurance Test)
 - pass RNA with no errors (Resident Non-Automatic Test)
@@ -79,6 +87,64 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 "IBM Displaywriter System Printer Guide," Order No. S544-0861-2, Copyright 1980.
 "Displaywriter System Product Support Manual," Order No. S241-6248-1, Copyright 1980
 
+
+Notes on floppy drive:
+
+    Diskette Unit 6360 models -010, -011 have Type 1D (SS/SD) drives;
+    models -020, -021 -- Type 2D (DS/DD).  Each drive has "file control card".
+
+
+    Useful parts of PSM Feb83 (pdf page numbers):
+
+    - 6-7/91 -- brief description
+    - 7-14..20/116..122 -- more detailed description
+    - 8-13/161 -- S1 (internal diskette signal cable), system board side
+    - 8-16/164 -- 5 (internal diskette signal cable), panel side
+    - 8-32/180 -- B1 (diskette signal cable), diskette adapter side
+    - 9-10..12/202..204 -- description of RNA tests
+
+
+    S1 connector has more signals than B1.  Only these are present in B1:
+
+    Address Bit 1-4 -- from host
+    Data Bus Bit 0-7 -- bidirectional
+    Interrupt 4 -- to host
+    I/O Read -- from host
+    I/O Write -- from host
+    DMA Request -- to host
+    DMA Acknowledge -- from host
+    Terminal Count -- from host
+    Interface Ready -- to host
+    Diskette Select -- from host
+
+
+    Signals between adapter board and file control cards:
+
+    from/to 765:
+
+    write data, inner tracks, write gate, erase gate ->
+    write/erase enable, file data <-
+
+    from/to MCU:
+
+    drive present -> ground
+    diskette sense <- always ground on 1D; 2D disk index hole sends +5V
+    head engage ->
+    index (1.5 to 3.0 ms pulse) <-
+    select head, switch filter (2D drive) ->
+
+
+    RNA test L performs in the following sequence:
+
+    1. PORs the Diskette Adapter Cards
+    2. Samples the Diskette Index Pulse
+    3. Checks the Drive Set Ready Signal
+    4. Engages the Read/Write Head
+    5. Checks the Write/Erase Enable Line (This ensures the system will not write on the customer's diskette.)
+    6. Reads the Track ID
+    7. Disengages the Head.
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -98,6 +164,7 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "ibm6580.lh"
 
@@ -144,57 +211,58 @@ public:
 		, m_screen(*this, "screen")
 		, m_kbd(*this, "kbd")
 		, m_fdc(*this, UPD765_TAG)
-		, m_flop0(*this, UPD765_TAG ":0")
-		, m_flop1(*this, UPD765_TAG ":1")
+		, m_flop(*this, UPD765_TAG ":%u", 0U)
 		, m_p_chargen(*this, "chargen")
+		, m_leds(*this, "led%u", 5U)
 	{ }
 
 	void ibm6580(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void ibm6580_palette(palette_device &palette) const;
+	void pic_latch_w(uint16_t data);
+	void unk_latch_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(pic_latch_w);
-	DECLARE_WRITE16_MEMBER(unk_latch_w);
+	void p40_w(offs_t offset, uint8_t data);
+	uint8_t p40_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(p40_w);
-	DECLARE_READ8_MEMBER(p40_r);
+	void gate_open_w(offs_t offset, uint8_t data);
+	void gate_close_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(video_r);
+	void video_w(offs_t offset, uint8_t data);
+	uint8_t video_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-	DECLARE_READ8_MEMBER(ppi_c_r);
+	uint8_t kb_data_r();
+	void led_w(uint8_t data);
+	void ppi_c_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_clock_w_internal);
 	DECLARE_WRITE_LINE_MEMBER(kb_strobe_w);
 
-	DECLARE_WRITE8_MEMBER(floppy_w);
-	DECLARE_READ8_MEMBER(floppy_r);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	void floppy_w(offs_t offset, uint8_t data);
+	uint8_t floppy_r(offs_t offset);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(floppy_intrq);
 	DECLARE_WRITE_LINE_MEMBER(floppy_hdl);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	uint8_t m_p40, m_p50, m_e000, m_kb_data, m_ppi_c;
-	bool m_kb_data_bit, m_kb_strobe;
-	util::fifo<uint8_t, 4> m_kb_fifo;
+	uint16_t m_gate;
+	uint8_t m_p40, m_p4a, m_p50, m_e000;
+	uint8_t m_kb_data, m_ppi_c, m_led_state;
+	bool m_kb_data_bit, m_kb_strobe, m_kb_clock;
 
 	util::fifo<uint8_t, 4> m_floppy_mcu_sr, m_floppy_mcu_cr;
 	int m_floppy_mcu_cr_fifo;
@@ -216,15 +284,15 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<dw_keyboard_device> m_kbd;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_flop0;
-	required_device<floppy_connector> m_flop1;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_region_ptr<u8> m_p_chargen;
+	output_finder<4> m_leds;
 };
 
 
-WRITE8_MEMBER(ibm6580_state::p40_w)
+void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 {
-	LOG("___ %02x <- %02x\n", 0x40 + (offset << 1), data);
+	LOG("___ %02x(%d) <- %02x\n", 0x40 + (offset << 1), offset, data);
 
 	switch (offset)
 	{
@@ -237,6 +305,16 @@ WRITE8_MEMBER(ibm6580_state::p40_w)
 			m_p40 |= 4;
 		break;
 
+	case 3:
+		m_dma8257->dreq0_w(BIT(data, 0));
+		m_dma8257->dreq1_w(BIT(data, 1));
+		m_dma8257->dreq2_w(BIT(data, 2));
+		break;
+
+	case 4:
+		m_dma8257->dreq3_w(BIT(data, 0));
+		break;
+
 	case 5:
 		// write_gate0 doesn't work -- counter is read back as 0
 		if (BIT(data, 2))
@@ -244,8 +322,8 @@ WRITE8_MEMBER(ibm6580_state::p40_w)
 			m_pit8253->set_clockin(0, (double)26880000);
 		else
 			m_pit8253->set_clockin(0, 0.0);
+		m_p4a = data;
 		m_p50 = 0;
-		m_ppi_c = data;
 		break;
 
 	case 6:
@@ -263,7 +341,7 @@ WRITE8_MEMBER(ibm6580_state::p40_w)
 	}
 }
 
-READ8_MEMBER(ibm6580_state::p40_r)
+uint8_t ibm6580_state::p40_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -285,32 +363,65 @@ READ8_MEMBER(ibm6580_state::p40_r)
 	return data;
 }
 
-WRITE8_MEMBER(ibm6580_state::video_w)
+void ibm6580_state::gate_open_w(offs_t offset, uint8_t data)
+{
+	LOG("___ %02x(%d) <- %02x\n", 0x60 + (offset << 1), offset, data);
+
+	m_gate |= (1 << offset);
+
+	switch (offset)
+	{
+	case 10:
+		m_kbd->reset_w(1);
+		break;
+	}
+}
+
+void ibm6580_state::gate_close_w(offs_t offset, uint8_t data)
+{
+	LOG("___ %04x(%d) <- %02x\n", 0x8060 + (offset << 1), offset, data);
+
+	m_gate &= ~(1 << offset);
+
+	switch (offset)
+	{
+	case 10:
+		m_kbd->reset_w(0);
+		break;
+	}
+}
+
+void ibm6580_state::video_w(offs_t offset, uint8_t data)
 {
 	LOG("Video %02x <- %02x\n", 0xe000 + (offset << 1), data);
 
 	switch (offset)
 	{
+	// some kind of gate
 	case 2:
-		// some kind of gate
-		m_e000 = data;
+		m_e000 = true;
+		break;
+
+	case 4:
+		m_e000 = false;
 		break;
 	}
 }
 
-READ8_MEMBER(ibm6580_state::video_r)
+uint8_t ibm6580_state::video_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	switch (offset)
 	{
 	case 8:
-		data = 1;   // 25-line video board ID.  66-line is 0x40.
-		data |= (m_screen->hblank() ? 8 : 0);
-		data |= (m_screen->vblank() ? 4 : 0);
-		// pure guesswork.  0x2, 0x10 and 0x20 are unknown video signals.
-		// 0x20 cannot be zero when 0x10 is zero.
-		data |= ((m_screen->vpos() < 2) ? 2 : 0);
+		// 25-line video board ID.  66-line is 0x40.
+		data = 1;
+		// pure guesswork.  0x20 cannot be zero when 0x10 is zero.  0x2 is unknown, may be vsync.
+		data |= (m_screen->hblank() ? 4 : 0);
+		data |= (m_screen->vblank() ? 8 : 0);
+		data |= ((m_screen->frame_number() & 1) ? 6 : 0);
+		data |= ((m_screen->vpos() > 196) ? 0x80 : 0);
 		if (m_e000) {
 			data |= (m_screen->vblank() ? 0x20 : 0);
 			data |= (m_screen->vblank() ? 0 : 0x10);
@@ -329,11 +440,10 @@ WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 //  if (state)
 //      m_pic8259->ir6_w(state);
 
-	if (ioport("DUMP")->read())
-		m_p40 |= 4;
+	m_p40 |= m_kbd->memory_record_r();
 }
 
-WRITE16_MEMBER(ibm6580_state::pic_latch_w)
+void ibm6580_state::pic_latch_w(uint16_t data)
 {
 	LOG("PIC latch <- %02x\n", data);
 
@@ -350,23 +460,32 @@ WRITE16_MEMBER(ibm6580_state::pic_latch_w)
 	m_pic8259->ir7_w(data == 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(ibm6580_state::unk_latch_w)
+void ibm6580_state::unk_latch_w(uint16_t data)
 {
 	LOG("UNK latch <- %02x\n", data);
 
 	m_p40 |= 0x10;
 }
 
-WRITE8_MEMBER(ibm6580_state::led_w)
+void ibm6580_state::led_w(uint8_t data)
 {
-	output().set_value("led5", BIT(data, 7));
-	output().set_value("led6", BIT(data, 6));
-	output().set_value("led7", BIT(data, 5));
-	output().set_value("led8", BIT(data, 4));
+	for (int i = 0; i < 4; i++)
+		m_leds[i] = BIT(data, 7 - i);
+
+	if (!BIT(m_p4a, 0))
+	{
+		kb_clock_w_internal(BIT(data, 1));
+	}
 
 	if (data & 0xf)
 		return;
 
+	if (data == m_led_state)
+		return;
+
+	m_led_state = data;
+
+#ifdef VERBOSE
 	switch (data >> 4)
 	{
 	case 0x1:
@@ -417,62 +536,87 @@ WRITE8_MEMBER(ibm6580_state::led_w)
 //      printf ("LED 0x%08x: unknown\n", data);
 		break;
 	}
+#endif
 }
 
-WRITE8_MEMBER(ibm6580_state::ppi_c_w)
+void ibm6580_state::ppi_c_w(uint8_t data)
 {
-	LOG("PPI Port C <- %02x\n", data);
+	uint8_t diff = m_ppi_c ^ data;
 
-	// bit 5 -- acknowledge
-	// bit 6 -- reset
-	// bit 7 -- ?? gate
+	LOGKBD("PPI Port C %02x <- %02x\n", m_ppi_c, data);
 
-	if (!BIT(data, 6)) {
-		m_kb_fifo.clear();
+	m_ppi_c = data;
+
+	// bit 3 -- mode 1 INTR.A out
+	// bit 4 -- mode 1 INTE
+	// bit 5 -- mode 1 IBF.A out
+	// bit 6 -- I/O out = reset || to data input of keyboard shift register
+	// bit 7 -- I/O out = invert bit 6
+
+	// normal operation
+	if (BIT(m_p4a, 0))
+	{
+		// Port A IBF bit
+		m_kbd->ack_w(BIT(data, 5));
+
+		// 0 = reset
+		m_kbd->reset_w(BIT(data, 6));
+
+		return;
 	}
 
-	m_kbd->reset_w(!BIT(data, 6));
-	m_kbd->ack_w(BIT(data, 5));
+	// self-tests
+	m_kb_data_bit = BIT(data, 6) ^ !BIT(m_ppi_c, 7);
+	if (BIT(diff, 6)) m_ppi8255->pc4_w(!m_kb_data_bit);
 }
 
-READ8_MEMBER(ibm6580_state::ppi_c_r)
+uint8_t ibm6580_state::kb_data_r()
 {
-	uint8_t data = 0;
+	uint8_t data = m_kb_data;
 
-	data |= (m_kb_strobe << 3);
-
-	LOGDBG("PPI Port C == %02x\n", data);
-
-	return data;
-}
-
-READ8_MEMBER(ibm6580_state::ppi_a_r)
-{
-	uint8_t data = m_kb_fifo.dequeue();
-
-	LOG("PPI Port A == %02x (fifo full: %d)\n", data, m_kb_fifo.full());
+	LOGKBD("PPI Port A == %02x\n", data);
 
 	return data;
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_data_w)
 {
+	if (!BIT(m_p4a, 0)) return;
+
 	m_kb_data_bit = !state;
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w)
 {
+	if (!BIT(m_p4a, 0)) return;
+
+	kb_clock_w_internal(state);
+}
+
+WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w_internal)
+{
+	if (m_kb_clock == state) return;
+	m_kb_clock = state;
+
 	if (!state)
+	{
 		m_kb_data = (m_kb_data >> 1) | (m_kb_data_bit << 7);
+		LOGKBD("Kbd clock %d data %d -> %02x\n", state, m_kb_data_bit, m_kb_data);
+	}
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
 {
-	m_kb_strobe = !state;
-	if (!state && BIT(m_ppi_c, 0)) {
-		m_kb_fifo.enqueue(m_kb_data);
-		LOGKBD("Kbd enqueue %02x (fifo full: %d, m_ppi_c %02x)\n", m_kb_data, m_kb_fifo.full(), m_ppi_c);
+	if (!BIT(m_p4a, 0)) return;
+
+	if (m_kb_strobe != state)
+	LOGKBD("Kbd strobe %d data %02x\n", state, m_kb_data);
+	m_kb_strobe = state;
+	if (!state)
+	{
+		LOGKBD("Kbd enqueue %02x (m_ppi_c %02x)\n", m_kb_data, m_ppi_c);
 	}
+	m_ppi8255->pc4_w(m_kb_strobe);
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::floppy_intrq)
@@ -488,13 +632,13 @@ WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(ibm6580_state::memory_read_byte)
+uint8_t ibm6580_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(ibm6580_state::memory_write_byte)
+void ibm6580_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
@@ -536,8 +680,8 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	// 1 byte -- get status?
 	case 5:
 		m_floppy_mcu_sr.enqueue(0x00);
-		if (m_flop0->get_device()->exists())
-			m_floppy_mcu_sr.enqueue( m_flop0->get_device()->idx_r() ? 0x08 : 0);
+		if (m_flop[0]->get_device()->exists())
+			m_floppy_mcu_sr.enqueue( m_flop[0]->get_device()->idx_r() ? 0x08 : 0);
 		else
 			m_floppy_mcu_sr.enqueue(0x08);
 		break;
@@ -567,10 +711,10 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	case 0xd:
 		m_floppy_mcu_sr.enqueue(0x00);
 		i = 0;
-		if (m_flop0->get_device()->exists())
-			i |= m_flop0->get_device()->ready_r() ? 0 : 0x40;
-		if (m_flop1->get_device()->exists())
-			i |= m_flop1->get_device()->ready_r() ? 0 : 0x80;
+		if (m_flop[0]->get_device()->exists())
+			i |= m_flop[0]->get_device()->ready_r() ? 0 : 0x40;
+		if (m_flop[1]->get_device()->exists())
+			i |= m_flop[1]->get_device()->ready_r() ? 0 : 0x80;
 		m_floppy_mcu_sr.enqueue(i);
 		break;
 
@@ -580,9 +724,9 @@ uint8_t ibm6580_state::floppy_mcu_command()
 		i = m_floppy_mcu_cr.dequeue();
 #if 1
 		if (i & 1)
-			m_fdc->set_floppy(m_flop0->get_device());
+			m_fdc->set_floppy(m_flop[0]->get_device());
 		else if (i & 2)
-			m_fdc->set_floppy(m_flop1->get_device());
+			m_fdc->set_floppy(m_flop[1]->get_device());
 #endif
 		break;
 
@@ -601,7 +745,7 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	return data;
 }
 
-WRITE8_MEMBER(ibm6580_state::floppy_w)
+void ibm6580_state::floppy_w(offs_t offset, uint8_t data)
 {
 	LOG("Floppy %02x <- %02x\n", 0x8150 + (offset << 1), data);
 
@@ -631,7 +775,7 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 	}
 }
 
-READ8_MEMBER(ibm6580_state::floppy_r)
+uint8_t ibm6580_state::floppy_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -662,7 +806,7 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 	if (offset)
 		LOG("Floppy %02x == %02x\n", 0x8150 + (offset << 1), data);
 	else {
-		floppy_image_device *f = m_flop0->get_device();
+		floppy_image_device *f = m_flop[0]->get_device();
 
 		if (f)
 			LOG("Floppy %02x == %02x (empty %d hdl %d + idle %d irq %d drq %d + dskchg %d idx %d cyl %d)\n",
@@ -696,14 +840,14 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x0010, 0x0017).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0020, 0x003f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
 	map(0x0040, 0x005f).rw(FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
-	map(0x0070, 0x007f).unmaprw();
+	map(0x0060, 0x007f).w(FUNC(ibm6580_state::gate_open_w)).umask16(0xff);
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0140, 0x0143).rw("upd8251a", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0160, 0x0163).rw("upd8251b", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x4000, 0x400f).unmaprw();
 	map(0x5000, 0x500f).unmaprw();
 	map(0x6000, 0x601f).unmaprw();
-	map(0x8060, 0x807f).unmaprw();
+	map(0x8060, 0x807f).w(FUNC(ibm6580_state::gate_close_w)).umask16(0xff);
 	map(0x8150, 0x815f).rw(FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
 	map(0x81a0, 0x81af).unmaprw();
 	map(0xc000, 0xc00f).unmaprw();
@@ -711,32 +855,26 @@ void ibm6580_state::ibm6580_io(address_map &map)
 }
 
 
-/* Input ports */
-static INPUT_PORTS_START( ibm6580 )
-	PORT_START("DUMP")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Memory Record") PORT_CODE(KEYCODE_PRTSCR) PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
-INPUT_PORTS_END
-
-
 uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,gfx,fg,bg,chr,attr;
-	uint16_t sy=0,ma=25,x,ca;
+	uint16_t sy=0,ma=25;
 
-	fg = 1; bg = 0;
+	uint8_t fg = 1, bg = 0;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (uint8_t ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			// graphics mode
-			if (m_p_videoram[ma] & 0x100) {
-				for (x = ma; x < ma + 80; x++)
+			if (m_p_videoram[ma] & 0x100)
+			{
+				// graphics mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint8_t gfx;
 
 					switch (ra >> 1)
 					{
@@ -767,13 +905,16 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						*p++ = BIT(gfx, i) ? fg : bg;
 					}
 				}
-			} else {
-			// text mode
-				for (x = ma; x < ma + 80; x++)
+			}
+			else
+			{
+				// text mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
-					ca = (chr<<4);
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint16_t ca = (chr<<4);
+					uint8_t gfx;
 
 					// font 2
 					if (attr & 0x02)
@@ -783,7 +924,7 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					if (attr & 0x20)
 						ca |= (ra < 13) ? ra + 3 : 0;
 					// subscript
-					if (attr & 0x20)
+					if (attr & 0x40)
 						ca |= (ra > 2) ? ra - 3 : 0;
 #endif
 
@@ -823,46 +964,36 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void ibm6580_state::ibm6580_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, 0, 0, 0 );     // Black
-	palette.set_pen_color(1, 0, 192, 0 );   // Normal
-	palette.set_pen_color(2, 0, 255, 0 );   // Bright
-}
-
 void ibm6580_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
-	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
-	membank("bank10")->set_base(m_ram->pointer());
+	m_fdc->set_rate(500000); // FIXME: workaround
 
-	m_fdc->set_rate(500000); // XXX workaround
+	m_leds.resolve();
+
+	memset(m_p_videoram, 0x0, 0x1000);
 }
 
 void ibm6580_state::machine_reset()
 {
-	m_p40 = m_p50 = m_e000 = m_ppi_c = m_floppy_sr = 0;
+	m_p40 = m_p4a = m_p50 = m_gate = m_e000 = m_ppi_c = m_floppy_sr = m_led_state = 0;
 	m_kb_data_bit = false;
+	m_kb_clock = false;
+	m_kb_strobe = true;
+	m_kb_data = 0;
 	m_floppy_idle = true;
-	m_kb_fifo.clear();
 
 	m_pit8253->set_clockin(0, 0.0);
 
-	if (ioport("DUMP")->read())
-		m_p40 |= 4;
+	m_p40 |= m_kbd->memory_record_r();
 
-	m_flop0->get_device()->mon_w(!m_flop0->get_device()->exists());
-	m_flop1->get_device()->mon_w(!m_flop1->get_device()->exists());
-	m_fdc->set_floppy(m_flop0->get_device());
+	m_flop[0]->get_device()->mon_w(!m_flop[0]->get_device()->exists());
+	m_flop[1]->get_device()->mon_w(!m_flop[1]->get_device()->exists());
+	m_fdc->set_floppy(m_flop[0]->get_device());
 	m_floppy_mcu_sr.clear();
 	m_floppy_mcu_cr.clear();
 	m_floppy_mcu_cr_fifo = 0;
-}
-
-void ibm6580_state::video_start()
-{
-	memset(m_p_videoram, 0x0, 0x1000);
 }
 
 static void dw_floppies(device_slot_interface &device)
@@ -872,14 +1003,17 @@ static void dw_floppies(device_slot_interface &device)
 
 void ibm6580_state::ibm6580(machine_config &config)
 {
-	I8086(config, m_maincpu, 14.7456_MHz_XTAL / 3);
+	I8086(config, m_maincpu, 14.7456_MHz_XTAL / 3); // XTAL is confirmed, divisor is not
 	m_maincpu->set_addrmap(AS_PROGRAM, &ibm6580_state::ibm6580_mem);
 	m_maincpu->set_addrmap(AS_IO, &ibm6580_state::ibm6580_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
+	// DMA tests need this
+	config.set_perfect_quantum(m_maincpu);
+
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400);
 	m_screen->set_screen_update(FUNC(ibm6580_state::screen_update));
 	m_screen->set_palette("palette");
@@ -887,24 +1021,25 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	config.set_default_layout(layout_ibm6580);
 
-	PALETTE(config, "palette", FUNC(ibm6580_state::ibm6580_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.in_pa_callback().set(FUNC(ibm6580_state::ppi_a_r));
-	ppi.out_pb_callback().set(FUNC(ibm6580_state::led_w));
-	ppi.out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
-	ppi.in_pc_callback().set(FUNC(ibm6580_state::ppi_c_r));
+	I8255(config, m_ppi8255);
+	m_ppi8255->in_pa_callback().set(FUNC(ibm6580_state::kb_data_r));
+	m_ppi8255->out_pb_callback().set(FUNC(ibm6580_state::led_w));
+	m_ppi8255->out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	PIT8253(config, m_pit8253, 0);
+	m_pit8253->out_handler<0>().set([this] (int state) { m_p40 = (m_p40 & ~1) | state; });
 
 	DW_KEYBOARD(config, m_kbd, 0);
 	m_kbd->out_data_handler().set(FUNC(ibm6580_state::kb_data_w));
 	m_kbd->out_clock_handler().set(FUNC(ibm6580_state::kb_clock_w));
 	m_kbd->out_strobe_handler().set(FUNC(ibm6580_state::kb_strobe_w));
-	m_kbd->out_strobe_handler().append(m_ppi8255, FUNC(i8255_device::pc4_w));
 
 	I8257(config, m_dma8257, 14.7456_MHz_XTAL / 3);
 	m_dma8257->out_hrq_cb().set(FUNC(ibm6580_state::hrq_w));
@@ -918,8 +1053,8 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
 //  m_fdc->intrq_wr_callback().append(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8251_device &upd8251a(I8251(config, "upd8251a", 0));
 	upd8251a.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -957,6 +1092,19 @@ ROM_START( ibm6580 )
 	ROMX_LOAD("8493823_8k.bin", 0x0001, 0x2000, CRC(aa5524c0) SHA1(9938f2a82828b17966cb0be7fdbf73803c1f10d3), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("8493822_8k.bin", 0x0000, 0x2000, CRC(90e7e73a) SHA1(d3ee7a4d2cb8f4920b5d95e8c7f4fef06599d24e), ROM_SKIP(1) | ROM_BIOS(0))
 
+	// disable halts in video test
+	ROM_FILL(0x501,1,0x90)
+	ROM_FILL(0x51b,1,0x90)
+	ROM_FILL(0x52f,1,0x90)
+	ROM_FILL(0x587,1,0x90)
+	ROM_FILL(0x5a0,1,0x90)
+	ROM_FILL(0x5a6,1,0x90)
+	ROM_FILL(0x5f4,1,0x90)
+	ROM_FILL(0x609,1,0x90)
+
+	// disable rom checksum halt
+	ROM_FILL(0x2027,1,0x01)
+
 	ROM_SYSTEM_BIOS(1, "new", "new bios - 1983?")
 	// was downloaded via DDT86
 	ROMX_LOAD( "dwrom16kb.bin", 0x0000, 0x4000, BAD_DUMP CRC(ced87929) SHA1(907a46f288809bc93a1f59f3fbef18bd44be42d9), ROM_BIOS(1))
@@ -967,5 +1115,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
-COMP( 1980, ibm6580, 0,      0,      ibm6580, ibm6580, ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
+COMP( 1980, ibm6580, 0,      0,      ibm6580, 0,     ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)

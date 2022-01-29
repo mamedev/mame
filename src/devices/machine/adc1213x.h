@@ -26,15 +26,7 @@ public:
 
 	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_ipt_convert_callback(ipt_convert_delegate callback) { m_ipt_read_cb = callback; }
-	template <class FunctionClass> void set_ipt_convert_callback(const char *devname, double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_ipt_convert_callback(ipt_convert_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_ipt_convert_callback(double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_ipt_convert_callback(ipt_convert_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_ipt_convert_callback(T &&... args) { m_ipt_read_cb.set(std::forward<T>(args)...); }
 
 	void di_w(u8 data);
 	void cs_w(u8 data);

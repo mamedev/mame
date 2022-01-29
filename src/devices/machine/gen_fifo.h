@@ -197,7 +197,7 @@ private:
 	bool m_empty_triggered, m_full_triggered;
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class generic_fifo_u32_device : public generic_fifo_device_base<u32>
@@ -206,8 +206,8 @@ public:
 	generic_fifo_u32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_fifo_u32_device() = default;
 
-	DECLARE_READ32_MEMBER(read) { return read_gen<u32>(); }
-	DECLARE_WRITE32_MEMBER(write) { write_gen(data); }
+	u32 read() { return read_gen<u32>(); }
+	void write(u32 data) { write_gen(data); }
 };
 
 DECLARE_DEVICE_TYPE(GENERIC_FIFO_U32, generic_fifo_u32_device)

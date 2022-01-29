@@ -39,12 +39,12 @@ void pc1403h_state::video_start()
 	m_right = 155;
 }
 
-READ8_MEMBER(pc1403_state::lcd_read)
+uint8_t pc1403_state::lcd_read(offs_t offset)
 {
 	return m_reg[offset];
 }
 
-WRITE8_MEMBER(pc1403_state::lcd_write)
+void pc1403_state::lcd_write(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 }

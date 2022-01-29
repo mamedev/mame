@@ -322,10 +322,8 @@ void sns_rom_seta11dsp_device::device_add_mconfig(machine_config &config)
 
 void sns_rom20_necdsp_device::speedup_addon_bios_access()
 {
-	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
-	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
-	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
-	membank("dsp_data")->set_base(&m_dsp_data[0]);
+	m_upd7725->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, &m_dsp_prg[0]);
+	m_upd7725->space(AS_DATA).install_rom(0x0000, 0x03ff, &m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x800; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
@@ -335,10 +333,8 @@ void sns_rom20_necdsp_device::speedup_addon_bios_access()
 
 void sns_rom21_necdsp_device::speedup_addon_bios_access()
 {
-	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
-	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
-	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
-	membank("dsp_data")->set_base(&m_dsp_data[0]);
+	m_upd7725->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, &m_dsp_prg[0]);
+	m_upd7725->space(AS_DATA).install_rom(0x0000, 0x03ff, &m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x800; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
@@ -348,10 +344,8 @@ void sns_rom21_necdsp_device::speedup_addon_bios_access()
 
 void sns_rom_setadsp_device::speedup_addon_bios_access()
 {
-	m_upd96050->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "dsp_prg");
-	m_upd96050->space(AS_DATA).install_read_bank(0x0000, 0x07ff, "dsp_data");
-	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
-	membank("dsp_data")->set_base(&m_dsp_data[0]);
+	m_upd96050->space(AS_PROGRAM).install_rom(0x0000, 0x3fff, &m_dsp_prg[0]);
+	m_upd96050->space(AS_DATA).install_rom(0x0000, 0x07ff, &m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x4000; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;

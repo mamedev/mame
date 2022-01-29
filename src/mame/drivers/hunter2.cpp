@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Barry Rodewald
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
     Husky Hunter, Hunter 2
@@ -17,13 +17,16 @@
     though only 48K of this is ever paged in.
 
     Usage:
-    The RAMdisk must first be formatted using 'format'.
+    The RAMdisk must first be formatted using 'format' (but you'll lose the inbuilt apps).
+    The function keys labels at the bottom of the screen are accessed by Ctrl 1 through 8.
 
     TODO:
     - Add ports 83 and 85
     - Need software
     - Add whatever image devices existed
     - Probably lots of other stuff
+    - DIR command can go crazy
+    - Clock doesn't advance
 
 ****************************************************************************/
 
@@ -68,17 +71,17 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(display_ctrl_w);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(serial_dtr_w);
-	DECLARE_WRITE8_MEMBER(serial_rts_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(memmap_w);
+	uint8_t keyboard_r();
+	uint8_t portb_r();
+	void keyboard_w(uint8_t data);
+	uint8_t portc_r();
+	void display_ctrl_w(uint8_t data);
+	void serial_tx_w(uint8_t data);
+	void serial_dtr_w(uint8_t data);
+	void serial_rts_w(uint8_t data);
+	void speaker_w(uint8_t data);
+	void irqctrl_w(uint8_t data);
+	void memmap_w(uint8_t data);
 	void hunter2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -139,30 +142,30 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
@@ -189,22 +192,22 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_START("X5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctl/Fn")  PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 
 	PORT_START("BATTERY")
 	PORT_CONFNAME(0x04, 0x00, "Battery")
@@ -212,7 +215,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_CONFSETTING(0x04, "Low")
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::keyboard_r )
+uint8_t hunter2_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 	for (int i = 0; i < 7; i++)
@@ -225,7 +228,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::portb_r )
+uint8_t hunter2_state::portb_r()
 {
 	uint8_t res = 0x00;
 
@@ -235,7 +238,7 @@ READ8_MEMBER( hunter2_state::portb_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::keyboard_w )
+void hunter2_state::keyboard_w(uint8_t data)
 {
 	m_keydata = data;
 }
@@ -247,7 +250,7 @@ Bit 1 = DCD (inverted from RS-232 line)
 Bit 2 = Power low warning (0 = Power OK, 1 = Power low)
 Bit 3 = TXCLK (inverted from RS-232 line)
 */
-READ8_MEMBER( hunter2_state::portc_r )
+uint8_t hunter2_state::portc_r()
 {
 	uint8_t res = 0x28;
 
@@ -263,7 +266,7 @@ READ8_MEMBER( hunter2_state::portc_r )
 /*
 ANGLE - Controls display viewing angle. Input value in the range 0-0x1F.
 */
-WRITE8_MEMBER( hunter2_state::display_ctrl_w )
+void hunter2_state::display_ctrl_w(uint8_t data)
 {
 /* according to the website,
 Bit 2: Backlight toggle
@@ -276,7 +279,7 @@ Bits 1,0,7,6: Contrast level.
 V24OUT - Directly outputs to the V24 data line signal on bit 0.
 The output is voltage inverted ie. 0 = +ve, 1 = -ve
 */
-WRITE8_MEMBER( hunter2_state::serial_tx_w )
+void hunter2_state::serial_tx_w(uint8_t data)
 {
 	m_rs232->write_txd(data & 0x01);
 }
@@ -284,7 +287,7 @@ WRITE8_MEMBER( hunter2_state::serial_tx_w )
 /*
 DTR output bit
 */
-WRITE8_MEMBER( hunter2_state::serial_dtr_w )
+void hunter2_state::serial_dtr_w(uint8_t data)
 {
 	m_rs232->write_dtr(data & 0x01);
 }
@@ -292,12 +295,12 @@ WRITE8_MEMBER( hunter2_state::serial_dtr_w )
 /*
 RTS output bit
 */
-WRITE8_MEMBER( hunter2_state::serial_rts_w )
+void hunter2_state::serial_rts_w(uint8_t data)
 {
 	m_rs232->write_rts(data & 0x01);
 }
 
-WRITE8_MEMBER( hunter2_state::speaker_w )
+void hunter2_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -309,7 +312,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER( hunter2_state::irqctrl_w )
+void hunter2_state::irqctrl_w(uint8_t data)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -323,7 +326,7 @@ WRITE8_MEMBER( hunter2_state::irqctrl_w )
 /*
 PAGE - Memory paging register
 */
-WRITE8_MEMBER( hunter2_state::memmap_w )
+void hunter2_state::memmap_w(uint8_t data)
 {
 	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t bank = data & 0x0f;

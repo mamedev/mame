@@ -26,9 +26,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint8_t m_bus, m_t0, m_t1, m_p1, m_p2;
@@ -39,11 +39,11 @@ private:
 	devcb_write_line m_out_strobe;
 	required_device<i8048_device> m_mcu;
 
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(p2_r);
+	void bus_w(uint8_t data);
+	uint8_t bus_r();
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t p2_r();
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 };

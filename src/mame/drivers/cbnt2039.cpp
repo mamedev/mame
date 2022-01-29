@@ -50,7 +50,7 @@ void cbnt2039_state::cbnt2039(machine_config &config)
 {
 	//F8680(config, m_maincpu, OSC1);
 
-	DP8344(config, m_bcp, 18.8696_MHz_XTAL); // DP8344BV; Y1 = "RXD8.000"; Y2 = "RXD18.86"
+	DP8344B(config, m_bcp, 18.8696_MHz_XTAL); // DP8344BV; Y1 = "RXD8.000"; Y2 = "RXD18.86"
 	m_bcp->set_addrmap(AS_PROGRAM, &cbnt2039_state::bcp_prog_map);
 	m_bcp->set_addrmap(AS_DATA, &cbnt2039_state::bcp_data_map);
 

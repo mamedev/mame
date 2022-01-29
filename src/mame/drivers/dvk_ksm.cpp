@@ -115,7 +115,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 
@@ -123,8 +123,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_brgb);
 	DECLARE_WRITE_LINE_MEMBER(write_brgc);
 
-	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	void ksm_ppi_porta_w(uint8_t data);
+	void ksm_ppi_portc_w(uint8_t data);
 
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
@@ -151,7 +151,7 @@ private:
 	void update_brg(bool a, bool b, int c);
 
 	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( ksm )
 	PORT_DIPSETTING(0x0E, "75")
 INPUT_PORTS_END
 
-void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_ID_BRG)
 	{
@@ -247,13 +247,13 @@ void ksm_state::video_start()
 	m_brg = timer_alloc(TIMER_ID_BRG);
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
+void ksm_state::ksm_ppi_porta_w(uint8_t data)
 {
 	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
+void ksm_state::ksm_ppi_portc_w(uint8_t data)
 {
 	brgc = (data >> 5) & 3;
 
@@ -365,7 +365,6 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 {
 	uint16_t y = m_screen->vpos();
-	uint16_t offset;
 
 	LOGDBG("scanline_cb addr %02x frame %d x %.4d y %.3d row %.2d\n",
 		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11);
@@ -374,6 +373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	y -= KSM_VERT_START;
 	if (y >= KSM_DISP_VERT) return;
 
+	uint16_t offset;
 	if (y < KSM_STATUSLINE_TOTAL)
 	{
 		offset = KSM_STATUSLINE_VRAM - 0xC000;
@@ -383,7 +383,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 		offset = 0x2000 + 0x30 + (((m_video.line + y / 11 - 1) % 48) << 7);
 	}
 
-	draw_scanline(&m_tmpbmp.pix16(y), offset, y % 11);
+	draw_scanline(&m_tmpbmp.pix(y), offset, y % 11);
 }
 
 uint32_t ksm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -416,7 +416,7 @@ void ksm_state::ksm(machine_config &config)
 	I8080(config, m_maincpu, XTAL(15'400'000)/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
 	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 

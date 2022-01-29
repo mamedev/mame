@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Gordon Jefferyes
 /******************************************************************************
+
     uPD7002 Analogue to Digital Converter
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
 
 ******************************************************************************/
 
@@ -19,7 +15,14 @@
 DEFINE_DEVICE_TYPE(UPD7002, upd7002_device, "upd7002", "uPD7002 ADC")
 
 upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD7002, tag, owner, clock), m_status(0), m_data1(0), m_data0(0), m_digitalvalue(0), m_conversion_counter(0)
+	: device_t(mconfig, UPD7002, tag, owner, clock)
+	, m_status(0)
+	, m_data1(0)
+	, m_data0(0)
+	, m_digitalvalue(0)
+	, m_conversion_counter(0)
+	, m_get_analogue_cb(*this)
+	, m_eoc_cb(*this)
 {
 }
 
@@ -29,8 +32,8 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 
 void upd7002_device::device_start()
 {
-	m_get_analogue_cb.bind_relative_to(*owner());
-	m_eoc_cb.bind_relative_to(*owner());
+	m_get_analogue_cb.resolve();
+	m_eoc_cb.resolve();
 
 	// register for state saving
 	save_item(NAME(m_status));
@@ -65,7 +68,7 @@ READ_LINE_MEMBER( upd7002_device::eoc_r )
 }
 
 
-void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -47,8 +47,8 @@ public:
 
 	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(cru_r);
-	DECLARE_WRITE8_MEMBER(cru_w);
+	uint8_t cru_r(offs_t offset);
+	void cru_w(offs_t offset, uint8_t data);
 
 	auto keyint_cb() { return m_keyint_line.bind(); }
 	auto lineint_cb() { return m_lineint_line.bind(); }
@@ -60,7 +60,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);

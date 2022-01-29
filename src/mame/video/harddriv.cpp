@@ -86,7 +86,7 @@ void harddriv_state::init_video()
 		}
 
 	/* init VRAM pointers */
-	m_vram_mask = m_gsp_vram.bytes() - 1;
+	m_vram_mask = m_gsp_vram.bytes()/2 - 1;
 }
 
 
@@ -103,9 +103,9 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_write_to_shiftreg)
 	if (address >= 0x02000000 && address <= 0x020fffff)
 	{
 		address -= 0x02000000;
-		address >>= m_gsp_multisync;
+		address >>= m_gsp_multisync + 1;
 		address &= m_vram_mask;
-		address &= ~((512*8 >> m_gsp_multisync) - 1);
+		address &= ~((256*8 >> m_gsp_multisync) - 1);
 		m_gsp_shiftreg_source = &m_gsp_vram[address];
 	}
 
@@ -113,9 +113,9 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_write_to_shiftreg)
 	else if (address >= 0xff800000 && address <= 0xffffffff)
 	{
 		address -= 0xff800000;
-		address /= 8;
+		address /= 16;
 		address &= m_vram_mask;
-		address &= ~511;
+		address &= ~255;
 		m_gsp_shiftreg_source = &m_gsp_vram[address];
 	}
 	else
@@ -132,9 +132,9 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_read_from_shiftreg)
 	if (address >= 0x02000000 && address <= 0x020fffff)
 	{
 		address -= 0x02000000;
-		address >>= m_gsp_multisync;
+		address >>= m_gsp_multisync + 1;
 		address &= m_vram_mask;
-		address &= ~((512*8 >> m_gsp_multisync) - 1);
+		address &= ~((256*8 >> m_gsp_multisync) - 1);
 		memmove(&m_gsp_vram[address], m_gsp_shiftreg_source, 512*8 >> m_gsp_multisync);
 	}
 
@@ -142,9 +142,9 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_read_from_shiftreg)
 	else if (address >= 0xff800000 && address <= 0xffffffff)
 	{
 		address -= 0xff800000;
-		address /= 8;
+		address /= 16;
 		address &= m_vram_mask;
-		address &= ~511;
+		address &= ~255;
 		memmove(&m_gsp_vram[address], m_gsp_shiftreg_source, 512);
 	}
 	else
@@ -175,13 +175,13 @@ void harddriv_state::update_palette_bank(int newbank)
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdgsp_control_lo_r )
+uint16_t harddriv_state::hdgsp_control_lo_r(offs_t offset)
 {
 	return m_gsp_control_lo[offset];
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_control_lo_w )
+void harddriv_state::hdgsp_control_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_gsp_control_lo[offset];
 	int newword;
@@ -201,13 +201,13 @@ WRITE16_MEMBER( harddriv_state::hdgsp_control_lo_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdgsp_control_hi_r )
+uint16_t harddriv_state::hdgsp_control_hi_r(offs_t offset)
 {
 	return m_gsp_control_hi[offset];
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_control_hi_w )
+void harddriv_state::hdgsp_control_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int val = (offset >> 3) & 1;
 
@@ -262,15 +262,15 @@ WRITE16_MEMBER( harddriv_state::hdgsp_control_hi_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdgsp_vram_2bpp_r )
+uint16_t harddriv_state::hdgsp_vram_2bpp_r()
 {
 	return 0;
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_vram_1bpp_w )
+void harddriv_state::hdgsp_vram_1bpp_w (offs_t offset, uint16_t data)
 {
-	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 16];
+	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 8];
 	uint32_t *mask = &m_mask_table[data * 4];
 	uint32_t color = m_gsp_control_lo[0] & 0xff;
 	uint32_t curmask;
@@ -296,9 +296,9 @@ WRITE16_MEMBER( harddriv_state::hdgsp_vram_1bpp_w )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_vram_2bpp_w )
+void harddriv_state::hdgsp_vram_2bpp_w(offs_t offset, uint16_t data)
 {
-	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 8];
+	uint32_t *dest = (uint32_t *)&m_gsp_vram[offset * 4];
 	uint32_t *mask = &m_mask_table[data * 2];
 	uint32_t color = m_gsp_control_lo[0];
 	uint32_t curmask;
@@ -331,7 +331,7 @@ inline void harddriv_state::gsp_palette_change(int offset)
 }
 
 
-READ16_MEMBER( harddriv_state::hdgsp_paletteram_lo_r )
+uint16_t harddriv_state::hdgsp_paletteram_lo_r(offs_t offset)
 {
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -341,7 +341,7 @@ READ16_MEMBER( harddriv_state::hdgsp_paletteram_lo_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_lo_w )
+void harddriv_state::hdgsp_paletteram_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -359,7 +359,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_lo_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdgsp_paletteram_hi_r )
+uint16_t harddriv_state::hdgsp_paletteram_hi_r(offs_t offset)
 {
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -369,7 +369,7 @@ READ16_MEMBER( harddriv_state::hdgsp_paletteram_hi_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_hi_w )
+void harddriv_state::hdgsp_paletteram_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -409,16 +409,23 @@ static void display_speedups(void)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 {
-	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
+	if (!m_gsp_vram) return;
+	uint16_t const *const vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
 
-	if (!vram_base) return;
-
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (m_gfx_finescroll & 0x0f);
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
+	for (int x = params->heblnk; x < params->hsblnk; x++)
+	{
+		int coloridx = coladdr++ & 0xfff;
+		uint8_t color;
+		if(coloridx & 1)
+			color = vram_base[coloridx >> 1] >> 8;
+		else
+			color = vram_base[coloridx >> 1];
+
+		dest[x] = m_gfx_palettebank * 256 + color;
+	}
 
 	if (scanline == screen.visible_area().bottom())
 		display_speedups();
@@ -427,16 +434,22 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 {
-	uint8_t *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
+	if (!m_gsp_vram) return;
+	uint16_t const *const vram_base = &m_gsp_vram[(params->rowaddr << 10) & m_vram_mask];
 
-	if (!vram_base) return;
-
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (m_gfx_finescroll & 0x07);
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
+	for (int x = params->heblnk; x < params->hsblnk; x++)
+	{
+		int coloridx = coladdr++ & 0x7ff;
+		uint8_t color;
+		if(coloridx & 1)
+			color = vram_base[coloridx >> 1] >> 8;
+		else
+			color = vram_base[coloridx >> 1];
+		dest[x] = m_gfx_palettebank * 256 + color;
+	}
 
 	if (scanline == screen.visible_area().bottom())
 		display_speedups();

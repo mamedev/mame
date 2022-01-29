@@ -28,7 +28,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "machine/wy50kb.h"
 #include "video/scn2674.h"
 #include "screen.h"
@@ -77,7 +77,7 @@ private:
 	required_device<wy50_keyboard_device> m_keyboard;
 	required_device<er1400_device> m_earom;
 	required_device<scn2672_device> m_pvtc;
-	required_device<mc2661_device> m_sio;
+	required_device<scn2661b_device> m_sio;
 
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
@@ -158,11 +158,11 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 	const rgb_t fg = BIT(m_cur_attr, 0) || (prot && !m_rev_prot) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!m_is_132)
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
 WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)
@@ -306,16 +306,16 @@ void wy50_state::wy50(machine_config &config)
 	m_pvtc->mbc_callback().set(FUNC(wy50_state::mbc_attr_clock_w));
 	m_pvtc->mbc_char_callback().set(FUNC(wy50_state::pvtc_videoram_r));
 
-	MC2661(config, m_sio, 4.9152_MHz_XTAL); // SCN2661B
+	SCN2661B(config, m_sio, 4.9152_MHz_XTAL);
 	m_sio->rxrdy_handler().set_inputline(m_maincpu, MCS51_INT1_LINE);
 	m_sio->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_sio->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_sio->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "loopback"));
-	modem.rxd_handler().set(m_sio, FUNC(mc2661_device::rx_w));
-	modem.cts_handler().set(m_sio, FUNC(mc2661_device::cts_w));
-	modem.dcd_handler().set(m_sio, FUNC(mc2661_device::dcd_w));
+	modem.rxd_handler().set(m_sio, FUNC(scn2661b_device::rxd_w));
+	modem.cts_handler().set(m_sio, FUNC(scn2661b_device::cts_w));
+	modem.dcd_handler().set(m_sio, FUNC(scn2661b_device::dcd_w));
 }
 
 ROM_START(wy50)

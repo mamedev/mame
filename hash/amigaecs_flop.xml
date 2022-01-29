@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- General purpose software list for Amiga software with a MINIMUM requirement of the ECS chipset (A500+ / A600)
-     some ECS software exists instead in other lists if it is backwards compatible with older hardware
+    General purpose software list for Amiga software with a MINIMUM requirement of the ECS chipset (A500+ / A600)
+    some ECS software exists instead in other lists if it is backwards compatible with older hardware
 
     the software listed here is not designed for use on systems without the ECS chipset and
     will not function.
 -->
 
-<softwarelist name="amigaecs_flop" description="Amiga ECS disk images">
+<softwarelist name="amigaecs_flop" description="Commodore Amiga ECS disk images">
 
 	<software name="cmang2up" supported="no">
 		<!-- SPS (CAPS) release 1997 -->
@@ -643,13 +645,15 @@
 		</part>
 	</software>
 
-	<software name="snapper" supported="no">
+	<!-- boot OK -->
+	<software name="snapper" supported="yes">
 		<!-- SPS (CAPS) release 2534 -->
 		<description>Snapperazzi (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Alternative Software</publisher>
+		<!-- TODO: is this truly a ECS exclusive game? Reports indicates this being OCS as well, it also works on vanilla a500 -->
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

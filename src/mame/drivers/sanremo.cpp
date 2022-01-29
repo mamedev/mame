@@ -136,10 +136,10 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_banksel;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(banksel_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void banksel_w(uint8_t data);
+	void lamps_w(uint8_t data);
 	void sanremo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sanremo_map(address_map &map);
@@ -152,7 +152,7 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(sanremo_state::videoram_w)
+void sanremo_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_attrram[offset] = m_banksel;
@@ -164,12 +164,12 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int bank = m_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code + bank * 256, 0, 0);
+	tileinfo.set(0, code + bank * 256, 0, 0);
 }
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanremo_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 
 	m_lamps.resolve();
 
@@ -199,7 +199,7 @@ void sanremo_state::sanremo_palette(palette_device &palette) const
 *                   R/W Handlers                  *
 **************************************************/
 
-WRITE8_MEMBER(sanremo_state::lamps_w)
+void sanremo_state::lamps_w(uint8_t data)
 {
 	/*  LAMPS:
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
 		m_lamps[n] = BIT(data, n);
 }
 
-WRITE8_MEMBER(sanremo_state::banksel_w)
+void sanremo_state::banksel_w(uint8_t data)
 {
 	/*  GFX banks selector.
 

@@ -39,10 +39,10 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void control(int offset);
-	DECLARE_WRITE8_MEMBER(set_phase);
+	void set_phase(uint8_t data);
 	uint64_t time_to_cycles(const attotime &tm);
 	attotime cycles_to_time(uint64_t cycles);
 	void a3_update_drive_sel();

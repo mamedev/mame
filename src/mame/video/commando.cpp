@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  commando.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -12,43 +12,43 @@
 #include "includes/commando.h"
 
 
-WRITE8_MEMBER(commando_state::commando_videoram_w)
+void commando_state::commando_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram_w)
+void commando_state::commando_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_videoram2_w)
+void commando_state::commando_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram2_w)
+void commando_state::commando_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_scrollx_w)
+void commando_state::commando_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_scrolly_w)
+void commando_state::commando_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll_y[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_c804_w)
+void commando_state::commando_c804_w(uint8_t data)
 {
 	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(commando_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
@@ -78,13 +78,18 @@ TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void commando_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 
 	m_fg_tilemap->set_transparent_pen(3);
 }
@@ -115,7 +120,7 @@ void commando_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		if (bank < 3)
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 15);
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx+128, sy+6, 15);
 	}
 }
 

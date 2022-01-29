@@ -14,8 +14,8 @@ class mc68340_timer_module_device : public device_t
 public:
 	mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	READ16_MEMBER( read );
-	WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( tin_w );
 	DECLARE_WRITE_LINE_MEMBER( tgate_w );
 

@@ -13,10 +13,10 @@ public:
 
 	auto int_cb() { return m_int_cb.bind(); }
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( vram_r );
-	DECLARE_WRITE32_MEMBER( vram_w );
+	u32 read(offs_t offset);
+	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
+	uint32_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	u32 *get_vram() { return m_vram; }
 

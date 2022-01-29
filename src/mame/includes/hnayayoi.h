@@ -26,38 +26,45 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void untoucha(machine_config &config);
 	void hnayayoi(machine_config &config);
 	void hnfubuki(machine_config &config);
+	void untoucha(machine_config &config);
 
 	void init_hnfubuki();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* video-related */
 	std::unique_ptr<uint8_t[]> m_pixmap[8];
 	int        m_palbank;
-	uint8_t      m_blit_layer;
-	uint16_t     m_blit_dest;
-	uint32_t     m_blit_src;
+	uint8_t    m_blit_layer;
+	uint16_t   m_blit_dest;
+	uint32_t   m_blit_src;
 
 	/* misc */
 	int        m_keyb;
 	bool m_nmi_enable;
 
-	DECLARE_READ8_MEMBER(keyboard_0_r);
-	DECLARE_READ8_MEMBER(keyboard_1_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_param_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_start_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_clear_w);
-	DECLARE_WRITE8_MEMBER(hnayayoi_palbank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_mainlatch;
+	required_device<msm5205_device> m_msm;
+	required_device<palette_device> m_palette;
+
+	uint8_t keyboard_0_r();
+	uint8_t keyboard_1_r();
+	void keyboard_w(uint8_t data);
+	void dynax_blitter_rev1_param_w(offs_t offset, uint8_t data);
+	void dynax_blitter_rev1_start_w(uint8_t data);
+	void dynax_blitter_rev1_clear_w(uint8_t data);
+	void hnayayoi_palbank_w(offs_t offset, uint8_t data);
+	void adpcm_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(untoucha);
 	MC6845_UPDATE_ROW(hnayayoi_update_row);
 	MC6845_UPDATE_ROW(untoucha_update_row);
@@ -65,15 +72,12 @@ private:
 	void copy_pixel( int x, int y, int pen );
 	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<ls259_device> m_mainlatch;
-	required_device<msm5205_device> m_msm;
-	required_device<palette_device> m_palette;
-	void hnayayoi_io_map(address_map &map);
+
 	void hnayayoi_map(address_map &map);
+	void hnayayoi_io_map(address_map &map);
 	void hnfubuki_map(address_map &map);
-	void untoucha_io_map(address_map &map);
 	void untoucha_map(address_map &map);
+	void untoucha_io_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HNAYAYOI_H

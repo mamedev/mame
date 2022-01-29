@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -150,9 +150,7 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 		}
 		else if (ImGui::IsItemHovered() )
 		{
-			char tmp[1024];
-			bx::snprintf(tmp, BX_COUNTOF(tmp), "Documentation: %.*s", url.getLength(), url.getPtr() );
-			ImGui::SetTooltip(tmp);
+			ImGui::SetTooltip("Documentation: %.*s", url.getLength(), url.getPtr() );
 		}
 	}
 
@@ -393,9 +391,10 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 						const double toGpuMs = 1000.0/double(stats->gpuTimerFreq);
 						const float  scale   = 3.0f;
 
-						if (ImGui::ListBoxHeader("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
+						if (ImGui::BeginListBox("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper(stats->numEncoders, itemHeight);
+							ImGuiListClipper clipper;
+							clipper.Begin(stats->numEncoders, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -420,14 +419,15 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 								}
 							}
 
-							ImGui::ListBoxFooter();
+							ImGui::EndListBox();
 						}
 
 						ImGui::Separator();
 
-						if (ImGui::ListBoxHeader("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
+						if (ImGui::BeginListBox("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper(stats->numViews, itemHeight);
+							ImGuiListClipper clipper;
+							clipper.Begin(stats->numViews, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -438,8 +438,10 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 									ImGui::Text("%3d %3d %s", pos, viewStats.view, viewStats.name);
 
 									const float maxWidth = 30.0f*scale;
-									const float cpuWidth = bx::clamp(float(viewStats.cpuTimeElapsed*toCpuMs)*scale, 1.0f, maxWidth);
-									const float gpuWidth = bx::clamp(float(viewStats.gpuTimeElapsed*toGpuMs)*scale, 1.0f, maxWidth);
+									const float cpuTimeElapsed = float((viewStats.cpuTimeEnd - viewStats.cpuTimeBegin) * toCpuMs);
+									const float gpuTimeElapsed = float((viewStats.gpuTimeEnd - viewStats.gpuTimeBegin) * toGpuMs);
+									const float cpuWidth = bx::clamp(cpuTimeElapsed*scale, 1.0f, maxWidth);
+									const float gpuWidth = bx::clamp(gpuTimeElapsed*scale, 1.0f, maxWidth);
 
 									ImGui::SameLine(64.0f);
 
@@ -448,7 +450,7 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 										ImGui::SetTooltip("View %d \"%s\", CPU: %f [ms]"
 											, pos
 											, viewStats.name
-											, viewStats.cpuTimeElapsed*toCpuMs
+											, cpuTimeElapsed
 											);
 									}
 
@@ -458,13 +460,13 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 										ImGui::SetTooltip("View: %d \"%s\", GPU: %f [ms]"
 											, pos
 											, viewStats.name
-											, viewStats.gpuTimeElapsed*toGpuMs
+											, gpuTimeElapsed
 											);
 									}
 								}
 							}
 
-							ImGui::ListBoxFooter();
+							ImGui::EndListBox();
 						}
 
 						ImGui::PopFont();

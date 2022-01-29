@@ -140,7 +140,7 @@ private:
 };
 
 // interface type iterator
-typedef device_interface_iterator<device_palette_interface> palette_interface_iterator;
+typedef device_interface_enumerator<device_palette_interface> palette_interface_enumerator;
 
 
 #endif  // MAME_EMU_DIPALETTE_H

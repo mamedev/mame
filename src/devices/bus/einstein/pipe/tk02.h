@@ -40,9 +40,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(de_w);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(status_r);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t status_r();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

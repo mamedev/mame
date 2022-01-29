@@ -40,8 +40,8 @@ public:
 	auto read_callback() { return m_read.bind(); }
 	auto write_callback() { return m_write.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( te_w );
 	DECLARE_WRITE_LINE_MEMBER( pe_w );

@@ -29,21 +29,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
 
-	DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
-	DECLARE_WRITE8_MEMBER(mpeg_start_w);
-	DECLARE_WRITE8_MEMBER(mpeg_end_w);
-	DECLARE_WRITE8_MEMBER(mpeg_volume_w);
-	DECLARE_WRITE8_MEMBER(mpeg_stereo_w);
-	DECLARE_READ8_MEMBER(mpeg_pos_r);
-
 	void dsbz80_map(address_map &map);
 	void dsbz80io_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	mpeg_audio *decoder;
@@ -54,6 +48,13 @@ private:
 	devcb_write_line   m_rxd_handler;
 
 	DECLARE_WRITE_LINE_MEMBER(output_txd);
+
+	void mpeg_trigger_w(uint8_t data);
+	void mpeg_start_w(offs_t offset, uint8_t data);
+	void mpeg_end_w(offs_t offset, uint8_t data);
+	void mpeg_volume_w(uint8_t data);
+	void mpeg_stereo_w(uint8_t data);
+	uint8_t mpeg_pos_r(offs_t offset);
 };
 
 

@@ -62,23 +62,22 @@ private:
 	bool    m_video_enable;
 
 	/* common */
-	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(scanline_r);
+	uint8_t scanline_r();
 
 	/* all but psurge */
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
 
 	/* psurge */
-	DECLARE_READ8_MEMBER(psurge_protection_r);
+	uint8_t psurge_protection_r();
 
 	/* chkun */
-	DECLARE_WRITE8_MEMBER(chkun_sound_w);
+	void chkun_sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_chkun_tile_info);

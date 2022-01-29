@@ -55,14 +55,14 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
-	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
-	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
-	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
-	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
+	void acefruit_colorram_w(offs_t offset, uint8_t data);
+	void acefruit_coin_w(uint8_t data);
+	void acefruit_sound_w(uint8_t data);
+	void acefruit_lamp_w(offs_t offset, uint8_t data);
+	void acefruit_solenoid_w(uint8_t data);
 
 	void acefruit_palette(palette_device &palette) const;
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,7 +108,7 @@ void acefruit_state::acefruit_update_irq(int vpos)
 }
 
 
-void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int vpos = m_screen->vpos();
 
@@ -149,16 +149,14 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 {
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
-	int row;
-	int col;
 
-	for( row = startrow; row <= endrow; row++ )
+	for( int row = startrow; row <= endrow; row++ )
 	{
 		int spriterow = 0;
 		int spriteindex = 0;
 		int spriteparameter = 0;
 
-		for( col = 0; col < 32; col++ )
+		for( int col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
 			int code = m_videoram[ tile_index ];
@@ -170,20 +168,18 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
-				int y;
-				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
 				gfx_element *gfx =  m_gfxdecode->gfx(0);
 
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
 					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const uint8_t *gfxdata = gfx->get_data(sprite);
 
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
@@ -192,14 +188,11 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else
 			{
-				int y;
-				int x;
-
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = 0;
 					}
 				}
@@ -230,7 +223,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::sidewndr_payout_r)
+int acefruit_state::sidewndr_payout_r()
 {
 	switch (Mask)
 	{
@@ -245,7 +238,7 @@ READ_LINE_MEMBER(acefruit_state::sidewndr_payout_r)
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::starspnr_coinage_r)
+int acefruit_state::starspnr_coinage_r()
 {
 	switch (Mask)
 	{
@@ -264,7 +257,7 @@ READ_LINE_MEMBER(acefruit_state::starspnr_coinage_r)
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::starspnr_payout_r)
+int acefruit_state::starspnr_payout_r()
 {
 	switch (Mask)
 	{
@@ -280,28 +273,28 @@ READ_LINE_MEMBER(acefruit_state::starspnr_payout_r)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
+void acefruit_state::acefruit_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
+void acefruit_state::acefruit_coin_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+void acefruit_state::acefruit_sound_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
+void acefruit_state::acefruit_lamp_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
+void acefruit_state::acefruit_solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_solenoids[i] = BIT(data, i);

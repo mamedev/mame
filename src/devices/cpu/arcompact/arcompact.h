@@ -72,14 +72,14 @@ public:
 	// construction/destruction
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( arcompact_auxreg002_LPSTART_r);
-	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);
-	DECLARE_READ32_MEMBER( arcompact_auxreg003_LPEND_r);
-	DECLARE_WRITE32_MEMBER(arcompact_auxreg003_LPEND_w);
+	uint32_t arcompact_auxreg002_LPSTART_r();
+	void arcompact_auxreg002_LPSTART_w(uint32_t data);
+	uint32_t arcompact_auxreg003_LPEND_r();
+	void arcompact_auxreg003_LPEND_w(uint32_t data);
 
-	DECLARE_READ32_MEMBER( arcompact_auxreg00a_STATUS32_r);
-	DECLARE_READ32_MEMBER( arcompact_auxreg025_INTVECTORBASE_r);
-	DECLARE_WRITE32_MEMBER( arcompact_auxreg025_INTVECTORBASE_w);
+	uint32_t arcompact_auxreg00a_STATUS32_r();
+	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
+	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
 
 	void arcompact_auxreg_map(address_map &map);
@@ -89,9 +89,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 5; }
-	virtual uint32_t execute_max_cycles() const override { return 5; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 
@@ -31,9 +31,9 @@ public:
 	template <typename T> void set_chargen(T &&tag) { m_char_rom.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ_LINE_MEMBER(lba7_r);
-	DECLARE_WRITE8_MEMBER(dc012_w);
-	DECLARE_WRITE8_MEMBER(dc011_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	void dc012_w(offs_t offset, uint8_t data);
+	void dc011_w(uint8_t data);
+	void brightness_w(uint8_t data);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -48,7 +48,7 @@ protected:
 	// internal state
 	void recompute_parameters();
 	void vblank_callback(screen_device &screen, bool state);
-	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
+	void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank);
 	TIMER_CALLBACK_MEMBER(lba3_change);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 	virtual void notify_vblank(bool choice) { }
@@ -101,10 +101,8 @@ public:
 	void palette_select(int choice);
 
 protected:
-	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type) override;
 	virtual void notify_vblank(bool choice) override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DECLARE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device)

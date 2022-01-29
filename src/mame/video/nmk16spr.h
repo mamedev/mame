@@ -11,14 +11,14 @@
 class nmk_16bit_sprite_device : public device_t
 {
 public:
-	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 	typedef device_delegate<void (u16 attr, int &flipx, int &flipy, int &code)> ext_cb_delegate;
 
+	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// configuration
-	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = colpri_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb = ext_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb.set(std::forward<T>(args)...); }
 	void set_videoshift(int shift) { m_videoshift = shift; }
 	void set_mask(int xmask, int ymask) { m_xmask = xmask, m_ymask = ymask; }
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }
@@ -34,10 +34,10 @@ protected:
 private:
 	struct sprite_t
 	{
-		u32 code, colour;
-		int x, y;
-		bool flipx, flipy;
-		u32 pri_mask;
+		u32 code = 0, colour = 0;
+		int x = 0, y = 0;
+		bool flipx = false, flipy = false;
+		u32 pri_mask = 0;
 	};
 	colpri_cb_delegate m_colpri_cb;                  // callback for colour, priority
 	ext_cb_delegate m_ext_cb;                        // callback for flipx, flipy or code bit modification
@@ -46,7 +46,7 @@ private:
 	int m_xmask, m_ymask;                            // x,y position masking
 	int m_screen_width, m_screen_height;             // screen size related to flipscreen
 	u32 m_max_sprite_clock;                          // max sprite cycles, related to screen total size?
-	std::unique_ptr<struct sprite_t[]> m_spritelist; // sprite list caches
+	std::unique_ptr<sprite_t[]> m_spritelist;        // sprite list caches
 };
 
 DECLARE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device)

@@ -45,7 +45,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 protected:
 	// device-specific overrides

@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!--The purpose of this list is to document the .raw files of e-reader, which may be supported later in GBA driver-->
-<!--It's based in No-Intro e-reader set-->
-<!--ereader interface is dummy yet-->
-<!--Author: Shideravan-->
-
 <!--
+license:CC0
+
+The purpose of this list is to document the .raw files of e-reader, which may be supported later in GBA driver
+It's based in No-Intro e-reader set
+ereader interface is dummy yet
+Author: Shideravan
+
  e-Reader cart hardware info (USA version):
    PCB: AGB-PES-10
    U1: U1 MASK ROM AGB [MX23L6406-12C]

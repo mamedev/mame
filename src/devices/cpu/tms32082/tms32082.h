@@ -68,11 +68,10 @@ public:
 		INPUT_X4        = 4
 	};
 
-	DECLARE_READ32_MEMBER(mp_param_r);
-	DECLARE_WRITE32_MEMBER(mp_param_w);
+	uint32_t mp_param_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void set_command_callback(write32_delegate callback);
-
+	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
 	void mp_internal_map(address_map &map);
 protected:
@@ -81,9 +80,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -130,10 +129,12 @@ protected:
 
 	int m_icount;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 
-	write32_delegate m_cmd_callback;
+	write32mo_delegate m_cmd_callback;
+
+	uint32_t m_pp_status;
 
 	void check_interrupts();
 	void processor_command(uint32_t command);
@@ -147,6 +148,7 @@ protected:
 	bool test_condition(int condition, uint32_t value);
 	uint32_t calculate_cmp(uint32_t src1, uint32_t src2);
 	void vector_loadstore();
+	void tc_command_execute(int channel, uint32_t entrypoint);
 };
 
 
@@ -169,9 +171,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -190,8 +192,8 @@ protected:
 
 	int m_icount;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 };
 
 

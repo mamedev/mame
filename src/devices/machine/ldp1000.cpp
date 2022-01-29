@@ -116,7 +116,7 @@ int32_t sony_ldp1000_device::player_update(const vbi_metadata &vbi, int fieldnum
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( sony_ldp1000_device::status_r )
+uint8_t sony_ldp1000_device::status_r()
 {
 	uint8_t res = m_status;
 	m_status = stat_undef;
@@ -169,7 +169,7 @@ void sony_ldp1000_device::exec_enter_cmd()
 
 
 // TODO: de-instantize this
-WRITE8_MEMBER( sony_ldp1000_device::command_w )
+void sony_ldp1000_device::command_w(uint8_t data)
 {
 	printf("CMD %02x\n",data);
 	// 0x30 to 0x69 range causes an ACK, anything else is invalid

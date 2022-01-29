@@ -23,13 +23,8 @@ public:
 	// construction/destruction
 	hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	DECLARE_READ16_MEMBER(tape_r);
-	DECLARE_WRITE16_MEMBER(tape_w);
+	uint16_t tape_r(offs_t offset);
+	void tape_w(offs_t offset, uint16_t data);
 
 	auto flg() { return m_flg_handler.bind(); }
 	auto sts() { return m_sts_handler.bind(); }
@@ -45,6 +40,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(motion_w);
 	DECLARE_WRITE_LINE_MEMBER(rd_bit_w);
 	DECLARE_READ_LINE_MEMBER(wr_bit_r);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line m_flg_handler;

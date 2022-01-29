@@ -2,7 +2,11 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-    Micronics 1000
+    Micronic 1000
+
+    This is a small handheld CP/M computer with a 4x8 keypad and a 128x64
+    LCD display. It was produced by Victor Micronic Ltd, a UK subsidiary
+    of Datronic AB.
 
     06/2010 (Sandro Ronco)
     - ROM/RAM banking
@@ -18,9 +22,10 @@
     The display shows "TESTING..." for about 2 min before showing the information screen
 
     More info:
-    http://www.philpem.me.uk/elec/micronic/
-    http://members.lycos.co.uk/leeedavison/z80/micronic/index.html
-    http://reocities.com/SiliconValley/Port/8052/
+    http://web.archive.org/web/20180104024745/http://www.philpem.me.uk/elec/micronic/
+    http://web.archive.org/web/20080411235036/http://members.lycos.co.uk:80/leeedavison/z80/micronic/index.html
+    https://geocities.restorativland.org/SiliconValley/Port/8052/
+    https://www.cbronline.com/news/victor_micronic_has_the_m1000_handheld_computer_terminal/
 
 ****************************************************************************/
 
@@ -118,7 +123,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER( micronic_state::keypad_r )
+uint8_t micronic_state::keypad_r()
 {
 	uint8_t data = 0;
 
@@ -137,22 +142,22 @@ READ8_MEMBER( micronic_state::keypad_r )
 	return data;
 }
 
-READ8_MEMBER( micronic_state::status_flag_r )
+uint8_t micronic_state::status_flag_r()
 {
 	return m_status_flag;
 }
 
-WRITE8_MEMBER( micronic_state::status_flag_w )
+void micronic_state::status_flag_w(uint8_t data)
 {
 	m_status_flag = data;
 }
 
-WRITE8_MEMBER( micronic_state::kp_matrix_w )
+void micronic_state::kp_matrix_w(uint8_t data)
 {
 	m_kp_matrix = data;
 }
 
-WRITE8_MEMBER( micronic_state::beep_w )
+void micronic_state::beep_w(uint8_t data)
 {
 	uint16_t frequency[16] =
 	{
@@ -164,12 +169,12 @@ WRITE8_MEMBER( micronic_state::beep_w )
 	m_beep->set_state((data & 0x0f) ? 1 : 0);
 }
 
-READ8_MEMBER( micronic_state::irq_flag_r )
+uint8_t micronic_state::irq_flag_r()
 {
-	return (m_backbattery->read()<<4) | (m_mainbattery->read()<<3) | (keypad_r(space, offset) ? 0 : 1);
+	return (m_backbattery->read()<<4) | (m_mainbattery->read()<<3) | (keypad_r() ? 0 : 1);
 }
 
-WRITE8_MEMBER( micronic_state::bank_select_w )
+void micronic_state::bank_select_w(uint8_t data)
 {
 	if (data < 2)
 	{
@@ -179,16 +184,16 @@ WRITE8_MEMBER( micronic_state::bank_select_w )
 	else
 	{
 		m_bank1->set_entry((data <= m_banks_num) ? data : m_banks_num);
-		m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x7fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x7fff, membank("bank1"));
 	}
 }
 
-WRITE8_MEMBER( micronic_state::lcd_contrast_w )
+void micronic_state::lcd_contrast_w(uint8_t data)
 {
 	m_lcd_contrast = data;
 }
 
-WRITE8_MEMBER( micronic_state::port_2c_w )
+void micronic_state::port_2c_w(uint8_t data)
 {
 	m_lcd_backlight = BIT(data, 4);
 }
@@ -198,17 +203,17 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
     RTC-146818
 ***************************************************************************/
 
-WRITE8_MEMBER( micronic_state::rtc_address_w )
+void micronic_state::rtc_address_w(uint8_t data)
 {
 	m_rtc->write(0, data);
 }
 
-READ8_MEMBER( micronic_state::rtc_data_r )
+uint8_t micronic_state::rtc_data_r()
 {
 	return m_rtc->read(1);
 }
 
-WRITE8_MEMBER( micronic_state::rtc_data_w )
+void micronic_state::rtc_data_w(uint8_t data)
 {
 	m_rtc->write(1, data);
 }
@@ -395,4 +400,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME         FLAGS
-COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

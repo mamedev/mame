@@ -608,7 +608,7 @@ void crt9007_device::device_clock_changed()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int x = screen().hpos();
 	int y = screen().vpos();
@@ -719,7 +719,7 @@ device_memory_interface::space_config_vector crt9007_device::memory_space_config
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( crt9007_device::read )
+uint8_t crt9007_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -788,7 +788,7 @@ READ8_MEMBER( crt9007_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( crt9007_device::write )
+void crt9007_device::write(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 
@@ -934,7 +934,7 @@ WRITE8_MEMBER( crt9007_device::write )
 //  ack_w - DMA acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_device::ack_w )
+void crt9007_device::ack_w(int state)
 {
 	LOG("CRT9007 ACK: %u\n", state);
 
@@ -952,7 +952,7 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 //  lpstb_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
+void crt9007_device::lpstb_w(int state)
 {
 	LOG("CRT9007 LPSTB: %u\n", state);
 

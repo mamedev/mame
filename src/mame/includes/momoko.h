@@ -75,6 +75,10 @@ private:
 	virtual void machine_reset() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int flip);
+	void draw_text_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_fg_romtilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_bg_romtilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, bool high);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

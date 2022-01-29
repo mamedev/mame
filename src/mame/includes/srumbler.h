@@ -33,11 +33,11 @@ private:
 	tilemap_t *m_fg_tilemap;
 	int m_scroll[4];
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(foreground_w);
-	DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(_4009_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void bankswitch_w(uint8_t data);
+	void foreground_w(offs_t offset, uint8_t data);
+	void background_w(offs_t offset, uint8_t data);
+	void _4009_w(uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

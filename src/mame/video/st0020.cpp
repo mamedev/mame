@@ -16,15 +16,17 @@
 
 #include "emu.h"
 #include "st0020.h"
-#include "render.h"
+
+#include "screen.h"
+
 
 DEFINE_DEVICE_TYPE(ST0020_SPRITES, st0020_device, "st0020", "Seta ST0020 Sprites")
 
 
-#define ST0020_ST0032_BYTESWAP_DATA \
-	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8);
-#define ST0020_ST0032_BYTESWAP_MEM_MASK \
-	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8);
+#define ST0020_ST0032_BYTESWAP_DATA() \
+		do { if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8); } while (false)
+#define ST0020_ST0032_BYTESWAP_MEM_MASK() \
+		do { if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); } while (false)
 
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -68,13 +70,13 @@ void st0020_device::device_start()
 
 	// Tilemaps
 	m_tmap[0] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<0>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[1] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<1>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[2] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<2>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<2>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[3] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<3>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<3>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	for (int i = 0; i < 4; ++i)
 	{
 		m_tmap[i]->set_transparent_pen(0);
@@ -90,27 +92,27 @@ void st0020_device::device_start()
 
 
 // Gfx ram
-READ16_MEMBER(st0020_device::gfxram_r)
+uint16_t st0020_device::gfxram_r(offs_t offset, uint16_t mem_mask)
 {
-	ST0020_ST0032_BYTESWAP_MEM_MASK
+	ST0020_ST0032_BYTESWAP_MEM_MASK();
 
 	uint16_t data = m_gfxram[offset + m_gfxram_bank * 0x100000/2];
 
-	ST0020_ST0032_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_DATA();
 	return data;
 }
 
-WRITE16_MEMBER(st0020_device::gfxram_w)
+void st0020_device::gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	ST0020_ST0032_BYTESWAP_MEM_MASK
-	ST0020_ST0032_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_MEM_MASK();
+	ST0020_ST0032_BYTESWAP_DATA();
 
 	offset += m_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_gfxram[offset]);
 	gfx(0)->mark_dirty(offset / (16*8/2));
 }
 
-WRITE16_MEMBER(st0020_device::gfxram_bank_w)
+void st0020_device::gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_regs[offset]);
 
@@ -169,7 +171,7 @@ TILE_GET_INFO_MEMBER(st0020_device::get_tile_info)
 	if (m_is_st0032)    color = (color & 0x1ff) * ((color & 0x200) ? 4 : 16);
 	else                color = color * ((m_regs[Layer * 4 + 3] & 0x0100) ? 2 : 8);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(st0020_device::scan_16x16)
@@ -178,12 +180,12 @@ TILEMAP_MAPPER_MEMBER(st0020_device::scan_16x16)
 }
 
 // Sprite RAM
-READ16_MEMBER(st0020_device::sprram_r)
+uint16_t st0020_device::sprram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(st0020_device::sprram_w)
+void st0020_device::sprram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 
@@ -201,7 +203,7 @@ WRITE16_MEMBER(st0020_device::sprram_w)
 }
 
 // Blitter
-WRITE16_MEMBER(st0020_device::do_blit_w)
+void st0020_device::do_blit_w(uint16_t data)
 {
 	uint32_t src  =   (m_regs[0xc0/2] + (m_regs[0xc2/2] << 16)) << 1;
 	uint32_t dst  =   (m_regs[0xc4/2] + (m_regs[0xc6/2] << 16)) << 4;
@@ -256,7 +258,7 @@ WRITE16_MEMBER(st0020_device::do_blit_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(st0020_device::tmap_st0020_w)
+void st0020_device::tmap_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_regs[offset];
 	data = COMBINE_DATA(&m_regs[offset]);
@@ -285,7 +287,7 @@ WRITE16_MEMBER(st0020_device::tmap_st0020_w)
 	}
 }
 
-WRITE16_MEMBER(st0020_device::tmap_st0032_w)
+void st0020_device::tmap_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_regs[offset];
 	data = COMBINE_DATA(&m_regs[offset]);
@@ -309,7 +311,7 @@ WRITE16_MEMBER(st0020_device::tmap_st0032_w)
 }
 
 
-READ16_MEMBER(st0020_device::regs_r)
+uint16_t st0020_device::regs_r(offs_t offset)
 {
 	if (m_is_st0032)
 	{
@@ -332,11 +334,11 @@ READ16_MEMBER(st0020_device::regs_r)
 }
 
 
-WRITE16_MEMBER(st0020_device::regs_st0020_w)
+void st0020_device::regs_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x20/2)
 	{
-		tmap_st0020_w(space, offset, data, mem_mask);
+		tmap_st0020_w(offset, data, mem_mask);
 		return;
 	}
 
@@ -362,7 +364,7 @@ WRITE16_MEMBER(st0020_device::regs_st0020_w)
 //      case 0x86/2:    double buffering?
 
 		case 0x8a/2:
-			gfxram_bank_w(space, offset, data, mem_mask);
+			gfxram_bank_w(offset, data, mem_mask);
 			break;
 
 		// blitter
@@ -374,7 +376,7 @@ WRITE16_MEMBER(st0020_device::regs_st0020_w)
 			break;
 
 		case 0xca/2:    // start
-			do_blit_w(space, offset, data, mem_mask);
+			do_blit_w(data);
 			break;
 
 		default:
@@ -382,11 +384,11 @@ WRITE16_MEMBER(st0020_device::regs_st0020_w)
 	}
 }
 
-WRITE16_MEMBER(st0020_device::regs_st0032_w)
+void st0020_device::regs_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset >= 0x20/2 && offset < 0x60/2)
 	{
-		tmap_st0032_w(space, offset, data, mem_mask);
+		tmap_st0032_w(offset, data, mem_mask);
 		return;
 	}
 
@@ -401,7 +403,7 @@ WRITE16_MEMBER(st0020_device::regs_st0032_w)
 //      case 0x82/2:    double buffering?
 
 		case 0x86/2:
-			gfxram_bank_w(space, offset, data, mem_mask);
+			gfxram_bank_w(offset, data, mem_mask);
 			break;
 
 		// blitter
@@ -413,7 +415,7 @@ WRITE16_MEMBER(st0020_device::regs_st0032_w)
 			break;
 
 		case 0xca/2:    // start
-			do_blit_w(space, offset, data, mem_mask);
+			do_blit_w(data);
 			break;
 
 		default:
@@ -421,12 +423,12 @@ WRITE16_MEMBER(st0020_device::regs_st0032_w)
 	}
 }
 
-WRITE16_MEMBER(st0020_device::regs_w)
+void st0020_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_is_st0032)
-		regs_st0032_w(space, offset, data, mem_mask);
+		regs_st0032_w(offset, data, mem_mask);
 	else
-		regs_st0020_w(space, offset, data, mem_mask);
+		regs_st0020_w(offset, data, mem_mask);
 }
 
 /***************************************************************************

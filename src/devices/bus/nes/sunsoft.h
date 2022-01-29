@@ -60,7 +60,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	uint16_t m_irq_count;
 	int m_irq_enable, m_irq_toggle;
@@ -96,6 +97,7 @@ protected:
 	int m_reg, m_latch1, m_latch2, m_wram_enable;
 };
 
+
 // ======================> nes_sunsoft_fme7_device
 
 class nes_sunsoft_fme7_device : public nes_nrom_device
@@ -116,7 +118,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint16_t m_irq_count;

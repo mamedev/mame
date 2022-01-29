@@ -200,20 +200,18 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
  *************************************/
 
 midzeus_renderer::midzeus_renderer(midzeus_state &state)
-	: poly_manager<float, mz_poly_extra_data, 4, 10000>(state.machine()),
+	: poly_manager<float, mz_poly_extra_data, 4>(state.machine()),
 		m_state(state)
 {}
 
-VIDEO_START_MEMBER(midzeus_state,midzeus)
+void midzeus_state::video_start()
 {
-	int i;
-
 	/* allocate memory for "wave" RAM */
 	m_waveram[0] = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_waveram[1] = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8/4);
 
 	/* initialize a 5-5-5 palette */
-	for (i = 0; i < 32768; i++)
+	for (int i = 0; i < 32768; i++)
 		m_palette->set_pen_color(i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 
 	/* initialize polygon engine */
@@ -272,27 +270,11 @@ void midzeus_state::exit_handler()
  *
  *************************************/
 
-uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	m_poly->wait("VIDEO_UPDATE");
 
-	/* normal update case */
-	if (!machine().input().code_pressed(KEYCODE_V))
-	{
-		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
-		int xoffs = screen.visible_area().min_x;
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix16(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
-		}
-	}
-
-	/* waveram drawing case */
-	else
+	if (DEBUG_KEYS && machine().input().code_pressed(KEYCODE_V)) /* waveram drawing case */
 	{
 		const void *base;
 
@@ -304,17 +286,30 @@ uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind1
 		if (m_yoffs < 0) m_yoffs = 0;
 		base = waveram0_ptr_from_block_addr(m_yoffs << 12);
 
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t *dest = &bitmap.pix16(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			uint16_t *const dest = &bitmap.pix(y);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				uint8_t tex = get_texel_8bit(base, y, x, m_texel_width);
+				uint8_t const tex = get_texel_8bit(base, y, x, m_texel_width);
 				dest[x] = (tex << 8) | tex;
 			}
 		}
+
 		popmessage("offs = %06X", m_yoffs << 12);
 	}
+	else /* normal update case */
+	{
+		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
+		int xoffs = screen.visible_area().min_x;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			uint16_t *const dest = &bitmap.pix(y);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
+		}
+	}
+
 
 	return 0;
 }
@@ -327,7 +322,7 @@ uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::zeus_r)
+uint32_t midzeus_state::zeus_r(offs_t offset)
 {
 	bool logit = (offset < 0xb0 || offset > 0xb7);
 	uint32_t result = m_zeusbase[offset & ~1];
@@ -397,7 +392,7 @@ READ32_MEMBER(midzeus_state::zeus_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midzeus_state::zeus_w)
+void midzeus_state::zeus_w(offs_t offset, uint32_t data)
 {
 	bool logit = m_zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 
@@ -584,7 +579,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					// m_zeusbase[0x46] = ??? = 0x00000000
 					// m_zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// m_zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					mz_poly_extra_data& extra = m_poly->object_data_alloc();
+					mz_poly_extra_data& extra = m_poly->object_data().next();
 					poly_vertex vert[4];
 
 					vert[0].x = (int16_t)m_zeusbase[0x08];
@@ -703,7 +698,12 @@ void midzeus_state::zeus_register_update(offs_t offset)
 
 		case 0xcc:
 			m_screen->update_partial(m_screen->vpos());
-			m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+
+			if (DEBUG_KEYS)
+				m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+			else
+				m_log_fifo = 0;
+
 			break;
 
 		case 0xe0:
@@ -874,7 +874,6 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		/* 0x28: same for mk4b */
 		/* 0x30: same for invasn */
 		case 0x25:
-		{
 			/* 0x25 is used differently in mk4b. What determines this? */
 			if (m_is_mk4b)
 			{
@@ -883,7 +882,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 
 				break;
 			}
-		}
+			[[fallthrough]];
 		case 0x28:
 		case 0x30:
 			if (numwords < 4 || ((data[0] & 0x808000) && numwords < 10))
@@ -1132,7 +1131,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		}
 	}
 
-	numverts = m_state.m_poly->zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
+	numverts = m_state.m_poly->zclip_if_less<4>(4, &vert[0], &clipvert[0], 512.0f);
 	if (numverts < 3)
 		return;
 
@@ -1160,7 +1159,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 			clipvert[i].y += 0.0005f;
 	}
 
-	mz_poly_extra_data& extra = m_state.m_poly->object_data_alloc();
+	mz_poly_extra_data& extra = m_state.m_poly->object_data().next();
 
 	if (ctrl_word & 0x01000000)
 	{
@@ -1198,15 +1197,14 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	// Note: Before being upgraded to the new polygon rasterizing code, this function call was
 	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
 	//       the template argument is 4, but keep an eye out for missing quads.
-	m_state.m_poly->render_polygon<4>(m_state.m_zeus_cliprect,
+	m_state.m_poly->render_polygon<4, 4>(m_state.m_zeus_cliprect,
 							render_delegate(&midzeus_renderer::render_poly, this),
-							4,
 							clipvert);
 }
 
 void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
 {
-	m_state.m_poly->render_polygon<4>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), 0, vert);
+	m_state.m_poly->render_polygon<4, 0>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), vert);
 }
 
 
@@ -1471,14 +1469,14 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 	for (i = 0; i < numoctets; i++)
 		checksum += ptr[i*2] + ptr[i*2+1];
 
-	for (i = 0; i < ARRAY_LENGTH(recent_entries); i++)
+	for (i = 0; i < std::size(recent_entries); i++)
 		if (recent_entries[i].lab == length_and_base && recent_entries[i].checksum == checksum)
 		{
 			foundit = true;
 			break;
 		}
 
-	if (i == ARRAY_LENGTH(recent_entries))
+	if (i == std::size(recent_entries))
 		i--;
 	if (i != 0)
 	{

@@ -30,11 +30,13 @@ public:
 	void fw1stpal(machine_config &config);
 	void fw2ndpal(machine_config &config);
 	void saloon(machine_config &config);
+	void clubcard(machine_config &config);
 	void cuoreuno(machine_config &config);
 	void funquiz(machine_config &config);
 	void witchryl(machine_config &config);
 	void fw_brick_1(machine_config &config);
 	void fw_brick_2(machine_config &config);
+	void gratispk(machine_config &config);
 
 	void init_saloon();
 	void init_mongolnw();
@@ -43,12 +45,13 @@ public:
 	void init_dino4();
 	void init_ctunk();
 	void init_jolycdig();
+	void init_impera16();
 
 protected:
-	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
-	DECLARE_WRITE8_MEMBER(funworld_colorram_w);
-	DECLARE_WRITE8_MEMBER(funworld_lamp_a_w);
-	DECLARE_WRITE8_MEMBER(funworld_lamp_b_w);
+	void funworld_videoram_w(offs_t offset, uint8_t data);
+	void funworld_colorram_w(offs_t offset, uint8_t data);
+	void funworld_lamp_a_w(uint8_t data);
+	void funworld_lamp_b_w(uint8_t data);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
@@ -63,16 +66,18 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 private:
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(question_bank_w);
+	uint8_t questions_r(offs_t offset);
+	void question_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
-	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
-	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
+	uint8_t funquiz_ay8910_a_r();
+	uint8_t funquiz_ay8910_b_r();
 
+	void clubcard_map(address_map &map);
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
 	void fw_brick_map(address_map &map);
+	void gratispk_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
 
@@ -130,7 +135,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(chinatow_r_32f0);
+	uint8_t chinatow_r_32f0(offs_t offset);
 
 	void chinatow_map(address_map &map);
 };
@@ -151,7 +156,7 @@ protected:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(multiwin_opcode_r);
+	uint8_t multiwin_opcode_r(offs_t offset);
 
 	void multiwin_opcodes_map(address_map& map);
 };
@@ -167,7 +172,7 @@ public:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
+	uint8_t royalcrdf_opcode_r(offs_t offset);
 
 	void royalcrdf_map(address_map& map);
 	void royalcrdf_opcodes_map(address_map& map);

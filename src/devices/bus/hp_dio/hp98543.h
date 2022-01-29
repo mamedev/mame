@@ -11,8 +11,8 @@
 #include "video/nereid.h"
 #include "machine/ram.h"
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
+
 class dio16_98543_device :
 	public device_t,
 	public device_dio16_card_interface,
@@ -21,13 +21,13 @@ class dio16_98543_device :
 public:
 	dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(rom_w);
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static constexpr int TOPCAT_COUNT = 4;
 
@@ -67,7 +67,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device)

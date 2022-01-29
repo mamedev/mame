@@ -17,7 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"
 #include "imagedev/cassette.h"
@@ -288,19 +288,19 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
-	DECLARE_READ8_MEMBER(msx_sec_slot_r);
-	DECLARE_READ8_MEMBER(msx_kanji_r);
-	DECLARE_WRITE8_MEMBER(msx_kanji_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
-	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
-	DECLARE_READ8_MEMBER(msx_mem_read);
-	DECLARE_WRITE8_MEMBER(msx_mem_write);
-	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
-	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	void msx_sec_slot_w(uint8_t data);
+	uint8_t msx_sec_slot_r();
+	uint8_t msx_kanji_r(offs_t offset);
+	void msx_kanji_w(offs_t offset, uint8_t data);
+	void msx_ppi_port_a_w(uint8_t data);
+	void msx_ppi_port_c_w(uint8_t data);
+	uint8_t msx_ppi_port_b_r();
+	uint8_t msx_mem_read(offs_t offset);
+	void msx_mem_write(offs_t offset, uint8_t data);
+	uint8_t msx_psg_port_a_r();
+	uint8_t msx_psg_port_b_r();
+	void msx_psg_port_a_w(uint8_t data);
+	void msx_psg_port_b_w(uint8_t data);
 
 private:
 	void msx_memory_map_all();
@@ -308,7 +308,7 @@ private:
 	void msx_memory_reset();
 	void msx_memory_init();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
@@ -483,6 +483,7 @@ private:
 	void msx2(machine_config &config);
 	void msx2p(machine_config &config);
 	void msx2_pal(machine_config &config);
+	void turbor(machine_config &config);
 
 	void msx2_cartlist(machine_config &config);
 	void msx2_floplist(machine_config &config);
@@ -491,11 +492,11 @@ private:
 	void msx_ym2413(machine_config &config);
 	void msx2_64kb_vram(machine_config &config);
 
-	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
-	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
-	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
-	DECLARE_READ8_MEMBER(msx_switched_r);
-	DECLARE_WRITE8_MEMBER(msx_switched_w);
+	uint8_t msx_rtc_reg_r();
+	void msx_rtc_reg_w(uint8_t data);
+	void msx_rtc_latch_w(uint8_t data);
+	uint8_t msx_switched_r(offs_t offset);
+	void msx_switched_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
 	void msx2_io_map(address_map &map);

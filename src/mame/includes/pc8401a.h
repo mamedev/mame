@@ -49,7 +49,7 @@ public:
 		, m_io_cart(*this, "io_cart")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
-		, m_crt_ram(*this, "crt_ram")
+		, m_crt_ram(*this, "crt_ram", PC8401A_CRT_VIDEORAM_SIZE, ENDIANNESS_LITTLE)
 		, m_io_y(*this, "Y.%u", 0)
 	{ }
 
@@ -62,7 +62,7 @@ public:
 	required_device<generic_slot_device> m_io_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_crt_ram;
+	memory_share_creator<uint8_t> m_crt_ram;
 	required_ioport_array<10> m_io_y;
 
 	memory_region *m_cart_rom;
@@ -70,19 +70,19 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER( mmr_w );
-	DECLARE_READ8_MEMBER( mmr_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_cmd_w );
-	DECLARE_WRITE8_MEMBER( rtc_ctrl_w );
-	DECLARE_READ8_MEMBER( io_rom_data_r );
-	DECLARE_WRITE8_MEMBER( io_rom_addr_w );
-	DECLARE_READ8_MEMBER( port70_r );
-	DECLARE_READ8_MEMBER( port71_r );
-	DECLARE_WRITE8_MEMBER( port70_w );
-	DECLARE_WRITE8_MEMBER( port71_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	void mmr_w(uint8_t data);
+	uint8_t mmr_r();
+	uint8_t rtc_r();
+	void rtc_cmd_w(uint8_t data);
+	void rtc_ctrl_w(uint8_t data);
+	uint8_t io_rom_data_r();
+	void io_rom_addr_w(offs_t offset, uint8_t data);
+	uint8_t port70_r();
+	uint8_t port71_r();
+	void port70_w(uint8_t data);
+	void port71_w(uint8_t data);
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
 	void pc8401a_palette(palette_device &palette) const;
 
 	void scan_keyboard();

@@ -17,13 +17,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define PET_EXPANSION_SLOT_TAG     "exp"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -32,7 +25,7 @@
 class device_pet_expansion_card_interface;
 
 class pet_expansion_slot_device : public device_t,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_pet_expansion_card_interface>
 {
 public:
 	template <typename T>
@@ -86,9 +79,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_pet_expansion_card_interface *m_card;
 
@@ -99,7 +90,7 @@ protected:
 
 // ======================> device_pet_expansion_card_interface
 
-class device_pet_expansion_card_interface : public device_slot_card_interface
+class device_pet_expansion_card_interface : public device_interface
 {
 	friend class pet_expansion_slot_device;
 

@@ -20,7 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,12 +37,12 @@ WRITE_LINE_MEMBER(battlnts_state::vblank_irq)
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
+void battlnts_state::battlnts_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
+void battlnts_state::battlnts_bankswitch_w(uint8_t data)
 {
 	/* bits 6 & 7 = bank number */
 	m_rombank->set_entry((data & 0xc0) >> 6);
@@ -257,12 +257,12 @@ void battlnts_state::battlnts(machine_config &config)
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback), this);
+	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback), this);
+	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback));
 	m_k007420->set_palette_tag("palette");
 
 	/* sound hardware */

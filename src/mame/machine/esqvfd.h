@@ -9,7 +9,7 @@
 
 class esqvfd_device : public device_t {
 public:
-	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
+	void write(uint8_t data) { write_char(data); }
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
@@ -48,7 +48,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	output_helper::ptr m_vfds;
 	int m_cursx, m_cursy;

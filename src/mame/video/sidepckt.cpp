@@ -54,7 +54,7 @@ void sidepckt_state::sidepckt_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
@@ -71,12 +71,14 @@ TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 
 void sidepckt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidepckt_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidepckt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_transmask(0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
 	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
+
+	save_item(NAME(m_scroll_y));
 }
 
 
@@ -87,24 +89,24 @@ void sidepckt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sidepckt_state::videoram_w)
+void sidepckt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::colorram_w)
+void sidepckt_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(sidepckt_state::scroll_y_r)
+uint8_t sidepckt_state::scroll_y_r()
 {
 	return (m_scroll_y);
 }
 
-WRITE8_MEMBER(sidepckt_state::scroll_y_w)
+void sidepckt_state::scroll_y_w(uint8_t data)
 {
 	// Bits 0-5: Scroll y
 	m_scroll_y = data & 0x3F;

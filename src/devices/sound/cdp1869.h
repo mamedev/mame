@@ -141,6 +141,10 @@ public:
 
 	static constexpr unsigned PALETTE_LENGTH  = 8+64;
 
+	typedef device_delegate<uint8_t (uint16_t pma, uint8_t cma, uint8_t pmd)> char_ram_read_delegate;
+	typedef device_delegate<void (uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)> char_ram_write_delegate;
+	typedef device_delegate<int (uint16_t pma, uint8_t cma, uint8_t pmd)> pcb_read_delegate;
+
 	// construction/destruction
 	template <typename T>
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&addrmap)
@@ -156,44 +160,9 @@ public:
 	void set_color_clock(const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); set_color_clock(xtal.value()); }
 
 	// delegate setters
-	typedef device_delegate<uint8_t (uint16_t pma, uint8_t cma, uint8_t pmd)> char_ram_read_delegate;
-	void set_char_ram_read_callback(char_ram_read_delegate callback) { m_in_char_ram_func = callback; }
-	template <class FunctionClass> void set_char_ram_read_callback(const char *devname,
-		uint8_t (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_read_callback(char_ram_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_char_ram_read_callback(
-		uint8_t (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_read_callback(char_ram_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	typedef device_delegate<void (uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)> char_ram_write_delegate;
-	void set_char_ram_write_callback(char_ram_write_delegate callback) { m_out_char_ram_func = callback; }
-	template <class FunctionClass> void set_char_ram_write_callback(const char *devname,
-		void (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_write_callback(char_ram_write_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_char_ram_write_callback(
-		void (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_write_callback(char_ram_write_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	typedef device_delegate<int (uint16_t pma, uint8_t cma, uint8_t pmd)> pcb_read_delegate;
-	void set_pcb_read_callback(pcb_read_delegate callback) { m_in_pcb_func = callback; }
-	template <class FunctionClass> void set_pcb_read_callback(const char *devname,
-		int (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_pcb_read_callback(pcb_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pcb_read_callback(
-		int (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_pcb_read_callback(pcb_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_char_ram_read_callback(T &&... args) { m_in_char_ram_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_char_ram_write_callback(T &&... args) { m_out_char_ram_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_pcb_read_callback(T &&... args) { m_in_pcb_func.set(std::forward<T>(args)...); }
 
 	// helper functions
 	template <typename T, typename U> screen_device& add_pal_screen(machine_config &config, T &&screen_tag, U &&clock)
@@ -218,20 +187,20 @@ public:
 	virtual void char_map(address_map &map);
 	virtual void page_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER( out3_w );
-	DECLARE_WRITE8_MEMBER( out4_w );
-	DECLARE_WRITE8_MEMBER( out5_w );
-	DECLARE_WRITE8_MEMBER( out6_w );
-	DECLARE_WRITE8_MEMBER( out7_w );
+	void out3_w(uint8_t data);
+	void out4_w(offs_t offset);
+	void out5_w(offs_t offset);
+	void out6_w(offs_t offset);
+	void out7_w(offs_t offset);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_WRITE8_MEMBER( char_ram_w );
+	uint8_t char_ram_r(offs_t offset);
+	void char_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( page_ram_r );
-	DECLARE_WRITE8_MEMBER( page_ram_w );
+	uint8_t page_ram_r(offs_t offset);
+	void page_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( predisplay_r );
-	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
+	int predisplay_r();
+	int pal_ntsc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -241,13 +210,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_sound_interface callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	inline bool is_ntsc();
 	inline uint8_t read_page_ram_byte(offs_t address);
@@ -295,7 +264,7 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	int16_t m_signal;                 // current signal
+	stream_buffer::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 	int m_toneoff;                  // tone off
 	int m_wnoff;                    // white noise off

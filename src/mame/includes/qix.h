@@ -49,7 +49,7 @@ public:
 		m_sn2(*this, "sn2"),
 		m_discrete(*this, "discrete"),
 		m_paletteram(*this, "paletteram"),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoram", 0x10000, ENDIANNESS_BIG),
 		m_videoram_address(*this, "videoram_addr"),
 		m_videoram_mask(*this, "videoram_mask"),
 		m_scanline_latch(*this, "scanline_latch"),
@@ -90,7 +90,7 @@ protected:
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_paletteram;
-	optional_shared_ptr<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_videoram_address;
 	optional_shared_ptr<uint8_t> m_videoram_mask;
 	required_shared_ptr<uint8_t> m_scanline_latch;
@@ -101,41 +101,43 @@ protected:
 	optional_memory_bank m_bank0;
 	optional_memory_bank m_bank1;
 	required_device<screen_device> m_screen;
+	std::unique_ptr<uint8_t[]> m_decrypted;
+	std::unique_ptr<uint8_t[]> m_decrypted2;
 
 	pen_t m_pens[0x400];
-	DECLARE_WRITE8_MEMBER(qix_data_firq_w);
-	DECLARE_WRITE8_MEMBER(qix_data_firq_ack_w);
-	DECLARE_READ8_MEMBER(qix_data_firq_r);
-	DECLARE_READ8_MEMBER(qix_data_firq_ack_r);
-	DECLARE_WRITE8_MEMBER(qix_video_firq_w);
-	DECLARE_WRITE8_MEMBER(qix_video_firq_ack_w);
-	DECLARE_READ8_MEMBER(qix_video_firq_r);
-	DECLARE_READ8_MEMBER(qix_video_firq_ack_r);
-	DECLARE_READ8_MEMBER(qix_videoram_r);
-	DECLARE_WRITE8_MEMBER(qix_videoram_w);
-	DECLARE_WRITE8_MEMBER(slither_videoram_w);
-	DECLARE_READ8_MEMBER(qix_addresslatch_r);
-	DECLARE_WRITE8_MEMBER(qix_addresslatch_w);
-	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
-	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
-	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
+	void qix_data_firq_w(uint8_t data);
+	void qix_data_firq_ack_w(uint8_t data);
+	uint8_t qix_data_firq_r(address_space &space);
+	uint8_t qix_data_firq_ack_r(address_space &space);
+	void qix_video_firq_w(uint8_t data);
+	void qix_video_firq_ack_w(uint8_t data);
+	uint8_t qix_video_firq_r(address_space &space);
+	uint8_t qix_video_firq_ack_r(address_space &space);
+	uint8_t qix_videoram_r(offs_t offset);
+	void qix_videoram_w(offs_t offset, uint8_t data);
+	void slither_videoram_w(offs_t offset, uint8_t data);
+	uint8_t qix_addresslatch_r(offs_t offset);
+	void qix_addresslatch_w(offs_t offset, uint8_t data);
+	void slither_addresslatch_w(offs_t offset, uint8_t data);
+	void qix_paletteram_w(offs_t offset, uint8_t data);
+	void qix_palettebank_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
-	DECLARE_WRITE8_MEMBER(qix_pia_w);
-	DECLARE_WRITE8_MEMBER(qix_coinctl_w);
-	DECLARE_WRITE8_MEMBER(slither_76489_0_w);
-	DECLARE_WRITE8_MEMBER(slither_76489_1_w);
-	DECLARE_READ8_MEMBER(slither_trak_lr_r);
-	DECLARE_READ8_MEMBER(slither_trak_ud_r);
+	void qix_pia_w(offs_t offset, uint8_t data);
+	void qix_coinctl_w(uint8_t data);
+	void slither_76489_0_w(uint8_t data);
+	void slither_76489_1_w(uint8_t data);
+	uint8_t slither_trak_lr_r();
+	uint8_t slither_trak_ud_r();
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE_LINE_MEMBER(qix_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(qix_dac_w);
-	DECLARE_WRITE8_MEMBER(qix_vol_w);
-	DECLARE_WRITE8_MEMBER(sndpia_2_warning_w);
-	DECLARE_WRITE8_MEMBER(sync_sndpia1_porta_w);
-	DECLARE_WRITE8_MEMBER(slither_coinctl_w);
+	void qix_dac_w(uint8_t data);
+	void qix_vol_w(uint8_t data);
+	void sndpia_2_warning_w(uint8_t data);
+	void sync_sndpia1_porta_w(uint8_t data);
+	void slither_coinctl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(qix_pia_dint);
 	DECLARE_WRITE_LINE_MEMBER(qix_pia_sint);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
@@ -168,17 +170,17 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	optional_device<m68705p_device> m_mcu;
+
 private:
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(coinctrl_w);
+	uint8_t coin_r();
+	void coin_w(uint8_t data);
+	void coinctrl_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mcu_portb_r);
-	DECLARE_READ8_MEMBER(mcu_portc_r);
-	DECLARE_WRITE8_MEMBER(mcu_porta_w);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
-
-	required_device<m68705p_device> m_mcu;
+	uint8_t mcu_portb_r();
+	uint8_t mcu_portc_r();
+	void mcu_porta_w(uint8_t data);
+	void mcu_portb_w(uint8_t data);
 
 	/* machine state */
 	uint8_t  m_68705_porta_out;
@@ -194,13 +196,14 @@ public:
 	{ }
 
 	void zookeep(machine_config &config);
+	void zookeepbl(machine_config &config);
 	void video(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 
 	void main_map(address_map &map);
 	void video_map(address_map &map);

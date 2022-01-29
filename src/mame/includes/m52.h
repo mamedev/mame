@@ -29,14 +29,14 @@ public:
 
 	void m52(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(m52_videoram_w);
-	DECLARE_WRITE8_MEMBER(m52_colorram_w);
-	DECLARE_READ8_MEMBER(m52_protection_r);
+	void m52_videoram_w(offs_t offset, uint8_t data);
+	void m52_colorram_w(offs_t offset, uint8_t data);
+	uint8_t m52_protection_r();
 
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual DECLARE_WRITE8_MEMBER(m52_scroll_w);
+	virtual void m52_scroll_w(uint8_t data);
 
 	/* board mod changes? */
 	int m_spritelimit;
@@ -67,12 +67,12 @@ private:
 	required_device<palette_device> m_tx_palette;
 	required_device<palette_device> m_bg_palette;
 
-	DECLARE_WRITE8_MEMBER(m52_bg1ypos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg1xpos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg2xpos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg2ypos_w);
-	DECLARE_WRITE8_MEMBER(m52_bgcontrol_w);
-	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
+	void m52_bg1ypos_w(uint8_t data);
+	void m52_bg1xpos_w(uint8_t data);
+	void m52_bg2xpos_w(uint8_t data);
+	void m52_bg2ypos_w(uint8_t data);
+	void m52_bgcontrol_w(uint8_t data);
+	void m52_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void init_palette();
 	template <size_t N, size_t O, size_t P>
@@ -98,8 +98,8 @@ public:
 
 protected:
 	virtual void video_start() override;
-	virtual DECLARE_WRITE8_MEMBER(m52_scroll_w) override;
-	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
+	virtual void m52_scroll_w(uint8_t data) override;
+	void alpha1v_flipscreen_w(uint8_t data);
 
 };
 

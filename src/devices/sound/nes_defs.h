@@ -94,7 +94,7 @@ struct apu_t
 		}
 
 		uint8 regs[4]; /* regs[1] unused */
-		int cur_pos = 0;
+		u32 seed = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
 		float output_vol = 0.0;
@@ -146,10 +146,6 @@ struct apu_t
 	static constexpr unsigned WRE3    = 0x13;
 	static constexpr unsigned SMASK   = 0x15;
 	static constexpr unsigned IRQCTRL = 0x17;
-
-	static constexpr unsigned NOISE_LONG     = 0x4000;
-	static constexpr unsigned NOISE_SHORT    = 93;
-
 
 	apu_t()
 	{
@@ -215,10 +211,12 @@ static const int noise_freq[16] =
 	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
 };
 
-/* dpcm transfer freqs */
-static const int dpcm_clocks[16] =
+// dpcm (cpu) cycle period
+// each frequency is determined as: freq = master / period
+static const int dpcm_clocks[2][16] =
 {
-	428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54
+	{ 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54 }, // NTSC
+	{ 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118, 98, 78, 66, 50 } // PAL
 };
 
 /* ratios of pos/neg pulse for square waves */

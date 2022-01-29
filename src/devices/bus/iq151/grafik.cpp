@@ -78,7 +78,7 @@ void iq151_grafik_device::device_add_mconfig(machine_config &config)
 //  I8255 port a
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::x_write)
+void iq151_grafik_device::x_write(uint8_t data)
 {
 	if (LOG) logerror("Grafik: set posx 0x%02x\n", data);
 
@@ -89,7 +89,7 @@ WRITE8_MEMBER(iq151_grafik_device::x_write)
 //  I8255 port b
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::y_write)
+void iq151_grafik_device::y_write(uint8_t data)
 {
 	if (LOG) logerror("Grafik: set posy 0x%02x\n", data);
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER(iq151_grafik_device::y_write)
 //  I8255 port c
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::control_w)
+void iq151_grafik_device::control_w(uint8_t data)
 {
 	if (LOG) logerror("Grafik: control write 0x%02x\n", data);
 
@@ -178,7 +178,7 @@ void iq151_grafik_device::video_update(bitmap_ind16 &bitmap, const rectangle &cl
 			{
 				for (int ra = 0; ra < 8; ra++)
 				{
-					bitmap.pix16(y, x*8 + ra) |= BIT(m_videoram[(32*8 -1 - y)*64 + x], ra);
+					bitmap.pix(y, x*8 + ra) |= BIT(m_videoram[(32*8 -1 - y)*64 + x], ra);
 				}
 			}
 		}

@@ -20,16 +20,21 @@ public:
 	// construction/destruction
 	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// callback configuration
+	auto machinex_cb() { return m_machinex_cb.bind(); }
+	auto iackx_cb() { return m_iackx_cb.bind(); }
+
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -45,6 +50,9 @@ protected:
 private:
 	address_space_config m_program_config;
 
+	devcb_write8 m_machinex_cb;
+	devcb_read8 m_iackx_cb;
+
 	//GPR
 	uint32_t m_R[8];
 	//SPR
@@ -54,17 +62,13 @@ private:
 	uint32_t m_ER;
 	uint32_t m_PPC;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 	uint8_t m_IRQ;
 	uint8_t m_NMI;
 
 	int m_icount;
 
-	inline uint32_t read_dword_unaligned(address_space &space, uint32_t address);
-	inline uint16_t read_word_unaligned(address_space &space, uint32_t address);
-	inline void write_dword_unaligned(address_space &space, uint32_t address, uint32_t data);
-	inline void write_word_unaligned(address_space &space, uint32_t address, uint16_t data);
 	inline uint8_t SE3208_Read8(uint32_t addr);
 	inline uint16_t SE3208_Read16(uint32_t addr);
 	inline uint32_t SE3208_Read32(uint32_t addr);

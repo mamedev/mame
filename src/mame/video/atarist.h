@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
-#ifndef _VIDEO_ATARIST_H_
-#define _VIDEO_ATARIST_H_
+#ifndef MAME_VIDEO_ATARIST_H
+#define MAME_VIDEO_ATARIST_H
+
+#pragma once
 
 // 32028400 also exists
 #define Y2      32084988.0
@@ -38,4 +40,4 @@
 #define ATARIST_BLITTER_CTRL_HOG    0x40
 #define ATARIST_BLITTER_CTRL_BUSY   0x80
 
-#endif
+#endif // MAME_VIDEO_ATARIST_H

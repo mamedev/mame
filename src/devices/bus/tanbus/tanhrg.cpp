@@ -323,16 +323,13 @@ void tanbus_tanhrgc_device::set_inhibit_lines(offs_t offset, int &inhram, int &i
 
 uint32_t tanbus_tanhrg_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t offset;
-	uint32_t *p;
-
 	for (int y = 0; y < 256; y++)
 	{
-		p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix(y);
 
 		for (int x = 0; x < 256; x++)
 		{
-			offset = (y * 32) + (x / 8);
+			uint16_t const offset = (y * 32) + (x / 8);
 
 			*p++ = m_palette->pen_color(BIT(m_videoram[offset], x & 7));
 		}
@@ -344,21 +341,17 @@ uint32_t tanbus_tanhrg_device::screen_update(screen_device &screen, bitmap_rgb32
 
 uint32_t tanbus_tanhrgc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t r, g, b;
-	uint16_t offset;
-	uint32_t *p;
-
 	for (int y = 0; y < 256; y++)
 	{
-		p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix(y);
 
 		for (int x = 0; x < 256; x++)
 		{
-			offset = (y * 32) + (x / 8);
+			uint16_t const offset = (y * 32) + (x / 8);
 
-			r = m_videoram[0x0000 | offset];
-			b = m_videoram[0x2000 | offset];
-			g = m_videoram[0x4000 | offset];
+			uint8_t const r = m_videoram[0x0000 | offset];
+			uint8_t const b = m_videoram[0x2000 | offset];
+			uint8_t const g = m_videoram[0x4000 | offset];
 
 			*p++ = m_palette->pen_color(BIT(b, x & 7) << 2 | BIT(g, x & 7) << 1 | BIT(r, x & 7));
 		}

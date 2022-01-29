@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 
 void epson_pf10_device::cpu_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw("maincpu", FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("maincpu", FUNC(hd6303y_cpu_device::m6801_io));
 	map(0x0040, 0x00ff).ram(); /* 192 bytes internal ram */
 	map(0x0800, 0x0fff).ram(); /* external 2k ram */
 	map(0x1000, 0x17ff).rw(FUNC(epson_pf10_device::fdc_r), FUNC(epson_pf10_device::fdc_w));
@@ -71,7 +71,7 @@ void epson_pf10_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_ser_tx_cb().set(FUNC(epson_pf10_device::hd6303_tx_w));
 
 	UPD765A(config, m_fdc, 4'000'000, false, true);
-	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_mfm_floppy_formats);
 
 	EPSON_SIO(config, m_sio_output, nullptr);
 	m_sio_output->rx_callback().set(DEVICE_SELF, FUNC(epson_pf10_device::rxc_w));
@@ -109,7 +109,7 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 
 void epson_pf10_device::device_start()
 {
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 //-------------------------------------------------
@@ -118,14 +118,14 @@ void epson_pf10_device::device_start()
 
 void epson_pf10_device::device_reset()
 {
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(38400 * 8));
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(38400 * 16));
 }
 
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -140,42 +140,42 @@ void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  CPU
 //**************************************************************************
 
-READ8_MEMBER( epson_pf10_device::port1_r )
+uint8_t epson_pf10_device::port1_r()
 {
 	logerror("%s: port1_r(%02x)\n", tag(), m_port1);
 	return m_port1;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port1_w )
+void epson_pf10_device::port1_w(uint8_t data)
 {
 	logerror("%s: port1_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::port2_r )
+uint8_t epson_pf10_device::port2_r()
 {
 	logerror("%s: port2_r(%02x)\n", tag(), m_port2);
 	return m_port2;
 }
 
-WRITE8_MEMBER( epson_pf10_device::port2_w )
+void epson_pf10_device::port2_w(uint8_t data)
 {
 	if (m_floppy->get_device() != nullptr)
 		m_floppy->get_device()->mon_w(data & PORT2_MON);
 	logerror("%s: port2_w(%02x)\n", tag(), data);
 }
 
-READ8_MEMBER( epson_pf10_device::fdc_r )
+uint8_t epson_pf10_device::fdc_r(offs_t offset)
 {
 	logerror("%s: fdc_r @ %04x\n", tag(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_w )
+void epson_pf10_device::fdc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: fdc_w @ %04x (%02x)\n", tag(), offset, data);
 }
 
-WRITE8_MEMBER( epson_pf10_device::fdc_tc_w )
+void epson_pf10_device::fdc_tc_w(uint8_t data)
 {
 	logerror("%s: fdc_tc_w(%02x)\n", tag(), data);
 }

@@ -6,11 +6,8 @@ VTech Genius Junior series
 
 CPU is 68HC05 derived?
 
-Other known international versions:
-- Genius 4000 (French version of Genius Leader 4000)
-- Genius 5000 (French version of Genius Leader 5000)
+Other known undumped international versions:
 - Genius PRO (French version of Genius Leader Select)
-- Pitagorín (Spanish version of Genius Leader Notebook)
 - Pitagorín Plus (Spanish version of Genius Junior Redstar 3)
 - PreComputer Notebook (alternate English version of Genius Leader Notebook)
 - Smart Start Animated (alternate English version of Genius Junior Redstar)
@@ -26,6 +23,7 @@ Undumped VTech laptops possibly on similar hardware:
 - Genius Einstein (French version of Genius Leader Action)
 - Genius Explorations (French version; German version unknown)
 - Genius Junior Profi 2
+- Genius Junior Profi 3
 - Genius Leader Action
 - Genius Leader Notebook Plus
 - Genius Master Notebook MM
@@ -37,9 +35,12 @@ Undumped VTech laptops possibly on similar hardware:
 - Smart Start Future (alternate English version of Genius Junior Profi 2)
 - Talking Einstein (English version of Genius Leader Action)
 - Talking Whiz-Kid Explorer (alternate English version of Genius Leader Action)
+- Talking Whiz-Kid Honors (alternate English version of Genius Junior Notebook Plus)
 - Talking Whiz-Kid Laptop (English version of Genius Junior Profi 2)
+- Talking Whiz-Kid Lessons (English version of Genius Master Power Maus)
 - Talking Whiz-Kid Major Mouse (alternate English version of Genius Explorations)
 - Talking Whiz-Kid Notebook 2000 (English version of Genius Master Notebook MM)
+- Talking Whiz-Kid Notebook 3000 (alternate English version of Genius Master Notebook MM)
 - Talking Whiz-Kid Power Mouse Deluxe (English version of Genius Explorations)
 
 */
@@ -91,7 +92,7 @@ Undumped VTech laptops possibly on similar hardware:
 
   1x Unknown CPU inside an epoxy blob (more than 100 connections) @ U? (covered with the blob).
   1x VTech LH532HJT mask ROM (originary from Sharp) also silkscreened '9811D' @ U3.
-  1x Texas Instruments 84C91HT (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
+  1x Texas Instruments TSP50C10 (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
   1x SN74HC00N @ U5.
   1x SN74HC244N @ U4.
 
@@ -173,7 +174,7 @@ Undumped VTech laptops possibly on similar hardware:
                 '---------'
 
 
-  U2 - Texas Instruments 84C91HT (CSM10150AN).
+  U2 - Texas Instruments TSP50C10 (CSM10150AN).
 
        Speech Generator with 8-bit microprocessor, 8K ROM, 112 bytes RAM.
        Maximum Clock Frequency = 9.6 MHz.
@@ -317,6 +318,18 @@ ROM_START( gj4000 )
 	ROM_LOAD( "27-05886-000-000.u4", 0x000000, 0x40000, CRC(5f6db95b) SHA1(fe683154e33a82ea38696096616d11e850e0c7a3))
 ROM_END
 
+// VTech PCB 35-21205. "C.Q.F.D" is a VTech brand, and the Scientus is a straight clone of the "Genius Junior 4000".
+ROM_START( scientus )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "extrom", 0 )
+	ROM_LOAD( "54-6050-00-0.u2",  0x000000, 0x80000, CRC(dbcfebaa) SHA1(863697d144857fab45aad493b812ed607ad7e1d0)) // AMD AM27C010
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "27-05992-0-0.u3", 0x0000, 0x2000, NO_DUMP ) // TI speech chip
+ROM_END
+
 ROM_START( gj5000 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
@@ -339,6 +352,9 @@ ROM_START( pitagjr )
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10150an.u2", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "CSM10150AN"
 ROM_END
 
 ROM_START( gjrstar )
@@ -373,22 +389,35 @@ ROM_START( gln )
 	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
 ROM_END
 
-ROM_START( gls )
+ROM_START( pitagor )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "extrom", 0 )
+	ROM_LOAD( "27-5374-00.u2", 0x000000, 0x80000, CRC(89a8fe7d) SHA1(dff06f7313af22c6c19b1f00c0651a64cc505fe2))
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10150an.u1", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "64C_4TT VIDEO TECH CSM10150AN"
+ROM_END
+
+ROM_START( gls )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP ) // As per decap, confirmed to be a Motorola 68HC05 CSIC (Customer Specification Integrated Circuit)
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))
 ROM_END
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                             FLAGS
-COMP( 1996, gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1993, gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
-COMP( 199?, pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin Junior",                  MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
-COMP( 1995, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON )
+//    YEAR   NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME                             FLAGS
+COMP( 1996,  gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
+COMP( 1999?, scientus, gj4000,  0,      gj4000,   geniusjr, geniusjr_state, empty_init, "C.Q.F.D", "Scientus (France)",                 MACHINE_IS_SKELETON )
+COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
+COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin Junior",                  MACHINE_IS_SKELETON )
+COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
+COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
+COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )
+COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin",                         MACHINE_IS_SKELETON )
+COMP( 1995,  gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Select",              MACHINE_IS_SKELETON )

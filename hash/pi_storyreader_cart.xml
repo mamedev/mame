@@ -1,0 +1,493 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pi_storyreader_cart" description="Publications International Ltd. Story Reader cartridges">
+
+	<!-- carts have either one or two globs in them -->
+
+	<software name="srbamltpetp3" supported="no">
+		<description>Disney's Bambi / Lady and the Tramp / Peter Pan</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="storyreaderv1_bambiladyandthetramppeterpan.1.bin" offset="0x000000" size="0x100000" crc="954b3315" sha1="37d104bb67cd02a5a86c3653adc2df955bb11f11" />
+				<rom name="storyreaderv1_bambiladyandthetramppeterpan.2.bin" offset="0x100000" size="0x100000" crc="ebba94f6" sha1="b9bca7225e174eea19f95a7bd84a0226bff327f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srbarney3" supported="no">
+		<description>Barney: Barney Cares / Best Manners Show / Let's Work Together</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="30473" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_barneycaresbestmannersshowletsworktogether.1.bin" offset="0x000000" size="0x200000" crc="5fffe4ec" sha1="b4bc4a19bd1df16d41c134fca902f3e7c729d26a" />
+				<rom name="storyreaderv1_barneycaresbestmannersshowletsworktogether.2.bin" offset="0x200000" size="0x100000" crc="2a80e6e7" sha1="fcd9903c6a55101ab64ab0d1f74ba2dfb62bcd37" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srbluespps" supported="no">
+		<description>Blue's Perfect Picnic Spot</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="01465" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_bluesperfectpicnicspot.bin" size="0x100000" crc="88536a08" sha1="a124e5a653bf86e3eb0a00b3eaae068b2a9245b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srcarincmon3" supported="no">
+		<description>Disney/Pixar Cars / The Incredibles / Monsters Inc.</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="62823" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_carsincrediblesmonstersinc.1.bin" offset="0x000000" size="0x200000" crc="c12a2cd9" sha1="35032bd6b494cf082f1227b8c24bd0297aff53a6" />
+				<rom name="storyreaderv1_carsincrediblesmonstersinc.2.bin" offset="0x200000" size="0x100000" crc="5251f391" sha1="857e41f0bde573a0a9a2ff218e5019f2fefae4ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srdoragrdn" supported="no">
+		<description>Dora's Garden Adventure</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="01457" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_dorasgardenadventure.bin" size="0x100000" crc="83fe2fcf" sha1="44a4b1fb79f54f49883f37fee448f93972363bfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srdoragrgiar3" supported="no">
+		<description>Dora the Explorer: Dora's Garden Adventure / The Gingerbread Boy / Dora's Art Adventure</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="33618" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_dorasgardenadventuregingerbreadboydorasartadventure.1.bin" offset="0x000000" size="0x200000" crc="8840f754" sha1="1d0270db79dc0a92fcce494cc14dcad9cb7194a4" />
+				<rom name="storyreaderv1_dorasgardenadventuregingerbreadboydorasartadventure.2.bin" offset="0x200000" size="0x100000" crc="29bb4c9b" sha1="b82cce833dcafc2e17952d79e09a875636c7e7bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srfindnemo" supported="no">
+		<description>Disney/Pixar Finding Nemo</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="32018" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_findingnemo.bin" size="0x100000" crc="9ad6c87a" sha1="f1b33c3501b2850757eaf7c9a44d148ca9f093c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srlionkng" supported="no">
+		<description>Disney's The Lion King</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_lionking.bin" size="0x100000" crc="8d1a63f1" sha1="6596739951a76cb311b7a5dc1db123fa045c5351" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srlimermaid" supported="no">
+		<description>Disney's The Little Mermaid</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_littlemermaid.bin" size="0x100000" crc="bdf625f7" sha1="084864e2ee310f30811e8a0bf1bbaa2885de5ada" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srnoahark" supported="no">
+		<description>Noah's Ark</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="0151-1" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_noahsark.bin" size="0x100000" crc="7d518933" sha1="fa8913d2dfc33af9669cdb1019784ed9085e06e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpetjetom3" supported="no">
+		<description>Petter Rabbit / Jemima Puddle-Duck / Tom Kitten</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="06238" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_peterrabbitjemimapuddleducktomkitten.1.bin" offset="0x000000" size="0x200000" crc="e8859dd3" sha1="69304c73a8d4fd9fe6cd4fc37209372e294c0ad8" />
+				<rom name="storyreaderv1_peterrabbitjemimapuddleducktomkitten.2.bin" offset="0x200000" size="0x100000" crc="64d50d09" sha1="c842df62fe0767768da1a314f47c091737a12738" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpitsjb3" supported="no">
+		<description>Disney's Pinocchio / Disney/Pixar Toy Story 2 / The Jungle Book</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="storyreaderv1_pinocchiotoystory2junglebook.1.bin" offset="0x000000" size="0x100000" crc="d5529c3a" sha1="af4ca3595169852dad1ddbb68506b830197c4069" />
+				<rom name="storyreaderv1_pinocchiotoystory2junglebook.2.bin" offset="0x100000" size="0x100000" crc="ec7cb5f1" sha1="70a51e2cb905e261cabc7429bcddb59f2276c1bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpoohrmbly" supported="no">
+		<description>Disney No Rumbly In Pooh's Tumbly</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="0161-9" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_norumblyinpoohstumbly.bin" size="0x100000" crc="78b7ee0a" sha1="257b91be7eb0bfc3b22c3f6a7535a5c8a4269332" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpoohwndy" supported="no">
+		<description>Disney Pooh Windy Day</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="01597" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_poohswindyday.bin" size="0x100000" crc="fe167f3c" sha1="bb9dcd5cd2231a2f1150ed127dac148b0a7416ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srprinjamupo3" supported="no">
+		<description>Disney Princess: Jasmine / Mulan / Pocahontas</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="67224" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_jasminemulanpocahontas.1.bin" offset="0x000000" size="0x200000" crc="dad388cb" sha1="d92a6e66a38cf21ee41a644ae0849c959dcd7847" />
+				<rom name="storyreaderv1_jasminemulanpocahontas.2.bin" offset="0x200000" size="0x100000" crc="d8f3bb4f" sha1="6980bae41faac9e3d0412ab88cf72ad817e0b7e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srprinlmswbb3" supported="no">
+		<description>Disney Princess: The Little Mermaid / Snow White / Beauty and the Beast</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="storyreaderv1_littlemermaidsnowwhitebeautyandthebeast.1.bin" offset="0x000000" size="0x100000" crc="dd96327b" sha1="fd9213696760b049fadf8e0157cd0692e0c6fb95" />
+				<rom name="storyreaderv1_littlemermaidsnowwhitebeautyandthebeast.2.bin" offset="0x100000" size="0x100000" crc="628c816d" sha1="fd2b13189ee3ecc8f9a335fffcd9f50b5b98cac9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srscoobymgm" supported="no">
+		<description>Scooby-Doo! Miniature Golf Mistery</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="01473" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_scoobydoominiaturegolfmystery.bin" size="0x100000" crc="bfed0514" sha1="1fde50f130df60772501d72380a3fdb975fc831e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srsesame3" supported="no">
+		<description>Sesame Street: Elmo's Colorful Adventure / Grover Stays Up Very Very Late / Me Loves Cookies</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="30481" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_elmoscolorfuladventuregroverstaysupverylatemelovecookies.1.bin" offset="0x000000" size="0x200000" crc="31cc421a" sha1="751aa570612782577249685765ccf7fe608e0cb6" />
+				<rom name="storyreaderv1_elmoscolorfuladventuregroverstaysupverylatemelovecookies.2.bin" offset="0x200000" size="0x100000" crc="73eaba54" sha1="2726b6711a6a2d8f2eaead5f9f1ef556ba8e3892" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srsbobgpw" supported="no">
+		<description>Spongebob Squarepants Grand Price Winner!</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="01449" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_grandprizewinner.bin" size="0x100000" crc="da0428ce" sha1="fb0d95ccb2a116d676b386249668b240a7178f2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srsbodobl3" supported="no">
+		<description>Spongebob Squarepants Grand Price Winner! / Dora's Garden Adventure / Blue's Perfect Picnic Spot</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="30376" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_grandprizewinnerdorasgardenadventurebluesperfectpicnicspot.1.bin" offset="0x000000" size="0x200000" crc="a2c1648d" sha1="4dedde521cc8862fd93b441df330f92968eadd19" />
+				<rom name="storyreaderv1_grandprizewinnerdorasgardenadventurebluesperfectpicnicspot.2.bin" offset="0x200000" size="0x100000" crc="f59b9ba9" sha1="545c6db2fa4ba2ab1269a7788d1f2f5c4037bf6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srthomas3" supported="no">
+		<description>Thomas &amp; Friends: Cheer up Cranky! / The Big Race / Carnival Capers</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<info name="serial" value="84009" />
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="storyreaderv1_cheerupcrankythebigracecarnivalcapers.1.bin" offset="0x000000" size="0x200000" crc="9d58dc21" sha1="2f77e9b850749a1e0975edfdee1eb6ff0c8dc66d" />
+				<rom name="storyreaderv1_cheerupcrankythebigracecarnivalcapers.2.bin" offset="0x200000" size="0x100000" crc="2bd1adaf" sha1="21082583d720a3c432a32080f0eed3e5da47ae4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srtoystry2" supported="no">
+		<description>Disney/Pixar Toy Story 2</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="storyreaderv1_toystory2.bin" size="0x100000" crc="496fe7b5" sha1="4a66e1e7ec0fdcfe578d60437fcbaaa19f7ac2d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srscooby" supported="no">
+		<description>Scooby Doo - Miniature Golf Mystery / Museum Mystery / Haunted Theater</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd.</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="srscooby.1.bin" offset="0x000000" size="0x200000" crc="13b5a30a" sha1="294c9a7c2afa81fc038feaf2f89a36f8b2c9b0c6" />
+				<rom name="srscooby.2.bin" offset="0x200000" size="0x100000" crc="e8b9214e" sha1="7ca6b5ca2726904990f5987397a768926117fa09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- German carts -->
+
+	<software name="carsger" supported="no">
+		<description>Cars (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="cars (ger).bin" size="0x100000" crc="42716336" sha1="b8d05a6608fefaaa6cca8ed6c8e8d661ea72157e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dasdsch" supported="no">
+		<description>Das Dschungelbuch (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="das dschungel-buch (ger).bin" size="0x100000" crc="cceac135" sha1="ec7c03cb0b64e47e4e70bd535e903a1e94f37778" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koniglow" supported="no">
+		<description>Der König der Löwen (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="der konig der lowen (ger).bin" size="0x100000" crc="e75e2e61" sha1="173734475d1300a8b8e0d8cd1d97e62560881771" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemoger" supported="no">
+		<description>Findet Nemo (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="findet nemo (ger).bin" size="0x100000" crc="619898b3" sha1="4472782e816006626d45055d54e9b0d773561826" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppanger" supported="no">
+		<description>Peter Pan (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="peter pan (ger).bin" size="0x100000" crc="8a86cfdd" sha1="0ff16eb6aeaf8f755432acfe6dfcebecb28e7d27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puuhtag" supported="no">
+		<description>Winnie Puuh - Ein stürmischer Tag (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="winnie puuh - ein sturmischer tag (ger).bin" size="0x100000" crc="d39bc8a0" sha1="745d946dc744d9fe1fba68425e6af8758945e0b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puuhhung" supported="no">
+		<description>Winnie Puuh hat keinen Hunger (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="winnie puuh hat keinen hunger (ger).bin" size="0x100000" crc="be1c90f1" sha1="08f2972bd69764952ae02f9cd0ba993fdc582705" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dal" supported="no">
+		<description>101 Dalmatiner (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="101 Dalmatiner (GER).bin" size="0x100000" crc="85112e08" sha1="137f1842cf60767badf18357db515de526a949da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arielle" supported="no">
+		<description>Arielle - Die Meerjungfrau (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Arielle  - Die Meerjungfrau (GER).bin" size="0x100000" crc="a113accf" sha1="a7e3a915ce71ddea58e03fdd762c97ad0e72c33e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bambi" supported="no">
+		<description>Bambi (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Bambi (GER).bin" size="0x100000" crc="fec017bd" sha1="6ffd67e7d6e5bc3ce17e1f21646269711386d694" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinder" supported="no">
+		<description>Cinderella (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Cinderella (GER).bin" size="0x100000" crc="742d2e0f" sha1="26583dfb23eb56fce4f2518c4009db407e8b72d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schone" supported="no">
+		<description>Die Schöne und das Biest (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Die Schone und das Biest (GER).bin" size="0x100000" crc="8f8d1dd8" sha1="0d125bcf2bb583d3733074afc2ca35c50368e56f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pino" supported="no">
+		<description>Pinocchio (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Pinocchio (GER).bin" size="0x100000" crc="ec576e74" sha1="d385ce39f359707b5cdc84d28b32444e24d7ab3a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scheewtn" supported="no">
+		<description>Schneewittchen und die Sieben Zwerge (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Schneewittchen und die Sieben Zwerge (GER).bin" size="0x100000" crc="893f0743" sha1="f2e9d802f4856b77ed959e1178b5db465bf3fcf4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="susistro" supported="no">
+		<description>Susi und STROLCH (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Susi und STROLCH (GER).bin" size="0x100000" crc="1181ea02" sha1="2d1d660d5f1bf014f5fa445e3424634016e8aaa6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Spanish carts -->
+
+	<software name="srlionkngs" supported="no">
+		<description>Disney El Rey León (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="El Rey Leon (SPA).bin" size="0x100000" crc="5bf23272" sha1="e9b3e232eb34834677741d33037397d8d2136fa0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpeterpns" supported="no">
+		<description>Walt Disney Peter Pan (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Peter Pan (SPA).bin" size="0x100000" crc="3a2c5e66" sha1="7f0c3d3118a47949d9bf14579b6c16d11e334736" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srsnowwhts" supported="no">
+		<description>Disney Blanca Nieves y los siete enanos (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Blanca Nieves y los siete enanos (SPA).bin" size="0x100000" crc="b263a480" sha1="f6f30118e69b371e8fd25adef745d132da17d9f0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

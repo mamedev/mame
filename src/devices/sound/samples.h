@@ -43,15 +43,7 @@ public:
 	void set_samples_names(const char *const *names) { m_names = names; }
 
 	// start callback helpers
-	void set_samples_start_callback(start_cb_delegate callback) { m_samples_start_cb = callback; }
-	template <class FunctionClass> void set_samples_start_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
-	{
-		set_samples_start_callback(start_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_samples_start_callback(void (FunctionClass::*callback)(), const char *name)
-	{
-		set_samples_start_callback(start_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_samples_start_callback(T &&...args) { m_samples_start_cb.set(std::forward<T>(args)...); }
 
 	// getters
 	bool playing(uint8_t channel) const;
@@ -93,19 +85,18 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal classes
 	struct channel_t
 	{
 		sound_stream *  stream;
-		const int16_t *   source;
-		int32_t           source_length;
-		int32_t           source_num;
-		uint32_t          pos;
-		uint32_t          frac;
-		uint32_t          step;
-		uint32_t          basefreq;
+		const int16_t * source;
+		int32_t         source_num;
+		uint32_t        source_len;
+		double          pos;
+		uint32_t        basefreq;
+		uint32_t        curfreq;
 		bool            loop;
 		bool            paused;
 	};
@@ -128,7 +119,7 @@ protected:
 };
 
 // iterator, since lots of people are interested in these devices
-typedef device_type_iterator<samples_device> samples_device_iterator;
+typedef device_type_enumerator<samples_device> samples_device_enumerator;
 
 
 // ======================> samples_iterator

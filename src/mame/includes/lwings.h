@@ -63,21 +63,21 @@ private:
 	uint8_t    m_nmi_mask;
 	int      m_sprbank;
 
-	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
-	DECLARE_READ8_MEMBER(avengers_adpcm_r);
-	DECLARE_WRITE8_MEMBER(lwings_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(avengers_protection_w);
-	DECLARE_WRITE8_MEMBER(avengers_prot_bank_w);
-	DECLARE_READ8_MEMBER(avengers_protection_r);
-	DECLARE_READ8_MEMBER(avengers_soundlatch2_r);
-	DECLARE_WRITE8_MEMBER(lwings_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrollx_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrolly_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
-	DECLARE_WRITE8_MEMBER(fball_oki_bank_w);
+	void avengers_adpcm_w(uint8_t data);
+	uint8_t avengers_adpcm_r();
+	void lwings_bankswitch_w(uint8_t data);
+	void avengers_protection_w(uint8_t data);
+	void avengers_prot_bank_w(uint8_t data);
+	uint8_t avengers_protection_r();
+	uint8_t avengers_soundlatch2_r();
+	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1videoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrollx_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrolly_w(offs_t offset, uint8_t data);
+	void trojan_bg2_scrollx_w(uint8_t data);
+	void trojan_bg2_image_w(uint8_t data);
+	void msm5205_w(uint8_t data);
+	void fball_oki_bank_w(uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

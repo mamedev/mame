@@ -3,7 +3,7 @@
 /****************************************************************************
 
     TI-99/4(A) databus multiplexer circuit
-    See datamux.c for documentation
+    See datamux.cpp for documentation
 
     Michael Zapf
 
@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
 #include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/ioport.h"
@@ -24,7 +23,17 @@
 #include "video/tms9928a.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace internal {
+#define TI99_DATAMUX_TAG     "datamux_16_8"
+#define TI99_GROM0_TAG       "console_grom_0"
+#define TI99_GROM1_TAG       "console_grom_1"
+#define TI99_GROM2_TAG       "console_grom_2"
+#define TI99_PADRAM_TAG      "scratchpad"
+#define TI99_EXPRAM_TAG      "internal_32k_mod"
+#define TI99_CONSOLEROM      "console_rom"
+#define TI99_SOUNDCHIP_TAG   "soundchip"
+#define TI99_VDP_TAG         "vdp"
+
+namespace bus::ti99::internal {
 
 /*
     Main class
@@ -138,7 +147,7 @@ private:
 
 /******************************************************************************/
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device)
 

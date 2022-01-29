@@ -110,7 +110,7 @@ void c8280_device::c8280_fdc_mem(address_map &map)
 //  riot6532 0
 //-------------------------------------------------
 
-READ8_MEMBER( c8280_device::dio_r )
+uint8_t c8280_device::dio_r()
 {
 	/*
 
@@ -127,10 +127,10 @@ READ8_MEMBER( c8280_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c8280_device::dio_w )
+void c8280_device::dio_w(uint8_t data)
 {
 	/*
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER( c8280_device::dio_w )
 //  riot6532 1
 //-------------------------------------------------
 
-READ8_MEMBER( c8280_device::riot1_pa_r )
+uint8_t c8280_device::riot1_pa_r()
 {
 	/*
 
@@ -186,7 +186,7 @@ READ8_MEMBER( c8280_device::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8280_device::riot1_pa_w )
+void c8280_device::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -221,7 +221,7 @@ WRITE8_MEMBER( c8280_device::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c8280_device::riot1_pb_r )
+uint8_t c8280_device::riot1_pb_r()
 {
 	/*
 
@@ -252,7 +252,7 @@ READ8_MEMBER( c8280_device::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8280_device::riot1_pb_w )
+void c8280_device::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -284,9 +284,11 @@ static void c8280_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( c8280_device::floppy_formats )
-	FLOPPY_C8280_FORMAT
-FLOPPY_FORMATS_END
+void c8280_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_C8280_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -467,7 +469,7 @@ void c8280_device::ieee488_ifc(int state)
 	m_ifc = state;
 }
 
-READ8_MEMBER( c8280_device::fk5_r )
+uint8_t c8280_device::fk5_r()
 {
 	/*
 
@@ -492,7 +494,7 @@ READ8_MEMBER( c8280_device::fk5_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8280_device::fk5_w )
+void c8280_device::fk5_w(uint8_t data)
 {
 	/*
 

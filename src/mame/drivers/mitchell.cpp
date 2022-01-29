@@ -123,9 +123,8 @@ mw-9.rom = ST M27C1001 / GFX
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -136,7 +135,7 @@ mw-9.rom = ST M27C1001 / GFX
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::pang_port5_r)
+uint8_t mitchell_state::pang_port5_r()
 {
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
 	    bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -148,17 +147,17 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
+void mitchell_state::eeprom_cs_w(uint8_t data)
 {
 	m_eeprom->cs_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
+void mitchell_state::eeprom_clock_w(uint8_t data)
 {
 	m_eeprom->clk_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
+void mitchell_state::eeprom_serial_w(uint8_t data)
 {
 	m_eeprom->di_write(data & 1);
 }
@@ -170,7 +169,7 @@ WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
+void mitchell_state::pang_bankswitch_w(uint8_t data)
 {
 	m_bank1->set_entry(data & 0x0f);
 	if(m_bank1d)
@@ -183,7 +182,7 @@ WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::block_input_r)
+uint8_t mitchell_state::block_input_r(offs_t offset)
 {
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
@@ -227,7 +226,7 @@ READ8_MEMBER(mitchell_state::block_input_r)
 	}
 }
 
-WRITE8_MEMBER(mitchell_state::block_dial_control_w)
+void mitchell_state::block_dial_control_w(uint8_t data)
 {
 	if (data == 0x08)
 	{
@@ -242,7 +241,7 @@ WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 }
 
 
-READ8_MEMBER(mitchell_state::mahjong_input_r)
+uint8_t mitchell_state::mahjong_input_r(offs_t offset)
 {
 	int i;
 	static const char *const keynames[2][5] =
@@ -260,13 +259,13 @@ READ8_MEMBER(mitchell_state::mahjong_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mitchell_state::mahjong_input_select_w)
+void mitchell_state::mahjong_input_select_w(uint8_t data)
 {
 	m_keymatrix = data;
 }
 
 
-READ8_MEMBER(mitchell_state::input_r)
+uint8_t mitchell_state::input_r(offs_t offset)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -277,12 +276,12 @@ READ8_MEMBER(mitchell_state::input_r)
 			return ioport(portnames[offset])->read();
 		case 1:     /* Mahjong games */
 			if (offset)
-				return mahjong_input_r(space, offset - 1);
+				return mahjong_input_r(offset - 1);
 			else
 				return ioport("IN0")->read();
 		case 2:     /* Block Block - dial control */
 			if (offset)
-				return block_input_r(space, offset - 1);
+				return block_input_r(offset - 1);
 			else
 				return ioport("IN0")->read();
 		case 3:     /* Super Pang - simulate START 1 press to initialize EEPROM */
@@ -291,7 +290,7 @@ READ8_MEMBER(mitchell_state::input_r)
 }
 
 
-WRITE8_MEMBER(mitchell_state::input_w)
+void mitchell_state::input_w(uint8_t data)
 {
 	switch (m_input_type)
 	{
@@ -300,10 +299,10 @@ WRITE8_MEMBER(mitchell_state::input_w)
 			logerror("PC %04x: write %02x to port 01\n", m_maincpu->pc(), data);
 			break;
 		case 1:
-			mahjong_input_select_w(space, offset, data);
+			mahjong_input_select_w(data);
 			break;
 		case 2:
-			block_dial_control_w(space, offset, data);
+			block_dial_control_w(data);
 			break;
 	}
 }
@@ -350,8 +349,8 @@ void mitchell_state::mitchell_io_map(address_map &map)
 	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
 	map(0x01, 0x01).w(FUNC(mitchell_state::input_w));
 	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
-	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_w));
+	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::address_w));
 	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
 	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
@@ -377,7 +376,7 @@ void mitchell_state::spangbl_io_map(address_map &map)
 	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));
 	map(0x00, 0x00).w(FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
 	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
-	map(0x03, 0x03).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).portr("SYS0");
 	map(0x06, 0x06).nopw();    /* watchdog? irq ack? */
 	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
@@ -386,7 +385,7 @@ void mitchell_state::spangbl_io_map(address_map &map)
 	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
 }
 
-WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
+void mitchell_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 3));
 
@@ -417,7 +416,7 @@ void mitchell_state::pangba_sound_map(address_map &map)
 
 
 /**** Monsters World ****/
-WRITE8_MEMBER(mitchell_state::oki_banking_w)
+void mitchell_state::oki_banking_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 3);
 }
@@ -431,7 +430,7 @@ void mitchell_state::mstworld_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
+void mitchell_state::mstworld_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -451,6 +450,22 @@ void mitchell_state::mstworld_io_map(address_map &map)
 	map(0x07, 0x07).w(FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
 }
 
+void mitchell_state::pkladiesbl_io_map(address_map &map) // TODO: check everything, where is the MSM5205 hooked up?
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x01, 0x01).portr("IN1").w("ymsnd", FUNC(ym2413_device::address_w)); // TODO: hold buttons are here, multiplexed but not in the same way as the original
+	map(0x02, 0x02).portr("IN2").w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).portr("DSW0");
+	map(0x04, 0x04).portr("DSW1");
+	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r));
+	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+	map(0x09, 0x09).w("ymsnd", FUNC(ym2413_device::data_w));
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
+}
 
 /*************************************
  *
@@ -717,6 +732,105 @@ static INPUT_PORTS_START( pkladies )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pkladiesbl )
+	PORT_START("SYS0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* USED - handled in port5_r */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) // ok
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) // ok
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) // ok
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) // ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // ok
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) // ok
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // this seems flipscreen?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // this and the following seem to influence both Winning Percentage Level (although only levels 1, 3, 5 and 7) and Game BGM
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x04, "Maximum Hands" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	PORT_DIPSETTING(    0x0c, "12" )
+	PORT_DIPSETTING(    0x0d, "13" )
+	PORT_DIPSETTING(    0x0e, "14" )
+	PORT_DIPSETTING(    0x0f, "15" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pang )
 	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* USED - handled in port5_r */
@@ -757,14 +871,69 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pangdsw )
+	PORT_INCLUDE( pang )
+
+// the settings are shown if entering test mode. The game always respects the dip setting, changing the values in test mode has no effect
+// it appears the bootleggers didn't care to add dips for flipscreen, free play and extend values (or at least they haven't been found yet)
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( spangbl )
 	PORT_INCLUDE( pang )
 
 	PORT_MODIFY("SYS0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // this bootleg doesn't seem to allow entering test mode. It has a dip bank for settings, instead.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be high for game to boot..
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x18, "4" )
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mstworld )
@@ -812,7 +981,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_DIPSETTING(    0x03, "A 1Coin 4Credits / B 1Coin 4Credits" )
 	PORT_DIPSETTING(    0x02, "A 1Coin 3Credits / B 1Coin 3Credits" )
 	PORT_DIPSETTING(    0x01, "A 1Coin 2Credits / B 1Coin 2Credits" )
-	PORT_DIPSETTING(    0x00, "A 1Coin 1Credit / B 1Coin 4Credists" )
+	PORT_DIPSETTING(    0x00, "A 1Coin 1Credit / B 1Coin 4Credits" )
 	PORT_DIPSETTING(    0x04, "A 2Coins 1Credit / B 1Coin 2Credits" )
 	PORT_DIPSETTING(    0x05, "A 2Coins 1Credit / B 1Coin 3Credits" )
 	PORT_DIPSETTING(    0x06, "A 3Coins 1Credit / B 1Coin 2Credits" )
@@ -1408,7 +1577,7 @@ void mitchell_state::pkladiesbl(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
-	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::pkladiesbl_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
@@ -1431,8 +1600,8 @@ void mitchell_state::pkladiesbl(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* It should be a OKIM5205 with a 384khz resonator */
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
+	MSM5205(config, m_msm, 384000);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3750000)); /* verified on pcb, read the comments */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1571,12 +1740,11 @@ ROM_END
 
 ROM_START( pkladiesbl )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
-	// you would expect one half of this to be decrypted code, and the other half to be decrypted data
-	// however, only parts of it are??
+	// only 1.ic112 is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
-	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
-	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
 
 	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
@@ -1608,8 +1776,8 @@ ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(cadb9925) SHA1(d88353501a29ff855335f9c8822e095ef5196246) ) //sldh
 	ROM_CONTINUE(0x00000,0x08000)
-	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
-	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
 
 	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
@@ -1639,24 +1807,46 @@ ROM_END
 
 ROM_START( dokaben )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "db06.11h",     0x00000, 0x08000, CRC(413e0886) SHA1(e9e6117fbbd980bc0f5448ada6c1856919bf92b5) )
-	ROM_LOAD( "db07.13h",     0x10000, 0x20000, CRC(8bdcf49e) SHA1(7d845ae2e640ec7d8d642e3aeef741d9f7b0a57c) )
-	ROM_LOAD( "db08.14h",     0x30000, 0x20000, CRC(1643bdd9) SHA1(5805e749713dbffacbb1238b1b4d42e8473d3656) )
+	ROM_LOAD( "db_06.11h",    0x00000, 0x08000, CRC(413e0886) SHA1(e9e6117fbbd980bc0f5448ada6c1856919bf92b5) )
+	ROM_LOAD( "db_07.13h",    0x10000, 0x20000, CRC(8bdcf49e) SHA1(7d845ae2e640ec7d8d642e3aeef741d9f7b0a57c) )
+	ROM_LOAD( "db_08.14h",    0x30000, 0x20000, CRC(1643bdd9) SHA1(5805e749713dbffacbb1238b1b4d42e8473d3656) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "db02.1e",      0x000000, 0x20000, CRC(9aa8470c) SHA1(8acbed381d6140e70045da232dee9b4b165953f9) ) /* chars */
-	ROM_LOAD( "db03.2e",      0x020000, 0x20000, CRC(3324e43d) SHA1(ed273d4de56e382e24ab0f0a8bcd5e30a05a1c6d) )
+	ROM_LOAD( "db_02.1e",     0x000000, 0x20000, CRC(9aa8470c) SHA1(8acbed381d6140e70045da232dee9b4b165953f9) ) /* chars */
+	ROM_LOAD( "db_03.2e",     0x020000, 0x20000, CRC(3324e43d) SHA1(ed273d4de56e382e24ab0f0a8bcd5e30a05a1c6d) )
 	/* 40000-7ffff empty */
-	ROM_LOAD( "db04.1g",      0x080000, 0x20000, CRC(c0c5b6c2) SHA1(5d66d8b2a62ccab9574e04a867df9bbb8c0d15aa) )
-	ROM_LOAD( "db05.2g",      0x0a0000, 0x20000, CRC(d2ab25f2) SHA1(96eea06d1645e0aade4c1b3153c55e2b61fd52c7) )
+	ROM_LOAD( "db_04.1g",     0x080000, 0x20000, CRC(c0c5b6c2) SHA1(5d66d8b2a62ccab9574e04a867df9bbb8c0d15aa) )
+	ROM_LOAD( "db_05.2g",     0x0a0000, 0x20000, CRC(d2ab25f2) SHA1(96eea06d1645e0aade4c1b3153c55e2b61fd52c7) )
 	/* c0000-fffff empty */
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "db10.2k",      0x000000, 0x20000, CRC(9e70f7ae) SHA1(ff3833a52d3d198f14e915ce52f7449cf04a0cca) ) /* sprites */
-	ROM_LOAD( "db09.1k",      0x020000, 0x20000, CRC(2d9263f7) SHA1(fe2811ae47b9a250ea1485a91c2c3be742d90622) )
+	ROM_LOAD( "db_10.2k",     0x000000, 0x20000, CRC(9e70f7ae) SHA1(ff3833a52d3d198f14e915ce52f7449cf04a0cca) ) /* sprites */
+	ROM_LOAD( "db_09.1k",     0x020000, 0x20000, CRC(2d9263f7) SHA1(fe2811ae47b9a250ea1485a91c2c3be742d90622) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
-	ROM_LOAD( "db01.1d",      0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
+	ROM_LOAD( "db_01.1d",     0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
+ROM_END
+
+ROM_START( dokaben2 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "d2_06.11h",    0x00000, 0x08000, CRC(9adcc38c) SHA1(0cacc58a14d63dfb1565ff517cc45f3d8fc9b77c) )
+	ROM_LOAD( "d2_07.13h",    0x10000, 0x20000, CRC(43076e32) SHA1(fca84da82d427b3dca28ed2ec1e811eeddcee666) )
+	ROM_LOAD( "d2_08.14h",    0x30000, 0x20000, CRC(cb9deb7a) SHA1(a3e359e991a64190e25cf1c589c82008af2cb9b5) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "d2_02.1e",     0x000000, 0x20000, CRC(5dd7b941) SHA1(b0e93e733b9bbabe68896c92af34b90daf8dcd7c) ) /* chars */
+	ROM_LOAD( "d2_03.2e",     0x020000, 0x20000, CRC(b615e696) SHA1(f1ec11202fce23af4af15682b158795f7ff4234f) )
+	/* 40000-7ffff empty */
+	ROM_LOAD( "d2_04.1g",     0x080000, 0x20000, CRC(56b35605) SHA1(c065b03b5cb00ac75b8b439a4f35d9b04a886626) )
+	ROM_LOAD( "d2_05.2g",     0x0a0000, 0x20000, CRC(ce98ff74) SHA1(ddae2e035369886ab03074e947405ef916cc425a) )
+	/* c0000-fffff empty */
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "d2_10.2k",     0x000000, 0x20000, CRC(9b9bfb5f) SHA1(5969861e1fe900a3076785c7d1e304c10aa56435) ) /* sprites */
+	ROM_LOAD( "d2_09.1k",     0x020000, 0x20000, CRC(84de2e1d) SHA1(692304332b37ca3b26dc96bcad797ee81ab8b819) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
+	ROM_LOAD( "db_01.1d",     0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
 ROM_END
 
 ROM_START( pang )
@@ -1906,6 +2096,45 @@ ROM_START( pangbb ) // Same bootleg hardware as pangba, but with original YM2413
 	ROM_LOAD( "10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
+// Sound: Z80 (GoldStar Z8400A PS) + OKI M5205 + YM2413 + Xtal 10.000MHz
+ROM_START( pangbc )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
+	ROM_LOAD( "27c512-1.bin", 0x50000, 0x08000, CRC(f5e4a6c3) SHA1(2679d67877769389e726d601294c986e4bafabe6) )
+	ROM_CONTINUE( 0x00000, 0x08000 )
+	ROM_LOAD( "27c010.bin",   0x60000, 0x04000, CRC(a128522f) SHA1(476adab8a5a4fae2c5022f89f36598ce275a070d) )
+	ROM_CONTINUE( 0x10000, 0x04000 )
+	ROM_CONTINUE( 0x64000, 0x04000 )
+	ROM_CONTINUE( 0x14000, 0x04000 )
+	ROM_CONTINUE( 0x68000, 0x04000 )
+	ROM_CONTINUE( 0x18000, 0x04000 )
+	ROM_CONTINUE( 0x6c000, 0x04000 )
+	ROM_CONTINUE( 0x1c000, 0x04000 )
+	ROM_LOAD( "27c512.bin",   0x70000, 0x04000, CRC(48d0e236) SHA1(d459bf1c500d5110c300212552449cbdae2a9dfd) )
+	ROM_CONTINUE( 0x20000, 0x04000 )
+	ROM_CONTINUE( 0x74000, 0x04000 )
+	ROM_CONTINUE( 0x24000, 0x04000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Sound Z80 + M5205 samples
+	ROM_LOAD( "27c512-2.bin", 0x00000, 0x10000, CRC(09c43210) SHA1(79b5aed2c5d6d9110129885e8979c1f13b7b8aac) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "pang.14", 0x000001, 0x10000, CRC(c90095ee) SHA1(bf380f289eb42030a9f911aa5f697ba76f5723db) )
+	ROM_LOAD16_BYTE( "7.bin",   0x000000, 0x10000, CRC(0725d6ad) SHA1(de2efab47b4958d24c065ce52dcf4fab3c8d4274) )
+	ROM_LOAD16_BYTE( "pang.13", 0x020001, 0x10000, CRC(a49e98ec) SHA1(8a3d13bd755b58b0bc1d1497363409a1eeade129) )
+	ROM_LOAD16_BYTE( "pang.5",  0x020000, 0x10000, CRC(5804ae3e) SHA1(33de9aea7aa201aa650b0b6c5347713bf10cc13d) )
+
+	ROM_LOAD16_BYTE( "pang.16", 0x080001, 0x10000, CRC(bc508935) SHA1(1a11144b563befc11015d75e3867c07329ee6f32) )
+	ROM_LOAD16_BYTE( "pang.8",  0x080000, 0x10000, CRC(53a99bb6) SHA1(ffb75c5541d7c1478f05717b2cfa4bfe9b4654cd) )
+	ROM_LOAD16_BYTE( "pang.15", 0x0a0001, 0x10000, CRC(bf5c09b9) SHA1(f66a901292b190aa39dc2460363307e94c358d4d) )
+	ROM_LOAD16_BYTE( "pang.7",  0x0a0000, 0x10000, CRC(8b718670) SHA1(c22005a665a9e0bcfc3ddbc22ca4a2a261224ce1) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "pang.11", 0x020000, 0x10000, CRC(07191732) SHA1(7de03ddb07b2afad311b9ed5c84e04bef62d0050) )
+	ROM_LOAD( "pang.9",  0x030000, 0x10000, CRC(6496be82) SHA1(9c7ef4c6c3a0361f3118339a0c63b0923045d6c3) )
+	ROM_LOAD( "pang.12", 0x000000, 0x10000, CRC(fa247a04) SHA1(b5cab5f65eb3af3deeea6afba955056ca51f39af) )
+	ROM_LOAD( "pang.10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
+ROM_END
+
 ROM_START( cworld )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cw05.bin", 0x00000, 0x08000, CRC(d3c1723d) SHA1(b67f63e39f4301909c967555222820b54e98a205) )
@@ -2091,33 +2320,6 @@ ROM_START( spangbl )
 	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
 ROM_END
 
-// "spangbl2"
-// TODO: There is a bank of 8 dipswitches that needs to be hooked up with this set up:
-// ______________________________________________________
-// |                    | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | 1 Coin - 1 Credit  | ON| ON| ON|   |   |   |   |   |
-// | 1 Coin - 2 Credits |OFF| ON| ON|   |   |   |   |   |
-// | 1 Coin - 3 Credits | ON|OFF| ON|   |   |   |   |   |
-// | 1 Coin - 4 Credits |OFF|OFF| ON|   |   |   |   |   |
-// | 1 Coin - 6 Credits | ON| ON|OFF|   |   |   |   |   |
-// | 2 Coin - 1 Credit  |OFF| ON|OFF|   |   |   |   |   |
-// | 3 Coin - 1 Credit  | ON|OFF|OFF|   |   |   |   |   |
-// | 4 Coin - 1 Credit  |OFF|OFF|OFF|   |   |   |   |   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | 1 Player           |   |   |   | ON| ON|   |   |   |
-// | 2 Players          |   |   |   |OFF| ON|   |   |   |
-// | 3 Players          |   |   |   | ON|OFF|   |   |   |
-// | 4 Players          |   |   |   |OFF|OFF|   |   |   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | Easy               |   |   |   |   |   | ON| ON|   |
-// | Normal             |   |   |   |   |   |OFF| ON|   |
-// | Dificult           |   |   |   |   |   | ON|OFF|   |
-// | Very dificult      |   |   |   |   |   |OFF|OFF|   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | No demo sounds     |   |   |   |   |   |   |   | ON|
-// | Demo sounds        |   |   |   |   |   |   |   |OFF|
-// |____________________________________________________|
 ROM_START( spangbl2 )
 	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
 	// IC2 can be found as 27C512 with 1st and 2nd half identical or as 27C256
@@ -2414,11 +2616,11 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	uint8_t *dst = auto_alloc_array(machine(), uint8_t, size);
-	decode(src, dst, size);
+	m_decoded = std::make_unique<uint8_t[]>(size);
+	decode(src, m_decoded.get(), size);
 	m_bank1->configure_entries(0, 16, src + 0x10000, 0x4000);
-	m_bank0d->set_base(dst);
-	m_bank1d->configure_entries(0, 16, dst + 0x10000, 0x4000);
+	m_bank0d->set_base(m_decoded.get());
+	m_bank1d->configure_entries(0, 16, &m_decoded[0x10000], 0x4000);
 }
 
 
@@ -2499,7 +2701,7 @@ void mitchell_state::init_pkladies()
 }
 void mitchell_state::init_pkladiesbl()
 {
-	m_input_type = 1;
+	m_input_type = 0;
 	bootleg_decode();
 }
 void mitchell_state::init_marukin()
@@ -2569,37 +2771,52 @@ void mitchell_state::init_mstworld()
  *
  *************************************/
 
-GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
-GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbp,      pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
-GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,  mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, init_blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,    mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state, init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
+
+GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, dokaben2,    0,        pang,       pang,       mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, pang,        0,        pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb,       pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbold,    pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
+GAME( 1989, pangbc,      pang,     spangbl,    pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state, init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state, init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangbl,     spang,    spangbl,    spangbl,    mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
+
+GAME( 1994, mstworld,    0,        mstworld,   mstworld,   mitchell_state, init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state, init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, qtono1,      0,        pang,       qtono1,     mitchell_state, init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, qsangoku,    0,        pang,       qtono1,     mitchell_state, init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, block,       0,        pangnv,     blockjoy,   mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr1,     block,    pangnv,     blockjoy,   mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,      mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,      mitchell_state, init_blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )

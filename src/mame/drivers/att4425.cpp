@@ -54,10 +54,10 @@ public:
 	void att4425(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_READ8_MEMBER(port14_r);
-	DECLARE_READ8_MEMBER(port15_r);
+	void port10_w(uint8_t data);
+	void port14_w(uint8_t data);
+	uint8_t port14_r();
+	uint8_t port15_r();
 
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -79,23 +79,23 @@ private:
 
 /* Memory Maps */
 
-WRITE8_MEMBER(att4425_state::port10_w)
+void att4425_state::port10_w(uint8_t data)
 {
 	logerror("Writing %02X to port 10\n", data);
 }
 
-WRITE8_MEMBER(att4425_state::port14_w)
+void att4425_state::port14_w(uint8_t data)
 {
 	logerror("Writing %02X to port 14\n", data);
 }
 
-READ8_MEMBER(att4425_state::port14_r)
+uint8_t att4425_state::port14_r()
 {
 	// only complement of bit 0 used?
 	return 0;
 }
 
-READ8_MEMBER(att4425_state::port15_r)
+uint8_t att4425_state::port15_r()
 {
 	// status of something (at least bits 2 and 3 used)
 	return 0;
@@ -131,26 +131,26 @@ void att4425_state::video_start()
 
 uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx, fg, bg, chr, attr;
-	uint16_t sy = 0, ma, x, ca;
+	uint16_t sy = 0;
 
-	fg = 2;
-	bg = 0;
+	uint8_t fg = 2;
+	uint8_t bg = 0;
 
-	for (y = 0; y < 27; y++)
+	for (uint8_t y = 0; y < 27; y++)
 	{
-		ma = 0x7e9c + 4 * (81 - 27 + y);
+		uint16_t ma = 0x7e9c + 4 * (81 - 27 + y);
 		ma = (m_p_videoram[ma] << 8) + m_p_videoram[ma + 1] - 0x8000;
 
-		for (ra = 0; ra < 13; ra++)
+		for (uint8_t ra = 0; ra < 13; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 160; x += 2)
+			for (uint16_t x = ma; x < ma + 160; x += 2)
 			{
-				chr = m_p_videoram[x + 1];
-				attr = m_p_videoram[x];
-				ca = (chr << 4) & 0x7f0;
+				uint8_t const chr = m_p_videoram[x + 1];
+				uint8_t const attr = m_p_videoram[x];
+				uint16_t ca = (chr << 4) & 0x7f0;
+				uint8_t gfx;
 
 				// font 2
 				if (attr & 0x01)
@@ -178,9 +178,8 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 				/* Display a scanline of a character */
 				for (int i = 7; i >= 0; i--)
-				{
 					*p++ = BIT(gfx, i) ? fg : bg;
-				}
+
 				*p++ = bg;
 			}
 		}

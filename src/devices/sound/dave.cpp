@@ -62,7 +62,7 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
-		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
+		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
 		m_write_irq(*this),
 		m_write_lh(*this),
 		m_write_rh(*this),
@@ -122,7 +122,7 @@ void dave_device::device_start()
 	 the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
-	m_sound_stream_var = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_sound_stream_var = stream_alloc(0, 2, machine().sample_rate());
 }
 
 
@@ -149,7 +149,7 @@ void dave_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void dave_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dave_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -190,9 +190,8 @@ device_memory_interface::space_config_vector dave_device::memory_space_config() 
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
 	 2 = channel 1 left volume, 3 = channel 1 right volume,
 	 4 = channel 2 left volume, 5 = channel 2 right volume
@@ -203,10 +202,10 @@ void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	//logerror("sound update!\n");
 
-	buffer1 = outputs[0];
-	buffer2 = outputs[1];
+	auto &buffer1 = outputs[0];
+	auto &buffer2 = outputs[1];
 
-	while (samples)
+	for (int sampindex = 0; sampindex < buffer1.samples(); sampindex++)
 	{
 		int vol[4];
 
@@ -261,13 +260,11 @@ void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		output_volumes[6] = ((m_level[3] & m_level_and[6]) | m_level_or[6]) & m_mame_volumes[3];
 		output_volumes[7] = ((m_level[3] & m_level_and[7]) | m_level_or[7]) & m_mame_volumes[7];
 
-		left_volume = (output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6])>>2;
-		right_volume = (output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7])>>2;
+		left_volume = output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6];
+		right_volume = output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7];
 
-		*(buffer1++) = left_volume;
-		*(buffer2++) = right_volume;
-
-		samples--;
+		buffer1.put_int(sampindex, left_volume, 32768 * 4);
+		buffer2.put_int(sampindex, right_volume, 32768 * 4);
 	}
 }
 
@@ -312,7 +309,7 @@ WRITE_LINE_MEMBER( dave_device::int2_w )
 //  program_r - program space read
 //-------------------------------------------------
 
-READ8_MEMBER( dave_device::program_r )
+uint8_t dave_device::program_r(offs_t offset)
 {
 	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
@@ -325,7 +322,7 @@ READ8_MEMBER( dave_device::program_r )
 //  program_w - program space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( dave_device::program_w )
+void dave_device::program_w(offs_t offset, uint8_t data)
 {
 	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
@@ -338,7 +335,7 @@ WRITE8_MEMBER( dave_device::program_w )
 //  io_r - I/O space read
 //-------------------------------------------------
 
-READ8_MEMBER( dave_device::io_r )
+uint8_t dave_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -391,7 +388,7 @@ READ8_MEMBER( dave_device::io_r )
 //  io_w - I/O space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( dave_device::io_w )
+void dave_device::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xff)
 	{

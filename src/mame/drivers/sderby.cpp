@@ -78,7 +78,7 @@
 *       R/W Handlers       *
 ***************************/
 
-READ16_MEMBER(sderby_state::sderby_input_r)
+uint16_t sderby_state::sderby_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -93,7 +93,7 @@ READ16_MEMBER(sderby_state::sderby_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(sderby_state::sderbya_input_r)
+uint16_t sderby_state::sderbya_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -109,7 +109,7 @@ READ16_MEMBER(sderby_state::sderbya_input_r)
 }
 
 
-READ16_MEMBER(sderby_state::roulette_input_r)
+uint16_t sderby_state::roulette_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -146,7 +146,7 @@ READ16_MEMBER(sderby_state::roulette_input_r)
 
 ****************************************************************/
 
-READ16_MEMBER(sderby_state::rprot_r)
+uint16_t sderby_state::rprot_r()
 {
 	logerror("rprot_r : offset = %02x\n",m_maincpu->pc());
 
@@ -155,12 +155,12 @@ READ16_MEMBER(sderby_state::rprot_r)
    or simply throw a deliberated losing number.
 
    If someone more skilled in 68K code can help to trace it,
-   searching for an accurated response, I'll appreciate.
+   searching for an accurate response, I'll appreciate.
 */
 	return machine().rand() & 0x1f;
 }
 
-WRITE16_MEMBER(sderby_state::rprot_w)
+void sderby_state::rprot_w(uint16_t data)
 {
 	logerror("rprot_w %02x\n", data);
 }
@@ -170,7 +170,7 @@ WRITE16_MEMBER(sderby_state::rprot_w)
 *       Outputs / Lamps       *
 ******************************/
 
-WRITE16_MEMBER(sderby_state::sderby_out_w)
+void sderby_state::sderby_out_w(uint16_t data)
 {
 /*
   ---------------------------
@@ -214,7 +214,7 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
 }
 
 
-WRITE16_MEMBER(sderby_state::scmatto_out_w)
+void sderby_state::scmatto_out_w(uint16_t data)
 {
 /*
   ----------------------------------------
@@ -263,7 +263,7 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
 }
 
 
-WRITE16_MEMBER(sderby_state::roulette_out_w)
+void sderby_state::roulette_out_w(uint16_t data)
 {
 /*
   -----------------------------------

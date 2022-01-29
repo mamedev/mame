@@ -107,7 +107,7 @@ void epson_tf20_device::device_add_mconfig(machine_config &config)
 
 	// floppy drives
 	for (auto &fd : m_fd)
-		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_floppy_formats);
+		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_mfm_floppy_formats);
 
 	// serial interface to another device
 	EPSON_SIO(config, m_sio_output, nullptr);
@@ -149,8 +149,8 @@ void epson_tf20_device::device_start()
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	m_timer_serial = timer_alloc(0, nullptr);
-	m_timer_tc = timer_alloc(1, nullptr);
+	m_timer_serial = timer_alloc(0);
+	m_timer_tc = timer_alloc(1);
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
@@ -178,7 +178,7 @@ void epson_tf20_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -215,7 +215,7 @@ IRQ_CALLBACK_MEMBER( epson_tf20_device::irq_callback )
 }
 
 // a read from this location disables the rom
-READ8_MEMBER( epson_tf20_device::rom_disable_r )
+uint8_t epson_tf20_device::rom_disable_r()
 {
 	// switch in ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x0000, 0x7fff, m_ram->pointer());
@@ -231,7 +231,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 //  fdc interrupt
 //-------------------------------------------------
 
-READ8_MEMBER( epson_tf20_device::upd765_tc_r )
+uint8_t epson_tf20_device::upd765_tc_r()
 {
 	logerror("%s: upd765_tc_r\n", machine().describe_context());
 
@@ -242,7 +242,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
+void epson_tf20_device::fdc_control_w(uint8_t data)
 {
 	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 

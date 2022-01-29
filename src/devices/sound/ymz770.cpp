@@ -77,7 +77,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
+	m_stream = stream_alloc(0, 2, m_sclock);
 
 	for (auto & channel : m_channels)
 	{
@@ -98,47 +98,40 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
-	for (int ch = 0; ch < 16; ch++) // TODO array size
-	{
-		save_item(NAME(m_channels[ch].phrase), ch);
-		save_item(NAME(m_channels[ch].pan), ch);
-		save_item(NAME(m_channels[ch].pan_delay), ch);
-		save_item(NAME(m_channels[ch].pan1), ch);
-		save_item(NAME(m_channels[ch].pan1_delay), ch);
-		save_item(NAME(m_channels[ch].volume), ch);
-		save_item(NAME(m_channels[ch].volume_target), ch);
-		save_item(NAME(m_channels[ch].volume_delay), ch);
-		save_item(NAME(m_channels[ch].volume2), ch);
-		save_item(NAME(m_channels[ch].loop), ch);
-		save_item(NAME(m_channels[ch].is_playing), ch);
-		save_item(NAME(m_channels[ch].last_block), ch);
-		save_item(NAME(m_channels[ch].is_paused), ch);
-		save_item(NAME(m_channels[ch].output_remaining), ch);
-		save_item(NAME(m_channels[ch].output_ptr), ch);
-		save_item(NAME(m_channels[ch].atbl), ch);
-		save_item(NAME(m_channels[ch].pptr), ch);
-		save_item(NAME(m_channels[ch].output_data), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sequences[ch].delay), ch);
-		save_item(NAME(m_sequences[ch].sequence), ch);
-		save_item(NAME(m_sequences[ch].timer), ch);
-		save_item(NAME(m_sequences[ch].stopchan), ch);
-		save_item(NAME(m_sequences[ch].loop), ch);
-		save_item(NAME(m_sequences[ch].bank), ch);
-		save_item(NAME(m_sequences[ch].is_playing), ch);
-		save_item(NAME(m_sequences[ch].is_paused), ch);
-		save_item(NAME(m_sequences[ch].offset), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sqcs[ch].sqc), ch);
-		save_item(NAME(m_sqcs[ch].loop), ch);
-		save_item(NAME(m_sqcs[ch].is_playing), ch);
-		save_item(NAME(m_sqcs[ch].is_waiting), ch);
-		save_item(NAME(m_sqcs[ch].offset), ch);
-	}
+	save_item(STRUCT_MEMBER(m_channels, phrase));
+	save_item(STRUCT_MEMBER(m_channels, pan));
+	save_item(STRUCT_MEMBER(m_channels, pan_delay));
+	save_item(STRUCT_MEMBER(m_channels, pan1));
+	save_item(STRUCT_MEMBER(m_channels, pan1_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume));
+	save_item(STRUCT_MEMBER(m_channels, volume_target));
+	save_item(STRUCT_MEMBER(m_channels, volume_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume2));
+	save_item(STRUCT_MEMBER(m_channels, loop));
+	save_item(STRUCT_MEMBER(m_channels, is_playing));
+	save_item(STRUCT_MEMBER(m_channels, last_block));
+	save_item(STRUCT_MEMBER(m_channels, is_paused));
+	save_item(STRUCT_MEMBER(m_channels, output_remaining));
+	save_item(STRUCT_MEMBER(m_channels, output_ptr));
+	save_item(STRUCT_MEMBER(m_channels, atbl));
+	save_item(STRUCT_MEMBER(m_channels, pptr));
+	save_item(STRUCT_MEMBER(m_channels, output_data));
+
+	save_item(STRUCT_MEMBER(m_sequences, delay));
+	save_item(STRUCT_MEMBER(m_sequences, sequence));
+	save_item(STRUCT_MEMBER(m_sequences, timer));
+	save_item(STRUCT_MEMBER(m_sequences, stopchan));
+	save_item(STRUCT_MEMBER(m_sequences, loop));
+	save_item(STRUCT_MEMBER(m_sequences, bank));
+	save_item(STRUCT_MEMBER(m_sequences, is_playing));
+	save_item(STRUCT_MEMBER(m_sequences, is_paused));
+	save_item(STRUCT_MEMBER(m_sequences, offset));
+
+	save_item(STRUCT_MEMBER(m_sqcs, sqc));
+	save_item(STRUCT_MEMBER(m_sqcs, loop));
+	save_item(STRUCT_MEMBER(m_sqcs, is_playing));
+	save_item(STRUCT_MEMBER(m_sqcs, is_waiting));
+	save_item(STRUCT_MEMBER(m_sqcs, offset));
 }
 
 
@@ -189,14 +182,12 @@ void ymz770_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz770_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	outL = outputs[0];
-	outR = outputs[1];
-
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outL.samples(); i++)
 	{
 		sequencer();
 
@@ -275,22 +266,22 @@ retry:
 		switch (m_cpl)
 		{
 		case 3:
-			mixl = (mixl > ClipMax3) ? ClipMax3 : (mixl < -ClipMax3) ? -ClipMax3 : mixl;
-			mixr = (mixr > ClipMax3) ? ClipMax3 : (mixr < -ClipMax3) ? -ClipMax3 : mixr;
+			mixl = std::clamp(mixl, -ClipMax3, ClipMax3);
+			mixr = std::clamp(mixr, -ClipMax3, ClipMax3);
 			break;
 		case 2:
-			mixl = (mixl > ClipMax2) ? ClipMax2 : (mixl < -ClipMax2) ? -ClipMax2 : mixl;
-			mixr = (mixr > ClipMax2) ? ClipMax2 : (mixr < -ClipMax2) ? -ClipMax2 : mixr;
+			mixl = std::clamp(mixl, -ClipMax2, ClipMax2);
+			mixr = std::clamp(mixr, -ClipMax2, ClipMax2);
 			break;
 		case 1:
-			mixl = (mixl > 32767) ? 32767 : (mixl < -32768) ? -32768 : mixl;
-			mixr = (mixr > 32767) ? 32767 : (mixr < -32768) ? -32768 : mixr;
+			mixl = std::clamp(mixl, -32768, 32767);
+			mixr = std::clamp(mixr, -32768, 32767);
 			break;
 		}
 		if (m_mute)
 			mixr = mixl = 0;
-		outL[i] = mixl;
-		outR[i] = mixr;
+		outL.put_int(i, mixl, 32768);
+		outR.put_int(i, mixr, 32768);
 	}
 }
 
@@ -333,7 +324,7 @@ void ymz770_device::sequencer()
 //  write - write to the chip's registers
 //-------------------------------------------------
 
-WRITE8_MEMBER( ymz770_device::write )
+void ymz770_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -478,7 +469,7 @@ ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, dev
 	}
 }
 
-READ8_MEMBER(ymz774_device::read)
+uint8_t ymz774_device::read(offs_t offset)
 {
 	if (offset & 1)
 	{

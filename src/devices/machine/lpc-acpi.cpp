@@ -82,288 +82,288 @@ void lpc_acpi_device::device_reset()
 	sw_irq_gen = 0;
 }
 
-READ16_MEMBER( lpc_acpi_device::pm1_sts_r)
+uint16_t lpc_acpi_device::pm1_sts_r()
 {
 	return pm1_sts;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::pm1_sts_w)
+void lpc_acpi_device::pm1_sts_w(uint16_t data)
 {
 	pm1_sts &= ~data;
 	logerror("%s: pm1_sts = %04x\n", tag(), pm1_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::pm1_en_r)
+uint16_t lpc_acpi_device::pm1_en_r()
 {
 	return pm1_en;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::pm1_en_w)
+void lpc_acpi_device::pm1_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&pm1_en);
 	logerror("%s: pm1_en = %04x\n", tag(), pm1_en);
 }
 
-READ32_MEMBER( lpc_acpi_device::pm1_cnt_r)
+uint32_t lpc_acpi_device::pm1_cnt_r()
 {
 	return pm1_cnt;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::pm1_cnt_w)
+void lpc_acpi_device::pm1_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&pm1_cnt);
 	logerror("%s: pm1_cnt = %08x\n", tag(), pm1_cnt);
 }
 
-READ32_MEMBER(lpc_acpi_device::pm1_tmr_r)
+uint32_t lpc_acpi_device::pm1_tmr_r()
 {
 	return machine().time().as_ticks(3579545) & 0xffffff;
 }
 
-READ32_MEMBER( lpc_acpi_device::proc_cnt_r)
+uint32_t lpc_acpi_device::proc_cnt_r()
 {
 	return proc_cnt;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::proc_cnt_w)
+void lpc_acpi_device::proc_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&proc_cnt);
 	logerror("%s: proc_cnt = %08x\n", tag(), proc_cnt);
 }
 
-READ8_MEMBER(  lpc_acpi_device::lv2_r)
+uint8_t lpc_acpi_device::lv2_r()
 {
 	return 0x00;
 }
 
-READ32_MEMBER( lpc_acpi_device::gpe0_sts_r)
+uint32_t lpc_acpi_device::gpe0_sts_r()
 {
 	return gpe0_sts;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::gpe0_sts_w)
+void lpc_acpi_device::gpe0_sts_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gpe0_sts);
 	logerror("%s: gpe0_sts = %08x\n", tag(), gpe0_sts);
 }
 
-READ32_MEMBER( lpc_acpi_device::gpe0_en_r)
+uint32_t lpc_acpi_device::gpe0_en_r()
 {
 	return gpe0_en;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::gpe0_en_w)
+void lpc_acpi_device::gpe0_en_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gpe0_en);
 	logerror("%s: gpe0_en = %08x\n", tag(), gpe0_en);
 }
 
-READ32_MEMBER( lpc_acpi_device::smi_en_r)
+uint32_t lpc_acpi_device::smi_en_r()
 {
 	return smi_en;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::smi_en_w)
+void lpc_acpi_device::smi_en_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&smi_en);
 	logerror("%s: smi_en = %08x\n", tag(), smi_en);
 }
 
-READ32_MEMBER( lpc_acpi_device::smi_sts_r)
+uint32_t lpc_acpi_device::smi_sts_r()
 {
 	return smi_sts;
 }
 
-WRITE32_MEMBER(lpc_acpi_device::smi_sts_w)
+void lpc_acpi_device::smi_sts_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&smi_sts);
 	logerror("%s: smi_sts = %08x\n", tag(), smi_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::alt_gp_smi_en_r)
+uint16_t lpc_acpi_device::alt_gp_smi_en_r()
 {
 	return alt_gp_smi_en;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::alt_gp_smi_en_w)
+void lpc_acpi_device::alt_gp_smi_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&alt_gp_smi_en);
 	logerror("%s: alt_gp_smi_en = %04x\n", tag(), alt_gp_smi_en);
 }
 
-READ16_MEMBER( lpc_acpi_device::alt_gp_smi_sts_r)
+uint16_t lpc_acpi_device::alt_gp_smi_sts_r()
 {
 	return alt_gp_smi_sts;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::alt_gp_smi_sts_w)
+void lpc_acpi_device::alt_gp_smi_sts_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&alt_gp_smi_sts);
 	logerror("%s: alt_gp_smi_sts = %04x\n", tag(), alt_gp_smi_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::devact_sts_r)
+uint16_t lpc_acpi_device::devact_sts_r()
 {
 	return devact_sts;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::devact_sts_w)
+void lpc_acpi_device::devact_sts_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&devact_sts);
 	logerror("%s: devact_sts = %04x\n", tag(), devact_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::devtrap_en_r)
+uint16_t lpc_acpi_device::devtrap_en_r()
 {
 	return devtrap_en;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::devtrap_en_w)
+void lpc_acpi_device::devtrap_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&devtrap_en);
 	logerror("%s: devtrap_en = %04x\n", tag(), devtrap_en);
 }
 
-READ16_MEMBER( lpc_acpi_device::bus_addr_track_r)
+uint16_t lpc_acpi_device::bus_addr_track_r()
 {
 	logerror("%s: read bus_addr_track\n", tag());
 	return 0;
 }
 
-READ8_MEMBER(  lpc_acpi_device::bus_cyc_track_r)
+uint8_t lpc_acpi_device::bus_cyc_track_r()
 {
 	logerror("%s: read bus_cyc_track\n", tag());
 	return 0;
 }
 
 
-READ8_MEMBER(  lpc_acpi_device::tco_rld_r)
+uint8_t lpc_acpi_device::tco_rld_r()
 {
 	return tco_rld;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_rld_w)
+void lpc_acpi_device::tco_rld_w(uint8_t data)
 {
 	tco_rld = data;
 	logerror("%s: tco_rld = %02x\n", tag(), tco_rld);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_tmr_r)
+uint8_t lpc_acpi_device::tco_tmr_r()
 {
 	return tco_tmr;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_tmr_w)
+void lpc_acpi_device::tco_tmr_w(uint8_t data)
 {
 	tco_tmr = data;
 	logerror("%s: tco_tmr = %02x\n", tag(), tco_tmr);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_dat_in_r)
+uint8_t lpc_acpi_device::tco_dat_in_r()
 {
 	return tco_dat_in;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_dat_in_w)
+void lpc_acpi_device::tco_dat_in_w(uint8_t data)
 {
 	tco_dat_in = data;
 	logerror("%s: tco_dat_in = %02x\n", tag(), tco_dat_in);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_dat_out_r)
+uint8_t lpc_acpi_device::tco_dat_out_r()
 {
 	return tco_dat_out;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_dat_out_w)
+void lpc_acpi_device::tco_dat_out_w(uint8_t data)
 {
 	tco_dat_out = data;
 	logerror("%s: tco_dat_out = %02x\n", tag(), tco_dat_out);
 }
 
-READ16_MEMBER( lpc_acpi_device::tco1_sts_r)
+uint16_t lpc_acpi_device::tco1_sts_r()
 {
 	return tco1_sts;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::tco1_sts_w)
+void lpc_acpi_device::tco1_sts_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&tco1_sts);
 	logerror("%s: tco1_sts = %04x\n", tag(), tco1_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::tco2_sts_r)
+uint16_t lpc_acpi_device::tco2_sts_r()
 {
 	return tco2_sts;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::tco2_sts_w)
+void lpc_acpi_device::tco2_sts_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&tco2_sts);
 	logerror("%s: tco2_sts = %04x\n", tag(), tco2_sts);
 }
 
-READ16_MEMBER( lpc_acpi_device::tco1_cnt_r)
+uint16_t lpc_acpi_device::tco1_cnt_r()
 {
 	return tco1_cnt;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::tco1_cnt_w)
+void lpc_acpi_device::tco1_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&tco1_cnt);
 	logerror("%s: tco1_cnt = %04x\n", tag(), tco1_cnt);
 }
 
-READ16_MEMBER( lpc_acpi_device::tco2_cnt_r)
+uint16_t lpc_acpi_device::tco2_cnt_r()
 {
 	return tco2_cnt;
 }
 
-WRITE16_MEMBER(lpc_acpi_device::tco2_cnt_w)
+void lpc_acpi_device::tco2_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&tco2_cnt);
 	logerror("%s: tco2_cnt = %04x\n", tag(), tco2_cnt);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_message1_r)
+uint8_t lpc_acpi_device::tco_message1_r()
 {
 	return tco_message1;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_message1_w)
+void lpc_acpi_device::tco_message1_w(uint8_t data)
 {
 	tco_message1 = data;
 	logerror("%s: tco_message1 = %02x\n", tag(), tco_message1);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_message2_r)
+uint8_t lpc_acpi_device::tco_message2_r()
 {
 	return tco_message2;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_message2_w)
+void lpc_acpi_device::tco_message2_w(uint8_t data)
 {
 	tco_message2 = data;
 	logerror("%s: tco_message2 = %02x\n", tag(), tco_message2);
 }
 
-READ8_MEMBER(  lpc_acpi_device::tco_wdstatus_r)
+uint8_t lpc_acpi_device::tco_wdstatus_r()
 {
 	return tco_wdstatus;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::tco_wdstatus_w)
+void lpc_acpi_device::tco_wdstatus_w(uint8_t data)
 {
 	tco_wdstatus = data;
 	logerror("%s: tco_wdstatus = %02x\n", tag(), tco_wdstatus);
 }
 
-READ8_MEMBER(  lpc_acpi_device::sw_irq_gen_r)
+uint8_t lpc_acpi_device::sw_irq_gen_r()
 {
 	return sw_irq_gen;
 }
 
-WRITE8_MEMBER( lpc_acpi_device::sw_irq_gen_w)
+void lpc_acpi_device::sw_irq_gen_w(uint8_t data)
 {
 	sw_irq_gen = data;
 	logerror("%s: sw_irq_gen = %02x\n", tag(), sw_irq_gen);

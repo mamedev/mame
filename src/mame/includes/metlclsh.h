@@ -18,6 +18,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bgram(*this, "bgram"),
 		m_scrollx(*this, "scrollx"),
+		m_rambank(*this, "rambank"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -33,6 +34,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_scrollx;
+	required_memory_bank m_rambank;
 	std::unique_ptr<uint8_t[]>        m_otherram;
 
 	/* video-related */
@@ -47,16 +49,16 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(metlclsh_cause_irq);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi);
-	DECLARE_WRITE8_MEMBER(metlclsh_cause_nmi2);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_irq2);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi2);
-	DECLARE_WRITE8_MEMBER(metlclsh_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_rambank_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_bgram_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_fgram_w);
+	void metlclsh_cause_irq(uint8_t data);
+	void metlclsh_ack_nmi(uint8_t data);
+	void metlclsh_cause_nmi2(uint8_t data);
+	void metlclsh_ack_irq2(uint8_t data);
+	void metlclsh_ack_nmi2(uint8_t data);
+	void metlclsh_flipscreen_w(uint8_t data);
+	void metlclsh_rambank_w(uint8_t data);
+	void metlclsh_gfxbank_w(uint8_t data);
+	void metlclsh_bgram_w(offs_t offset, uint8_t data);
+	void metlclsh_fgram_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(metlclsh_bgtilemap_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

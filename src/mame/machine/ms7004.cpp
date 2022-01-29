@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER( ms7004_device::write_rxd )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::p1_w )
+void ms7004_device::p1_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -416,7 +416,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::p2_w )
+void ms7004_device::p2_w(uint8_t data)
 {
 	/*
 	    bit     description

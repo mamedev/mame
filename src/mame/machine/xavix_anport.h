@@ -14,15 +14,15 @@ public:
 	auto read_2_callback() { return m_in2_cb.bind(); }
 	auto read_3_callback() { return m_in3_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(mouse_7b00_r);
-	DECLARE_READ8_MEMBER(mouse_7b01_r);
-	DECLARE_READ8_MEMBER(mouse_7b10_r);
-	DECLARE_READ8_MEMBER(mouse_7b11_r);
+	uint8_t mouse_7b00_r();
+	uint8_t mouse_7b01_r();
+	uint8_t mouse_7b10_r();
+	uint8_t mouse_7b11_r();
 
-	DECLARE_WRITE8_MEMBER(mouse_7b00_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
-	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
+	void mouse_7b00_w(uint8_t data);
+	void mouse_7b01_w(uint8_t data);
+	void mouse_7b10_w(uint8_t data);
+	void mouse_7b11_w(uint8_t data);
 
 protected:
 	// device-level overrides

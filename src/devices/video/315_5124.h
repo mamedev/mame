@@ -55,6 +55,7 @@ public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_hcounter_divide(unsigned divide) { m_hcounter_divide = divide; }
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	auto vblank() { return m_vblank_cb.bind(); }
@@ -93,7 +94,7 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
@@ -102,6 +103,7 @@ protected:
 
 	void sega315_5124(address_map &map);
 
+	virtual int screen_hpos() { return screen().hpos() / ((m_hcounter_divide == 0) ? 1 : m_hcounter_divide); }
 	void set_display_settings();
 	void set_frame_timing();
 	virtual void vblank_end(int vpos);
@@ -117,9 +119,11 @@ protected:
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
-	virtual u16 name_table_row_mode4(int row);
-	virtual u16 sprite_attributes_addr_mode4(u16 base);
-	virtual u8 sprite_tile_mask_mode4(u8 tile_number);
+	virtual u16 name_row_mode4(u16 row);
+	virtual u16 tile1_select_mode4(u16 tile_number);
+	virtual u16 tile2_select_mode4(u16 tile_number);
+	virtual u8 sprite_attribute_extra_offset_mode4(u8 offset);
+	virtual u8 sprite_tile_select_mode4(u8 tile_number);
 	void process_line_timer();
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
@@ -129,7 +133,10 @@ protected:
 	void draw_scanline_mode1(int *line_buffer, int line);
 	void draw_scanline_mode0(int *line_buffer, int line);
 	void check_pending_flags();
+	u8 vcount();
+	u8 hcount();
 
+	unsigned         m_hcounter_divide;
 	u8               m_reg[16];                  /* All the registers */
 	u8               m_status;                   /* Status register */
 	u8               m_pending_status;           /* Pending status flags */
@@ -164,7 +171,7 @@ protected:
 	const u8         m_palette_offset;
 	const u8         m_reg_num_mask;
 	bool             m_display_disabled;
-	u16              m_sprite_base;
+	u16              m_sprite_attribute_base;
 	u16              m_sprite_pattern_line[8];
 	int              m_sprite_tile_selected[8];
 	int              m_sprite_x[8];
@@ -214,10 +221,17 @@ public:
 protected:
 	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
-	virtual u16 name_table_row_mode4(int row) override;
-	virtual u16 sprite_attributes_addr_mode4(u16 base) override;
-	virtual u8 sprite_tile_mask_mode4(u8 tile_number) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual u16 name_row_mode4(u16 row) override;
+	virtual u16 tile1_select_mode4(u16 tile_number) override;
+	virtual u16 tile2_select_mode4(u16 tile_number) override;
+	virtual u8 sprite_attribute_extra_offset_mode4(u8 offset) override;
+	virtual u8 sprite_tile_select_mode4(u8 tile_number) override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
+
+private:
+	void sega315_5246_palette(palette_device &palette) const;
 };
 
 

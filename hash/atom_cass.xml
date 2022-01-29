@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn Atom - Cassette images -->
+Acorn Atom - Cassette images
+-->
 
 <softwarelist name="atom_cass" description="Acorn Atom cassettes">
 

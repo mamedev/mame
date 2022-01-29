@@ -43,17 +43,19 @@ class debug_view_disasm_source : public debug_view_source
 {
 	friend class debug_view_disasm;
 
-	// construction/destruction
-	debug_view_disasm_source(const char *name, device_t &device);
-
 public:
+	// construction/destruction
+	debug_view_disasm_source(std::string &&name, device_t &device);
+
 	// getters
 	address_space &space() const { return m_space; }
+	offs_t pcbase() const { return m_pcbase != nullptr ? m_pcbase->value() & m_space.logaddrmask() : 0; }
 
 private:
 	// internal state
 	address_space &     m_space;                // address space to display
 	address_space &     m_decrypted_space;      // address space to display for decrypted opcodes
+	const device_state_entry *m_pcbase;
 };
 
 

@@ -180,7 +180,7 @@ void pgm_arm_type2_state::init_kov2()
 	kov2_latch_init();
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::kov2_arm_region_w)));
 }
 
 
@@ -194,7 +194,7 @@ void pgm_arm_type2_state::init_kov2p()
 	kov2_latch_init();
 
 	// we only have a China internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::kov2p_arm_region_w)));
 }
 
 void pgm_arm_type2_state::martmast_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
@@ -213,11 +213,11 @@ void pgm_arm_type2_state::init_martmast()
 	kov2_latch_init();
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::martmast_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::martmast_arm_region_w)));
 }
 
 
-READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
+u32 pgm_arm_type2_state::ddp2_speedup_r(address_space &space)
 {
 	const int pc = m_prot->pc();
 	const u32 data = m_arm_ram[0x300c/4];
@@ -238,7 +238,7 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 	return data;
 }
 
-READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
+u16 pgm_arm_type2_state::ddp2_main_speedup_r()
 {
 	const u16 data = m_mainram[0x0ee54/2];
 	const int pc = m_maincpu->pc();
@@ -256,8 +256,8 @@ void pgm_arm_type2_state::init_ddp2()
 	pgm_ddp2_decrypt(machine());
 	kov2_latch_init();
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(FUNC(pgm_arm_type2_state::ddp2_speedup_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32mo_delegate(*this, FUNC(pgm_arm_type2_state::ddp2_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16smo_delegate(*this, FUNC(pgm_arm_type2_state::ddp2_main_speedup_r)));
 }
 
 
@@ -271,10 +271,20 @@ void pgm_arm_type2_state::init_dw2001()
 void pgm_arm_type2_state::init_dwpc()
 {
 	pgm_basic_init();
+	pgm_dwpc_decrypt(machine());
+	kov2_latch_init();
+
+	// we only have a JAPAN internal ROM dumped for now, so hack it to allow booting the Chinese version
+	u8 *armrom = memregion("prot")->base();
+	armrom[0x3c8] = 0x01;
+}
+
+void pgm_arm_type2_state::init_dwpc101j()
+{
+	pgm_basic_init();
 	kov2_latch_init();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
-
 
 INPUT_PORTS_START( kov2 )
 	PORT_INCLUDE ( pgm )

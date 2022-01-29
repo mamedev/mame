@@ -18,52 +18,12 @@ class _Identifier(object):
     def __init__(self, dbcurs, **kwargs):
         super(_Identifier, self).__init__(**kwargs)
         self.dbcurs = dbcurs
+        self.shortnamewidth = 0
         self.pathwidth = 0
         self.labelwidth = 0
-        self.matches = { }
+        self.machines = { }
+        self.software = { }
         self.unmatched = [ ]
-
-    def processRomFile(self, path, f):
-        crc, sha1 = self.digestRom(f)
-        matched = False
-        for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
-            matched = True
-            self.labelwidth = max(len(label), self.labelwidth)
-            romset = self.matches.get(shortname)
-            if romset is None:
-                romset = (description, [])
-                self.matches[shortname] = romset
-            romset[1].append((path, label, bad))
-        if not matched:
-            self.unmatched.append((path, crc, sha1))
-        self.pathwidth = max(len(path), self.pathwidth)
-
-    def processChd(self, path, sha1):
-        matched = False
-        for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
-            matched = True
-            self.labelwidth = max(len(label), self.labelwidth)
-            romset = self.matches.get(shortname)
-            if romset is None:
-                romset = (description, [])
-                self.matches[shortname] = romset
-            romset[1].append((path, label, bad))
-        if not matched:
-            self.unmatched.append((path, None, sha1))
-        self.pathwidth = max(len(path), self.pathwidth)
-
-    def processFile(self, path):
-        if os.path.splitext(path)[1].lower() != '.chd':
-            with open(path, mode='rb', buffering=0) as f:
-                self.processRomFile(path, f)
-        else:
-            with open(path, mode='rb') as f:
-                sha1 = self.probeChd(f)
-                if sha1 is None:
-                    f.seek(0)
-                    self.processRomFile(path, f)
-                else:
-                    self.processChd(path, sha1)
 
     def processPath(self, path, depth=0):
         try:
@@ -78,20 +38,30 @@ class _Identifier(object):
             sys.stderr.write('Error identifying \'%s\': %s\n' % (path, e))
 
     def printResults(self):
+        nw = self.shortnamewidth - (self.shortnamewidth % 4) + 4
         pw = self.pathwidth - (self.pathwidth % 4) + 4
         lw = self.labelwidth - (self.labelwidth % 4) + 4
         first = True
-        for shortname, romset in sorted(self.matches.items()):
+        for shortname, romset in sorted(self.machines.items()):
             if first:
                 first = False
             else:
                 sys.stdout.write('\n')
-            sys.stdout.write('%-20s%s\n' % (shortname, romset[0]))
-            for path, label, bad in romset[1]:
-                if bad:
-                    sys.stdout.write('    %-*s= %-*s(BAD)\n' % (pw, path, lw, label))
+            sys.stdout.write('%-*s%s\n' % (nw, shortname, romset[0]))
+            self.printMatches(romset[1], pw, lw)
+        for softwarelist, listinfo in sorted(self.software.items()):
+            for shortname, softwareinfo in sorted(listinfo[1].items()):
+                if first:
+                    first = False
                 else:
-                    sys.stdout.write('    %-*s= %s\n' % (pw, path, label))
+                    sys.stdout.write('\n')
+                sys.stdout.write('%-*s%s\n' % (nw, '%s:%s' % (softwarelist, shortname), softwareinfo[0]))
+                for part, partinfo in sorted(softwareinfo[1].items()):
+                    if partinfo[0] is not None:
+                        sys.stdout.write('%-*s%s\n' % (nw, '  ' + part, partinfo[0]))
+                    else:
+                        sys.stdout.write('  %s\n' % (part, ))
+                    self.printMatches(partinfo[1], pw, lw)
         if self.unmatched:
             if first:
                 first = False
@@ -103,6 +73,73 @@ class _Identifier(object):
                     sys.stdout.write('    %-*sCRC(%08x) SHA1(%s)\n' % (pw, path, crc, sha1))
                 else:
                     sys.stdout.write('    %-*sSHA1(%s)\n' % (pw, path, sha1))
+
+    def getMachineMatches(self, shortname, description):
+        result = self.machines.get(shortname)
+        if result is None:
+            result = (description, [ ])
+            self.machines[shortname] = result
+        return result[1]
+
+    def getSoftwareMatches(self, softwarelist, softwarelistdescription, shortname, description, part, part_id):
+        listinfo = self.software.get(softwarelist)
+        if listinfo is None:
+            listinfo = (softwarelistdescription, { })
+            self.software[softwarelist] = listinfo
+        softwareinfo = listinfo[1].get(shortname)
+        if softwareinfo is None:
+            softwareinfo = (description, { })
+            listinfo[1][shortname] = softwareinfo
+        partinfo = softwareinfo[1].get(part)
+        if partinfo is None:
+            partinfo = (part_id, [ ])
+            softwareinfo[1][part] = partinfo
+        return partinfo[1]
+
+    def processRomFile(self, path, f):
+        crc, sha1 = self.digestRom(f)
+        matched = False
+        for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
+            matched = True
+            self.shortnamewidth = max(len(shortname), self.shortnamewidth)
+            self.labelwidth = max(len(label), self.labelwidth)
+            self.getMachineMatches(shortname, description).append((path, label, bad))
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_rom_dumps(crc, sha1):
+            matched = True
+            self.shortnamewidth = max(len(softwarelist) + 1 + len(shortname), 2 + len(part), self.shortnamewidth)
+            self.labelwidth = max(len(label), self.labelwidth)
+            self.getSoftwareMatches(softwarelist, softwarelistdescription, shortname, description, part, part_id).append((path, label, bad))
+        if not matched:
+            self.unmatched.append((path, crc, sha1))
+
+    def processChd(self, path, sha1):
+        matched = False
+        for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
+            matched = True
+            self.shortnamewidth = max(len(shortname), self.shortnamewidth)
+            self.labelwidth = max(len(label), self.labelwidth)
+            self.getMachineMatches(shortname, description).append((path, label, bad))
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_disk_dumps(sha1):
+            matched = True
+            self.shortnamewidth = max(len(softwarelist) + 1 + len(shortname), 2 + len(part), self.shortnamewidth)
+            self.labelwidth = max(len(label), self.labelwidth)
+            self.getSoftwareMatches(softwarelist, softwarelistdescription, shortname, description, part, part_id).append((path, label, bad))
+        if not matched:
+            self.unmatched.append((path, None, sha1))
+
+    def processFile(self, path):
+        if os.path.splitext(path)[1].lower() != '.chd':
+            with open(path, mode='rb', buffering=0) as f:
+                self.processRomFile(path, f)
+        else:
+            with open(path, mode='rb') as f:
+                sha1 = self.probeChd(f)
+                if sha1 is None:
+                    f.seek(0)
+                    self.processRomFile(path, f)
+                else:
+                    self.processChd(path, sha1)
+        self.pathwidth = max(len(path), self.pathwidth)
 
     @staticmethod
     def iterateBlocks(f, s=65536):
@@ -149,6 +186,14 @@ class _Identifier(object):
         if len(buf) != 20:
             return None
         return codecs.getencoder('hex_codec')(buf)[0].decode('ascii')
+
+    @staticmethod
+    def printMatches(matches, pathwidth, labelwidth):
+        for path, label, bad in matches:
+            if bad:
+                sys.stdout.write('    %-*s= %-*s(BAD)\n' % (pathwidth, path, labelwidth, label))
+            else:
+                sys.stdout.write('    %-*s= %s\n' % (pathwidth, path, label))
 
 
 def do_listfull(options):

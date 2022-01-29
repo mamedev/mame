@@ -1048,7 +1048,7 @@ void tms5110_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
 	m_romclk_hack_timer = timer_alloc(0);
@@ -1119,7 +1119,7 @@ commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_MEMBER( tms5110_device::ctl_w )
+void tms5110_device::ctl_w(uint8_t data)
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1133,7 +1133,7 @@ WRITE8_MEMBER( tms5110_device::ctl_w )
 
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( tms5110_device::pdc_w )
+void tms5110_device::pdc_w(int state)
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1159,7 +1159,7 @@ WRITE_LINE_MEMBER( tms5110_device::pdc_w )
 
 ******************************************************************************/
 
-READ8_MEMBER( tms5110_device::ctl_r )
+uint8_t tms5110_device::ctl_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1180,7 +1180,7 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	}
 }
 
-READ8_MEMBER( m58817_device::status_r )
+uint8_t m58817_device::status_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1193,12 +1193,12 @@ READ8_MEMBER( m58817_device::status_r )
 
 ******************************************************************************/
 
-void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
 
-READ_LINE_MEMBER( tms5110_device::romclk_hack_r )
+int tms5110_device::romclk_hack_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1223,24 +1223,22 @@ READ_LINE_MEMBER( tms5110_device::romclk_hack_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
-	while (samples)
+	for (int sampindex = 0; sampindex < buffer.samples(); )
 	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-		int index;
+		int length = buffer.samples() - sampindex;
+		if (length > MAX_SAMPLE_CHUNK)
+			length = MAX_SAMPLE_CHUNK;
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
-		for (index = 0; index < length; index++)
-			*buffer++ = sample_data[index];
-
-		/* account for the samples */
-		samples -= length;
+		for (int index = 0; index < length; index++)
+			buffer.put_int(sampindex++, sample_data[index], 32768);
 	}
 }
 
@@ -1324,7 +1322,7 @@ void tmsprom_device::update_prom_cnt()
 		m_prom_cnt &= 0x0f;
 }
 
-void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	/* only 16 bytes needed ... The original dump is bad. This
 	 * is what is needed to get speech to work. The prom data has
@@ -1374,7 +1372,7 @@ void tmsprom_device::device_start()
 	register_for_save_states();
 }
 
-WRITE_LINE_MEMBER( tmsprom_device::m0_w )
+void tmsprom_device::m0_w(int state)
 {
 	/* falling edge counts */
 	if (m_m0 && !state)
@@ -1385,24 +1383,24 @@ WRITE_LINE_MEMBER( tmsprom_device::m0_w )
 	m_m0 = state;
 }
 
-READ_LINE_MEMBER( tmsprom_device::data_r )
+int tmsprom_device::data_r()
 {
 	return (m_rom[m_base_address + m_address] >> m_bit) & 0x01;
 }
 
 
-WRITE8_MEMBER( tmsprom_device::rom_csq_w )
+void tmsprom_device::rom_csq_w(offs_t offset, uint8_t data)
 {
 	if (!data)
 		m_base_address = offset * m_rom_size;
 }
 
-WRITE8_MEMBER( tmsprom_device::bit_w )
+void tmsprom_device::bit_w(uint8_t data)
 {
 	m_bit = data;
 }
 
-WRITE_LINE_MEMBER( tmsprom_device::enable_w )
+void tmsprom_device::enable_w(int state)
 {
 	if (state != m_enable)
 	{
@@ -1511,7 +1509,7 @@ DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMSPROM, tag, owner, clock),
 		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, finder_base::DUMMY_TAG, 0x20),
+		m_prom(*this, finder_base::DUMMY_TAG),
 		m_rom_size(0),
 		m_pdc_bit(0),
 		m_ctl1_bit(0),

@@ -64,18 +64,18 @@ private:
 	bool       m_spriteram_select;
 
 	bool       m_irq_mask;
-	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);
+	void sbasketb_sh_irqtrigger_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(sbasketb_videoram_w);
-	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
+	void sbasketb_videoram_w(offs_t offset, uint8_t data);
+	void sbasketb_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spriteram_select_w);
 
 	uint8_t m_SN76496_latch;
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
+	void  konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
+	void  konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	void sbasketb_palette(palette_device &palette) const;

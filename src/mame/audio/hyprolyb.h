@@ -8,27 +8,24 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
-class hyprolyb_adpcm_device : public device_t, public device_sound_interface
+class hyprolyb_adpcm_device : public device_t
 {
 public:
 	hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( busy_r );
+	void write(uint8_t data);
+	uint8_t busy_r();
 
-	WRITE8_MEMBER( msm_data_w );
-	READ8_MEMBER( msm_vck_r );
-	READ8_MEMBER( ready_r );
-	READ8_MEMBER( data_r );
+	void msm_data_w(uint8_t data);
+	uint8_t msm_vck_r();
+	uint8_t ready_r();
+	uint8_t data_r();
 
 	void vck_callback( int st );
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	private:
 	// internal state

@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/pet/cass.h"
 #include "bus/vic10/exp.h"
@@ -23,7 +23,6 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG       "u3"
 #define MOS6566_TAG     "u2"
 #define MOS6581_TAG     "u6"
 #define MOS6526_TAG     "u9"
@@ -37,16 +36,16 @@ class vic10_state : public driver_device
 public:
 	vic10_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6510_TAG),
+		m_maincpu(*this, "u3"),
 		m_vic(*this, MOS6566_TAG),
 		m_sid(*this, MOS6581_TAG),
 		m_cia(*this, MOS6526_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
-		m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_restore(*this, "RESTORE"),
 		m_lock(*this, "LOCK")
@@ -64,7 +63,7 @@ private:
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport m_restore;
 	required_ioport m_lock;
@@ -605,9 +604,6 @@ WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
 
 void vic10_state::machine_start()
 {
-	// allocate memory
-	m_color_ram.allocate(0x400);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -645,17 +641,16 @@ void vic10_state::vic10(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic10_state::vic10_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
 	m_maincpu->set_pulls(0x10, 0x20);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
 
 	// video hardware
 	mos8566_device &mos8566(MOS8566(config, MOS6566_TAG, XTAL(8'000'000)/8));
-	mos8566.set_cpu(M6510_TAG);
+	mos8566.set_cpu(m_maincpu);
 	mos8566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	mos8566.set_screen(SCREEN_TAG);
 	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
@@ -692,6 +687,7 @@ void vic10_state::vic10(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
+	m_exp->set_must_be_loaded(true);
 	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->res_callback().set(FUNC(vic10_state::exp_reset_w));
 	m_exp->cnt_callback().set(m_cia, FUNC(mos6526_device::cnt_w));

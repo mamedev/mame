@@ -52,14 +52,14 @@ public:
 	void nichild(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(gfx_r);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(portd_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
+	uint8_t gfx_r(offs_t offset);
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	void portd_w(uint8_t data);
+	void gfxbank_w(uint8_t data);
 
 	void nichild_io(address_map &map);
 	void nichild_map(address_map &map);
@@ -75,7 +75,7 @@ private:
 };
 
 
-READ8_MEMBER(nichild_state::gfx_r)
+uint8_t nichild_state::gfx_r(offs_t offset)
 {
 	uint32_t gfx_offset;
 
@@ -90,40 +90,40 @@ READ8_MEMBER(nichild_state::gfx_r)
 
 //#include "debugger.h"
 
-WRITE8_MEMBER(nichild_state::porta_w)
+void nichild_state::porta_w(uint8_t data)
 {
 	printf("PORTA %02x\n",data);
 //  machine().debug_break();
 }
 
-WRITE8_MEMBER(nichild_state::portb_w)
+void nichild_state::portb_w(uint8_t data)
 {
 	printf("PORTB %02x\n",data);
 }
 
-WRITE8_MEMBER(nichild_state::portc_w)
+void nichild_state::portc_w(uint8_t data)
 {
 	printf("PORTC %02x\n",data);
 }
 
-WRITE8_MEMBER(nichild_state::portd_w)
+void nichild_state::portd_w(uint8_t data)
 {
 	printf("PORTD %02x\n",data);
 }
 
-WRITE8_MEMBER(nichild_state::gfxbank_w)
+void nichild_state::gfxbank_w(uint8_t data)
 {
 	// TODO: ldquiz4 checks up to 0x30, what for?
 	m_gfx_bank = data * 0x8000;
 }
 
-READ8_MEMBER(nichild_state::mux_r)
+uint8_t nichild_state::mux_r()
 {
 	// TODO
 	return 0xff;
 }
 
-WRITE8_MEMBER(nichild_state::mux_w)
+void nichild_state::mux_w(uint8_t data)
 {
 	// ...
 }

@@ -1,18 +1,18 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * pchrono.h
- *
- */
 
 #ifndef PCHRONO_H_
 #define PCHRONO_H_
 
+///
+/// \file pchrono.h
+///
+
 #include "pconfig.h"
+#include "pgsl.h"
 #include "ptypes.h"
 
 #include <chrono>
-//#include <cstdint>
 
 namespace plib {
 	namespace chrono {
@@ -20,9 +20,9 @@ namespace plib {
 		struct sys_ticks
 		{
 			using type = typename T::rep;
-			static inline constexpr type start() noexcept { return T::now().time_since_epoch().count(); }
-			static inline constexpr type stop() noexcept { return T::now().time_since_epoch().count(); }
-			static inline constexpr type per_second() noexcept { return T::period::den / T::period::num; }
+			static constexpr type start() noexcept { return T::now().time_since_epoch().count(); }
+			static constexpr type stop() noexcept { return T::now().time_since_epoch().count(); }
+			static constexpr type per_second() noexcept { return T::period::den / T::period::num; }
 		};
 
 		using hires_ticks = sys_ticks<std::chrono::high_resolution_clock>;
@@ -35,7 +35,7 @@ namespace plib {
 		struct base_ticks
 		{
 			using ret_type = R;
-			static ret_type per_second()
+			static ret_type per_second() noexcept
 			{
 				static ret_type persec = 0;
 				if (persec == 0)
@@ -66,9 +66,9 @@ namespace plib {
 						"rdtscp;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v)           /* outputs  */
-						:                   /* inputs   */
-						: "%rcx", "%rdx"    /* clobbers */
+						: "=a"(v)           // outputs
+						:                   // inputs
+						: "%rcx", "%rdx"    // clobbers
 				);
 				return v;
 			}
@@ -89,9 +89,9 @@ namespace plib {
 						"rdtsc;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v)   /* outputs  */
-						:           /* inputs   */
-						: "%rdx"    /* clobbers */
+						: "=a"(v)   // outputs
+						:           // inputs
+						: "%rdx"    // clobbers
 				);
 				return v;
 			}
@@ -104,16 +104,14 @@ namespace plib {
 		#endif
 
 
-		/* Based on "How to Benchmark Code Execution Times on Intel?? IA-32 and IA-64
-		 * Instruction Set Architectures", Intel, 2010
-		 *
-		 */
+		// Based on "How to Benchmark Code Execution Times on Intel?? IA-32 and IA-64
+		// Instruction Set Architectures", Intel, 2010
+
 		#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
-		/*
-		 * kills performance completely, but is accurate
-		 * cpuid serializes, but clobbers ebx and ecx
-		 *
-		 */
+		//
+		// kills performance completely, but is accurate
+		// cpuid serializes, but clobbers ebx and ecx
+		//
 
 		struct exact_ticks : public base_ticks<exact_ticks, int64_t>
 		{
@@ -128,9 +126,9 @@ namespace plib {
 						"rdtsc;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v) /* outputs */
-						: "a"(0x0)                /* inputs */
-						: "%ebx", "%ecx", "%rdx"  /* clobbers*/
+						: "=a"(v) // outputs
+						: "a"(0x0)                // inputs
+						: "%ebx", "%ecx", "%rdx"  // clobbers
 				);
 				return v;
 			}
@@ -179,9 +177,9 @@ namespace plib {
 		struct counter<false>
 		{
 			using type = uint_least64_t;
-			constexpr type operator()() const { return 0; }
-			void inc() const { }
-			void reset() const { }
+			constexpr type operator()() const noexcept { return 0; }
+			void inc() const noexcept { }
+			void reset() const noexcept { }
 			constexpr static bool enabled = false;
 		};
 
@@ -196,30 +194,38 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = delete;
-				guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
-				~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
+				explicit constexpr guard_t(timer &m) noexcept : m_m(&m) { m_m->m_time -= T::start(); }
+				~guard_t() noexcept { m_m->m_time += T::stop(); ++m_m->m_count; }
 
-				COPYASSIGNMOVE(guard_t, default)
+				constexpr guard_t(const guard_t &) = default;
+				constexpr guard_t &operator=(const guard_t &) = default;
+				constexpr guard_t(guard_t &&) noexcept = default;
+				constexpr guard_t &operator=(guard_t &&) noexcept = default;
 
 			private:
-				timer &m_m;
+				timer *m_m;
 			};
 
-			friend struct guard_t;
+			constexpr timer() : m_time(0), m_count(0) { }
 
-			timer() : m_time(0), m_count(0) { }
+			constexpr type operator()() const { return m_time; }
 
-			type operator()() const { return m_time; }
+			void reset() noexcept { m_time = 0; m_count = 0; }
+			constexpr type average() const noexcept { return (m_count == 0) ? 0 : m_time / m_count; }
+			constexpr type total() const noexcept { return m_time; }
+			constexpr ctype count() const noexcept { return m_count; }
 
-			void reset() { m_time = 0; m_count = 0; }
-			type average() const { return (m_count == 0) ? 0 : m_time / m_count; }
-			type total() const { return m_time; }
-			ctype count() const { return m_count; }
+			template <typename S>
+			constexpr S as_seconds() const noexcept { return narrow_cast<S>(total())
+					/ narrow_cast<S>(T::per_second()); }
 
-			double as_seconds() const { return static_cast<double>(total())
-					/ static_cast<double>(T::per_second()); }
+			constexpr guard_t guard() noexcept { return guard_t(*this); }
 
-			guard_t guard() { return guard_t(*this); }
+			// pause must be followed by cont(inue)
+			void stop() noexcept { m_time += T::stop(); }
+			void start() noexcept { m_time -= T::start(); }
+
+
 		private:
 			type m_time;
 			ctype m_count;
@@ -233,21 +239,27 @@ namespace plib {
 
 			struct guard_t
 			{
-				guard_t() = default;
-				COPYASSIGNMOVE(guard_t, default)
-				/* using default constructor will trigger warning on
-				 * unused local variable.
-				 */
+				constexpr guard_t() = default;
+
+				constexpr guard_t(const guard_t &) = default;
+				constexpr guard_t &operator=(const guard_t &) = default;
+				constexpr guard_t(guard_t &&) noexcept = default;
+				constexpr guard_t &operator=(guard_t &&) noexcept = default;
+
+				// using default constructor will trigger warning on
+				// unused local variable.
+
 				// NOLINTNEXTLINE(modernize-use-equals-default)
-				~guard_t() { }
+				~guard_t() noexcept { }
 			};
 
-			constexpr type operator()() const { return 0; }
-			void reset() const { }
-			constexpr type average() const { return 0; }
-			constexpr type total() const { return 0; }
-			constexpr ctype count() const { return 0; }
-			constexpr double as_seconds() const { return 0.0; }
+			constexpr type operator()() const noexcept { return 0; }
+			void reset() const noexcept { }
+			constexpr type average() const noexcept { return 0; }
+			constexpr type total() const noexcept { return 0; }
+			constexpr ctype count() const noexcept { return 0; }
+			template <typename S>
+			constexpr S as_seconds() const noexcept { return narrow_cast<S>(0); }
 			constexpr static bool enabled = false;
 			guard_t guard() { return guard_t(); }
 		};
@@ -264,4 +276,4 @@ namespace plib {
 	using pperfcount_t = plib::chrono::counter<enabled_>;
 } // namespace plib
 
-#endif /* PCHRONO_H_ */
+#endif // PCHRONO_H_

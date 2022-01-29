@@ -216,11 +216,11 @@ private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_videobank;
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(vbank_w);
-	DECLARE_WRITE8_MEMBER(vram_clear_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void vbank_w(uint8_t data);
+	void vram_clear_w(uint8_t data);
+	void coincounter_w(uint8_t data);
 
 	void cocoloco_palette(palette_device &palette) const;
 
@@ -288,7 +288,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
 				if (cliprect.contains(x + xi, 256 - y))
-					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
+					bitmap.pix(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
 			count++;
@@ -299,12 +299,12 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-READ8_MEMBER( cocoloco_state::vram_r )
+uint8_t cocoloco_state::vram_r(offs_t offset)
 {
 	return m_videoram[offset|0x0000] | m_videoram[offset|0x2000] | m_videoram[offset|0x4000] | m_videoram[offset|0x6000];
 }
 
-WRITE8_MEMBER( cocoloco_state::vram_w )
+void cocoloco_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset|0x0000] = (m_videobank == 0) ? data : 0;
 	m_videoram[offset|0x2000] = (m_videobank & 2) ? data : 0;
@@ -312,12 +312,12 @@ WRITE8_MEMBER( cocoloco_state::vram_w )
 	m_videoram[offset|0x6000] = (m_videobank & 8) ? data : 0;
 }
 
-WRITE8_MEMBER( cocoloco_state::vbank_w )
+void cocoloco_state::vbank_w(uint8_t data)
 {
 	m_videobank = data;
 }
 
-WRITE8_MEMBER( cocoloco_state::vram_clear_w )
+void cocoloco_state::vram_clear_w(uint8_t data)
 {
 	/* ??? */
 //  for(int i=0;i<0x8000;i++)
@@ -327,7 +327,7 @@ WRITE8_MEMBER( cocoloco_state::vram_clear_w )
 }
 
 
-WRITE8_MEMBER( cocoloco_state::coincounter_w )
+void cocoloco_state::coincounter_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -503,7 +503,7 @@ void cocoloco_state::cocoloco(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5 / 32768.0, 0);
 }
 
 

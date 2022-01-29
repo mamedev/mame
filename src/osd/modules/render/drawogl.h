@@ -7,11 +7,10 @@
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
+#ifndef MAME_OSD_MODULES_RENDER_DRAWOGL_H
+#define MAME_OSD_MODULES_RENDER_DRAWOGL_H
 
 #pragma once
-
-#ifndef __DRAWOGL__
-#define __DRAWOGL__
 
 // OSD headers
 #ifndef OSD_WINDOWS
@@ -239,4 +238,4 @@ private:
 	static bool     s_dll_loaded;
 };
 
-#endif // __DRAWOGL__
+#endif // MAME_OSD_MODULES_RENDER_DRAWOGL_H

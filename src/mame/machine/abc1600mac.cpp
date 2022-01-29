@@ -18,6 +18,7 @@
 #define LOG 0
 #define LOG_MAC 0
 #define LOG_DMA 0
+#define LOG_IO 0
 
 
 #define A0          BIT(offset, 0)
@@ -44,10 +45,6 @@
 #define PAGE_WP     BIT(page_data, 14)
 #define PAGE_NONX   BIT(page_data, 15)
 
-#define BOOTE       BIT(m_task, 6)
-#define MAGIC       BIT(m_task, 7)
-#define READ_MAGIC  !MAGIC
-
 
 
 //**************************************************************************
@@ -65,6 +62,14 @@ void abc1600_mac_device::map(address_map &map)
 
 void abc1600_mac_device::program_map(address_map &map)
 {
+	map(0x80000, 0x80000).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mac_device::page_hi_r), FUNC(abc1600_mac_device::page_hi_w));
+	map(0x80001, 0x80001).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mac_device::page_lo_r), FUNC(abc1600_mac_device::page_lo_w));
+    map(0x80002, 0x80002).mirror(0x7fff8).noprw();
+	map(0x80003, 0x80003).mirror(0x07ef8).select(0x78100).rw(FUNC(abc1600_mac_device::segment_r), FUNC(abc1600_mac_device::segment_w));
+    map(0x80004, 0x80004).mirror(0x7fff8).noprw();
+	map(0x80005, 0x80005).mirror(0x7fff8).nopr().w(FUNC(abc1600_mac_device::task_w));
+    map(0x80006, 0x80006).mirror(0x7fff8).noprw();
+	map(0x80007, 0x80007).mirror(0x7fff8).r(FUNC(abc1600_mac_device::cause_r)).nopw();
 }
 
 
@@ -109,13 +114,18 @@ const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC1600_MAC, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
+	m_program_config("program", ENDIANNESS_BIG, 8, 21, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_rom(*this, "boot"),
-	m_segment_ram(*this, "segment_ram"),
-	m_page_ram(*this, "page_ram"),
+	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
+	m_page_ram(*this, "page_ram", 0x800, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_task(0)
+	m_read_fc(*this),
+	m_write_buserr(*this),
+	m_ifc2(0),
+	m_boote(0),
+	m_magic(0),
+	m_task(0),
+	m_cause(0)
 {
 }
 
@@ -126,9 +136,9 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
-	// allocate memory
-	m_segment_ram.allocate(0x400);
-	m_page_ram.allocate(0x400);
+	// resolve callbacks
+	m_read_fc.resolve_safe(0);
+	m_write_buserr.resolve_safe();
 
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xcd, 0x400);
@@ -149,6 +159,8 @@ void abc1600_mac_device::device_start()
 void abc1600_mac_device::device_reset()
 {
 	// clear task register
+	m_boote = 0;
+	m_magic = 0;
 	m_task = 0;
 }
 
@@ -161,47 +173,8 @@ void abc1600_mac_device::device_reset()
 device_memory_interface::space_config_vector abc1600_mac_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_space_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
-}
-
-
-//-------------------------------------------------
-//  get_current_task -
-//-------------------------------------------------
-
-int abc1600_mac_device::get_current_task(offs_t offset)
-{
-	int force_task0 = !(m_ifc2 || A19);
-	int t0 = !(BIT(m_task, 0) || force_task0);
-	int t1 = !(BIT(m_task, 1) || force_task0);
-	int t2 = !(BIT(m_task, 2) || force_task0);
-	int t3 = !(BIT(m_task, 3) || force_task0);
-
-	return (t3 << 3) | (t2 << 2) | (t1 << 1) | t0;
-}
-
-
-//-------------------------------------------------
-//  get_segment_address -
-//-------------------------------------------------
-
-offs_t abc1600_mac_device::get_segment_address(offs_t offset)
-{
-	int sega19 = !(!(A8 || m_ifc2) || !A19);
-	int task = get_current_task(offset);
-
-	return (task << 5) | (sega19 << 4) | ((offset >> 15) & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  get_page_address -
-//-------------------------------------------------
-
-offs_t abc1600_mac_device::get_page_address(offs_t offset, uint8_t segd)
-{
-	return ((segd & 0x3f) << 4) | ((offset >> 11) & 0x0f);
 }
 
 
@@ -209,125 +182,35 @@ offs_t abc1600_mac_device::get_page_address(offs_t offset, uint8_t segd)
 //  translate_address -
 //-------------------------------------------------
 
-offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
+offs_t abc1600_mac_device::translate_address(offs_t offset, int &nonx, int &wp)
 {
 	// segment
-	offs_t sega = get_segment_address(offset);
+	int force_task0 = !(m_ifc2 || A19);
+	int task = force_task0 ? 0 : m_task;
+	int sega19 = !(!(A8 || m_ifc2) || !A19);
+
+	offs_t sega = (task << 5) | (sega19 << 4) | ((offset >> 15) & 0x0f);
 	uint8_t segd = m_segment_ram[sega];
 
 	// page
-	offs_t pga = get_page_address(offset, segd);
+	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0x0f);
 	uint16_t page_data = m_page_ram[pga];
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 
 	if (PAGE_NONX)
 	{
-		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
-		//m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		//m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		logerror("Bus error %06x : %06x\n", offset, virtual_offset);
+		m_write_buserr(ASSERT_LINE);
+		m_write_buserr(CLEAR_LINE);
 	}
 
-	*nonx = PAGE_NONX;
-	*wp = PAGE_WP;
+	nonx = PAGE_NONX;
+	wp = PAGE_WP;
 
-	if (LOG_MAC && offset != virtual_offset) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u)\n", machine().describe_context(), offset, virtual_offset, sega, segd, pga, m_page_ram[pga], *nonx, *wp);
+	if (LOG_MAC && offset != virtual_offset) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u)\n", machine().describe_context(), offset, virtual_offset, sega, segd, pga, m_page_ram[pga], nonx, wp, task, m_read_fc());
 
 	return virtual_offset;
-}
-
-
-//-------------------------------------------------
-//  read_user_memory -
-//-------------------------------------------------
-
-uint8_t abc1600_mac_device::read_user_memory(offs_t offset)
-{
-	int nonx = 0, wp = 0;
-	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
-
-	return space().read_byte(virtual_offset);
-}
-
-
-//-------------------------------------------------
-//  write_user_memory -
-//-------------------------------------------------
-
-void abc1600_mac_device::write_user_memory(offs_t offset, uint8_t data)
-{
-	int nonx = 0, wp = 0;
-	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
-
-	//if (nonx || !wp) return;
-
-	space().write_byte(virtual_offset, data);
-}
-
-
-//-------------------------------------------------
-//  read_supervisor_memory -
-//-------------------------------------------------
-
-uint8_t abc1600_mac_device::read_supervisor_memory(address_space &space, offs_t offset)
-{
-	uint8_t data = 0;
-
-	if (!A2 && !A1)
-	{
-		// _EP
-		data = page_r(space, offset);
-	}
-	else if (!A2 && A1 && A0)
-	{
-		// _ES
-		data = segment_r(space, offset);
-	}
-	else if (A2 && A1 && A0)
-	{
-		// _CAUSE
-		data = cause_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write_supervisor_memory -
-//-------------------------------------------------
-
-void abc1600_mac_device::write_supervisor_memory(address_space &space, offs_t offset, uint8_t data)
-{
-	if (!A2 && !A1)
-	{
-		// _WEP
-		page_w(space, offset, data);
-	}
-	else if (!A2 && A1 && A0)
-	{
-		// _WES
-		segment_w(space, offset, data);
-	}
-	else if (A2 && !A1 && A0)
-	{
-		// W(C)
-		task_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  get_fc -
-//-------------------------------------------------
-
-int abc1600_mac_device::get_fc()
-{
-	uint16_t fc = m_cpu->get_fc();
-
-	m_ifc2 = !(!(MAGIC || FC0) || FC2);
-
-	return fc;
 }
 
 
@@ -335,24 +218,30 @@ int abc1600_mac_device::get_fc()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::read )
+uint8_t abc1600_mac_device::read(offs_t offset)
 {
-	int fc = get_fc();
+	uint16_t fc = m_read_fc();
+	m_ifc2 = !(!(m_magic || FC0) || FC2);
 
 	uint8_t data = 0;
 
-	if (!BOOTE && !A19 && !A18 && !A17)
+	if (!m_boote && (offset < 0x20000))
 	{
 		// _BOOTCE
 		data = m_rom->base()[offset & 0x3fff];
 	}
-	else if (A19 && !m_ifc2 && !FC1)
+	else if ((offset & 0x80000) && !m_ifc2 && !FC1)
 	{
-		data = read_supervisor_memory(space, offset);
+		data = space(AS_PROGRAM).read_byte(offset);
 	}
 	else
 	{
-		data = read_user_memory(offset);
+		int nonx = 0, wp = 0;
+		offs_t virtual_offset = translate_address(offset, nonx, wp);
+		
+		data = space().read_byte(virtual_offset);
+
+		if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user read %06x:%02x\n", machine().describe_context(), virtual_offset, data);
 	}
 
 	return data;
@@ -363,17 +252,25 @@ READ8_MEMBER( abc1600_mac_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::write )
+void abc1600_mac_device::write(offs_t offset, uint8_t data)
 {
-	int fc = get_fc();
+	uint16_t fc = m_read_fc();
+	m_ifc2 = !(!(m_magic || FC0) || FC2);
 
-	if (A19 && !m_ifc2 && !FC1)
+	if ((offset & 0x80000) && !m_ifc2 && !FC1)
 	{
-		write_supervisor_memory(space, offset, data);
+		space(AS_PROGRAM).write_byte(offset, data);
 	}
 	else
 	{
-		write_user_memory(offset, data);
+		int nonx = 0, wp = 0;
+		offs_t virtual_offset = translate_address(offset, nonx, wp);
+
+		if (nonx || !wp) return;
+
+		if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user write %06x:%02x\n", machine().describe_context(), virtual_offset, data);
+
+		space().write_byte(virtual_offset, data);
 	}
 }
 
@@ -382,7 +279,7 @@ WRITE8_MEMBER( abc1600_mac_device::write )
 //  cause_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::cause_r )
+uint8_t abc1600_mac_device::cause_r()
 {
 	/*
 
@@ -414,7 +311,7 @@ READ8_MEMBER( abc1600_mac_device::cause_r )
 //  task_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::task_w )
+void abc1600_mac_device::task_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -431,9 +328,12 @@ WRITE8_MEMBER( abc1600_mac_device::task_w )
 
 	*/
 
-	m_task = data ^ 0xff;
+	m_task = data & 0x0f;
+	m_boote = !BIT(data, 6);
+	m_magic = !BIT(data, 7);
 
-	if (LOG) logerror("%s TASK %05x:%02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), offset, data, get_current_task(offset), BOOTE, MAGIC);
+	if (LOG) logerror("%s TASK %05x:%02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), offset, data,
+		m_task, m_boote, m_magic);
 }
 
 
@@ -441,7 +341,7 @@ WRITE8_MEMBER( abc1600_mac_device::task_w )
 //  segment_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::segment_r )
+uint8_t abc1600_mac_device::segment_r(offs_t offset)
 {
 	/*
 
@@ -458,10 +358,10 @@ READ8_MEMBER( abc1600_mac_device::segment_r )
 
 	*/
 
-	offs_t sega = get_segment_address(offset);
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	uint8_t segd = m_segment_ram[sega];
 
-	return (READ_MAGIC << 7) | (segd & 0x7f);
+	return (!m_magic << 7) | (segd & 0x7f);
 }
 
 
@@ -469,7 +369,7 @@ READ8_MEMBER( abc1600_mac_device::segment_r )
 //  segment_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::segment_w )
+void abc1600_mac_device::segment_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -486,19 +386,19 @@ WRITE8_MEMBER( abc1600_mac_device::segment_w )
 
 	*/
 
-	offs_t sega = get_segment_address(offset);
-
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	m_segment_ram[sega] = data & 0x7f;
 
-	if (LOG) logerror("%s SEGMENT %05x:%02x (SEGA %03x SEGD %02x)\n", machine().describe_context(), offset, data, sega, m_segment_ram[sega]);
+	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u MEM %05x-%05x\n", machine().describe_context(), offset, data,
+		m_task, sega & 0x1f, (sega & 0x1f) * 0x8000, ((sega & 0x1f) * 0x8000) + 0x7fff);
 }
 
 
 //-------------------------------------------------
-//  page_r -
+//  page_lo_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::page_r )
+uint8_t abc1600_mac_device::page_lo_r(offs_t offset)
 {
 	/*
 
@@ -513,47 +413,60 @@ READ8_MEMBER( abc1600_mac_device::page_r )
 	    6       X17
 	    7       X18
 
-	    8       X19
-	    9       X20
-	    10      X20
-	    11      X20
-	    12      X20
-	    13      X20
-	    14      _WP
-	    15      NONX
-
 	*/
 
 	// segment
-	offs_t sega = get_segment_address(offset);
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	uint8_t segd = m_segment_ram[sega];
 
 	// page
-	offs_t pga = get_page_address(offset, segd);
+	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
 	uint16_t pgd = m_page_ram[pga];
 
-	uint8_t data = 0;
-
-	if (A0)
-	{
-		data = pgd & 0xff;
-	}
-	else
-	{
-		int x20 = BIT(pgd, 9);
-
-		data = (pgd >> 8) | (x20 << 2) | (x20 << 3) | (x20 << 4) | (x20 << 5);
-	}
-
-	return data;
+	return pgd & 0xff;
 }
 
 
 //-------------------------------------------------
-//  page_w -
+//  page_hi_r -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::page_w )
+uint8_t abc1600_mac_device::page_hi_r(offs_t offset)
+{
+	/*
+
+	    bit     description
+
+	    0       X19
+	    1       X20
+	    2       X20
+	    3       X20
+	    4       X20
+	    5       X20
+	    6       _WP
+	    7       NONX
+
+	*/
+
+	// segment
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
+	uint8_t segd = m_segment_ram[sega];
+
+	// page
+	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
+	uint16_t pgd = m_page_ram[pga];
+
+	int x20 = BIT(pgd, 9);
+
+	return (pgd >> 8) | (x20 << 2) | (x20 << 3) | (x20 << 4) | (x20 << 5);
+}
+
+
+//-------------------------------------------------
+//  page_lo_w -
+//-------------------------------------------------
+
+void abc1600_mac_device::page_lo_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -568,34 +481,50 @@ WRITE8_MEMBER( abc1600_mac_device::page_w )
 	    6       X17
 	    7       X18
 
-	    8       X19
-	    9       X20
-	    10
-	    11
-	    12
-	    13
-	    14      _WP
-	    15      NONX
+	*/
+
+	// segment
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
+	uint8_t segd = m_segment_ram[sega];
+
+	// page
+	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
+	m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
+
+	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u PAGE %u MEM %05x-%05x %06x\n", machine().describe_context(), offset, data,
+		m_task, sega & 0x1f, ((offset >> 11) & 0x0f), ((sega & 0x1f) * 0x8000) + ((offset >> 11) & 0x0f) * 0x800,
+		((sega & 0x1f) * 0x8000) + (((offset >> 11) & 0x0f) * 0x800) + 0x7ff, (m_page_ram[pga] & 0x3ff) << 11);
+}
+
+
+//-------------------------------------------------
+//  page_hi_w -
+//-------------------------------------------------
+
+void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
+{
+	/*
+
+	    bit     description
+
+	    0       X19
+	    1       X20
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       _WP
+	    7       NONX
 
 	*/
 
 	// segment
-	offs_t sega = get_segment_address(offset);
+	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	uint8_t segd = m_segment_ram[sega];
 
 	// page
-	offs_t pga = get_page_address(offset, segd);
-
-	if (A0)
-	{
-		m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
-	}
-	else
-	{
-		m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
-	}
-
-	if (LOG) logerror("%s PAGE %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x)\n", machine().describe_context(), offset, data, sega, segd, pga, m_page_ram[pga]);
+	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
+	m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
 }
 
 
@@ -623,7 +552,7 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, uint16_t offset)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
 
-	if (LOG_DMA)logerror("%s DMA R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DMA MEM R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	return space().read_byte(virtual_offset);
 }
@@ -637,7 +566,7 @@ void abc1600_mac_device::dma_mreq_w(int index, uint16_t offset, uint8_t data)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
 
-	if (LOG_DMA)logerror("%s DMA W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DMA MEM W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -651,7 +580,7 @@ uint8_t abc1600_mac_device::dma_iorq_r(int index, uint16_t offset)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
 
-	if (LOG_DMA)logerror("%s DMA R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DMA I/O R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	return space().read_byte(virtual_offset);
 }
@@ -665,7 +594,7 @@ void abc1600_mac_device::dma_iorq_w(int index, uint16_t offset, uint8_t data)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
 
-	if (LOG_DMA)logerror("%s DMA W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DMA I/O W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -675,7 +604,7 @@ void abc1600_mac_device::dma_iorq_w(int index, uint16_t offset, uint8_t data)
 //  dmamap_w - DMA map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::dmamap_w )
+void abc1600_mac_device::dmamap_w(offs_t offset, uint8_t data)
 {
 	/*
 

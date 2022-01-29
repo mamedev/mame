@@ -44,8 +44,8 @@ private:
 	lcd_spi_t m_lcd_spi;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
+	uint32_t s3c2410_gpio_port_r(offs_t offset);
+	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void lcd_spi_reset();
 	void lcd_spi_init();
@@ -176,7 +176,7 @@ int hp49gp_state::lcd_spi_line_r( int line)
 
 // I/O PORT
 
-READ32_MEMBER(hp49gp_state::s3c2410_gpio_port_r)
+uint32_t hp49gp_state::s3c2410_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
@@ -226,7 +226,7 @@ READ32_MEMBER(hp49gp_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
+void hp49gp_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 {
 	m_port[offset] = data;
 	switch (offset)

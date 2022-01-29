@@ -14,6 +14,7 @@
 
 #include "cassimg.h"
 
+CASSETTE_FORMATLIST_EXTERN(trs80l1_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(trs80l2_cassette_formats);
 
 #endif // MAME_FORMATS_TRS_CAS_H

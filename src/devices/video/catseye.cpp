@@ -14,10 +14,49 @@
 DEFINE_DEVICE_TYPE(CATSEYE, catseye_device, "catseye", "HP Catseye ASIC")
 
 catseye_device::catseye_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	m_vram(*this, { "^vram_video", "^vram_overlay"}),
-	m_int_write_func(*this),
-	m_blink_timer(nullptr)
+	device_t{mconfig, type, tag, owner, clock},
+	m_vram{*this, { "^vram_video", "^vram_overlay"}},
+	m_int_write_func{*this},
+	m_blink_timer{nullptr},
+	m_changed{false},
+	m_blink_state{false},
+	m_plane_mask_l{0},
+	m_plane_mask_h{0},
+	m_write_enable{0},
+	m_read_enable{0},
+	m_fb_enable{0},
+	m_display_enable{0},
+	m_blink_enable{0},
+	m_in_vblank{0},
+	m_wm_int_pending{0},
+	m_vblank_int_pending{0},
+	m_wm_int_enable{0},
+	m_vblank_int_enable{0},
+	m_rugsc{0},
+	m_misc{0},
+	m_wmx{0},
+	m_wmwidth{0},
+	m_wmheight{0},
+	m_wmsourcex{0},
+	m_wmsourcey{0},
+	m_wmdestx{0},
+	m_wmdesty{0},
+	m_wmclipleft{0},
+	m_wmclipright{0},
+	m_wmcliptop{0},
+	m_wmclipbottom{0},
+	m_patterns{{{0}}},
+	m_linepath{0},
+	m_linetype{0},
+	m_prr{0},
+	m_wrr{0},
+	m_trr{0},
+	m_trrctl{0},
+	m_color{0},
+	m_vb{0},
+	m_acntrl{0},
+	m_planemode{0},
+	m_status{0}
 {
 }
 
@@ -433,7 +472,7 @@ u16 catseye_device::vram_r(offs_t offset, u16 mem_mask)
 		return vram_r_word<Idx>(offset, mem_mask);
 }
 
-READ16_MEMBER(catseye_device::vram_r)
+uint16_t catseye_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -491,7 +530,7 @@ void catseye_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 		vram_w_word<Idx>(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(catseye_device::vram_w)
+void catseye_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_VRAM, "%s: %04x: %04x(%04x)\n", __func__, offset << 1, data, mem_mask);
 
@@ -502,7 +541,7 @@ WRITE16_MEMBER(catseye_device::vram_w)
 		vram_w<VRAM_OVERLAY_PLANE>(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(catseye_device::ctrl_w)
+void catseye_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	bool trigger = false;
 
@@ -863,7 +902,7 @@ WRITE16_MEMBER(catseye_device::ctrl_w)
 
 }
 
-READ16_MEMBER(catseye_device::ctrl_r)
+uint16_t catseye_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 

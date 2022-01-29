@@ -28,14 +28,14 @@ public:
 	void tunhunt(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(button_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(dsw2_0r);
-	DECLARE_READ8_MEMBER(dsw2_1r);
-	DECLARE_READ8_MEMBER(dsw2_2r);
-	DECLARE_READ8_MEMBER(dsw2_3r);
-	DECLARE_READ8_MEMBER(dsw2_4r);
+	void control_w(uint8_t data);
+	uint8_t button_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t dsw2_0r();
+	uint8_t dsw2_1r();
+	uint8_t dsw2_2r();
+	uint8_t dsw2_3r();
+	uint8_t dsw2_4r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -50,6 +50,7 @@ private:
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code,
 	int hposition,int vstart,int vstop,int vstretch,int hstretch);
 	void main_map(address_map &map);
+	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -65,6 +66,29 @@ private:
 	uint8_t m_control;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_tmpbitmap;
+
+	uint8_t m_mobsc0;
+	uint8_t m_mobsc1;
+	uint8_t m_lineh[13];
+	uint8_t m_shl0st;
+	uint8_t m_shl1st;
+	uint8_t m_vstrlo;
+	uint8_t m_linesh;
+	uint8_t m_shl0pc;
+	uint8_t m_shl1pc;
+	uint8_t m_linec[13];
+	uint8_t m_shl0v;
+	uint8_t m_shl1v;
+	uint8_t m_mobjh;
+	uint8_t m_linev[13];
+	uint8_t m_shl0vs;
+	uint8_t m_shl1vs;
+	uint8_t m_mobvs;
+	uint8_t m_linevs[13];
+	uint8_t m_shel0h;
+	uint8_t m_mobst;
+	uint8_t m_shel1h;
+	uint8_t m_mobjv;
 };
 
 #endif // MAME_INCLUDES_TUNHUNT_H

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "cpu/m6809/konami.h" // for the callback and the firq irq definition
-#include "machine/bankdev.h"
 #include "machine/k053252.h"
 #include "video/k052109.h"
 #include "video/k053246_k053247_k055673.h"
@@ -33,12 +32,17 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k054000(*this, "k054000"),
 		m_palette(*this, "palette"),
-		m_videobank0(*this, "videobank0"),
-		m_videobank1(*this, "videobank1")
+		m_videoview0(*this, "videoview0"),
+		m_videoview1(*this, "videoview1")
 	{ }
 
 	void esckids(machine_config &config);
 	void vendetta(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -64,19 +68,17 @@ private:
 	optional_device<k054000_device> m_k054000;
 	required_device<palette_device> m_palette;
 
-	required_device<address_map_bank_device> m_videobank0;
-	required_device<address_map_bank_device> m_videobank1;
+	// views
+	memory_view m_videoview0;
+	memory_view m_videoview1;
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(K052109_r);
-	DECLARE_WRITE8_MEMBER(K052109_w);
-	DECLARE_WRITE8_MEMBER(_5fe0_w);
-	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
-	DECLARE_WRITE8_MEMBER(z80_irq_w);
-	DECLARE_READ8_MEMBER(z80_irq_r);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void eeprom_w(uint8_t data);
+	uint8_t K052109_r(offs_t offset);
+	void K052109_w(offs_t offset, uint8_t data);
+	void _5fe0_w(uint8_t data);
+	void z80_arm_nmi_w(uint8_t data);
+	void z80_irq_w(uint8_t data);
+	uint8_t z80_irq_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -84,16 +86,12 @@ private:
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 	K053246_CB_MEMBER(sprite_callback);
 
 	void esckids_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-	void videobank0_map(address_map &map);
-	void videobank1_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_VENDETTA_H

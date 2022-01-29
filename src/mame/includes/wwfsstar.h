@@ -52,11 +52,11 @@ private:
 	tilemap_t *m_fg0_tilemap;
 	tilemap_t *m_bg0_tilemap;
 
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(irqack_w);
-	DECLARE_WRITE16_MEMBER(fg0_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg0_videoram_w);
+	void scroll_w(offs_t offset, uint16_t data);
+	void flipscreen_w(uint16_t data);
+	void irqack_w(offs_t offset, uint16_t data);
+	void fg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 

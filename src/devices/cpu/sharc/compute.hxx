@@ -2,7 +2,7 @@
 // copyright-holders:Ville Linde
 /* compute operations */
 
-#include <math.h>
+#include <cmath>
 
 #define CLEAR_ALU_FLAGS()       (m_core->astat &= ~(AZ|AN|AV|AC|AS|AI))
 

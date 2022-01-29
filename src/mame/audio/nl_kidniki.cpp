@@ -6,11 +6,7 @@
 #error Somehow nl_base.h made it into the include chain.
 #endif
 
-#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
-#else
-#define USE_FRONTIERS 1
-#endif
 
 /* if we use frontiers, use fixed STV for smaller matrix sizes */
 #if (USE_FRONTIERS)
@@ -30,10 +26,10 @@
  * inputs. The arrangement of components in the schematic however indicate that
  * this is not the case and indeed a connection exists. This results in sounds
  * at output XU1.14 to contain more detail.
- * 
+ *
  * You can observe sounds at XU1.14 by doing
  *
- * NL_LOGS=XU1.14 ./mame64 kidniki
+ * NL_LOGS=XU1.14 ./mame kidniki
  * nlwav -o x.wav log_XU1.14.log
  * play x.wav
  *
@@ -60,7 +56,7 @@
  *
  */
 
-#define J4	(1)
+#define J4  (1)
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -78,7 +74,7 @@
  *  Kidniki schematics
  * ---------------------------------------------------------------------------*/
 
-NETLIST_START(kidniki_schematics)
+static NETLIST_START(kidniki_schematics)
 	//  EESCHEMA NETLIST VERSION 1.1 (SPICE FORMAT) CREATION DATE: SAT 06 JUN 2015 01:06:26 PM CEST
 	//  TO EXCLUDE A COMPONENT FROM THE SPICE NETLIST ADD [SPICE_NETLIST_ENABLED] USER FIELD SET TO: N
 	//  TO REORDER THE COMPONENT SPICE NODE SEQUENCE ADD [SPICE_NODE_SEQUENCE] USER FIELD AND DEFINE SEQUENCE: 2,1,0
@@ -361,15 +357,17 @@ NETLIST_END()
 
 NETLIST_START(kidniki)
 
-#if (0 || USE_FRONTIERS)
+#if (1 || USE_FRONTIERS)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.GS_LOOPS, 10)
 	//PARAM(Solver.METHOD, "SOR")
 	PARAM(Solver.METHOD, "MAT_CR")
+	PARAM(Solver.FPTYPE, "DOUBLE")
 	//PARAM(Solver.METHOD, "MAT")
-	//PARAM(Solver.METHOD, "GMRES")
+	//PARAM(Solver.PIVOT, 1)
+	//PARAM(Solver.Solver_0.METHOD, "GMRES")
 	PARAM(Solver.SOR_FACTOR, 1.313)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
@@ -421,6 +419,7 @@ NETLIST_START(kidniki)
 	ALIAS(I_SOUND0, R_AY45L_A.2)
 
 	TTL_INPUT(SINH, 1)
+
 #if (D6_EXISTS)
 	DIODE(D6, "1N914")
 	NET_C(D6.K, SINH)
@@ -431,12 +430,15 @@ NETLIST_START(kidniki)
 	ALIAS(I_SINH0, SINH_DUMMY.2)
 #endif
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(TYPE=NMOS OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
 
 	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
 	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
 	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
 	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
+
+	NET_C(I_V5, I_SD0.VCC, I_BD0.VCC, I_CH0.VCC, I_OH0.VCC, SINH.VCC)
+	NET_C(GND, I_SD0.GND, I_BD0.GND, I_CH0.GND, I_OH0.GND, SINH.GND)
 
 	ANALOG_INPUT(I_MSM2K0, 0)
 	ANALOG_INPUT(I_MSM3K0, 0)

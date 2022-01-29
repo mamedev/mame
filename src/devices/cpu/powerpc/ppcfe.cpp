@@ -711,6 +711,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x136: // ECIWX
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
+			[[fallthrough]];
 		case 0x014: // LWARX
 		case 0x017: // LWZX
 		case 0x057: // LBZX
@@ -920,6 +921,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x1b6: // ECOWX
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
+			[[fallthrough]];
 		case 0x096: // STWCX.
 		case 0x097: // STWX
 		case 0x0d7: // STBX
@@ -1339,6 +1341,7 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 			case 0x00e: // FCTIWx
 			case 0x00f: // FCTIWZx
 				FPSCR_MODIFIED(desc, 4);
+				[[fallthrough]];
 			case 0x028: // FNEGx
 			case 0x048: // FMRx
 			case 0x088: // FNABSx

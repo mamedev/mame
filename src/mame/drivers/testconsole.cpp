@@ -83,7 +83,7 @@ public:
 	void whousetc(machine_config &config);
 
 private:
-	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
+	template <unsigned Dsp> void update_dsp(offs_t offset, u16 data)
 	{
 		m_digit[(Dsp << 2) | offset] = data;
 	}

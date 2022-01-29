@@ -57,11 +57,11 @@ private:
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spartanxtec_palette(palette_device &palette) const;
 
-	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	void kungfum_tileram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(a801_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
-	DECLARE_WRITE8_MEMBER(irq_ack);
+	void a801_w(uint8_t data);
+	void sound_irq_ack(uint8_t data);
+	void irq_ack(uint8_t data);
 
 	void spartanxtec_map(address_map &map);
 	void spartanxtec_sound_io(address_map &map);
@@ -83,7 +83,7 @@ private:
 
 
 
-WRITE8_MEMBER(spartanxtec_state::kungfum_tileram_w)
+void spartanxtec_state::kungfum_tileram_w(offs_t offset, uint8_t data)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
 
 	/* is the following right? */
 	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 
 void spartanxtec_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spartanxtec_state::get_kungfum_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -172,12 +172,12 @@ uint32_t spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bit
 
 
 
-WRITE8_MEMBER(spartanxtec_state::a801_w)
+void spartanxtec_state::a801_w(uint8_t data)
 {
 	if (data != 0xf0) printf("a801_w %02x\n", data);
 }
 
-WRITE8_MEMBER(spartanxtec_state::irq_ack)
+void spartanxtec_state::irq_ack(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -210,7 +210,7 @@ void spartanxtec_state::spartanxtec_map(address_map &map)
 
 
 
-WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
+void spartanxtec_state::sound_irq_ack(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -441,11 +441,11 @@ ROM_START( spartanxtec )
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
 	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
-	
+
 	ROM_REGION( 0x00228, "plds", 0 )
 	ROM_LOAD( "pal16r8acn.ic12", 0x0000, 0x0114, NO_DUMP )
- 	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
-	
+	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
+
 ROM_END
 
 

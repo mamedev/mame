@@ -41,12 +41,12 @@ Stephh's notes (based on the game M6502 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(scotrsht_state::ctrl_w)
+void scotrsht_state::ctrl_w(uint8_t data)
 {
 	m_irq_enable = data & 0x02;
 	flip_screen_set(data & 0x08);
@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER(scotrsht_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(scotrsht_state::soundlatch_w)
+void scotrsht_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

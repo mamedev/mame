@@ -63,13 +63,13 @@ huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int vpos = screen().vpos();
 	int hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	uint16_t *bitmap_line = &m_bmp->pix16(v);
+	uint16_t *bitmap_line = &m_bmp->pix(v);
 
 	while ( h != hpos || v != vpos )
 	{
@@ -112,7 +112,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_hsync_changed_cb( 1 );
 			m_pixel_clock = 0;
 			v = ( v + 1 ) % m_height;
-			bitmap_line = &m_bmp->pix16(v);
+			bitmap_line = &m_bmp->pix(v);
 			break;
 
 		case HUC6260_HSYNC_START + 30:      /* End/Start of VSync */
@@ -187,19 +187,19 @@ void huc6260_device::video_update( bitmap_ind16 &bitmap, const rectangle &clipre
 
 
 // the battlera arcade board reads/writes the palette directly
-READ8_MEMBER(huc6260_device::palette_direct_read)
+uint8_t huc6260_device::palette_direct_read(offs_t offset)
 {
 	if (!(offset&1)) return m_palette[offset>>1];
 	else return m_palette[offset >> 1] >> 8;
 }
 
-WRITE8_MEMBER(huc6260_device::palette_direct_write)
+void huc6260_device::palette_direct_write(offs_t offset, uint8_t data)
 {
 	if (!(offset&1)) m_palette[offset>>1] = (m_palette[offset>>1] & 0xff00) | data;
 	else m_palette[offset>>1] = (m_palette[offset>>1] & 0x00ff) | (data<<8);
 }
 
-READ8_MEMBER( huc6260_device::read )
+uint8_t huc6260_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -221,7 +221,7 @@ READ8_MEMBER( huc6260_device::read )
 }
 
 
-WRITE8_MEMBER( huc6260_device::write )
+void huc6260_device::write(offs_t offset, uint8_t data)
 {
 	switch ( offset & 7 )
 	{

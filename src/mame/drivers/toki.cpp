@@ -98,18 +98,18 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
+void toki_state::tokib_soundcommand_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(toki_state::pip_r)
+uint16_t toki_state::pip_r()
 {
 	return ~0;
 }
@@ -118,7 +118,7 @@ READ16_MEMBER(toki_state::pip_r)
 
 WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 {
-	m_msm->write_data(m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 
 	m_toggle ^= 1;
@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
+void toki_state::tokib_adpcm_control_w(uint8_t data)
 {
 	/* the code writes either 2 or 3 in the bottom two bits */
 	membank("bank1")->set_entry(data & 1);
@@ -134,7 +134,7 @@ WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_data_w)
+void toki_state::tokib_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
@@ -234,7 +234,7 @@ void toki_state::jujuba_audio_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).bankr("seibu_bank1");
 }
 
-READ8_MEMBER(toki_state::jujuba_z80_data_decrypt)
+uint8_t toki_state::jujuba_z80_data_decrypt(offs_t offset)
 {
 	return m_audiocpu_rom[offset] ^ 0x55;
 }
@@ -492,7 +492,8 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-void toki_state::toki(machine_config &config) /* KOYO 20.000MHz near the cpu */
+/* KOYO 20.000MHz near the cpu */
+void toki_state::toki(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000) / 2);   /* verified on pcb */
@@ -510,9 +511,7 @@ void toki_state::toki(machine_config &config) /* KOYO 20.000MHz near the cpu */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.61);    /* verified on pcb */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* verified */
+	m_screen->set_raw(XTAL(12'000'000)/2, 390, 0, 256, 258, 16, 240);
 	m_screen->set_screen_update(FUNC(toki_state::screen_update_toki));
 	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->set_palette(m_palette);
@@ -563,6 +562,7 @@ void toki_state::tokib(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: refresh rate is unknown for bootlegs
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1); /* verified */

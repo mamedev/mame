@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1541.h"
@@ -34,7 +34,6 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG       "u7"
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
 #define MOS6581_TAG     "u18"
@@ -51,7 +50,7 @@ class c64_state : public driver_device
 public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6510_TAG),
+		m_maincpu(*this, "u7"),
 		m_nmi(*this, "nmi"),
 		m_pla(*this, PLA_TAG),
 		m_vic(*this, MOS6569_TAG),
@@ -65,7 +64,7 @@ public:
 		m_user(*this, PET_USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_loram(1),
@@ -94,7 +93,7 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	optional_ioport_array<8> m_row;
 	optional_ioport m_lock;
 
@@ -103,28 +102,28 @@ public:
 
 	void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba);
-	void write_memory(address_space &space, offs_t offset, uint8_t data, int aec, int ba);
+	uint8_t read_memory(offs_t offset, offs_t va, int aec, int ba);
+	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r();
+	uint8_t sid_poty_r();
 
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_WRITE8_MEMBER( cia1_pa_w );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
-	DECLARE_WRITE8_MEMBER( cia1_pb_w );
+	uint8_t cia1_pa_r();
+	void cia1_pa_w(uint8_t data);
+	uint8_t cia1_pb_r();
+	void cia1_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cia2_pa_r );
-	DECLARE_WRITE8_MEMBER( cia2_pa_w );
+	uint8_t cia2_pa_r();
+	void cia2_pa_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
@@ -132,8 +131,8 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
-	DECLARE_READ8_MEMBER( cia2_pb_r );
-	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+	uint8_t cia2_pb_r();
+	void cia2_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
@@ -180,8 +179,8 @@ public:
 		: c64_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 	void ntsc_sx(machine_config &config);
 	void ntsc_dx(machine_config &config);
 	void pal_sx(machine_config &config);
@@ -194,6 +193,7 @@ public:
 	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
+
 	void pal_c(machine_config &config);
 	void ntsc_c(machine_config &config);
 };
@@ -206,13 +206,25 @@ public:
 		: c64c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
+	uint8_t cia1_pa_r();
+	uint8_t cia1_pb_r();
 	void pal_gs(machine_config &config);
 };
+
+
+class clipper_state : public c64_state
+{
+public:
+	clipper_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64_state(mconfig, type, tag)
+	{ }
+
+	void clipper(machine_config &config);
+};
+
 
 struct dasm_zeropage_data
 {
@@ -411,7 +423,7 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c64_state::quickload_c64)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 
@@ -460,7 +472,7 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba)
+uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 {
 	int rw = 1;
 	int io1 = 1, io2 = 1;
@@ -551,7 +563,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 //  write_memory -
 //-------------------------------------------------
 
-void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, int aec, int ba)
+void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 {
 	int rw = 0;
 	offs_t va = 0;
@@ -623,14 +635,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::read )
+uint8_t c64_state::read(offs_t offset)
 {
 	int aec = 1, ba = 1;
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
 
-	return read_memory(space, offset, va, aec, ba);
+	return read_memory(offset, va, aec, ba);
 }
 
 
@@ -638,11 +650,11 @@ READ8_MEMBER( c64_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64_state::write )
+void c64_state::write(offs_t offset, uint8_t data)
 {
 	int aec = 1, ba = 1;
 
-	write_memory(space, offset, data, aec, ba);
+	write_memory(offset, data, aec, ba);
 }
 
 
@@ -650,7 +662,7 @@ WRITE8_MEMBER( c64_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_videoram_r )
+uint8_t c64_state::vic_videoram_r(offs_t offset)
 {
 	int aec = m_vic->aec_r(), ba = m_vic->ba_r();
 	offs_t va = offset;
@@ -658,7 +670,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 	// A15/A14 are not connected to VIC so they are floating
 	//offset |= 0xc000;
 
-	return read_memory(space, offset, va, aec, ba);
+	return read_memory(offset, va, aec, ba);
 }
 
 
@@ -666,7 +678,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_colorram_r )
+uint8_t c64_state::vic_colorram_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -853,6 +865,16 @@ static INPUT_PORTS_START( c64gs )
 INPUT_PORTS_END
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( clipper )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( clipper )
+	PORT_INCLUDE( c64 )
+	// TODO extra keys
+INPUT_PORTS_END
+
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -862,7 +884,7 @@ INPUT_PORTS_END
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::sid_potx_r )
+uint8_t c64_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
@@ -889,7 +911,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( c64_state::sid_poty_r )
+uint8_t c64_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
@@ -921,7 +943,7 @@ READ8_MEMBER( c64_state::sid_poty_r )
 //  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cia1_pa_r )
+uint8_t c64_state::cia1_pa_r()
 {
 	/*
 
@@ -969,7 +991,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia1_pa_w )
+void c64_state::cia1_pa_w(uint8_t data)
 {
 	/*
 
@@ -989,7 +1011,7 @@ WRITE8_MEMBER( c64_state::cia1_pa_w )
 	m_joy2->joy_w(data & 0x1f);
 }
 
-READ8_MEMBER( c64_state::cia1_pb_r )
+uint8_t c64_state::cia1_pb_r()
 {
 	/*
 
@@ -1029,7 +1051,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia1_pb_w )
+void c64_state::cia1_pb_w(uint8_t data)
 {
 	/*
 
@@ -1051,7 +1073,7 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 	m_vic->lp_w(BIT(data, 4));
 }
 
-READ8_MEMBER( c64gs_state::cia1_pa_r )
+uint8_t c64gs_state::cia1_pa_r()
 {
 	/*
 
@@ -1079,7 +1101,7 @@ READ8_MEMBER( c64gs_state::cia1_pa_r )
 	return data;
 }
 
-READ8_MEMBER( c64gs_state::cia1_pb_r )
+uint8_t c64gs_state::cia1_pb_r()
 {
 	/*
 
@@ -1112,7 +1134,7 @@ READ8_MEMBER( c64gs_state::cia1_pb_r )
 //  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cia2_pa_r )
+uint8_t c64_state::cia2_pa_r()
 {
 	/*
 
@@ -1141,7 +1163,7 @@ READ8_MEMBER( c64_state::cia2_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia2_pa_w )
+void c64_state::cia2_pa_w(uint8_t data)
 {
 	/*
 
@@ -1171,12 +1193,12 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_iec->host_data_w(!BIT(data, 5));
 }
 
-READ8_MEMBER( c64_state::cia2_pb_r )
+uint8_t c64_state::cia2_pb_r()
 {
 	return m_user_pb;
 }
 
-WRITE8_MEMBER( c64_state::cia2_pb_w )
+void c64_state::cia2_pb_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1192,7 +1214,7 @@ WRITE8_MEMBER( c64_state::cia2_pb_w )
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cpu_r )
+uint8_t c64_state::cpu_r()
 {
 	/*
 
@@ -1214,7 +1236,7 @@ READ8_MEMBER( c64_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cpu_w )
+void c64_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1246,7 +1268,7 @@ WRITE8_MEMBER( c64_state::cpu_w )
 //  M6510_INTERFACE( sx64_cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( sx64_state::cpu_r )
+uint8_t sx64_state::cpu_r()
 {
 	/*
 
@@ -1264,7 +1286,7 @@ READ8_MEMBER( sx64_state::cpu_r )
 	return 0x07;
 }
 
-WRITE8_MEMBER( sx64_state::cpu_w )
+void sx64_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1290,7 +1312,7 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 //  M6510_INTERFACE( c64gs_cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64gs_state::cpu_r )
+uint8_t c64gs_state::cpu_r()
 {
 	/*
 
@@ -1308,7 +1330,7 @@ READ8_MEMBER( c64gs_state::cpu_r )
 	return 0x07;
 }
 
-WRITE8_MEMBER( c64gs_state::cpu_w )
+void c64gs_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1387,9 +1409,6 @@ void c64_state::machine_start()
 	}
 	m_charom = memregion("charom")->base();
 
-	// allocate memory
-	m_color_ram.allocate(0x400);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1442,12 +1461,11 @@ void c64_state::ntsc(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(14'318'181)/14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1457,7 +1475,7 @@ void c64_state::ntsc(machine_config &config)
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6510_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1536,13 +1554,15 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop").set_filter("NTSC");
+	// disk softlist split into originals and misc (homebrew and cracks)
+	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1574,7 +1594,7 @@ void sx64_state::ntsc_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 
@@ -1587,7 +1607,7 @@ void sx64_state::ntsc_dx(machine_config &config)
 	ntsc_sx(config);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec9", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec9", 9, sx1541_iec_devices, "sx1541");
 }
 
 
@@ -1614,12 +1634,11 @@ void c64_state::pal(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1629,7 +1648,7 @@ void c64_state::pal(machine_config &config)
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6510_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1708,13 +1727,15 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
 	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("PAL");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop").set_filter("PAL");
+	// disk softlist split into originals and misc (homebrew and cracks)
+	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1735,7 +1756,7 @@ void sx64_state::pal_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 
@@ -1762,12 +1783,11 @@ void c64gs_state::pal_gs(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64gs_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1777,7 +1797,7 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	// video hardware
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos8565.set_cpu(M6510_TAG);
+	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1854,7 +1874,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
@@ -1862,6 +1882,21 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
+}
+
+
+//-------------------------------------------------
+//  machine_config( clipper )
+//-------------------------------------------------
+
+void clipper_state::clipper(machine_config &config)
+{
+	pal(config);
+
+	// TODO extra hardware
+
+	// software list
+	SOFTWARE_LIST(config, "flop525").set_original("clipper_flop");
 }
 
 
@@ -2182,27 +2217,56 @@ ROM_START( c64gs )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( clipper )
+//-------------------------------------------------
+
+ROM_START( clipper )
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "kernal.bin", 0x0000, 0x2000, CRC(13ca39ca) SHA1(d668e7980887a5b90fad693eba35fac49c7ad941) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "chr_gen.bin", 0x0000, 0x1000, CRC(a675a239) SHA1(9ad11a5de5bd7e43c43e985b31bed7ca96101fc5) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
+
+	ROM_REGION( 0x4000, "fdc", 0 )
+	ROM_LOAD( "fdc.bin", 0x0000, 0x2000, CRC(44b0b1fc) SHA1(effcf165cb4ea32540a8a8c12781303dc36fa4b2) )
+	ROM_LOAD( "fdc_12.bin", 0x2000, 0x2000, CRC(397a2219) SHA1(7eefcc871a805f45be4ba016fe9fc7d25318c431) )
+
+	ROM_REGION( 0x6000, "sb", 0 )
+	ROM_LOAD( "sb1.bin", 0x0000, 0x2000, CRC(400040be) SHA1(b290216f49b24355a1a2b25adfa96709c5d9c049) )
+	ROM_LOAD( "sb2.bin", 0x2000, 0x2000, CRC(a3d7177a) SHA1(0f50381aecf3c5ea03cce358a3325b3e06939c37) )
+	ROM_LOAD( "sb3.bin", 0x4000, 0x2000, CRC(7b1fc6c6) SHA1(900fe4be8d6348bf68dbda0c7ecefc84bda51202) )
+
+	ROM_REGION( 0x1000, "thdr", 0 )
+	ROM_LOAD( "thdr5.bin", 0x0000, 0x1000, CRC(b4296e62) SHA1(4b6edadbb810c409ece77d5834568fcc2e0bbd61) )
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                        FULLNAME                                   FLAGS
-COMP( 1982, c64,      0,      0,      ntsc,    c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (NTSC)",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64p,     c64,    0,      pal,     c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_se,   c64,    0,      pal,     c64sw, c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pet64,    c64,    0,      pet64,   c64,   c64_state,   empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1983, edu64,    c64,    0,      pet64,   c64,   c64_state,   empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,   sx64_state,  empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,   sx64_state,  empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw, sx64_state,  empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,   sx64_state,  empty_init, "Commodore Business Machines", "DX-64 (NTSC)",                            MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,   sx64_state,  empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (Spain)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64g,     c64,    0,      pal_c,   c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
-CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs, c64gs_state, empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                        FULLNAME                                   FLAGS
+COMP( 1982, c64,      0,      0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (NTSC)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64p,     c64,    0,      pal,     c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_se,   c64,    0,      pal,     c64sw,   c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pet64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1983, edu64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw,   sx64_state,    empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "DX-64 (NTSC)",                            MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, clipper,  c64,    0,      clipper, clipper, clipper_state, empty_init, "Professional Data Computer",  "Clipper",                                 MACHINE_NOT_WORKING )
+COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Spain)",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64g,     c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
+CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs,   c64gs_state,   empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
 

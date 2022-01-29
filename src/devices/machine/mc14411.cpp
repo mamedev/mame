@@ -102,7 +102,7 @@ mc14411_device::mc14411_device(const machine_config &mconfig, const char *tag, d
 
 mc14411_device::mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_out_fx_cbs{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this }
+	, m_out_fx_cbs(*this)
 	, m_divider(0)
 	, m_reset(CLEAR_LINE)
 {
@@ -215,7 +215,7 @@ void mc14411_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
+void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id >= TIMER_F1 && id <= TIMER_F16)
 	{
@@ -244,14 +244,15 @@ void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int32_t 
 //       divider at run time affects wave forms
 //--------------------------------------------------------
 
-WRITE8_MEMBER(mc14411_device::rate_select_w)
+void mc14411_device::rate_select_w(uint8_t data)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, data);
 
 	if (m_divider != (data & 3))
 	{
 		m_divider = data & 3;
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 
@@ -260,14 +261,15 @@ WRITE8_MEMBER(mc14411_device::rate_select_w)
 //  rsa_w - set RSA input line
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::rsa_w)
+void mc14411_device::rsa_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 
 	if ((m_divider & RSA) != (state == ASSERT_LINE ? RSA : 0))
 	{
 		m_divider = (m_divider & ~RSA) | (state == ASSERT_LINE ? RSA : 0);
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 
@@ -276,14 +278,15 @@ WRITE_LINE_MEMBER(mc14411_device::rsa_w)
 //  rsb_w - set RSB input line
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::rsb_w)
+void mc14411_device::rsb_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 
 	if ((m_divider & RSB) != (state == ASSERT_LINE ? RSB : 0))
 	{
 		m_divider = (m_divider & ~RSB) | (state == ASSERT_LINE ? RSB : 0);
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 
@@ -292,7 +295,7 @@ WRITE_LINE_MEMBER(mc14411_device::rsb_w)
 //  reset_w - software controlled reset
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::reset_w)
+void mc14411_device::reset_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 

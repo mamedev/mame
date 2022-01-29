@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(VIC1111, vic1111_device, "vic1111", "VIC-1111 16K RAM Expansi
 vic1111_device::vic1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIC1111, tag, owner, clock)
 	, device_vic20_expansion_card_interface(mconfig, *this)
-	, m_ram(*this, "ram")
+	, m_ram(*this, "ram", 0x4000, ENDIANNESS_LITTLE)
 {
 }
 
@@ -41,8 +41,6 @@ vic1111_device::vic1111_device(const machine_config &mconfig, const char *tag, d
 
 void vic1111_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x4000);
 }
 
 

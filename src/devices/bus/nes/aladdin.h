@@ -6,7 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 //----------------------------------
@@ -17,7 +17,7 @@
 
 // ======================> aladdin_cart_interface
 
-class aladdin_cart_interface : public device_slot_card_interface
+class aladdin_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -44,8 +44,8 @@ protected:
 class nes_aladdin_device;
 
 class nes_aladdin_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<aladdin_cart_interface>
 {
 	friend class nes_aladdin_device;
 public:
@@ -63,21 +63,12 @@ public:
 	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_aladdin_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "ade_cart"; }
-	virtual const char *file_extensions() const override { return "nes,bin"; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "ade_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "nes,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -86,6 +77,9 @@ public:
 	void write_prg(uint32_t offset, uint8_t data) { if (m_cart) m_cart->write_prg(offset, data); }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	aladdin_cart_interface*      m_cart;
 };
 

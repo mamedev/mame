@@ -3,8 +3,8 @@
 
 // Yamaha DSPV, dsp used for acoustic simulation
 
-#ifndef DEVICES_SOUND_DSPV_H
-#define DEVICES_SOUND_DSPV_H
+#ifndef MAME_SOUND_DSPV_H
+#define MAME_SOUND_DSPV_H
 
 #pragma once
 
@@ -20,16 +20,16 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	address_space_config m_program_config, m_data_config;
@@ -65,4 +65,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DSPV, dspv_device)
 
-#endif
+#endif // MAME_SOUND_DSPV_H

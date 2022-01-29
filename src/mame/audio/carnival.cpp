@@ -61,7 +61,7 @@ enum
 };
 
 
-WRITE8_MEMBER( carnival_state::carnival_audio_1_w )
+void carnival_state::carnival_audio_1_w(uint8_t data)
 {
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -126,7 +126,7 @@ WRITE8_MEMBER( carnival_state::carnival_audio_1_w )
 	}
 }
 
-WRITE8_MEMBER( carnival_state::carnival_audio_2_w )
+void carnival_state::carnival_audio_2_w(uint8_t data)
 {
 	int bitsChanged;
 	//int bitsGoneHigh;
@@ -183,14 +183,14 @@ void carnival_state::carnival_psg_latch()
 	}
 }
 
-WRITE8_MEMBER( carnival_state::carnivala_music_port_1_w )
+void carnival_state::carnivala_music_port_1_w(uint8_t data)
 {
 	// P1: AY8912 d0-d7
 	m_musicData = data;
 	carnival_psg_latch();
 }
 
-WRITE8_MEMBER( carnival_state::carnivala_music_port_2_w )
+void carnival_state::carnivala_music_port_2_w(uint8_t data)
 {
 	// P2 d6: AY8912 BDIR(R/W)
 	// P2 d7: AY8912 BC1
@@ -219,13 +219,13 @@ void carnival_state::carnivala_audio(machine_config &config)
 
 // PIT8253 music
 
-WRITE8_MEMBER( carnival_state::carnivalb_music_port_1_w )
+void carnival_state::carnivalb_music_port_1_w(uint8_t data)
 {
 	// P1: PIT8253 d0-d7
 	m_musicData = data;
 }
 
-WRITE8_MEMBER( carnival_state::carnivalb_music_port_2_w )
+void carnival_state::carnivalb_music_port_2_w(uint8_t data)
 {
 	// P2 d7: PIT8253 write strobe
 	// P2 d5,d6: PIT8253 A0,A1
@@ -253,8 +253,5 @@ void carnival_state::carnivalb_audio(machine_config &config)
 	m_pit->out_handler<2>().set(m_dac[2], FUNC(dac_bit_interface::write));
 
 	for (int i = 0; i < 3; i++)
-	{
 		DAC_1BIT(config, m_dac[i]).add_route(ALL_OUTPUTS, "mono", 0.15);
-		VOLTAGE_REGULATOR(config, m_vref[i]).add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
-	}
 }

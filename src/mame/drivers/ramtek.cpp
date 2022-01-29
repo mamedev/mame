@@ -10,9 +10,9 @@
  Clean Sweep (1974/06)      YES       501082A/B/C/D  501083A/B/C/D
  Deluxe Baseball (1975/06)  YES       550188
  Hockey (1973/11)           YES       500699         500629
- Horoscope (1976)           UNKNOWN
+ Horoscope (1976/11)        UNKNOWN
  Knock Out (1974/09)        YES       550300
- Lie Detector (1976)        UNKNOWN   Unreleased     Unreleased
+ Lie Detector (1976/11)     UNKNOWN   Unreleased     Unreleased
  Sea Battle (1976/04)       UNKNOWN
  Soccer (1973/11)           YES       500880         500889
  Trivia (1975/11)           YES       550436
@@ -113,7 +113,7 @@ void ramtek_state::video_start()
 void ramtek_state::ramtek(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_ramtek);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_ramtek);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

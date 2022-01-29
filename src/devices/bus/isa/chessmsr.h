@@ -37,14 +37,14 @@ private:
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
-	optional_shared_ptr<u32> m_ram;
+	std::unique_ptr<u32[]> m_ram;
 
 	u8 m_ram_offset;
 	bool m_suspended;
 	bool m_installed;
 
-	DECLARE_READ8_MEMBER(chessmsr_r);
-	DECLARE_WRITE8_MEMBER(chessmsr_w);
+	uint8_t chessmsr_r(offs_t offset);
+	void chessmsr_w(offs_t offset, uint8_t data);
 
 	void chessmsr_mem(address_map &map);
 };

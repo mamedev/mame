@@ -20,7 +20,7 @@ public:
 
 	void decrypt_cthd2003(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size, uint8_t* fixedrom, uint32_t fixedrom_size);
 	void patch_cthd2003(uint8_t* cpurom, uint32_t cpurom_size);
-	//DECLARE_WRITE16_MEMBER(cthd2003_bankswitch_w);
+	//void cthd2003_bankswitch_w(offs_t offset, uint16_t data);
 	uint32_t get_bank_base(uint16_t sel);
 
 	void ct2k3sp_sx_decrypt(uint8_t* fixedrom, uint32_t fixedrom_size);

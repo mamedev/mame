@@ -58,7 +58,7 @@ void dcheese_state::update_irq_state()
 }
 
 
-uint8_t dcheese_state::iack_r(offs_t offset)
+u8 dcheese_state::iack_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -111,7 +111,7 @@ void dcheese_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(dcheese_state::eeprom_control_w)
+void dcheese_state::eeprom_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
@@ -129,14 +129,14 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
  *
  *************************************/
 
-READ8_MEMBER(dcheese_state::sound_status_r)
+u8 dcheese_state::sound_status_r()
 {
 	/* seems to be ready signal on BSMT or latching hardware */
 	return m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER(dcheese_state::sound_control_w)
+void dcheese_state::sound_control_w(u8 data)
 {
 	u8 const diff = data ^ m_sound_control;
 	m_sound_control = data;
@@ -150,7 +150,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 }
 
 
-WRITE8_MEMBER(dcheese_state::bsmt_data_w)
+void dcheese_state::bsmt_data_w(offs_t offset, u8 data)
 {
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if ((offset & 1) == 0)
@@ -780,9 +780,9 @@ ROM_END
 GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, empty_init, ROT90, "HAR",                "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, empty_init, ROT0,  "HAR",                "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cecmatch,  0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (UK, 3/17/95)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (Mandarin Chinese, 3/17/95)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (Spanish, 3/17/95)",                   MACHINE_SUPPORTS_SAVE )

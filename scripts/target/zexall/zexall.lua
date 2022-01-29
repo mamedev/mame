@@ -2,6 +2,8 @@ STANDALONE = true
 
 CPUS["Z80"] = true
 
+MACHINES["Z80DAISY"] = true
+
 function standalone()
 	files{
 		MAME_DIR .. "src/zexall/main.cpp",

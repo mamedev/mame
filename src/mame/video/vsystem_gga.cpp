@@ -50,7 +50,7 @@ void vsystem_gga_device::device_start()
 //  write - register write handler
 //-------------------------------------------------
 
-WRITE8_MEMBER(vsystem_gga_device::write)
+void vsystem_gga_device::write(offs_t offset, u8 data)
 {
 	if (offset & 1)
 	{

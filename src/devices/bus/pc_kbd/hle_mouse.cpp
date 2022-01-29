@@ -8,7 +8,7 @@
  * byte PS/2 mouse protocol. Serial I/O is driven at 10kHz by a 40kHz timer
  * to generate somewhat accurate clock rising and falling edges, as well as
  * sampling or writing the data line in the middle of each high or low cycle
- * as exoected by the protocol.
+ * as expected by the protocol.
  *
  * The original IBM PS/2 mouse had only two buttons and the documented protocol
  * reflects this, however it also allows a third button to be added without any
@@ -155,7 +155,7 @@ void hle_ps2_mouse_device::resume()
 	}
 }
 
-void hle_ps2_mouse_device::serial(void *ptr, s32 param)
+void hle_ps2_mouse_device::serial(s32 param)
 {
 	// host may inhibit device communication by holding the clock low for 100µs
 	if (!clock_signal() && clock_held(100))
@@ -474,7 +474,7 @@ void hle_ps2_mouse_device::command(u8 const command)
 	}
 }
 
-void hle_ps2_mouse_device::sample(void *ptr, s32 param)
+void hle_ps2_mouse_device::sample(s32 param)
 {
 	// read mouse state
 	s16 const x = m_port_x_axis->read();

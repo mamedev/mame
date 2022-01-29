@@ -106,7 +106,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
 
 
 
-WRITE16_MEMBER(galpanic_state::m6295_bankswitch_w)
+void galpanic_state::m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -119,7 +119,7 @@ WRITE16_MEMBER(galpanic_state::m6295_bankswitch_w)
 
 
 
-WRITE16_MEMBER(galpanic_state::coin_w)
+void galpanic_state::coin_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

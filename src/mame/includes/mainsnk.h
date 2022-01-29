@@ -45,10 +45,10 @@ private:
 	int m_sound_cpu_busy;
 	uint32_t m_bg_tile_offset;
 
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(c600_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
+	uint8_t sound_ack_r();
+	void c600_w(uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
 /***************************************************************************
 
@@ -12,8 +12,6 @@
 
 #pragma once
 
-#pragma once
-
 #include "wd177x_dsk.h"
 
 
@@ -22,7 +20,7 @@ class afs_format : public wd177x_format
 public:
 	afs_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
 	virtual const char *description() const override;

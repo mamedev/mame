@@ -96,8 +96,8 @@
 
 ***************************************************************************/
 
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 
 #include "coretmpl.h"
 #include "huffman.h"
@@ -431,7 +431,7 @@ huffman_error huffman_context_base::compute_tree_from_histo()
 	// binary search to achieve the optimum encoding
 	uint32_t lowerweight = 0;
 	uint32_t upperweight = sdatacount * 2;
-	while (1)
+	while (true)
 	{
 		// build a tree using the current weight
 		uint32_t curweight = (upperweight + lowerweight) / 2;

@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 	uint8_t code = m_videoram[tile_index];
 	uint8_t col = m_colorram[tile_index];
 	uint8_t attr = m_attributeram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code | ((attr & 0x03) << 8),
 					col & 0x3f,
 					TILE_FLIPYX(attr >> 2));
@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 
 void espial_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(espial_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
 	save_item(NAME(m_flipscreen));
@@ -97,7 +97,7 @@ void espial_state::video_start()
 VIDEO_START_MEMBER(espial_state,netwars)
 {
 	/* Net Wars has a tile map that's twice as big as Espial's */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(espial_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_bg_tilemap->set_scrolldy(0, 0x100);
@@ -112,35 +112,35 @@ VIDEO_START_MEMBER(espial_state,netwars)
  *
  *************************************/
 
-WRITE8_MEMBER(espial_state::espial_videoram_w)
+void espial_state::espial_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_colorram_w)
+void espial_state::espial_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_attributeram_w)
+void espial_state::espial_attributeram_w(offs_t offset, uint8_t data)
 {
 	m_attributeram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_scrollram_w)
+void espial_state::espial_scrollram_w(offs_t offset, uint8_t data)
 {
 	m_scrollram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_flipscreen_w)
+void espial_state::espial_flipscreen_w(uint8_t data)
 {
 	m_flipscreen = data;
 	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

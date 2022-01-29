@@ -134,7 +134,7 @@ void msx_slot_fs4600_device::write(offs_t offset, uint8_t data)
 					break;
 
 				default:
-					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);;
+					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);
 					break;
 			}
 		}

@@ -686,7 +686,7 @@ void xt_hdc_device::command()
 	}
 }
 
-void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	command();
 }
@@ -923,8 +923,8 @@ void isa8_hdc_device::device_add_mconfig(machine_config &config)
 	XT_HDC(config, m_hdc,0);
 	m_hdc->irq_handler().set(FUNC(isa8_hdc_device::irq_w));
 	m_hdc->drq_handler().set(FUNC(isa8_hdc_device::drq_w));
-	HARDDISK(config, "hdc:primary");
-	HARDDISK(config, "hdc:slave");
+	HARDDISK(config, "hdc:primary", "st_hdd");
+	HARDDISK(config, "hdc:slave", "st_hdd");
 }
 
 void isa8_hdc_ec1841_device::device_add_mconfig(machine_config &config)
@@ -932,8 +932,8 @@ void isa8_hdc_ec1841_device::device_add_mconfig(machine_config &config)
 	EC1841_HDC(config, m_hdc,0);
 	m_hdc->irq_handler().set(FUNC(isa8_hdc_ec1841_device::irq_w));
 	m_hdc->drq_handler().set(FUNC(isa8_hdc_ec1841_device::drq_w));
-	HARDDISK(config, "hdc:primary");
-	HARDDISK(config, "hdc:slave");
+	HARDDISK(config, "hdc:primary", "st_hdd");
+	HARDDISK(config, "hdc:slave", "st_hdd");
 }
 
 //-------------------------------------------------
@@ -987,7 +987,7 @@ isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, co
 void isa8_hdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0320, 0x0323, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
+	m_isa->install_device(0x0320, 0x0323, read8sm_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_r)), write8sm_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_w)));
 	m_isa->set_dma_channel(3, this, false);
 }
 
@@ -1000,7 +1000,7 @@ void isa8_hdc_device::device_reset()
 	dip = ioport("HDD")->read();
 
 	if (ioport("ROM")->read() == 1 && m_hdc->install_rom())
-		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
+		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc");
 }
 
 /*************************************************************************
@@ -1009,7 +1009,7 @@ void isa8_hdc_device::device_reset()
  *      hard disk controller
  *
  *************************************************************************/
-READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
+uint8_t isa8_hdc_device::pc_hdc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1027,7 +1027,7 @@ READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
+void isa8_hdc_device::pc_hdc_w(offs_t offset, uint8_t data)
 {
 	if (LOG_HDC_CALL)
 		logerror("%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);

@@ -135,6 +135,7 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 	, device_video_interface(mconfig, *this)
 	, m_write_hsync(*this)
 	, m_write_fsync(*this)
+	, m_charrom_cb(*this)
 	, m_character_map(fontdata, is_mc6847t1)
 	, m_tpfs(tpfs)
 	, m_divider(divider)
@@ -252,7 +253,7 @@ void mc6847_friend_device::update_field_sync_timer()
 //  device_timer
 //-------------------------------------------------
 
-void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -554,7 +555,7 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 {
 	m_palette = s_palette;
 
-	for (int i = 0; i < ARRAY_LENGTH(s_palette); i++)
+	for (int i = 0; i < std::size(s_palette); i++)
 	{
 		m_bw_palette[i] = black_and_white(s_palette[i]);
 	}
@@ -599,7 +600,7 @@ void mc6847_base_device::device_config_complete()
 	}
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(mc6847_base_device::screen_update), this));
+		screen().set_screen_update(*this, FUNC(mc6847_base_device::screen_update));
 }
 
 
@@ -617,7 +618,7 @@ void mc6847_base_device::device_start()
 
 	/* resolve callbacks */
 	m_input_cb.resolve_safe(0);
-	m_charrom_cb.bind_relative_to(*owner());
+	m_charrom_cb.resolve();
 
 	/* set up fixed mode */
 	setup_fixed_mode();
@@ -692,7 +693,7 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 			{
 				// update values
 				//assert(current_sample_count >= 0);
-				assert(current_sample_count < ARRAY_LENGTH(m_data[scanline].m_mode));
+				assert(current_sample_count < std::size(m_data[scanline].m_mode));
 				update_value(&m_data[scanline].m_mode[current_sample_count], simplify_mode(data, m_mode));
 				update_value(&m_data[scanline].m_data[current_sample_count], data);
 				current_sample_count++;
@@ -947,7 +948,7 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 		m_stripes[i] = ~(i / 12);
 
 	// loop through all modes
-	for (mode = 0; mode < ARRAY_LENGTH(m_entries); mode++)
+	for (mode = 0; mode < std::size(m_entries); mode++)
 	{
 		const uint8_t *fontdata;
 		uint8_t character_mask;

@@ -28,8 +28,8 @@ public:
 	// I/O operations
 	void wdt_regs(address_map &map);
 
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint16_t data);
+	uint8_t read(address_space &space, offs_t offset);
 
 protected:
 	// device-level overrides

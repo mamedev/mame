@@ -38,7 +38,7 @@ protected:
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<upd765a_device> m_fdc;
 	uint8_t *     m_rom;

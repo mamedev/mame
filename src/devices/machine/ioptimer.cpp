@@ -198,7 +198,7 @@ TIMER_CALLBACK_MEMBER(iop_timer_device::overflow)
 	update_interrupts();
 }
 
-READ32_MEMBER(iop_timer_device::read)
+uint32_t iop_timer_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -229,7 +229,7 @@ READ32_MEMBER(iop_timer_device::read)
 	return ret;
 }
 
-WRITE32_MEMBER(iop_timer_device::write)
+void iop_timer_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

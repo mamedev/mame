@@ -89,7 +89,7 @@ void phoenix_sound_device::device_start()
 		m_poly18[i] = bits;
 	}
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	save_item(NAME(m_sound_latch_a));
 	save_item(NAME(m_c24_state.counter));
@@ -101,7 +101,6 @@ void phoenix_sound_device::device_start()
 	save_item(NAME(m_noise_state.polyoffs));
 	save_item(NAME(m_noise_state.lowpass_counter));
 	save_item(NAME(m_noise_state.lowpass_polybit));
-	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 int phoenix_sound_device::update_c24(int samplerate)
@@ -495,7 +494,7 @@ DISCRETE_SOUND_START(phoenix_discrete)
 	DISCRETE_OUTPUT(NODE_90, 1)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( phoenix_sound_device::control_a_w )
+void phoenix_sound_device::control_a_w(uint8_t data)
 {
 	m_discrete->write(PHOENIX_EFFECT_2_DATA, data & 0x0f);
 	m_discrete->write(PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
@@ -508,7 +507,7 @@ WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 	m_sound_latch_a = data;
 }
 
-WRITE8_MEMBER( phoenix_sound_device::control_b_w )
+void phoenix_sound_device::control_b_w(uint8_t data)
 {
 	m_discrete->write(PHOENIX_EFFECT_1_DATA, data & 0x0f);
 	m_discrete->write(PHOENIX_EFFECT_1_FILT, data & 0x20);
@@ -523,15 +522,15 @@ WRITE8_MEMBER( phoenix_sound_device::control_b_w )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void phoenix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void phoenix_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int samplerate = machine().sample_rate();
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
+	int samplerate = buffer.sample_rate();
 
-	while( samples-- > 0 )
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int sum = 0;
 		sum = noise(samplerate) / 2;
-		*buffer++ = sum < 32768 ? sum > -32768 ? sum : -32768 : 32767;
+		buffer.put_int_clamp(sampindex, sum, 32768);
 	}
 }

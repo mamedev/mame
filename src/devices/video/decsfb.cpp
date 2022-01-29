@@ -89,12 +89,12 @@ void decsfb_device::device_reset()
     0x100074 Interrupt Enable
 */
 
-READ32_MEMBER(decsfb_device::read)
+u32 decsfb_device::read(offs_t offset)
 {
 	return m_regs[offset];
 }
 
-WRITE32_MEMBER(decsfb_device::write)
+void decsfb_device::write(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 
@@ -104,12 +104,12 @@ WRITE32_MEMBER(decsfb_device::write)
 	}
 }
 
-READ32_MEMBER(decsfb_device::vram_r)
+u32 decsfb_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE32_MEMBER(decsfb_device::vram_w)
+void decsfb_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (m_regs[0x30/4])
 	{

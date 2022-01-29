@@ -15,8 +15,6 @@
 #define CPU_CLOCK       (XTAL(40'000'000) / 2)        /* clock for 68020 */
 #define SOUND_CPU_CLOCK     (XTAL(12'000'000) / 2)        /* clock for Z80 sound CPU */
 
-/* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
-
 
 class fuuki32_state : public driver_device
 {
@@ -28,9 +26,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_fuukivid(*this, "fuukivid")
-		, m_spriteram(*this, "spriteram", 32U)
+		, m_spriteram(*this, "spriteram", 0x2000, ENDIANNESS_BIG)
 		, m_vram(*this, "vram.%u", 0)
-		, m_vregs(*this, "vregs", 32U)
+		, m_vregs(*this, "vregs", 0x20, ENDIANNESS_BIG)
 		, m_priority(*this, "priority")
 		, m_tilebank(*this, "tilebank")
 		, m_shared_ram(*this, "shared_ram")
@@ -59,9 +57,9 @@ private:
 	required_device<fuukivid_device> m_fuukivid;
 
 	/* memory pointers */
-	required_shared_ptr<u16> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	required_shared_ptr_array<u32, 4> m_vram;
-	required_shared_ptr<u16> m_vregs;
+	memory_share_creator<u16> m_vregs;
 	required_shared_ptr<u32> m_priority;
 	required_shared_ptr<u32> m_tilebank;
 	required_shared_ptr<u8> m_shared_ram;
@@ -109,7 +107,7 @@ private:
 	void fuuki32_sound_io_map(address_map &map);
 	void fuuki32_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_FUUKIFG3_H

@@ -18,10 +18,10 @@ public:
 	auto read_6_callback() { return m_in6_cb.bind(); }
 	auto read_7_callback() { return m_in7_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(adc_7b80_r);
-	DECLARE_WRITE8_MEMBER(adc_7b80_w);
-	DECLARE_READ8_MEMBER(adc_7b81_r);
-	DECLARE_WRITE8_MEMBER(adc_7b81_w);
+	uint8_t adc_7b80_r();
+	void adc_7b80_w(uint8_t data);
+	uint8_t adc_7b81_r();
+	void adc_7b81_w(uint8_t data);
 
 protected:
 	// device-level overrides

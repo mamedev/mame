@@ -45,11 +45,11 @@ public:
 	void set_auto_save(bool auto_save) { m_auto_save = auto_save; }
 
 	// I/O operations
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(address_space &space, offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( store );
-	DECLARE_WRITE_LINE_MEMBER( recall );
+	void store(int state);
+	void recall(int state);
 
 protected:
 	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int size_data);

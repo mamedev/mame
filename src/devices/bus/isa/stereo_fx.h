@@ -8,7 +8,7 @@
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 
 //*********************************************************************
 //   TYPE DEFINITIONS
@@ -28,7 +28,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -54,24 +54,24 @@ private:
 	uint8_t m_t1;
 
 	// mcu ports
-	DECLARE_READ8_MEMBER( dev_dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dev_dsp_data_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_WRITE8_MEMBER( dev_host_irq_w );
-	DECLARE_WRITE8_MEMBER( raise_drq_w );
-	DECLARE_WRITE8_MEMBER( port20_w );
-	DECLARE_WRITE8_MEMBER( port00_w );
+	uint8_t dev_dsp_data_r();
+	void dev_dsp_data_w(uint8_t data);
+	uint8_t p1_r();
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
+	void dev_host_irq_w(uint8_t data);
+	void raise_drq_w(uint8_t data);
+	void port20_w(uint8_t data);
+	void port00_w(uint8_t data);
 
 	// host ports
-	DECLARE_READ8_MEMBER( dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dsp_cmd_w );
-	DECLARE_WRITE8_MEMBER( dsp_reset_w );
-	DECLARE_READ8_MEMBER( dsp_wbuf_status_r );
-	DECLARE_READ8_MEMBER( dsp_rbuf_status_r );
-	DECLARE_READ8_MEMBER( invalid_r );
-	DECLARE_WRITE8_MEMBER( invalid_w );
+	uint8_t dsp_data_r();
+	void dsp_cmd_w(uint8_t data);
+	void dsp_reset_w(uint8_t data);
+	uint8_t dsp_wbuf_status_r();
+	uint8_t dsp_rbuf_status_r();
+	uint8_t invalid_r();
+	void invalid_w(uint8_t data);
 
 	void stereo_fx_io(address_map &map);
 	void stereo_fx_rom(address_map &map);

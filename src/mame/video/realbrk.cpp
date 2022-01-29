@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 {
 	const u16 attr = m_vram[Layer][tile_index * 2 + 0];
 	const u16 code = m_vram[Layer][tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x7f,
 			TILE_FLIPYX( attr >> 14 ));
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 {
 	const u16 code = m_vram[2][tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0x0fff,
 			((code & 0xf000) >> 12) | ((m_vregs[0xa/2] & 0x7f) << 4),
 			0);
@@ -121,11 +121,11 @@ void realbrk_state::vram_2_w(offs_t offset, u16 data, u16 mem_mask)
 void realbrk_state::video_start()
 {
 	/* Backgrounds */
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
 
 	/* Text */
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,   8,  8, 0x40, 0x20);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info_2)), TILEMAP_SCAN_ROWS,   8,  8, 0x40, 0x20);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -135,6 +135,7 @@ void realbrk_state::video_start()
 	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
 
 	save_item(NAME(m_disable_video));
+	m_disable_video = 0;
 }
 
 /***************************************************************************

@@ -113,14 +113,14 @@
       must type a password. At this time, in the layout, under the
       roulette leds will appear the password we need (six numeric digits).
 
-  4.- Enter the required paswword using the credits in (IN1....IN6)
+  4.- Enter the required password using the credits in (IN1....IN6)
       and credits out (OUT1...OUT6) buttons following the key assignment
       indications located under the password field.
       Use the "E" button to finish once all numbers were typed.
       Use the "B" button clear last digit typed, in case of mistake.
 
   5.- Once finished that, the game will reboot and will be ready
-      to play. Also, password showed on layout will dissapear.
+      to play. Also, password showed on layout will disappear.
 
       In case that (by unknown reason) the game asks for
       "CONTROL ADMINISTRATIVO" again, follow the instructions starting
@@ -140,13 +140,13 @@
   roulettes like Lucky Ball, Lucky Roulette, Corona, Re900, etc...
 
   The most exciting part of this work was discover that this game runs
-  with an electromechanical roulette, not a tipical LED roulette. It
-  added an extra challenge to the work, wich implies a full develop
+  with an electromechanical roulette, not a typical LED roulette. It
+  added an extra challenge to the work, which implies a full develop
   of an electromechanical part simulation, objective that finally
   could be reached.
 
   Surprisingly, this game firmware includes a full communications
-  module, accesible via RS232 serial interface, that let the users
+  module, accessible via RS232 serial interface, that let the users
   some useful things like reconfigure hardware and game options or
   get different kinds of reports, like accounting, statistics and
   many other technical items. All this tasks are performed from a
@@ -216,16 +216,16 @@ public:
 	void rulechan_init();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); m_digits.resolve(); }
+	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(port30_r);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port32_w);
-	DECLARE_READ8_MEMBER(psg_portA_r);
-	DECLARE_READ8_MEMBER(psg_portB_r);
+	void port0_w(uint8_t data);
+	uint8_t port2_r();
+	uint8_t port30_r();
+	void port31_w(uint8_t data);
+	void port32_w(uint8_t data);
+	uint8_t psg_portA_r();
+	uint8_t psg_portB_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ball_speed );
 	TIMER_DEVICE_CALLBACK_MEMBER( wheel_speed );
@@ -265,6 +265,27 @@ private:
 
 constexpr uint8_t rulechan_state::s_sndsrt[10];
 
+void rulechan_state::machine_start()
+{
+	m_lamps.resolve();
+	m_digits.resolve();
+
+	save_item(NAME(m_sline));
+	save_item(NAME(m_p30));
+	save_item(NAME(m_p31));
+	save_item(NAME(m_p32));
+	save_item(NAME(m_step));
+	save_item(NAME(m_updn2));
+	save_item(NAME(m_updn3));
+	save_item(NAME(m_updn4));
+	save_item(NAME(m_num));
+	save_item(NAME(m_spin));
+	save_item(NAME(m_tspin));
+	save_item(NAME(d_spin));
+	save_item(NAME(m_ballin));
+	save_item(NAME(m_led));
+	save_item(NAME(m_pass));
+}
 
 /* BCD to Seven Segment Decoder */
 
@@ -318,7 +339,7 @@ void rulechan_state::main_io(address_map &map)
 *      Read Handlers      *
 **************************/
 
-READ8_MEMBER(rulechan_state::port2_r)
+uint8_t rulechan_state::port2_r()
 {
 	return m_keymx[m_sline]->read();
 }
@@ -328,22 +349,22 @@ READ8_MEMBER(rulechan_state::port2_r)
 *  bit 2 - ball detector      *
 *  bit 3 - step detector      *
 *  bit 4 - Zero detector      *
-*  bit 5 - Ball in shotter    *
+*  bit 5 - Ball in shooter    *
 ******************************/
 
-READ8_MEMBER(rulechan_state::port30_r)
+uint8_t rulechan_state::port30_r()
 {
 	return m_p30;
 }
 
-READ8_MEMBER(rulechan_state::psg_portA_r)
+uint8_t rulechan_state::psg_portA_r()
 {
 	m_lamps[60] = (BIT(m_aux->read(), 3)) ? 0 : 1;    // Show Operator Key via layout lamp.
 	m_lamps[61] = (BIT(m_aux->read(), 7)) ? 0 : 1;    // Show Page Key via layout lamp.
 	return m_aux->read();                             // Operator Key read.
 }
 
-READ8_MEMBER(rulechan_state::psg_portB_r)
+uint8_t rulechan_state::psg_portB_r()
 {
 	return m_dsw->read();                   // DIP Switch read.
 }
@@ -353,7 +374,7 @@ READ8_MEMBER(rulechan_state::psg_portB_r)
 *    Write Handlers    *
 ***********************/
 
-WRITE8_MEMBER(rulechan_state::port0_w)
+void rulechan_state::port0_w(uint8_t data)
 {
 	m_sline = data & 0x07;                 // Matrix scan line selector.
 
@@ -368,7 +389,7 @@ WRITE8_MEMBER(rulechan_state::port0_w)
 *  bit 7 - ball shooter                 *
 ****************************************/
 
-WRITE8_MEMBER(rulechan_state::port31_w)
+void rulechan_state::port31_w(uint8_t data)
 {
 	m_p31 = data;
 
@@ -394,7 +415,7 @@ WRITE8_MEMBER(rulechan_state::port31_w)
 *                                       *
 ****************************************/
 
-WRITE8_MEMBER(rulechan_state::port32_w)
+void rulechan_state::port32_w(uint8_t data)
 {
 	m_p32 = data;
 }

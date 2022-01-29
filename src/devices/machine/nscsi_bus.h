@@ -7,6 +7,7 @@
 
 
 class nscsi_device;
+class nscsi_slot_card_interface;
 
 class nscsi_bus_device : public device_t
 {
@@ -42,7 +43,7 @@ private:
 };
 
 class nscsi_connector: public device_t,
-					   public device_slot_interface
+					   public device_single_card_slot_interface<nscsi_slot_card_interface>
 {
 public:
 	template <typename T>
@@ -60,11 +61,10 @@ public:
 	nscsi_device *get_device();
 
 protected:
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 };
 
-class nscsi_slot_card_interface : public device_slot_card_interface
+class nscsi_slot_card_interface : public device_interface
 {
 	friend class nscsi_connector;
 
@@ -316,7 +316,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void scsi_message();
 	virtual void scsi_command();

@@ -13,6 +13,9 @@ class eispc_keyboard_device : public device_t
 {
 public:
 	auto txd_cb() { return m_txd_cb.bind(); }
+	auto caps_cb() { return m_led_caps_cb.bind(); }
+	auto num_cb() { return m_led_num_cb.bind(); }
+	auto scroll_cb() { return m_led_scroll_cb.bind(); }
 
 	eispc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
@@ -30,6 +33,9 @@ protected:
 	required_device<m6801_cpu_device> m_mcu;
 	required_ioport_array<6>       m_rows;
 	devcb_write_line               m_txd_cb; // Callback for KBD-> EPC
+	devcb_write_line               m_led_caps_cb; // Callback for Caps led -> layout
+	devcb_write_line               m_led_num_cb; // Callback for Num led -> layout
+	devcb_write_line               m_led_scroll_cb; // Callback for Scroll led -> layout
 
 	bool    m_rxd_high; // state of Rx input line
 	bool    m_txd_high; // state of Tx output line

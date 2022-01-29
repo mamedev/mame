@@ -88,7 +88,7 @@ RM480Z has the speaker fitted
 
 ===
 
-Memory map from sevice manual:
+Memory map from service manual:
 
 PAGE SEL bit in PORT0 set to 0:
 
@@ -180,7 +180,7 @@ void rm380z_state::rm380z_mem(address_map &map)
 	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
 	map(0xfa00, 0xfaff).ram();
 	map(0xfb00, 0xfbff).rw(FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
-	map(0xfc00, 0xffff).rw(FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+	map(0xfc00, 0xffff).ram().share("hiram");
 }
 
 void rm380z_state::rm380z_io(address_map &map)
@@ -269,8 +269,8 @@ void rm380z_state::rm380z(machine_config &config)
 	/* floppy disk */
 	FD1771(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));

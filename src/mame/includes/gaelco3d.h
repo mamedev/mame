@@ -32,7 +32,8 @@ public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_adsp_ram_base(*this, "adsp_ram_base")
-		, m_m68k_ram_base(*this, "m68k_ram_base", 0)
+		, m_m68k_ram_base16(*this, "m68k_ram_base16")
+		, m_m68k_ram_base32(*this, "m68k_ram_base32")
 		, m_adsp_control_regs(*this, "adsp_regs")
 		, m_adsp_fastram_base(*this, "adsp_fastram")
 		, m_maincpu(*this, "maincpu")
@@ -46,8 +47,8 @@ public:
 		, m_mainlatch(*this, "mainlatch")
 		, m_outlatch(*this, "outlatch")
 		, m_adsp_autobuffer_timer(*this, "adsp_timer")
-		, m_paletteram16(*this, "paletteram")
-		, m_paletteram32(*this, "paletteram")
+		, m_paletteram16(*this, "paletteram16")
+		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
 		, m_adsp_bank(*this, "adspbank")
 	{ }
@@ -73,7 +74,7 @@ private:
 		float z0;
 	};
 
-	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 2000>
+	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1>
 	{
 	public:
 		gaelco3d_renderer(gaelco3d_state &state);
@@ -102,7 +103,8 @@ private:
 	};
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
-	required_shared_ptr<uint16_t> m_m68k_ram_base;
+	optional_shared_ptr<uint16_t> m_m68k_ram_base16;
+	optional_shared_ptr<uint32_t> m_m68k_ram_base32;
 	required_shared_ptr<uint16_t> m_adsp_control_regs;
 	required_shared_ptr<uint16_t> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +125,6 @@ private:
 	required_memory_bank m_adsp_bank;
 
 	uint8_t m_sound_status;
-	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
 	uint32_t m_fp_analog_ports[2];
 	uint32_t m_fp_lenght[2];
@@ -141,27 +142,27 @@ private:
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
+	void irq_ack_w(uint16_t data);
+	uint16_t sound_status_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sound_status_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
-	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
-	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
-	DECLARE_WRITE8_MEMBER(tms_iack_w);
+	uint32_t tms_m68k_ram_r(offs_t offset);
+	void tms_m68k_ram_w(offs_t offset, uint32_t data);
+	void tms_iack_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
-	DECLARE_WRITE16_MEMBER(adsp_control_w);
-	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
+	void adsp_control_w(offs_t offset, uint16_t data);
+	void adsp_rombank_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
 	DECLARE_WRITE_LINE_MEMBER(unknown_137_w);
 	DECLARE_WRITE_LINE_MEMBER(unknown_13a_w);
-	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
-	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
-	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
+	void gaelco3d_render_w(uint32_t data);
+	void gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
-	DECLARE_READ16_MEMBER(eeprom_data_r);
+	uint16_t eeprom_data_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);
@@ -169,7 +170,7 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
-	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
+	void adsp_tx_callback(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
 
 	void adsp_data_map(address_map &map);

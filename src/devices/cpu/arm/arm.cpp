@@ -497,12 +497,15 @@ void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	if(m_program->endianness() == ENDIANNESS_LITTLE) {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		m_program->cache(m_cachele);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
+	}
+	else
+	{
+		m_program->cache(m_cachebe);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
 	}
 
 	save_item(NAME(m_sArmRegister));
@@ -765,7 +768,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
 		| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
 			<< V_BIT) \
-		| (((~(rn)) < (op2)) << C_BIT) \
+		| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 		| HandleALUNZFlags(rd)) \
 		+ 4; \
 	else R15 += 4;
@@ -824,7 +827,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 	{
 		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
-			if (!(insn & INSN_S))
+		if (!(insn & INSN_S))
 			sc=0;
 	}
 

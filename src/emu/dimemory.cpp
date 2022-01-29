@@ -2,13 +2,15 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dimemory.c
+    dimemory.cpp
 
     Device memory interfaces.
 
 ***************************************************************************/
 
 #include "emu.h"
+
+#include <map>
 
 
 //**************************************************************************
@@ -50,15 +52,16 @@ device_memory_interface::~device_memory_interface()
 
 void device_memory_interface::set_addrmap(int spacenum, address_map_constructor map)
 {
+	assert(0 <= spacenum);
 	if (spacenum >= int(m_address_map.size()))
-		m_address_map.resize(spacenum+1);
-	m_address_map[spacenum] = map;
+		m_address_map.resize(spacenum + 1);
+	m_address_map[spacenum] = std::move(map);
 }
 
 
 //-------------------------------------------------
 //  memory_translate - translate from logical to
-//  phyiscal addresses; designed to be overridden
+//  physical addresses; designed to be overridden
 //  by the actual device implementation if address
 //  translation is supported
 //-------------------------------------------------
@@ -94,21 +97,48 @@ void device_memory_interface::interface_config_complete()
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
 	// loop over all address spaces
+	std::map<std::string, int> space_name_map;
 	const int max_spaces = std::max(m_address_map.size(), m_address_config.size());
 	for (int spacenum = 0; spacenum < max_spaces; ++spacenum)
 	{
 		const address_space_config *config = space_config(spacenum);
-		if (config != nullptr)
+		if (config)
 		{
+			// validate name
+			if (!config->name() || !*config->name())
+			{
+				osd_printf_error("Name is empty for address space %d\n",  config->name(), spacenum);
+			}
+			else
+			{
+				static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_";
+				for (char const *p = config->name(); *p; ++p)
+				{
+					if (*p == ' ')
+					{
+						osd_printf_error("Name for address space %s (%d) contains spaces\n",  config->name(), spacenum);
+						break;
+					}
+					if (!strchr(validchars, *p))
+					{
+						osd_printf_error("Name for address space %s (%d) contains invalid character '%c'\n",  config->name(), spacenum, *p);
+						break;
+					}
+				}
+				auto const ins = space_name_map.emplace(config->name(), spacenum);
+				if (!ins.second)
+					osd_printf_error("Name for address space %s (%d) already used for space %d\n",  config->name(), spacenum, ins.first->second);
+			}
+
 			// validate data width
 			int width = config->data_width();
 			if (width != 8 && width != 16 && width != 32 && width != 64)
-				osd_printf_error("Invalid data width %d specified for address space %d\n", width, spacenum);
+				osd_printf_error("Invalid data width %d specified for address space %s (%d)\n", width, config->name(), spacenum);
 
 			// validate address shift
 			int shift = config->addr_shift();
 			if (shift < 0 && (width >> -shift) < 8)
-				osd_printf_error("Invalid shift %d specified for address space %d\n", shift, spacenum);
+				osd_printf_error("Invalid shift %d specified for address space %s (%d)\n", shift, config->name(), spacenum);
 
 			// construct the map
 			::address_map addrmap(const_cast<device_t &>(device()), spacenum);

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(NEWBRAIN_EXPANSION_SLOT, newbrain_expansion_slot_device, "new
 //-------------------------------------------------
 
 device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig,device)
+	device_interface(device, "newbrainexp")
 {
 	m_slot = dynamic_cast<newbrain_expansion_slot_device *>(device.owner());
 }
@@ -45,7 +45,8 @@ device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interfa
 
 newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEWBRAIN_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_card(nullptr)
+	device_single_card_slot_interface<device_newbrain_expansion_slot_interface>(mconfig, *this),
+	m_card(nullptr)
 {
 }
 
@@ -56,7 +57,7 @@ newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_con
 
 void newbrain_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_newbrain_expansion_slot_interface *>(get_card_device());
+	m_card = get_card_device();
 }
 
 

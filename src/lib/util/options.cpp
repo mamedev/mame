@@ -8,13 +8,18 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <assert.h>
 #include "options.h"
+
+#include "corefile.h"
 #include "corestr.h"
+
+#include <locale>
 #include <string>
+
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -50,17 +55,19 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 
 namespace
 {
-	void trim_spaces_and_quotes(std::string &data)
+	std::string_view trim_spaces_and_quotes(std::string_view data)
 	{
 		// trim any whitespace
-		strtrimspace(data);
+		data = strtrimspace(data);
 
 		// trim quotes
-		if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
+		if (data.length() >= 2 && data.front() == '"' && data.back() == '"')
 		{
-			data.erase(0, 1);
-			data.erase(data.length() - 1, 1);
+			data.remove_prefix(1);
+			data.remove_suffix(1);
 		}
+
+		return data;
 	}
 };
 
@@ -134,7 +141,7 @@ core_options::entry::~entry()
 //  entry::value
 //-------------------------------------------------
 
-const char *core_options::entry::value() const
+const char *core_options::entry::value() const noexcept
 {
 	// returning 'nullptr' from here signifies a value entry that is essentially "write only"
 	// and cannot be meaningfully persisted (e.g. - a command or the software name)
@@ -150,6 +157,8 @@ void core_options::entry::set_value(std::string &&newvalue, int priority_value, 
 {
 	// it is invalid to set the value on a header
 	assert(type() != option_type::HEADER);
+
+	validate(newvalue);
 
 	// only set the value if we have priority
 	if (always_override || priority_value >= priority())
@@ -181,43 +190,86 @@ void core_options::entry::set_default_value(std::string &&newvalue)
 
 void core_options::entry::validate(const std::string &data)
 {
-	float fval;
-	int ival;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
 
 	switch (type())
 	{
 	case option_type::BOOLEAN:
-		// booleans must be 0 or 1
-		if (sscanf(data.c_str(), "%d", &ival) != 1 || ival < 0 || ival > 1)
-			throw options_warning_exception("Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+		{
+			// booleans must be 0 or 1
+			int ival;
+			if (!(str >> ival) || (0 > ival) || (1 < ival))
+				throw options_warning_exception("Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+		}
 		break;
 
 	case option_type::INTEGER:
-		// integers must be integral
-		if (sscanf(data.c_str(), "%d", &ival) != 1)
-			throw options_warning_exception("Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
-
-		// range checking
-		if (has_range())
 		{
-			int minimum_integer = atoi(minimum());
-			int maximum_integer = atoi(maximum());
-			if (ival < minimum_integer || ival > maximum_integer)
-				throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d); reverting to %s\n", name(), data, minimum_integer, maximum_integer, value());
+			// integers must be integral
+			int ival;
+			if (!(str >> ival))
+				throw options_warning_exception("Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+
+			// range checking
+			char const *const strmin(minimum());
+			char const *const strmax(maximum());
+			int imin(0), imax(0);
+			if (strmin && *strmin)
+			{
+				str.str(strmin);
+				str.seekg(0);
+				str >> imin;
+			}
+			if (strmax && *strmax)
+			{
+				str.str(strmax);
+				str.seekg(0);
+				str >> imax;
+			}
+			if ((strmin && *strmin && (ival < imin)) || (strmax && *strmax && (ival > imax)))
+			{
+				if (!strmax || !*strmax)
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no less than %d); reverting to %s\n", name(), data, imin, value());
+				else if (!strmin || !*strmin)
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no greater than %d); reverting to %s\n", name(), data, imax, value());
+				else
+					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d, inclusive); reverting to %s\n", name(), data, imin, imax, value());
+			}
 		}
 		break;
 
 	case option_type::FLOAT:
-		if (sscanf(data.c_str(), "%f", &fval) != 1)
-			throw options_warning_exception("Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
-
-		// range checking
-		if (has_range())
 		{
-			float minimum_float = atof(minimum());
-			float maximum_float = atof(maximum());
-			if (fval < minimum_float || fval > maximum_float)
-				throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f); reverting to %s\n", name(), data, minimum_float, maximum_float, value());
+			float fval;
+			if (!(str >> fval))
+				throw options_warning_exception("Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+
+			// range checking
+			char const *const strmin(minimum());
+			char const *const strmax(maximum());
+			float fmin(0), fmax(0);
+			if (strmin && *strmin)
+			{
+				str.str(strmin);
+				str.seekg(0);
+				str >> fmin;
+			}
+			if (strmax && *strmax)
+			{
+				str.str(strmax);
+				str.seekg(0);
+				str >> fmax;
+			}
+			if ((strmin && *strmin && (fval < fmin)) || (strmax && *strmax && (fval > fmax)))
+			{
+				if (!strmax || !*strmax)
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no less than %f); reverting to %s\n", name(), data, fmin, value());
+				else if (!strmin || !*strmin)
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no greater than %f); reverting to %s\n", name(), data, fmax, value());
+				else
+					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f, inclusive); reverting to %s\n", name(), data, fmin, fmax, value());
+			}
 		}
 		break;
 
@@ -238,7 +290,7 @@ void core_options::entry::validate(const std::string &data)
 //  entry::minimum
 //-------------------------------------------------
 
-const char *core_options::entry::minimum() const
+const char *core_options::entry::minimum() const noexcept
 {
 	return nullptr;
 }
@@ -248,7 +300,7 @@ const char *core_options::entry::minimum() const
 //  entry::maximum
 //-------------------------------------------------
 
-const char *core_options::entry::maximum() const
+const char *core_options::entry::maximum() const noexcept
 {
 	return nullptr;
 }
@@ -258,7 +310,7 @@ const char *core_options::entry::maximum() const
 //  entry::has_range
 //-------------------------------------------------
 
-bool core_options::entry::has_range() const
+bool core_options::entry::has_range() const noexcept
 {
 	return minimum() && maximum();
 }
@@ -268,11 +320,10 @@ bool core_options::entry::has_range() const
 //  entry::default_value
 //-------------------------------------------------
 
-const std::string &core_options::entry::default_value() const
+const std::string &core_options::entry::default_value() const noexcept
 {
-	// I don't really want this generally available, but MewUI seems to need it.  Please
-	// do not use
-	throw false;
+	// I don't really want this generally available, but MewUI seems to need it.  Please do not use.
+	abort();
 }
 
 
@@ -307,25 +358,21 @@ core_options::simple_entry::~simple_entry()
 //  simple_entry::value
 //-------------------------------------------------
 
-const char *core_options::simple_entry::value() const
+const char *core_options::simple_entry::value() const noexcept
 {
-	const char *result;
 	switch (type())
 	{
 	case core_options::option_type::BOOLEAN:
 	case core_options::option_type::INTEGER:
 	case core_options::option_type::FLOAT:
 	case core_options::option_type::STRING:
-		result = m_data.c_str();
-		break;
+		return m_data.c_str();
 
 	default:
 		// this is an option type for which returning a value is
 		// a meaningless operation (e.g. - core_options::option_type::COMMAND)
-		result = nullptr;
-		break;
+		return nullptr;
 	}
-	return result;
 }
 
 
@@ -333,7 +380,7 @@ const char *core_options::simple_entry::value() const
 //  simple_entry::default_value
 //-------------------------------------------------
 
-const std::string &core_options::simple_entry::default_value() const
+const std::string &core_options::simple_entry::default_value() const noexcept
 {
 	// only MewUI seems to need this; please don't use
 	return m_defdata;
@@ -364,7 +411,7 @@ void core_options::simple_entry::set_default_value(std::string &&newvalue)
 //  minimum
 //-------------------------------------------------
 
-const char *core_options::simple_entry::minimum() const
+const char *core_options::simple_entry::minimum() const noexcept
 {
 	return m_minimum.c_str();
 }
@@ -374,7 +421,7 @@ const char *core_options::simple_entry::minimum() const
 //  maximum
 //-------------------------------------------------
 
-const char *core_options::simple_entry::maximum() const
+const char *core_options::simple_entry::maximum() const noexcept
 {
 	return m_maximum.c_str();
 }
@@ -412,11 +459,7 @@ void core_options::add_entry(entry::shared_ptr &&entry, const char *after_header
 	for (const std::string &name : entry->names())
 	{
 		// append the entry
-		add_to_entry_map(std::string(name), entry);
-
-		// for booleans, add the "-noXYZ" option as well
-		if (entry->type() == option_type::BOOLEAN)
-			add_to_entry_map(std::string("no") + name, entry);
+		add_to_entry_map(name, entry);
 	}
 
 	// and add the entry to the vector
@@ -429,13 +472,13 @@ void core_options::add_entry(entry::shared_ptr &&entry, const char *after_header
 //  map
 //-------------------------------------------------
 
-void core_options::add_to_entry_map(std::string &&name, entry::shared_ptr &entry)
+void core_options::add_to_entry_map(const std::string &name, entry::shared_ptr &entry)
 {
 	// it is illegal to call this method for something that already exists
 	assert(m_entrymap.find(name) == m_entrymap.end());
 
 	// append the entry
-	m_entrymap.emplace(std::make_pair(name, entry::weak_ptr(entry)));
+	m_entrymap.emplace(std::make_pair(std::string_view(name), entry::weak_ptr(entry)));
 }
 
 
@@ -454,26 +497,39 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	{
 		// first extract any range
 		std::string namestr(opt.name);
-		int lparen = namestr.find_first_of('(', 0);
-		int dash = namestr.find_first_of('-', lparen + 1);
-		int rparen = namestr.find_first_of(')', dash + 1);
-		if (lparen != -1 && dash != -1 && rparen != -1)
+		std::string::size_type lparen = namestr.find_first_of('(', 0);
+		if (lparen != std::string::npos)
 		{
-			strtrimspace(minimum.assign(namestr.substr(lparen + 1, dash - (lparen + 1))));
-			strtrimspace(maximum.assign(namestr.substr(dash + 1, rparen - (dash + 1))));
-			namestr.erase(lparen, rparen + 1 - lparen);
+			std::string::size_type dash = namestr.find_first_of('-', lparen + 1);
+			if (dash != std::string::npos)
+			{
+				std::string::size_type rparen = namestr.find_first_of(')', dash + 1);
+				if (rparen != std::string::npos)
+				{
+					minimum.assign(strtrimspace(std::string_view(&namestr[lparen + 1], dash - (lparen + 1))));
+					maximum.assign(strtrimspace(std::string_view(&namestr[dash + 1], rparen - (dash + 1))));
+					namestr.erase(lparen, rparen + 1 - lparen);
+				}
+			}
 		}
 
 		// then chop up any semicolon-separated names
-		size_t semi;
+		std::string::size_type semi;
 		while ((semi = namestr.find_first_of(';')) != std::string::npos)
 		{
 			names.push_back(namestr.substr(0, semi));
+
+			// for booleans, add the "-noXYZ" option as well
+			if (opt.type == option_type::BOOLEAN)
+				names.push_back(std::string("no") + names.back());
+
 			namestr.erase(0, semi + 1);
 		}
 
 		// finally add the last item
 		names.push_back(std::move(namestr));
+		if (opt.type == option_type::BOOLEAN)
+			names.push_back(std::string("no") + names.back());
 	}
 
 	// we might be called with an existing entry
@@ -482,7 +538,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	{
 		for (const std::string &name : names)
 		{
-			existing_entry = get_entry(name.c_str());
+			existing_entry = get_entry(name);
 			if (existing_entry)
 				break;
 		}
@@ -558,10 +614,12 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 //  of an option
 //-------------------------------------------------
 
-void core_options::set_default_value(const char *name, const char *defvalue)
+void core_options::set_default_value(std::string_view name, std::string &&defvalue)
 {
 	// update the data and default data
-	get_entry(name)->set_default_value(defvalue);
+	auto entry = get_entry(name);
+	assert(entry != nullptr);
+	entry->set_default_value(std::move(defvalue));
 }
 
 
@@ -570,10 +628,12 @@ void core_options::set_default_value(const char *name, const char *defvalue)
 //  of an option
 //-------------------------------------------------
 
-void core_options::set_description(const char *name, const char *description)
+void core_options::set_description(std::string_view name, const char *description)
 {
 	// update the data and default data
-	get_entry(name)->set_description(description);
+	auto entry = get_entry(name);
+	assert(entry != nullptr);
+	entry->set_description(description);
 }
 
 
@@ -619,7 +679,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		// special case - collect unadorned arguments after commands into a special place
 		if (is_unadorned && !m_command.empty())
 		{
-			m_command_arguments.push_back(std::move(args[arg]));
+			m_command_arguments.push_back(args[arg]);
 			command_argument_processed();
 			continue;
 		}
@@ -638,7 +698,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 			continue;
 
 		// get the data for this argument, special casing booleans
-		std::string newdata;
+		std::string_view newdata;
 		if (curentry->type() == option_type::BOOLEAN)
 		{
 			newdata = (strncmp(&curarg[1], "no", 2) == 0) ? "0" : "1";
@@ -657,7 +717,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		}
 
 		// set the new data
-		do_set_value(*curentry, std::move(newdata), priority, error_stream, condition);
+		do_set_value(*curentry, newdata, priority, error_stream, condition);
 	}
 
 	// did we have any errors that may need to be aggregated?
@@ -677,7 +737,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 
 	// loop over lines in the file
 	char buffer[4096];
-	while (inifile.gets(buffer, ARRAY_LENGTH(buffer)) != nullptr)
+	while (inifile.gets(buffer, std::size(buffer)) != nullptr)
 	{
 		// find the extent of the name
 		char *optionname;
@@ -731,9 +791,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 		}
 
 		// set the new data
-		std::string data = optiondata;
-		trim_spaces_and_quotes(data);
-		do_set_value(*curentry, std::move(data), priority, error_stream, condition);
+		do_set_value(*curentry, trim_spaces_and_quotes(optiondata), priority, error_stream, condition);
 	}
 
 	// did we have any errors that may need to be aggregated?
@@ -777,7 +835,7 @@ void core_options::copy_from(const core_options &that)
 		if (dest_entry->names().size() > 0)
 		{
 			// identify the source entry
-			const entry::shared_ptr source_entry = that.get_entry(dest_entry->name());
+			const entry::shared_const_ptr source_entry = that.get_entry(dest_entry->name());
 			if (source_entry)
 			{
 				const char *value = source_entry->value();
@@ -799,6 +857,7 @@ std::string core_options::output_ini(const core_options *diff) const
 {
 	// INI files are complete, so always start with a blank buffer
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 
 	int num_valid_headers = 0;
 	int unadorned_index = 0;
@@ -885,9 +944,10 @@ std::string core_options::output_help() const
 //  value - return the raw option value
 //-------------------------------------------------
 
-const char *core_options::value(const char *option) const
+const char *core_options::value(std::string_view option) const noexcept
 {
-	return get_entry(option)->value();
+	auto const entry = get_entry(option);
+	return entry ? entry->value() : nullptr;
 }
 
 
@@ -895,9 +955,48 @@ const char *core_options::value(const char *option) const
 //  description - return description of option
 //-------------------------------------------------
 
-const char *core_options::description(const char *option) const
+const char *core_options::description(std::string_view option) const noexcept
 {
-	return get_entry(option)->description();
+	auto const entry = get_entry(option);
+	return entry ? entry->description() : nullptr;
+}
+
+
+//-------------------------------------------------
+//  value - return the option value as an integer
+//-------------------------------------------------
+
+int core_options::int_value(std::string_view option) const
+{
+	char const *const data = value(option);
+	if (!data)
+		return 0;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  value - return the option value as a float
+//-------------------------------------------------
+
+float core_options::float_value(std::string_view option) const
+{
+	char const *const data = value(option);
+	if (!data)
+		return 0.0f;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0f;
 }
 
 
@@ -909,24 +1008,31 @@ const char *core_options::description(const char *option) const
 //  set_value - set the raw option value
 //-------------------------------------------------
 
-void core_options::set_value(const std::string &name, const std::string &value, int priority)
+void core_options::set_value(std::string_view name, std::string_view value, int priority)
 {
 	set_value(name, std::string(value), priority);
 }
 
-void core_options::set_value(const std::string &name, std::string &&value, int priority)
+void core_options::set_value(std::string_view name, const char *value, int priority)
 {
-	get_entry(name)->set_value(std::move(value), priority);
+	set_value(name, std::string(value), priority);
 }
 
-void core_options::set_value(const std::string &name, int value, int priority)
+void core_options::set_value(std::string_view name, std::string &&value, int priority)
 {
-	set_value(name, string_format("%d", value), priority);
+	auto entry = get_entry(name);
+	assert(entry != nullptr);
+	entry->set_value(std::move(value), priority);
 }
 
-void core_options::set_value(const std::string &name, float value, int priority)
+void core_options::set_value(std::string_view name, int value, int priority)
 {
-	set_value(name, string_format("%f", value), priority);
+	set_value(name, util::string_format("%d", value), priority);
+}
+
+void core_options::set_value(std::string_view name, float value, int priority)
+{
+	set_value(name, util::string_format("%f", value), priority);
 }
 
 
@@ -957,13 +1063,13 @@ void core_options::remove_entry(core_options::entry &delentry)
 //  do_set_value
 //-------------------------------------------------
 
-void core_options::do_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition)
+void core_options::do_set_value(entry &curentry, std::string_view data, int priority, std::ostream &error_stream, condition_type &condition)
 {
 	// this is called when parsing a command line or an INI - we want to catch the option_exception and write
 	// any exception messages to the error stream
 	try
 	{
-		curentry.set_value(std::move(data), priority);
+		curentry.set_value(std::string(data), priority);
 	}
 	catch (options_warning_exception &ex)
 	{
@@ -984,13 +1090,13 @@ void core_options::do_set_value(entry &curentry, std::string &&data, int priorit
 //  get_entry
 //-------------------------------------------------
 
-const core_options::entry::shared_ptr core_options::get_entry(const std::string &name) const
+core_options::entry::shared_const_ptr core_options::get_entry(std::string_view name) const noexcept
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
 }
 
-core_options::entry::shared_ptr core_options::get_entry(const std::string &name)
+core_options::entry::shared_ptr core_options::get_entry(std::string_view name) noexcept
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
@@ -1001,9 +1107,11 @@ core_options::entry::shared_ptr core_options::get_entry(const std::string &name)
 //  set_value_changed_handler
 //-------------------------------------------------
 
-void core_options::set_value_changed_handler(const std::string &name, std::function<void(const char *)> &&handler)
+void core_options::set_value_changed_handler(std::string_view name, std::function<void(const char *)> &&handler)
 {
-	get_entry(name)->set_value_changed_handler(std::move(handler));
+	auto entry = get_entry(name);
+	assert(entry != nullptr);
+	entry->set_value_changed_handler(std::move(handler));
 }
 
 
@@ -1011,17 +1119,17 @@ void core_options::set_value_changed_handler(const std::string &name, std::funct
 //  header_exists
 //-------------------------------------------------
 
-bool core_options::header_exists(const char *description) const
+bool core_options::header_exists(const char *description) const noexcept
 {
 	auto iter = std::find_if(
-		m_entries.begin(),
-		m_entries.end(),
-		[description](const auto &entry)
-		{
-			return entry->type() == option_type::HEADER
-					&& entry->description()
-					&& !strcmp(entry->description(), description);
-		});
+			m_entries.begin(),
+			m_entries.end(),
+			[description](const auto &entry)
+			{
+				return entry->type() == option_type::HEADER
+						&& entry->description()
+						&& !strcmp(entry->description(), description);
+			});
 
 	return iter != m_entries.end();
 }
@@ -1034,7 +1142,7 @@ bool core_options::header_exists(const char *description) const
 void core_options::revert(int priority_hi, int priority_lo)
 {
 	for (entry::shared_ptr &curentry : m_entries)
-		if (curentry->type() != option_type::HEADER)
+		if (curentry->type() != option_type::HEADER && curentry->type() != option_type::COMMAND)
 			curentry->revert(priority_hi, priority_lo);
 }
 

@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index * 2 + 0];
 	uint16_t attr = m_vram[Layer][tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3));
@@ -77,8 +77,8 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info)
 
 void blmbycar_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blmbycar_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blmbycar_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap[1]->set_transparent_pen(0);
 }
 

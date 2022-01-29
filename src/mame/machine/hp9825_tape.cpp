@@ -92,7 +92,7 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LENGTH);
-	m_tape->set_bits_per_word(17);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_17_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp9825_tape_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp9825_tape_device::hole_w));
@@ -173,7 +173,7 @@ void hp9825_tape_device::clear_state()
 	m_led_handler(false);
 }
 
-READ16_MEMBER(hp9825_tape_device::tape_r)
+uint16_t hp9825_tape_device::tape_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -208,7 +208,7 @@ READ16_MEMBER(hp9825_tape_device::tape_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9825_tape_device::tape_w)
+void hp9825_tape_device::tape_w(offs_t offset, uint16_t data)
 {
 	LOG_REG("W R%u=%02x\n" , offset + 4 , data);
 

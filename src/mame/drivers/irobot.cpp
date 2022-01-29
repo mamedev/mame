@@ -95,19 +95,19 @@
  *
  *************************************/
 
-WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
+void irobot_state::irobot_clearirq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
+void irobot_state::irobot_clearfirq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 
-READ8_MEMBER(irobot_state::quad_pokeyn_r)
+uint8_t irobot_state::quad_pokeyn_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -116,7 +116,7 @@ READ8_MEMBER(irobot_state::quad_pokeyn_r)
 	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
-WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
+void irobot_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -148,7 +148,7 @@ void irobot_state::irobot_map(address_map &map)
 	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
 	map(0x1400, 0x143f).rw(FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
 	map(0x1800, 0x18ff).w(FUNC(irobot_state::irobot_paletteram_w));
-	map(0x1900, 0x19ff).writeonly();            /* Watchdog reset */
+	map(0x1900, 0x19ff).nopw();            /* Watchdog reset */
 	map(0x1a00, 0x1a00).w(FUNC(irobot_state::irobot_clearfirq_w));
 	map(0x1b00, 0x1b03).mirror(0xfc).w("adc", FUNC(adc0809_device::address_offset_start_w));
 	map(0x1c00, 0x1fff).ram().share("videoram");

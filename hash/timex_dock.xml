@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="timex_dock" description="Timex Sinclair TS-2068 DOCK cartridges">
 

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    dirtc.c
+    dirtc.cpp
 
     Device Real Time Clock interfaces.
 

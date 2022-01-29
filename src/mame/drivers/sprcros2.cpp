@@ -107,10 +107,10 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sprcros2_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(master_output_w);
-	DECLARE_WRITE8_MEMBER(slave_output_w);
-	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(bg_scrolly_w);
+	void master_output_w(uint8_t data);
+	void slave_output_w(uint8_t data);
+	void bg_scrollx_w(uint8_t data);
+	void bg_scrolly_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
@@ -213,7 +213,7 @@ uint32_t sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(sprcros2_state::master_output_w)
+void sprcros2_state::master_output_w(uint8_t data)
 {
 	//popmessage("%02x",data);
 	//if(data & 0xbe)
@@ -227,7 +227,7 @@ WRITE8_MEMBER(sprcros2_state::master_output_w)
 //      m_master_cpu->set_input_line(0,HOLD_LINE);
 }
 
-WRITE8_MEMBER(sprcros2_state::slave_output_w)
+void sprcros2_state::slave_output_w(uint8_t data)
 {
 	//if(data & 0xf6)
 	//  printf("slave 03 -> %02x\n",data);
@@ -236,12 +236,12 @@ WRITE8_MEMBER(sprcros2_state::slave_output_w)
 	membank("slave_rombank")->set_entry((data&8)>>3);
 }
 
-WRITE8_MEMBER(sprcros2_state::bg_scrollx_w)
+void sprcros2_state::bg_scrollx_w(uint8_t data)
 {
 	m_bg_scrollx = data;
 }
 
-WRITE8_MEMBER(sprcros2_state::bg_scrolly_w)
+void sprcros2_state::bg_scrolly_w(uint8_t data)
 {
 	m_bg_scrolly = data;
 }
@@ -467,7 +467,7 @@ void sprcros2_state::sprcros2(machine_config &config)
 	m_slave_cpu->set_addrmap(AS_IO, &sprcros2_state::slave_io);
 	m_slave_cpu->set_vblank_int("screen", FUNC(sprcros2_state::slave_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("master_cpu");
+	config.set_perfect_quantum(m_master_cpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

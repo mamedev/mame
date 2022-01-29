@@ -41,11 +41,8 @@ public:
 		return *this;
 	}
 
-	uint32_t read_config(offs_t offset);
-	void write_config(offs_t offset, uint32_t data);
-
-	DECLARE_READ32_MEMBER(config_r) { return read_config(offset); }
-	DECLARE_WRITE32_MEMBER(config_w) { write_config(offset, data); }
+	uint32_t config_r(offs_t offset);
+	void config_w(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;

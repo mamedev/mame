@@ -51,7 +51,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -129,7 +129,7 @@ void olytext_state::keyboard_put(u8 data)
 //  }
 }
 
-//WRITE8_MEMBER( olytext_state::fdcctrl_w )
+//void olytext_state::fdcctrl_w(uint8_t data)
 //{
 //  m_fdcctrl = data;
 //  m_romen = (m_fdcctrl & 1) ? false : true;
@@ -166,8 +166,8 @@ void olytext_state::olytext(machine_config &config)
 
 	/* devices */
 	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
-	FLOPPY_CONNECTOR(config, "fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", olytext_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", olytext_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));

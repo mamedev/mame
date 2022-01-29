@@ -32,14 +32,14 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) = 0;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) = 0;
+	virtual uint16_t graphic_r(offs_t offset) = 0;
+	virtual void graphic_w(offs_t offset, uint16_t data) = 0;
 	attotime time_to_gv_mem_availability() const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
-	DECLARE_READ16_MEMBER(kb_scancode_r);
-	DECLARE_READ16_MEMBER(kb_status_r);
-	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
+	uint16_t kb_scancode_r();
+	uint16_t kb_status_r();
+	void kb_irq_clear_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);
@@ -63,6 +63,9 @@ protected:
 	required_device_array<hp9845_io_slot_device, 4> m_io_slot;
 	required_device<ram_device> m_ram;
 	output_finder<8> m_softkeys;
+	output_finder<> m_shift_lock_led;
+	output_finder<> m_prt_all_led;
+	output_finder<> m_auto_st_led;
 
 	void setup_ram_block(unsigned block , unsigned offset);
 
@@ -83,11 +86,11 @@ protected:
 	required_region_ptr<uint8_t> m_chargen;
 
 	// Text mode video I/F
-	typedef struct {
+	struct video_buffer_t {
 		uint8_t chars[ 80 ];
 		uint8_t attrs[ 80 ];
-		bool full;
-	} video_buffer_t;
+		bool full = 0;
+	};
 
 	bitmap_rgb32 m_bitmap;
 	offs_t m_video_mar;
@@ -100,7 +103,7 @@ protected:
 	video_buffer_t m_video_buff[ 2 ];
 
 	// Graphic video
-	typedef enum {
+	enum gv_fsm_state_t {
 		GV_STAT_RESET,
 		GV_STAT_WAIT_DS_0 = GV_STAT_RESET,
 		GV_STAT_WAIT_TRIG_0,
@@ -110,7 +113,7 @@ protected:
 		GV_STAT_WAIT_TRIG_1,
 		GV_STAT_WAIT_MEM_1,
 		GV_STAT_WAIT_MEM_2
-	} gv_fsm_state_t;
+	};
 
 	bool m_graphic_sel;
 	gv_fsm_state_t m_gv_fsm_state;

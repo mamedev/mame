@@ -116,7 +116,7 @@ DIP locations verified for:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(baraduke_state::inputport_select_w)
+void baraduke_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -128,7 +128,7 @@ WRITE8_MEMBER(baraduke_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(baraduke_state::inputport_r)
+uint8_t baraduke_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -151,13 +151,13 @@ READ8_MEMBER(baraduke_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
+void baraduke_state::baraduke_lamps_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 3);
 	m_lamps[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
+void baraduke_state::baraduke_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -177,14 +177,14 @@ void baraduke_state::baraduke_map(address_map &map)
 	map(0x6000, 0xffff).rom();                             /* ROM */
 }
 
-READ8_MEMBER(baraduke_state::soundkludge_r)
+uint8_t baraduke_state::soundkludge_r()
 {
 	return ((m_counter++) >> 4) & 0xff;
 }
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));/* internal registers */
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));/* internal registers */
 	map(0x0080, 0x00ff).ram();                             /* built in RAM */
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r));             /* cures speech */
@@ -369,14 +369,14 @@ void baraduke_state::baraduke(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &baraduke_state::baraduke_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8);
 	m_mcu->set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(baraduke_state::inputport_r));         /* input ports read */
 	m_mcu->out_p1_cb().set(FUNC(baraduke_state::inputport_select_w)); /* input port select */
 	m_mcu->in_p2_cb().set_constant(0xff);                             /* leds won't work otherwise */
 	m_mcu->out_p2_cb().set(FUNC(baraduke_state::baraduke_lamps_w));   /* lamps */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);      /* we need heavy synch */
+	config.set_maximum_quantum(attotime::from_hz(6000));      /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

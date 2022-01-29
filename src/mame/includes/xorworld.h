@@ -37,9 +37,9 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
+	void irq2_ack_w(uint16_t data);
+	void irq6_ack_w(uint16_t data);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

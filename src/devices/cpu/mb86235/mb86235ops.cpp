@@ -144,15 +144,15 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 
 inline uint32_t mb86235_device::read_bus(bool isbbus, uint32_t addr)
 {
-	return isbbus == true ? m_datab->read_dword(addr & 0x3ff) : m_dataa->read_dword(addr & 0x3ff);
+	return isbbus == true ? m_datab.read_dword(addr & 0x3ff) : m_dataa.read_dword(addr & 0x3ff);
 }
 
 inline void mb86235_device::write_bus(bool isbbus, uint32_t addr, uint32_t data)
 {
 	if(isbbus == true)
-		m_datab->write_dword(addr & 0x3ff,data);
+		m_datab.write_dword(addr & 0x3ff,data);
 	else
-		m_dataa->write_dword(addr & 0x3ff,data);
+		m_dataa.write_dword(addr & 0x3ff,data);
 }
 
 
@@ -885,7 +885,7 @@ void mb86235_device::do_trans1_1(uint32_t h, uint32_t l)
 			uint32_t addr = m_core->eb+m_core->eo;
 			uint8_t disp_offs = (l >> 19) & 0x3f;
 
-			res = m_dataa->read_dword(addr);
+			res = m_dataa.read_dword(addr);
 			if(dr & 0x40)
 			{
 				bool isbbus = (dr & 0x20) == 0x20;
@@ -998,7 +998,7 @@ void mb86235_device::do_trans1_2(uint32_t h, uint32_t l)
 			if(l&0x80000000)
 				disp_offs |= 1;
 
-			res = m_dataa->read_dword(addr);
+			res = m_dataa.read_dword(addr);
 			if(dr & 0x40)
 			{
 				bool isbbus = (dr & 0x20) == 0x20;
@@ -1035,7 +1035,7 @@ void mb86235_device::do_trans1_2(uint32_t h, uint32_t l)
 			else
 				res = get_transfer_reg(sr);
 
-			m_dataa->write_dword(addr,res);
+			m_dataa.write_dword(addr,res);
 			if(disp_offs & 0x20)
 				m_core->eo -= disp_offs & 0x1f;
 			else
@@ -1206,10 +1206,10 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 		case 0x04: // PUSH
 			m_core->sp --;
 			m_core->sp &= 0x3ff;
-			m_datab->write_dword(m_core->sp,get_transfer_reg((ef2>>6) & 0x3f));
+			m_datab.write_dword(m_core->sp,get_transfer_reg((ef2>>6) & 0x3f));
 			break;
 		case 0x05: // POP
-			set_transfer_reg((ef2>>6) & 0x3f, m_datab->read_dword(m_core->sp));
+			set_transfer_reg((ef2>>6) & 0x3f, m_datab.read_dword(m_core->sp));
 			m_core->sp ++;
 			m_core->sp &= 0x3ff;
 			break;

@@ -33,7 +33,6 @@ class microkit_state : public driver_device
 public:
 	microkit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_a15(1)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_rs232(*this, "rs232")
@@ -47,8 +46,8 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t ram_r(offs_t offset);
 
 	void microkit_io(address_map &map);
 	void microkit_mem(address_map &map);
@@ -56,8 +55,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	std::unique_ptr<uint8_t[]> m_ram;
-	uint8_t m_resetcnt;
-	bool m_a15;
+	uint8_t m_resetcnt = 0U;
+	bool m_a15 = 1;
 	required_device<cosmac_device> m_maincpu;
 	required_memory_region m_rom;
 	required_device<rs232_port_device> m_rs232;
@@ -80,9 +79,9 @@ void microkit_state::microkit_io(address_map &map)
 
 static INPUT_PORTS_START( microkit )
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, reset_button, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RUN P") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, runp_button, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RUN U") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, runu_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, reset_button, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RUN P") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, runp_button, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RUN U") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, microkit_state, runu_button, 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(microkit_state::reset_button)
@@ -119,7 +118,7 @@ READ_LINE_MEMBER( microkit_state::clear_r )
 	return 1;
 }
 
-READ8_MEMBER( microkit_state::ram_r )
+uint8_t microkit_state::ram_r(offs_t offset)
 {
 	if (m_a15)
 		return m_rom->base()[offset];
@@ -127,7 +126,7 @@ READ8_MEMBER( microkit_state::ram_r )
 		return m_ram[offset];
 }
 
-WRITE8_MEMBER( microkit_state::ram_w )
+void microkit_state::ram_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }
@@ -150,7 +149,6 @@ void microkit_state::machine_start()
 static DEVICE_INPUT_DEFAULTS_START( serial_keyb )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_MARK )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )

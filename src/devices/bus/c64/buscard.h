@@ -27,12 +27,12 @@
 
 // ======================> buscard_t
 
-class buscard_t : public device_t,
+class c64_buscard_device : public device_t,
 				  public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	buscard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -66,11 +66,11 @@ private:
 	bool m_dipsw;
 	bool m_busy;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	void ppi_pb_w(uint8_t data);
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 
 	bool pd_pgm1(offs_t offset, int sphi2);
@@ -79,7 +79,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C64_BUSCARD, buscard_t)
+DECLARE_DEVICE_TYPE(C64_BUSCARD, c64_buscard_device)
 
 
 #endif // MAME_BUS_C64_BUSCARD_H

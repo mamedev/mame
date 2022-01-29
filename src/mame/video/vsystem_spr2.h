@@ -12,7 +12,7 @@ class vsystem_spr2_device : public device_t
 public:
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = vsystem_tile2_indirection_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb.set(std::forward<T>(args)...); }
 	void set_pritype(int pritype) { m_pritype = pritype; }
 	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
 	void set_offsets(int xoffs, int yoffs)

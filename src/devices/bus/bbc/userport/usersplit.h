@@ -40,6 +40,8 @@ protected:
 
 	virtual uint8_t pb_r() override;
 	virtual void pb_w(uint8_t data) override;
+	virtual void write_cb1(int state) override;
+	virtual void write_cb2(int state) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(cb1a_w);

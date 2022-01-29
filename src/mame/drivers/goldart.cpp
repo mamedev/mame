@@ -48,6 +48,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class goldart_state : public driver_device
 {
 public:
@@ -70,8 +72,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_data;
 
-	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_READ8_MEMBER(mcu_port1_r);
+	void mcu_port1_w(uint8_t data);
+	uint8_t mcu_port1_r();
 
 
 	uint32_t screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
@@ -83,17 +85,17 @@ private:
 
 	uint8_t m_port1;
 
-	DECLARE_READ8_MEMBER(hostmem_r);
-	DECLARE_WRITE8_MEMBER(hostmem_w);
+	uint8_t hostmem_r(offs_t offset);
+	void hostmem_w(offs_t offset, uint8_t data);
 };
 
-WRITE8_MEMBER(goldart_state::mcu_port1_w)
+void goldart_state::mcu_port1_w(uint8_t data)
 {
 	logerror("%s: mcu_port1_w %02x\n", machine().describe_context(), data);
 	m_port1 = data;
 }
 
-READ8_MEMBER(goldart_state::mcu_port1_r)
+uint8_t goldart_state::mcu_port1_r()
 {
 	uint8_t ret = m_port1;
 	logerror("%s: mcu_port1_r %02x\n", machine().describe_context(), ret);
@@ -111,13 +113,13 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 	{
 		for (int x = 0; x < 192; x++)
 		{
-			uint16_t* dstptr_bitmap  =  &bitmap.pix16(y);
-			uint8_t data = m_ram[count];
-			uint8_t data2 = m_ram2[count];
+			uint16_t *const dstptr_bitmap = &bitmap.pix(y);
+			uint8_t const data = m_ram[count];
+			uint8_t const data2 = m_ram2[count];
 
 			count++;
 
-			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);;
+			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);
 			dstptr_bitmap[(x*2)+1] = (data&0x0f) | ((data2 & 0x0f)<<4);
 		}
 	}
@@ -125,7 +127,7 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 	return 0;
 }
 
-READ8_MEMBER(goldart_state::hostmem_r)
+uint8_t goldart_state::hostmem_r(offs_t offset)
 {
 	// must be some control bits (or DS5002FP memory access isn't correct) as registers map over ROM/RAM with no obvious way to select at the moment
 	// and we need to be able to access full range of each ROM bank at least
@@ -186,7 +188,7 @@ READ8_MEMBER(goldart_state::hostmem_r)
 	return ret;
 }
 
-WRITE8_MEMBER(goldart_state::hostmem_w)
+void goldart_state::hostmem_w(offs_t offset, uint8_t data)
 {
 	// registers seem to control write modes? (palette select bits, overwrite / transparent drawing etc.)
 
@@ -304,8 +306,13 @@ INPUT_PORTS_END
 
 void goldart_state::machine_start()
 {
+	save_item(NAME(m_port1));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram2));
+
+	m_port1 = 0;
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+	std::fill(std::begin(m_ram2), std::end(m_ram2), 0);
 }
 
 void goldart_state::machine_reset()
@@ -384,6 +391,8 @@ ROM_START( goldartp )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1994, goldart,       0,        goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Spain)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

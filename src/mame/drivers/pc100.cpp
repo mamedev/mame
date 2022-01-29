@@ -106,25 +106,25 @@ private:
 	required_region_ptr<uint16_t> m_vram;
 	required_ioport_array<6> m_keys;
 
-	DECLARE_READ16_MEMBER(pc100_vram_r);
-	DECLARE_WRITE16_MEMBER(pc100_vram_w);
-	DECLARE_READ16_MEMBER(pc100_kanji_r);
-	DECLARE_WRITE16_MEMBER(pc100_kanji_w);
-	DECLARE_READ8_MEMBER(pc100_key_r);
-	DECLARE_WRITE8_MEMBER(pc100_output_w);
-	DECLARE_WRITE8_MEMBER(pc100_tc_w);
-	DECLARE_READ8_MEMBER(pc100_shift_r);
-	DECLARE_WRITE8_MEMBER(pc100_shift_w);
-	DECLARE_READ8_MEMBER(pc100_vs_vreg_r);
-	DECLARE_WRITE8_MEMBER(pc100_vs_vreg_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_addr_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_data_w);
-	DECLARE_WRITE8_MEMBER(lower_mask_w);
-	DECLARE_WRITE8_MEMBER(upper_mask_w);
-	DECLARE_WRITE8_MEMBER(crtc_bank_w);
-	DECLARE_WRITE8_MEMBER(rtc_porta_w);
-	DECLARE_READ8_MEMBER(rtc_portc_r);
-	DECLARE_WRITE8_MEMBER(rtc_portc_w);
+	uint16_t pc100_vram_r(offs_t offset);
+	void pc100_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pc100_kanji_r();
+	void pc100_kanji_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t pc100_key_r(offs_t offset);
+	void pc100_output_w(offs_t offset, uint8_t data);
+	void pc100_tc_w(uint8_t data);
+	uint8_t pc100_shift_r();
+	void pc100_shift_w(uint8_t data);
+	uint8_t pc100_vs_vreg_r(offs_t offset);
+	void pc100_vs_vreg_w(offs_t offset, uint8_t data);
+	void pc100_crtc_addr_w(uint8_t data);
+	void pc100_crtc_data_w(uint8_t data);
+	void lower_mask_w(uint8_t data);
+	void upper_mask_w(uint8_t data);
+	void crtc_bank_w(uint8_t data);
+	void rtc_porta_w(uint8_t data);
+	uint8_t rtc_portc_r();
+	void rtc_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irqnmi_w);
 	DECLARE_WRITE_LINE_MEMBER(drqnmi_w);
 	uint16_t m_kanji_addr;
@@ -164,40 +164,35 @@ void pc100_state::video_start()
 
 uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int count;
-	int xi;
-	int dot;
-	int pen[4],pen_i;
+	int count = (m_crtc.vstart + 0x20) * 0x40;
 
-	count = ((m_crtc.vstart + 0x20) * 0x40);
-
-	for(y=0;y<512;y++)
+	for(int y=0;y<512;y++)
 	{
 		count &= 0xffff;
 
-		for(x=0;x<1024/16;x++)
+		for(int x=0;x<1024/16;x++)
 		{
-			for(xi=0;xi<16;xi++)
+			for(int xi=0;xi<16;xi++)
 			{
 				if(m_crtc.cmd != 0xffff)
 				{
-					for(pen_i=0;pen_i<4;pen_i++)
+					int pen[4];
+					for(int pen_i=0;pen_i<4;pen_i++)
 						pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
 
-					dot = 0;
-					for(pen_i=0;pen_i<4;pen_i++)
+					int dot = 0;
+					for(int pen_i=0;pen_i<4;pen_i++)
 						dot |= pen[pen_i]<<pen_i;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot);
 				}
 				else
 				{
-					dot = (m_vram[count] >> xi) & 1;
+					int dot = (m_vram[count] >> xi) & 1;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
 				}
 			}
 
@@ -222,17 +217,15 @@ WRITE_LINE_MEMBER(pc100_state::drqnmi_w)
 	m_drq_state = state == ASSERT_LINE;
 }
 
-READ16_MEMBER( pc100_state::pc100_vram_r )
+uint16_t pc100_state::pc100_vram_r(offs_t offset)
 {
 	return m_vram[offset+m_bank_r*0x10000];
 }
 
-WRITE16_MEMBER( pc100_state::pc100_vram_w )
+void pc100_state::pc100_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_vram;
-	int i;
-
-	for(i=0;i<4;i++)
+	for(int i=0;i<4;i++)
 	{
 		if((m_bank_w >> i) & 1)
 		{
@@ -258,18 +251,18 @@ void pc100_state::pc100_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("ipl", 0);
 }
 
-READ16_MEMBER( pc100_state::pc100_kanji_r )
+uint16_t pc100_state::pc100_kanji_r()
 {
 	return m_kanji_rom[m_kanji_addr];
 }
 
 
-WRITE16_MEMBER( pc100_state::pc100_kanji_w )
+void pc100_state::pc100_kanji_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_kanji_addr);
 }
 
-READ8_MEMBER( pc100_state::pc100_key_r )
+uint8_t pc100_state::pc100_key_r(offs_t offset)
 {
 	if(offset)
 		return ioport("DSW")->read(); // bit 5: horizontal/vertical monitor dsw
@@ -282,7 +275,7 @@ READ8_MEMBER( pc100_state::pc100_key_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_output_w )
+void pc100_state::pc100_output_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -292,22 +285,22 @@ WRITE8_MEMBER( pc100_state::pc100_output_w )
 	}
 }
 
-WRITE8_MEMBER( pc100_state::pc100_tc_w )
+void pc100_state::pc100_tc_w(uint8_t data)
 {
 	m_fdc->tc_w(data & 0x40);
 }
 
-READ8_MEMBER( pc100_state::pc100_shift_r )
+uint8_t pc100_state::pc100_shift_r()
 {
 	return m_crtc.shift;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_shift_w )
+void pc100_state::pc100_shift_w(uint8_t data)
 {
 	m_crtc.shift = data & 0xf;
 }
 
-READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
+uint8_t pc100_state::pc100_vs_vreg_r(offs_t offset)
 {
 	if(offset)
 		return m_crtc.vstart >> 8;
@@ -315,7 +308,7 @@ READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
 	return m_crtc.vstart & 0xff;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
+void pc100_state::pc100_vs_vreg_w(offs_t offset, uint8_t data)
 {
 	if(offset)
 		m_crtc.vstart = (m_crtc.vstart & 0xff) | (data << 8);
@@ -323,12 +316,12 @@ WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
 		m_crtc.vstart = (m_crtc.vstart & 0xff00) | (data & 0xff);
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
+void pc100_state::pc100_crtc_addr_w(uint8_t data)
 {
 	m_crtc.addr = data & 7;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
+void pc100_state::pc100_crtc_data_w(uint8_t data)
 {
 	m_crtc.reg[m_crtc.addr] = data;
 	//printf("%02x %02x\n",m_crtc.addr,data);
@@ -353,8 +346,9 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x3a, 0x3a).w(FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
 	map(0x3c, 0x3f).rw(FUNC(pc100_state::pc100_vs_vreg_r), FUNC(pc100_state::pc100_vs_vreg_w)).umask16(0x00ff); //crtc vertical start position
 	map(0x40, 0x5f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x60, 0x61).r(read16_delegate([this](address_space &s, offs_t o, u8 mm) { return m_crtc.cmd; }, "pc100_crtc_cmd_r")).
-					w(write16_delegate([this](address_space &s, offs_t o, u16 d, u8 mm) { m_crtc.cmd = d; }, "pc100_crtc_cmd_w"));
+	map(0x60, 0x61).lrw16(
+			NAME([this] () { return m_crtc.cmd; }),
+			NAME([this] (u16 d) { m_crtc.cmd = d; }));
 	map(0x80, 0x81).rw(FUNC(pc100_state::pc100_kanji_r), FUNC(pc100_state::pc100_kanji_w));
 	map(0x82, 0x83).nopw(); //kanji-related?
 	map(0x84, 0x87).nopw(); //kanji "strobe" signal 0/1
@@ -518,7 +512,7 @@ static GFXDECODE_START( gfx_pc100 )
 GFXDECODE_END
 
 /* TODO: untested */
-WRITE8_MEMBER( pc100_state::rtc_porta_w )
+void pc100_state::rtc_porta_w(uint8_t data)
 {
 /*
     ---- -x-- chip select
@@ -533,7 +527,7 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
 	m_rtc->cs1_w((data >> 2) & 1);
 }
 
-WRITE8_MEMBER( pc100_state::rtc_portc_w )
+void pc100_state::rtc_portc_w(uint8_t data)
 {
 	m_rtc->d0_w((data >> 0) & 1);
 	m_rtc->d1_w((data >> 1) & 1);
@@ -541,22 +535,22 @@ WRITE8_MEMBER( pc100_state::rtc_portc_w )
 	m_rtc->d3_w((data >> 3) & 1);
 }
 
-READ8_MEMBER( pc100_state::rtc_portc_r )
+uint8_t pc100_state::rtc_portc_r()
 {
 	return m_rtc_portc;
 }
 
-WRITE8_MEMBER( pc100_state::lower_mask_w )
+void pc100_state::lower_mask_w(uint8_t data)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff00) | data;
 }
 
-WRITE8_MEMBER( pc100_state::upper_mask_w )
+void pc100_state::upper_mask_w(uint8_t data)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER( pc100_state::crtc_bank_w )
+void pc100_state::crtc_bank_w(uint8_t data)
 {
 	if(data & 0x80)
 	{
@@ -678,8 +672,8 @@ void pc100_state::pc100(machine_config &config)
 	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
 	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

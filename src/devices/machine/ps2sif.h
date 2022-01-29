@@ -29,10 +29,10 @@ public:
 	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ps2_sif_device() override;
 
-	DECLARE_READ32_MEMBER(ee_r);
-	DECLARE_WRITE32_MEMBER(ee_w);
-	DECLARE_READ32_MEMBER(iop_r);
-	DECLARE_WRITE32_MEMBER(iop_w);
+	uint32_t ee_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ee_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t iop_r(offs_t offset, uint32_t mem_mask = ~0);
+	void iop_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t fifo_depth(uint32_t channel);
 	void fifo_push(uint32_t channel, uint32_t value);

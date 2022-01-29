@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's xBR-lv2 Shader
-   
+
    Copyright (C) 2011-2016 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -136,10 +136,10 @@ void main()
 	vec4 Ci = vec4(0.25, 0.25, 0.25, 0.25);
 
 	// These inequations define the line below which interpolation occurs.
-	vec4 fx      = (Ao*fp.y+Bo*fp.x); 
+	vec4 fx      = (Ao*fp.y+Bo*fp.x);
 	vec4 fx_left = (Ax*fp.y+Bx*fp.x);
 	vec4 fx_up   = (Ay*fp.y+By*fp.x);
-	
+
 	vec4 interp_restriction_lv0 = vec4(notEqual(e,f)) * vec4(notEqual(e,h));
 	vec4 interp_restriction_lv1 = interp_restriction_lv0;
 
@@ -191,7 +191,7 @@ void main()
 	vec3 res1 = E.xyz;
 	res1 = mix(res1, mix(H.xyz, F.xyz, px.x), maximos.x);
 	res1 = mix(res1, mix(B.xyz, D.xyz, px.z), maximos.z);
-	
+
 	vec3 res2 = E.xyz;
 	res2 = mix(res2, mix(F.xyz, B.xyz, px.y), maximos.y);
 	res2 = mix(res2, mix(D.xyz, H.xyz, px.w), maximos.w);

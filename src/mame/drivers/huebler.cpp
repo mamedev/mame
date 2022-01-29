@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(amu880_state::keyboard_tick)
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( amu880_state::keyboard_r )
+uint8_t amu880_state::keyboard_r(offs_t offset)
 {
 	/*
 
@@ -119,7 +119,7 @@ void amu880_state::amu880_io(address_map &map)
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x18, 0x1b).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x18, 0x1b).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 
 /* Input Ports */
@@ -231,26 +231,25 @@ INPUT_PORTS_END
 
 uint32_t amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y, sx, x, line;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		line = y % 10;
+		int const line = y % 10;
 
-		for (sx = 0; sx < 64; sx++)
+		for (int sx = 0; sx < 64; sx++)
 		{
-			uint16_t videoram_addr = ((y / 10) * 64) + sx;
-			uint8_t videoram_data = m_video_ram[videoram_addr & 0x7ff];
+			uint16_t const videoram_addr = ((y / 10) * 64) + sx;
+			uint8_t const videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
-			uint16_t charrom_addr = ((videoram_data & 0x7f) << 3) | line;
+			uint16_t const charrom_addr = ((videoram_data & 0x7f) << 3) | line;
 			uint8_t data = m_char_rom->base()[charrom_addr & 0x3ff];
 
-			for (x = 0; x < 6; x++)
+			for (int x = 0; x < 6; x++)
 			{
-				int color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
+				int const color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
 
-				bitmap.pix32(y, (sx * 6) + x) = pen[color];
+				bitmap.pix(y, (sx * 6) + x) = pen[color];
 
 				data <<= 1;
 			}
@@ -287,6 +286,7 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 				break;
 			case 6:
 				m_sio->rxa_w((m_cassette->input() > 0.04) ? 1 : 0);
+				break;
 			default:
 				break;
 		}
@@ -369,7 +369,7 @@ void amu880_state::amu880(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set(FUNC(amu880_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	ctc.zc_callback<2>().set(FUNC(amu880_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(10'000'000)/4));
@@ -378,7 +378,7 @@ void amu880_state::amu880(machine_config &config)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(10'000'000)/4));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_sio, XTAL(10'000'000)/4); // U856
+	Z80SIO(config, m_sio, XTAL(10'000'000)/4); // U856
 	m_sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

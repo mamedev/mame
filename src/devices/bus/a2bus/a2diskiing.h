@@ -14,9 +14,13 @@
 #pragma once
 
 #include "a2bus.h"
-#include "imagedev/floppy.h"
-#include "formats/flopimg.h"
+#include "a2diskii.h"
+
 #include "machine/wozfdc.h"
+#include "imagedev/floppy.h"
+
+#include "formats/flopimg.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,11 +31,10 @@ class diskiing_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
-public:
+protected:
 	// construction/destruction
 	diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -45,16 +48,18 @@ protected:
 	required_device<diskii_fdc_device> m_wozfdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-private:
 	const uint8_t *m_rom;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+private:
+	static void floppy_formats(format_registration &fr);
 };
 
 class a2bus_diskiing_device: public diskiing_device
 {
 public:
 	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &A2BUS_DISKII; }
 };
 
 class a2bus_diskiing13_device: public diskiing_device
@@ -67,11 +72,39 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
+};
+
+class a2bus_applesurance_device: public diskiing_device
+{
+public:
+	a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual void device_reset() override;
+
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+	virtual void write_c800(uint16_t offset, uint8_t data) override
+	{
+		if (offset == 0x7ff)
+		{
+			m_c800_bank = data & 1;
+		}
+	}
+
+	virtual bool take_c800() override { return true; }
+
+private:
+	int m_c800_bank;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device)
 DECLARE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device)
+DECLARE_DEVICE_TYPE(A2BUS_APPLESURANCE, a2bus_applesurance_device)
 
 #endif  // MAME_BUS_A2BUS_A2DISKIING_H

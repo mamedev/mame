@@ -205,7 +205,7 @@ void c2040_device::c2040_fdc_mem(address_map &map)
 //  riot6532 uc1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_device::dio_r )
+uint8_t c2040_device::dio_r()
 {
 	/*
 
@@ -222,10 +222,10 @@ READ8_MEMBER( c2040_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c2040_device::dio_w )
+void c2040_device::dio_w(uint8_t data)
 {
 	/*
 
@@ -250,7 +250,7 @@ WRITE8_MEMBER( c2040_device::dio_w )
 //  riot6532 ue1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_device::riot1_pa_r )
+uint8_t c2040_device::riot1_pa_r()
 {
 	/*
 
@@ -281,7 +281,7 @@ READ8_MEMBER( c2040_device::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_device::riot1_pa_w )
+void c2040_device::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -316,7 +316,7 @@ WRITE8_MEMBER( c2040_device::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c2040_device::riot1_pb_r )
+uint8_t c2040_device::riot1_pb_r()
 {
 	/*
 
@@ -347,7 +347,7 @@ READ8_MEMBER( c2040_device::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_device::riot1_pb_w )
+void c2040_device::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER( c2040_device::riot1_pb_w )
 }
 
 
-WRITE8_MEMBER( c2040_device::via_pb_w )
+void c2040_device::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -420,30 +420,33 @@ static void c2040_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c2040_device::floppy_formats )
-	FLOPPY_C3040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c2040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C3040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c3040_device::floppy_formats )
-	FLOPPY_C3040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c3040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C3040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c4040_device::floppy_formats )
-	FLOPPY_C4040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c4040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C4040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -471,7 +474,7 @@ void c2040_device::add_common_devices(machine_config &config)
 	M6504(config, m_fdccpu, XTAL(16'000'000)/16);
 	m_fdccpu->set_addrmap(AS_PROGRAM, &c2040_device::c2040_fdc_mem);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpa_handler().set(m_fdc, FUNC(c2040_fdc_device::read));
 	m_via->writepb_handler().set(FUNC(c2040_device::via_pb_w));
 	m_via->ca2_handler().set(m_fdc, FUNC(c2040_fdc_device::mode_sel_w));

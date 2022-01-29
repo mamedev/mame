@@ -27,15 +27,15 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 	void start_dma(uint8_t *mainram, uint32_t size);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
@@ -149,6 +149,7 @@ private:
 	uint32_t m_sysclock;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
+	command_result *m_results[MAX_PSXCD_TIMERS];
 
 	devcb_write_line m_irq_handler;
 	required_device<cpu_device> m_maincpu;

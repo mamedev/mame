@@ -27,9 +27,12 @@ public:
 	auto flg() { return m_flg_handler.bind(); }
 	auto sts() { return m_sts_handler.bind(); }
 
+	// Set unit name
+	void set_name(const std::string& name);
+
 	// Register read/write
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(reg_r);
+	void reg_w(offs_t offset, uint16_t data);
+	uint16_t reg_r(offs_t offset);
 
 	// Flag & status read
 	DECLARE_READ_LINE_MEMBER(flg_r);
@@ -49,7 +52,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<hp_dc100_tape_device> m_tape;
@@ -107,6 +110,7 @@ private:
 	bool is_at_slow_speed() const;
 	void start_rd();
 	void start_wr();
+	bool adv_bit_idx();
 	void update_checksum(uint16_t data);
 	void cmd_fsm();
 	static uint8_t get_cmd(uint16_t cmd_reg);

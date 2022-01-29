@@ -87,7 +87,7 @@ void sk101bl_state::machine_reset()
 HD44780_PIXEL_UPDATE(sk101bl_state::pixel_update)
 {
 	if (pos < 16 && line == 0)
-		bitmap.pix16(line * 10 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 10 + y, pos * 6 + x) = state;
 }
 
 u8 sk101bl_state::p1_r()
@@ -170,7 +170,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 	screen.set_palette("palette");
 
 	HD44780(config, m_lcdc).set_lcd_size(1, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(sk101bl_state::pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(sk101bl_state::pixel_update));
 
 	PALETTE(config, "palette").set_entries(2);
 

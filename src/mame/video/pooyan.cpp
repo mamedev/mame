@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
 
 void pooyan_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pooyan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pooyan_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -124,14 +124,14 @@ void pooyan_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(pooyan_state::videoram_w)
+void pooyan_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pooyan_state::colorram_w)
+void pooyan_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

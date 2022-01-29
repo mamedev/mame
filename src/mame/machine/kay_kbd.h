@@ -27,18 +27,19 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_WRITE8_MEMBER(bus_w);
+	uint8_t bus_r();
+	void bus_w(uint8_t data);
 
 private:
 	required_device<i8049_device>           m_mcu;
 	required_device<speaker_sound_device>   m_bell;
 	required_ioport_array<16>               m_matrix;
 	required_ioport                         m_modifiers;
+	output_finder<>                         m_led_caps_lock;
 	devcb_write_line                        m_rxd_cb;
 
 	std::uint8_t        m_txd;

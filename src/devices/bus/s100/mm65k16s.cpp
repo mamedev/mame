@@ -205,7 +205,7 @@ ioport_constructor s100_mm65k16s_device::device_input_ports() const
 s100_mm65k16s_device::s100_mm65k16s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_MM65K16S, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram", 0x10000, ENDIANNESS_LITTLE)
 {
 }
 
@@ -216,7 +216,6 @@ s100_mm65k16s_device::s100_mm65k16s_device(const machine_config &mconfig, const 
 
 void s100_mm65k16s_device::device_start()
 {
-	m_ram.allocate(0x10000);
 }
 
 

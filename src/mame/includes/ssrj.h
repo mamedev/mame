@@ -47,10 +47,10 @@ private:
 	tilemap_t *m_tilemap4;
 	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
-	DECLARE_READ8_MEMBER(wheel_r);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram4_w);
+	uint8_t wheel_r();
+	void vram1_w(offs_t offset, uint8_t data);
+	void vram2_w(offs_t offset, uint8_t data);
+	void vram4_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);

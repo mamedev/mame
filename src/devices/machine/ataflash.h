@@ -6,19 +6,19 @@
 #pragma once
 
 #include "pccard.h"
-#include "machine/idehd.h"
+#include "bus/ata/idehd.h"
 
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
-class ata_flash_pccard_device : public ide_hdd_device, public pccard_interface
+class ata_flash_pccard_device : public ide_hdd_device, public device_pccard_interface
 {
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_memory) override;
-	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
-	virtual DECLARE_READ16_MEMBER(read_reg) override;
-	virtual DECLARE_WRITE16_MEMBER(write_reg) override;
+	virtual uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	ata_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -27,6 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual attotime seek_time() override;
+	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); };
 
 private:
 	uint8_t m_cis[512];
@@ -42,8 +43,8 @@ class taito_pccard1_device : public ata_flash_pccard_device
 public:
 	taito_pccard1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_reg) override;
-	virtual DECLARE_WRITE16_MEMBER(write_reg) override;
+	virtual uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	virtual void device_start() override;

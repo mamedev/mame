@@ -128,37 +128,37 @@ public:
 	auto cd_write() { return m_cd_write_handler.bind(); }
 
 	// public interfaces
-	DECLARE_WRITE32_MEMBER( berr_w );
-	DECLARE_READ32_MEMBER( berr_r );
+	void berr_w(uint32_t data);
+	uint32_t berr_r();
 
 	uint32_t exp_base();
 
-	DECLARE_WRITE32_MEMBER( exp_base_w );
-	DECLARE_READ32_MEMBER( exp_base_r );
+	void exp_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t exp_base_r();
 
-	DECLARE_WRITE32_MEMBER( exp_config_w );
-	DECLARE_READ32_MEMBER( exp_config_r );
+	void exp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t exp_config_r();
 
-	DECLARE_WRITE32_MEMBER( ram_config_w );
-	DECLARE_READ32_MEMBER( ram_config_r );
+	void ram_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ram_config_r();
 
-	DECLARE_WRITE32_MEMBER( rom_config_w );
-	DECLARE_READ32_MEMBER( rom_config_r );
+	void rom_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rom_config_r();
 
-	DECLARE_WRITE32_MEMBER( biu_w );
-	DECLARE_READ32_MEMBER( biu_r );
+	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_r();
 
-	DECLARE_WRITE32_MEMBER( gpu_w );
-	DECLARE_READ32_MEMBER( gpu_r );
+	void gpu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpu_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( spu_w );
-	DECLARE_READ16_MEMBER( spu_r );
+	void spu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t spu_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER( cd_w );
-	DECLARE_READ8_MEMBER( cd_r );
+	void cd_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t cd_r(offs_t offset, uint8_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( com_delay_w );
-	DECLARE_READ32_MEMBER( com_delay_r );
+	void com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t com_delay_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
@@ -177,11 +177,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return ( clocks + 3 ) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return ( clocks + 3 ) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -208,7 +208,8 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_instruction;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// other internal states
 	int m_icount;

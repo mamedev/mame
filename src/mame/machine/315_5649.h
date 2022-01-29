@@ -49,8 +49,10 @@ public:
 	auto serial_ch1_wr_callback() { return m_serial_wr_cb[0].bind(); }
 	auto serial_ch2_wr_callback() { return m_serial_wr_cb[1].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	template <unsigned N> auto in_counter_callback() { return m_cnt_cb[N].bind(); }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -59,14 +61,16 @@ protected:
 
 private:
 	// callbacks
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
-	devcb_read8 m_an_port_cb[8];
-	devcb_read8 m_serial_rd_cb[2];
-	devcb_write8 m_serial_wr_cb[2];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
+	devcb_read8::array<8> m_an_port_cb;
+	devcb_read8::array<2> m_serial_rd_cb;
+	devcb_write8::array<2> m_serial_wr_cb;
+	devcb_read16::array<4> m_cnt_cb;
 
 	uint8_t m_port_value[7];
 	uint8_t m_port_config;
+	uint8_t m_mode;
 	int m_analog_channel;
 };
 

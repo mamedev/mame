@@ -51,6 +51,10 @@ Stephh's notes (based on the games Z80 code and some tests) :
       . 2 players game : [0x1838] = 0xaa (player 1) or 0x55 (player 2)
   - Credits are stored at address 0x1836 (BCD coded, range 0x00-0x99)
 
+  Additional notes:
+  - The only difference with pacominva is that it has some coded added
+    at the end of ROM 5, however it appears to be unused
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -81,9 +85,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	DECLARE_READ8_MEMBER(v128_r);
-	DECLARE_WRITE8_MEMBER(controller_select_w);
-	DECLARE_READ8_MEMBER(controller_r);
+	uint8_t v128_r();
+	void controller_select_w(uint8_t data);
+	uint8_t controller_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -91,8 +95,10 @@ public:
 	void create_interrupt_timer();
 	void start_interrupt_timer();
 	void beaminv(machine_config &config);
+	void ctainv(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
+	void ctainv_map(address_map &map);
 };
 
 
@@ -180,23 +186,19 @@ void beaminv_state::machine_reset()
 
 uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs;
 		uint8_t x = offs >> 8 << 3;
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			data = data >> 1;
-			x = x + 1;
+			data >>= 1;
+			x++;
 		}
 	}
 
@@ -204,7 +206,7 @@ uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb3
 }
 
 
-READ8_MEMBER(beaminv_state::v128_r)
+uint8_t beaminv_state::v128_r()
 {
 	return (m_screen->vpos() >> 7) & 0x01;
 }
@@ -221,14 +223,14 @@ READ8_MEMBER(beaminv_state::v128_r)
 #define P2_CONTROL_PORT_TAG ("CONTP2")
 
 
-WRITE8_MEMBER(beaminv_state::controller_select_w)
+void beaminv_state::controller_select_w(uint8_t data)
 {
 	/* 0x01 (player 1) or 0x02 (player 2) */
 	m_controller_select = data;
 }
 
 
-READ8_MEMBER(beaminv_state::controller_r)
+uint8_t beaminv_state::controller_r()
 {
 	return ioport((m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG)->read();
 }
@@ -248,6 +250,19 @@ void beaminv_state::main_map(address_map &map)
 	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
 	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
 	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
+	map(0x4000, 0x5fff).ram().share("videoram");
+}
+
+
+void beaminv_state::ctainv_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x23ff).rom().region("maincpu", 0x1800);
+	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
+	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
+	map(0x2c00, 0x2c00).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
 	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
 }
@@ -333,6 +348,23 @@ static INPUT_PORTS_START( pacominv )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ctainv )
+	PORT_INCLUDE( pacominv )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x04, "1500" )
+	PORT_DIPSETTING(    0x08, "2000" )
+	PORT_DIPSETTING(    0x0c, "2500" )
+	PORT_DIPNAME( 0x60, 0x00, "Faster Bombs At" ) // table at 0x1738
+	PORT_DIPSETTING(    0x00, "29 Enemies" )
+	PORT_DIPSETTING(    0x20, "24 Enemies" )
+	PORT_DIPSETTING(    0x40, "19 Enemies" )
+	PORT_DIPSETTING(    0x40, "14 Enemies" )
+INPUT_PORTS_END
+
+
 
 /*************************************
  *
@@ -354,6 +386,15 @@ void beaminv_state::beaminv(machine_config &config)
 	m_screen->set_visarea(0, 247, 16, 231);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(beaminv_state::screen_update_beaminv));
+}
+
+
+void beaminv_state::ctainv(machine_config &config)
+{
+	beaminv(config);
+
+	m_maincpu->set_clock(9.732_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &beaminv_state::ctainv_map);
 }
 
 
@@ -386,6 +427,29 @@ ROM_START( pacominv )
 ROM_END
 
 
+ROM_START( pacominva )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.bin", 0x0000, 0x0400, CRC(67e100dd) SHA1(5f58e2ed3da14c48f7c382ee6091a59caf8e0609) )
+	ROM_LOAD( "1.bin", 0x0400, 0x0400, CRC(442bbe98) SHA1(0e0382d4f6491629449759747019bd453a458b66) )
+	ROM_LOAD( "2.bin", 0x0800, 0x0400, CRC(5d5d2f68) SHA1(e363f9445bbba1492188efe1830cae96f6078878) )
+	ROM_LOAD( "3.bin", 0x0c00, 0x0400, CRC(527906b8) SHA1(9bda7da653db64246597ca386adab4cbab319189) )
+	ROM_LOAD( "4.bin", 0x1000, 0x0400, CRC(920bb3f0) SHA1(3b9897d31c551e0b9193f775a6be65376b4a8c34) )
+	ROM_LOAD( "5.bin", 0x1400, 0x0400, CRC(72972e81) SHA1(1e5f820eb7b30f2f1b63d077eab786cb2b836e26) )
+ROM_END
+
+
+ROM_START( ctainv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.bin", 0x0000, 0x0400, CRC(363cd088) SHA1(125dfa97b80369da7c2e8fd84caa14bdf7df80dc) )
+	ROM_LOAD( "1.bin", 0x0400, 0x0400, CRC(04057d07) SHA1(749acd65f01cd408d3d452cba902580fc2e4cd49) )
+	ROM_LOAD( "2.bin", 0x0800, 0x0400, CRC(569a3fe9) SHA1(ed51bd5a950c821531f8a40219339df6882e7d26) )
+	ROM_LOAD( "3.bin", 0x0c00, 0x0400, CRC(772db93e) SHA1(65d0a7528c86b4c3377e8cfda82eae51ee078238) )
+	ROM_LOAD( "4.bin", 0x1000, 0x0400, CRC(c9f671d9) SHA1(27e8ded5afc92f1eef9968a6af4b8c5af482904f) )
+	ROM_LOAD( "5.bin", 0x1400, 0x0400, CRC(a028342f) SHA1(32fd83b0ac8215935032a22e3bfd9fcf1b8402c0) )
+	ROM_LOAD( "6.bin", 0x1800, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
+ROM_END
+
+
 
 /*************************************
  *
@@ -393,5 +457,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  beaminv_state, empty_init, ROT270, "Teknon Kogyo",      "Beam Invader",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, beaminv,   0,       beaminv, beaminv,  beaminv_state, empty_init, ROT270, "Teknon Kogyo",      "Beam Invader",          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, pacominv,  beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 19??, pacominva, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAME ( 19??, ctainv,    beaminv, ctainv,  ctainv,   beaminv_state, empty_init, ROT270, "CTA Corporation",   "CTA Invader",           MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -12,7 +12,7 @@
 #include "m65ce02.h"
 #include "m65ce02d.h"
 
-DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "MOS Technology M65CE02")
+DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "CSG 65CE02")
 
 m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M65CE02, tag, owner, clock)
@@ -44,10 +44,7 @@ void m65ce02_device::init()
 
 void m65ce02_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_default_nd>();
-	else
-		mintf = std::make_unique<mi_default_normal>();
+	mintf = std::make_unique<mi_default>();
 
 	init();
 }

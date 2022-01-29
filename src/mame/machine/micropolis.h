@@ -30,26 +30,19 @@ public:
 	auto intrq_wr_callback() { return m_write_intrq.bind(); }
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 
-	void set_drive_tags(const char *tag1, const char *tag2, const char *tag3, const char *tag4)
+	template<typename T, typename U, typename V, typename W>
+	void set_drive_tags(T &&tag1, U &&tag2, V &&tag3, W &&tag4)
 	{
-		m_floppy_drive_tags[0] = tag1;
-		m_floppy_drive_tags[1] = tag2;
-		m_floppy_drive_tags[2] = tag3;
-		m_floppy_drive_tags[3] = tag4;
+		m_floppy_drive[0].set_tag(std::forward<T>(tag1));
+		m_floppy_drive[1].set_tag(std::forward<U>(tag2));
+		m_floppy_drive[2].set_tag(std::forward<V>(tag3));
+		m_floppy_drive[3].set_tag(std::forward<W>(tag4));
 	}
-
-	void set_default_drive_tags() { set_drive_tags(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3); }
 
 	void set_drive(uint8_t drive); // set current drive (0-3)
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( data_r );
-
-	DECLARE_WRITE8_MEMBER( command_w );
-	DECLARE_WRITE8_MEMBER( data_w );
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -63,7 +56,7 @@ private:
 	devcb_write_line m_write_intrq;
 	devcb_write_line m_write_drq;
 
-	const char *m_floppy_drive_tags[4];
+	optional_device_array<legacy_floppy_image_device, 4> m_floppy_drive;
 
 	/* register */
 	uint8_t m_data;
@@ -86,6 +79,12 @@ private:
 
 	void read_sector();
 	void write_sector();
+
+	uint8_t status_r(offs_t offset);
+	uint8_t data_r();
+
+	void command_w(uint8_t data);
+	void data_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(MICROPOLIS, micropolis_device)

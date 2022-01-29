@@ -33,10 +33,10 @@ protected:
 	virtual void dack_w(int line, uint8_t data) override;
 	// virtual void eop_w(int state) override;
 
-	virtual DECLARE_READ8_MEMBER(myb3k_inv_fdc_data_r);
-	virtual DECLARE_WRITE8_MEMBER(myb3k_inv_fdc_data_w);
-	virtual DECLARE_READ8_MEMBER(myb3k_fdc_status);
-	virtual DECLARE_WRITE8_MEMBER(myb3k_fdc_command);
+	virtual uint8_t myb3k_inv_fdc_data_r(offs_t offset);
+	virtual void myb3k_inv_fdc_data_w(offs_t offset, uint8_t data);
+	virtual uint8_t myb3k_fdc_status();
+	virtual void myb3k_fdc_command(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
@@ -75,9 +75,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 class isa8_myb3k_fdc4711_device : public isa8_myb3k_fdc471x_device_base
@@ -92,9 +89,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 class isa8_myb3k_fdc4712_device : public isa8_myb3k_fdc471x_device_base
@@ -110,13 +104,10 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_WRITE8_MEMBER(myb3k_fdc_command) override;
-	virtual DECLARE_READ8_MEMBER(myb3k_fdc_status) override;
+	virtual void myb3k_fdc_command(uint8_t data) override;
+	virtual uint8_t myb3k_fdc_status() override;
 
 	uint8_t selected_drive;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 // device type definition

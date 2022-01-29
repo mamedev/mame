@@ -98,14 +98,14 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(jailbrek_state::ctrl_w)
+void jailbrek_state::ctrl_w(uint8_t data)
 {
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
 	flip_screen_set(data & 0x08);
 }
 
-WRITE8_MEMBER(jailbrek_state::coin_w)
+void jailbrek_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -124,12 +124,12 @@ INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
 }
 
 
-READ8_MEMBER(jailbrek_state::speech_r)
+uint8_t jailbrek_state::speech_r()
 {
 	return (m_vlm->bsy() ? 1 : 0);
 }
 
-WRITE8_MEMBER(jailbrek_state::speech_w)
+void jailbrek_state::speech_w(uint8_t data)
 {
 	/* bit 0 could be latch direction like in yiear */
 	m_vlm->st((data >> 1) & 1);

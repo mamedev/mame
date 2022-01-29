@@ -80,17 +80,17 @@ private:
 	required_device<pia6821_device> m_pia_u1;
 	required_device<pia6821_device> m_pia_u2;
 	required_device<pia6821_device> m_pia_u3;
-	DECLARE_WRITE8_MEMBER(clear_tv_w);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(clear_timer_w);
+	void clear_tv_w(uint8_t data);
+	uint8_t timer_r();
+	void clear_timer_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cb2_u2_w);
-	DECLARE_WRITE8_MEMBER(port_b_u1_w);
+	void port_b_u1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE8_MEMBER(sn1_port_a_u3_w);
-	DECLARE_WRITE8_MEMBER(sn1_port_b_u3_w);
+	void sn1_port_a_u3_w(uint8_t data);
+	void sn1_port_b_u3_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u3_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_w);
+	void sn2_port_a_u2_w(uint8_t data);
+	void sn2_port_b_u2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -121,20 +121,16 @@ WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
 
 uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
 			data = data << 1;
 			x = x + 1;
@@ -151,7 +147,7 @@ uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(toratora_state::clear_tv_w)
+void toratora_state::clear_tv_w(uint8_t data)
 {
 	m_clear_tv = 1;
 }
@@ -163,7 +159,7 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
  *
  *************************************/
 
-WRITE8_MEMBER(toratora_state::port_b_u1_w)
+void toratora_state::port_b_u1_w(uint8_t data)
 {
 	if (m_pia_u1->port_b_z_mask() & 0x20)
 		machine().bookkeeping().coin_counter_w(0, 1);
@@ -201,17 +197,17 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	m_pia_u1->write_porta(ioport("INPUT")->read() & 0x0f);
+	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
 
-READ8_MEMBER(toratora_state::timer_r)
+uint8_t toratora_state::timer_r()
 {
 	return m_timer;
 }
 
-WRITE8_MEMBER(toratora_state::clear_timer_w)
+void toratora_state::clear_timer_w(uint8_t data)
 {
 	m_timer = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -225,14 +221,14 @@ WRITE8_MEMBER(toratora_state::clear_timer_w)
  *************************************/
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_a_u3_w)
+void toratora_state::sn1_port_a_u3_w(uint8_t data)
 {
 	m_sn1->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn1->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_b_u3_w)
+void toratora_state::sn1_port_b_u3_w(uint8_t data)
 {
 	static const double resistances[] =
 	{
@@ -269,14 +265,14 @@ WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u3_w)
 	m_sn1->vco_w(state);
 }
 
-WRITE8_MEMBER(toratora_state::sn2_port_a_u2_w)
+void toratora_state::sn2_port_a_u2_w(uint8_t data)
 {
 	m_sn2->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn2->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn2_port_b_u2_w)
+void toratora_state::sn2_port_b_u2_w(uint8_t data)
 {
 	static const double resistances[] =
 	{

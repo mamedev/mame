@@ -34,45 +34,63 @@ public:
 
 	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto gpio0_set_cb() { return m_gpio0_set_func.bind(); }
-	auto gpio0_clear_cb() { return m_gpio0_clear_func.bind(); }
-	auto gpio0_in_cb() { return m_gpio0_in_func.bind(); }
+	auto gpio0_write() { return m_gpio0_w.bind(); }
+	auto gpio0_read() { return m_gpio0_r.bind(); }
+	auto gpio1_write() { return m_gpio1_w.bind(); }
+	auto gpio1_read() { return m_gpio1_r.bind(); }
+	auto gpio2_write() { return m_gpio2_w.bind(); }
+	auto gpio2_read() { return m_gpio2_r.bind(); }
 
-	DECLARE_READ32_MEMBER(pxa255_i2s_r);
-	DECLARE_WRITE32_MEMBER(pxa255_i2s_w);
-	DECLARE_READ32_MEMBER(pxa255_dma_r);
-	DECLARE_WRITE32_MEMBER(pxa255_dma_w);
-	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
-	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
-	DECLARE_READ32_MEMBER(pxa255_intc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_intc_w);
-	DECLARE_READ32_MEMBER(pxa255_gpio_r);
-	DECLARE_WRITE32_MEMBER(pxa255_gpio_w);
-	DECLARE_READ32_MEMBER(pxa255_lcd_r);
-	DECLARE_WRITE32_MEMBER(pxa255_lcd_w);
+	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t i2s_r(offs_t offset, uint32_t mem_mask = ~0);
+	void i2s_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ostimer_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t intc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void intc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void gpio_bit_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint32_t gpio_r(offs_t offset, uint32_t mem_mask = ~0);
+	void gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lcd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t power_r(offs_t offset, uint32_t mem_mask = ~0);
+	void power_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t clocks_r(offs_t offset, uint32_t mem_mask = ~0);
+	void clocks_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	void pxa255_dma_irq_check();
-	void pxa255_dma_load_descriptor_and_start(int channel);
-	void pxa255_ostimer_irq_check();
-	void pxa255_update_interrupts();
-	void pxa255_set_irq_line(uint32_t line, int state);
-	void pxa255_lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel);
-	void pxa255_lcd_irq_check();
-	void pxa255_lcd_dma_kickoff(int channel);
-	void pxa255_lcd_check_load_next_branch(int channel);
+	static const device_timer_id TIMER_DMA0 = 0;
+	static const device_timer_id TIMER_OSTIMER0 = 16;
+	static const device_timer_id TIMER_LCD_EOF0 = 20;
+	static const device_timer_id TIMER_RTC = 22;
+
+	void dma_irq_check();
+	void dma_load_descriptor_and_start(int channel);
+	void ostimer_irq_check();
+	void update_interrupts();
+	void lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel);
+	void lcd_irq_check();
+	void lcd_dma_kickoff(int channel);
+	void lcd_check_load_next_branch(int channel);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
-	TIMER_CALLBACK_MEMBER(pxa255_ostimer_match);
-	TIMER_CALLBACK_MEMBER(pxa255_lcd_dma_eof);
+	void dma_end_tick(int channel);
+	void ostimer_match_tick(int channel);
+	void lcd_dma_eof_tick(int channel);
+	void rtc_tick();
 
-	struct dma_regs_t
+	void set_irq_line(uint32_t line, int state);
+
+	struct dma_regs
 	{
 		uint32_t dcsr[16];
 		uint32_t pad0[44];
@@ -91,7 +109,7 @@ protected:
 		emu_timer* timer[16];
 	};
 
-	struct i2s_regs_t
+	struct i2s_regs
 	{
 		uint32_t sacr0;
 		uint32_t sacr1;
@@ -110,7 +128,16 @@ protected:
 		uint32_t sadr;
 	};
 
-	struct ostmr_regs_t
+	struct rtc_regs
+	{
+		uint32_t rcnr;
+		uint32_t rtar;
+		uint32_t rtsr;
+		uint32_t rttr;
+		emu_timer *timer;
+	};
+
+	struct ostmr_regs
 	{
 		uint32_t osmr[4];
 		uint32_t oscr;
@@ -121,7 +148,7 @@ protected:
 		emu_timer* timer[4];
 	};
 
-	struct intc_regs_t
+	struct intc_regs
 	{
 		uint32_t icip;
 		uint32_t icmr;
@@ -131,7 +158,7 @@ protected:
 		uint32_t iccr;
 	};
 
-	struct gpio_regs_t
+	struct gpio_regs
 	{
 		uint32_t gplr0; // GPIO Pin-Level
 		uint32_t gplr1;
@@ -169,7 +196,7 @@ protected:
 		uint32_t gafr2u;
 	};
 
-	struct lcd_dma_regs_t
+	struct lcd_dma_regs
 	{
 		uint32_t fdadr;
 		uint32_t fsadr;
@@ -178,47 +205,72 @@ protected:
 		emu_timer *eof;
 	};
 
-	struct lcd_regs_t
+	struct lcd_regs
 	{
 		uint32_t lccr0;
 		uint32_t lccr1;
 		uint32_t lccr2;
 		uint32_t lccr3;
-		uint32_t pad0[4];
 
 		uint32_t fbr[2];
-		uint32_t pad1[4];
 
 		uint32_t lcsr;
 		uint32_t liidr;
 		uint32_t trgbr;
 		uint32_t tcr;
-		uint32_t pad2[110];
 
-		lcd_dma_regs_t dma[2];
+		lcd_dma_regs dma[2];
 	};
 
-	dma_regs_t m_dma_regs;
-	i2s_regs_t m_i2s_regs;
-	ostmr_regs_t m_ostimer_regs;
-	intc_regs_t m_intc_regs;
-	gpio_regs_t m_gpio_regs;
-	lcd_regs_t m_lcd_regs;
+	struct power_regs
+	{
+		uint32_t pmcr;
+		uint32_t pssr;
+		uint32_t pspr;
+		uint32_t pwer;
+		uint32_t prer;
+		uint32_t pfer;
+		uint32_t pedr;
+		uint32_t pcfr;
+		uint32_t pgsr0;
+		uint32_t pgsr1;
+		uint32_t pgsr2;
+		uint32_t rcsr;
+		uint32_t pmfw;
+	};
 
-	devcb_write32 m_gpio0_set_func;
-	devcb_write32 m_gpio0_clear_func;
-	devcb_read32 m_gpio0_in_func;
+	struct clocks_regs
+	{
+		uint32_t cccr;
+		uint32_t cken;
+		uint32_t oscc;
+	};
+
+	dma_regs m_dma_regs;
+	i2s_regs m_i2s_regs;
+	rtc_regs m_rtc_regs;
+	ostmr_regs m_ostimer_regs;
+	intc_regs m_intc_regs;
+	gpio_regs m_gpio_regs;
+	lcd_regs m_lcd_regs;
+	power_regs m_power_regs;
+	clocks_regs m_clocks_regs;
+
+	devcb_write32 m_gpio0_w;
+	devcb_write32 m_gpio1_w;
+	devcb_write32 m_gpio2_w;
+	devcb_read32 m_gpio0_r;
+	devcb_read32 m_gpio1_r;
+	devcb_read32 m_gpio2_r;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<uint32_t[]> m_pxa255_lcd_palette; // 0x100
-	std::unique_ptr<uint8_t[]> m_pxa255_lcd_framebuffer; // 0x100000
+	std::unique_ptr<uint32_t[]> m_lcd_palette; // 0x100
+	std::unique_ptr<uint8_t[]> m_lcd_framebuffer; // 0x100000
 	std::unique_ptr<uint32_t[]> m_words; // 0x800
 	std::unique_ptr<int16_t[]> m_samples; // 0x1000
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)

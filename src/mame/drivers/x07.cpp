@@ -32,7 +32,7 @@
 #include "includes/x07.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -893,7 +893,7 @@ void x07_state::printer_w()
 
 inline uint8_t x07_state::kb_get_index(uint8_t char_code)
 {
-	for(uint8_t i=0 ; i< ARRAY_LENGTH(x07_keycodes); i++)
+	for(uint8_t i=0 ; i< std::size(x07_keycodes); i++)
 		if (x07_keycodes[i].codes[0] == char_code)
 			return i;
 
@@ -1063,7 +1063,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
 
 		if (strcmp(card_type, "xp140"))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported card type");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported card type");
 			return image_init_result::FAIL;
 		}
 	}
@@ -1094,9 +1094,9 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				for(int y = 0; y < 8; y++)
 					for (int x=0; x<6; x++)
 						if(m_cursor.on && m_blink && m_cursor.x == px && m_cursor.y == py)
-							bitmap.pix16(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
+							bitmap.pix(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
 						else
-							bitmap.pix16(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
+							bitmap.pix(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
 
 	}
 
@@ -1108,7 +1108,7 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
     Machine
 ***************************************************************************/
 
-READ8_MEMBER( x07_state::x07_io_r )
+uint8_t x07_state::x07_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1135,7 +1135,7 @@ READ8_MEMBER( x07_state::x07_io_r )
 		break;
 	case 0xf6:
 		if (m_cass_motor)   m_regs_r[6] |= 4;
-		//fall through
+		[[fallthrough]];
 	case 0xf0:
 	case 0xf1:
 	case 0xf3:
@@ -1158,7 +1158,7 @@ READ8_MEMBER( x07_state::x07_io_r )
 }
 
 
-WRITE8_MEMBER( x07_state::x07_io_w )
+void x07_state::x07_io_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -1437,9 +1437,9 @@ void x07_state::machine_start()
 	{
 		// 0x4000 - 0x4fff   4KB RAM
 		// 0x6000 - 0x7fff   8KB ROM
-		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
-		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
-		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_ram)));
+		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(*m_card, FUNC(generic_slot_device::write_ram)));
+		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_rom)));
 
 		m_card->save_ram();
 	}
@@ -1519,7 +1519,7 @@ void x07_state::x07(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K,20K,24K");
 
 	/* Memory Card */
-	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "x07_card", "rom,bin").set_device_load(FUNC(x07_state::card_load), this);
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "x07_card", "rom,bin").set_device_load(FUNC(x07_state::card_load));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

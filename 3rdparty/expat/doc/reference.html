@@ -31,7 +31,7 @@ the underlying XML parser for the open source Mozilla project, Perl's
 other open-source XML parsers.</p>
 
 <p>This library is the creation of James Clark, who's also given us
-groff (an nroff look-alike), Jade (an implemention of ISO's DSSSL
+groff (an nroff look-alike), Jade (an implementation of ISO's DSSSL
 stylesheet language for SGML), XP (a Java XML parser package), XT (a
 Java XSL engine).  James was also the technical lead on the XML
 Working Group at W3C that produced the XML specification.</p>
@@ -276,9 +276,11 @@ directions or Unix directions below.</p>
 
 <p>If you're using the GNU compiler under cygwin, follow the Unix
 directions in the next section. Otherwise if you have Microsoft's
-Developer Studio installed, then from Windows Explorer double-click on
-"expat.dsp" in the lib directory and build and install in the usual
-manner.</p>
+Developer Studio installed,
+you can use CMake to generate a <code>.sln</code> file, e.g.
+<code>
+cmake -G"Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo .
+</code>, and build Expat using <code>msbuild /m expat.sln</code> after.</p>
 
 <p>Alternatively, you may download the Win32 binary package that
 contains the "expat.h" include file and a pre-built DLL.</p>
@@ -360,7 +362,7 @@ off by default.</dd>
 <dd>The number of input bytes of markup context which the parser will
 ensure are available for reporting via <code><a href=
 "#XML_GetInputContext" >XML_GetInputContext</a></code>.  This is
-normally set to 1024, and must be set to a positive interger.  If this
+normally set to 1024, and must be set to a positive integer.  If this
 is not defined, the input context will not be available and <code><a
 href= "#XML_GetInputContext" >XML_GetInputContext</a></code> will
 always report NULL.  Without this, Expat has a smaller memory
@@ -373,7 +375,7 @@ the right MSVC magic annotations correct.  This is ignored on other
 platforms.</dd>
 
 <dt>XML_ATTR_INFO</dt>
-<dd>If defined, makes the the additional function <code><a href=
+<dd>If defined, makes the additional function <code><a href=
 "#XML_GetAttributeInfo" >XML_GetAttributeInfo</a></code> available
 for reporting attribute byte offsets.</dd>
 </dl>
@@ -739,7 +741,7 @@ arguments:</p>
 <dt><code>XML_PARAM_ENTITY_PARSING_NEVER</code></dt>
 <dd>Don't parse parameter entities or the external subset</dd>
 <dt><code>XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE</code></dt>
-<dd>Parse parameter entites and the external subset unless
+<dd>Parse parameter entities and the external subset unless
 <code>standalone</code> was set to "yes" in the XML declaration.</dd>
 <dt><code>XML_PARAM_ENTITY_PARSING_ALWAYS</code></dt>
 <dd>Always parse parameter entities and the external subset</dd>
@@ -767,7 +769,7 @@ include</p>
 
   <li>Stopping parsing completely (simply free or reset the parser
   instead of resuming in the outer parsing loop).  This can be useful
-  if a application-domain error is found in the XML being parsed or if
+  if an application-domain error is found in the XML being parsed or if
   the result of the parse is determined not to be useful after
   all.</li>
 </ul>
@@ -1296,7 +1298,7 @@ typedef void
                                     int len);
 </pre>
 <p>Set a text handler. The string your handler receives
-is <em>NOT nul-terminated</em>. You have to use the length argument
+is <em>NOT null-terminated</em>. You have to use the length argument
 to deal with the end of the string. A single block of contiguous text
 free of markup may still result in a sequence of calls to this handler.
 In other words, if you're searching for a pattern in the text, it may
@@ -1564,7 +1566,7 @@ at most once per parsed (external) entity. The optional application
 data pointer <code>encodingHandlerData</code> will be passed back to
 the handler.</p>
 
-<p>The map array contains information for every possible possible leading
+<p>The map array contains information for every possible leading
 byte in a byte sequence. If the corresponding value is &gt;= 0, then it's
 a single byte sequence and the byte encodes that Unicode value. If the
 value is -1, then that byte is invalid as the initial byte in a sequence.
@@ -1574,7 +1576,7 @@ call to the function pointed at by convert. This function may return -1
 if the sequence itself is invalid. The convert pointer may be null if
 there are only single byte codes. The data parameter passed to the convert
 function is the data pointer from <code>XML_Encoding</code>. The
-string s is <em>NOT</em> nul-terminated and points at the sequence of
+string s is <em>NOT</em> null-terminated and points at the sequence of
 bytes to be converted.</p>
 
 <p>The function pointed at by <code>release</code> is called by the
@@ -1902,7 +1904,7 @@ of errors. The position reported is the byte position (in the original
 document or entity encoding) of the first of the sequence of
 characters that generated the current event (or the error that caused
 the parse functions to return <code>XML_STATUS_ERROR</code>.)  The
-exceptions are callbacks trigged by declarations in the document
+exceptions are callbacks triggered by declarations in the document
 prologue, in which case they exact position reported is somewhere in the
 relevant markup, but not necessarily as meaningful as for other
 events.</p>
@@ -1999,7 +2001,7 @@ return NULL.</p>
 <h3><a name="miscellaneous">Miscellaneous functions</a></h3>
 
 <p>The functions in this section either obtain state information from
-the parser or can be used to dynamicly set parser options.</p>
+the parser or can be used to dynamically set parser options.</p>
 
 <pre class="fcndec" id="XML_SetUserData">
 void XMLCALL
@@ -2152,7 +2154,7 @@ function behavior. In order to have an effect this must be called
 before parsing has started. Returns 1 if successful, 0 when called
 after <code>XML_Parse</code> or <code>XML_ParseBuffer</code>.
 <p><b>Note:</b>This call is optional, as the parser will auto-generate 
-a new random salt value if no value has been set at the start of parsing.
+a new random salt value if no value has been set at the start of parsing.</p>
 <p><b>Note:</b>One should not call <code>XML_SetHashSalt</code> with a
 hash salt value of 0, as this value is used as sentinel value to indicate
 that <code>XML_SetHashSalt</code> has <b>not</b> been called. Consequently

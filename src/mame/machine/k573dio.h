@@ -18,62 +18,71 @@ public:
 	void amap(address_map &map);
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
-	DECLARE_READ16_MEMBER(a00_r);
-	DECLARE_READ16_MEMBER(a02_r);
-	DECLARE_READ16_MEMBER(a04_r);
-	DECLARE_READ16_MEMBER(a06_r);
-	DECLARE_READ16_MEMBER(a0a_r);
-	DECLARE_WRITE16_MEMBER(a10_w);
-	DECLARE_READ16_MEMBER(a80_r);
-	DECLARE_READ16_MEMBER(ac4_r);
+	uint16_t a00_r();
+	uint16_t a02_r();
+	uint16_t a04_r();
+	uint16_t a06_r();
+	uint16_t a0a_r();
+	void a10_w(uint16_t data);
+	uint16_t a80_r();
 
-	DECLARE_WRITE16_MEMBER(mpeg_start_adr_high_w);
-	DECLARE_WRITE16_MEMBER(mpeg_start_adr_low_w);
-	DECLARE_WRITE16_MEMBER(mpeg_end_adr_high_w);
-	DECLARE_WRITE16_MEMBER(mpeg_end_adr_low_w);
-	DECLARE_READ16_MEMBER(mpeg_key_1_r);
-	DECLARE_WRITE16_MEMBER(mpeg_key_1_w);
-	DECLARE_READ16_MEMBER(mas_i2c_r);
-	DECLARE_WRITE16_MEMBER(mas_i2c_w);
-	DECLARE_READ16_MEMBER(mpeg_ctrl_r);
-	DECLARE_WRITE16_MEMBER(mpeg_ctrl_w);
-	DECLARE_WRITE16_MEMBER(ram_write_adr_high_w);
-	DECLARE_WRITE16_MEMBER(ram_write_adr_low_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_WRITE16_MEMBER(ram_read_adr_high_w);
-	DECLARE_WRITE16_MEMBER(ram_read_adr_low_w);
-	DECLARE_READ16_MEMBER(mp3_frame_count_high_r);
-	DECLARE_READ16_MEMBER(mp3_frame_count_low_r);
-	DECLARE_WRITE16_MEMBER(output_0_w);
-	DECLARE_WRITE16_MEMBER(output_1_w);
-	DECLARE_WRITE16_MEMBER(output_7_w);
-	DECLARE_WRITE16_MEMBER(output_3_w);
-	DECLARE_WRITE16_MEMBER(mpeg_key_2_w);
-	DECLARE_WRITE16_MEMBER(mpeg_key_3_w);
-	DECLARE_READ16_MEMBER(digital_id_r);
-	DECLARE_WRITE16_MEMBER(digital_id_w);
-	DECLARE_READ16_MEMBER(fpga_status_r);
-	DECLARE_WRITE16_MEMBER(fpga_firmware_w);
-	DECLARE_WRITE16_MEMBER(output_4_w);
-	DECLARE_WRITE16_MEMBER(output_2_w);
-	DECLARE_WRITE16_MEMBER(output_5_w);
-	DECLARE_READ16_MEMBER(mp3_unk_r);
+	uint16_t mpeg_start_adr_high_r();
+	void mpeg_start_adr_high_w(uint16_t data);
+	uint16_t mpeg_start_adr_low_r();
+	void mpeg_start_adr_low_w(uint16_t data);
+	uint16_t mpeg_end_adr_high_r();
+	void mpeg_end_adr_high_w(uint16_t data);
+	uint16_t mpeg_end_adr_low_r();
+	void mpeg_end_adr_low_w(uint16_t data);
+	uint16_t mpeg_key_1_r();
+	void mpeg_key_1_w(uint16_t data);
+	uint16_t mpeg_ctrl_r();
+	uint16_t mas_i2c_r();
+	void mas_i2c_w(uint16_t data);
+	uint16_t fpga_ctrl_r();
+	void fpga_ctrl_w(uint16_t data);
+	void ram_write_adr_high_w(uint16_t data);
+	void ram_write_adr_low_w(uint16_t data);
+	uint16_t ram_r();
+	void ram_w(uint16_t data);
+	void ram_read_adr_high_w(uint16_t data);
+	void ram_read_adr_low_w(uint16_t data);
+	uint16_t mp3_counter_high_r();
+	uint16_t mp3_counter_low_r();
+	void mp3_counter_low_w(uint16_t data);
+	uint16_t mp3_counter_diff_r();
+	void output_0_w(uint16_t data);
+	void output_1_w(uint16_t data);
+	void output_7_w(uint16_t data);
+	void output_3_w(uint16_t data);
+	void mpeg_key_2_w(uint16_t data);
+	void mpeg_key_3_w(uint16_t data);
+	uint16_t digital_id_r();
+	void digital_id_w(uint16_t data);
+	uint16_t fpga_status_r();
+	void fpga_firmware_w(uint16_t data);
+	void output_4_w(uint16_t data);
+	void output_2_w(uint16_t data);
+	void output_5_w(uint16_t data);
+	uint16_t network_r();
+	void network_w(uint16_t data);
+	uint16_t network_output_buf_size_r();
+	uint16_t network_input_buf_size_r();
+	void network_id_w(uint16_t data);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
+	memory_share_creator<uint16_t> ram;
 	required_device<k573fpga_device> k573fpga;
 	required_device<ds2401_device> digital_id;
-	required_device<mas3507d_device> mas3507d;
 	devcb_write8 output_cb;
 
-	std::unique_ptr<uint16_t[]> ram;
 	uint32_t ram_adr, ram_read_adr;
 	uint8_t output_data[8];
 
@@ -81,6 +90,8 @@ private:
 
 	bool is_ddrsbm_fpga;
 	u16 crypto_key1;
+
+	uint16_t network_id;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)

@@ -30,19 +30,19 @@ private:
 	void machine_reset() override;
 
 	// ARM7
-	DECLARE_READ32_MEMBER(arm7_io_r);
-	DECLARE_WRITE32_MEMBER(arm7_io_w);
+	uint32_t arm7_io_r(offs_t offset, uint32_t mem_mask = ~0);
+	void arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// ARM9
-	DECLARE_READ32_MEMBER(arm9_io_r);
-	DECLARE_WRITE32_MEMBER(arm9_io_w);
+	uint32_t arm9_io_r(offs_t offset, uint32_t mem_mask = ~0);
+	void arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(wram_first_half_r);
-	DECLARE_READ32_MEMBER(wram_second_half_r);
-	DECLARE_WRITE32_MEMBER(wram_first_half_w);
-	DECLARE_WRITE32_MEMBER(wram_second_half_w);
-	DECLARE_READ32_MEMBER(wram_arm7mirror_r);
-	DECLARE_WRITE32_MEMBER(wram_arm7mirror_w);
+	uint32_t wram_first_half_r(offs_t offset);
+	uint32_t wram_second_half_r(offs_t offset);
+	void wram_first_half_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void wram_second_half_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t wram_arm7mirror_r(offs_t offset);
+	void wram_arm7mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void nds7_wram_map(address_map &map);
 	void nds9_wram_map(address_map &map);

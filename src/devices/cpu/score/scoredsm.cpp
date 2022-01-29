@@ -18,7 +18,7 @@ const char *const score7_disassembler::m_r2_op[16]  = { "add", "sub", "neg", "cm
 const char *const score7_disassembler::m_i1_op[8]   = { "addi", "", "cmpi", "", "andi", "ori", "ldi", "" };
 const char *const score7_disassembler::m_i2_op[8]   = { "addis", "", "cmpis", "", "andis", "oris", "ldis", "" };
 const char *const score7_disassembler::m_ls_op[8]   = { "lw", "lh", "lhu", "lb", "sw", "sh", "lbu", "sb" };
-const char *const score7_disassembler::m_i1a_op[8]  = { "addei", "slli", "sdbbp", "srli", "bitclr", "bitset", "bittst", "" };
+const char *const score7_disassembler::m_i1a_op[8]  = { "addei", "slli", "sdbbp", "srli", "bitclr", "bitset", "bittst", "bittgl" };
 const char *const score7_disassembler::m_i1b_op[8]  = { "lwp", "lhp", "", "lbup", "swp", "shp", "", "sbp" };
 const char *const score7_disassembler::m_cr_op[2]   = { "mtcr", "mfcr" };
 
@@ -234,10 +234,7 @@ void score7_disassembler::disasm16(std::ostream &stream, offs_t pc, uint16_t opc
 			util::stream_format(stream, "ldiu! r%d, 0x%02x", GET_I2_RD(opcode), GET_I2_IMM8(opcode));
 			break;
 		case 0x06:      // I-form-1a
-				if (GET_I16_FUNC3(opcode) != 7)
-					util::stream_format(stream, "%s! r%d, %d", m_i1a_op[GET_I16_FUNC3(opcode)], GET_I16_RD(opcode), GET_I16_IMM5(opcode));
-				else
-					util::stream_format(stream, "<undefined i-form-1a 0x%02x>", GET_I16_FUNC3(opcode));
+			util::stream_format(stream, "%s! r%d, %d", m_i1a_op[GET_I16_FUNC3(opcode)], GET_I16_RD(opcode), GET_I16_IMM5(opcode));
 			break;
 		case 0x07:      // I-form-1b
 			switch(GET_I16_FUNC3(opcode))

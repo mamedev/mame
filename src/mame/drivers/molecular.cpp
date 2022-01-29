@@ -87,17 +87,17 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(file_r);
-	DECLARE_WRITE8_MEMBER(file_w);
+	uint8_t file_r(offs_t offset);
+	void file_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(app_r);
-	DECLARE_WRITE8_MEMBER(app_w);
+	uint8_t app_r(offs_t offset);
+	void app_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(file_output_w);
-	DECLARE_WRITE8_MEMBER(app_output_w);
+	void file_output_w(offs_t offset, uint8_t data);
+	void app_output_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( sio_r );
-	DECLARE_WRITE8_MEMBER( sio_w );
+	uint8_t sio_r(offs_t offset);
+	void sio_w(offs_t offset, uint8_t data);
 
 	uint8_t app_ram_enable;
 	uint8_t file_ram_enable;
@@ -119,7 +119,7 @@ uint32_t molecula_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER(molecula_state::file_r)
+uint8_t molecula_state::file_r(offs_t offset)
 {
 	if(file_ram_enable)
 		return m_file_ram[offset];
@@ -128,12 +128,12 @@ READ8_MEMBER(molecula_state::file_r)
 }
 
 
-WRITE8_MEMBER(molecula_state::file_w)
+void molecula_state::file_w(offs_t offset, uint8_t data)
 {
 	m_file_ram[offset] = data;
 }
 
-READ8_MEMBER(molecula_state::app_r)
+uint8_t molecula_state::app_r(offs_t offset)
 {
 	if(app_ram_enable)
 		return m_app_ram[offset];
@@ -142,12 +142,12 @@ READ8_MEMBER(molecula_state::app_r)
 }
 
 
-WRITE8_MEMBER(molecula_state::app_w)
+void molecula_state::app_w(offs_t offset, uint8_t data)
 {
 	m_app_ram[offset] = data;
 }
 
-WRITE8_MEMBER(molecula_state::file_output_w)
+void molecula_state::file_output_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 		file_ram_enable = (data & 0x80) >> 7;
@@ -157,7 +157,7 @@ WRITE8_MEMBER(molecula_state::file_output_w)
 }
 
 
-WRITE8_MEMBER(molecula_state::app_output_w)
+void molecula_state::app_output_w(uint8_t data)
 {
 	app_ram_enable = (data & 0x80) >> 7;
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER(molecula_state::app_output_w)
 		printf("APP 0x10 -> %02x\n",data);
 }
 
-READ8_MEMBER( molecula_state::sio_r)
+uint8_t molecula_state::sio_r(offs_t offset)
 {
 	if(offset == 1)
 		return 4;
@@ -173,7 +173,7 @@ READ8_MEMBER( molecula_state::sio_r)
 	return 0;
 }
 
-WRITE8_MEMBER( molecula_state::sio_w)
+void molecula_state::sio_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 		printf("%c\n",data);

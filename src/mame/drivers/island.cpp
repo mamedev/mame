@@ -54,7 +54,7 @@ INPUT_PORTS_END
 
 void island_state::vortex(machine_config &config)
 {
-	I80C32(config, m_maincpu, 20_MHz_XTAL); // FIXME: actually DS80C320 (more registers, faster machine cycles)
+	DS80C320(config, m_maincpu, 20_MHz_XTAL); // FIXME: has more registers, faster machine cycles
 	m_maincpu->set_addrmap(AS_PROGRAM, &island_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &island_state::ext_map);
 

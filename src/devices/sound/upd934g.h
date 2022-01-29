@@ -29,14 +29,14 @@ public:
 	// configuration
 	auto data_callback() { return m_data_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	devcb_read8 m_data_cb;

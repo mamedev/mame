@@ -59,11 +59,11 @@ private:
 	u8 m_data;
 	u8 m_control;
 
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_READ8_MEMBER(input_r);
+	void data_w(u8 data);
+	u8 data_r();
+	void control_w(u8 data);
+	u8 control_r();
+	u8 input_r();
 };
 
 void milton_state::machine_start()
@@ -90,7 +90,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	sound_stream *m_stream;
@@ -112,21 +112,20 @@ void milton_filter_device::device_start()
 	m_led_out.resolve();
 }
 
-void milton_filter_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void milton_filter_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int level = 0;
+	stream_buffer::sample_t level = 0;
 
-	for (int i = 0; i < samples; i++)
-	{
-		level += abs(inputs[0][i]);
-		outputs[0][i] = inputs[0][i];
-	}
+	for (int i = 0; i < outputs[0].samples(); i++)
+		level += fabsf(inputs[0].get(i));
 
-	if (samples > 0)
-		level /= samples;
+	outputs[0] = inputs[0];
+
+	if (outputs[0].samples() > 0)
+		level /= outputs[0].samples();
 
 	// 2 leds connected to the audio circuit
-	const int threshold = 1500;
+	const stream_buffer::sample_t threshold = 1500.0 / 32768.0;
 	m_led_out = (level > threshold) ? 1 : 0;
 }
 
@@ -136,13 +135,13 @@ void milton_filter_device::sound_stream_update(sound_stream &stream, stream_samp
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(milton_state::data_w)
+void milton_state::data_w(u8 data)
 {
 	// TMC0430 + SP0250 data
 	m_data = data;
 }
 
-READ8_MEMBER(milton_state::data_r)
+u8 milton_state::data_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -154,13 +153,13 @@ READ8_MEMBER(milton_state::data_r)
 	return data;
 }
 
-WRITE8_MEMBER(milton_state::control_w)
+void milton_state::control_w(u8 data)
 {
 	// d0-d4: input mux
 
 	// d5: SP0250 data present
 	if (~m_control & data & 0x20)
-		m_speech->write(space, 0, m_data);
+		m_speech->write(m_data);
 
 	// d1: TMC0430 M
 	// d3: TMC0430 MO
@@ -182,7 +181,7 @@ WRITE8_MEMBER(milton_state::control_w)
 	m_control = data;
 }
 
-READ8_MEMBER(milton_state::control_r)
+u8 milton_state::control_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -192,7 +191,7 @@ READ8_MEMBER(milton_state::control_r)
 	return m_speech->drq_r() ? 0x40 : 0;
 }
 
-READ8_MEMBER(milton_state::input_r)
+u8 milton_state::input_r()
 {
 	u8 data = 0;
 

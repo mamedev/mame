@@ -4,12 +4,16 @@
  * midi_module.h
  *
  */
+#ifndef MAME_OSD_MODULES_MIDI_MIDI_MODULE_H
+#define MAME_OSD_MODULES_MIDI_MIDI_MODULE_H
 
-#ifndef MIDI_MODULE_H_
-#define MIDI_MODULE_H_
+#pragma once
 
 #include "osdepend.h"
 #include "modules/osdmodule.h"
+
+#include <memory>
+
 
 //============================================================
 //  CONSTANTS
@@ -23,10 +27,9 @@ public:
 	virtual ~midi_module() { }
 	// specific routines
 
-	virtual osd_midi_device *create_midi_device() = 0;
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() = 0;
 	// FIXME: should return a list of strings ...
-	virtual void list_midi_devices(void) = 0;
+	virtual void list_midi_devices() = 0;
 };
 
-
-#endif /* MIDI_MODULE_H_ */
+#endif // MAME_OSD_MODULES_MIDI_MIDI_MODULE_H

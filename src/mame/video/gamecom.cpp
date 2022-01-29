@@ -23,9 +23,8 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 	}
 	else
 	{
-		uint8_t *line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
+		uint8_t const *const line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
 		int pal[4];
-		int i;
 
 		switch( m_p_ram[SM8521_LCDC] & 0x30 )
 		{
@@ -54,13 +53,13 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 			pal[3] = 0;
 			break;
 		}
-		for( i = 0; i < 40; i++ )
+		for( int i = 0; i < 40; i++ )
 		{
 			uint8_t p = line[i];
-			m_bitmap.pix16(i * 4 + 0, m_scanline) = pal[ ( p >> 6 ) & 3 ];
-			m_bitmap.pix16(i * 4 + 1, m_scanline) = pal[ ( p >> 4 ) & 3 ];
-			m_bitmap.pix16(i * 4 + 2, m_scanline) = pal[ ( p >> 2 ) & 3 ];
-			m_bitmap.pix16(i * 4 + 3, m_scanline) = pal[ ( p      ) & 3 ];
+			m_bitmap.pix(i * 4 + 0, m_scanline) = pal[ ( p >> 6 ) & 3 ];
+			m_bitmap.pix(i * 4 + 1, m_scanline) = pal[ ( p >> 4 ) & 3 ];
+			m_bitmap.pix(i * 4 + 2, m_scanline) = pal[ ( p >> 2 ) & 3 ];
+			m_bitmap.pix(i * 4 + 3, m_scanline) = pal[ ( p      ) & 3 ];
 		}
 	}
 
@@ -72,4 +71,7 @@ void gamecom_state::video_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_scanline),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0, m_screen->scan_period());
 	m_screen->register_screen_bitmap(m_bitmap);
+
+	m_base_address = 0;
+	m_scanline = 0;
 }

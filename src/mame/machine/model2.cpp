@@ -21,24 +21,24 @@ void model2_state::debug_init()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("m2", CMDFLAG_CUSTOM_HELP, 0, 1, 2, std::bind(&model2_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("m2", CMDFLAG_CUSTOM_HELP, 1, 2, std::bind(&model2_state::debug_commands, this, _1));
 	}
 }
 
-void model2_state::debug_commands(int ref, const std::vector<std::string> &params)
+void model2_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "geodasm")
-		debug_geo_dasm_command(ref, params);
+		debug_geo_dasm_command(params);
 	else if(params[0] == "trilist")
-		debug_tri_dump_command(ref, params);
+		debug_tri_dump_command(params);
 	else
-		debug_help_command(ref, params);
+		debug_help_command(params);
 }
 
-void model2_state::debug_help_command(int ref, const std::vector<std::string> &params)
+void model2_state::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -54,7 +54,7 @@ void model2_state::debug_help_command(int ref, const std::vector<std::string> &p
  *
  ****************************************/
 
-void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string> &params)
+void model2_state::debug_geo_dasm_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -88,8 +88,8 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 
 	while (!end_code && ptr < 0x20000/4)
 	{
-		uint32_t opcode;
-		uint32_t attr;
+		u32 opcode;
+		u32 attr;
 
 		util::stream_format(f, "%08x: \t",ptr*4+0x900000);
 		opcode = m_bufferram[ptr++];
@@ -264,7 +264,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
  *
  ****************************************/
 
-void model2_state::debug_tri_dump_command(int ref, const std::vector<std::string> &params)
+void model2_state::debug_tri_dump_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	FILE *f;

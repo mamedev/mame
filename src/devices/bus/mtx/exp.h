@@ -21,8 +21,9 @@
 
 class device_mtx_exp_interface;
 
-class mtx_exp_slot_device : public device_t, public device_slot_interface
+class mtx_exp_slot_device : public device_t, public device_single_card_slot_interface<device_mtx_exp_interface>
 {
+	friend class device_mtx_exp_interface;
 public:
 	// construction/destruction
 	template <typename T>
@@ -45,23 +46,20 @@ public:
 	auto int_handler() { return m_int_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
+	// for the card to use
 	DECLARE_WRITE_LINE_MEMBER( busreq_w ) { m_busreq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
 	// address spaces we are attached to
 	required_address_space m_program;
 	required_address_space m_io;
 
-protected:
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	device_mtx_exp_interface *m_card;
-
-private:
 	devcb_write_line m_busreq_handler;
 	devcb_write_line m_int_handler;
 	devcb_write_line m_nmi_handler;
@@ -70,13 +68,12 @@ private:
 
 // ======================> device_mtx_exp_interface
 
-class device_mtx_exp_interface : public device_slot_card_interface
+class device_mtx_exp_interface : public device_interface
 {
-public:
+protected:
 	// construction/destruction
 	device_mtx_exp_interface(const machine_config &mconfig, device_t &device);
 
-protected:
 	address_space &program_space() { return *m_slot->m_program; }
 	address_space &io_space() { return *m_slot->m_io; }
 

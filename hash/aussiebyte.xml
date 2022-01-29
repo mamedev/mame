@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="aussiebyte" description="Aussie Byte II floppies">
+
+	<software name="boot">
+		<description>Boot disk</description>
+		<year>1985</year>
+		<publisher>SME Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="knight2000_boot.dsk" size="860416" crc="2d3af348" sha1="3eb09b9a64b31f4141a186a67f6bd9d4249d2c6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

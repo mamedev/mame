@@ -25,11 +25,16 @@
     0x1700 - 0x17ff | Work RAM - contains hiscore table, coin count
     0x1800 - 0x1fff | SAA 5050 video RAM
 
-  TODO - I/O ports (0x00 for sprite->background collisions)
-         sound (2x SN76477)
-         playfield graphics may be banked, tiles above 0x1f are incorrect
-         sprite->sprite collisions aren't quite perfect
-           (you can often fly through flying missiles)
+  TODO:
+  - implement sprite-playfield collisions;
+  - sprite-playfield colors are dubious at best;
+  - Tiles may be flipped for playfield in final stage;
+  - Ranking table doesn't sort properly when player gets a better score than
+    the ones listed, CPU core bug?
+  - improve gfx layers superimposing, honor PAL timings;
+  - sound (2x SN76477)
+  - sprite->sprite collisions aren't quite perfect
+    (you can often fly through flying missiles) <- does this still occur -AS?
 
   Notes:
   - Test mode in Malzak II should be enabled by setting a POT to position
@@ -74,12 +79,12 @@
 #include <algorithm>
 
 
-READ8_MEMBER(malzak_state::fake_VRLE_r)
+uint8_t malzak_state::fake_VRLE_r()
 {
-	return (m_s2636[0]->read_data(space, 0xcb) & 0x3f) + (m_screen->vblank() ? 0x40 : 0x00);
+	return (m_s2636[0]->read_data(0xcb) & 0x3f) + (m_screen->vblank() ? 0x40 : 0x00);
 }
 
-READ8_MEMBER(malzak_state::s2636_portA_r)
+uint8_t malzak_state::s2636_portA_r()
 {
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
@@ -111,7 +116,7 @@ void malzak_state::malzak_map(address_map &map)
 	map(0x1400, 0x14ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x14cb, 0x14cb).mirror(0x6000).r(FUNC(malzak_state::fake_VRLE_r));
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::malzak_playfield_w));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::playfield_w));
 	map(0x1700, 0x17ff).mirror(0x6000).ram();
 	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
 	map(0x2000, 0x2fff).rom();
@@ -133,7 +138,7 @@ void malzak_state::malzak2_map(address_map &map)
 	map(0x14cb, 0x14cb).mirror(0x6000).r(FUNC(malzak_state::fake_VRLE_r));
 	map(0x14cc, 0x14cc).mirror(0x6000).r(FUNC(malzak_state::s2636_portA_r));
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::malzak_playfield_w));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(FUNC(malzak_state::playfield_w));
 	map(0x1700, 0x17ff).mirror(0x6000).ram().share("nvram");
 	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
 	map(0x2000, 0x2fff).rom();
@@ -142,13 +147,13 @@ void malzak_state::malzak2_map(address_map &map)
 }
 
 
-READ8_MEMBER(malzak_state::s2650_data_r)
+uint8_t malzak_state::s2650_data_r()
 {
-	popmessage("S2650 data port read");
+//  popmessage("S2650 data port read");
 	return 0xff;
 }
 
-WRITE8_MEMBER(malzak_state::port40_w)
+void malzak_state::port40_w(uint8_t data)
 {
 //  Bit 0 is constantly set high during gameplay
 //  Bit 4 is set high, then low, upon death
@@ -158,22 +163,25 @@ WRITE8_MEMBER(malzak_state::port40_w)
 //        the selected version
 //  logerror("%s S2650: port 0x40 write: 0x%02x\n", machine().describe_context(), data);
 	m_mainbank->set_entry((data & 0x40) >> 6);
+	// bit 7 is set at final stage
+	u8 gfx_bank = ((data & 0x80) >> 7);
+	if (m_playfield_bank != gfx_bank)
+	{
+		m_playfield_bank = gfx_bank;
+		m_playfield_tilemap->mark_all_dirty();
+	}
 }
 
-WRITE8_MEMBER(malzak_state::port60_w)
+uint8_t malzak_state::collision_r()
 {
-	m_malzak_x = data;
-	//  logerror("I/O: port 0x60 write 0x%02x\n", data);
-}
+	// s2636 (0 only?) <-> tilemap collision detection
+	// yyyy ---- y collision
+	// 0100 -> upper tilemap border (pixel 160)
+	// 1101 -> lower (pixel 448)
+	// pix / 32 = suggested value+1
+	// ---- xxxx x collision
+	// TODO: verify scroll offsets
 
-WRITE8_MEMBER(malzak_state::portc0_w)
-{
-	m_malzak_y = data;
-	//  logerror("I/O: port 0xc0 write 0x%02x\n", data);
-}
-
-READ8_MEMBER(malzak_state::collision_r)
-{
 	// High 4 bits seem to refer to the row affected.
 	if(++m_collision_counter > 15)
 		m_collision_counter = 0;
@@ -259,41 +267,22 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( gfx_malzak )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0,  16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0,  16*16 )
 GFXDECODE_END
-
-
-void malzak_state::malzak_palette(palette_device &palette) const
-{
-	for (int i = 0; i < 8 * 8; i++)
-	{
-		palette.set_pen_color(i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
-		palette.set_pen_color(i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-	}
-}
-
-
-READ8_MEMBER(malzak_state::videoram_r)
-{
-	return m_videoram[offset];
-}
 
 void malzak_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 2, memregion("user2")->base(), 0x400);
 
 	save_item(NAME(m_playfield_code));
-	save_item(NAME(m_malzak_x));
-	save_item(NAME(m_malzak_y));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 	save_item(NAME(m_collision_counter));
 }
 
 void malzak_state::machine_reset()
 {
 	std::fill(std::begin(m_playfield_code), std::end(m_playfield_code), 0);
-
-	m_malzak_x = 0;
-	m_malzak_y = 0;
 }
 
 void malzak_state::malzak(machine_config &config)
@@ -307,6 +296,7 @@ void malzak_state::malzak(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: convert to PAL set_raw
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(480, 512);  /* vert size is a guess */
@@ -314,7 +304,7 @@ void malzak_state::malzak(machine_config &config)
 	m_screen->set_screen_update(FUNC(malzak_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
-	PALETTE(config, m_palette, FUNC(malzak_state::malzak_palette), 128);
+	PALETTE(config, m_palette, FUNC(malzak_state::palette_init), 128);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(0, -16);  // -8, -16
@@ -408,8 +398,12 @@ ROM_START( malzak2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
+
+	ROM_REGION( 0x0100, "nvram", 0 )
+	// default nvram so that game boots in version II off the bat
+	ROM_LOAD( "malzak2.nv",    0x0000, 0x0100, CRC(aadf03d8) SHA1(9d751c4249faab7f5d88d0c99f33468f439641ad) )
 ROM_END
 
 
-GAME( 19??, malzak,  0,      malzak,  malzak,  malzak_state, empty_init, ROT0, "Kitronix", "Malzak",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak, malzak2, malzak2, malzak_state, empty_init, ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak,  0,      malzak,  malzak,  malzak_state, empty_init, ROT0, "Kitronix", "Malzak",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak, malzak2, malzak2, malzak_state, empty_init, ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -10,7 +10,7 @@
 #include "machine/keyboard.h"
 
 
-namespace bus { namespace hp_hil {
+namespace bus::hp_hil {
 
 class hle_hp_ipc_device
 		: public hle_device_base
@@ -24,12 +24,25 @@ public:
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
 	virtual int hil_poll() override;
 	virtual void hil_idd() override;
+	virtual void hil_typematic(uint8_t command) override;
+
+	required_ioport m_modifiers;
+
 private:
+	virtual void will_scan_row(u8 row) override;
+
 	util::fifo<uint8_t, 8> m_fifo;
 	void transmit_byte(uint8_t byte);
+	attotime typematic_delay() const;
+	attotime typematic_period() const;
+
+	u16 m_last_modifiers;
+	bool m_typematic;
+	int m_typematic_rate;
 };
 
 class hle_hp_itf_device
@@ -51,7 +64,7 @@ private:
 	void transmit_byte(uint8_t byte);
 };
 
-} } // namespace bus::hp_hil
+} // namespace bus::hp_hil
 
 
 DECLARE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device);

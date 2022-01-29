@@ -62,6 +62,7 @@ DEFINE_DEVICE_TYPE(CRT9021, crt9021_device, "crt9021", "SMC CRT9021 VAC")
 crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CRT9021, tag, owner, clock),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
 	m_data(0),
 	m_ms0(0),
 	m_ms1(0),
@@ -94,6 +95,8 @@ crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, d
 
 void crt9021_device::device_start()
 {
+	m_display_cb.resolve();
+
 	// register bitmap
 	screen().register_screen_bitmap(m_bitmap);
 
@@ -128,7 +131,7 @@ void crt9021_device::device_start()
 //  ld_sh_w - load/shift
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9021_device::ld_sh_w )
+void crt9021_device::ld_sh_w(int state)
 {
 	LOG("CRT9021 LD/SH: %u\n", state);
 
@@ -168,7 +171,7 @@ WRITE_LINE_MEMBER( crt9021_device::ld_sh_w )
 //  vsync_w - vertical sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9021_device::vsync_w )
+void crt9021_device::vsync_w(int state)
 {
 	LOG("CRT9021 VSYNC: %u\n", state);
 }

@@ -79,7 +79,7 @@ void dp8573_device::save_registers()
 	m_ram[REG_SAVE_MONTH]  = m_ram[REG_MONTH];
 }
 
-void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if ((m_pfr & PFR_OSF) || !(m_ram[REG_RTMR] & RTMR_CSS))
 	{

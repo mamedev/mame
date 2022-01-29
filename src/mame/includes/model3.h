@@ -28,12 +28,19 @@ typedef float VECTOR3[3];
 
 struct cached_texture
 {
+	cached_texture(int texwidth, int texheight, int texformat) :
+		next(nullptr),
+		width(texwidth),
+		height(texheight),
+		format(texformat),
+		alpha(~0),
+		data(new rgb_t[(32 << texwidth) * (32 << texheight) * 4]) { }
 	cached_texture *next;
 	uint8_t       width;
 	uint8_t       height;
 	uint8_t       format;
 	uint8_t       alpha;
-	rgb_t       data[1];
+	std::unique_ptr<rgb_t[]> data;
 };
 
 struct m3_vertex
@@ -60,7 +67,45 @@ struct m3_triangle
 	int color;
 };
 
-class model3_renderer;
+struct model3_polydata
+{
+	cached_texture *texture;
+	uint32_t color;
+	uint32_t texture_param;
+	int transparency;
+	int intensity;
+};
+
+class model3_state;
+
+class model3_renderer : public poly_manager<float, model3_polydata, 6>
+{
+public:
+	model3_renderer(running_machine &machine, int width, int height)
+		: poly_manager<float, model3_polydata, 6>(machine)
+	{
+		m_fb = std::make_unique<bitmap_rgb32>(width, height);
+		m_zb = std::make_unique<bitmap_ind32>(width, height);
+	}
+
+	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_opaque_triangles(const m3_triangle* tris, int num_tris);
+	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
+	void clear_fb();
+	void clear_zb();
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void wait_for_polys();
+
+private:
+	std::unique_ptr<bitmap_rgb32> m_fb;
+	std::unique_ptr<bitmap_ind32> m_zb;
+};
 
 class model3_state : public driver_device
 {
@@ -76,6 +121,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io(*this, "io"),
 		m_work_ram(*this, "work_ram"),
+		m_bank_crom(*this, "bank_crom"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_uart(*this, "uart"),
@@ -83,7 +129,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_cryptdevice(*this, "315_5881"),
-		m_billboard(*this, "billboard")
+		m_billboard(*this, "billboard"),
+		m_bank2(*this, "bank2")
 	{
 		m_step15_with_mpc106 = false;
 		m_step20_with_old_real3d = false;
@@ -104,6 +151,7 @@ public:
 	void model3_20(machine_config &config);
 	void model3_21(machine_config &config);
 
+	void getbass(machine_config &config);
 	void scud(machine_config &config);
 	void lostwsga(machine_config &config);
 
@@ -141,6 +189,9 @@ public:
 	void init_lamachin();
 	void init_model3_15();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -152,6 +203,7 @@ private:
 	required_device<sega_315_5649_device> m_io;
 
 	required_shared_ptr<uint64_t> m_work_ram;
+	memory_bank_creator m_bank_crom;
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<i8251_device> m_uart;
@@ -162,6 +214,7 @@ private:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 	required_device<sega_billboard_device> m_billboard;
+	memory_bank_creator m_bank2;
 
 	tilemap_t *m_layer4[4];
 	tilemap_t *m_layer8[4];
@@ -233,7 +286,7 @@ private:
 	uint64_t m_vid_reg0;
 	int m_matrix_stack_ptr;
 	int m_list_depth;
-	MATRIX *m_matrix_stack;
+	std::unique_ptr<MATRIX[]> m_matrix_stack;
 	MATRIX m_coordinate_system;
 	MATRIX m_projection_matrix;
 	float m_viewport_x;
@@ -245,62 +298,62 @@ private:
 	uint32_t m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
-	model3_renderer *m_renderer;
-	m3_triangle* m_tri_buffer;
-	m3_triangle* m_tri_alpha_buffer;
+	std::unique_ptr<model3_renderer> m_renderer;
+	std::unique_ptr<m3_triangle[]> m_tri_buffer;
+	std::unique_ptr<m3_triangle[]> m_tri_alpha_buffer;
 	int m_tri_buffer_ptr;
 	int m_tri_alpha_buffer_ptr;
 	int m_viewport_tri_index[4];
 	int m_viewport_tri_alpha_index[4];
 
-	DECLARE_READ32_MEMBER(rtc72421_r);
-	DECLARE_WRITE32_MEMBER(rtc72421_w);
-	DECLARE_READ64_MEMBER(model3_char_r);
-	DECLARE_WRITE64_MEMBER(model3_char_w);
-	DECLARE_READ64_MEMBER(model3_tile_r);
-	DECLARE_WRITE64_MEMBER(model3_tile_w);
-	DECLARE_READ64_MEMBER(model3_vid_reg_r);
-	DECLARE_WRITE64_MEMBER(model3_vid_reg_w);
-	DECLARE_WRITE64_MEMBER(model3_palette_w);
-	DECLARE_READ64_MEMBER(model3_palette_r);
-	DECLARE_WRITE64_MEMBER(real3d_display_list_w);
-	DECLARE_WRITE64_MEMBER(real3d_polygon_ram_w);
-	DECLARE_WRITE64_MEMBER(real3d_cmd_w);
-	DECLARE_READ64_MEMBER(mpc105_addr_r);
-	DECLARE_WRITE64_MEMBER(mpc105_addr_w);
-	DECLARE_READ64_MEMBER(mpc105_data_r);
-	DECLARE_WRITE64_MEMBER(mpc105_data_w);
-	DECLARE_READ64_MEMBER(mpc105_reg_r);
-	DECLARE_WRITE64_MEMBER(mpc105_reg_w);
+	uint32_t rtc72421_r(offs_t offset);
+	void rtc72421_w(offs_t offset, uint32_t data);
+	uint64_t model3_char_r(offs_t offset);
+	void model3_char_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t model3_tile_r(offs_t offset);
+	void model3_tile_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t model3_vid_reg_r(offs_t offset);
+	void model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void model3_palette_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t model3_palette_r(offs_t offset);
+	void real3d_display_list_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void real3d_polygon_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void real3d_cmd_w(uint64_t data);
+	uint64_t mpc105_addr_r(offs_t offset, uint64_t mem_mask = ~0);
+	void mpc105_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t mpc105_data_r();
+	void mpc105_data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t mpc105_reg_r(offs_t offset);
+	void mpc105_reg_w(offs_t offset, uint64_t data);
 	void mpc105_init();
-	DECLARE_READ64_MEMBER(mpc106_addr_r);
-	DECLARE_WRITE64_MEMBER(mpc106_addr_w);
-	DECLARE_READ64_MEMBER(mpc106_data_r);
-	DECLARE_WRITE64_MEMBER(mpc106_data_w);
-	DECLARE_READ64_MEMBER(mpc106_reg_r);
-	DECLARE_WRITE64_MEMBER(mpc106_reg_w);
+	uint64_t mpc106_addr_r(offs_t offset, uint64_t mem_mask = ~0);
+	void mpc106_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t mpc106_data_r(offs_t offset, uint64_t mem_mask = ~0);
+	void mpc106_data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t mpc106_reg_r(offs_t offset);
+	void mpc106_reg_w(offs_t offset, uint64_t data);
 	void mpc106_init();
-	DECLARE_READ64_MEMBER(scsi_r);
-	DECLARE_WRITE64_MEMBER(scsi_w);
-	DECLARE_READ64_MEMBER(real3d_dma_r);
-	DECLARE_WRITE64_MEMBER(real3d_dma_w);
+	uint64_t scsi_r(offs_t offset, uint64_t mem_mask = ~0);
+	void scsi_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t real3d_dma_r(offs_t offset, uint64_t mem_mask = ~0);
+	void real3d_dma_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lostwsga_ser1_w);
-	DECLARE_READ8_MEMBER(lostwsga_ser2_r);
-	DECLARE_WRITE8_MEMBER(lostwsga_ser2_w);
+	void eeprom_w(uint8_t data);
+	uint8_t input_r();
+	void lostwsga_ser1_w(uint8_t data);
+	uint8_t lostwsga_ser2_r();
+	void lostwsga_ser2_w(uint8_t data);
 
-	DECLARE_READ64_MEMBER(model3_sys_r);
-	DECLARE_WRITE64_MEMBER(model3_sys_w);
-	DECLARE_READ64_MEMBER(model3_rtc_r);
-	DECLARE_WRITE64_MEMBER(model3_rtc_w);
-	DECLARE_READ64_MEMBER(real3d_status_r);
-	DECLARE_READ8_MEMBER(model3_sound_r);
-	DECLARE_WRITE8_MEMBER(model3_sound_w);
+	uint64_t model3_sys_r(offs_t offset, uint64_t mem_mask = ~0);
+	void model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t model3_rtc_r(offs_t offset, uint64_t mem_mask = ~0);
+	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t real3d_status_r(offs_t offset);
+	uint8_t model3_sound_r(offs_t offset);
+	void model3_sound_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
-	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
+	void daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void model3snd_ctrl(uint16_t data);
 	uint32_t pci_device_get_reg();
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();
@@ -319,7 +372,7 @@ private:
 	TIMER_CALLBACK_MEMBER(model3_scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 	void real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
 	uint32_t scsi_fetch(uint32_t dsp);
 	void scsi_irq_callback(int state);
@@ -327,7 +380,6 @@ private:
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
 	// video
-	virtual void video_start() override;
 	uint32_t screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);
@@ -382,6 +434,8 @@ private:
 	void model3_snd(address_map &map);
 	void scsp1_map(address_map &map);
 	void scsp2_map(address_map &map);
+	void getbass_iocpu_mem(address_map &map);
+	void getbass_iocpu_io(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MODEL3_H

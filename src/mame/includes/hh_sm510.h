@@ -9,8 +9,16 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#pragma once
+
 #include "cpu/sm510/sm510.h"
+#include "cpu/sm510/sm511.h"
+#include "cpu/sm510/sm5a.h"
 #include "sound/spkrdev.h"
+
+
+#define PORT_CHANGED_CB(x) \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
 
 
 class hh_sm510_state : public driver_device
@@ -53,15 +61,15 @@ protected:
 	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();
-	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
-	virtual DECLARE_WRITE16_MEMBER(sm500_lcd_segment_w);
-	virtual DECLARE_READ8_MEMBER(input_r);
-	virtual DECLARE_WRITE8_MEMBER(input_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo2bit_r1_w);
-	virtual DECLARE_WRITE8_MEMBER(piezo2bit_input_w);
+	virtual void sm510_lcd_segment_w(offs_t offset, u16 data);
+	virtual void sm500_lcd_segment_w(offs_t offset, u16 data);
+	virtual u8 input_r();
+	virtual void input_w(u8 data);
+	virtual void piezo_r1_w(u8 data);
+	virtual void piezo_r2_w(u8 data);
+	virtual void piezo_input_w(u8 data);
+	virtual void piezo2bit_r1_w(u8 data);
+	virtual void piezo2bit_input_w(u8 data);
 
 	// display common
 	int m_decay_pivot;              // lcd segment off-to-on delay in 1kHz ticks (affects input lag)

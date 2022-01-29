@@ -14,6 +14,7 @@
 #include "cdrom.h"
 #include "cpu/h6280/h6280.h"
 #include "bus/pce/pce_slot.h"
+#include "bus/pce_ctrl/pcectrl.h"
 #include "machine/pce_cd.h"
 #include "video/huc6260.h"
 
@@ -37,49 +38,44 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cd_ram(*this, "cd_ram"),
-		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260"),
 		m_cartslot(*this, "cartslot"),
 		m_cd(*this, "pce_cd"),
-		m_joy(*this, "JOY_P.%u", 0),
-		m_joy6b(*this, "JOY6B_P.%u", 0),
-		m_joy_type(*this, "JOY_TYPE"),
+		m_port_ctrl(*this, "ctrl"),
 		m_a_card(*this, "A_CARD")
 	{ }
 
-	required_device<h6280_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_cd_ram;
-	required_shared_ptr<uint8_t> m_user_ram;
-	optional_device<huc6260_device> m_huc6260;
-	required_device<pce_cart_slot_device> m_cartslot;
-	optional_device<pce_cd_device> m_cd;
-	required_ioport_array<5> m_joy;
-	required_ioport_array<5> m_joy6b;
-	required_ioport m_joy_type;
-	required_ioport m_a_card;
-
-	uint8_t m_io_port_options;
-	uint8_t m_sys3_card;
-	uint8_t m_acard;
-	int m_joystick_port_select;
-	int m_joystick_data_select;
-	uint8_t m_joy_6b_packet[5];
-	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
-	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
-	DECLARE_READ8_MEMBER(pce_cd_intf_r);
-	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
-	void init_sgx();
 	void init_tg16();
-	void init_mess_pce();
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_MACHINE_START(pce);
-	DECLARE_MACHINE_RESET(mess_pce);
+	void init_pce();
+
 	void pce_common(machine_config &config);
 	void pce(machine_config &config);
 	void tg16(machine_config &config);
 	void sgx(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<h6280_device> m_maincpu;
+	required_shared_ptr<u8> m_cd_ram;
+	required_device<huc6260_device> m_huc6260;
+	required_device<pce_cart_slot_device> m_cartslot;
+	optional_device<pce_cd_device> m_cd;
+	required_device<pce_control_port_device> m_port_ctrl;
+	required_ioport m_a_card;
+
+	u8 m_io_port_options;
+	u8 m_sys3_card;
+	u8 m_acard;
+	void controller_w(u8 data);
+	u8 controller_r();
+	void cd_intf_w(offs_t offset, u8 data);
+	u8 cd_intf_r(offs_t offset);
+	u8 acard_wram_r(offs_t offset);
+	void acard_wram_w(offs_t offset, u8 data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void sgx_io(address_map &map);

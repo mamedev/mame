@@ -201,7 +201,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 //  REGISTER ACCESS
 //**************************************************************************
 
-READ32_MEMBER(hpc1_device::read)
+uint32_t hpc1_device::read(offs_t offset, uint32_t mem_mask)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
 		return m_rtc->read(offset - 0xe00/4);
@@ -327,7 +327,7 @@ READ32_MEMBER(hpc1_device::read)
 	return 0;
 }
 
-WRITE32_MEMBER(hpc1_device::write)
+void hpc1_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
 	{

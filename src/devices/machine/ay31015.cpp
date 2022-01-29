@@ -238,7 +238,7 @@ inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_device::o
 
 
 /*-------------------------------------------------
- ay31015_update_status_pins - Update the status pins
+ update_status_pins - Update the status pins
 -------------------------------------------------*/
 
 void ay31015_device::update_status_pins()
@@ -260,7 +260,7 @@ void ay31015_device::update_status_pins()
 
 
 /*-------------------------------------------------
- ay31015_rx_process - convert serial to parallel
+ rx_process - convert serial to parallel
 -------------------------------------------------*/
 
 void ay31015_device::rx_process()
@@ -336,7 +336,9 @@ void ay31015_device::rx_process()
 
 			if (m_rx_pulses == 8)                    // sample input stream
 			{
-				m_rx_parity ^= get_si();             // calculate cumulative parity
+				m_internal_sample = get_si();
+				m_rx_parity ^= m_internal_sample;     // calculate cumulative parity
+				LOG("Receive parity bit: %d\n", m_internal_sample);
 			}
 			else
 			if (!m_rx_pulses)                    // end of a byte
@@ -350,7 +352,10 @@ void ay31015_device::rx_process()
 				if ((m_control_reg & CONTROL_EPS) && (!m_rx_parity))
 					m_rx_parity = 0;         // even parity, ok
 				else
+				{
 					m_rx_parity = 1;         // parity error
+					LOG("Parity error\n");
+				}
 			}
 			return;
 
@@ -423,7 +428,7 @@ void ay31015_device::rx_process()
 
 
 /*-------------------------------------------------
- ay31015_tx_process - convert parallel to serial
+ tx_process - convert parallel to serial
 -------------------------------------------------*/
 
 void ay31015_device::tx_process()
@@ -478,7 +483,7 @@ void ay31015_device::tx_process()
 				}
 				else
 					set_so(0);
-				LOG("Transmit data bit #%d: %d\n", 9 - (m_tx_pulses >> 4), m_tx_data & 1);
+				LOG("Transmit data bit #%d: %d\n", 1 + ((m_total_pulses - m_tx_pulses) >> 4), m_tx_data & 1);
 
 				m_tx_data >>= 1;             // adjust the shift register
 			}
@@ -524,14 +529,36 @@ void ay31015_device::tx_process()
 			m_tx_pulses--;
 			if (!m_tx_pulses)
 			{
-				m_status_reg |= STATUS_EOC;          // character is completely sent
 				if (m_second_stop_bit)
 				{
 					m_tx_state = SECOND_STOP_BIT;
 					m_tx_pulses = m_second_stop_bit;
-					LOG("Transmit second stop bit\n");
 				}
 				else
+				{
+					m_status_reg |= STATUS_EOC;          // character is completely sent
+					if (m_status_reg & STATUS_TBMT)
+					{
+						m_tx_state = IDLE;           // if nothing to send, go idle
+						LOG("Transmitter idle\n");
+					}
+					else
+					{
+						m_tx_pulses = 16;
+						m_tx_state = START_BIT;      // otherwise immediately start next byte
+					}
+					update_status_pins();
+				}
+			}
+			return;
+
+		case SECOND_STOP_BIT:
+			if (m_tx_pulses == 16)
+				LOG("Transmit second stop bit\n");
+			m_tx_pulses--;
+			if (!m_tx_pulses)
+			{
+				m_status_reg |= STATUS_EOC;          // character is completely sent
 				if (m_status_reg & STATUS_TBMT)
 				{
 					m_tx_state = IDLE;           // if nothing to send, go idle
@@ -546,31 +573,12 @@ void ay31015_device::tx_process()
 			}
 			return;
 
-		case SECOND_STOP_BIT:
-			if (m_tx_pulses == 16)
-				LOG("Transmit second stop bit\n");
-			m_tx_pulses--;
-			if (!m_tx_pulses)
-			{
-				if (m_status_reg & STATUS_TBMT)
-				{
-					m_tx_state = IDLE;           // if nothing to send, go idle
-					LOG("Transmitter idle\n");
-				}
-				else
-				{
-					m_tx_pulses = 16;
-					m_tx_state = START_BIT;      // otherwise immediately start next byte
-				}
-			}
-			return;
-
 	}
 }
 
 
 /*-------------------------------------------------
- ay31015_reset - reset internal state
+ internal_reset - reset internal state
 -------------------------------------------------*/
 
 void ay31015_device::internal_reset()
@@ -626,7 +634,7 @@ void ay51013_device::internal_reset()
 }
 
 /*-------------------------------------------------
- ay31015_transfer_control_pins - transfers contents of controls pins to the control register
+ transfer_control_pins - transfers contents of controls pins to the control register
 -------------------------------------------------*/
 
 void ay31015_device::transfer_control_pins()
@@ -648,7 +656,7 @@ void ay31015_device::transfer_control_pins()
 
 
 /*-------------------------------------------------
- ay31015_set_input_pin - set an input pin
+ set_input_pin - set an input pin
 -------------------------------------------------*/
 void ay31015_device::set_input_pin( ay31015_device::input_pin pin, int data )
 {
@@ -701,7 +709,7 @@ void ay31015_device::set_input_pin( ay31015_device::input_pin pin, int data )
 
 
 /*-------------------------------------------------
- ay31015_get_output_pin - get the status of an output pin
+ get_output_pin - get the status of an output pin
 -------------------------------------------------*/
 
 int ay31015_device::get_output_pin( ay31015_device::output_pin pin )
@@ -711,10 +719,10 @@ int ay31015_device::get_output_pin( ay31015_device::output_pin pin )
 
 
 /*-------------------------------------------------
- ay31015_get_received_data - return a byte to the computer
+ received - return a byte to the computer
 -------------------------------------------------*/
 
-uint8_t ay31015_device::get_received_data()
+uint8_t ay31015_device::receive()
 {
 	if (m_auto_rdav && !machine().side_effects_disabled())
 	{
@@ -725,16 +733,10 @@ uint8_t ay31015_device::get_received_data()
 	return m_rx_buffer;
 }
 
-READ8_MEMBER(ay31015_device::receive)
-{
-	return get_received_data();
-}
-
-
 /*-------------------------------------------------
-    ay31015_set_transmit_data - accept a byte to transmit, if able
+ transmit - accept a byte to transmit, if able
 -------------------------------------------------*/
-void ay31015_device::set_transmit_data( uint8_t data )
+void ay31015_device::transmit( uint8_t data )
 {
 	if (m_status_reg & STATUS_TBMT)
 	{
@@ -742,9 +744,4 @@ void ay31015_device::set_transmit_data( uint8_t data )
 		m_status_reg &= ~STATUS_TBMT;
 		update_status_pins();
 	}
-}
-
-WRITE8_MEMBER(ay31015_device::transmit)
-{
-	set_transmit_data(data);
 }

@@ -28,7 +28,6 @@
     - use priority PROM for drawing sprites
     - find and dump an unmodified bme01.12d to correct the 1943 Euro set
     - Accurate interrupt handling
-    - Screen raw parameters
 
     Notes:
 
@@ -46,7 +45,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -81,11 +80,11 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc007, 0xc007).lr8("mcu_r", [this]() -> u8 { return m_mcu_to_cpu; });
+	map(0xc007, 0xc007).lr8(NAME([this] () -> u8 { return m_mcu_to_cpu; }));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(_1943_state::c804_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc807, 0xc807).lw8("mcu_w", [this](u8 data) { m_cpu_to_mcu = data; });
+	map(0xc807, 0xc807).lw8(NAME([this] (u8 data) { m_cpu_to_mcu = data; }));
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
@@ -106,7 +105,7 @@ void _1943_state::c1943b_map(address_map &map)
 
 	// the bootleg expects 0x00 to be returned from the protection reads
 	// because the protection has been patched out
-	map(0xc007, 0xc007).lr8("mcu_r", []() -> u8 { return 0x00; });
+	map(0xc007, 0xc007).lr8(NAME([]() -> u8 { return 0x00; }));
 	map(0xc807, 0xc807).noprw();
 }
 
@@ -115,7 +114,7 @@ void _1943_state::sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xc800).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xd800, 0xd800).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
+	map(0xd800, 0xd800).lrw8(NAME([this]() { return m_mcu_to_audiocpu; }), NAME([this](u8 data) { m_audiocpu_to_mcu = data; }));
 	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
 }
@@ -297,10 +296,7 @@ void _1943_state::_1943(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
 	m_screen->set_palette(m_palette);
 

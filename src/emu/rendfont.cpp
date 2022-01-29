@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    rendfont.c
+    rendfont.cpp
 
     Rendering system font management.
 
@@ -11,10 +11,12 @@
 #include "emu.h"
 #include "rendfont.h"
 #include "emuopts.h"
+#include "corestr.h"
 #include "coreutil.h"
 
 #include "osdepend.h"
 #include "uismall.fh"
+#include "unicode.h"
 
 #include "ui/uicmd14.fh"
 #include "ui/cmddata.h"
@@ -372,35 +374,30 @@ private:
 } // anonymous namespace
 
 
-void convert_command_glyph(std::string &str)
+std::string convert_command_glyph(std::string_view str)
 {
-	(void)str.c_str(); // force NUL-termination - we depend on it later
-	std::size_t const len(str.length());
-	std::vector<char> buf(2 * (len + 1));
+	std::vector<char> buf(2 * (str.length() + 1));
 	std::size_t j(0);
-	for (std::size_t i = 0; len > i; )
+	while (!str.empty())
 	{
 		// decode UTF-8
 		char32_t uchar;
-		int const codelen(uchar_from_utf8(&uchar, &str[i], len - i));
+		int const codelen(uchar_from_utf8(&uchar, str));
 		if (0 >= codelen)
 			break;
-		i += codelen;
+		str.remove_prefix(codelen);
 
 		// check for three metacharacters
 		fix_command_t const *fixcmd(nullptr);
 		switch (uchar)
 		{
 		case COMMAND_CONVERT_TEXT:
-			for (fix_strings_t *fixtext = convert_text; fixtext->glyph_code; ++fixtext)
+			for (fix_strings_t const *fixtext = convert_text; fixtext->glyph_code; ++fixtext)
 			{
-				if (!fixtext->glyph_str_len)
-					fixtext->glyph_str_len = std::strlen(fixtext->glyph_str);
-
-				if (!std::strncmp(fixtext->glyph_str, &str[i], fixtext->glyph_str_len))
+				if (str.substr(0, fixtext->glyph_str.length()) == fixtext->glyph_str)
 				{
 					uchar = fixtext->glyph_code + COMMAND_UNICODE;
-					i += strlen(fixtext->glyph_str);
+					str.remove_prefix(fixtext->glyph_str.length());
 					break;
 				}
 			}
@@ -416,20 +413,20 @@ void convert_command_glyph(std::string &str)
 		}
 
 		// this substitutes a single character
-		if (fixcmd)
+		if (fixcmd && !str.empty())
 		{
-			if (str[i] == uchar)
+			if (str[0] == uchar)
 			{
-				++i;
+				str.remove_prefix(1);
 			}
 			else
 			{
-				while (fixcmd->glyph_code && (fixcmd->glyph_char != str[i]))
+				while (fixcmd->glyph_code && !str.empty() && fixcmd->glyph_char != str[0])
 					++fixcmd;
-				if (fixcmd->glyph_code)
+				if (fixcmd->glyph_code && !str.empty())
 				{
 					uchar = COMMAND_UNICODE + fixcmd->glyph_code;
-					++i;
+					str.remove_prefix(1);
 				}
 			}
 		}
@@ -440,7 +437,7 @@ void convert_command_glyph(std::string &str)
 			break;
 		j += outlen;
 	}
-	str.assign(&buf[0], j);
+	return std::string(&buf[0], j);
 }
 
 
@@ -481,7 +478,7 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 	static glyph dummy_glyph;
 
 	unsigned const page(chnum / 256);
-	if (page >= ARRAY_LENGTH(m_glyphs))
+	if (page >= std::size(m_glyphs))
 	{
 		if ((0 <= m_defchar) && (chnum != m_defchar))
 			return get_char(m_defchar);
@@ -597,8 +594,8 @@ render_font::render_font(render_manager &manager, const char *filename)
 
 	// load the compiled in data instead
 	emu_file ramfile(OPEN_FLAG_READ);
-	osd_file::error const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
-	if (osd_file::error::NONE == filerr)
+	std::error_condition const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
+	if (!filerr)
 		load_cached(ramfile, 0, 0);
 	render_font_command_glyph();
 }
@@ -664,7 +661,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height_cmd + m_yoffs_cmd - gl.yoffs - gl.bmheight;
-			u32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix32(desty, 0) : nullptr;
+			u32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix(desty, 0) : nullptr;
 			{
 				for (int x = 0; x < gl.bmwidth; x++)
 				{
@@ -723,7 +720,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; ++y)
 		{
 			int const desty(y + m_height + m_yoffs - gl.yoffs - gl.bmheight);
-			u32 *dest(((0 <= desty) && (m_height > desty)) ? &gl.bitmap.pix32(desty) : nullptr);
+			u32 *dest(((0 <= desty) && (m_height > desty)) ? &gl.bitmap.pix(desty) : nullptr);
 
 			if (m_format == format::TEXT)
 			{
@@ -856,21 +853,19 @@ float render_font::char_width(float height, float aspect, char32_t ch)
 //  at the given height
 //-------------------------------------------------
 
-float render_font::string_width(float height, float aspect, const char *string)
+float render_font::string_width(float height, float aspect, std::string_view string)
 {
 	// loop over the string and accumulate widths
 	int totwidth = 0;
 
-	const char *ends = string + strlen(string);
-	const char *s = string;
 	char32_t schar;
 
 	// loop over characters
-	while (*s != 0)
+	while (!string.empty())
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(&schar, string);
 		totwidth += get_char(schar).width;
-		s += scharcount;
+		string.remove_prefix(scharcount);
 	}
 
 
@@ -884,21 +879,19 @@ float render_font::string_width(float height, float aspect, const char *string)
 //  UTF8-encoded string at the given height
 //-------------------------------------------------
 
-float render_font::utf8string_width(float height, float aspect, const char *utf8string)
+float render_font::utf8string_width(float height, float aspect, std::string_view utf8string)
 {
-	std::size_t const length = std::strlen(utf8string);
-
 	// loop over the string and accumulate widths
-	int count;
 	s32 totwidth = 0;
-	for (std::size_t offset = 0U; offset < length; offset += unsigned(count))
+	while (!utf8string.empty())
 	{
 		char32_t uchar;
-		count = uchar_from_utf8(&uchar, utf8string + offset, length - offset);
+		int count = uchar_from_utf8(&uchar, utf8string);
 		if (count < 0)
 			break;
 
 		totwidth += get_char(uchar).width;
+		utf8string.remove_prefix(count);
 	}
 
 	// scale the final result based on height
@@ -915,14 +908,14 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 
 bool render_font::load_cached_bdf(const char *filename)
 {
-	osd_file::error filerr;
+	std::error_condition filerr;
 	u32 chunk;
 	u64 bytes;
 
 	// first try to open the BDF itself
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
 	filerr = file.open(filename);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		return false;
 
 	// determine the file size and allocate memory
@@ -958,8 +951,8 @@ bool render_font::load_cached_bdf(const char *filename)
 	// attempt to open the cached version of the font
 	{
 		emu_file cachefile(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
-		filerr = cachefile.open(cachedname.c_str());
-		if (filerr == osd_file::error::NONE)
+		filerr = cachefile.open(cachedname);
+		if (!filerr)
 		{
 			// if we have a cached version, load it
 			bool const result = load_cached(cachefile, m_rawsize, hash);
@@ -1299,7 +1292,7 @@ bool render_font::load_bdf()
 			{
 				LOG("render_font::load_bdf: ignoring character with negative x advance\n");
 			}
-			else if ((256 * ARRAY_LENGTH(m_glyphs)) <= encoding)
+			else if ((256 * std::size(m_glyphs)) <= encoding)
 			{
 				LOG("render_font::load_bdf: ignoring character with encoding outside range\n");
 			}
@@ -1463,8 +1456,8 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 
 	// attempt to open the file
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	osd_file::error const filerr = file.open(filename);
-	if (osd_file::error::NONE != filerr)
+	std::error_condition const filerr = file.open(filename);
+	if (filerr)
 		return false;
 
 	// count glyphs
@@ -1512,7 +1505,7 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 
 		// loop over all characters
 		bdc_table_entry table_entry(chartable.empty() ? nullptr : &chartable[0]);
-		for (unsigned chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
+		for (unsigned chnum = 0; chnum < (256 * std::size(m_glyphs)); chnum++)
 		{
 			if (m_glyphs[chnum / 256] && (0 < m_glyphs[chnum / 256][chnum % 256].width))
 			{
@@ -1531,7 +1524,7 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const u32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
+						u32 const *const src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix(desty) : nullptr;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
 							if (src != nullptr && rgb_t(src[x]).a() != 0)
@@ -1603,7 +1596,7 @@ void render_font::render_font_command_glyph()
 {
 	// FIXME: this is copy/pasta from the BDC loading, and it shouldn't be injected into every font
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open_ram(font_uicmd14, sizeof(font_uicmd14)) == osd_file::error::NONE)
+	if (!file.open_ram(font_uicmd14, sizeof(font_uicmd14)))
 	{
 		// get the file size, read the header, and check that it looks good
 		u64 const filesize(file.size());

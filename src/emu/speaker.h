@@ -69,28 +69,28 @@ public:
 	speaker_device &backrest()          { set_position( 0.0, -0.2,  0.1); return *this; }
 
 	// internally for use by the sound system
-	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
+	void mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// inline configuration state
-	double              m_x;
-	double              m_y;
-	double              m_z;
+	double m_x;
+	double m_y;
+	double m_z;
 
 	// internal state
-#ifdef MAME_DEBUG
-	s32                 m_max_sample;           // largest sample value we've seen
-	s32                 m_clipped_samples;      // total number of clipped samples
-	s32                 m_total_samples;        // total number of samples
-#endif
+	static constexpr int BUCKETS_PER_SECOND = 10;
+	std::vector<stream_buffer::sample_t> m_max_sample;
+	stream_buffer::sample_t m_current_max;
+	u32 m_samples_this_bucket;
 };
 
 
 // speaker device iterator
-typedef device_type_iterator<speaker_device> speaker_device_iterator;
+using speaker_device_enumerator = device_type_enumerator<speaker_device>;
 
 
 #endif // MAME_EMU_SPEAKER_H

@@ -15,8 +15,8 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ32_MEMBER(gcsr_r) { return m_gcsr; }
-	DECLARE_WRITE32_MEMBER(gcsr_w) { m_gcsr = data; }
+	u32 gcsr_r() { return m_gcsr; }
+	void gcsr_w(u32 data) { m_gcsr = data; }
 	enum ipoll_mask
 	{
 		IPOLL_ATTN       = 0x000000ff,
@@ -28,8 +28,8 @@ public:
 		IPOLL_INTBERR    = 0x00010000,
 		IPOLL_INTMMBE    = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(ipoll_r) { return m_ipoll; }
-	DECLARE_WRITE32_MEMBER(ipoll_w) { m_ipoll = data; }
+	u32 ipoll_r() { return m_ipoll; }
+	void ipoll_w(u32 data) { m_ipoll = data; }
 
 	enum imask_mask
 	{
@@ -41,12 +41,12 @@ public:
 		IMASK_INTBERR    = 0x00010000,
 		IMASK_INTMMBE    = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(imask_r) { return m_imask; }
-	DECLARE_WRITE32_MEMBER(imask_w) { m_imask = data; }
-	DECLARE_READ32_MEMBER(range_base_r) { return m_range_base; }
-	DECLARE_WRITE32_MEMBER(range_base_w) { m_range_base = data; }
-	DECLARE_READ32_MEMBER(range_end_r) { return m_range_end; }
-	DECLARE_WRITE32_MEMBER(range_end_w) { m_range_end = data; }
+	u32 imask_r() { return m_imask; }
+	void imask_w(u32 data) { m_imask = data; }
+	u32 range_base_r() { return m_range_base; }
+	void range_base_w(u32 data) { m_range_base = data; }
+	u32 range_end_r() { return m_range_end; }
+	void range_end_w(u32 data) { m_range_end = data; }
 
 	enum cttag_mask
 	{
@@ -55,85 +55,85 @@ public:
 		CTTAG_MAXBCLK  = 0x0003fe00,
 		CTTAG_MAXRETRY = 0x3ffc0000
 	};
-	DECLARE_READ32_MEMBER(cttag_r) { return m_cttag; }
-	DECLARE_WRITE32_MEMBER(cttag_w) { m_cttag = data; }
-	DECLARE_READ32_MEMBER(address_r) { return m_address; }
-	DECLARE_WRITE32_MEMBER(address_w) { m_address = data; }
+	u32 cttag_r() { return m_cttag; }
+	void cttag_w(u32 data) { m_cttag = data; }
+	u32 address_r() { return m_address; }
+	void address_w(u32 data) { m_address = data; }
 
 	enum dmacsr_mask
 	{
 		DMACSR_CH1ENABLE = 0x00000080
 	};
-	DECLARE_READ32_MEMBER(dmacsr_r) { return m_dmacsr; }
-	DECLARE_WRITE32_MEMBER(dmacsr_w) { m_dmacsr = data; }
+	u32 dmacsr_r() { return m_dmacsr; }
+	void dmacsr_w(u32 data) { m_dmacsr = data; }
 
 	enum edmacsr_mask
 	{
 		EDMACSR_CH1RDONLY = 0x00000010
 	};
-	DECLARE_READ32_MEMBER(edmacsr_r) { return m_edmacsr; }
-	DECLARE_WRITE32_MEMBER(edmacsr_w) { m_edmacsr = data; }
-	DECLARE_READ32_MEMBER(reg6_range_r) { return m_reg6_range; }
-	DECLARE_WRITE32_MEMBER(reg6_range_w) { m_reg6_range = data; }
+	u32 edmacsr_r() { return m_edmacsr; }
+	void edmacsr_w(u32 data) { m_edmacsr = data; }
+	u32 reg6_range_r() { return m_reg6_range; }
+	void reg6_range_w(u32 data) { m_reg6_range = data; }
 
-	DECLARE_READ32_MEMBER(ddpta0_r) { return m_ddpta0; }
-	DECLARE_WRITE32_MEMBER(ddpta0_w) { m_ddpta0 = data; }
-	DECLARE_READ32_MEMBER(ddpad0_r) { return m_ddpad0; }
-	DECLARE_WRITE32_MEMBER(ddpad0_w) { m_ddpad0 = data; }
-	DECLARE_READ32_MEMBER(ddoff0_r) { return m_ddoff0; }
-	DECLARE_WRITE32_MEMBER(ddoff0_w) { m_ddoff0 = data; }
-	DECLARE_READ32_MEMBER(ddtc0_r) { return m_ddtc0; }
-	DECLARE_WRITE32_MEMBER(ddtc0_w) { m_ddtc0 = data; }
+	u32 ddpta0_r() { return m_ddpta0; }
+	void ddpta0_w(u32 data) { m_ddpta0 = data; }
+	u32 ddpad0_r() { return m_ddpad0; }
+	void ddpad0_w(u32 data) { m_ddpad0 = data; }
+	u32 ddoff0_r() { return m_ddoff0; }
+	void ddoff0_w(u32 data) { m_ddoff0 = data; }
+	u32 ddtc0_r() { return m_ddtc0; }
+	void ddtc0_w(u32 data) { m_ddtc0 = data; }
 
-	DECLARE_READ32_MEMBER(dspta0_r) { return m_dspta0; }
-	DECLARE_WRITE32_MEMBER(dspta0_w) { m_dspta0 = data; }
-	DECLARE_READ32_MEMBER(dspad0_r) { return m_dspad0; }
-	DECLARE_WRITE32_MEMBER(dspad0_w) { m_dspad0 = data; }
-	DECLARE_READ32_MEMBER(dsoff0_r) { return m_dsoff0; }
-	DECLARE_WRITE32_MEMBER(dsoff0_w) { m_dsoff0 = data; }
-	DECLARE_READ32_MEMBER(dstc0_r) { return m_dstc0; }
-	DECLARE_WRITE32_MEMBER(dstc0_w) { m_dstc0 = data; }
+	u32 dspta0_r() { return m_dspta0; }
+	void dspta0_w(u32 data) { m_dspta0 = data; }
+	u32 dspad0_r() { return m_dspad0; }
+	void dspad0_w(u32 data) { m_dspad0 = data; }
+	u32 dsoff0_r() { return m_dsoff0; }
+	void dsoff0_w(u32 data) { m_dsoff0 = data; }
+	u32 dstc0_r() { return m_dstc0; }
+	void dstc0_w(u32 data) { m_dstc0 = data; }
 
-	DECLARE_READ32_MEMBER(dspad1_r) { return m_dspad1; }
-	DECLARE_WRITE32_MEMBER(dspad1_w) { m_dspad1 = data; }
-	DECLARE_READ32_MEMBER(dsoff1_r) { return m_dsoff1; }
-	DECLARE_WRITE32_MEMBER(dsoff1_w) { m_dsoff1 = data; }
-	DECLARE_READ32_MEMBER(dstc1_r) { return m_dstc1; }
-	DECLARE_WRITE32_MEMBER(dstc1_w) { m_dstc1 = data; }
+	u32 dspad1_r() { return m_dspad1; }
+	void dspad1_w(u32 data) { m_dspad1 = data; }
+	u32 dsoff1_r() { return m_dsoff1; }
+	void dsoff1_w(u32 data) { m_dsoff1 = data; }
+	u32 dstc1_r() { return m_dstc1; }
+	void dstc1_w(u32 data) { m_dstc1 = data; }
 
-	DECLARE_READ32_MEMBER(ddpad1_r) { return m_ddpad1; }
-	DECLARE_WRITE32_MEMBER(ddpad1_w) { m_ddpad1 = data; }
-	DECLARE_READ32_MEMBER(ddoff1_r) { return m_ddoff1; }
-	DECLARE_WRITE32_MEMBER(ddoff1_w) { m_ddoff1 = data; }
-	DECLARE_READ32_MEMBER(ddtc1_r) { return m_ddtc1; }
-	DECLARE_WRITE32_MEMBER(ddtc1_w);
+	u32 ddpad1_r() { return m_ddpad1; }
+	void ddpad1_w(u32 data) { m_ddpad1 = data; }
+	u32 ddoff1_r() { return m_ddoff1; }
+	void ddoff1_w(u32 data) { m_ddoff1 = data; }
+	u32 ddtc1_r() { return m_ddtc1; }
+	void ddtc1_w(u32 data);
 
-	DECLARE_READ32_MEMBER(ddpta2_r) { return m_ddpta2; }
-	DECLARE_WRITE32_MEMBER(ddpta2_w) { m_ddpta2 = data; }
-	DECLARE_READ32_MEMBER(ddpad2_r) { return m_ddpad2; }
-	DECLARE_WRITE32_MEMBER(ddpad2_w) { m_ddpad2 = data; }
-	DECLARE_READ32_MEMBER(ddoff2_r) { return m_ddoff2; }
-	DECLARE_WRITE32_MEMBER(ddoff2_w) { m_ddoff2 = data; }
-	DECLARE_READ32_MEMBER(ddtc2_r) { return m_ddtc2; }
-	DECLARE_WRITE32_MEMBER(ddtc2_w) { m_ddtc2 = data; }
+	u32 ddpta2_r() { return m_ddpta2; }
+	void ddpta2_w(u32 data) { m_ddpta2 = data; }
+	u32 ddpad2_r() { return m_ddpad2; }
+	void ddpad2_w(u32 data) { m_ddpad2 = data; }
+	u32 ddoff2_r() { return m_ddoff2; }
+	void ddoff2_w(u32 data) { m_ddoff2 = data; }
+	u32 ddtc2_r() { return m_ddtc2; }
+	void ddtc2_w(u32 data) { m_ddtc2 = data; }
 
-	DECLARE_READ32_MEMBER(dspta2_r) { return m_dspta2; }
-	DECLARE_WRITE32_MEMBER(dspta2_w) { m_dspta2 = data; }
-	DECLARE_READ32_MEMBER(dspad2_r) { return m_dspad2; }
-	DECLARE_WRITE32_MEMBER(dspad2_w) { m_dspad2 = data; }
-	DECLARE_READ32_MEMBER(dsoff2_r) { return m_dsoff2; }
-	DECLARE_WRITE32_MEMBER(dsoff2_w) { m_dsoff2 = data; }
-	DECLARE_READ32_MEMBER(dstc2_r) { return m_dstc2; }
-	DECLARE_WRITE32_MEMBER(dstc2_w) { m_dstc2 = data; }
+	u32 dspta2_r() { return m_dspta2; }
+	void dspta2_w(u32 data) { m_dspta2 = data; }
+	u32 dspad2_r() { return m_dspad2; }
+	void dspad2_w(u32 data) { m_dspad2 = data; }
+	u32 dsoff2_r() { return m_dsoff2; }
+	void dsoff2_w(u32 data) { m_dsoff2 = data; }
+	u32 dstc2_r() { return m_dstc2; }
+	void dstc2_w(u32 data) { m_dstc2 = data; }
 
-	DECLARE_READ32_MEMBER(ddrd2_r) { return m_ddrd2; }
-	DECLARE_WRITE32_MEMBER(ddrd2_w) { m_ddrd2 = data; }
-	DECLARE_READ32_MEMBER(dsrd2_r) { return m_dsrd2; }
-	DECLARE_WRITE32_MEMBER(dsrd2_w) { m_dsrd2 = data; }
-	DECLARE_READ32_MEMBER(dcksum0_r) { return m_dcksum0; }
-	DECLARE_WRITE32_MEMBER(dcksum0_w) { m_dcksum0 = data; }
-	DECLARE_READ32_MEMBER(dcksum1_r) { return m_dcksum1; }
-	DECLARE_WRITE32_MEMBER(dcksum1_w) { m_dcksum1 = data; }
+	u32 ddrd2_r() { return m_ddrd2; }
+	void ddrd2_w(u32 data) { m_ddrd2 = data; }
+	u32 dsrd2_r() { return m_dsrd2; }
+	void dsrd2_w(u32 data) { m_dsrd2 = data; }
+	u32 dcksum0_r() { return m_dcksum0; }
+	void dcksum0_w(u32 data) { m_dcksum0 = data; }
+	u32 dcksum1_r() { return m_dcksum1; }
+	void dcksum1_w(u32 data) { m_dcksum1 = data; }
 
 protected:
 	virtual void device_start() override;

@@ -77,7 +77,7 @@ void matmania_state::matmania_palette(palette_device &palette) const
 
 
 
-WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
+void matmania_state::matmania_paletteram_w(offs_t offset, uint8_t data)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;

@@ -21,8 +21,7 @@ class device_epson_sio_interface;
 // supported devices
 void epson_sio_devices(device_slot_interface &device);
 
-class epson_sio_device : public device_t,
-							public device_slot_interface
+class epson_sio_device : public device_t, public device_single_card_slot_interface<device_epson_sio_interface>
 {
 public:
 	// construction/destruction
@@ -53,7 +52,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_epson_sio_interface *m_cart;
 
@@ -64,14 +62,14 @@ private:
 
 
 // class representing interface-specific live sio device
-class device_epson_sio_interface : public device_slot_card_interface
+class device_epson_sio_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_epson_sio_interface();
 
-	virtual void tx_w(int state) { };
-	virtual void pout_w(int state) { };
+	virtual void tx_w(int state) { }
+	virtual void pout_w(int state) { }
 
 protected:
 	device_epson_sio_interface(const machine_config &mconfig, device_t &device);

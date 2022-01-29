@@ -81,11 +81,10 @@ void tc0360pri_device::write(offs_t offset, u8 data)
 if (offset >= 0x0a)
 	popmessage("write %02x to unused TC0360PRI reg %x", data, offset);
 #if 0
-#define regs m_regs
 	popmessage("%02x %02x  %02x %02x  %02x %02x %02x %02x %02x %02x",
-		regs[0x00], regs[0x01], regs[0x02], regs[0x03],
-		regs[0x04], regs[0x05], regs[0x06], regs[0x07],
-		regs[0x08], regs[0x09]);
+		m_regs[0x00], m_regs[0x01], m_regs[0x02], m_regs[0x03],
+		m_regs[0x04], m_regs[0x05], m_regs[0x06], m_regs[0x07],
+		m_regs[0x08], m_regs[0x09]);
 #endif
 }
 

@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device, "cpc_rom_image", "CPC ROM 
 
 cpc_rom_image_device::cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CPC_ROMSLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_rom_image_interface(mconfig, *this)
 	, m_base(nullptr)
 {
 }
@@ -109,12 +109,12 @@ image_init_result cpc_rom_image_device::call_load()
 	m_base = std::make_unique<uint8_t[]>(16384);
 	if(size <= 16384)
 	{
-		image->fread(m_base.get(),size);
+		image->fread(m_base,size);
 	}
 	else
 	{
 		image->fseek(size-16384,SEEK_SET);
-		image->fread(m_base.get(),16384);
+		image->fread(m_base,16384);
 	}
 
 	return image_init_result::PASS;

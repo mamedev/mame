@@ -5,7 +5,11 @@
 
 #pragma once
 
+#define USE_BUS_ADB (0)
 
+#if USE_BUS_ADB
+#include "bus/adb/adb.h"
+#endif
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -44,20 +48,26 @@ public:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	DECLARE_READ8_MEMBER( ddr_r );
-	DECLARE_WRITE8_MEMBER( ddr_w );
-	DECLARE_READ8_MEMBER( ports_r );
-	DECLARE_WRITE8_MEMBER( ports_w );
-	DECLARE_READ8_MEMBER( pll_r );
-	DECLARE_WRITE8_MEMBER( pll_w );
-	DECLARE_READ8_MEMBER( timer_ctrl_r );
-	DECLARE_WRITE8_MEMBER( timer_ctrl_w );
-	DECLARE_READ8_MEMBER( timer_counter_r );
-	DECLARE_WRITE8_MEMBER( timer_counter_w );
-	DECLARE_READ8_MEMBER( onesec_r );
-	DECLARE_WRITE8_MEMBER( onesec_w );
-	DECLARE_READ8_MEMBER( pram_r );
-	DECLARE_WRITE8_MEMBER( pram_w );
+	uint8_t ddr_r(offs_t offset);
+	void ddr_w(offs_t offset, uint8_t data);
+	uint8_t ports_r(offs_t offset);
+	void ports_w(offs_t offset, uint8_t data);
+	uint8_t pll_r();
+	void pll_w(uint8_t data);
+	uint8_t timer_ctrl_r();
+	void timer_ctrl_w(uint8_t data);
+	uint8_t timer_counter_r();
+	void timer_counter_w(uint8_t data);
+	uint8_t onesec_r();
+	void onesec_w(uint8_t data);
+	uint8_t pram_r(offs_t offset);
+	void pram_w(offs_t offset, uint8_t data);
+
+#if USE_BUS_ADB
+	void adb_w(int id, int state);
+	void adb_poweron_w(int id, int state);
+	void adb_change();
+#endif
 
 	// interface routines
 	uint8_t get_xcvr_session() { return xcvr_session; }
@@ -67,7 +77,6 @@ public:
 	void set_via_data(uint8_t dat) { via_data = dat; }
 	uint8_t get_via_clock() { return via_clock; }
 	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
-	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
 
@@ -76,7 +85,8 @@ public:
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
 
-	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
+	devcb_write_line write_reset, write_linechange;
+	devcb_write_line write_via_clock, write_via_data;
 
 	void egret_map(address_map &map);
 protected:
@@ -88,7 +98,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint8_t ddrs[3];
@@ -107,7 +117,15 @@ private:
 	uint8_t pram[0x100], disk_pram[0x100];
 	bool pram_loaded;
 
-	void send_port(address_space &space, uint8_t offset, uint8_t data);
+	#if USE_BUS_ADB
+	optional_device <adb_connector> m_adb_connector[2];
+	adb_device *m_adb_device[2];
+	bool m_adb_device_out[2];
+	bool m_adb_device_poweron[2];
+	bool m_adb_out;
+	#endif
+
+	void send_port(uint8_t offset, uint8_t data);
 };
 
 // device type definition

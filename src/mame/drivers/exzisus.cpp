@@ -41,7 +41,7 @@ TODO:
 #include "audio/taitosnd.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,19 +52,19 @@ TODO:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
+void exzisus_state::cpua_bankswitch_w(uint8_t data)
 {
 	membank("cpuabank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
+void exzisus_state::cpub_bankswitch_w(uint8_t data)
 {
 	membank("cpubbank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::coincounter_w)
+void exzisus_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
@@ -73,7 +73,7 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 }
 
 // is it ok that cpub_reset refers to cpuc?
-WRITE8_MEMBER(exzisus_state::cpub_reset_w)
+void exzisus_state::cpub_reset_w(uint8_t data)
 {
 	m_cpuc->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
@@ -247,7 +247,7 @@ void exzisus_state::exzisus(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
 	audiocpu.set_addrmap(AS_PROGRAM, &exzisus_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

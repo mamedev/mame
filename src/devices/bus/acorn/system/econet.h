@@ -39,7 +39,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_READ8_MEMBER(statid_r);
+	uint8_t statid_r();
 	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
 
 	required_device<mc6854_device> m_adlc;

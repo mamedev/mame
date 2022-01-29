@@ -41,27 +41,28 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 
 	void lviv_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(ppi_0_porta_r);
-	DECLARE_READ8_MEMBER(ppi_0_portb_r);
-	DECLARE_READ8_MEMBER(ppi_0_portc_r);
-	DECLARE_READ8_MEMBER(ppi_1_porta_r);
-	DECLARE_READ8_MEMBER(ppi_1_portb_r);
-	DECLARE_READ8_MEMBER(ppi_1_portc_r);
+	uint8_t ppi0_porta_r();
+	uint8_t ppi0_portb_r();
+	uint8_t ppi0_portc_r();
+	uint8_t ppi1_porta_r();
+	uint8_t ppi1_portb_r();
+	uint8_t ppi1_portc_r();
 
-	DECLARE_WRITE8_MEMBER(ppi_0_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_0_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_0_portc_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_portc_w);
+	void ppi0_porta_w(uint8_t data);
+	void ppi0_portb_w(uint8_t data);
+	void ppi0_portc_w(uint8_t data);
+	void ppi1_porta_w(uint8_t data);
+	void ppi1_portb_w(uint8_t data);
+	void ppi1_portc_w(uint8_t data);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
@@ -87,7 +88,7 @@ private:
 	required_ioport_array<12> m_key;
 	required_ioport m_joy_port;
 
-	uint8_t* m_video_ram;
+	uint8_t* m_vram;
 	uint16_t m_colortable[1][4];
 	uint8_t m_ppi_port_outputs[2][3];
 	uint8_t m_startup_mem_map;

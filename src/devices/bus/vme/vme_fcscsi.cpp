@@ -245,10 +245,6 @@ void vme_fcscsi1_card_device::cpu_space_map(address_map &map)
 	map(0xfffff5, 0xfffff5).r(FUNC(vme_fcscsi1_card_device::dma_iack));
 }
 
-FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void fcscsi_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -283,10 +279,10 @@ void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
 	WD1772(config, m_fdc, PIT_CRYSTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(vme_fcscsi1_card_device::fdc_irq));
 	m_fdc->drq_wr_callback().set("mc68450", FUNC(hd63450_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
 
 	/* PIT Parallel Interface and Timer device */
 	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
@@ -333,7 +329,6 @@ vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, 
 void vme_fcscsi1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	set_vme_device();
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xe00000);
@@ -354,7 +349,7 @@ void vme_fcscsi1_card_device::device_reset()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (vme_fcscsi1_card_device::bootvect_r){
+uint16_t vme_fcscsi1_card_device::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
@@ -370,12 +365,12 @@ Bit #: 7 6 5 4 3 2 1 0
               \ ISCSI-l 1.D. Bit #2
 */
 
-READ8_MEMBER (vme_fcscsi1_card_device::tcr_r){
+uint8_t vme_fcscsi1_card_device::tcr_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint8_t) m_tcr;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::tcr_w){
+void vme_fcscsi1_card_device::tcr_w(uint8_t data){
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 	floppy_image_device *floppy2 = m_fdc->subdevice<floppy_connector>("2")->get_device();
@@ -406,7 +401,7 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::tcr_w){
 	return;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::led_w){
+void vme_fcscsi1_card_device::led_w(uint8_t data) {
 	LOG("%s [%02x]\n", FUNCNAME, data);
 
 	m_fdc->dden_w(BIT(data, 7));
@@ -450,17 +445,17 @@ WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
+uint8_t vme_fcscsi1_card_device::fdc_read_byte()
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
+void vme_fcscsi1_card_device::fdc_write_byte(uint8_t data)
 {
 	m_fdc->data_w(data & 0xff);
 }
 
-READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)
+uint8_t vme_fcscsi1_card_device::scsi_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -473,12 +468,12 @@ READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)
 	return data;
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::scsi_w)
+void vme_fcscsi1_card_device::scsi_w(offs_t offset, uint8_t data)
 {
 	LOG("scsi W %02x <- %02x\n", offset, data);
 }
 
-READ8_MEMBER (vme_fcscsi1_card_device::not_implemented_r){
+uint8_t vme_fcscsi1_card_device::not_implemented_r(){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -487,7 +482,7 @@ READ8_MEMBER (vme_fcscsi1_card_device::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::not_implemented_w){
+void vme_fcscsi1_card_device::not_implemented_w(uint8_t data){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);

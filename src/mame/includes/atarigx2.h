@@ -14,6 +14,7 @@
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
+#include "machine/timer.h"
 #include "video/atarirle.h"
 #include "tilemap.h"
 
@@ -39,23 +40,22 @@ public:
 	void atarigx2_0x400(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ32_MEMBER(special_port2_r);
-	DECLARE_READ32_MEMBER(special_port3_r);
-	DECLARE_READ8_MEMBER(a2d_data_r);
-	DECLARE_WRITE32_MEMBER(latch_w);
-	DECLARE_WRITE32_MEMBER(mo_command_w);
-	DECLARE_WRITE32_MEMBER(atarigx2_protection_w);
-	DECLARE_READ32_MEMBER(atarigx2_protection_r);
-	DECLARE_READ32_MEMBER(rrreveng_prot_r);
+	void video_int_ack_w(uint32_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	uint32_t special_port2_r();
+	uint32_t special_port3_r();
+	uint8_t a2d_data_r(offs_t offset);
+	void latch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void atarigx2_protection_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t atarigx2_protection_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t rrreveng_prot_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
 	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
+	void atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void atarigx2(machine_config &config);
 	void main_map(address_map &map);

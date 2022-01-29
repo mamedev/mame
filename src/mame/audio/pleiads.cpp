@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "audio/pleiads.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #define VMIN    0
 #define VMAX    32767
 
@@ -570,18 +573,18 @@ inline int pleiads_sound_device::noise(int samplerate)
 	return sum / 2;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_a_w )
+void pleiads_sound_device::control_a_w(uint8_t data)
 {
 	if (data == m_sound_latch_a)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_a_w $%02x\n", data);
 
 	m_channel->update();
 	m_sound_latch_a = data;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_b_w )
+void pleiads_sound_device::control_b_w(uint8_t data)
 {
 	/*
 	 * pitch selects one of 4 possible clock inputs
@@ -594,7 +597,7 @@ WRITE8_MEMBER( pleiads_sound_device::control_b_w )
 	if (data == m_sound_latch_b)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_b_w $%02x\n", data);
 
 	if (pitch == 3)
 		pitch = 2;  /* 2 and 3 are the same */
@@ -606,12 +609,12 @@ WRITE8_MEMBER( pleiads_sound_device::control_b_w )
 }
 
 /* two bits (4 + 5) from the videoreg_w latch go here */
-WRITE8_MEMBER( pleiads_sound_device::control_c_w )
+void pleiads_sound_device::control_c_w(uint8_t data)
 {
 	if (data == m_sound_latch_c)
 		return;
 
-	logerror("pleiads_sound_control_c_w $%02x\n", data);
+	LOG("pleiads_sound_control_c_w $%02x\n", data);
 	m_channel->update();
 	m_sound_latch_c = data;
 }
@@ -639,7 +642,7 @@ void pleiads_sound_device::common_start()
 		m_poly18[i] = bits;
 	}
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	save_item(NAME(m_sound_latch_a));
 	save_item(NAME(m_sound_latch_b));
@@ -691,24 +694,24 @@ void pleiads_sound_device::common_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void pleiads_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pleiads_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int rate = machine().sample_rate();
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
+	int rate = buffer.sample_rate();
 
-	while( samples-- > 0 )
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int sum = tone1(rate)/2 + tone23(rate)/2 + tone4(rate) + noise(rate);
-		*buffer++ = sum < 32768 ? sum > -32768 ? sum : -32768 : 32767;
+		buffer.put_int_clamp(sampindex, sum, 32768);
 	}
 }
 
-void naughtyb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void naughtyb_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	pleiads_sound_device::sound_stream_update(stream, inputs, outputs, samples);
+	pleiads_sound_device::sound_stream_update(stream, inputs, outputs);
 }
 
-void popflame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void popflame_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	pleiads_sound_device::sound_stream_update(stream, inputs, outputs, samples);
+	pleiads_sound_device::sound_stream_update(stream, inputs, outputs);
 }

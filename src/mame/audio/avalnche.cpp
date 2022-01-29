@@ -24,7 +24,7 @@
   Avalanche memory audio output handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
+void avalnche_state::avalnche_noise_amplitude_w(uint8_t data)
 {
 	m_discrete->write(AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }

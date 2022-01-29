@@ -25,18 +25,20 @@ public:
 
 	void init_common();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_temp_bitmap;
-	DECLARE_WRITE8_MEMBER(galaxia_video_w);
-	DECLARE_WRITE8_MEMBER(galaxia_scroll_w);
-	DECLARE_WRITE8_MEMBER(galaxia_ctrlport_w);
-	DECLARE_WRITE8_MEMBER(galaxia_dataport_w);
-	DECLARE_READ8_MEMBER(galaxia_collision_r);
-	DECLARE_READ8_MEMBER(galaxia_collision_clear);
+	void galaxia_video_w(offs_t offset, uint8_t data);
+	void galaxia_scroll_w(uint8_t data);
+	void galaxia_ctrlport_w(uint8_t data);
+	void galaxia_dataport_w(uint8_t data);
+	uint8_t galaxia_collision_r();
+	uint8_t galaxia_collision_clear();
 	TILE_GET_INFO_MEMBER(get_galaxia_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_astrowar_bg_tile_info);
-	DECLARE_VIDEO_START(galaxia);
 	void galaxia_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(astrowar);
 	void astrowar_palette(palette_device &palette) const;

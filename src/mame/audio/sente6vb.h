@@ -40,25 +40,17 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(counter_state_r);
-	DECLARE_WRITE8_MEMBER(counter_control_w);
-	DECLARE_WRITE8_MEMBER(chip_select_w);
-	DECLARE_WRITE8_MEMBER(dac_data_w);
-	DECLARE_WRITE8_MEMBER(register_addr_w);
+	uint8_t counter_state_r();
+	void counter_control_w(uint8_t data);
+	void chip_select_w(uint8_t data);
+	void dac_data_w(offs_t offset, uint8_t data);
+	void register_addr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(counter_0_set_out);
 
 	void update_counter_0_timer();
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
-	void poly17_init();
 	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
-	inline void noise_gen_chip(int chip, int count, short *buffer);
-	CEM3394_EXT_INPUT(noise_gen_0);
-	CEM3394_EXT_INPUT(noise_gen_1);
-	CEM3394_EXT_INPUT(noise_gen_2);
-	CEM3394_EXT_INPUT(noise_gen_3);
-	CEM3394_EXT_INPUT(noise_gen_4);
-	CEM3394_EXT_INPUT(noise_gen_5);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -78,9 +70,6 @@ private:
 	bool m_counter_0_out;
 	bool m_counter_0_timer_active;
 
-	// random number generator states
-	uint8_t m_poly17[POLY17_SIZE + 1];
-
 	// CEM3394 DAC control states
 	uint16_t m_dac_value;
 	uint8_t m_dac_register;
@@ -88,9 +77,6 @@ private:
 
 	// sound CPU 6850 states
 	bool m_uint;
-
-	// noise generator states
-	uint32_t m_noise_position[6];
 };
 
 DECLARE_DEVICE_TYPE(SENTE6VB, sente6vb_device)

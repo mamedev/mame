@@ -31,11 +31,11 @@ public:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// PPU access
-	DECLARE_READ16_MEMBER(printer_r);
-	DECLARE_WRITE16_MEMBER(printer_w);
+	uint16_t printer_r(offs_t offset);
+	void printer_w(offs_t offset, uint16_t data);
 
 private:
 	devcb_write_line m_irl_handler;

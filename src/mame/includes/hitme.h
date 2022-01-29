@@ -44,13 +44,13 @@ private:
 
 	/* misc */
 	attotime m_timeout_time;
-	DECLARE_WRITE8_MEMBER(hitme_vidram_w);
-	DECLARE_READ8_MEMBER(hitme_port_0_r);
-	DECLARE_READ8_MEMBER(hitme_port_1_r);
-	DECLARE_READ8_MEMBER(hitme_port_2_r);
-	DECLARE_READ8_MEMBER(hitme_port_3_r);
-	DECLARE_WRITE8_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(output_port_1_w);
+	void hitme_vidram_w(offs_t offset, uint8_t data);
+	uint8_t hitme_port_0_r();
+	uint8_t hitme_port_1_r();
+	uint8_t hitme_port_2_r();
+	uint8_t hitme_port_3_r();
+	void output_port_0_w(uint8_t data);
+	void output_port_1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_hitme_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

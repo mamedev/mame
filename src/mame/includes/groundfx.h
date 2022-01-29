@@ -59,7 +59,7 @@ private:
 
 	void rotate_control_w(offs_t offset, u16 data);
 	void motor_control_w(u32 data);
-	DECLARE_READ32_MEMBER(irq_speedup_r);
+	u32 irq_speedup_r();
 	DECLARE_READ_LINE_MEMBER(frame_counter_r);
 	void coin_word_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

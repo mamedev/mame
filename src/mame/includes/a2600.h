@@ -47,21 +47,21 @@ protected:
 		m_riot(*this, "riot"),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
-		m_screen(*this, "screen"),
-		m_swb(*this, "SWB")
+		m_screen(*this, "screen")
 	{ }
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(switch_A_w);
-	DECLARE_READ8_MEMBER(switch_A_r);
-	DECLARE_WRITE8_MEMBER(switch_B_w);
+	void a2600_base_ntsc(machine_config &config);
+
+	void switch_A_w(uint8_t data);
+	uint8_t switch_A_r();
+	void switch_B_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
-	DECLARE_READ8_MEMBER(riot_input_port_8_r);
-	DECLARE_READ16_MEMBER(a2600_read_input_port);
-	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
+	uint16_t a2600_read_input_port(offs_t offset);
+	uint8_t a2600_get_databus_contents(offs_t offset);
+	void a2600_tia_vsync_callback(uint16_t data);
+	void a2600_tia_vsync_callback_pal(uint16_t data);
 
 	void a2600_mem(address_map &map);
 
@@ -79,8 +79,6 @@ protected:
 
 private:
 	uint16_t m_current_screen_height;
-
-	required_ioport m_swb;
 };
 
 
@@ -98,17 +96,50 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
+	void cart_over_tia_w(address_space &space, offs_t offset, uint8_t data);
 	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
-	DECLARE_READ8_MEMBER(cart_over_riot_r);
-	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
-	DECLARE_READ8_MEMBER(cart_over_all_r);
-	DECLARE_WRITE8_MEMBER(cart_over_all_w);
+	uint8_t cart_over_riot_r(address_space &space, offs_t offset);
+	void cart_over_riot_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t cart_over_all_r(address_space &space, offs_t offset);
+	void cart_over_all_w(address_space &space, offs_t offset, uint8_t data);
 
 	void a2600_cartslot(machine_config &config);
 
 private:
 	required_device<vcs_cart_slot_device> m_cart;
 };
+
+
+class a2600_pop_state : public a2600_base_state
+{
+public:
+	a2600_pop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a2600_base_state(mconfig, type, tag)
+		, m_bank(*this, "bank")
+		, m_a8(*this, "A8")
+		, m_swb(*this, "SWB")
+	{ }
+
+	void a2600_pop(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void memory_map(address_map &map);
+
+	uint8_t rom_switch_r(offs_t offset);
+	void rom_switch_w(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(reset_timer_callback);
+	TIMER_CALLBACK_MEMBER(game_select_button_timer_callback);
+
+	required_memory_bank m_bank;
+	required_ioport m_a8;
+	required_ioport m_swb;
+	emu_timer *m_reset_timer;
+	emu_timer *m_game_select_button_timer;
+};
+
 
 #endif // MAME_INCLUDES_A2600_H

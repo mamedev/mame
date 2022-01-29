@@ -111,7 +111,7 @@ void tx1_sound_device::device_start()
 
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine().sample_rate();
 
 	/* Compute the engine resistor weights */
@@ -131,23 +131,23 @@ void tx1_sound_device::device_reset()
 }
 
 /* Main CPU and Z80 synchronisation */
-WRITE16_MEMBER( tx1_sound_device::z80_busreq_w )
+void tx1_sound_device::z80_busreq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
-WRITE8_MEMBER( tx1_sound_device::z80_intreq_w )
+void tx1_sound_device::z80_intreq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER( tx1_sound_device::z80_shared_r )
+uint16_t tx1_sound_device::z80_shared_r(offs_t offset)
 {
 	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE16_MEMBER( tx1_sound_device::z80_shared_w )
+void tx1_sound_device::z80_shared_w(offs_t offset, uint16_t data)
 {
 	m_audiocpu->space(AS_PROGRAM).write_byte(offset, data & 0xff);
 }
@@ -156,13 +156,13 @@ WRITE16_MEMBER( tx1_sound_device::z80_shared_w )
     (TODO) TS: Connected in place of dipswitch A bit 0
     Accessed on startup as some sort of acknowledgement
 */
-WRITE8_MEMBER( tx1_sound_device::ts_w )
+void tx1_sound_device::ts_w(offs_t offset, uint8_t data)
 {
 //  TS = 1;
 	m_z80_ram[offset] = data;
 }
 
-READ8_MEMBER( tx1_sound_device::ts_r )
+uint8_t tx1_sound_device::ts_r(offs_t offset)
 {
 //  TS = 1;
 	return m_z80_ram[offset];
@@ -177,13 +177,13 @@ static uint8_t bit_reverse8(uint8_t val)
 	return val;
 }
 
-READ16_MEMBER( tx1_sound_device::dipswitches_r )
+uint16_t tx1_sound_device::dipswitches_r()
 {
 	return (m_dsw->read() & 0xfffe) | m_ts;
 }
 
 // Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
-READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
+uint8_t buggyboy_sound_device::bb_analog_r(offs_t offset)
 {
 	if (offset == 0)
 		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | m_steering->read());
@@ -191,7 +191,7 @@ READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
 		return bit_reverse8((m_brake->read() & 0xf) << 4);
 }
 
-READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
+uint8_t buggyboyjr_sound_device::bbjr_analog_r(offs_t offset)
 {
 	if (offset == 0)
 		return ((m_accelerator->read() & 0xf) << 4) | m_steering->read();
@@ -199,37 +199,37 @@ READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
 		return (m_brake->read() & 0xf) << 4;
 }
 
-WRITE8_MEMBER( tx1_sound_device::tx1_coin_cnt_w )
+void tx1_sound_device::tx1_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::bb_coin_cnt_w )
+void buggyboy_sound_device::bb_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x04);
 }
 
-WRITE8_MEMBER( tx1_sound_device::tx1_ppi_latch_w )
+void tx1_sound_device::tx1_ppi_latch_w(uint8_t data)
 {
 	m_ppi_latch_a = ((m_brake->read() & 0xf) << 4) | (m_accelerator->read() & 0xf);
 	m_ppi_latch_b = m_steering->read();
 }
 
-READ8_MEMBER( tx1_sound_device::tx1_ppi_porta_r )
+uint8_t tx1_sound_device::tx1_ppi_porta_r()
 {
 	return m_ppi_latch_a;
 }
 
-READ8_MEMBER( tx1_sound_device::tx1_ppi_portb_r )
+uint8_t tx1_sound_device::tx1_ppi_portb_r()
 {
 	return m_ppi_portd->read() | m_ppi_latch_b;
 }
 
-WRITE8_MEMBER( tx1_sound_device::pit8253_w )
+void tx1_sound_device::pit8253_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( tx1_sound_device::pit8253_w )
 	}
 }
 
-READ8_MEMBER( tx1_sound_device::pit8253_r )
+uint8_t tx1_sound_device::pit8253_r(offs_t offset)
 {
 	osd_printf_debug("PIT R: %x", offset);
 	return 0;
@@ -291,7 +291,7 @@ INTERRUPT_GEN_MEMBER(tx1_sound_device::z80_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
+void tx1_sound_device::ay8910_a_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
 	m_ay_outputa = ~data;
 }
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
+void tx1_sound_device::ay8910_b_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -359,17 +359,13 @@ static inline void update_engine(int eng[4])
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tx1_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
 
-	stream_sample_t *fl = &outputs[0][0];
-	stream_sample_t *fr = &outputs[1][0];
-
-	/* Clear the buffers */
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	auto &fl = outputs[0];
+	auto &fr = outputs[1];
 
 	/* 8253 outputs for the player/opponent engine sounds. */
 	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
@@ -381,7 +377,7 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	gain_2 = tx1_engine_gains[m_ay_outputb & 0xf];
 	gain_3 = BIT(m_ay_outputb, 5) ? 1.0f : 1.5f;
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
 	{
 		if (m_step0 & ((1 << TX1_FRAC)))
 		{
@@ -404,8 +400,8 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 			m_step2 &= ((1 << TX1_FRAC) - 1);
 		}
 
-		*fl++ = (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2;
-		*fr++ = (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2;
+		fl.put_int(sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
+		fr.put_int(sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
 
 		m_step0 += step_0;
 		m_step1 += step_1;
@@ -481,7 +477,7 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_DIPSETTING(      0xe000, "No Bonus" )
 
 	PORT_START("AN_STEERING")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(6)
 
 	PORT_START("AN_ACCELERATOR")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
@@ -493,7 +489,7 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
 
 	PORT_START("PPI_PORTD")
@@ -662,7 +658,7 @@ void buggyboy_sound_device::device_start()
 		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << 24) / (double)machine().sample_rate();
 }
 
@@ -718,19 +714,19 @@ void buggyboy_sound_device::device_reset()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( buggyboy_sound_device::ym1_a_w )
+void buggyboy_sound_device::ym1_a_w(uint8_t data)
 {
 	m_stream->update();
 	m_ym1_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
+void buggyboy_sound_device::ym2_a_w(uint8_t data)
 {
 	m_stream->update();
 	m_ym2_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
+void buggyboy_sound_device::ym2_b_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -766,7 +762,7 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* This is admittedly a bit of a hack job... */
 
@@ -774,12 +770,8 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
 
-	stream_sample_t *fl = &outputs[0][0];
-	stream_sample_t *fr = &outputs[1][0];
-
-	/* Clear the buffers */
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	auto &fl = outputs[0];
+	auto &fr = outputs[1];
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
 	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
@@ -796,10 +788,10 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	gain1_l = bb_engine_gains[m_ym2_outputa >> 4] * 5;
 	gain1_r = bb_engine_gains[m_ym2_outputa & 0xf] * 5;
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
 	{
 		int i;
-		stream_sample_t pit0, pit1, n1, n2;
+		s32 pit0, pit1, n1, n2;
 		pit0 = m_eng_voltages[(m_step0 >> 24) & 0xf];
 		pit1 = m_eng_voltages[(m_step1 >> 24) & 0xf];
 
@@ -839,8 +831,8 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		else
 			n2 = 8192;
 
-		*fl++ = n1 + n2 + (pit0 * gain0) + (pit1 * gain1_l);
-		*fr++ = n1 + n2 + (pit0 * gain0) + (pit1 * gain1_r);
+		fl.put_int(sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_l), 32768);
+		fr.put_int(sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_r), 32768);
 
 		m_step0 += step_0;
 		m_step1 += step_1;
@@ -939,7 +931,7 @@ INPUT_PORTS_START( buggyboy_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START("PPI_PORTC")
@@ -1028,7 +1020,7 @@ INPUT_PORTS_START( buggyboyjr_inputs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	/* Wire jumper setting on sound PCB */

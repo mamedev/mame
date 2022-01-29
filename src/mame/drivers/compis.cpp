@@ -46,7 +46,6 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/compis/graphics.h"
 #include "bus/isbx/isbx.h"
@@ -58,12 +57,14 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i80130.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 #define I80186_TAG      "ic1"
 #define I80130_TAG      "ic15"
@@ -109,7 +110,7 @@ public:
 	required_device<i8274_device> m_mpsc;
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
-	required_device<mm58274c_device> m_rtc;
+	required_device<mm58174_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<compis_graphics_slot_device> m_graphics;
 	required_device<isbx_slot_device> m_isbx0;
@@ -120,27 +121,27 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( pcs6_0_1_r );
-	DECLARE_WRITE16_MEMBER( pcs6_0_1_w );
-	DECLARE_READ16_MEMBER( pcs6_2_3_r );
-	DECLARE_WRITE16_MEMBER( pcs6_2_3_w );
-	DECLARE_READ16_MEMBER( pcs6_4_5_r );
-	DECLARE_WRITE16_MEMBER( pcs6_4_5_w );
-	DECLARE_READ16_MEMBER( pcs6_6_7_r );
-	DECLARE_WRITE16_MEMBER( pcs6_6_7_w );
-	DECLARE_READ16_MEMBER( pcs6_8_9_r );
-	DECLARE_WRITE16_MEMBER( pcs6_8_9_w );
-	DECLARE_READ16_MEMBER( pcs6_10_11_r );
-	DECLARE_WRITE16_MEMBER( pcs6_10_11_w );
-	DECLARE_READ16_MEMBER( pcs6_12_13_r );
-	DECLARE_WRITE16_MEMBER( pcs6_12_13_w );
-	DECLARE_READ16_MEMBER( pcs6_14_15_r );
-	DECLARE_WRITE16_MEMBER( pcs6_14_15_w );
+	uint16_t pcs6_0_1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_0_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_2_3_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_2_3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_4_5_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_4_5_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_6_7_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_6_7_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_8_9_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_8_9_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_10_11_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_10_11_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_12_13_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_12_13_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pcs6_14_15_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pcs6_14_15_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER( compis_irq_callback );
+	uint8_t compis_irq_callback();
 
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
@@ -169,7 +170,7 @@ public:
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( compis_state::pcs6_0_1_r )
+uint16_t compis_state::pcs6_0_1_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -181,7 +182,7 @@ READ16_MEMBER( compis_state::pcs6_0_1_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_0_1_w )
+void compis_state::pcs6_0_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -195,7 +196,7 @@ WRITE16_MEMBER( compis_state::pcs6_0_1_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_2_3_r )
+uint16_t compis_state::pcs6_2_3_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -207,7 +208,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_2_3_w )
+void compis_state::pcs6_2_3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -218,7 +219,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_4_5_r )
+uint16_t compis_state::pcs6_4_5_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -233,7 +234,7 @@ READ16_MEMBER( compis_state::pcs6_4_5_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_4_5_w )
+void compis_state::pcs6_4_5_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -246,7 +247,7 @@ WRITE16_MEMBER( compis_state::pcs6_4_5_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_6_7_r )
+uint16_t compis_state::pcs6_6_7_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -261,7 +262,7 @@ READ16_MEMBER( compis_state::pcs6_6_7_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_6_7_w )
+void compis_state::pcs6_6_7_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -274,7 +275,7 @@ WRITE16_MEMBER( compis_state::pcs6_6_7_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_8_9_r )
+uint16_t compis_state::pcs6_8_9_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -286,7 +287,7 @@ READ16_MEMBER( compis_state::pcs6_8_9_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_8_9_w )
+void compis_state::pcs6_8_9_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -298,7 +299,7 @@ WRITE16_MEMBER( compis_state::pcs6_8_9_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_10_11_r )
+uint16_t compis_state::pcs6_10_11_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -310,7 +311,7 @@ READ16_MEMBER( compis_state::pcs6_10_11_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_10_11_w )
+void compis_state::pcs6_10_11_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -322,7 +323,7 @@ WRITE16_MEMBER( compis_state::pcs6_10_11_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_12_13_r )
+uint16_t compis_state::pcs6_12_13_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -334,7 +335,7 @@ READ16_MEMBER( compis_state::pcs6_12_13_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_12_13_w )
+void compis_state::pcs6_12_13_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -346,7 +347,7 @@ WRITE16_MEMBER( compis_state::pcs6_12_13_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_14_15_r )
+uint16_t compis_state::pcs6_14_15_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -358,7 +359,7 @@ READ16_MEMBER( compis_state::pcs6_14_15_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_14_15_w )
+void compis_state::pcs6_14_15_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -409,7 +410,7 @@ void compis_state::compis_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
+	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0x00ff);
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(m_graphics, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
 	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(m_osp, FUNC(i80130_device::io_map));
@@ -555,7 +556,7 @@ INPUT_PORTS_END
 //  I80186_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( compis_state::compis_irq_callback )
+uint8_t compis_state::compis_irq_callback()
 {
 	return m_osp->inta_r();
 }
@@ -609,7 +610,7 @@ WRITE_LINE_MEMBER(compis_state::write_centronics_select)
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( compis_state::ppi_pb_r )
+uint8_t compis_state::ppi_pb_r()
 {
 	/*
 
@@ -644,7 +645,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( compis_state::ppi_pc_w )
+void compis_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -694,15 +695,15 @@ void compis_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 256*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, m_ram->pointer());
 		break;
 
 	case 512*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x7ffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x7ffff, m_ram->pointer());
 		break;
 
 	case 768*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0xbffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0xbffff, m_ram->pointer());
 		break;
 	}
 
@@ -762,7 +763,7 @@ void compis_state::compis(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
 	I8255(config, m_ppi);
-	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi->in_pb_callback().set(FUNC(compis_state::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(compis_state::ppi_pc_w));
 
@@ -783,24 +784,24 @@ void compis_state::compis(machine_config &config)
 	m_mpsc->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 
-	MM58274C(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->set_mode24(1); // 24 hour
-	m_rtc->set_day1(1);   // monday
+	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
+	SPEAKER(config, "cass_snd").front_center();
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "cass_snd", 0.05);
 
 	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(compis_state::write_centronics_busy));

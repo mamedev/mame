@@ -257,7 +257,7 @@ void c8050_device::sfd1001_fdc_mem(address_map &map)
 //  riot6532 uc1
 //-------------------------------------------------
 
-READ8_MEMBER( c8050_device::dio_r )
+uint8_t c8050_device::dio_r()
 {
 	/*
 
@@ -274,10 +274,10 @@ READ8_MEMBER( c8050_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c8050_device::dio_w )
+void c8050_device::dio_w(uint8_t data)
 {
 	/*
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER( c8050_device::dio_w )
 //  riot6532 ue1
 //-------------------------------------------------
 
-READ8_MEMBER( c8050_device::riot1_pa_r )
+uint8_t c8050_device::riot1_pa_r()
 {
 	/*
 
@@ -332,7 +332,7 @@ READ8_MEMBER( c8050_device::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8050_device::riot1_pa_w )
+void c8050_device::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER( c8050_device::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c8050_device::riot1_pb_r )
+uint8_t c8050_device::riot1_pb_r()
 {
 	/*
 
@@ -398,7 +398,7 @@ READ8_MEMBER( c8050_device::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8050_device::riot1_pb_w )
+void c8050_device::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER( c8050_device::riot1_pb_w )
 	m_leds[LED_ERR] = BIT(data, 5);
 }
 
-WRITE8_MEMBER( c8050_device::via_pb_w )
+void c8050_device::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -473,9 +473,10 @@ static void c8050_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8050_device::floppy_formats )
-	FLOPPY_D80_FORMAT
-FLOPPY_FORMATS_END
+void c8050_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -502,30 +503,33 @@ static void sfd1001_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8250_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void c8250_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8250lp_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void c8250lp_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( sfd1001_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void sfd1001_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 void c8050_device::add_common_devices(machine_config &config)
@@ -548,7 +552,7 @@ void c8050_device::add_common_devices(machine_config &config)
 	// controller
 	M6504(config, m_fdccpu, XTAL(12'000'000)/12);
 
-	VIA6522(config, m_via, XTAL(12'000'000)/12);
+	MOS6522(config, m_via, XTAL(12'000'000)/12);
 	m_via->readpa_handler().set(m_fdc, FUNC(c8050_fdc_device::read));
 	m_via->writepb_handler().set(FUNC(c8050_device::via_pb_w));
 	m_via->ca2_handler().set(m_fdc, FUNC(c8050_fdc_device::mode_sel_w));

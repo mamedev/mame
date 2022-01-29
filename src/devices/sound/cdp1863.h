@@ -42,10 +42,9 @@ public:
 	void set_clock2(int clock2) { m_clock2 = clock2; }
 	void set_clock2(const XTAL &xtal) { xtal.validate("selecting cdp1863 clock"); set_clock2(xtal.value()); }
 
-	DECLARE_WRITE8_MEMBER( str_w ) { write_str(data); }
-	void write_str(uint8_t data) { m_latch = data; }
+	void str_w(uint8_t data) { m_latch = data; }
 
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
+	void oe_w(int state);
 
 	void set_clk1(int clock);
 	void set_clk2(int clock);
@@ -55,7 +54,7 @@ protected:
 	virtual void device_start() override;
 
 	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	sound_stream *m_stream;
@@ -66,7 +65,7 @@ private:
 	// sound state
 	int m_oe;                       // output enable
 	int m_latch;                    // sound latch
-	int16_t m_signal;                 // current signal
+	stream_buffer::sample_t m_signal;// current signal
 	int m_incr;                     // initial wave state
 };
 

@@ -40,11 +40,11 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void update_interrupts();
-	DECLARE_WRITE16_MEMBER(nvram_recall_w);
-	DECLARE_WRITE8_MEMBER(digital_w);
-	DECLARE_WRITE16_MEMBER(foodf_paletteram_w);
+	void nvram_recall_w(uint16_t data);
+	void digital_w(uint8_t data);
+	void foodf_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void foodf_set_flip(int flip);
-	DECLARE_READ8_MEMBER(pot_r);
+	uint8_t pot_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);

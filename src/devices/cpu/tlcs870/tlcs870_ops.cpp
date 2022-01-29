@@ -1077,7 +1077,7 @@ void tlcs870_device::do_JR_a(const uint8_t opbyte0)
 	int val = READ8();
 	if (val & 0x80) val -= 0x100;
 
-	m_addr = m_tmppc + 2 + val;;
+	m_addr = m_tmppc + 2 + val;
 
 	set_JF();
 }

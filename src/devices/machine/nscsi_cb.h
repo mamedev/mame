@@ -26,29 +26,28 @@ public:
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t read() { return scsi_bus->data_r(); }
-	DECLARE_READ8_MEMBER( read ) { return read(); }
+
 	void write(uint8_t data) { scsi_bus->data_w(scsi_refid, data); }
-	DECLARE_WRITE8_MEMBER( write ) { write(data); }
 
-	DECLARE_READ_LINE_MEMBER( rst_r ) { return (m_ctrl & S_RST) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return (m_ctrl & S_ATN) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( ack_r ) { return (m_ctrl & S_ACK) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( req_r ) { return (m_ctrl & S_REQ) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( msg_r ) { return (m_ctrl & S_MSG) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( io_r )  { return (m_ctrl & S_INP) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( cd_r )  { return (m_ctrl & S_CTL) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( sel_r ) { return (m_ctrl & S_SEL) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER( bsy_r ) { return (m_ctrl & S_BSY) ? 1 : 0; }
+	int rst_r() { return (m_ctrl & S_RST) ? 1 : 0; }
+	int atn_r() { return (m_ctrl & S_ATN) ? 1 : 0; }
+	int ack_r() { return (m_ctrl & S_ACK) ? 1 : 0; }
+	int req_r() { return (m_ctrl & S_REQ) ? 1 : 0; }
+	int msg_r() { return (m_ctrl & S_MSG) ? 1 : 0; }
+	int io_r()  { return (m_ctrl & S_INP) ? 1 : 0; }
+	int cd_r()  { return (m_ctrl & S_CTL) ? 1 : 0; }
+	int sel_r() { return (m_ctrl & S_SEL) ? 1 : 0; }
+	int bsy_r() { return (m_ctrl & S_BSY) ? 1 : 0; }
 
-	DECLARE_WRITE_LINE_MEMBER( rst_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_RST : 0, S_RST); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_ATN : 0, S_ATN); }
-	DECLARE_WRITE_LINE_MEMBER( ack_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_ACK : 0, S_ACK); }
-	DECLARE_WRITE_LINE_MEMBER( req_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_REQ : 0, S_REQ); }
-	DECLARE_WRITE_LINE_MEMBER( msg_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_MSG : 0, S_MSG); }
-	DECLARE_WRITE_LINE_MEMBER( io_w )  { scsi_bus->ctrl_w(scsi_refid, state ? S_INP : 0, S_INP); }
-	DECLARE_WRITE_LINE_MEMBER( cd_w )  { scsi_bus->ctrl_w(scsi_refid, state ? S_CTL : 0, S_CTL); }
-	DECLARE_WRITE_LINE_MEMBER( sel_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_SEL : 0, S_SEL); }
-	DECLARE_WRITE_LINE_MEMBER( bsy_w ) { scsi_bus->ctrl_w(scsi_refid, state ? S_BSY : 0, S_BSY); }
+	void rst_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_RST : 0, S_RST); }
+	void atn_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_ATN : 0, S_ATN); }
+	void ack_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_ACK : 0, S_ACK); }
+	void req_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_REQ : 0, S_REQ); }
+	void msg_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_MSG : 0, S_MSG); }
+	void io_w(int state)  { scsi_bus->ctrl_w(scsi_refid, state ? S_INP : 0, S_INP); }
+	void cd_w(int state)  { scsi_bus->ctrl_w(scsi_refid, state ? S_CTL : 0, S_CTL); }
+	void sel_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_SEL : 0, S_SEL); }
+	void bsy_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_BSY : 0, S_BSY); }
 
 protected:
 	virtual void device_start() override;

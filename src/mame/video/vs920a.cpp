@@ -53,7 +53,7 @@ void vs920a_text_tilemap_device::device_start()
 	save_item(NAME(m_pal_base));
 
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(vs920a_text_tilemap_device::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vs920a_text_tilemap_device::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tmap->set_transparent_pen(0);
 }
 
@@ -71,17 +71,17 @@ TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO_MEMBER(m_gfx_region, tileno, m_pal_base + pal, 0);
+	tileinfo.set(m_gfx_region, tileno, m_pal_base + pal, 0);
 }
 
-WRITE16_MEMBER(vs920a_text_tilemap_device::vram_w)
+void vs920a_text_tilemap_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tmap->mark_tile_dirty(offset);
 }
 
 
-READ16_MEMBER(vs920a_text_tilemap_device::vram_r)
+uint16_t vs920a_text_tilemap_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }

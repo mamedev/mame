@@ -91,13 +91,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
 
-	DECLARE_READ16_MEMBER(spriteram_mirror_r);
-	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
-	DECLARE_READ16_MEMBER(xexex_waitskip_r);
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint16_t spriteram_mirror_r(offs_t offset);
+	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t xexex_waitskip_r();
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void sound_bankswitch_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -30,6 +30,8 @@
 //#define REAL_PCI_CHIPSET
 
 #include "emu.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/idehd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
@@ -38,8 +40,6 @@
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
@@ -77,10 +77,10 @@ private:
 	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(coin_r);
+	uint8_t coin_r();
+	void bank_w(uint8_t data);
+	uint8_t key_r();
+	void key_w(uint8_t data);
 	static void cdrom(device_t *device);
 	static void hdd(device_t *device);
 	void at32_io(address_map &map);
@@ -88,22 +88,22 @@ private:
 	void dbank_map(address_map &map);
 };
 
-WRITE8_MEMBER(mtxl_state::bank_w)
+void mtxl_state::bank_w(uint8_t data)
 {
 	m_iocard->set_bank(data & 0x1f);
 }
 
-READ8_MEMBER(mtxl_state::key_r)
+uint8_t mtxl_state::key_r()
 {
 	return m_multikey->read_dq() ? 0xff : 0xdf;
 }
 
-READ8_MEMBER(mtxl_state::coin_r)
+uint8_t mtxl_state::coin_r()
 {
 	return ioport("Coin")->read();
 }
 
-WRITE8_MEMBER(mtxl_state::key_w)
+void mtxl_state::key_w(uint8_t data)
 {
 	m_multikey->write_rst((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_multikey->write_clk((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -176,15 +176,13 @@ void mtxl_state::machine_start()
 #ifndef REAL_PCI_CHIPSET
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > 0xa0000)
 	{
 		offs_t ram_limit = 0x100000 + m_ram->size() - 0xa0000;
-		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
+		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + 0xa0000);
 	}
 #endif
 }
@@ -236,7 +234,7 @@ void mtxl_state::at486(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -257,7 +255,6 @@ void mtxl_state::at486(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
@@ -296,7 +293,7 @@ void mtxl_state::at486hd(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -317,7 +314,6 @@ void mtxl_state::at486hd(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
@@ -350,11 +346,11 @@ void mtxl_state::at486hd(machine_config &config)
 
 #ifdef REAL_PCI_CHIPSET
 #define MOTHERBOARD_ROMS \
-	ROM_REGION(0x20000, ":pci:05.0", 0) \
+	ROM_REGION32_LE(0x20000, ":pci:05.0", 0) \
 	ROM_LOAD( "094572516 bios - 486.bin", 0x000000, 0x020000, CRC(1c0b3ba0) SHA1(ff86dd6e476405e716ac7a4de4a216d2d2b49f15))
 #else
 #define MOTHERBOARD_ROMS \
-	ROM_REGION(0x20000, "bios", 0) \
+	ROM_REGION32_LE(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
 	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
@@ -363,7 +359,7 @@ void mtxl_state::at486hd(machine_config &config)
 ROM_START( mtouchxl )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -376,7 +372,7 @@ ROM_END
 ROM_START( mtchxl5k )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -389,7 +385,7 @@ ROM_END
 ROM_START( mtchxl5ko )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -402,7 +398,7 @@ ROM_END
 ROM_START( mtchxl5ko2 )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -415,7 +411,7 @@ ROM_END
 ROM_START( mtchxl6k )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -428,7 +424,7 @@ ROM_END
 ROM_START( mtchxl6ko4 )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -441,7 +437,7 @@ ROM_END
 ROM_START( mtchxl6ko )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -454,7 +450,7 @@ ROM_END
 ROM_START( mtchxlgld )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
@@ -470,7 +466,7 @@ ROM_END
 ROM_START( mtchxlgldo )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
@@ -486,7 +482,7 @@ ROM_END
 ROM_START( mtchxlti )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", ROMREGION_ERASE00)
+	ROM_REGION32_LE(0x100000, "ioboard", ROMREGION_ERASE00)
 
 	ROM_REGION(0x8000, "nvram", ROMREGION_ERASE00)
 

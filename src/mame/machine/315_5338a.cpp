@@ -33,8 +33,8 @@ DEFINE_DEVICE_TYPE(SEGA_315_5338A, sega_315_5338a_device, "315_5338a", "Sega 315
 sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_315_5338A, tag, owner, clock),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
-	m_out_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_in_port_cb(*this),
+	m_out_port_cb(*this),
 	m_port_config(0), m_serial_output(0), m_address(0)
 {
 	std::fill(std::begin(m_port_value), std::end(m_port_value), 0xff);
@@ -49,18 +49,15 @@ void sega_315_5338a_device::device_start()
 	// resolve callbacks
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 7; i++)
-	{
-		m_in_port_cb[i].resolve_safe(0xff);
-		m_out_port_cb[i].resolve_safe();
-	}
+	m_in_port_cb.resolve_all_safe(0xff);
+	m_out_port_cb.resolve_all_safe();
 
 	// register for save states
 	save_pointer(NAME(m_port_value), 7);
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_serial_output));
 	save_item(NAME(m_address));
+	save_item(NAME(m_cmd));
 }
 
 
@@ -68,7 +65,7 @@ void sega_315_5338a_device::device_start()
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( sega_315_5338a_device::read )
+uint8_t sega_315_5338a_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -93,6 +90,9 @@ READ8_MEMBER( sega_315_5338a_device::read )
 	// serial data read back?
 	case 0x0a: data = m_serial_output; break;
 
+	// command read back?
+	case 0x0b: data = m_cmd; break;
+
 	// serial data input
 	case 0x0c: data = m_read_cb(m_address); break;
 
@@ -111,7 +111,7 @@ READ8_MEMBER( sega_315_5338a_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( sega_315_5338a_device::write )
+void sega_315_5338a_device::write(offs_t offset, uint8_t data)
 {
 	LOG("WR %02x = %02x\n", offset, data);
 
@@ -126,8 +126,10 @@ WRITE8_MEMBER( sega_315_5338a_device::write )
 	case 0x05:
 	case 0x06:
 		m_port_value[offset] = data;
-		if (BIT(m_port_config, offset) == 0)
-			m_out_port_cb[offset](data);
+
+		// always output, even if set to input?
+		// needed for bingoct sound
+		m_out_port_cb[offset](data);
 		break;
 
 	// port direction register (0 = output, 1 = input)
@@ -145,6 +147,7 @@ WRITE8_MEMBER( sega_315_5338a_device::write )
 
 	// command register
 	case 0x09:
+		m_cmd = data;
 		switch (data)
 		{
 		case 0x00:
@@ -156,11 +159,22 @@ WRITE8_MEMBER( sega_315_5338a_device::write )
 		case 0x07:
 			m_write_cb(m_address, m_serial_output, 0xff);
 			break;
+		case 0x70:
+		case 0x71:
+		case 0x72:
+		case 0x73:
+		case 0x74:
+		case 0x75:
+		case 0x76:
+		case 0x77:
+			m_write_cb(data & 0x07, m_serial_output, 0xff);
+			break;
 		case 0x87:
 			// sent after setting up the address and when wanting to receive serial data
 			break;
 		default:
 			logerror("Unknown command: %02x\n", data);
+			break;
 		}
 		break;
 

@@ -21,7 +21,7 @@
 
 class compis_graphics_slot_device;
 
-class device_compis_graphics_card_interface : public device_slot_card_interface
+class device_compis_graphics_card_interface : public device_interface
 {
 public:
 	virtual uint8_t mcs0_r(offs_t offset) { return 0xff; }
@@ -45,8 +45,7 @@ protected:
 
 // ======================> compis_graphics_slot_device
 
-class compis_graphics_slot_device : public device_t,
-							   public device_slot_interface
+class compis_graphics_slot_device : public device_t, public device_single_card_slot_interface<device_compis_graphics_card_interface>
 {
 public:
 	// construction/destruction
@@ -81,7 +80,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_dma_request;
 

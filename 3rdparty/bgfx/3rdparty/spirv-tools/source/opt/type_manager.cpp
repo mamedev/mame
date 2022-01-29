@@ -223,7 +223,7 @@ uint32_t TypeManager::GetTypeInstruction(const Type* type) {
   case Type::k##kind:                                                     \
     typeInst = MakeUnique<Instruction>(context(), SpvOpType##kind, 0, id, \
                                        std::initializer_list<Operand>{}); \
-    break;
+    break
     DefineParameterlessCase(Void);
     DefineParameterlessCase(Bool);
     DefineParameterlessCase(Sampler);
@@ -409,6 +409,22 @@ uint32_t TypeManager::GetTypeInstruction(const Type* type) {
                {static_cast<uint32_t>(
                    type->AsForwardPointer()->storage_class())}}});
       break;
+    case Type::kCooperativeMatrixNV: {
+      auto coop_mat = type->AsCooperativeMatrixNV();
+      uint32_t const component_type =
+          GetTypeInstruction(coop_mat->component_type());
+      if (component_type == 0) {
+        return 0;
+      }
+      typeInst = MakeUnique<Instruction>(
+          context(), SpvOpTypeCooperativeMatrixNV, 0, id,
+          std::initializer_list<Operand>{
+              {SPV_OPERAND_TYPE_ID, {component_type}},
+              {SPV_OPERAND_TYPE_SCOPE_ID, {coop_mat->scope_id()}},
+              {SPV_OPERAND_TYPE_ID, {coop_mat->rows_id()}},
+              {SPV_OPERAND_TYPE_ID, {coop_mat->columns_id()}}});
+      break;
+    }
     default:
       assert(false && "Unexpected type");
       break;
@@ -497,7 +513,7 @@ Type* TypeManager::RebuildType(const Type& type) {
 #define DefineNoSubtypeCase(kind)             \
   case Type::k##kind:                         \
     rebuilt_ty.reset(type.Clone().release()); \
-    return type_pool_.insert(std::move(rebuilt_ty)).first->get();
+    return type_pool_.insert(std::move(rebuilt_ty)).first->get()
 
     DefineNoSubtypeCase(Void);
     DefineNoSubtypeCase(Bool);
@@ -602,6 +618,14 @@ Type* TypeManager::RebuildType(const Type& type) {
         rebuilt_ty->AsForwardPointer()->SetTargetPointer(
             RebuildType(*target_ptr)->AsPointer());
       }
+      break;
+    }
+    case Type::kCooperativeMatrixNV: {
+      const CooperativeMatrixNV* cm_type = type.AsCooperativeMatrixNV();
+      const Type* component_type = cm_type->component_type();
+      rebuilt_ty = MakeUnique<CooperativeMatrixNV>(
+          RebuildType(*component_type), cm_type->scope_id(), cm_type->rows_id(),
+          cm_type->columns_id());
       break;
     }
     default:
@@ -831,6 +855,15 @@ Type* TypeManager::RecordIfTypeDefinition(const Instruction& inst) {
       break;
     case SpvOpTypeAccelerationStructureNV:
       type = new AccelerationStructureNV();
+      break;
+    case SpvOpTypeCooperativeMatrixNV:
+      type = new CooperativeMatrixNV(GetType(inst.GetSingleWordInOperand(0)),
+                                     inst.GetSingleWordInOperand(1),
+                                     inst.GetSingleWordInOperand(2),
+                                     inst.GetSingleWordInOperand(3));
+      break;
+    case SpvOpTypeRayQueryKHR:
+      type = new RayQueryKHR();
       break;
     default:
       SPIRV_UNIMPLEMENTED(consumer_, "unhandled type");

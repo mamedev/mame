@@ -29,8 +29,8 @@ public:
 	// Set VRAM size (in kw). Parameter must be <= 128 and it must be a power of 2.
 	void set_vram_size(unsigned kw) { m_vram_size = kw * 1024; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

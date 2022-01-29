@@ -79,18 +79,18 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( fixbias_w );
-	DECLARE_WRITE8_MEMBER( border_w );
-	DECLARE_WRITE8_MEMBER( lpl_w );
-	DECLARE_WRITE8_MEMBER( lph_w );
+	void fixbias_w(uint8_t data);
+	void border_w(uint8_t data);
+	void lpl_w(uint8_t data);
+	void lph_w(uint8_t data);
 
 	address_space_config m_space_config;
 

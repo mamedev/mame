@@ -46,7 +46,7 @@ const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_HD20, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
-	m_hdc(*this,"hdc")
+	m_hdc(*this, "hdc")
 {
 }
 
@@ -58,8 +58,8 @@ void cpc_hd20_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	space.install_write_handler(0xfbe0,0xfbe4,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
-	space.install_read_handler(0xfbe0,0xfbe4,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
+	space.install_write_handler(0xfbe0,0xfbe4, write8sm_delegate(*this, FUNC(cpc_hd20_device::hdc_w)));
+	space.install_read_handler(0xfbe0,0xfbe4, read8sm_delegate(*this, FUNC(cpc_hd20_device::hdc_r)));
 }
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ void cpc_hd20_device::device_reset()
 	// TODO
 }
 
-READ8_MEMBER(cpc_hd20_device::hdc_r)
+uint8_t cpc_hd20_device::hdc_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -95,7 +95,7 @@ READ8_MEMBER(cpc_hd20_device::hdc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_hd20_device::hdc_w)
+void cpc_hd20_device::hdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

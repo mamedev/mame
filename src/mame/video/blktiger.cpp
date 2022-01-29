@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	};
 	uint8_t attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
 	uint8_t attr = m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
 			0);
@@ -71,9 +71,9 @@ void blktiger_state::video_start()
 
 	m_scroll_ram = std::make_unique<uint8_t[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	m_tx_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap8x4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
-	m_bg_tilemap4x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),this), 16, 16, 64, 128);
+	m_tx_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blktiger_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap8x4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blktiger_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(blktiger_state::bg8x4_scan)), 16, 16, 128, 64);
+	m_bg_tilemap4x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blktiger_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(blktiger_state::bg4x8_scan)), 16, 16, 64, 128);
 
 	m_tx_tilemap->set_transparent_pen(3);
 
@@ -86,6 +86,13 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
+	m_tx_tilemap->set_scrolldx(128, 128);
+	m_tx_tilemap->set_scrolldy(  6,   6);
+	m_bg_tilemap8x4->set_scrolldx(128, 128);
+	m_bg_tilemap8x4->set_scrolldy(  6,   6);
+	m_bg_tilemap4x8->set_scrolldx(128, 128);
+	m_bg_tilemap4x8->set_scrolldy(  6,   6);
+
 	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
@@ -97,18 +104,18 @@ void blktiger_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(blktiger_state::blktiger_txvideoram_w)
+void blktiger_state::blktiger_txvideoram_w(offs_t offset, uint8_t data)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(blktiger_state::blktiger_bgvideoram_r)
+uint8_t blktiger_state::blktiger_bgvideoram_r(offs_t offset)
 {
 	return m_scroll_ram[offset + m_scroll_bank];
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_w)
+void blktiger_state::blktiger_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	offset += m_scroll_bank;
 
@@ -117,34 +124,30 @@ WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_w)
 	m_bg_tilemap4x8->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_bank_w)
+void blktiger_state::blktiger_bgvideoram_bank_w(uint8_t data)
 {
 	m_scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
 }
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_scrolly_w)
+void blktiger_state::blktiger_scrolly_w(offs_t offset, uint8_t data)
 {
-	int scrolly;
-
 	m_scroll_y[offset] = data;
-	scrolly = m_scroll_y[0] | (m_scroll_y[1] << 8);
+	int scrolly = m_scroll_y[0] | (m_scroll_y[1] << 8);
 	m_bg_tilemap8x4->set_scrolly(0, scrolly);
 	m_bg_tilemap4x8->set_scrolly(0, scrolly);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
+void blktiger_state::blktiger_scrollx_w(offs_t offset, uint8_t data)
 {
-	int scrollx;
-
 	m_scroll_x[offset] = data;
-	scrollx = m_scroll_x[0] | (m_scroll_x[1] << 8);
+	int scrollx = m_scroll_x[0] | (m_scroll_x[1] << 8);
 	m_bg_tilemap8x4->set_scrollx(0, scrollx);
 	m_bg_tilemap4x8->set_scrollx(0, scrollx);
 }
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
+void blktiger_state::blktiger_video_control_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -160,7 +163,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 	m_chon = ~data & 0x80;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
+void blktiger_state::blktiger_video_enable_w(uint8_t data)
 {
 	/* not sure which is which, but I think that bit 1 and 2 enable background and sprites */
 	/* bit 1 enables bg ? */
@@ -170,7 +173,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
 	m_objon = ~data & 0x04;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_screen_layout_w)
+void blktiger_state::blktiger_screen_layout_w(uint8_t data)
 {
 	m_screen_layout = data;
 	m_bg_tilemap8x4->enable(m_screen_layout);
@@ -211,7 +214,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				code,
 				color,
 				flipx,flip_screen(),
-				sx,sy,15);
+				sx+128,sy+6,15);
 	}
 }
 

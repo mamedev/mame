@@ -99,6 +99,8 @@ void s32comm_device::device_add_mconfig(machine_config &config)
 s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S32COMM, tag, owner, clock)
 {
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
+
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -135,38 +137,38 @@ void s32comm_device::device_reset()
 	m_fg = 0;
 }
 
-READ8_MEMBER(s32comm_device::zfg_r)
+uint8_t s32comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | 0xFE;
 	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(s32comm_device::zfg_w)
+void s32comm_device::zfg_w(uint8_t data)
 {
 	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
-READ8_MEMBER(s32comm_device::share_r)
+uint8_t s32comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
 	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(s32comm_device::share_w)
+void s32comm_device::share_w(offs_t offset, uint8_t data)
 {
 	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(s32comm_device::cn_r)
+uint8_t s32comm_device::cn_r()
 {
 	return m_cn | 0xFE;
 }
 
-WRITE8_MEMBER(s32comm_device::cn_w)
+void s32comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -195,12 +197,12 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 #endif
 }
 
-READ8_MEMBER(s32comm_device::fg_r)
+uint8_t s32comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7E;
 }
 
-WRITE8_MEMBER(s32comm_device::fg_w)
+void s32comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;
@@ -264,7 +266,7 @@ int s32comm_device::read_frame(int dataSize)
 
 	// try to read a message
 	std::uint32_t recv = 0;
-	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
 		// check if message complete
@@ -285,14 +287,14 @@ int s32comm_device::read_frame(int dataSize)
 					togo -= recv;
 					offset += recv;
 				}
-				else if (filerr == osd_file::error::NONE && recv == 0)
+				else if (!filerr && recv == 0)
 				{
 					togo = 0;
 				}
 			}
 		}
 	}
-	else if (filerr == osd_file::error::NONE && recv == 0)
+	else if (!filerr && recv == 0)
 	{
 		if (m_linkalive == 0x01)
 		{
@@ -320,11 +322,11 @@ void s32comm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	osd_file::error filerr;
+	std::error_condition filerr;
 	std::uint32_t written;
 
 	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		if (m_linkalive == 0x01)
 		{

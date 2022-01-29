@@ -6,13 +6,17 @@ Nichibutsu 1414M4 device emulation
 
 Written by Angelo Salese, based on researches by Tomasz Slanina with Legion
 
-This is some fancy MCU / blitter that copies text strings in various Nihon Bussan games;
+This is some fancy blitter DMA or MCU or even a discrete structure that copies text strings to a 8-bit text layer in
+various Nihon Bussan games;
 
 TODO:
+- Identify what exactly this "device" is;
+- The overlying text layer should actually be a base device for this (and used where not applicable like galivan,
+  armedf and bigfightr);
+- Command triggering condition not understood (and diverges between galivan.cpp and armedf.cpp);
 - where is the condition that makes "insert coin" text to properly blink?
 - first byte meaning is completely unknown;
 - Ninja Emaki triggers unknown commands 0x8000 & 0xff20;
-- Ninja Emaki continue screen is corrupt;
 
 Notes:
 - Just before any string in the "MCU" rom, there's a control byte, this meaning is as follows:
@@ -20,9 +24,6 @@ Notes:
   10-- ---- ---- ---- single string transfer
   11-- ---- ---- ---- src -> dst copy, if destination != 0 fixed src, otherwise do a src -> dst
   --xx xxxx xxxx xxxx destination offset in the VRAM tilemap
-
-- I'm sure that this is a shared device, that shares everything. All of the known differences are due of not
-  understood features of the chip (some bytes in the ROM etc.)
 
 ********************************************************************************************************************/
 
@@ -46,6 +47,12 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
+	m_in_game = false;
+	save_item(NAME(m_previous_0200_command));
+	save_item(NAME(m_previous_0200_command_frame));
+	save_item(NAME(m_in_game));
 }
 
 //-------------------------------------------------
@@ -54,6 +61,9 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
+	m_in_game = false;
 }
 
 /*****************************************************************************
@@ -71,7 +81,7 @@ void nb1414m4_device::dma(uint16_t src, uint16_t dst, uint16_t size, uint8_t con
 
 		vram[i+dst+0x000] = (condition) ? (m_data[i+(0)+src] & 0xff) : 0x20;
 
-		vram[i+dst+0x400] = m_data[i+(size)+src] & 0xff;
+		vram[i+dst+0x400] = (condition) ? (m_data[i+(size)+src] & 0xff) : m_data[0x13];
 	}
 }
 
@@ -91,6 +101,9 @@ void nb1414m4_device::fill(uint16_t dst, uint8_t tile, uint8_t pal, uint8_t *vra
 
 void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 {
+	if (m_in_game)
+		return;
+
 	int credit_count = (vram[0xf] & 0xff);
 	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
@@ -118,10 +131,15 @@ void nb1414m4_device::credit_msg(uint8_t *vram)
 	dst = ((m_data[0x023]<<8)|(m_data[0x024]&0xff)) & 0x3fff;
 	dma(0x0025,dst,0x10,1,vram); /* credit */
 
+	/* credit num */
 	dst = ((m_data[0x045]<<8)|(m_data[0x046]&0xff)) & 0x3fff;
-	dst++; // m_data is 0x5e, needs to be 0x5f ...
-	vram[dst+0x000] = (credit_count + 0x30); /* credit num */
-	vram[dst+0x400] = (m_data[0x48]);
+	vram[dst+0x000] = (credit_count & 0xf0) ? (((credit_count & 0xf0)>>4) + 0x30) : 0x20;
+	vram[dst+0x400] = (m_data[0x47]);
+	vram[dst+0x001] = ((credit_count & 0x0f) + 0x30);
+	vram[dst+0x401] = (m_data[0x48]);
+
+	if (m_in_game)
+		return;
 
 	if(credit_count == 1) /* ONE PLAYER ONLY */
 	{
@@ -158,7 +176,7 @@ void nb1414m4_device::kozure_score_msg(uint16_t dst, uint8_t src_base, uint8_t *
 		vram[i+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+i];
 	}
 
-	vram[6+dst+0x0000] = 0x30;
+	vram[6+dst+0x0000] = vram[5+dst+0x0000] == 0x20 ? 0x20 : 0x30;
 	vram[6+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+6];
 	vram[7+dst+0x0000] = 0x30;
 	vram[7+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+7];
@@ -169,14 +187,28 @@ void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 {
 	uint16_t dst;
 
+	// In any game, this bit is set when now playing.
+	// If it is set, "INSERT COIN" etc. are not displayed.
+	m_in_game = (mcu_cmd & 0x80) != 0;
+
+	// If the same command in an extremely short cycle (1 frame or less), ignored it.
+	// This is required to displaying continue screen of ninjaemak.
+	// ninjaemak calls this command to clear the screen, draw the continuation screen, and then immediately call the same command.
+	// This second command must be ignored in order not to corrupt the continue screen.
+	if (m_previous_0200_command == mcu_cmd && (screen().frame_number() - m_previous_0200_command_frame) <= 1)
+		return;
+
 	dst = (m_data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(m_data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
 
 	dst &= 0x3fff;
 
 	if(dst & 0x7ff) // fill
-		fill(0x0000,m_data[dst & 0x3fff],m_data[dst+1],vram);
+		fill(0x0000,m_data[dst],m_data[dst+1],vram);
 	else // src -> dst
-		dma(dst & 0x3fff,0x0000,0x400,1,vram);
+		dma(dst,0x0000,0x400,1,vram);
+
+	m_previous_0200_command = mcu_cmd;
+	m_previous_0200_command_frame = screen().frame_number();
 }
 
 /*
@@ -271,28 +303,38 @@ void nb1414m4_device::_0e00(uint16_t mcu_cmd, uint8_t *vram)
 	dst = ((m_data[0xdf]<<8)|(m_data[0xe0]&0xff)) & 0x3fff;
 	dma(0x00e1,dst,8,1,vram); /* hi-score */
 
-	if(mcu_cmd & 0x04)
+	dst = ((m_data[0xfb]<<8)|(m_data[0xfc]&0xff)) & 0x3fff;
+	dma(0x00fd,dst,8,!(mcu_cmd & 1),vram); /* 1p-msg */
+	dst = ((m_data[0x10d]<<8)|(m_data[0x10e]&0xff)) & 0x3fff;
+	kozure_score_msg(dst,0,vram); /* 1p score */
+
+	if(mcu_cmd & 0x80)
 	{
-		dst = ((m_data[0xfb]<<8)|(m_data[0xfc]&0xff)) & 0x3fff;
-		dma(0x00fd,dst,8,!(mcu_cmd & 1),vram); /* 1p-msg */
-		dst = ((m_data[0x10d]<<8)|(m_data[0x10e]&0xff)) & 0x3fff;
-		kozure_score_msg(dst,0,vram); /* 1p score */
-		if(mcu_cmd & 0x80)
-		{
-			dst = ((m_data[0x117]<<8)|(m_data[0x118]&0xff)) & 0x3fff;
-			dma(0x0119,dst,8,!(mcu_cmd & 2),vram); /* 2p-msg */
-			dst = ((m_data[0x129]<<8)|(m_data[0x12a]&0xff)) & 0x3fff;
-			kozure_score_msg(dst,1,vram); /* 2p score */
-		}
+		dst = ((m_data[0x117]<<8)|(m_data[0x118]&0xff)) & 0x3fff;
+		dma(0x0119,dst,8,!(mcu_cmd & 2),vram); /* 2p-msg */
+		dst = ((m_data[0x129]<<8)|(m_data[0x12a]&0xff)) & 0x3fff;
+		kozure_score_msg(dst,1,vram); /* 2p score */
 	}
-	else
+
+	if((mcu_cmd & 0x04) == 0)
 	{
 		dst = ((m_data[0x133]<<8)|(m_data[0x134]&0xff)) & 0x3fff;
-		dma(0x0135,dst,0x10,!(mcu_cmd & 1),vram); /* game over */
+		dma(0x0135,dst,0x10,1,vram); /* game over */
 		insert_coin_msg(vram);
 		if((mcu_cmd & 0x18) == 0) // TODO: either one of these two disables credit display
 			credit_msg(vram);
 	}
+}
+
+/*****************************************************************************
+    DEVICE SETTERS
+*****************************************************************************/
+
+void nb1414m4_device::vblank_trigger()
+{
+	// TODO: use this for frame number synchronization instead of screen().frame_number()
+	//  real HW references definitely syncs insert coin blinking after POST so whatever is the host actually
+	//  have an interest over vblank signal.
 }
 
 void nb1414m4_device::exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap)

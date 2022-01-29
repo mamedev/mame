@@ -43,7 +43,6 @@ public:
 
 	u8 read();
 	void write(u8 data);
-	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_WRITE_LINE_MEMBER( so_w );

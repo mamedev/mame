@@ -14,6 +14,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
+#include "sound/dac.h"
 #include "sound/namco.h"
 #include "emupal.h"
 
@@ -31,7 +32,8 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_dac(*this, "dac")
 	{ }
 
 	void _20pacgal(machine_config &config);
@@ -58,6 +60,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
+	required_device<dac_8bit_r2r_device> m_dac;
 
 	/* memory */
 	std::unique_ptr<uint8_t[]> m_sprite_gfx_ram;
@@ -69,17 +72,16 @@ protected:
 	uint8_t m_sprite_pal_base;
 
 	uint8_t m_irq_mask;
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(timer_pulse_w);
-	DECLARE_WRITE8_MEMBER(_20pacgal_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(ram_bank_select_w);
-	DECLARE_WRITE8_MEMBER(ram_48000_w);
-	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
-	DECLARE_WRITE8_MEMBER(sprite_ram_w);
-	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
+	void irqack_w(uint8_t data);
+	void timer_pulse_w(uint8_t data);
+	void _20pacgal_coin_counter_w(uint8_t data);
+	void ram_bank_select_w(uint8_t data);
+	void ram_48000_w(offs_t offset, uint8_t data);
+	void sprite_gfx_w(offs_t offset, uint8_t data);
+	void sprite_ram_w(offs_t offset, uint8_t data);
+	void sprite_lookup_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -108,7 +110,7 @@ public:
 	void _25pacman(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
+	uint8_t _25pacman_io_87_r();
 
 	virtual void machine_start() override;
 

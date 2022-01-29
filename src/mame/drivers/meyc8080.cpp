@@ -59,7 +59,6 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,13 +83,13 @@ public:
 	void meyc8080(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(lights_1_w);
-	DECLARE_WRITE8_MEMBER(lights_2_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_1_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
+	void lights_1_w(uint8_t data);
+	void lights_2_w(uint8_t data);
+	void counters_w(uint8_t data);
+	void meyc8080_dac_1_w(uint8_t data);
+	void meyc8080_dac_2_w(uint8_t data);
+	void meyc8080_dac_3_w(uint8_t data);
+	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void meyc8080_map(address_map &map);
 
@@ -113,12 +112,8 @@ private:
 
 uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram_0.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram_0.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 
@@ -132,15 +127,15 @@ uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rg
 		uint8_t data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
 		uint8_t data_b = data0 ^ data1;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x) = rgb_t(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
+			bitmap.pix(y, x) = rgb_t(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
 
-			data_r = data_r << 1;
-			data_g = data_g << 1;
-			data_b = data_b << 1;
+			data_r <<= 1;
+			data_g <<= 1;
+			data_b <<= 1;
 
-			x = x + 1;
+			x++;
 		}
 	}
 
@@ -155,7 +150,7 @@ uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::lights_1_w)
+void meyc8080_state::lights_1_w(uint8_t data)
 {
 /* Wild Arrow lamps
 
@@ -201,7 +196,7 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::lights_2_w)
+void meyc8080_state::lights_2_w(uint8_t data)
 {
 /* Wild Arrow unknown pulse...
 
@@ -250,7 +245,7 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::counters_w)
+void meyc8080_state::counters_w(uint8_t data)
 {
 /* Wild Arrow & Draw Poker counters
 
@@ -286,25 +281,25 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
+void meyc8080_state::meyc8080_dac_1_w(uint8_t data)
 {
 	m_dac->write(0);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
+void meyc8080_state::meyc8080_dac_2_w(uint8_t data)
 {
 	m_dac->write(1);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
+void meyc8080_state::meyc8080_dac_3_w(uint8_t data)
 {
 	m_dac->write(2);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
+void meyc8080_state::meyc8080_dac_4_w(uint8_t data)
 {
 	m_dac->write(3);
 }
@@ -607,9 +602,6 @@ void meyc8080_state::meyc8080(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.66); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

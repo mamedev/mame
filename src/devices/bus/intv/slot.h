@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -32,7 +32,7 @@ enum
 
 // ======================> device_intv_cart_interface
 
-class device_intv_cart_interface : public device_slot_card_interface
+class device_intv_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -93,8 +93,8 @@ protected:
 // ======================> intv_cart_slot_device
 
 class intv_cart_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_intv_cart_interface>
 {
 public:
 	// construction/destruction
@@ -114,24 +114,18 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override {}
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "intv_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,int,rom,itv"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	image_init_result load_fullpath();
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "intv_cart"; }
-	virtual const char *file_extensions() const override { return "bin,int,rom,itv"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	uint16_t read_rom04(offs_t offset) { if (m_cart) return m_cart->read_rom04(offset); else return 0xffff; }

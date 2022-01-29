@@ -156,6 +156,7 @@ tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxlayout(TC0100SCN_LAYOUT_DEFAULT)
+	, m_tc0100scn_cb(*this)
 	, m_ram(nullptr)
 	, m_bgscroll_ram(nullptr)
 	, m_fgscroll_ram(nullptr)
@@ -227,7 +228,7 @@ GFXDECODE_END
 void tc0100scn_base_device::device_start()
 {
 	// bind callbacks
-	m_tc0100scn_cb.bind_relative_to(*owner());
+	m_tc0100scn_cb.resolve();
 
 	static const gfx_layout charlayout =
 	{
@@ -248,14 +249,14 @@ void tc0100scn_base_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>, "bg0_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>, "bg1_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_tx_tile_info<0x02000, 1>, "txt_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_tx_tile_info<0x02000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>, "bg0_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>, "bg1_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_tx_tile_info<0x09000, 2>, "txt_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[0][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[2][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_tx_tile_info<0x09000, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -349,10 +350,10 @@ void tc0620scc_device::device_start()
 	gfx_element *gx1 = gfx(1);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_decoded_gfx = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -372,7 +373,7 @@ void tc0620scc_device::device_start()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_decoded_gfx.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(64);
 	tc0100scn_base_device::device_start();
 }
@@ -405,7 +406,7 @@ TILE_GET_INFO_MEMBER(tc0100scn_base_device::get_bg_tile_info)
 	if (!m_tc0100scn_cb.isnull())
 		m_tc0100scn_cb(&code, &color);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			((color + m_bg_colbank[Colbank]) & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -416,7 +417,7 @@ TILE_GET_INFO_MEMBER(tc0100scn_base_device::get_tx_tile_info)
 {
 	int attr = m_ram[Offset + tile_index];
 
-	SET_TILE_INFO_MEMBER(Gfx,
+	tileinfo.set(Gfx,
 			attr & 0x00ff,
 			((attr & 0x3f00) >> 8) + m_tx_colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -629,7 +630,7 @@ void tc0100scn_base_device::tilemap_update()
 void tc0100scn_base_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u8 priority, u8 pmask )
 {
 	const bitmap_ind16 &src_bitmap = tmap->pixmap();
-	int width_mask, height_mask, x, y, p;
+	int width_mask, height_mask;
 	int column_offset, src_x = 0, src_y = 0;
 	int scrollx_delta = - tmap->scrolldx();
 	int scrolly_delta = - tmap->scrolldy();
@@ -645,24 +646,24 @@ void tc0100scn_base_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16
 
 	src_y += cliprect.top();
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		src_x = (m_fgscrollx - m_fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.min_x) & width_mask;
 		if (m_ctrl[0x7] & 1) // Flipscreen
 			src_x = (256 - 64 - src_x) & width_mask;
 
 		// Col offsets are 'tilemap' space 0-511, and apply to blocks of 8 pixels at once
-		for (x = 0; x < cliprect.width(); x++)
+		for (int x = 0; x < cliprect.width(); x++)
 		{
 			column_offset = m_colscroll_ram[(src_x & 0x3ff) / 8];
-			p = src_bitmap.pix16((src_y - column_offset) & height_mask, src_x);
+			int p = src_bitmap.pix((src_y - column_offset) & height_mask, src_x);
 
 			if ((p & 0xf)!= 0 || (flags & TILEMAP_DRAW_OPAQUE))
 			{
-				bitmap.pix16(y, x + cliprect.min_x) = p;
+				bitmap.pix(y, x + cliprect.min_x) = p;
 				if (screen.priority().valid())
 				{
-					u8 *pri = &screen.priority().pix8(y);
+					u8 *pri = &screen.priority().pix(y);
 					pri[x + cliprect.min_x] = (pri[x + cliprect.min_x] & pmask) | priority;
 				}
 			}

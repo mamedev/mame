@@ -23,19 +23,13 @@ class flower_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( lower_write );
-	DECLARE_WRITE8_MEMBER( upper_write );
+	void lower_write(offs_t offset, u8 data);
+	void upper_write(offs_t offset, u8 data);
 //  virtual void lower_map(address_map &map);
 //  virtual void upper_map(address_map &map);
-	DECLARE_WRITE8_MEMBER( frequency_w );
-	DECLARE_WRITE8_MEMBER( repeat_w );
-	DECLARE_WRITE8_MEMBER( unk_w );
-	DECLARE_WRITE8_MEMBER( volume_w );
-	DECLARE_WRITE8_MEMBER( start_address_w );
-	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 
 	void regs_map(address_map &map);
 protected:
@@ -45,7 +39,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	address_space *m_iospace;
 private:
@@ -56,33 +50,40 @@ private:
 	static constexpr unsigned MAX_VOICES = 8;
 	static constexpr int defgain = 48;
 
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
+	u8 m_io_regs[0x80] = {0}; // for debug purpose
+
+	std::vector<s16> m_mixer_table;
+	s16 *m_mixer_lookup;
+	std::vector<short> m_mixer_buffer;
 
 	struct fl_sound_channel
 	{
-		uint8_t start_nibbles[6];
-		uint8_t raw_frequency[4];
-		uint32_t start_address;
-		uint32_t position;
-		uint16_t frequency;
-		uint8_t volume;
-		uint8_t volume_bank;
-		uint8_t effect;
-		bool enable;
-		bool repeat;
-		int channel_number;
+		u8 start_nibbles[6] = {0};
+		u8 raw_frequency[4] = {0};
+		u32 start_address = 0;
+		u32 position = 0;
+		u16 frequency = 0;
+		u8 volume = 0;
+		u8 volume_bank = 0;
+		//u8 effect = 0;
+		bool enable = false;
+		bool repeat = false;
 	};
 
 	/* data about the sound system */
 	fl_sound_channel m_channel_list[MAX_VOICES];
-	fl_sound_channel *m_last_channel;
 
 	void make_mixer_table(int voices, int gain);
 
-	const uint8_t *m_sample_rom;
-	const uint8_t *m_volume_rom;
+	required_region_ptr<u8> m_sample_rom;
+	required_region_ptr<u8> m_volume_rom;
+
+	void frequency_w(offs_t offset, u8 data);
+	void repeat_w(offs_t offset, u8 data);
+	void unk_w(offs_t offset, u8 data);
+	void volume_w(offs_t offset, u8 data);
+	void start_address_w(offs_t offset, u8 data);
+	void sample_trigger_w(offs_t offset, u8 data);
 };
 
 

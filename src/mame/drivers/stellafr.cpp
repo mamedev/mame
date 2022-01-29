@@ -29,11 +29,11 @@ public:
 	void stellafr(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(write_8000c1);
-	DECLARE_READ8_MEMBER(read_800101);
-	DECLARE_WRITE8_MEMBER(write_800101);
-	DECLARE_WRITE8_MEMBER(duart_output_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void write_8000c1(uint8_t data);
+	uint8_t read_800101();
+	void write_800101(uint8_t data);
+	void duart_output_w(uint8_t data);
+	void ay8910_portb_w(uint8_t data);
 
 	void mem_map(address_map &map);
 	void fc7_map(address_map &map);
@@ -44,24 +44,24 @@ private:
 };
 
 
-WRITE8_MEMBER(stellafr_state::write_8000c1)
+void stellafr_state::write_8000c1(uint8_t data)
 {
 }
 
-READ8_MEMBER(stellafr_state::read_800101)
+uint8_t stellafr_state::read_800101()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(stellafr_state::write_800101)
+void stellafr_state::write_800101(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(stellafr_state::duart_output_w)
+void stellafr_state::duart_output_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
+void stellafr_state::ay8910_portb_w(uint8_t data)
 {
 }
 
@@ -102,7 +102,7 @@ void stellafr_state::stellafr(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }

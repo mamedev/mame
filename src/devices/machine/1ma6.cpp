@@ -117,7 +117,7 @@ hp_1ma6_device::hp_1ma6_device(const machine_config &mconfig, const char *tag, d
 	clear_state();
 }
 
-WRITE8_MEMBER(hp_1ma6_device::reg_w)
+void hp_1ma6_device::reg_w(offs_t offset, uint8_t data)
 {
 	LOG("WR %u=%02x\n" , offset , data);
 	switch(offset) {
@@ -133,7 +133,7 @@ WRITE8_MEMBER(hp_1ma6_device::reg_w)
 	}
 }
 
-READ8_MEMBER(hp_1ma6_device::reg_r)
+uint8_t hp_1ma6_device::reg_r(offs_t offset)
 {
 	uint8_t res = 0;
 
@@ -341,7 +341,7 @@ void hp_1ma6_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);
-	m_tape->set_bits_per_word(16);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp_1ma6_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp_1ma6_device::hole_w));

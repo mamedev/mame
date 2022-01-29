@@ -167,14 +167,14 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  Input a word from given I/O port
  */
 
-#define TMS32010_In(Port) (m_io->read_word(Port))
+#define TMS32010_In(Port) (m_io.read_word(Port))
 
 
 /****************************************************************************
  *  Output a word to given I/O port
  */
 
-#define TMS32010_Out(Port,Value) (m_io->write_word(Port,Value))
+#define TMS32010_Out(Port,Value) (m_io.write_word(Port,Value))
 
 
 
@@ -182,14 +182,14 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  Read a word from given ROM memory location
  */
 
-#define TMS32010_ROM_RDMEM(A) (m_program->read_word(A))
+#define TMS32010_ROM_RDMEM(A) (m_program.read_word(A))
 
 
 /****************************************************************************
  *  Write a word to given ROM memory location
  */
 
-#define TMS32010_ROM_WRMEM(A,V) (m_program->write_word(A,V))
+#define TMS32010_ROM_WRMEM(A,V) (m_program.write_word(A,V))
 
 
 
@@ -197,14 +197,14 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  Read a word from given RAM memory location
  */
 
-#define TMS32010_RAM_RDMEM(A) (m_data->read_word(A))
+#define TMS32010_RAM_RDMEM(A) (m_data.read_word(A))
 
 
 /****************************************************************************
  *  Write a word to given RAM memory location
  */
 
-#define TMS32010_RAM_WRMEM(A,V) (m_data->write_word(A,V))
+#define TMS32010_RAM_WRMEM(A,V) (m_data.write_word(A,V))
 
 
 
@@ -214,7 +214,7 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (m_cache->read_word(A))
+#define TMS32010_RDOP(A) (m_cache.read_word(A))
 
 
 /****************************************************************************
@@ -223,7 +223,7 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (m_cache->read_word(A))
+#define TMS32010_RDOP_ARG(A) (m_cache.read_word(A))
 
 
 /************************************************************************
@@ -835,10 +835,10 @@ void tms32010_device::device_start()
 	save_item(NAME(m_memaccess));
 	save_item(NAME(m_addr_mask));
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	m_bio_in.resolve_safe(0);
 
@@ -869,8 +869,6 @@ void tms32010_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PREVPC).formatstr("%04X").noshow();
-	/* This is actually not a stack pointer, but the stack contents */
-	state_add(STATE_GENSP, "GENSP", m_STACK[3]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);

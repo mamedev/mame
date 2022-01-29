@@ -213,7 +213,7 @@ void ncr53c7xx_device::device_reset()
 //  read - Host read handler
 //-------------------------------------------------
 
-READ32_MEMBER( ncr53c7xx_device::read )
+uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
 
@@ -456,7 +456,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 //  write - Host write handler
 //-------------------------------------------------
 
-WRITE32_MEMBER( ncr53c7xx_device::write )
+void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", offset, mem_mask, data, machine().describe_context());
 
@@ -760,7 +760,7 @@ void ncr53c7xx_device::recv_byte()
 //  state machine
 //-------------------------------------------------
 
-void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	step(true);
 }

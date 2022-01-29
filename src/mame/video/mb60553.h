@@ -24,13 +24,13 @@ public:
 
 	TILEMAP_MAPPER_MEMBER(twc94_scan);
 
-	DECLARE_WRITE16_MEMBER(regs_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(line_w);
+	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void line_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_READ16_MEMBER(line_r);
+	uint16_t regs_r(offs_t offset);
+	uint16_t vram_r(offs_t offset);
+	uint16_t line_r(offs_t offset);
 
 protected:
 	virtual void device_start() override;

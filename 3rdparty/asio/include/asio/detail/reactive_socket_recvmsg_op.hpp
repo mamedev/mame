@@ -2,7 +2,7 @@
 // detail/reactive_socket_recvmsg_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,6 +19,9 @@
 #include "asio/detail/bind_handler.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/fenced_block.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/handler_invoke_helpers.hpp"
+#include "asio/detail/handler_work.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/reactor_op.hpp"
 #include "asio/detail/socket_ops.hpp"
@@ -33,10 +36,12 @@ template <typename MutableBufferSequence>
 class reactive_socket_recvmsg_op_base : public reactor_op
 {
 public:
-  reactive_socket_recvmsg_op_base(socket_type socket,
-      const MutableBufferSequence& buffers, socket_base::message_flags in_flags,
+  reactive_socket_recvmsg_op_base(const asio::error_code& success_ec,
+      socket_type socket, const MutableBufferSequence& buffers,
+      socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags, func_type complete_func)
-    : reactor_op(&reactive_socket_recvmsg_op_base::do_perform, complete_func),
+    : reactor_op(success_ec,
+        &reactive_socket_recvmsg_op_base::do_perform, complete_func),
       socket_(socket),
       buffers_(buffers),
       in_flags_(in_flags),
@@ -70,21 +75,24 @@ private:
   socket_base::message_flags& out_flags_;
 };
 
-template <typename MutableBufferSequence, typename Handler>
+template <typename MutableBufferSequence, typename Handler, typename IoExecutor>
 class reactive_socket_recvmsg_op :
   public reactive_socket_recvmsg_op_base<MutableBufferSequence>
 {
 public:
   ASIO_DEFINE_HANDLER_PTR(reactive_socket_recvmsg_op);
 
-  reactive_socket_recvmsg_op(socket_type socket,
-      const MutableBufferSequence& buffers, socket_base::message_flags in_flags,
-      socket_base::message_flags& out_flags, Handler& handler)
-    : reactive_socket_recvmsg_op_base<MutableBufferSequence>(socket, buffers,
-        in_flags, out_flags, &reactive_socket_recvmsg_op::do_complete),
-      handler_(ASIO_MOVE_CAST(Handler)(handler))
+  reactive_socket_recvmsg_op(const asio::error_code& success_ec,
+      socket_type socket, const MutableBufferSequence& buffers,
+      socket_base::message_flags in_flags,
+      socket_base::message_flags& out_flags, Handler& handler,
+      const IoExecutor& io_ex)
+    : reactive_socket_recvmsg_op_base<MutableBufferSequence>(
+        success_ec, socket, buffers, in_flags, out_flags,
+        &reactive_socket_recvmsg_op::do_complete),
+      handler_(ASIO_MOVE_CAST(Handler)(handler)),
+      work_(handler_, io_ex)
   {
-    handler_work<Handler>::start(handler_);
   }
 
   static void do_complete(void* owner, operation* base,
@@ -95,9 +103,13 @@ public:
     reactive_socket_recvmsg_op* o(
         static_cast<reactive_socket_recvmsg_op*>(base));
     ptr p = { asio::detail::addressof(o->handler_), o, o };
-    handler_work<Handler> w(o->handler_);
 
     ASIO_HANDLER_COMPLETION((*o));
+
+    // Take ownership of the operation's outstanding work.
+    handler_work<Handler, IoExecutor> w(
+        ASIO_MOVE_CAST2(handler_work<Handler, IoExecutor>)(
+          o->work_));
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -122,6 +134,7 @@ public:
 
 private:
   Handler handler_;
+  handler_work<Handler, IoExecutor> work_;
 };
 
 } // namespace detail

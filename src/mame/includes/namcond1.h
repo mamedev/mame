@@ -37,12 +37,12 @@ private:
 	uint8_t m_h8_irq5_enabled;
 	int m_p8;
 
-	DECLARE_READ16_MEMBER(mcu_p7_read);
-	DECLARE_READ16_MEMBER(mcu_pa_read);
-	DECLARE_WRITE16_MEMBER(mcu_pa_write);
-	DECLARE_READ16_MEMBER(cuskey_r);
-	DECLARE_WRITE16_MEMBER(cuskey_w);
-	DECLARE_READ16_MEMBER(printer_r);
+	uint16_t mcu_p7_read();
+	uint16_t mcu_pa_read();
+	void mcu_pa_write(uint16_t data);
+	uint16_t cuskey_r(offs_t offset);
+	void cuskey_w(offs_t offset, uint16_t data);
+	uint16_t printer_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

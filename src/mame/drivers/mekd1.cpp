@@ -58,7 +58,7 @@ control codes when loading and 'punching' a tape. TODO perhaps these could
 be detected and serial I/O diverted to a cassette.
  Code 0x11 DC1 - Tape playback on
  Code 0x12 DC2 - Tape record on.
- Code 0x13 DC4 - Tape playback off.
+ Code 0x13 DC3 - Tape playback off.
  Code 0x14 DC4 - Tape record off.
 
 The serial bit rate is controlled by a MC14536 timer and is variable. Common
@@ -104,9 +104,9 @@ public:
 		, m_acia(*this, "acia")
 		, m_brg(*this, "brg")
 		, m_rs232(*this, "rs232")
-		, m_baud_rate(*this, "baud_rate")
-		, m_stop_bits(*this, "stop_bits")
-		, m_acia_baud_rate(*this, "acia_baud_rate")
+		, m_baud_rate(*this, "BAUD_RATE")
+		, m_stop_bits(*this, "STOP_BITS")
+		, m_acia_baud_rate(*this, "ACIA_BAUD_RATE")
 	{ }
 
 	void mekd1(machine_config &config);
@@ -133,10 +133,10 @@ private:
 	required_ioport m_stop_bits;
 	required_ioport m_acia_baud_rate;
 
-	DECLARE_READ8_MEMBER(pia0_pa_r);
-	DECLARE_READ8_MEMBER(pia0_pb_r);
-	DECLARE_WRITE8_MEMBER(pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(pia0_pb_w);
+	uint8_t pia0_pa_r();
+	uint8_t pia0_pb_r();
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 
 	// Clocks
@@ -150,7 +150,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer *m_bit_rate_timer;
 	emu_timer *m_bit_rate_half_timer;
@@ -186,7 +186,7 @@ void mekd1_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( mekd1 )
 
-	PORT_START("baud_rate")
+	PORT_START("BAUD_RATE")
 	PORT_CONFNAME(0x3fff, 416, "RS232 Baud Rate")
 	PORT_CONFSETTING(9091, "110")
 	PORT_CONFSETTING(3333, "300")
@@ -197,12 +197,12 @@ static INPUT_PORTS_START( mekd1 )
 	PORT_CONFSETTING( 139, "7200")
 	PORT_CONFSETTING( 104, "9600")
 
-	PORT_START("stop_bits")
+	PORT_START("STOP_BITS")
 	PORT_CONFNAME(0x01, 0, "Stop bits")
 	PORT_CONFSETTING(0x00, "1")
 	PORT_CONFSETTING(0x01, "2")
 
-	PORT_START("acia_baud_rate")
+	PORT_START("ACIA_BAUD_RATE")
 	PORT_CONFNAME(0xf, 1, "ACIA Baud Rate")
 	PORT_CONFSETTING(13, "110")
 	PORT_CONFSETTING(11, "150")
@@ -218,12 +218,12 @@ INPUT_PORTS_END
 
 
 
-READ8_MEMBER(mekd1_state::pia0_pa_r)
+uint8_t mekd1_state::pia0_pa_r()
 {
 	return m_rs232->rxd_r() << 7;
 }
 
-READ8_MEMBER(mekd1_state::pia0_pb_r)
+uint8_t mekd1_state::pia0_pb_r()
 {
 	bool timer_out;
 	uint8_t stop_bits = m_stop_bits->read();
@@ -236,12 +236,12 @@ READ8_MEMBER(mekd1_state::pia0_pb_r)
 	return (timer_out << 7) | (stop_bits << 6);
 }
 
-WRITE8_MEMBER(mekd1_state::pia0_pa_w)
+void mekd1_state::pia0_pa_w(uint8_t data)
 {
 	m_rs232->write_txd(BIT(data, 0));
 }
 
-WRITE8_MEMBER(mekd1_state::pia0_pb_w)
+void mekd1_state::pia0_pb_w(uint8_t data)
 {
 	m_bit_rate_select = BIT(data, 2);
 
@@ -277,7 +277,7 @@ WRITE_LINE_MEMBER(mekd1_state::pia0_cb2_w)
 	// This is a tape reader control line.
 }
 
-void mekd1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mekd1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -404,7 +404,6 @@ void mekd1_state::machine_start()
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_2400)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_2400)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_SPACE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -441,8 +440,8 @@ void mekd1_state::mekd1(machine_config &config)
 	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	// User ACIA. Available at P2.
-	// /CTS is pulled low.
-	// /DCD is pulled low.
+	// /CTS is pulled low, but may be driven.
+	// /DCD is pulled low, but may be driven.
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 

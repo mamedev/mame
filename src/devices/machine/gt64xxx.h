@@ -36,33 +36,31 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 
 	// pci bus
-	DECLARE_READ32_MEMBER(  pci_config_r);
-	DECLARE_WRITE32_MEMBER( pci_config_w);
+	uint32_t pci_config_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pci_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// cpu bus
-	DECLARE_READ32_MEMBER (cpu_if_r);
-	DECLARE_WRITE32_MEMBER(cpu_if_w);
+	uint32_t cpu_if_r(offs_t offset);
+	void cpu_if_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master_mem0_r);
-	DECLARE_WRITE32_MEMBER(master_mem0_w);
+	uint32_t master_mem0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master_mem0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master_mem1_r);
-	DECLARE_WRITE32_MEMBER(master_mem1_w);
+	uint32_t master_mem1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master_mem1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master_io_r);
-	DECLARE_WRITE32_MEMBER(master_io_w);
+	uint32_t master_io_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// devices
-	DECLARE_READ32_MEMBER (ras_0_r);
-	DECLARE_WRITE32_MEMBER(ras_0_w);
-	DECLARE_READ32_MEMBER(ras_1_r);
-	DECLARE_WRITE32_MEMBER(ras_1_w);
-	DECLARE_READ32_MEMBER(ras_2_r);
-	DECLARE_WRITE32_MEMBER(ras_2_w);
-	DECLARE_READ32_MEMBER(ras_3_r);
-	DECLARE_WRITE32_MEMBER(ras_3_w);
-	DECLARE_READ32_MEMBER (cs_0_r);
-	DECLARE_WRITE32_MEMBER(cs_0_w);
+	uint32_t ras_0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ras_0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ras_1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ras_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ras_2_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ras_2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ras_3_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ras_3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// Enums
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};

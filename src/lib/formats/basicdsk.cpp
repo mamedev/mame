@@ -8,11 +8,13 @@
 
 *********************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
 #include "basicdsk.h"
+
+#include "opresolv.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 static floperr_t basicdsk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
 static floperr_t basicdsk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);

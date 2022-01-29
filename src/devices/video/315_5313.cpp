@@ -1,6 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Sega 315-5313 - Megadrive VDP */
+/*
+    Sega 315-5313 VDP emulation, used by Mega Drive/Genesis
+
+    TODO:
+    - Video, DMA timing and HV counter seem incorrect,
+      they need verification on real hardware.
+    - Support 128KB VRAM configuration, did any hardware use it?
+    - Is border area displayable?
+    - 32X overlay with H32 mode, did all known software use this?
+*/
 
 #include "emu.h"
 #include "video/315_5313.h"
@@ -153,7 +162,13 @@ static constexpr u8 line_315_5313_mode4[8] = {
 			, 37 /* SPRCOL_BASEHPOS */
 		};
 
-#define MAX_HPOSITION 480
+static const unsigned hres[4] = { 256, 256, 320, 320 };
+static const unsigned hres_mul[4] = { 5, 5, 4, 4 };
+
+inline u8 sega315_5313_device::get_hres() { return (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1)) & 3; }
+int sega315_5313_device::screen_hpos() { return screen().hpos() / (m_lcm_scaling ? hres_mul[get_hres()] : 1); }
+
+#define MAX_HPOSITION 480 // TODO: 342(H32) or 427.5(H40), each scanline used 3420 cycle
 
 
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
@@ -169,6 +184,9 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_sndirqline_callback(*this)
 	, m_lv6irqline_callback(*this)
 	, m_lv4irqline_callback(*this)
+	, m_32x_scanline_func(*this)
+	, m_32x_interrupt_func(*this)
+	, m_32x_scanline_helper_func(*this)
 	, m_command_pending(0)
 	, m_command_part1(0)
 	, m_command_part2(0)
@@ -184,6 +202,7 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_scanline_counter(0)
 	, m_vblank_flag(0)
 	, m_imode(0)
+	, m_lcm_scaling(false)
 	, m_visible_scanlines(0)
 	, m_irq6_scanline(0)
 	, m_z80irq_scanline(0)
@@ -283,9 +302,9 @@ void sega315_5313_device::device_start()
 	m_lv6irqline_callback.resolve_safe();
 	m_lv4irqline_callback.resolve_safe();
 
-	m_32x_scanline_func.bind_relative_to(*owner());
-	m_32x_interrupt_func.bind_relative_to(*owner());
-	m_32x_scanline_helper_func.bind_relative_to(*owner());
+	m_32x_scanline_func.resolve();
+	m_32x_interrupt_func.resolve();
+	m_32x_scanline_helper_func.resolve();
 
 	m_vram  = std::make_unique<u16[]>(0x10000 / 2);
 	m_cram  = std::make_unique<u16[]>(0x80 / 2);
@@ -334,9 +353,9 @@ void sega315_5313_device::device_start()
 	memset(m_palette_lookup.get(), 0x00, 0x40 * 2);
 
 	if (!m_use_alt_timing)
-		m_render_bitmap = std::make_unique<bitmap_rgb32>(320, 512); // allocate maximum sizes we're going to use, it's safer.
+		m_render_bitmap = std::make_unique<bitmap_rgb32>(1280, 512); // allocate maximum sizes we're going to use, it's safer.
 	else
-		m_render_line = std::make_unique<u32[]>(320);
+		m_render_line = std::make_unique<u32[]>(1280);
 
 	m_render_line_raw = std::make_unique<u16[]>(320);
 
@@ -348,7 +367,7 @@ void sega315_5313_device::device_start()
 	save_pointer(NAME(m_palette_lookup), 0x40);
 	save_pointer(NAME(m_render_line_raw), 320);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line), 320);
+		save_pointer(NAME(m_render_line), 1280);
 
 	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
 	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
@@ -1068,12 +1087,14 @@ u16 sega315_5313_device::ctrl_port_r()
 	/* Megalo Mania also fussy - cares about pending flag*/
 
 	const int sprite_overflow = 0;
-	const int odd_frame = m_imode_odd_frame^1;
+	int odd_frame = 0;
 	int hblank_flag = 0;
 	const int dma_active = 0;
 	int vblank = m_vblank_flag;
 	const int fifo_empty = 1;
 	const int fifo_full = 0;
+
+	if (m_imode & 1) odd_frame = m_imode_odd_frame ^ 1;
 
 	const u16 hpos = get_hposition();
 
@@ -1234,7 +1255,7 @@ u16 sega315_5313_device::get_hposition()
 	}
 	else
 	{
-		value4 = screen().hpos();
+		value4 = screen_hpos();
 	}
 
 	return value4;
@@ -1378,7 +1399,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 	int maxpixels = 0;
 	u16 base_address = 0;
 
-	const int screenwidth = MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1);
+	const int screenwidth = get_hres();
 
 	switch (screenwidth & 3)
 	{
@@ -1654,14 +1675,15 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	int non_window_lastcol;
 	const int screenheight = MEGADRIVE_REG01_240_LINE ? 240 : 224;
 	struct nametable_t tile;
+	unsigned horz = m_lcm_scaling ? hres[get_hres()] : 320;
 
 	/* Clear our Render Buffer */
-	for (int x = 0; x < 320; x++)
+	for (int x = 0; x < horz; x++)
 	{
 		m_video_renderline[x] = MEGADRIVE_REG07_BGCOLOUR | 0x20000; // mark as BG
 	}
 
-	memset(m_highpri_renderline.get(), 0, 320);
+	memset(m_highpri_renderline.get(), 0, horz);
 
 	/* is this line enabled? */
 	if (!MEGADRIVE_REG01_DISP_ENABLE)
@@ -1684,7 +1706,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	const u16 window_down = MEGADRIVE_REG12_WINDOW_DOWN;
 //  const u16 window_vpos = MEGADRIVE_REG12_WINDOW_VPOS;
 
-	const int screenwidth = MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1);
+	const int screenwidth = get_hres();
 
 	switch (screenwidth)
 	{
@@ -1977,7 +1999,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 
 /* MEGADRIVE_REG0C_SHADOW_HIGLIGHT */
 	/* Low Priority Sprites */
-	for (int x = 0; x < 320; x++)
+	for (int x = 0; x < horz; x++)
 	{
 		if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 		{
@@ -2020,7 +2042,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	}
 
 	/* High Priority A+B Tiles */
-	for (int x = 0; x < 320; x++)
+	for (int x = 0; x < horz; x++)
 	{
 		if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 		{
@@ -2046,7 +2068,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	}
 
 	/* High Priority Sprites */
-	for (int x = 0; x < 320; x++)
+	for (int x = 0; x < horz; x++)
 	{
 		if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 		{
@@ -2089,13 +2111,15 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
 	const unsigned palette_per_scanline = scanline * 64;
 	u32 *lineptr;
+	unsigned horz = m_lcm_scaling ? hres[get_hres()] : 320;
+	unsigned mul = m_lcm_scaling ? hres_mul[get_hres()] : 1;
 
 	if (!m_use_alt_timing)
 	{
 		if (scanline >= m_render_bitmap->height()) // safety, shouldn't happen now we allocate a fixed amount tho
 			return;
 
-		lineptr = &m_render_bitmap->pix32(scanline);
+		lineptr = &m_render_bitmap->pix(scanline);
 	}
 	else
 		lineptr = m_render_line.get();
@@ -2114,27 +2138,27 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		}
 	}
 
-	for (int x = 0; x < 320; x++)
+	for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
 	{
-		const u32 dat = m_video_renderline[x];
+		const u32 dat = m_video_renderline[srcx];
 		const u16 clut = (dat & 0x3f) + palette_per_scanline;
 
 		if (!(dat & 0x20000))
-			m_render_line_raw[x] = 0x100;
+			m_render_line_raw[srcx] = 0x100;
 		else
-			m_render_line_raw[x] = 0x000;
+			m_render_line_raw[srcx] = 0x000;
 
 		if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 		{
 			if (dat & 0x10000)
 			{
-				lineptr[x] = m_gfx_palette->pen(clut);
-				m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
+				lineptr[dstx] = m_gfx_palette->pen(clut);
+				m_render_line_raw[srcx] |= (dat & 0x3f) | 0x080;
 			}
 			else
 			{
-				lineptr[x] = m_gfx_palette->pen(clut);
-				m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
+				lineptr[dstx] = m_gfx_palette->pen(clut);
+				m_render_line_raw[srcx] |= (dat & 0x3f) | 0x040;
 			}
 		}
 		else
@@ -2148,26 +2172,26 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-					lineptr[x] = m_gfx_palette_shadow->pen(clut);
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
+					lineptr[dstx] = m_gfx_palette_shadow->pen(clut);
+					m_render_line_raw[srcx] |= (dat & 0x3f) | 0x000;
 					break;
 
 				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 				case 0x8000: // low pri, highlight sprite = normal;
-					lineptr[x] = m_gfx_palette->pen(clut);
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
+					lineptr[dstx] = m_gfx_palette->pen(clut);
+					m_render_line_raw[srcx] |= (dat & 0x3f) | 0x040;
 					break;
 
 				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 				case 0x18000: // (sprite) low pri, highlight sprite = normal;
-					lineptr[x] = m_gfx_palette->pen(clut);
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
+					lineptr[dstx] = m_gfx_palette->pen(clut);
+					m_render_line_raw[srcx] |= (dat & 0x3f) | 0x080;
 					break;
 
 				case 0x0c000: // normal pri, highlight set = highlight?
 				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-					lineptr[x] = m_gfx_palette_hilight->pen(clut);
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
+					lineptr[dstx] = m_gfx_palette_hilight->pen(clut);
+					m_render_line_raw[srcx] |= (dat & 0x3f) | 0x0c0;
 					break;
 
 				case 0x0a000: // shadow set, highlight set - not possible
@@ -2175,9 +2199,14 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 				case 0x1a000: // (sprite)shadow set, highlight set - not possible
 				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 				default:
-					lineptr[x] = m_render_line_raw[x] |= (machine().rand() & 0x3f);
+					lineptr[dstx] = m_render_line_raw[srcx] |= (machine().rand() & 0x3f);
 					break;
 			}
+		}
+		if (++xx >= mul)
+		{
+			srcx++;
+			xx = 0;
 		}
 	}
 
@@ -2185,8 +2214,15 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		m_32x_scanline_helper_func(scanline);
 	if (!m_32x_scanline_func.isnull())
 	{
-		for (int x = 0; x < 320; x++)
-			m_32x_scanline_func(x, m_video_renderline[x] & 0x20000, lineptr[x]);
+		for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
+		{
+			m_32x_scanline_func(srcx, m_video_renderline[srcx] & 0x20000, lineptr[dstx]);
+			if (++xx >= mul)
+			{
+				srcx++;
+				xx = 0;
+			}
+		}
 	}
 }
 
@@ -2280,6 +2316,7 @@ void sega315_5313_device::vdp_handle_eof()
 {
 	rectangle visarea;
 	int scr_width = 320;
+	int scr_mul = 1;
 
 	m_vblank_flag = 0;
 	//m_irq6_pending = 0; /* NO! (breaks warlock) */
@@ -2293,7 +2330,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	if (MEGADRIVE_REG01_240_LINE)
 	{
-		/* this is invalid in PAL! */
+		/* this is invalid in NTSC! */
 		m_total_scanlines = m_base_total_scanlines;
 		m_visible_scanlines = 240;
 		m_irq6_scanline = 240;
@@ -2315,19 +2352,14 @@ void sega315_5313_device::vdp_handle_eof()
 		m_z80irq_scanline <<= 1;
 	}
 
-	switch (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1))
-	{
-		/* note, add 240 mode + init new timings! */
-		case 0: scr_width = 256; break;
-		case 1: scr_width = 256; break;
-		case 2: scr_width = 320; break;
-		case 3: scr_width = 320; break;
-	}
+	/* note, add 240 mode + init new timings! */
+	scr_mul = m_lcm_scaling ? hres_mul[get_hres()] : 1;
+	scr_width = hres[get_hres()] * scr_mul;
 //      osd_printf_debug("my mode %02x", m_regs[0x0c]);
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
-	screen().configure(480, m_total_scanlines, visarea, screen().frame_period().attoseconds());
+	screen().configure(480 * scr_mul, m_total_scanlines, visarea, screen().frame_period().attoseconds());
 }
 
 
@@ -2353,7 +2385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sega315_5313_device::megadriv_scanline_timer_callba
 	{
 		if (param == 0)
 		{
-			//printf("where are we? %d %d\n", screen().vpos(), screen().hpos());
+			//printf("where are we? %d %d\n", screen().vpos(), screen_hpos());
 			vdp_handle_eof();
 			//vdp_clear_bitmap();
 		}

@@ -217,7 +217,7 @@ int amiga_state::copper_execute_next(int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		write_custom_chip(m_copper_pending_offset, m_copper_pending_data);
+		custom_chip_w(m_copper_pending_offset, m_copper_pending_data);
 		m_copper_pending_offset = 0;
 	}
 
@@ -273,7 +273,7 @@ int amiga_state::copper_execute_next(int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				write_custom_chip(word0, word1);
+				custom_chip_w(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
 			{
@@ -705,7 +705,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		if ((scanline & 1) ^ lof)
 		{
 			// lof matches? then render this scanline
-			dst = &bitmap.pix32(scanline);
+			dst = &bitmap.pix(scanline);
 		}
 		else
 		{
@@ -715,7 +715,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// otherwise just render the contents of the previous frame's scanline
 			int shift = (m_previous_lof == lof) ? 1 : 0;
 
-			std::copy_n(&m_flickerfixer.pix32(scanline - shift), amiga_state::SCREEN_WIDTH, &bitmap.pix32(scanline));
+			std::copy_n(&m_flickerfixer.pix(scanline - shift), amiga_state::SCREEN_WIDTH, &bitmap.pix(scanline));
 			return;
 		}
 	}
@@ -1026,7 +1026,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	// save
 	if (dst != nullptr)
-		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix32(save_scanline));
+		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix(save_scanline));
 
 #if GUESS_COPPER_OFFSET
 	if (m_screen->frame_number() % 64 == 0 && scanline == 0)

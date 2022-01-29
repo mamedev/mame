@@ -42,15 +42,14 @@
 ************************************************************
 
     The device has active high(!) SO strobes triggered by
-    read accesses, which transfer data from the the 8 SI
-    lines to the bus. Logically SO0-7 and SI0-7 ought to
-    be hooked up to the same input matrix, but this only
-    appears to be the case with the Astrocade home systems.
-    The arcade games instead channel the SI inputs through
-    a quartet of MC14539B (pin-compatible with 74153) CMOS
-    multiplexers and connect the SO strobes to unrelated
-    outputs which generally use the upper 8 address bits
-    as data.
+    read accesses, which transfer data from the 8 SI lines
+    to the bus. Logically SO0-7 and SI0-7 ought to be hooked
+    up to the same input matrix, but this only appears to be
+    the case with the Astrocade home systems.  The arcade
+    games instead channel the SI inputs through a quartet of
+    MC14539B (pin-compatible with 74153) CMOS multiplexers
+    and connect the SO strobes to unrelated outputs which
+    generally use the upper 8 address bits as data.
 
 ***********************************************************/
 
@@ -85,8 +84,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 	, m_c_count(0)
 	, m_c_state(0)
 	, m_si_callback(*this)
-	, m_so_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_pots{{*this}, {*this}, {*this}, {*this}}
+	, m_so_callback(*this)
+	, m_pots(*this)
 {
 	memset(m_reg, 0, sizeof(uint8_t)*8);
 	memset(m_bitswap, 0, sizeof(uint8_t)*256);
@@ -102,10 +101,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 void astrocade_io_device::device_resolve_objects()
 {
 	m_si_callback.resolve_safe(0);
-	for (auto &cb : m_so_callback)
-		cb.resolve_safe();
-	for (auto &pot : m_pots)
-		pot.resolve_safe(0);
+	m_so_callback.resolve_all_safe();
+	m_pots.resolve_all_safe(0);
 }
 
 
@@ -132,9 +129,9 @@ void astrocade_io_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void astrocade_io_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void astrocade_io_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *dest = outputs[0];
+	auto &dest = outputs[0];
 	uint16_t noise_state;
 	uint8_t master_count;
 	uint8_t noise_clock;
@@ -145,17 +142,16 @@ void astrocade_io_device::sound_stream_update(sound_stream &stream, stream_sampl
 	noise_state = m_noise_state;
 
 	/* loop over samples */
-	while (samples > 0)
+	int samples_this_time;
+	constexpr stream_buffer::sample_t sample_scale = 1.0f / 60.0f;
+	for (int sampindex = 0; sampindex < dest.samples(); sampindex += samples_this_time)
 	{
-		stream_sample_t cursample = 0;
-		int samples_this_time;
-		int samp;
+		s32 cursample = 0;
 
 		/* compute the number of cycles until the next master oscillator reset */
 		/* or until the next noise boundary */
-		samples_this_time = std::min(samples, 256 - master_count);
+		samples_this_time = std::min<int>(dest.samples() - sampindex, 256 - master_count);
 		samples_this_time = std::min(samples_this_time, 64 - noise_clock);
-		samples -= samples_this_time;
 
 		/* sum the output of the tone generators */
 		if (m_a_state)
@@ -170,9 +166,7 @@ void astrocade_io_device::sound_stream_update(sound_stream &stream, stream_sampl
 			cursample += m_reg[7] >> 4;
 
 		/* scale to max and output */
-		cursample = cursample * 32767 / 60;
-		for (samp = 0; samp < samples_this_time; samp++)
-			*dest++ = cursample;
+		dest.fill(stream_buffer::sample_t(cursample) * sample_scale, sampindex, samples_this_time);
 
 		/* clock the noise; a 2-bit counter clocks a 4-bit counter which clocks the LFSR */
 		noise_clock += samples_this_time;
@@ -300,7 +294,7 @@ void astrocade_io_device::state_save_register()
  *
  *************************************/
 
-WRITE8_MEMBER(astrocade_io_device::write)
+void astrocade_io_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 8) != 0)
 		offset = (offset >> 8) & 7;
@@ -315,14 +309,14 @@ WRITE8_MEMBER(astrocade_io_device::write)
 }
 
 
-READ8_MEMBER(astrocade_io_device::read)
+uint8_t astrocade_io_device::read(offs_t offset)
 {
 	if ((offset & 0x0f) < 0x08)
 	{
 		if (!machine().side_effects_disabled())
-			m_so_callback[offset & 7](space, 0, offset >> 8);
+			m_so_callback[offset & 7](0, offset >> 8);
 
-		return m_si_callback(space, offset & 7);
+		return m_si_callback(offset & 7);
 	}
 	else if ((offset & 0x0f) >= 0x0c)
 		return m_pots[offset & 3]();

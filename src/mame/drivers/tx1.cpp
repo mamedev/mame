@@ -48,8 +48,8 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "rendlay.h"
 
+#include "layout/generic.h"
 #include "tx1.lh"
 #include "buggyboy.lh"
 #include "buggybjr.lh"
@@ -61,12 +61,12 @@
  *
  *************************************/
 
-WRITE16_MEMBER(tx1_state::resume_math_w)
+void tx1_state::resume_math_w(uint16_t data)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tx1_state::halt_math_w)
+void tx1_state::halt_math_w(uint16_t data)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
@@ -177,7 +177,6 @@ void tx1_state::tx1(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::tx1_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
@@ -222,7 +221,6 @@ void tx1_state::buggyboy(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_triphsxs);
@@ -260,7 +258,6 @@ void tx1_state::buggybjr(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

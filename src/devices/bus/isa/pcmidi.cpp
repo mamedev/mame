@@ -28,8 +28,8 @@ Y1  : 12,000 MHz crystal 2 pin
 R1  : 15K ohm resistor +-5%
 R2  : 390 ohm resistor +-5%
 
-RP1 : 10K ohm Commoned (?) resistor network 2% SIP package (code used A103GA) 
-RP2 : 220 ohm Commoned (?) resistor network 2% SIP package (code used B221GA) 
+RP1 : 10K ohm Commoned (?) resistor network 2% SIP package (code used A103GA)
+RP2 : 220 ohm Commoned (?) resistor network 2% SIP package (code used B221GA)
 
 
 
@@ -100,8 +100,8 @@ void isa8_pcmidi_device::device_reset()
 {
 	offs_t ioaddr = BIT(m_config->read(), 0) ? 0x300 : 0x330;
 	m_isa->install_device(ioaddr, ioaddr + 1,
-		read8sm_delegate(FUNC(isa8_pcmidi_device::host_r), this),
-		write8sm_delegate(FUNC(isa8_pcmidi_device::host_w), this));
+			read8sm_delegate(*this, FUNC(isa8_pcmidi_device::host_r)),
+			write8sm_delegate(*this, FUNC(isa8_pcmidi_device::host_w)));
 
 	set_host_irq(false);
 }

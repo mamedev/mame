@@ -73,10 +73,10 @@ INPUT_PORTS_END
 
 void palestra_state::palestra(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK)
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK())
 		.set_source(netlist_palestra);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", m_video, FUNC(fixedfreq_device::update_composite_monochrome));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");

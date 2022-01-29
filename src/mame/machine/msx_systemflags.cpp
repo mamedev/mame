@@ -24,18 +24,18 @@ void msx_systemflags_device::device_start()
 
 	// Install IO read/write handlers
 	address_space &space = m_maincpu->space(AS_IO);
-	space.install_write_handler(0xf4, 0xf4, write8_delegate(FUNC(msx_systemflags_device::write), this));
-	space.install_read_handler(0xf4, 0xf4, read8_delegate(FUNC(msx_systemflags_device::read), this));
+	space.install_write_handler(0xf4, 0xf4, write8smo_delegate(*this, FUNC(msx_systemflags_device::write)));
+	space.install_read_handler(0xf4, 0xf4, read8smo_delegate(*this, FUNC(msx_systemflags_device::read)));
 }
 
 
-READ8_MEMBER(msx_systemflags_device::read)
+uint8_t msx_systemflags_device::read()
 {
 	return m_system_flags;
 }
 
 
-WRITE8_MEMBER(msx_systemflags_device::write)
+void msx_systemflags_device::write(uint8_t data)
 {
 	m_system_flags = data;
 }

@@ -12,7 +12,6 @@
 #define MAME_BUS_LPCI_PCI_H
 
 #pragma once
-#include <forward_list>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +20,7 @@ class pci_bus_device;
 
 // ======================> pci_device_interface
 
-class pci_device_interface :  public device_slot_card_interface
+class pci_device_interface :  public device_interface
 {
 public:
 	// construction/destruction
@@ -41,7 +40,7 @@ protected:
 };
 
 class pci_connector_device : public device_t,
-						public device_slot_interface
+						public device_single_card_slot_interface<pci_device_interface>
 {
 public:
 	template <typename T>
@@ -72,16 +71,16 @@ public:
 	// construction/destruction
 	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ64_MEMBER( read_64be );
-	DECLARE_WRITE64_MEMBER( write_64be );
+	uint64_t read_64be(offs_t offset, uint64_t mem_mask = ~0);
+	void write_64be(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
-	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, const char *tag) {
-		m_devtag[num] = tag; }
+	template <typename T>
+	void set_father(T &&tag) { m_father.set_tag(std::forward<T>(tag)); }
+	void set_device(int num, const char *tag) { m_devtag[num] = tag; }
 
 	pci_bus_device *pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus);
 	void add_sibling(pci_bus_device *sibling, int busnum);
@@ -100,7 +99,6 @@ private:
 	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
-	const char *        m_father;
 	pci_bus_device *    m_siblings[8];
 	uint8_t               m_siblings_busnum[8];
 	int                 m_siblings_count;
@@ -109,6 +107,8 @@ private:
 	int8_t                m_devicenum; // device number we are addressing
 	int8_t                m_busnumber; // pci bus number we are addressing
 	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
+
+	optional_device<pci_bus_device> m_father;
 };
 
 // device type definition

@@ -156,7 +156,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')') // 65
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_') // 2f
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') // 56
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']') // 55
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(']') PORT_CHAR('[') // 55
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':') // 46
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // 22
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 23
@@ -200,7 +200,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') // 4e
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') // 4d
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // 3e
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') // 3d
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3) // 3d
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x87\xA4") PORT_CODE(KEYCODE_TILDE) // 1f
@@ -257,7 +257,7 @@ INPUT_PORTS_START( wangpc_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INDENT") PORT_CODE(KEYCODE_F1) // 7e
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPLC") PORT_CODE(KEYCODE_F10) // 75
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("COPY") PORT_CODE(KEYCODE_F11) // 74
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) // 24
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL),UCHAR_SHIFT_2) // 24
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 1d
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER(wangpc_keyboard_device::write_rxd)
 //  mcs51_rx_callback -
 //-------------------------------------------------
 
-READ8_MEMBER(wangpc_keyboard_device::mcs51_rx_callback)
+uint8_t wangpc_keyboard_device::mcs51_rx_callback()
 {
 	if (LOG) logerror("KB '%s' CPU Receive Data %02x\n", tag(), get_received_char());
 
@@ -488,7 +488,7 @@ READ8_MEMBER(wangpc_keyboard_device::mcs51_rx_callback)
 //  mcs51_tx_callback -
 //-------------------------------------------------
 
-WRITE8_MEMBER(wangpc_keyboard_device::mcs51_tx_callback)
+void wangpc_keyboard_device::mcs51_tx_callback(uint8_t data)
 {
 	if (LOG) logerror("KB '%s' CPU Transmit Data %02x\n", tag(), data);
 
@@ -506,7 +506,7 @@ WRITE8_MEMBER(wangpc_keyboard_device::mcs51_tx_callback)
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
+uint8_t wangpc_keyboard_device::kb_p1_r()
 {
 	return m_y[m_keylatch]->read();
 }
@@ -516,7 +516,7 @@ READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
+void wangpc_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -546,7 +546,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
+void wangpc_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 //  kb_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
+void wangpc_keyboard_device::kb_p3_w(uint8_t data)
 {
 	/*
 

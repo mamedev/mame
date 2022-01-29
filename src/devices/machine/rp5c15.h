@@ -35,13 +35,13 @@ public:
 	auto alarm() { return m_out_alarm_cb.bind(); }
 	auto clkout() { return m_out_clkout_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_leap_year() const override { return true; }

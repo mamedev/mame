@@ -22,6 +22,7 @@
 	"passes": [
 		{
 			"effect": "xbr/xbr-hybrid/2xbr-hybrid-v4b",
+			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

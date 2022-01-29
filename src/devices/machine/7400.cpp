@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(TTL7400, ttl7400_device, "7400", "7400 Quad 2-Input NAND Gate
 
 ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL7400, tag, owner, clock)
-	, m_y_func{{*this}, {*this}, {*this}, {*this}}
+	, m_y_func(*this)
 	, m_a(0)
 	, m_b(0)
 	, m_y(0)
@@ -22,12 +22,11 @@ ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7400_device::device_start()
 {
+	m_y_func.resolve_all_safe();
+
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_y));
-
-	for (std::size_t bit = 0; bit < 4; bit++)
-		m_y_func[bit].resolve_safe();
 }
 
 void ttl7400_device::device_reset()

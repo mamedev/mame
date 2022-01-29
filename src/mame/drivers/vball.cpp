@@ -89,8 +89,8 @@ VBlank = 58Hz
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #define MAIN_CLOCK      XTAL(12'000'000)
@@ -139,7 +139,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 	}
 }
 
-WRITE8_MEMBER(vball_state::irq_ack_w)
+void vball_state::irq_ack_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -158,7 +158,7 @@ WRITE8_MEMBER(vball_state::irq_ack_w)
    bit 6 = scroll y hi
    bit 7 = ?
 */
-WRITE8_MEMBER(vball_state::bankswitch_w)
+void vball_state::bankswitch_w(uint8_t data)
 {
 	membank("mainbank")->set_entry(data & 1);
 
@@ -180,7 +180,7 @@ WRITE8_MEMBER(vball_state::bankswitch_w)
    bit 6 = sp prom bank
    bit 7 = sp prom bank
 */
-WRITE8_MEMBER(vball_state::scrollx_hi_w)
+void vball_state::scrollx_hi_w(uint8_t data)
 {
 	flip_screen_set(~data&1);
 	m_scrollx_hi = (data & 0x02) << 7;
@@ -189,7 +189,7 @@ WRITE8_MEMBER(vball_state::scrollx_hi_w)
 	//logerror("%04x: scrollx_hi = %d\n", m_maincpu->pcbase(), m_scrollx_hi);
 }
 
-WRITE8_MEMBER(vball_state::scrollx_lo_w)
+void vball_state::scrollx_lo_w(uint8_t data)
 {
 	m_scrollx_lo = data;
 	//logerror("%04x: scrollx_lo =%d\n", m_maincpu->pcbase(), m_scrollx_lo);

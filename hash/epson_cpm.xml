@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Generic software list for the Epson HX-20, PX-4 and PX-8 systems -->
+Generic software list for the Epson HX-20, PX-4 and PX-8 systems
+-->
 
 <softwarelist name="epson_cpm" description="Epson CPM systems floppy disks">
 

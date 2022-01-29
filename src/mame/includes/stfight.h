@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6805/m68705.h"
+#include "sound/ymopn.h"
 #include "sound/msm5205.h"
 #include "video/stfight_dev.h"
 #include "video/airraid_dev.h"
@@ -20,6 +21,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_mcu(*this, "mcu")
 		, m_msm(*this, "msm")
+		, m_ym(*this, "ym%u", 0)
 		, m_main_bank(*this, "mainbank")
 		, m_samples(*this, "adpcm")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -40,8 +42,6 @@ public:
 	void cshooter(machine_config &config);
 
 	void init_stfight();
-	void init_empcity();
-	void init_cshooter();
 
 protected:
 	enum
@@ -52,28 +52,28 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
-	DECLARE_WRITE8_MEMBER(stfight_io_w);
-	DECLARE_READ8_MEMBER(stfight_coin_r);
-	DECLARE_WRITE8_MEMBER(stfight_coin_w);
-	DECLARE_WRITE8_MEMBER(stfight_fm_w);
-	DECLARE_WRITE8_MEMBER(stfight_mcu_w);
+	void stfight_io_w(uint8_t data);
+	uint8_t stfight_coin_r();
+	void stfight_coin_w(uint8_t data);
+	void stfight_fm_w(uint8_t data);
+	void stfight_mcu_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(stfight_bank_w);
+	void stfight_bank_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(stfight_fm_r);
+	uint8_t stfight_fm_r();
 
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 
 	// MCU specifics
-	DECLARE_READ8_MEMBER(stfight_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
+	uint8_t stfight_68705_port_b_r();
+	void stfight_68705_port_a_w(uint8_t data);
+	void stfight_68705_port_b_w(uint8_t data);
+	void stfight_68705_port_c_w(uint8_t data);
 
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);
@@ -87,6 +87,7 @@ private:
 	required_device<cpu_device>      m_audiocpu;
 	required_device<m68705p5_device> m_mcu;
 	required_device<msm5205_device>  m_msm;
+	required_device_array<ym2203_device, 2> m_ym;
 
 	required_memory_bank             m_main_bank;
 

@@ -43,8 +43,8 @@ public:
 	auto dtr_handler() { return m_dtr_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
@@ -54,7 +54,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 private:

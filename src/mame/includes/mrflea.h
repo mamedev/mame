@@ -48,10 +48,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(mrflea_data1_w);
-	DECLARE_WRITE8_MEMBER(mrflea_gfx_bank_w);
-	DECLARE_WRITE8_MEMBER(mrflea_videoram_w);
-	DECLARE_WRITE8_MEMBER(mrflea_spriteram_w);
+	void mrflea_data1_w(uint8_t data);
+	void mrflea_gfx_bank_w(uint8_t data);
+	void mrflea_videoram_w(offs_t offset, uint8_t data);
+	void mrflea_spriteram_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

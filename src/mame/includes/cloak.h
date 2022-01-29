@@ -33,15 +33,15 @@ public:
 protected:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_l_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_r_w);
-	DECLARE_WRITE8_MEMBER(cloak_custom_w);
-	DECLARE_WRITE8_MEMBER(cloak_irq_reset_0_w);
-	DECLARE_WRITE8_MEMBER(cloak_irq_reset_1_w);
-	DECLARE_WRITE8_MEMBER(cloak_nvram_enable_w);
-	DECLARE_WRITE8_MEMBER(cloak_paletteram_w);
-	DECLARE_WRITE8_MEMBER(cloak_clearbmp_w);
-	DECLARE_READ8_MEMBER(graph_processor_r);
-	DECLARE_WRITE8_MEMBER(graph_processor_w);
-	DECLARE_WRITE8_MEMBER(cloak_videoram_w);
+	void cloak_custom_w(uint8_t data);
+	void cloak_irq_reset_0_w(uint8_t data);
+	void cloak_irq_reset_1_w(uint8_t data);
+	void cloak_nvram_enable_w(uint8_t data);
+	void cloak_paletteram_w(offs_t offset, uint8_t data);
+	void cloak_clearbmp_w(uint8_t data);
+	uint8_t graph_processor_r(offs_t offset);
+	void graph_processor_w(offs_t offset, uint8_t data);
+	void cloak_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cocktail_w);
 	void set_current_bitmap_videoram_pointer();
 	void adjust_xy(int offset);

@@ -100,7 +100,7 @@ void vp550_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (LOG) logerror("VP550 '%s' Interrupt\n", tag());
 
@@ -120,8 +120,8 @@ void vp550_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *min
 
 		switch (offset & 0x03)
 		{
-		case 1: m_pfg_a->write_str(data); break;
-		case 2: m_pfg_b->write_str(data); break;
+		case 1: m_pfg_a->str_w(data); break;
+		case 2: m_pfg_b->str_w(data); break;
 		case 3: octave_w(data); break;
 		}
 

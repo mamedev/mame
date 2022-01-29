@@ -7,15 +7,14 @@ DEFINE_DEVICE_TYPE(OUTPUT_LATCH, output_latch_device, "output_latch", "Output La
 
 output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OUTPUT_LATCH, tag, owner, clock)
-	, m_bit_handlers{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
+	, m_bit_handlers(*this)
 	, m_bits{ -1, -1, -1, -1, -1, -1, -1, -1 }
 {
 }
 
 void output_latch_device::device_resolve_objects()
 {
-	for (devcb_write_line &handler : m_bit_handlers)
-		handler.resolve_safe();
+	m_bit_handlers.resolve_all_safe();
 }
 
 void output_latch_device::device_start()

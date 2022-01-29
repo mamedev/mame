@@ -58,17 +58,17 @@ Press one of the start buttons to exit.
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2608intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(wc90_state::bankswitch_w)
+void wc90_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90_state::bankswitch1_w)
+void wc90_state::bankswitch1_w(uint8_t data)
 {
 	m_subbank->set_entry(data >> 3);
 }

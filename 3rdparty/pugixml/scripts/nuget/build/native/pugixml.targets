@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Default initializers for properties">
+    <Linkage-pugixml Condition="'$(Linkage-pugixml)' == ''">dynamic</Linkage-pugixml>
+  </PropertyGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\pugixml-propertiesui.xml" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="$(Configuration.ToLower().IndexOf('debug')) != -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib/$(Platform)\$(PlatformToolset.Split('_')[0])\$(Linkage-pugixml)\Debug\pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="$(Configuration.ToLower().IndexOf('debug')) == -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib/$(Platform)\$(PlatformToolset.Split('_')[0])\$(Linkage-pugixml)\Release\pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

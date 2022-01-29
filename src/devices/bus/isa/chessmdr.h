@@ -36,8 +36,8 @@ private:
 
 	bool m_installed;
 
-	DECLARE_READ8_MEMBER(chessmdr_r);
-	DECLARE_WRITE8_MEMBER(chessmdr_w);
+	uint8_t chessmdr_r(offs_t offset);
+	void chessmdr_w(offs_t offset, uint8_t data);
 };
 
 

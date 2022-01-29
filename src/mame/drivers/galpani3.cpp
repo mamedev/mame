@@ -111,10 +111,10 @@ private:
 	std::unique_ptr<uint32_t[]> m_spriteram32;
 	std::unique_ptr<uint32_t[]> m_spc_regs;
 
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
+	void galpani3_suprnova_sprite32_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void galpani3_suprnova_sprite32regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void galpani3_priority_buffer_scrollx_w(uint16_t data);
+	void galpani3_priority_buffer_scrolly_w(uint16_t data);
 
 	virtual void video_start() override;
 
@@ -190,7 +190,7 @@ void galpani3_state::video_start()
 
 uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = m_palette->pens();
+	pen_t const *const paldata = m_palette->pens();
 
 	bitmap.fill(0, cliprect);
 
@@ -198,137 +198,134 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 
 //  popmessage("%02x %02x", m_grap2[0]->m_framebuffer_bright2, m_grap2[1]->m_framebuffer_bright2);
 
+	for (int drawy=cliprect.min_y;drawy<=cliprect.max_y;drawy++)
 	{
-		int drawy, drawx;
-		for (drawy=cliprect.min_y;drawy<=cliprect.max_y;drawy++)
+		uint16_t const *const sprline  = &m_sprite_bitmap.pix(drawy);
+		uint16_t const *const srcline1 = m_grap2[0]->m_framebuffer.get() + ((drawy+m_grap2[0]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+		uint16_t const *const srcline2 = m_grap2[1]->m_framebuffer.get() + ((drawy+m_grap2[1]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+		uint16_t const *const srcline3 = m_grap2[2]->m_framebuffer.get() + ((drawy+m_grap2[2]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+
+		uint16_t const *const priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
+
+		uint32_t *const dst = &bitmap.pix(drawy & 0x3ff);
+
+		for (int drawx=cliprect.min_x;drawx<=cliprect.max_x;drawx++)
 		{
-			uint16_t* sprline  = &m_sprite_bitmap.pix16(drawy);
-			uint16_t* srcline1 = m_grap2[0]->m_framebuffer.get() + ((drawy+m_grap2[0]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			uint16_t* srcline2 = m_grap2[1]->m_framebuffer.get() + ((drawy+m_grap2[1]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			uint16_t* srcline3 = m_grap2[2]->m_framebuffer.get() + ((drawy+m_grap2[2]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			int sproffs  = drawx & 0x3ff;
+			int srcoffs1 = (drawx+m_grap2[0]->m_framebuffer_scrollx+67)&0x1ff;
+			int srcoffs2 = (drawx+m_grap2[1]->m_framebuffer_scrollx+67)&0x1ff;
+			int srcoffs3 = (drawx+m_grap2[2]->m_framebuffer_scrollx+67)&0x1ff;
 
-			uint16_t* priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
+			int prioffs  = (drawx+m_priority_buffer_scrollx+66)&0x1ff;
 
-			uint32_t* dst = &bitmap.pix32(drawy & 0x3ff);
+			uint16_t sprdat = sprline[sproffs];
+			uint8_t  dat1 = srcline1[srcoffs1];
+			uint8_t  dat2 = srcline2[srcoffs2];
+			uint8_t  dat3 = srcline3[srcoffs3];
 
-			for (drawx=cliprect.min_x;drawx<=cliprect.max_x;drawx++)
+			uint8_t  pridat = priline[prioffs];
+
+			// TODO : Verify priorities, blendings from real PCB.
+			if (pridat==0x0f) // relates to the area you've drawn over
 			{
-				int sproffs  = drawx & 0x3ff;
-				int srcoffs1 = (drawx+m_grap2[0]->m_framebuffer_scrollx+67)&0x1ff;
-				int srcoffs2 = (drawx+m_grap2[1]->m_framebuffer_scrollx+67)&0x1ff;
-				int srcoffs3 = (drawx+m_grap2[2]->m_framebuffer_scrollx+67)&0x1ff;
-
-				int prioffs  = (drawx+m_priority_buffer_scrollx+66)&0x1ff;
-
-				uint16_t sprdat = sprline[sproffs];
-				uint8_t  dat1 = srcline1[srcoffs1];
-				uint8_t  dat2 = srcline2[srcoffs2];
-				uint8_t  dat3 = srcline3[srcoffs3];
-
-				uint8_t  pridat = priline[prioffs];
-
-				// TODO : Verify priorities, blendings from real PCB.
-				if (pridat==0x0f) // relates to the area you've drawn over
+				SPRITE_DRAW_PIXEL(0x0000);
+				if (m_grap2[2]->m_framebuffer_enable)
 				{
-					SPRITE_DRAW_PIXEL(0x0000);
-					if (m_grap2[2]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(2, dat3);
-					}
-					SPRITE_DRAW_PIXEL(0x4000);
-					if (dat1 && m_grap2[0]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(0, dat1);
-					}
-					SPRITE_DRAW_PIXEL(0x8000);
-					if (dat2 && m_grap2[1]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(1, dat2);
-					}
-					SPRITE_DRAW_PIXEL(0xc000);
+					FB_DRAW_PIXEL(2, dat3);
 				}
-				else if (pridat==0xcf) // the girl
+				SPRITE_DRAW_PIXEL(0x4000);
+				if (dat1 && m_grap2[0]->m_framebuffer_enable)
 				{
-					SPRITE_DRAW_PIXEL(0x0000);
-					if (m_grap2[0]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(0, 0x100);
-					}
-					SPRITE_DRAW_PIXEL(0x4000);
-					if (m_grap2[1]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(1, 0x100);
-					}
-					SPRITE_DRAW_PIXEL(0x8000);
-					if (dat3 && m_grap2[2]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(2, dat3);
-					}
-					SPRITE_DRAW_PIXEL(0xc000);
+					FB_DRAW_PIXEL(0, dat1);
 				}
-				else if (pridat==0x30) // during the 'gals boxes' on the intro
+				SPRITE_DRAW_PIXEL(0x8000);
+				if (dat2 && m_grap2[1]->m_framebuffer_enable)
 				{
-					SPRITE_DRAW_PIXEL(0x0000);
-					if (m_grap2[1]->m_framebuffer_enable) // TODO : Opaqued and Swapped order?
-					{
-						FB_DRAW_PIXEL(1, dat2);
-					}
-					SPRITE_DRAW_PIXEL(0x4000);
-					if (dat1 && m_grap2[0]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(0, dat1);
-					}
-					SPRITE_DRAW_PIXEL(0x8000);
-					if (dat3 && m_grap2[2]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(2, dat3);
-					}
-					SPRITE_DRAW_PIXEL(0xc000);
+					FB_DRAW_PIXEL(1, dat2);
 				}
-				else
-				{
-					SPRITE_DRAW_PIXEL(0x0000);
-					if (m_grap2[0]->m_framebuffer_enable) // TODO : Opaque drawing 1st framebuffer in real PCB?
-					{
-						FB_DRAW_PIXEL(0, dat1);
-					}
-					SPRITE_DRAW_PIXEL(0x4000);
-					if (dat2 && m_grap2[1]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(1, dat2);
-					}
-					SPRITE_DRAW_PIXEL(0x8000);
-					if (dat3 && m_grap2[2]->m_framebuffer_enable)
-					{
-						FB_DRAW_PIXEL(2, dat3);
-					}
-					SPRITE_DRAW_PIXEL(0xc000);
-				}
-
-				/*
-				else if (pridat==0x2f) // area outside of the girl
-				{
-				    //dst[drawx] = machine().rand()&0x3fff;
-				}
-
-				else if (pridat==0x00) // the initial line / box that gets drawn
-				{
-				    //dst[drawx] = machine().rand()&0x3fff;
-				}
-				else if (pridat==0x30) // during the 'gals boxes' on the intro
-				{
-				    //dst[drawx] = machine().rand()&0x3fff;
-				}
-				else if (pridat==0x0c) // 'nice' at end of level
-				{
-				    //dst[drawx] = machine().rand()&0x3fff;
-				}
-				else
-				{
-				    //printf("%02x, ",pridat);
-				}
-				*/
+				SPRITE_DRAW_PIXEL(0xc000);
 			}
+			else if (pridat==0xcf) // the girl
+			{
+				SPRITE_DRAW_PIXEL(0x0000);
+				if (m_grap2[0]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(0, 0x100);
+				}
+				SPRITE_DRAW_PIXEL(0x4000);
+				if (m_grap2[1]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(1, 0x100);
+				}
+				SPRITE_DRAW_PIXEL(0x8000);
+				if (dat3 && m_grap2[2]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(2, dat3);
+				}
+				SPRITE_DRAW_PIXEL(0xc000);
+			}
+			else if (pridat==0x30) // during the 'gals boxes' on the intro
+			{
+				SPRITE_DRAW_PIXEL(0x0000);
+				if (m_grap2[1]->m_framebuffer_enable) // TODO : Opaqued and Swapped order?
+				{
+					FB_DRAW_PIXEL(1, dat2);
+				}
+				SPRITE_DRAW_PIXEL(0x4000);
+				if (dat1 && m_grap2[0]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(0, dat1);
+				}
+				SPRITE_DRAW_PIXEL(0x8000);
+				if (dat3 && m_grap2[2]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(2, dat3);
+				}
+				SPRITE_DRAW_PIXEL(0xc000);
+			}
+			else
+			{
+				SPRITE_DRAW_PIXEL(0x0000);
+				if (m_grap2[0]->m_framebuffer_enable) // TODO : Opaque drawing 1st framebuffer in real PCB?
+				{
+					FB_DRAW_PIXEL(0, dat1);
+				}
+				SPRITE_DRAW_PIXEL(0x4000);
+				if (dat2 && m_grap2[1]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(1, dat2);
+				}
+				SPRITE_DRAW_PIXEL(0x8000);
+				if (dat3 && m_grap2[2]->m_framebuffer_enable)
+				{
+					FB_DRAW_PIXEL(2, dat3);
+				}
+				SPRITE_DRAW_PIXEL(0xc000);
+			}
+
+			/*
+			else if (pridat==0x2f) // area outside of the girl
+			{
+			    //dst[drawx] = machine().rand()&0x3fff;
+			}
+
+			else if (pridat==0x00) // the initial line / box that gets drawn
+			{
+			    //dst[drawx] = machine().rand()&0x3fff;
+			}
+			else if (pridat==0x30) // during the 'gals boxes' on the intro
+			{
+			    //dst[drawx] = machine().rand()&0x3fff;
+			}
+			else if (pridat==0x0c) // 'nice' at end of level
+			{
+			    //dst[drawx] = machine().rand()&0x3fff;
+			}
+			else
+			{
+			    //printf("%02x, ",pridat);
+			}
+			*/
 		}
 	}
 	return 0;
@@ -386,26 +383,26 @@ static INPUT_PORTS_START( galpani3 )
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32_w)
+void galpani3_state::galpani3_suprnova_sprite32_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	offset>>=1;
 	m_spriteram32[offset]=(m_spriteram[offset*2+1]<<16) | (m_spriteram[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
+void galpani3_state::galpani3_suprnova_sprite32regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprregs[offset]);
 	offset>>=1;
 	m_spc_regs[offset]=(m_sprregs[offset*2+1]<<16) | (m_sprregs[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
+void galpani3_state::galpani3_priority_buffer_scrollx_w(uint16_t data)
 {
 	m_priority_buffer_scrollx = data;
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
+void galpani3_state::galpani3_priority_buffer_scrolly_w(uint16_t data)
 {
 	m_priority_buffer_scrolly = data;
 }

@@ -36,7 +36,7 @@ BK8T - Keys to navigate initial config screen are mostly unknown
 #include "machine/pit8253.h"
 #include "formats/pk8020_dsk.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Address maps */
@@ -212,9 +212,11 @@ static GFXDECODE_START( gfx_pk8020 )
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( pk8020_state::floppy_formats )
-	FLOPPY_PK8020_FORMAT
-FLOPPY_FORMATS_END
+void pk8020_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PK8020_FORMAT);
+}
 
 static void pk8020_floppies(device_slot_interface &device)
 {
@@ -237,11 +239,11 @@ static void pk8020_floppies(device_slot_interface &device)
 void pk8020_state::pk8020(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 20_MHz_XTAL / 8); // КР580ВМ80А
-	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
-	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("inr", FUNC(pic8259_device::inta_cb));
+	i8080a_cpu_device &maincpu(I8080A(config, m_maincpu, 20_MHz_XTAL / 8)); // КР580ВМ80А
+	maincpu.set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
+	maincpu.set_addrmap(AS_IO, &pk8020_state::pk8020_io);
+	maincpu.set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
+	maincpu.in_inta_func().set("inr", FUNC(pic8259_device::acknowledge));
 
 	PLS100(config, m_decplm); // КР556РТ2 (82S100 equivalent; D31)
 

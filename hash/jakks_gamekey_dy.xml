@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="jakks_gamekey_dy" description="JAKKS Pacific 'DY' Game Keys">
 
 	<!-- This list is for the 'DY' coded Game Keys, for Disney base systems (not Disney Princess) -->

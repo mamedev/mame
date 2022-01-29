@@ -26,7 +26,7 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_bgram(*this, "bgram"),
 		m_soundbank(*this, "soundbank"),
-		m_spritebank(*this, "spritebank", 0)
+		m_spritebank(*this, "spritebank", 0x08, ENDIANNESS_BIG)
 	{ }
 
 	void taotaido(machine_config &config);
@@ -50,7 +50,7 @@ private:
 
 	required_memory_bank m_soundbank;
 
-	required_shared_ptr<uint8_t> m_spritebank;
+	memory_share_creator<uint8_t> m_spritebank;
 
 	uint8_t m_bgbank[8];
 	tilemap_t *m_bg_tilemap;
@@ -59,12 +59,12 @@ private:
 	std::unique_ptr<uint16_t[]> m_spriteram2_old;
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
-	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(unknown_output_w);
-	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(spritebank_w);
-	DECLARE_WRITE16_MEMBER(tileregs_w);
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	uint16_t pending_command_r();
+	void unknown_output_w(uint8_t data);
+	void sh_bankswitch_w(uint8_t data);
+	void spritebank_w(offs_t offset, uint8_t data);
+	void tileregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);

@@ -128,13 +128,13 @@ void ttl7474_device::update()
 	if (m_output != m_last_output)
 	{
 		m_last_output = m_output;
-		m_output_func(m_output);
+		m_output_func(m_output!=0);
 	}
 	// call callback if any of the outputs changed
 	if (m_output_comp != m_last_output_comp)
 	{
 		m_last_output_comp = m_output_comp;
-		m_comp_output_func(m_output_comp);
+		m_comp_output_func(m_output_comp!=0);
 	}
 }
 
@@ -189,7 +189,7 @@ WRITE_LINE_MEMBER( ttl7474_device::d_w )
 
 READ_LINE_MEMBER( ttl7474_device::output_r )
 {
-	return m_output;
+	return m_output!=0;
 }
 
 
@@ -199,7 +199,7 @@ READ_LINE_MEMBER( ttl7474_device::output_r )
 
 READ_LINE_MEMBER( ttl7474_device::output_comp_r )
 {
-	return m_output_comp;
+	return m_output_comp!=0;
 }
 
 void ttl7474_device::init()

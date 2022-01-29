@@ -18,6 +18,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "formats/tzx_cas.h"
 #include "formats/zx81_p.h"
@@ -35,14 +36,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_io_row4(*this, "ROW4"),
-		m_io_row5(*this, "ROW5"),
-		m_io_row6(*this, "ROW6"),
-		m_io_row7(*this, "ROW7"),
+		m_io_row(*this, "ROW%u", 0U),
 		m_io_config(*this, "CONFIG"),
 		m_screen(*this, "screen")
 	{ }
@@ -57,21 +51,23 @@ public:
 
 	void init_zx();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ula_high_r);
-	DECLARE_READ8_MEMBER(ula_low_r);
-	DECLARE_WRITE8_MEMBER(refresh_w);
-	DECLARE_READ8_MEMBER(zx80_io_r);
-	DECLARE_READ8_MEMBER(zx81_io_r);
-	DECLARE_READ8_MEMBER(pc8300_io_r);
-	DECLARE_READ8_MEMBER(pow3000_io_r);
-	DECLARE_WRITE8_MEMBER(zx80_io_w);
-	DECLARE_WRITE8_MEMBER(zx81_io_w);
+	uint8_t ula_high_r(offs_t offset);
+	uint8_t ula_low_r(offs_t offset);
+	void refresh_w(offs_t offset, uint8_t data);
+	uint8_t zx80_io_r(offs_t offset);
+	uint8_t zx81_io_r(offs_t offset);
+	uint8_t pc8300_io_r(offs_t offset);
+	uint8_t pow3000_io_r(offs_t offset);
+	void zx80_io_w(offs_t offset, uint8_t data);
+	void zx81_io_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void zx_tape_input();
 	void zx_ula_hsync();
 
@@ -96,14 +92,7 @@ private:
 	optional_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;
-	required_ioport m_io_row0;
-	required_ioport m_io_row1;
-	required_ioport m_io_row2;
-	required_ioport m_io_row3;
-	required_ioport m_io_row4;
-	required_ioport m_io_row5;
-	required_ioport m_io_row6;
-	required_ioport m_io_row7;
+	required_ioport_array<8> m_io_row;
 	optional_ioport m_io_config;
 	required_device<screen_device> m_screen;
 
@@ -123,7 +112,7 @@ private:
 	uint16_t m_ula_char_buffer;
 	double m_cassette_cur_level;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void drop_sync();
 	void recalc_hsync();

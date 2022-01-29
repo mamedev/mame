@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-  video/balsente.c
+  video/balsente.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -24,6 +24,7 @@ void balsente_state::video_start()
 	m_palettebank_vis = 0;
 	m_sprite_bank[0] = memregion("gfx1")->base();
 	m_sprite_bank[1] = memregion("gfx1")->base() + 0x10000;
+	std::fill(std::begin(m_expanded_videoram), std::end(m_expanded_videoram), 0);
 
 	/* determine sprite size */
 	m_sprite_data = memregion("gfx1")->base();
@@ -42,7 +43,7 @@ void balsente_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::videoram_w)
+void balsente_state::videoram_w(offs_t offset, uint8_t data)
 {
 	/* expand the two pixel values into two bytes */
 	m_videoram[offset] = data;
@@ -59,7 +60,7 @@ WRITE8_MEMBER(balsente_state::videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::palette_select_w)
+void balsente_state::palette_select_w(uint8_t data)
 {
 	/* only update if changed */
 	if (m_palettebank_vis != (data & 3))
@@ -80,7 +81,7 @@ WRITE8_MEMBER(balsente_state::palette_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::paletteram_w)
+void balsente_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -101,7 +102,7 @@ WRITE8_MEMBER(balsente_state::paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
+void balsente_state::shrike_sprite_select_w(uint8_t data)
 {
 	if( m_sprite_data != m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
@@ -110,7 +111,7 @@ WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
 		m_sprite_data = m_sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
-	shrike_shared_6809_w( space, 1, data );
+	shrike_shared_6809_w( 1, data );
 }
 
 
@@ -127,27 +128,25 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
 	int xpos = sprite[3];
-	uint8_t *src;
-	int x, y;
 
 	/* get a pointer to the source image */
-	src = &m_sprite_data[(64 * image) & m_sprite_mask];
+	uint8_t const *src = &m_sprite_data[(64 * image) & m_sprite_mask];
 	if (flags & 0x80) src += 4 * 15;
 
 	/* loop over y */
-	for (y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
+	for (int y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 		{
-			const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
-			uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
+			pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 256);
+			const uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
 			if (!(flags & 0x40))
 			{
 				/* loop over x */
-				for (x = 0; x < 4; x++, old += 2)
+				for (int x = 0; x < 4; x++, old += 2)
 				{
 					int ipixel = *src++;
 					int left = ipixel & 0xf0;
@@ -155,12 +154,12 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 			}
@@ -171,7 +170,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 				src += 4;
 
 				/* loop over x */
-				for (x = 0; x < 4; x++, old += 2)
+				for (int x = 0; x < 4; x++, old += 2)
 				{
 					int ipixel = *--src;
 					int left = (ipixel << 4) & 0xf0;
@@ -179,12 +178,12 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap.pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 				src += 4;

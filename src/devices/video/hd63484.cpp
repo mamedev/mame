@@ -24,10 +24,11 @@
 //  hd63484_device - constructor
 //-------------------------------------------------
 
-hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63484, tag, owner, clock),
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HD63484, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
 	m_ar(0),
@@ -534,6 +535,8 @@ inline void hd63484_device::recompute_parameters()
 	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
 	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	if (LOG)
+		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 }
 
 
@@ -1913,97 +1916,109 @@ void hd63484_device::video_registers_w(int offset)
 	}
 }
 
-READ16_MEMBER( hd63484_device::status16_r )
+uint16_t hd63484_device::read16(offs_t offset)
 {
-	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
-	return m_sr | 0xff00;
-}
-
-READ16_MEMBER( hd63484_device::data16_r )
-{
-	uint16_t res;
-
-	if(m_ar == 0) // FIFO read
+	if (BIT(offset, 0))
 	{
-		uint8_t data;
+		// Read control register
+		uint16_t res;
 
-		dequeue_r(&data);
-		res = (data & 0xff) << 8;
-		dequeue_r(&data);
-		res |= data & 0xff;
+		if(m_ar == 0) // FIFO read
+		{
+			uint8_t data;
+
+			dequeue_r(&data);
+			res = (data & 0xff) << 8;
+			dequeue_r(&data);
+			res |= data & 0xff;
+		}
+		else
+			res = video_registers_r(m_ar);
+
+		inc_ar(2);
+
+		return res;
 	}
 	else
-		res = video_registers_r(m_ar);
-
-	inc_ar(2);
-
-	return res;
+	{
+		// Read status register
+		// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just open bus?
+		return m_sr | 0xff00;
+	}
 }
 
-WRITE16_MEMBER( hd63484_device::address16_w )
+void hd63484_device::write16(offs_t offset, uint16_t data)
 {
-	if(ACCESSING_BITS_0_7)
-		m_ar = data & 0xfe;
-}
-
-WRITE16_MEMBER( hd63484_device::data16_w )
-{
-	if(ACCESSING_BITS_8_15)
+	if (BIT(offset, 0))
+	{
+		// Write control register
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
-
-	if(ACCESSING_BITS_0_7)
 		m_vreg[m_ar+1] = (data & 0xff);
 
-	video_registers_w(m_ar);
+		video_registers_w(m_ar);
 
-	inc_ar(2);
-}
-
-READ8_MEMBER( hd63484_device::status8_r )
-{
-	return m_sr;
-}
-
-WRITE8_MEMBER( hd63484_device::address8_w )
-{
-	m_ar = data;
-}
-
-READ8_MEMBER( hd63484_device::data8_r )
-{
-	uint8_t res = 0xff;
-
-	if(m_ar < 2) // FIFO read
-		dequeue_r(&res);
-	else
-		res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
-
-	inc_ar(1);
-
-	return res;
-}
-
-WRITE8_MEMBER( hd63484_device::data8_w )
-{
-	m_vreg[m_ar] = data;
-
-	if(m_ar < 2) // FIFO write
-	{
-		queue_w(data);
-		if (m_ar & 1)
-			process_fifo();
-
-		m_ar ^= 1;
+		inc_ar(2);
 	}
 	else
-		video_registers_w(m_ar & 0xfe);
+	{
+		// Write address register
+		m_ar = data & 0xfe;
+	}
+}
 
-	inc_ar(1);
+uint8_t hd63484_device::read8(offs_t offset)
+{
+	if (BIT(offset, 0))
+	{
+		// Read control register
+		uint8_t res = 0xff;
+
+		if(m_ar < 2) // FIFO read
+			dequeue_r(&res);
+		else
+			res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
+
+		inc_ar(1);
+
+		return res;
+	}
+	else
+	{
+		// Read status register
+		return m_sr;
+	}
+}
+
+void hd63484_device::write8(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+	{
+		// Write control register
+		m_vreg[m_ar] = data;
+
+		if(m_ar < 2) // FIFO write
+		{
+			queue_w(data);
+			if (m_ar & 1)
+				process_fifo();
+
+			m_ar ^= 1;
+		}
+		else
+			video_registers_w(m_ar & 0xfe);
+
+		inc_ar(1);
+	}
+	else
+	{
+		// Write address register
+		m_ar = data;
+	}
 }
 
 void hd63484_device::device_start()
 {
-	m_display_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
 
 	register_save_state();
 }
@@ -2094,7 +2109,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			if (!m_display_cb.isnull())
 				m_display_cb(bitmap, cliprect, y, px, data & mask);
 			else if (cliprect.contains(px, y))
-				bitmap.pix16(y, px) = data & mask;
+				bitmap.pix(y, px) = data & mask;
 
 			data >>= bpp;
 		}

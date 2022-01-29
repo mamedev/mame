@@ -210,7 +210,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct filter {
@@ -340,7 +340,7 @@ void esq1_filters::device_start()
 		recalc_filter(elem);
 }
 
-void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 /*  if(0) {
         for(int i=0; i<8; i++)
@@ -352,11 +352,11 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
         fprintf(stderr, "\n");
     }*/
 
-	for(int i=0; i<samples; i++) {
+	for(int i=0; i<outputs[0].samples(); i++) {
 		double l=0, r=0;
 		for(int j=0; j<8; j++) {
 			filter &f = filters[j];
-			double x = inputs[j][i];
+			double x = inputs[j].get(i);
 			double y = (x*f.a[0]
 						+ f.x[0]*f.a[1] + f.x[1]*f.a[2] + f.x[2]*f.a[3] + f.x[3]*f.a[4]
 						- f.y[0]*f.b[1] - f.y[1]*f.b[2] - f.y[2]*f.b[3] - f.y[3]*f.b[4]) / f.b[0];
@@ -378,8 +378,8 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
 //      r *= 6553;
 		l *= 2;
 		r *= 2;
-		outputs[0][i] = l < -32768 ? -32768 : l > 32767 ? 32767 : int(l);
-		outputs[1][i] = r < -32768 ? -32768 : r > 32767 ? 32767 : int(r);
+		outputs[0].put_clamp(i, l, 1.0);
+		outputs[1].put_clamp(i, r, 1.0);
 	}
 }
 
@@ -414,18 +414,18 @@ private:
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
 
-	DECLARE_READ8_MEMBER(wd1772_r);
-	DECLARE_WRITE8_MEMBER(wd1772_w);
-	DECLARE_READ8_MEMBER(seqdosram_r);
-	DECLARE_WRITE8_MEMBER(seqdosram_w);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_WRITE8_MEMBER(analog_w);
+	uint8_t wd1772_r(offs_t offset);
+	void wd1772_w(offs_t offset, uint8_t data);
+	uint8_t seqdosram_r(offs_t offset);
+	void seqdosram_w(offs_t offset, uint8_t data);
+	void mapper_w(uint8_t data);
+	void analog_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(uint8_t data);
 
-	DECLARE_READ8_MEMBER(esq1_adc_read);
+	uint8_t esq1_adc_read();
 
-	DECLARE_READ8_MEMBER(es5503_sample_r);
+	uint8_t es5503_sample_r(offs_t offset);
 
 	int m_mapper_state;
 	int m_seq_bank;
@@ -443,7 +443,7 @@ private:
 	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 }; // VALV,PEDV,PITV,MODV,FILV,BATV
 };
 
-READ8_MEMBER( esq1_state::es5503_sample_r )
+uint8_t esq1_state::es5503_sample_r(offs_t offset)
 {
 	return m_es5503_rom[offset + (((m_es5503->get_channel_strobe() & 8)>>3) * 0x20000)];
 }
@@ -453,7 +453,7 @@ void esq1_state::sq80_es5503_map(address_map &map)
 	map(0x000000, 0x1ffff).r(FUNC(esq1_state::es5503_sample_r));
 }
 
-READ8_MEMBER(esq1_state::esq1_adc_read)
+uint8_t esq1_state::esq1_adc_read()
 {
 	return m_adc_value[m_adc_target];
 }
@@ -468,24 +468,24 @@ void esq1_state::machine_reset()
 	kpc_calibrated = false;
 }
 
-READ8_MEMBER(esq1_state::wd1772_r)
+uint8_t esq1_state::wd1772_r(offs_t offset)
 {
 	return m_fdc->read(offset&3);
 }
 
-WRITE8_MEMBER(esq1_state::wd1772_w)
+void esq1_state::wd1772_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset&3, data);
 }
 
-WRITE8_MEMBER(esq1_state::mapper_w)
+void esq1_state::mapper_w(uint8_t data)
 {
 	m_mapper_state = (data & 1);
 
 //    printf("mapper_state = %d\n", data ^ 1);
 }
 
-WRITE8_MEMBER(esq1_state::analog_w)
+void esq1_state::analog_w(offs_t offset, uint8_t data)
 {
 	if(!(offset & 8))
 		m_filters->set_vfc(offset & 7, data);
@@ -497,7 +497,7 @@ WRITE8_MEMBER(esq1_state::analog_w)
 		m_filters->set_vca(offset & 7, data);
 }
 
-READ8_MEMBER(esq1_state::seqdosram_r)
+uint8_t esq1_state::seqdosram_r(offs_t offset)
 {
 	if (m_mapper_state)
 	{
@@ -509,7 +509,7 @@ READ8_MEMBER(esq1_state::seqdosram_r)
 	}
 }
 
-WRITE8_MEMBER(esq1_state::seqdosram_w)
+void esq1_state::seqdosram_w(offs_t offset, uint8_t data)
 {
 	if (m_mapper_state)
 	{
@@ -560,7 +560,7 @@ void esq1_state::sq80_map(address_map &map)
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-WRITE8_MEMBER(esq1_state::duart_output)
+void esq1_state::duart_output(uint8_t data)
 {
 	int bank = m_adc_target = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
@@ -580,7 +580,7 @@ void esq1_state::send_through_panel(uint8_t data)
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	u8 offset = 0;
-	if (strncmp(machine().basename(), "sq80", 4) == 0)
+	if (strncmp(machine().basename().c_str(), "sq80", 4) == 0)
 	 {
 		if (!kpc_calibrated)
 		 { // ack SQ80 keyboard calibration

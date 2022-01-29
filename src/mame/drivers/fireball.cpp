@@ -58,18 +58,18 @@ public:
 	void fireball(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(io_00_w);
-	DECLARE_READ8_MEMBER(io_00_r);
-	DECLARE_WRITE8_MEMBER(io_02_w);
-	DECLARE_READ8_MEMBER(io_02_r);
-	DECLARE_WRITE8_MEMBER(io_04_w);
-	DECLARE_READ8_MEMBER(io_04_r);
-	DECLARE_WRITE8_MEMBER(io_06_w);
-	DECLARE_READ8_MEMBER(io_06_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p3_r);
-	DECLARE_WRITE8_MEMBER(p3_w);
+	void io_00_w(uint8_t data);
+	uint8_t io_00_r();
+	void io_02_w(uint8_t data);
+	uint8_t io_02_r();
+	void io_04_w(uint8_t data);
+	uint8_t io_04_r();
+	void io_06_w(uint8_t data);
+	uint8_t io_06_r();
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 	void fireball_io_map(address_map &map);
@@ -95,7 +95,7 @@ private:
 ****************************/
 
 
-READ8_MEMBER(fireball_state::io_00_r)
+uint8_t fireball_state::io_00_r()
 {
 	uint8_t tmp=0;
 
@@ -106,7 +106,7 @@ READ8_MEMBER(fireball_state::io_00_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_00_w)
+void fireball_state::io_00_w(uint8_t data)
 {
 	m_display_data= m_display_data&0x7f;
 	if (LOG_DISPLAY)
@@ -133,7 +133,7 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 	output().set_value("Hopper3", BIT(data, 6));
 }
 
-READ8_MEMBER(fireball_state::io_02_r)
+uint8_t fireball_state::io_02_r()
 {
 	uint8_t tmp=0;
 
@@ -144,7 +144,7 @@ READ8_MEMBER(fireball_state::io_02_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_02_w)
+void fireball_state::io_02_w(uint8_t data)
 {
 	if (LOG_OUTPUT)
 		logerror("write to 0x00 IO (X7-X9) %02X\n",data);
@@ -159,7 +159,7 @@ WRITE8_MEMBER(fireball_state::io_02_w)
 	output().set_value("RV", BIT(data, 7));
 }
 
-READ8_MEMBER(fireball_state::io_04_r)
+uint8_t fireball_state::io_04_r()
 {   //contraves per mod prog
 	uint8_t tmp=0;
 
@@ -170,7 +170,7 @@ READ8_MEMBER(fireball_state::io_04_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_04_w)
+void fireball_state::io_04_w(uint8_t data)
 {//display data
 	if (LOG_DISPLAY)
 		logerror("display datat write %02X\n",data);
@@ -179,17 +179,17 @@ WRITE8_MEMBER(fireball_state::io_04_w)
 
 
 
-READ8_MEMBER(fireball_state::io_06_r)
+uint8_t fireball_state::io_06_r()
 {
 	if (LOG_AY8912)
 		logerror("read from 0x06 IO\n");
 
 	return 0xbe;
 				//bit 0x01 is NC
-				//bit 0x40 is used to detect is the unit is powerd up!!! related to eeprom store?
+				//bit 0x40 is used to detect is the unit is powered up!!! related to eeprom store?
 }
 
-WRITE8_MEMBER(fireball_state::io_06_w)
+void fireball_state::io_06_w(uint8_t data)
 {
 	if (LOG_AY8912)
 		logerror("write to 0x06 data =%02X\n",data);
@@ -203,17 +203,17 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p1_r)
-	{
+uint8_t fireball_state::p1_r()
+{
 	uint8_t tmp=0;
 	tmp=(m_p1_data&0xfe)|(m_eeprom->do_read());
 	if (LOG_P1)
 		logerror("readP1 port data %02X\n",tmp&0x01);
 	return tmp;
-	}
+}
 
-	WRITE8_MEMBER(fireball_state::p1_w)
-	{
+void fireball_state::p1_w(uint8_t data)
+{
 	//eeprom x24c44/ay8912/system stuff...
 	//bit0 goes to eeprom pin 3 and 4  (0x01) Data_in and Data_out
 	//bit1 goes to eeprom pin 1 (0x02)      CE Hi active
@@ -228,7 +228,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 		if(( data&0x30) !=  (m_p1_data&0x30)){
 			logerror("write ay8910 control bc1= %02X bdir= %02X\n",data&0x10, data&0x20);
 		}
-	}
+}
 
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -271,16 +271,16 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p3_r)
-	{
+uint8_t fireball_state::p3_r()
+{
 	uint8_t ret = 0xfb | ((int_data&1)<<2);
 	if (LOG_P3)
 		logerror("read P3 port data = %02X\n",ret);
 	return ret;
-	}
+}
 
-WRITE8_MEMBER(fireball_state::p3_w)
-	{
+void fireball_state::p3_w(uint8_t data)
+{
 	if (LOG_P3)
 		logerror("write to P3 port data=%02X\n",data);
 
@@ -504,7 +504,7 @@ void fireball_state::fireball(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
 	//9ms from scope reading 111Hz take care of this in the handler
-	TIMER(config, "int_0", 0).configure_periodic(timer_device::expired_delegate(FUNC(fireball_state::int_0), this), attotime::from_hz(555));
+	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 

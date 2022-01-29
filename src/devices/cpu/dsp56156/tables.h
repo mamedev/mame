@@ -3,8 +3,8 @@
 #ifndef DSP56156_TABLES_H
 #define DSP56156_TABLES_H
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "dsp56156.h"
 

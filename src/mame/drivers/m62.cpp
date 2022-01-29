@@ -4,10 +4,6 @@
 
 Irem "M62" system
 
-TODO:
-- Kid Niki and Horizon are missing the drums. There is an analog section in
-  the sound board.
-
 Notes:
 - I believe that both kungfum bootlegs are derived from an Irem original which we
   don't have (prototype/early revision?). They say "kanfu master" instead of
@@ -60,6 +56,16 @@ JP3: |
 JP4: /
 
 
+Screen parameters from Lode Runner manual:
+
+15.6 KHz horizontal frequency (64.0 µsec period)
+4.0 µsec horizontal sync pulse, 5.0 µsec delayed from start of blanking
+16.0 µsec horizontal blanking period
+55.0 Hz vertical frequency (18.2 msec period)
+384 µsec vertical sync pulse, 512 µsec delayed from start of blanking
+1.79 msec vertical blanking period
+
+
 2008-08
 Dip locations verified with dips listing for: kungfum, ldrun, kidniki,
 spelunkr, spelunk2.
@@ -85,7 +91,7 @@ other supported games as well.
 /* that to select the ROM. The only exception I make is a special case used in */
 /* service mode to test the ROMs. */
 
-READ8_MEMBER(m62_state::ldrun2_bankswitch_r)
+uint8_t m62_state::ldrun2_bankswitch_r()
 {
 	if (m_ldrun2_bankswap)
 	{
@@ -98,7 +104,7 @@ READ8_MEMBER(m62_state::ldrun2_bankswitch_r)
 	return 0;
 }
 
-WRITE8_MEMBER(m62_state::ldrun2_bankswitch_w)
+void m62_state::ldrun2_bankswitch_w(offs_t offset, uint8_t data)
 {
 	static const int banks[30] =
 	{
@@ -133,41 +139,41 @@ WRITE8_MEMBER(m62_state::ldrun2_bankswitch_w)
 /* Lode Runner 3 has, it seems, a poor man's protection consisting of a PAL */
 /* (I think; it's included in the ROM set) which is read at certain times, */
 /* and the game crashes if it doesn't match the expected values. */
-READ8_MEMBER(m62_state::ldrun3_prot_5_r)
+uint8_t m62_state::ldrun3_prot_5_r()
 {
 	return 5;
 }
 
-READ8_MEMBER(m62_state::ldrun3_prot_7_r)
+uint8_t m62_state::ldrun3_prot_7_r()
 {
 	return 7;
 }
 
 
-WRITE8_MEMBER(m62_state::ldrun4_bankswitch_w)
+void m62_state::ldrun4_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(m62_state::kidniki_bankswitch_w)
+void m62_state::kidniki_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
-WRITE8_MEMBER(m62_state::spelunkr_bankswitch_w)
+void m62_state::spelunkr_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(m62_state::spelunk2_bankswitch_w)
+void m62_state::spelunk2_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry((data & 0xc0) >> 6);
 	membank("bank2")->set_entry((data & 0x3c) >> 2);
 }
 
-WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
+void m62_state::youjyudn_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
@@ -967,20 +973,15 @@ void m62_state::machine_reset()
 
 void m62_state::ldrun(machine_config &config)
 {
-
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 24000000/6);
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(m62_state::irq0_line_hold));
 
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 284, 0, 256);
 	screen.set_screen_update(FUNC(m62_state::screen_update_ldrun));
 
 	GFXDECODE(config, m_spr_decode, m_spr_palette, gfx_m62_sprites);
@@ -1001,12 +1002,12 @@ void m62_state::kungfum(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kungfum_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kungfum));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
@@ -1018,14 +1019,14 @@ void m62_state::battroad(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::battroad_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::battroad_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_battroad));
 
 	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_battroad);
@@ -1151,12 +1152,12 @@ void m62_state::youjyudn(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::youjyudn_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::youjyudn_io_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_youjyudn));
 
 	m_chr_decode->set_info(gfx_m62_tiles_youjyudn);
@@ -1174,7 +1175,7 @@ void m62_state::horizon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::horizon_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_horizon));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)

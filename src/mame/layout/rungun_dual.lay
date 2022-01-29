@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<!-- the MAME core has no real concept of demuxing a 60hz output across 2 screens, so this is a little ugly -->
 

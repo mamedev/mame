@@ -42,7 +42,7 @@ Notes:
       EPM7032 - Altera EPM7032LC44-15T CPLD (PLCC44)
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
     KM428C256 - Samsung Semiconductor KM428C256 256k x8 Dual Port DRAM (SOJ40)
-     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlinton pairs (DIP16)
+     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlington pairs (DIP16)
       HM86171 - Hualon Microelectronics HMC HM86171 VGA 256 colour RAMDAC (DIP28)
       3V_BATT - 3 Volt Coin Battery. This is tied to the CXK58257 SRAM. It appears to be used as an EEPROM, as the game
                 has on-board settings in test mode and there's no DIPs and no EEPROM.
@@ -62,6 +62,9 @@ Notes:
                 V106.U16 - MX27C4000 4MBit DIP32 EPROM; Main Program
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
+    TODO:
+     - Game speed seems to be completely wrong, timers and player movement too fast?
+
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -71,6 +74,8 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class lastfght_state : public driver_device
 {
@@ -86,33 +91,34 @@ public:
 
 	void init_lastfght();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory */
-	DECLARE_WRITE16_MEMBER(hi_w);
-	DECLARE_WRITE16_MEMBER(x_w);
-	DECLARE_WRITE16_MEMBER(yw_w);
-	DECLARE_WRITE16_MEMBER(h_w);
-	DECLARE_WRITE16_MEMBER(sx_w);
-	DECLARE_WRITE16_MEMBER(sy_w);
-	DECLARE_WRITE16_MEMBER(sr_w);
-	DECLARE_WRITE16_MEMBER(sd_w);
-	DECLARE_WRITE16_MEMBER(blit_w);
-	DECLARE_WRITE16_MEMBER(dest_w);
-	DECLARE_READ16_MEMBER(c00000_r);
-	DECLARE_READ16_MEMBER(c00002_r);
-	DECLARE_READ16_MEMBER(c00004_r);
-	DECLARE_READ16_MEMBER(c00006_r);
-	DECLARE_WRITE16_MEMBER(c00006_w);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	void hi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void yw_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void h_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sy_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dest_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c00000_r();
+	uint16_t c00002_r();
+	uint16_t c00004_r();
+	uint16_t c00006_r();
+	void c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sound_r();
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
@@ -131,8 +137,8 @@ private:
 	int m_w;
 	int m_h;
 #ifdef MAME_DEBUG
-	unsigned m_base;
-	int m_view_roms;
+	unsigned m_base = 0;
+	int m_view_roms = 0;
 #endif
 
 	/* misc */
@@ -165,9 +171,7 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
-	int x, y, count = 0;
-	uint8_t *gfxdata = memregion("gfx1")->base();
-	uint8_t data;
+	uint8_t const *const gfxdata = memregion("gfx1")->base();
 
 	if (machine().input().code_pressed_once(KEYCODE_ENTER)) m_view_roms ^= 1;
 	if (m_view_roms)
@@ -176,15 +180,15 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (machine().input().code_pressed_once(KEYCODE_PGUP))  m_base -= 512 * 256;
 		m_base %= memregion("gfx1")->bytes();
 
-		count = m_base;
+		int count = m_base;
 
 		bitmap.fill(m_palette->black_pen(), cliprect );
-		for (y = 0 ; y < 256; y++)
+		for (int y = 0 ; y < 256; y++)
 		{
-			for (x = 0; x < 512; x++)
+			for (int x = 0; x < 512; x++)
 			{
-				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
-				bitmap.pix16(y, x) = data;
+				uint8_t data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
+				bitmap.pix(y, x) = data;
 				count++;
 			}
 		}
@@ -202,7 +206,7 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  Blitter (supports zooming)
 
 // high byte of a 16 bit register
-WRITE16_MEMBER(lastfght_state::hi_w)
+void lastfght_state::hi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 600000.b = %02x\n", m_maincpu->pc(), data >> 8);
@@ -214,7 +218,7 @@ WRITE16_MEMBER(lastfght_state::hi_w)
 }
 
 // screen x
-WRITE16_MEMBER(lastfght_state::x_w)
+void lastfght_state::x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 800008.b = %02x\n", m_maincpu->pc(), data >> 8);
@@ -226,7 +230,7 @@ WRITE16_MEMBER(lastfght_state::x_w)
 }
 
 // screen y, screen width - 1
-WRITE16_MEMBER(lastfght_state::yw_w)
+void lastfght_state::yw_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -241,7 +245,7 @@ WRITE16_MEMBER(lastfght_state::yw_w)
 }
 
 // screen height - 1
-WRITE16_MEMBER(lastfght_state::h_w)
+void lastfght_state::h_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -253,7 +257,7 @@ WRITE16_MEMBER(lastfght_state::h_w)
 }
 
 // source delta x << 6, source x << 6
-WRITE16_MEMBER(lastfght_state::sx_w)
+void lastfght_state::sx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -268,7 +272,7 @@ WRITE16_MEMBER(lastfght_state::sx_w)
 }
 
 // source y << 6, source y1 << 6
-WRITE16_MEMBER(lastfght_state::sy_w)
+void lastfght_state::sy_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -283,7 +287,7 @@ WRITE16_MEMBER(lastfght_state::sy_w)
 }
 
 // source rom (0x200000 bytes), source page (512x256 bytes)
-WRITE16_MEMBER(lastfght_state::sr_w)
+void lastfght_state::sr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -298,7 +302,7 @@ WRITE16_MEMBER(lastfght_state::sr_w)
 }
 
 // source x1 << 6, source delta y << 6
-WRITE16_MEMBER(lastfght_state::sd_w)
+void lastfght_state::sd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -313,11 +317,10 @@ WRITE16_MEMBER(lastfght_state::sd_w)
 }
 
 // start blit
-WRITE16_MEMBER(lastfght_state::blit_w)
+void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		int x, y, addr;
 		uint8_t *gfxdata = memregion( "gfx1" )->base();
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
@@ -330,18 +333,18 @@ WRITE16_MEMBER(lastfght_state::blit_w)
 				data >> 8);
 #endif
 
-		for (y = 0; y <= m_h; y++)
+		for (int y = 0; y <= m_h; y++)
 		{
-			for (x = 0; x <= m_w; x++)
+			for (int x = 0; x <= m_w; x++)
 			{
-				addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
+				int addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
 							(((m_sy + m_sy1 + m_dsy * y) >> 6) & 0xff) * 0x200 +
 							m_sp * 0x200 * 0x100 + m_sr * 0x200000;
 
 				data = gfxdata[addr];
 
 				if (data && (m_x + x >= 0) && (m_x + x < 512) && (m_y + y >= 0) && (m_y + y < 256))
-					dest.pix16(m_y + y, m_x + x) = data;
+					dest.pix(m_y + y, m_x + x) = data;
 			}
 		}
 	}
@@ -350,13 +353,13 @@ WRITE16_MEMBER(lastfght_state::blit_w)
 }
 
 // toggle framebuffer
-WRITE16_MEMBER(lastfght_state::dest_w)
+void lastfght_state::dest_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dest ^= 1;
 }
 
-READ16_MEMBER(lastfght_state::c00000_r)
+uint16_t lastfght_state::c00000_r()
 {
 	// high byte:
 	// bit 7 = blitter busy
@@ -365,19 +368,19 @@ READ16_MEMBER(lastfght_state::c00000_r)
 
 }
 
-READ16_MEMBER(lastfght_state::c00002_r)
+uint16_t lastfght_state::c00002_r()
 {
 	// high byte:
 	// mask 0x1c: from sound?
 	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
 }
 
-READ16_MEMBER(lastfght_state::c00004_r)
+uint16_t lastfght_state::c00004_r()
 {
 	return ioport("IN1")->read();
 }
 
-READ16_MEMBER(lastfght_state::c00006_r)
+uint16_t lastfght_state::c00006_r()
 {
 	// low byte:
 	// bit 7 = protection?
@@ -385,20 +388,20 @@ READ16_MEMBER(lastfght_state::c00006_r)
 	return ioport("IN2")->read();
 }
 
-WRITE16_MEMBER(lastfght_state::c00006_w)
+void lastfght_state::c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c00006);
 	//  popmessage("%04x", m_c00006);
 }
 
-READ16_MEMBER(lastfght_state::sound_r)
+uint16_t lastfght_state::sound_r()
 {
 	// low byte:
 	// bit 3
 	return 8;
 }
 
-WRITE16_MEMBER(lastfght_state::sound_w)
+void lastfght_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: sound_w msb = %02x\n", m_maincpu->pc(), data >> 8);
@@ -606,4 +609,7 @@ void lastfght_state::init_lastfght()
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+} // Anonymous namespace
+
+
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -3,7 +3,11 @@
 #ifndef MAME_MACHINE_X68K_KBD_H
 #define MAME_MACHINE_X68K_KBD_H
 
-#include "bus/rs232/keyboard.h"
+#pragma once
+
+#include "bus/rs232/rs232.h"
+#include "machine/keyboard.h"
+
 
 class x68k_keyboard_device : public buffered_rs232_device<16U>, protected device_matrix_keyboard_interface<15U>
 {
@@ -20,6 +24,14 @@ protected:
 
 private:
 	virtual void received_byte(uint8_t data) override;
+
+	output_finder<> m_led_kana;
+	output_finder<> m_led_romaji;
+	output_finder<> m_led_code;
+	output_finder<> m_led_caps;
+	output_finder<> m_led_insert;
+	output_finder<> m_led_hiragana;
+	output_finder<> m_led_fullsize;
 
 	int m_delay;  // keypress delay after initial press
 	int m_repeat; // keypress repeat rate

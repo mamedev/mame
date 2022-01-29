@@ -28,20 +28,9 @@ DEFINE_DEVICE_TYPE(TANBUS_SLOT, tanbus_slot_device, "tanbus_slot", "Microtan Bus
 //-------------------------------------------------
 tanbus_slot_device::tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TANBUS_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_tanbus_interface>(mconfig, *this)
 	, m_tanbus(*this, DEVICE_SELF_OWNER)
 {
-}
-
-//-------------------------------------------------
-//  device_validity_check - device-specific checks
-//-------------------------------------------------
-
-void tanbus_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_tanbus_interface *>(card))
-		osd_printf_error("tanbus_slot_device: card device %s (%s) does not implement device_tanbus_interface\n", card->tag(), card->name());
 }
 
 //-------------------------------------------------
@@ -50,7 +39,7 @@ void tanbus_slot_device::device_validity_check(validity_checker &valid) const
 
 void tanbus_slot_device::device_start()
 {
-	device_tanbus_interface *dev = dynamic_cast<device_tanbus_interface *>(get_card_device());
+	device_tanbus_interface *const dev = get_card_device();
 	if (dev) m_tanbus->add_card(dev, m_bus_num);
 }
 
@@ -200,7 +189,7 @@ void tanbus_device::write(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 device_tanbus_interface::device_tanbus_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "tanbus")
 	, m_tanbus(nullptr)
 	, m_page(0)
 	, m_next(nullptr)

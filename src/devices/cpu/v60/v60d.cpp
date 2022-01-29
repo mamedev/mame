@@ -181,15 +181,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 	if(m) {
 		switch(mod>>5) {
 		case 0: // Double displacement (8 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int8_t(opcodes.r8(pc+1)), int8_t(opcodes.r8(pc+2)), opsize, stream);
 			return 3;
 
 		case 1: // Double displacement (16 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int16_t(opcodes.r16(pc+1)), int16_t(opcodes.r16(pc+3)), opsize, stream);
 			return 5;
 
 		case 2: // Double displacement (32 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int32_t(opcodes.r32(pc+1)), int32_t(opcodes.r32(pc+5)), opsize, stream);
 			return 9;
 
 		case 3: // Register
@@ -208,15 +208,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 			switch (opcodes.r8(pc+1)>>5)
 				{
 				case 0: // Displacement indexed (8 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int8_t(opcodes.r8(pc+2)), opsize, stream);
 					return 3;
 
 				case 1: // Displacement indexed (16 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int16_t(opcodes.r16(pc+2)), opsize, stream);
 					return 4;
 
 				case 2: // Displacement indexed (32 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int32_t(opcodes.r32(pc+2)), opsize, stream);
 					return 6;
 
 				case 3: // Register indirect indexed
@@ -224,30 +224,30 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 					return 2;
 
 				case 4: // Displacement indirect indexed (8 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int8_t(opcodes.r8(pc+2)), opsize, stream);
 					return 3;
 
 				case 5: // Displacement indirect indexed (16 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int16_t(opcodes.r16(pc+2)), opsize, stream);
 					return 4;
 
 				case 6: // Displacement indirect indexed (32 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int32_t(opcodes.r32(pc+2)), opsize, stream);
 					return 6;
 
 				case 7:
 					switch (opcodes.r8(pc+1)&0x1F)
 						{
 						case 16: // PC Displacement Indexed (8 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int8_t(opcodes.r8(pc+2)), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 17: // PC Displacement Indexed (16 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int16_t(opcodes.r16(pc+2)), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 18: // PC Displacement Indexed (32 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int32_t(opcodes.r32(pc+2)), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 19: // Direct Address Indexed
@@ -255,15 +255,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 							return 6;
 
 						case 24: // PC Displacement Indirect Indexed(8 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int8_t(opcodes.r8(pc+2)), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 25: // PC Displacement Indirect Indexed (16 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int16_t(opcodes.r16(pc+2)), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 26: // PC Displacement Indirect Indexed (32 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int32_t(opcodes.r32(pc+2)), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 27: // Direct Address Deferred Indexed
@@ -287,15 +287,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 	} else {
 		switch(mod>>5) {
 		case 0: // Displacement (8 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int8_t(opcodes.r8(pc+1)), opsize, stream);
 			return 2;
 
 		case 1: // Displacement (16 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int16_t(opcodes.r16(pc+1)), opsize, stream);
 			return 3;
 
 		case 2: // Displacement (32 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int32_t(opcodes.r32(pc+1)), opsize, stream);
 			return 5;
 
 		case 3: // Register indirect
@@ -303,15 +303,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 			return 1;
 
 		case 4: // Displacement indirect (8 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int8_t(opcodes.r8(pc+1)), opsize, stream);
 			return 2;
 
 		case 5: // Displacement indirect (16 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int16_t(opcodes.r16(pc+1)), opsize, stream);
 			return 3;
 
 		case 6: // Displacement indirect (32 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int32_t(opcodes.r32(pc+1)), opsize, stream);
 			return 5;
 
 		case 7:
@@ -336,15 +336,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				return 1;
 
 			case 16: // PC Displacement (8 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r8(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int8_t(opcodes.r8(pc+1)), opsize, stream);
 				return 2;
 
 			case 17: // PC Displacement (16 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r16(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int16_t(opcodes.r16(pc+1)), opsize, stream);
 				return 3;
 
 			case 18: // PC Displacement (32 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r32(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int32_t(opcodes.r32(pc+1)), opsize, stream);
 				return 5;
 
 			case 19: // Direct Address
@@ -372,15 +372,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				}
 
 			case 24: // PC Displacement Indirect (8 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r8(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int8_t(opcodes.r8(pc+1)), opsize, stream);
 				return 2;
 
 			case 25: // PC Displacement Indirect (16 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r16(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int16_t(opcodes.r16(pc+1)), opsize, stream);
 				return 3;
 
 			case 26: // PC Displacement Indirect (32 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r32(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int32_t(opcodes.r32(pc+1)), opsize, stream);
 				return 5;
 
 			case 27: // Direct Address Deferred
@@ -388,15 +388,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				return 5;
 
 			case 28: // PC Double Displacement (8 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int8_t(opcodes.r8(pc+1)), int8_t(opcodes.r8(pc+2)), opsize, stream);
 				return 3;
 
 			case 29: // PC Double Displacement (16 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int16_t(opcodes.r16(pc+1)), int16_t(opcodes.r16(pc+3)), opsize, stream);
 				return 5;
 
 			case 30: // PC Double Displacement (32 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int32_t(opcodes.r32(pc+1)), int32_t(opcodes.r32(pc+5)), opsize, stream);
 				return 9;
 
 			default:
@@ -455,13 +455,13 @@ u32 v60_disassembler::decode_F3(const char *opnm, int opsize1, int opsize2, unsi
 
 u32 v60_disassembler::decode_F4a(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int8_t>(opcodes.r8(pc)));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + int8_t(opcodes.r8(pc)));
 	return 2;
 }
 
 u32 v60_disassembler::decode_F4b(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int16_t>(opcodes.r16(pc)));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + int16_t(opcodes.r16(pc)));
 	return 3;
 }
 
@@ -473,7 +473,7 @@ u32 v60_disassembler::decode_F5(const char *opnm, int opsize1, int opsize2, unsi
 
 u32 v60_disassembler::decode_F6(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[opcodes.r8(pc) & 0x1f], ipc+opcodes.r16(pc+1));
+	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[opcodes.r8(pc) & 0x1f], ipc + int16_t(opcodes.r16(pc+1)));
 	return 4;
 }
 

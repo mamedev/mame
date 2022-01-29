@@ -161,7 +161,7 @@ void compute_res_net_all(std::vector<rgb_t> &rgb, const u8 *prom, const res_net_
 
 /* legacy interface */
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 template <std::size_t I, typename T, std::size_t N, typename U>
 constexpr auto combine_weights(T const (&tab)[N], U w) { return tab[I] * w; }
@@ -169,7 +169,7 @@ constexpr auto combine_weights(T const (&tab)[N], U w) { return tab[I] * w; }
 template <std::size_t I, typename T, std::size_t N, typename U, typename... V>
 constexpr auto combine_weights(T const (&tab)[N], U w0, V... w) { return (tab[I] * w0) + combine_weights<I + 1>(tab, w...); }
 
-} } // namespace emu::detail
+} // namespace emu::detail
 
 double compute_resistor_weights(
 		int minval, int maxval, double scaler,

@@ -84,7 +84,6 @@ void bbc_tube_6502_device::add_common_devices(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
-	SOFTWARE_LIST(config, "flop_ls_65c102").set_original("bbc_flop_65c102");
 }
 
 void bbc_tube_6502_device::device_add_mconfig(machine_config &config)

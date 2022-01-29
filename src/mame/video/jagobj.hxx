@@ -1056,9 +1056,11 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				m_gpu_regs[OB_HL]=objdata[1]&0xffff;
 				m_gpu_regs[OB_LH]=(objdata[0]&0xffff0000)>>16;
 				m_gpu_regs[OB_LL]=objdata[0]&0xffff;
-				m_cpu_irq_state |= 2;
-				update_cpu_irq();
+				m_gpu->set_input_line(3, ASSERT_LINE);
 				done=1;
+				// mutntpng, atarikrt VPOS = 0
+				// TODO: what the VPOS is actually for?
+				//printf("GPU irq VPOS = %04x\n",(objdata[1] >> 3) & 0x7ff);
 				break;
 
 			/* branch */
@@ -1078,16 +1080,20 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 					logerror("stop   = %08X-%08X\n", objdata[0], objdata[1]);
 				if (interrupt)
 				{
+					// TODO: fball95 doesn't have a real handling for stop irq, causing the line to be always asserted, how to prevent?
 //                  fprintf(stderr, "stop int=%d\n", interrupt);
-					m_cpu_irq_state |= 4;
-					update_cpu_irq();
+					trigger_host_cpu_irq(2);
 				}
 				break;
 			}
 
+			case 6:
+				// kasumi: F7000000 00F0311E (nop? bad align?)
+				break;
+
 			default:
 				fprintf(stderr, "%08X %08X\n", objdata[0], objdata[1]);
-				done = 1;
+				//done = 1;
 				break;
 		}
 	}

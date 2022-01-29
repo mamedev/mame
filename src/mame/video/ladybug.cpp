@@ -36,7 +36,7 @@ ladybug_video_device::ladybug_video_device(machine_config const &mconfig, char c
 {
 }
 
-WRITE8_MEMBER(ladybug_video_device::bg_w)
+void ladybug_video_device::bg_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset & 0x07ff] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x03ff);
@@ -101,7 +101,7 @@ void ladybug_video_device::device_start()
 	std::fill_n(m_spr_ram.get(), 0x0400, 0);
 	std::fill_n(m_bg_ram.get(), 0x0800, 0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_video_device::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladybug_video_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(ladybug_video_device::get_bg_tile_info)
 	int const code = m_bg_ram[tile_index] + (BIT(m_bg_ram[0x0400 | tile_index], 3) << 8);
 	int const color = m_bg_ram[0x0400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -207,7 +207,7 @@ void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect
 			if (cliprect.contains(xloc, yloc) && (hcond == vcond))
 			{
 				if (((state & 0x000ff) == 0x000ff) && !feedback && (xloc >= firstx) && (xloc <= lastx))
-					bitmap.pix16(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
+					bitmap.pix(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
 			}
 
 			// update LFSR state
@@ -353,6 +353,20 @@ uint32_t ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind1
 }
 
 
+void mrsdyna_state::mrsdyna_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	// the resistor net may be probably different than Lady Bug
+	palette_init_common(palette, color_prom, 3, 0, 5, 4, 7, 6);
+
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x60, i + 0x20);
+
+	// stationary part of grid
+	palette.set_pen_indirect(0x81, 0x40);
+}
+
 void sraider_state::sraider_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -393,17 +407,17 @@ TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
 	{
-		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
+		tileinfo.set(3, tile_index, 0, 0);
 	}
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
+		tileinfo.set(4, tile_index, 0, 0);
 	}
 }
 
-WRITE8_MEMBER(sraider_state::sraider_io_w)
+void mrsdyna_state::mrsdyna_io_w(uint8_t data)
 {
 	// bit7 = flip
 	// bit6 = grid red
@@ -419,6 +433,11 @@ WRITE8_MEMBER(sraider_state::sraider_io_w)
 	}
 
 	m_grid_color = data & 0x70;
+}
+
+void sraider_state::sraider_io_w(uint8_t data)
+{
+	mrsdyna_state::mrsdyna_io_w(data);
 
 	m_stars->set_enable(BIT(data, 3));
 
@@ -430,9 +449,9 @@ WRITE8_MEMBER(sraider_state::sraider_io_w)
 
 void sraider_state::video_start()
 {
-	ladybug_base_state::video_start();
+	mrsdyna_state::video_start();
 
-	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sraider_state::get_grid_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sraider_state::get_grid_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
 }
@@ -442,6 +461,17 @@ WRITE_LINE_MEMBER(sraider_state::screen_vblank_sraider)/* update starfield posit
 	// falling edge
 	if (!state)
 		m_stars->update_state();
+}
+
+uint32_t mrsdyna_state::screen_update_mrsdyna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// clear the bg bitmap
+	bitmap.fill(0, cliprect);
+
+	// now the chars/sprites
+	m_video->draw(screen, bitmap, cliprect, flip_screen());
+
+	return 0;
 }
 
 uint32_t sraider_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

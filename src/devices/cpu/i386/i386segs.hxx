@@ -401,6 +401,8 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	int SetRPL;
 	m_lock = false;
 
+	debugger_exception_hook(irq);
+
 	m_cycles -= 4; // TODO: subtract correct number of cycles
 
 	if( !(PROTECTED_MODE) )

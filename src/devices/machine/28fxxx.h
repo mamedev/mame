@@ -22,8 +22,8 @@ public:
 	};
 
 	DECLARE_WRITE_LINE_MEMBER(vpp) { m_program_power = state; }
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(address_space &space, offs_t offset, u8 mem_mask = ~0);
+	void write(offs_t offset, u8 data);
 
 protected:
 	base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size, u8 manufacturer_code, u8 device_code);

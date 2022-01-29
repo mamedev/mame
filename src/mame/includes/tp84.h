@@ -64,12 +64,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_READ8_MEMBER(tp84_sh_timer_r);
-	DECLARE_WRITE8_MEMBER(tp84_filter_w);
-	DECLARE_WRITE8_MEMBER(tp84_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(tp84_spriteram_w);
-	DECLARE_READ8_MEMBER(tp84_scanline_r);
+	uint8_t tp84_sh_timer_r();
+	void tp84_filter_w(offs_t offset, uint8_t data);
+	void tp84_sh_irqtrigger_w(uint8_t data);
+	void sub_irq_mask_w(uint8_t data);
+	void tp84_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t tp84_scanline_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

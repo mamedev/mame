@@ -24,8 +24,8 @@ public:
 	void port62_w(u8 data);
 	void port63_w(u8 data);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

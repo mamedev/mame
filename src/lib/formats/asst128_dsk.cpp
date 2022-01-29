@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/asst128_dsk.h"
 
 asst128_format::asst128_format() : upd765_format(formats)

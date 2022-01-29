@@ -35,7 +35,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -54,7 +54,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 
-	DECLARE_FLOPPY_FORMATS(corv_floppy_formats);
+	static void corv_floppy_formats(format_registration &fr);
 
 	uint8_t *m_rom;
 	uint8_t m_fdc_local_status, m_fdc_local_command;

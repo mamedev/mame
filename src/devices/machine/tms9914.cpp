@@ -7,7 +7,6 @@
     Texas Instruments TMS9914(A) GPIB Controller
 
     TODO:
-    - A few minor FSMs only used in non-controller devices (SR,PP)
     - A few interface commands
     - A few auxiliary commands
 
@@ -77,8 +76,8 @@ constexpr uint8_t  REG_INT0_INT_MASK = 0x3f;    // Mask of actual interrupt bits
 
 // Interrupt status/mask 1
 constexpr unsigned REG_INT1_IFC_BIT = 0;    // IFC received
-constexpr unsigned REG_INT1_MA_BIT = 1;     // My address received
-constexpr unsigned REG_INT1_SRQ_BIT = 2;    // SRQ asserted
+constexpr unsigned REG_INT1_SRQ_BIT = 1;    // SRQ asserted
+constexpr unsigned REG_INT1_MA_BIT = 2;     // My address received
 constexpr unsigned REG_INT1_DCAS_BIT = 3;   // DCAS state active
 constexpr unsigned REG_INT1_APT_BIT = 4;    // Address Pass-Through
 constexpr unsigned REG_INT1_UNC_BIT = 5;    // Unrecognized command
@@ -177,26 +176,64 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig , TMS9914 , tag , owner , clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
-	  m_signal_wr_fns{
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this) },
+	  m_signal_wr_fns(*this),
 	  m_int_write_func(*this),
-	  m_accrq_write_func(*this)
+	  m_accrq_write_func(*this),
+	  m_int_line{false},
+	  m_accrq_line{false},
+	  m_dio{0},
+	  m_signals{false},
+	  m_ext_signals{false},
+	  m_no_reflection{false},
+	  m_ext_state_change{false},
+	  m_reg_int0_status{0},
+	  m_reg_int0_mask{0},
+	  m_reg_int1_status{0},
+	  m_reg_int1_mask{0},
+	  m_reg_address{0},
+	  m_reg_serial_p{0},
+	  m_reg_2nd_serial_p{0},
+	  m_reg_parallel_p{0},
+	  m_reg_2nd_parallel_p{0},
+	  m_reg_di{0},
+	  m_reg_do{0},
+	  m_reg_ulpa{false},
+	  m_swrst{false},
+	  m_hdfa{false},
+	  m_hdfe{false},
+	  m_rtl{false},
+	  m_gts{false},
+	  m_rpp{false},
+	  m_sic{false},
+	  m_sre{false},
+	  m_dai{false},
+	  m_pts{false},
+	  m_stdl{false},
+	  m_shdw{false},
+	  m_vstdl{false},
+	  m_rsvd2{false},
+	  m_ah_state{FSM_AH_AIDS},
+	  m_ah_adhs{false},
+	  m_ah_anhs{false},
+	  m_ah_aehs{false},
+	  m_sh_state{FSM_SH_SIDS},
+	  m_sh_shfs{false},
+	  m_sh_vsts{false},
+	  m_t_state{FSM_T_TIDS},
+	  m_t_tpas{false},
+	  m_t_spms{false},
+	  m_t_eoi_state{FSM_T_ENIS},
+	  m_l_state{FSM_L_LIDS},
+	  m_l_lpas{false},
+	  m_sr_state{FSM_SR_NPRS},
+	  m_rl_state{FSM_RL_LOCS},
+	  m_pp_ppas{false},
+	  m_c_state{FSM_C_CIDS},
+	  m_next_eoi{false}
 {
 	// Silence compiler complaints about unused variables
-	(void)REG_INT0_RLC_BIT;
-	(void)REG_INT0_SPAS_BIT;
 	(void)REG_INT1_IFC_BIT;
-	(void)REG_INT1_SRQ_BIT;
 	(void)REG_INT1_GET_BIT;
-	(void)REG_SERIAL_P_MASK;
-	(void)REG_SERIAL_P_RSV1_BIT;
 }
 
 // Signal inputs
@@ -227,7 +264,11 @@ WRITE_LINE_MEMBER(tms9914_device::ifc_w)
 
 WRITE_LINE_MEMBER(tms9914_device::srq_w)
 {
+	bool prev_srq = get_signal(IEEE_488_SRQ);
 	set_ext_signal(IEEE_488_SRQ , state);
+	if (cont_r() && !prev_srq && get_signal(IEEE_488_SRQ)) {
+		set_int1_bit(REG_INT1_SRQ_BIT);
+	}
 }
 
 WRITE_LINE_MEMBER(tms9914_device::atn_w)
@@ -271,15 +312,17 @@ void tms9914_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case REG_W_SERIAL_P:
-		m_reg_serial_p = data;
-		// TODO: update FSM?
+		{
+			uint8_t diff = m_reg_2nd_serial_p ^ data;
+			m_reg_2nd_serial_p = data;
+			if (BIT(diff , REG_SERIAL_P_RSV1_BIT)) {
+				update_fsm();
+			}
+		}
 		break;
 
 	case REG_W_PARALLEL_P:
 		m_reg_2nd_parallel_p = data;
-		if (!m_pp_ppas) {
-			m_reg_parallel_p = data;
-		}
 		break;
 
 	case REG_W_DO:
@@ -443,6 +486,7 @@ void tms9914_device::device_start()
 	save_item(NAME(m_reg_int1_mask));
 	save_item(NAME(m_reg_address));
 	save_item(NAME(m_reg_serial_p));
+	save_item(NAME(m_reg_2nd_serial_p));
 	save_item(NAME(m_reg_parallel_p));
 	save_item(NAME(m_reg_2nd_parallel_p));
 	save_item(NAME(m_reg_di));
@@ -461,6 +505,7 @@ void tms9914_device::device_start()
 	save_item(NAME(m_stdl));
 	save_item(NAME(m_shdw));
 	save_item(NAME(m_vstdl));
+	save_item(NAME(m_rsvd2));
 	save_item(NAME(m_ah_state));
 	save_item(NAME(m_ah_adhs));
 	save_item(NAME(m_ah_anhs));
@@ -481,9 +526,7 @@ void tms9914_device::device_start()
 
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
-	for (auto& f : m_signal_wr_fns) {
-		f.resolve_safe();
-	}
+	m_signal_wr_fns.resolve_all_safe();
 	m_int_write_func.resolve_safe();
 	m_accrq_write_func.resolve_safe();
 
@@ -508,11 +551,40 @@ void tms9914_device::device_reset()
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
+	m_int_line = false;
 	m_accrq_line = true;    // Ensure change is propagated
+	m_dio = 0;
 
+	m_reg_int0_status = 0;
+	m_reg_int0_mask = 0;
+	m_reg_int1_status = 0;
+	m_reg_int1_mask = 0;
+	m_reg_address = 0;
 	m_reg_serial_p = 0;
+	m_reg_2nd_serial_p = 0;
 	m_reg_parallel_p = 0;
 	m_reg_2nd_parallel_p = 0;
+	m_reg_di = 0;
+	m_reg_do = 0;
+	m_reg_ulpa = false;
+	m_swrst = false;
+	m_hdfa = false;
+	m_hdfe = false;
+	m_rtl = false;
+	m_gts = false;
+	m_rpp = false;
+	m_sic = false;
+	m_sre = false;
+	m_dai = false;
+	m_pts = false;
+	m_stdl = false;
+	m_shdw = false;
+	m_vstdl = false;
+	m_rsvd2 = false;
+
+
+	std::fill(std::begin(m_ext_signals), std::end(m_ext_signals), false);
+	std::fill(std::begin(m_signals), std::end(m_signals), false);
 
 	do_swrst();
 	update_fsm();
@@ -521,7 +593,7 @@ void tms9914_device::device_reset()
 	update_ren();
 }
 
-void tms9914_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9914_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_NOISY("tmr %d\n" , id);
 	update_fsm();
@@ -745,6 +817,10 @@ void tms9914_device::update_fsm()
 				// BO interrupt is raised when SGNS state is entered
 				set_int0_bit(REG_INT0_BO_BIT);
 			}
+			if (prev_state == FSM_SH_STRS && m_t_state == FSM_T_SPAS &&
+				(m_sr_state == FSM_SR_APRS1 || m_sr_state == FSM_SR_APRS2)) {
+				set_int0_bit(REG_INT0_SPAS_BIT);
+			}
 		}
 		// SH outputs
 		// EOI is controlled by SH & C FSMs
@@ -753,14 +829,22 @@ void tms9914_device::update_fsm()
 		uint8_t dio_byte = 0;
 		set_signal(IEEE_488_DAV , m_sh_state == FSM_SH_STRS);
 		if (sh_active()) {
-			dio_byte = m_t_state == FSM_T_SPAS ? m_reg_serial_p : m_reg_do;
+			if (m_t_state == FSM_T_SPAS) {
+				dio_byte = m_reg_serial_p & REG_SERIAL_P_MASK;
+				if (m_sr_state == FSM_SR_APRS1 || m_sr_state == FSM_SR_APRS2) {
+					// Set RQS
+					BIT_SET(dio_byte , 6);
+				}
+			} else {
+				dio_byte = m_reg_do;
+			}
 			eoi_signal = m_t_eoi_state == FSM_T_ERAS || m_t_eoi_state == FSM_T_ENAS;
 		}
 
 		// AH FSM
 		prev_state = m_ah_state;
 		bool ah_reset = m_swrst ||
-			(get_signal(IEEE_488_ATN) && m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS) ||
+			(get_signal(IEEE_488_ATN) && cont_r()) ||
 			(!get_signal(IEEE_488_ATN) && m_l_state != FSM_L_LADS && m_l_state != FSM_L_LACS);
 		if (ah_reset) {
 			m_ah_state = FSM_AH_AIDS;
@@ -851,6 +935,9 @@ void tms9914_device::update_fsm()
 				if (!get_signal(IEEE_488_ATN)) {
 					if (m_t_spms) {
 						m_t_state = FSM_T_SPAS;
+						// When entering SPAS, serial poll register is copied into the
+						// register that is actually output (as it's double buffered)
+						m_reg_serial_p = m_reg_2nd_serial_p;
 					} else {
 						m_t_state = FSM_T_TACS;
 					}
@@ -872,7 +959,7 @@ void tms9914_device::update_fsm()
 		if (m_t_state != prev_state) {
 			changed = true;
 		}
-		if (m_t_spms && (m_swrst || get_ifcin() || (m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS))) {
+		if (m_t_spms && (m_swrst || get_ifcin() || cont_r())) {
 			m_t_spms = false;
 			changed = true;
 		}
@@ -909,7 +996,77 @@ void tms9914_device::update_fsm()
 		}
 		// No direct L outputs
 
-		// TODO: SR & PP FSMs
+		// PP FSM
+		if (!m_pp_ppas) {
+			// PPSS
+			if (!m_swrst && get_signal(IEEE_488_ATN) && get_signal(IEEE_488_EOI) && !cont_r()) {
+				m_pp_ppas = true;
+				changed = true;
+				// Copy m_reg_2nd_parallel_p when entering PPAS
+				m_reg_parallel_p = m_reg_2nd_parallel_p;
+			}
+		} else {
+			// PPAS
+			if (m_swrst || !get_signal(IEEE_488_ATN) || !get_signal(IEEE_488_EOI) || cont_r()) {
+				m_pp_ppas = false;
+				changed = true;
+			}
+		}
+		// PP output
+		if (m_pp_ppas) {
+			dio_byte |= m_reg_parallel_p;
+		}
+
+		// SR FSM
+		prev_state = m_sr_state;
+		if (m_swrst) {
+			m_sr_state = FSM_SR_NPRS;
+		} else {
+			switch (m_sr_state) {
+			case FSM_SR_NPRS:
+				if (m_t_state != FSM_T_SPAS &&
+					(BIT(m_reg_2nd_serial_p , REG_SERIAL_P_RSV1_BIT) || m_rsvd2)) {
+					m_sr_state = FSM_SR_SRQS;
+				}
+				break;
+
+			case FSM_SR_SRQS:
+				if (m_t_state == FSM_T_SPAS) {
+					m_sr_state = FSM_SR_APRS1;
+				} else if (!BIT(m_reg_2nd_serial_p , REG_SERIAL_P_RSV1_BIT) && !m_rsvd2) {
+					m_sr_state = FSM_SR_NPRS;
+				}
+				break;
+
+			case FSM_SR_APRS1:
+				if (m_t_state == FSM_T_SPAS && m_sh_state == FSM_SH_STRS) {
+					m_rsvd2 = false;
+				}
+				if (!BIT(m_reg_2nd_serial_p , REG_SERIAL_P_RSV1_BIT) && !m_rsvd2) {
+					m_sr_state = FSM_SR_APRS2;
+				}
+				break;
+
+			case FSM_SR_APRS2:
+				if (m_t_state == FSM_T_SPAS) {
+					if (m_sh_state == FSM_SH_STRS) {
+						m_rsvd2 = false;
+					}
+				} else {
+					m_sr_state = FSM_SR_NPRS;
+				}
+				break;
+
+			default:
+				LOG("Invalid SR state %d\n" , m_sr_state);
+				m_sr_state = FSM_SR_NPRS;
+			}
+		}
+		if (m_sr_state != prev_state) {
+			changed = true;
+		}
+		// SR outputs
+		set_signal(IEEE_488_SRQ , m_sr_state == FSM_SR_SRQS);
 
 		// RL FSM
 		if (m_rl_state != FSM_RL_LOCS && (m_swrst || !get_signal(IEEE_488_REN))) {
@@ -927,7 +1084,10 @@ void tms9914_device::update_fsm()
 		} else {
 			switch (m_c_state) {
 			case FSM_C_CIDS:
-				// sic | rqc -> CADS
+				// See also sic & rqc aux commands
+				if (m_sic) {
+					m_c_state = FSM_C_CADS;
+				}
 				break;
 
 			case FSM_C_CADS:
@@ -1107,11 +1267,17 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 		break;
 
 	case IFCMD_SPE:
-		// TODO:
+		if (!get_ifcin() && !m_t_spms) {
+			m_t_spms = true;
+			m_ext_state_change = true;
+		}
 		break;
 
 	case IFCMD_SPD:
-		// TODO:
+		if (m_t_spms) {
+			m_t_spms = false;
+			m_ext_state_change = true;
+		}
 		break;
 
 	case IFCMD_UNL:
@@ -1397,7 +1563,7 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_STDL:
-		LOG("Unimplemented STDL cmd\n");
+		LOG("Unimplemented STDL=%d cmd\n" , set_bit);
 		break;
 
 	case AUXCMD_SHDW:
@@ -1411,11 +1577,14 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_VSTDL:
-		LOG("Unimplemented VSTDL cmd\n");
+		LOG("Unimplemented VSTDL=%d cmd\n" , set_bit);
 		break;
 
 	case AUXCMD_RSV2:
-		LOG("Unimplemented RSV2 cmd\n");
+		if (set_bit != m_rsvd2) {
+			m_rsvd2 = set_bit;
+			update_fsm();
+		}
 		break;
 
 	default:

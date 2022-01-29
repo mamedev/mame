@@ -7,11 +7,15 @@
     Core MAME screen device.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_SCREEN_H
 #define MAME_EMU_SCREEN_H
 
 #pragma once
 
+#include "rendertypes.h"
+
+#include <type_traits>
 #include <utility>
 
 
@@ -27,16 +31,6 @@ enum screen_type_enum
 	SCREEN_TYPE_VECTOR,
 	SCREEN_TYPE_LCD,
 	SCREEN_TYPE_SVG
-};
-
-// texture formats
-enum texture_format
-{
-	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
-	TEXFORMAT_PALETTE16,                                // 16bpp palettized, no alpha
-	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
-	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
-	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
 };
 
 // screen_update callback flags
@@ -63,6 +57,9 @@ constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
  @def VIDEO_UPDATE_SCANLINE
  calls VIDEO_UPDATE for every visible scanline, even for skipped frames
 
+ @def VIDEO_VARIABLE_WIDTH
+ causes the screen to construct its final bitmap from a composite upscale of individual scanline bitmaps
+
  @}
  */
 
@@ -72,6 +69,7 @@ constexpr u32 VIDEO_UPDATE_AFTER_VBLANK     = 0x0004;
 constexpr u32 VIDEO_SELF_RENDER             = 0x0008;
 constexpr u32 VIDEO_ALWAYS_UPDATE           = 0x0080;
 constexpr u32 VIDEO_UPDATE_SCANLINE         = 0x0100;
+constexpr u32 VIDEO_VARIABLE_WIDTH          = 0x0200;
 
 
 //**************************************************************************
@@ -232,7 +230,7 @@ public:
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;
 		m_height = vtotal;
-		m_visarea.set(hbend, hbstart - 1, vbend, vbstart - 1);
+		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
 		return *this;
 	}
 	screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
@@ -314,7 +312,7 @@ public:
 
 	/// \brief Set visible area to full area
 	///
-	/// Set visible screen area to the full screen area (i.e. noi
+	/// Set visible screen area to the full screen area (i.e. no
 	/// horizontal or vertical blanking period).  This is generally not
 	/// possible for raster displays, but is useful for other display
 	/// simulations.  Must be called after calling #set_size.
@@ -334,36 +332,29 @@ public:
 		m_yoffset = yoffs;
 	}
 
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	template <typename F>
+	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16.set(std::forward<F>(callback), name);
+		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	template <typename F>
+	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
+		m_screen_update_rgb32.set(std::forward<F>(callback), name);
 	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	template <typename T, typename F>
+	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	template <typename T, typename F>
+	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_screen_update(screen_update_ind16_delegate callback)
-	{
-		m_screen_update_ind16 = callback;
-		m_screen_update_rgb32 = screen_update_rgb32_delegate();
-	}
-	void set_screen_update(screen_update_rgb32_delegate callback)
-	{
-		m_screen_update_ind16 = screen_update_ind16_delegate();
-		m_screen_update_rgb32 = callback;
+		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
+		m_screen_update_rgb32.set(std::forward<T>(target), std::forward<F>(callback), name);
 	}
 
 	auto screen_vblank() { return m_screen_vblank.bind(); }
@@ -399,6 +390,7 @@ public:
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
+	attotime pixel_period() const { return attotime(0, m_pixeltime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
 
@@ -408,6 +400,7 @@ public:
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
+	int partial_scan_hpos() const { return m_partial_scan_hpos; }
 	bool update_partial(int scanline);
 	void update_now();
 	void reset_partial_updates();
@@ -444,7 +437,7 @@ private:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
@@ -453,6 +446,11 @@ private:
 	void vblank_end();
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
+	void update_scan_bitmap_size(int y);
+	void pre_update_scanline(int y);
+	void create_composited_bitmap();
+	void destroy_scan_bitmaps();
+	void allocate_scan_bitmaps();
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
@@ -475,14 +473,17 @@ private:
 	render_container *  m_container;                // pointer to our container
 	std::unique_ptr<svg_renderer> m_svg; // the svg renderer
 	// dimensions
+	int                 m_max_width;                // maximum width encountered
 	int                 m_width;                    // current width (HTOTAL)
 	int                 m_height;                   // current height (VTOTAL)
 	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
+	std::vector<int>    m_scan_widths;              // current width, in samples, of each individual scanline
 
 	// textures and bitmaps
 	texture_format      m_texformat;                // texture format
 	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
+	std::vector<bitmap_t *> m_scan_bitmaps[2];      // 2x bitmaps for each individual scanline
 	bitmap_ind8         m_priority;                 // priority bitmap
 	bitmap_ind64        m_burnin;                   // burn-in bitmap
 	u8                  m_curbitmap;                // current bitmap index
@@ -541,15 +542,6 @@ private:
 DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 
 // iterator helper
-typedef device_type_iterator<screen_device> screen_device_iterator;
-
-/*!
- @defgroup Screen device configuration functions
- @{
- @def set_type
-  Modify the screen device type
-  @see screen_type_enum
- @}
- */
+typedef device_type_enumerator<screen_device> screen_device_enumerator;
 
 #endif // MAME_EMU_SCREEN_H

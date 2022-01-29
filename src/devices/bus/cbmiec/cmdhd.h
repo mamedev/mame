@@ -21,14 +21,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CMD_HD_TAG          "cmdhd"
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -59,7 +51,7 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<scsi_port_device> m_scsibus;
 
-	DECLARE_WRITE8_MEMBER( led_w );
+	void led_w(uint8_t data);
 
 	void mem_map(address_map &map);
 };

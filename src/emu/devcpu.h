@@ -7,6 +7,7 @@
     CPU device definitions.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DEVCPU_H
 #define MAME_EMU_DEVCPU_H
 

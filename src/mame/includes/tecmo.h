@@ -76,20 +76,20 @@ private:
 	int m_adpcm_data;
 	int m_video_type;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(adpcm_end_w);
-	DECLARE_READ8_MEMBER(dswa_l_r);
-	DECLARE_READ8_MEMBER(dswa_h_r);
-	DECLARE_READ8_MEMBER(dswb_l_r);
-	DECLARE_READ8_MEMBER(dswb_h_r);
-	DECLARE_WRITE8_MEMBER(txvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(bgscroll_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(adpcm_start_w);
-	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
+	void bankswitch_w(uint8_t data);
+	void adpcm_end_w(uint8_t data);
+	uint8_t dswa_l_r();
+	uint8_t dswa_h_r();
+	uint8_t dswb_l_r();
+	uint8_t dswb_h_r();
+	void txvideoram_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgscroll_w(offs_t offset, uint8_t data);
+	void bgscroll_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void adpcm_start_w(uint8_t data);
+	void adpcm_vol_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

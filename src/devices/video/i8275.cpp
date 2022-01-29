@@ -106,6 +106,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_write_hrtc(*this),
 	m_write_vrtc(*this),
 	m_write_lc(*this),
+	m_display_cb(*this),
 	m_refresh_hack(false),
 	m_status(0),
 	m_param_idx(0),
@@ -149,12 +150,12 @@ void i8275_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
 	m_write_drq.resolve_safe();
 	m_write_irq.resolve_safe();
 	m_write_hrtc.resolve_safe();
 	m_write_vrtc.resolve_safe();
 	m_write_lc.resolve_safe();
+	m_display_cb.resolve();
 
 	// allocate timers
 	m_hrtc_on_timer = timer_alloc(TIMER_HRTC_ON);
@@ -262,7 +263,7 @@ void i8275_device::dma_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	//int y = screen().vpos();
 	//int x = screen().hpos();
@@ -666,6 +667,7 @@ void i8275_device::dack_w(uint8_t data)
 		if (m_buffer_idx == CHARACTERS_PER_ROW)
 		{
 			// stop DMA
+			m_drq_on_timer->adjust(attotime::never);
 		}
 		else if (!(m_dma_idx % DMA_BURST_COUNT))
 		{

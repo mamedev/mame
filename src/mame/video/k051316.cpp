@@ -105,14 +105,15 @@ GFXDECODE_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051316, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_zoom_rom(*this, DEVICE_SELF),
-		m_dx(0),
-		m_dy(0),
-		m_wrap(0),
-		m_pixels_per_byte(2), // 4bpp layout is default
-		m_layermask(0)
+	: device_t(mconfig, K051316, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, m_zoom_rom(*this, DEVICE_SELF)
+	, m_dx(0)
+	, m_dy(0)
+	, m_wrap(0)
+	, m_pixels_per_byte(2) // 4bpp layout is default
+	, m_layermask(0)
+	, m_k051316_cb(*this)
 {
 }
 
@@ -149,13 +150,19 @@ void k051316_device::set_bpp(int bpp)
 
 void k051316_device::device_start()
 {
+	// assumes it can make an address mask with .length() - 1
+	assert(!(m_zoom_rom.length() & (m_zoom_rom.length() - 1)));
+
 	if (!palette().device().started())
 		throw device_missing_dependencies();
+
+	// bind callbacks
+	m_k051316_cb.resolve();
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k051316_device::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_ram.resize(0x800);
 	memset(&m_ram[0], 0, 0x800);
 
@@ -166,9 +173,6 @@ void k051316_device::device_start()
 	}
 	else
 		m_tmap->set_transparent_pen(0);
-
-	// bind callbacks
-	m_k051316_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));
@@ -209,7 +213,7 @@ u8 k051316_device::rom_r(offs_t offset)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
 		addr /= m_pixels_per_byte;
-		addr &= m_zoom_rom.mask();
+		addr &= m_zoom_rom.length() - 1;
 
 		//  popmessage("%s: offset %04x addr %04x", machine().describe_context(), offset, addr);
 
@@ -248,7 +252,7 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 
 	m_k051316_cb(&code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 							code,
 							color,
 							flags);

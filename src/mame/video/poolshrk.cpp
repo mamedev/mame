@@ -14,13 +14,13 @@ Atari Poolshark video emulation
 
 TILE_GET_INFO_MEMBER(poolshrk_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
+	tileinfo.set(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
 }
 
 
 void poolshrk_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(poolshrk_state::get_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(poolshrk_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);

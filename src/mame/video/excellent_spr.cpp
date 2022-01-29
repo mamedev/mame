@@ -26,6 +26,7 @@ excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const 
 	: device_t(mconfig, EXCELLENT_SPRITE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
+	, m_colpri_cb(*this)
 	, m_gfx_region(*this, DEVICE_SELF)
 	, m_colbase(0)
 {
@@ -48,7 +49,7 @@ void excellent_spr_device::device_start()
 	};
 	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
 
-	m_colpri_cb.bind_relative_to(*owner());
+	m_colpri_cb.resolve();
 	m_ram = make_unique_clear<u8[]>(0x1000);
 
 	save_pointer(NAME(m_ram), 0x1000);

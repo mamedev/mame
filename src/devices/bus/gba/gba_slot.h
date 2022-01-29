@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -36,21 +36,21 @@ enum
 
 // ======================> device_gba_cart_interface
 
-class device_gba_cart_interface : public device_slot_card_interface
+class device_gba_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_gba_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_gpio) { return 0; }
-	virtual DECLARE_READ32_MEMBER(read_tilt) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram) { }
-	virtual DECLARE_WRITE32_MEMBER(write_gpio) { }
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) { }
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) { }
+	virtual uint32_t read_rom(offs_t offset) { return 0xffffffff; }
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) { return 0xffffffff; }
+	virtual uint32_t read_gpio(offs_t offset, uint32_t mem_mask = ~0) { return 0; }
+	virtual uint32_t read_tilt(offs_t offset, uint32_t mem_mask = ~0) { return 0xffffffff; }
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { }
+	virtual void write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { }
+	virtual void write_tilt(offs_t offset, uint32_t data) { }
+	virtual void write_mapper(offs_t offset, uint32_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -79,7 +79,7 @@ protected:
 // ======================> gba_cart_slot_device
 
 class gba_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_slot_interface
 {
 public:
@@ -97,13 +97,16 @@ public:
 	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~gba_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "gba_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "gba,bin"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
@@ -111,30 +114,19 @@ public:
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 	uint32_t get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "gba_cart"; }
-	virtual const char *file_extensions() const override { return "gba,bin"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom);
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_READ32_MEMBER(read_gpio);
-	virtual DECLARE_READ32_MEMBER(read_tilt) { if (m_cart) return m_cart->read_tilt(space, offset, mem_mask); else return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_gpio);
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
-
+	virtual uint32_t read_rom(offs_t offset);
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t read_gpio(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t read_tilt(offs_t offset, uint32_t mem_mask = ~0) { if (m_cart) return m_cart->read_tilt(offset); else return 0xffffffff; }
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void write_tilt(offs_t offset, uint32_t data) { if (m_cart) m_cart->write_tilt(offset, data); }
+	virtual void write_mapper(offs_t offset, uint32_t data) { if (m_cart) m_cart->write_mapper(offset, data); }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_gba_cart_interface* m_cart;

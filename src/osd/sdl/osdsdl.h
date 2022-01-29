@@ -16,6 +16,7 @@
 #define SDLOPTION_INIPATH               "inipath"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
 #define SDLOPTION_USEALLHEADS           "useallheads"
+#define SDLOPTION_ATTACH_WINDOW         "attach_window"
 #define SDLOPTION_CENTERH               "centerh"
 #define SDLOPTION_CENTERV               "centerv"
 
@@ -89,18 +90,19 @@ public:
 	// full screen options
 #ifdef SDLMAME_X11
 	bool use_all_heads() const { return bool_value(SDLOPTION_USEALLHEADS); }
-#endif
+	const char *attach_window() const { return value(SDLOPTION_ATTACH_WINDOW); }
+#endif // SDLMAME_X11
 
 	// keyboard mapping
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }
 	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
 
 	// joystick mapping
-	const char *joy_index(int index) const { return value(string_format("%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
+	const char *joy_index(int index) const { return value(string_format("%s%d", SDLOPTION_JOYINDEX, index)); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
-	const char *mouse_index(int index) const { return value(string_format("%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
-	const char *keyboard_index(int index) const { return value(string_format("%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
+	const char *mouse_index(int index) const { return value(string_format("%s%d", SDLOPTION_MOUSEINDEX, index)); }
+	const char *keyboard_index(int index) const { return value(string_format("%s%d", SDLOPTION_KEYBINDEX, index)); }
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }
 	const char *render_driver() const { return value(SDLOPTION_RENDERDRIVER); }
@@ -124,9 +126,10 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
+	virtual void input_update() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	virtual void video_register() override;
 

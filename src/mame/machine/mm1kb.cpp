@@ -124,7 +124,7 @@ INPUT_PORTS_START( mm1_keyboard )
 
 	PORT_START("Y5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC2\xB4 '") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00B4) PORT_CHAR('`')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC2\xB4 '") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00B4,'\'') PORT_CHAR('`')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x96")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
@@ -247,7 +247,7 @@ void mm1_keyboard_device::shut_down_mm1()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// handle scan timer
 	uint8_t data = 0xff;

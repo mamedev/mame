@@ -8,14 +8,15 @@
 
 ****************************************************************************/
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
-#include "pool.h"
-#include "corestr.h"
 #include "opresolv.h"
+
+#include "strformat.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 
 
 namespace util {

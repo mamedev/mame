@@ -13,7 +13,7 @@
 void bgfx_view::update() {
 	std::shared_ptr<osd_window> win = m_renderer->assert_window();
 
-	const uint32_t window_index = win->m_index;
+	const uint32_t window_index = win->index();
 	const uint32_t width = m_renderer->get_window_width(window_index);
 	const uint32_t height = m_renderer->get_window_height(window_index);
 

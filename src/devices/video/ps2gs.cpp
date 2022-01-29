@@ -255,7 +255,7 @@ void ps2_gs_device::device_reset()
 	m_kick_count = 0;
 }
 
-READ64_MEMBER(ps2_gs_device::priv_regs0_r)
+uint64_t ps2_gs_device::priv_regs0_r(offs_t offset)
 {
 	uint64_t ret = m_base_regs[offset >> 1];
 	switch (offset)
@@ -300,7 +300,7 @@ READ64_MEMBER(ps2_gs_device::priv_regs0_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2_gs_device::priv_regs0_w)
+void ps2_gs_device::priv_regs0_w(offs_t offset, uint64_t data)
 {
 	switch (offset)
 	{
@@ -373,7 +373,7 @@ WRITE64_MEMBER(ps2_gs_device::priv_regs0_w)
 	m_base_regs[offset >> 1] = data;
 }
 
-READ64_MEMBER(ps2_gs_device::priv_regs1_r)
+uint64_t ps2_gs_device::priv_regs1_r(offs_t offset)
 {
 	uint64_t ret = 0;
 	switch (offset)
@@ -401,7 +401,7 @@ READ64_MEMBER(ps2_gs_device::priv_regs1_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2_gs_device::priv_regs1_w)
+void ps2_gs_device::priv_regs1_w(offs_t offset, uint64_t data)
 {
 	switch (offset)
 	{
@@ -433,7 +433,7 @@ void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uin
 	switch (reg)
 	{
 		case 0x0e:
-			regs_w(machine().dummy_space(), (uint32_t)hi, lo, ~0ULL);
+			regs_w((uint32_t)hi, lo);
 			break;
 		default:
 			logerror("%s: write_packed: Unknown register %02x = %08x%08x%08x%08x\n", machine().describe_context(), reg, (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
@@ -441,7 +441,7 @@ void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uin
 	}
 }
 
-WRITE64_MEMBER(ps2_gs_device::regs_w)
+void ps2_gs_device::regs_w(offs_t offset, uint64_t data)
 {
 	static char const *const dir_strs[4] = {
 		"Host->Local", "Local->Host", "Local->Local", "None"
@@ -748,12 +748,12 @@ ps2_gif_device* ps2_gs_device::interface()
 	return m_gif.target();
 }
 
-READ32_MEMBER(ps2_gs_device::gif_r)
+uint32_t ps2_gs_device::gif_r(offs_t offset)
 {
-	return m_gif->read(space, offset, mem_mask);
+	return m_gif->read(offset);
 }
 
-WRITE32_MEMBER(ps2_gs_device::gif_w)
+void ps2_gs_device::gif_w(offs_t offset, uint32_t data)
 {
-	m_gif->write(space, offset, data, mem_mask);
+	m_gif->write(offset, data);
 }

@@ -108,13 +108,21 @@ void mac_osd_interface::update(bool skip_redraw)
 //      profiler_mark(PROFILER_END);
 	}
 
-	// poll the joystick values here
-	downcast<mac_osd_interface&>(machine().osd()).poll_inputs(machine());
-
-	check_osd_inputs(machine());
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
+}
+
+//============================================================
+//  input_update
+//============================================================
+
+void mac_osd_interface::input_update()
+{
+	// poll the joystick values here
+	process_events_buf();
+	poll_inputs(machine());
+	check_osd_inputs(machine());
 }
 
 //============================================================
@@ -131,21 +139,6 @@ static void check_osd_inputs(running_machine &machine)
 	}
 
 	auto window = osd_common_t::s_window_list.front();
-	if (machine.ui_input().pressed(IPT_OSD_2))
-	{
-		//FIXME: on a per window basis
-		video_config.fullstretch = !video_config.fullstretch;
-		window->target()->set_scale_mode(video_config.fullstretch? SCALE_FRACTIONAL : SCALE_INTEGER);
-		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
-	}
-
-	if (machine.ui_input().pressed(IPT_OSD_4))
-	{
-		//FIXME: on a per window basis
-		video_config.keepaspect = !video_config.keepaspect;
-		window->target()->set_keepaspect(video_config.keepaspect);
-		machine.ui().popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
-	}
 
 	//FIXME: on a per window basis
 	if (machine.ui_input().pressed(IPT_OSD_5))
@@ -176,9 +169,7 @@ void mac_osd_interface::extract_video_config()
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
 	video_config.filter        = options().filter();
-	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
-	video_config.fullstretch   = options().uneven_stretch();
 
 	// if we are in debug mode, never go full screen
 	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
@@ -224,7 +215,7 @@ void mac_osd_interface::extract_video_config()
 		video_config.syncrefresh = 0;
 	}
 
-	if (video_config.prescale < 1 || video_config.prescale > 3)
+	if (video_config.prescale < 1 || video_config.prescale > 8)
 	{
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;

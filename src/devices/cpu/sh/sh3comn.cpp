@@ -12,7 +12,7 @@
 
 /* High internal area (ffffxxxx) */
 
-WRITE32_MEMBER( sh3_base_device::sh3_internal_high_w )
+void sh3_base_device::sh3_internal_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sh3internal_upper[offset]);
 
@@ -73,7 +73,7 @@ WRITE32_MEMBER( sh3_base_device::sh3_internal_high_w )
 
 }
 
-READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
+uint32_t sh3_base_device::sh3_internal_high_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -123,10 +123,12 @@ READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 			return m_sh3internal_upper[offset];
 
 		case SH3_INTEVT_ADDR:
-			logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 INTEVT - %08x)\n",tag(), m_sh2_state->pc & SH34_AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, m_sh3internal_upper[offset]);
-			fatalerror("INTEVT unsupported on SH3\n");
-			// never executed
-			//return m_sh3internal_upper[offset];
+			//logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 INTEVT - %08x)\n",tag(), m_sh2_state->pc & SH34_AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, m_sh3internal_upper[offset]);
+			return m_sh3internal_upper[offset];
+
+		case SH3_SCSSR_ADDR:
+			// hack until SCI is not implemented
+			return 0x84<<24;
 
 
 		default:
@@ -136,7 +138,7 @@ READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 }
 
 
-READ32_MEMBER( sh3_base_device::sh3_internal_r )
+uint32_t sh3_base_device::sh3_internal_r(offs_t offset, uint32_t mem_mask)
 {
 	if (offset<0x1000)
 	{
@@ -374,7 +376,7 @@ READ32_MEMBER( sh3_base_device::sh3_internal_r )
 
 /* Lower internal area */
 
-WRITE32_MEMBER( sh3_base_device::sh3_internal_w )
+void sh3_base_device::sh3_internal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset<0x1000)
 	{

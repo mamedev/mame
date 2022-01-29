@@ -43,7 +43,7 @@ protected:
 
 private:
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	int m_en;
 	uint8_t m_bank;

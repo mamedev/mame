@@ -29,12 +29,12 @@ DEFINE_DEVICE_TYPE(SH7604_SCI, sh7604_sci_device, "sh7604sci", "SH7604 SCI Contr
 //  LIVE DEVICE
 //**************************************************************************
 
-READ8_MEMBER(sh7604_sci_device::serial_mode_r)
+uint8_t sh7604_sci_device::serial_mode_r()
 {
 	return m_smr;
 }
 
-WRITE8_MEMBER(sh7604_sci_device::serial_mode_w)
+void sh7604_sci_device::serial_mode_w(uint8_t data)
 {
 	m_smr = data;
 
@@ -48,12 +48,12 @@ WRITE8_MEMBER(sh7604_sci_device::serial_mode_w)
 	logerror("\tClock select: clock/%d\n",4 << ((data & 0x03)*2));
 }
 
-READ8_MEMBER(sh7604_sci_device::serial_control_r)
+uint8_t sh7604_sci_device::serial_control_r()
 {
 	return m_scr;
 }
 
-WRITE8_MEMBER(sh7604_sci_device::serial_control_w)
+void sh7604_sci_device::serial_control_w(uint8_t data)
 {
 	m_scr = data;
 
@@ -61,39 +61,39 @@ WRITE8_MEMBER(sh7604_sci_device::serial_control_w)
 		throw emu_fatalerror("%s: enabled serial control %02x\n", tag(),data);
 }
 
-READ8_MEMBER(sh7604_sci_device::serial_status_r)
+uint8_t sh7604_sci_device::serial_status_r()
 {
 	return m_ssr;
 }
 
-WRITE8_MEMBER(sh7604_sci_device::serial_ack_w)
+void sh7604_sci_device::serial_ack_w(uint8_t data)
 {
 	// TODO: verify this
 	m_ssr = (m_ssr & 0x06) | (m_ssr & data & 0xf9);
 }
 
-READ8_MEMBER(sh7604_sci_device::bitrate_r )
+uint8_t sh7604_sci_device::bitrate_r()
 {
 	return m_brr;
 }
 
-WRITE8_MEMBER(sh7604_sci_device::bitrate_w )
+void sh7604_sci_device::bitrate_w(uint8_t data)
 {
 	m_brr = data;
 }
 
-READ8_MEMBER(sh7604_sci_device::transmit_data_r)
+uint8_t sh7604_sci_device::transmit_data_r()
 {
 	// ...
 	return 0;
 }
 
-WRITE8_MEMBER(sh7604_sci_device::transmit_data_w)
+void sh7604_sci_device::transmit_data_w(uint8_t data)
 {
 	// ...
 }
 
-READ8_MEMBER(sh7604_sci_device::receive_data_r)
+uint8_t sh7604_sci_device::receive_data_r()
 {
 	// ...
 	return 0;
@@ -146,12 +146,12 @@ void sh7604_sci_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( sh7604_sci_device::read )
+uint8_t sh7604_sci_device::read(address_space &space, offs_t offset)
 {
 	return space.read_byte(offset);
 }
 
-WRITE8_MEMBER( sh7604_sci_device::write )
+void sh7604_sci_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 	space.write_byte(offset,data);
 }

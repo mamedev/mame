@@ -11,8 +11,8 @@
 #define ALTO2_UCODE_PAGE_MASK   (ALTO2_UCODE_PAGE_SIZE-1)   //!< mask for microcode ROM/RAM address
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2RAM_H_
-#define _A2RAM_H_
+#ifndef MAME_CPU_ALTO2_A2RAM_H
+#define MAME_CPU_ALTO2_A2RAM_H
 //! BUS source for RAM related tasks
 enum {
 	bs_ram_read_slocation= bs_task_3,           //!< ram related: read S register
@@ -41,5 +41,5 @@ void f1_late_load_srb();                        //!< F1 func: load the S registe
 void init_ram(int task);                        //!< called by RAM related tasks
 void exit_ram();                                //!< deinitialize the RAM related tasks
 void reset_ram();                               //!< reset the RAM related tasks
-#endif // A2RAM_H
+#endif // MAME_CPU_ALTO2_A2RAM_H
 #endif  // ALTO2_DEFINE_CONSTANTS

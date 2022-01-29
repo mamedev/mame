@@ -106,7 +106,7 @@ public:
 		, m_user_pia(*this, "user_pia")
 		, m_display(*this, "display")
 		, m_brg(*this, "brg")
-		, m_baud_rate(*this, "baud_rate")
+		, m_baud_rate(*this, "BAUD_RATE")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
 		, m_keypad_columns(*this, "COL%u", 0)
@@ -122,9 +122,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(trace_timer_clear_w);
 
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
-	DECLARE_READ8_MEMBER(keypad_key_r);
-	DECLARE_WRITE8_MEMBER(led_digit_w);
-	DECLARE_WRITE8_MEMBER(led_segment_w);
+	uint8_t keypad_key_r();
+	void led_digit_w(uint8_t data);
+	void led_segment_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kansas_r);
 
 	// Clocks
@@ -139,12 +139,12 @@ private:
 
 	bool keypad_key_pressed();
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_kpd_pia;
 	required_device<pia6821_device> m_user_pia;
 	required_device<pwm_display_device> m_display;
@@ -223,14 +223,14 @@ static INPUT_PORTS_START(mekd5)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd5_state, keypad_changed, 0) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 
 	/* RS232 baud rates available via J5. */
-	PORT_START("baud_rate")
+	PORT_START("BAUD_RATE")
 	PORT_CONFNAME(0x3f, 1, "RS232 Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "2400")
-	PORT_CONFSETTING(0x08, "1200")
-	PORT_CONFSETTING(0x10, "300")
 	PORT_CONFSETTING(0x20, "110")
+	PORT_CONFSETTING(0x10, "300")
+	PORT_CONFSETTING(0x08, "1200")
+	PORT_CONFSETTING(0x04, "2400")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
 
 INPUT_PORTS_END
 
@@ -240,7 +240,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -310,7 +310,7 @@ READ_LINE_MEMBER(mekd5_state::keypad_cb1_r)
 	return mekd5_state::keypad_key_pressed();
 }
 
-READ8_MEMBER(mekd5_state::keypad_key_r)
+uint8_t mekd5_state::keypad_key_r()
 {
 	uint8_t view = machine().render().first_target()->view();
 	if (view > 1) return m_segment;
@@ -328,14 +328,14 @@ READ8_MEMBER(mekd5_state::keypad_key_r)
 ************************************************************/
 
 // PA
-WRITE8_MEMBER(mekd5_state::led_segment_w)
+void mekd5_state::led_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 	m_display->matrix(m_digit & 0x3f, ~m_segment);
 }
 
 // PB
-WRITE8_MEMBER(mekd5_state::led_digit_w)
+void mekd5_state::led_digit_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit & 0x3f, ~m_segment);
@@ -423,6 +423,8 @@ void mekd5_state::init_mekd5()
 
 void mekd5_state::machine_start()
 {
+	save_item(NAME(m_segment));
+	save_item(NAME(m_digit));
 }
 
 void mekd5_state::machine_reset()
@@ -447,7 +449,6 @@ void mekd5_state::machine_reset()
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -456,6 +457,7 @@ DEVICE_INPUT_DEFAULTS_END
 void mekd5_state::mekd5(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL_MEKD5);        /* 894.8 kHz clock */
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd5_state::mekd5_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);

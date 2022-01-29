@@ -302,7 +302,7 @@ void am7990_device_base::recv_complete_cb(int result)
 	update_interrupts();
 }
 
-void am7990_device_base::transmit_poll(void *ptr, s32 param)
+void am7990_device_base::transmit_poll(s32 param)
 {
 	// check transmitter enabled
 	if (m_csr[0] & CSR0_TXON)
@@ -482,7 +482,7 @@ void am7990_device_base::transmit()
 		}
 	}
 
-	send(buf, length);
+	send(buf, length, 4);
 }
 
 void am7990_device_base::send_complete_cb(int result)
@@ -525,7 +525,7 @@ void am7990_device_base::send_complete_cb(int result)
 	m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
 }
 
-READ16_MEMBER(am7990_device_base::regs_r)
+u16 am7990_device_base::regs_r(address_space &space, offs_t offset)
 {
 	if (!offset)
 	{
@@ -540,7 +540,7 @@ READ16_MEMBER(am7990_device_base::regs_r)
 		return m_rap;
 }
 
-WRITE16_MEMBER(am7990_device_base::regs_w)
+void am7990_device_base::regs_w(offs_t offset, u16 data)
 {
 	if (!offset)
 	{

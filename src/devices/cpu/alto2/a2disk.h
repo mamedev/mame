@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2DISK_H_
-#define _A2DISK_H_
+#ifndef MAME_CPU_ALTO2_A2DISK_H
+#define MAME_CPU_ALTO2_A2DISK_H
 
 required_device_array<diablo_hd_device, 2> m_drive;       //!< two diablo_hd_device drives
 
@@ -74,7 +74,7 @@ TIMER_CALLBACK_MEMBER( disk_seclate );          //!< timer callback to take away
 TIMER_CALLBACK_MEMBER( disk_ok_to_run );        //!< timer callback to take away the OK TO RUN pulse (reset)
 TIMER_CALLBACK_MEMBER( disk_strobon );          //!< timer callback to pulse the STROBE' signal to the drive
 TIMER_CALLBACK_MEMBER( disk_ready_mf31a );      //!< timer callback to change the READY monoflop 31a
-void disk_bitclk(void *ptr, int arg);           //!< function to update the disk controller with a new bitclk
+void disk_bitclk(int arg);                      //!< function to update the disk controller with a new bitclk
 void disk_block(int task);                      //!< called if one of the disk tasks (task_kwd or task_ksec) blocks
 void bs_early_read_kstat();                     //!< bus source: bus driven by disk status register KSTAT
 void bs_early_read_kdata();                     //!< bus source: bus driven by disk data register KDATA input
@@ -95,5 +95,5 @@ void f2_late_strobon();                         //!< f2_strobon late: branch on 
 void init_disk();                               //!< initialize the disk controller
 void exit_disk();                               //!< deinitialize the disk controller
 void reset_disk();                              //!< reset the disk controller
-#endif  // _A2DISK_H_
+#endif  // MAME_CPU_ALTO2_A2DISK_H
 #endif  // ALTO2_DEFINE_CONSTANTS

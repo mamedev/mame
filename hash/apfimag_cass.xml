@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="apfimag_cass" description="APF Imagination cassettes">
 
 <!-- To load a tape, just start APF Imagination with the BASIC cart inserted, and type CLOAD followed by <Return>
-(by default mapped to your ']' key). Then start the tape from the Internal UI and press <Return>.
+(by default mapped to your ']' key). Then start the tape from the Internal UI, wait for the leader sound to start,
+and press <Return>.
 
 If you don't press <Return>, the system won't read the tape (this is fairly unusual but it's the way the system works)
 
@@ -85,6 +89,7 @@ Once the tape has finished loading, just type RUN to start the loaded program --
 	</software>
 
 <!-- it keeps telling "START ME WITH: GOTO100", but it does not recognize the command -->
+<!-- delete line 8010, then do GOTO 100 - you get the menu. It still doesn't do anything useful though. -->
 	<software name="artist" supported="no">
 		<description>Artist and Easel</description>
 		<year>1979</year>
@@ -196,14 +201,13 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- LINE XXX NO LINE REFERENCED error -->
 	<software name="bugger">
-		<description>Bugger (Bad?)</description>
+		<description>Bugger</description>
 		<year>19??</year>
 		<publisher>MR R's</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1089196">
-				<rom name="mr_rs_bugger.wav" size="1089196" crc="39bf5e65" sha1="29cb8ee3fc263126db659fffd34271015e6efc38"/>
+			<dataarea name="cass" size="1107248">
+				<rom name="Bugger(Mr Rs).wav" size="1107248" crc="0ff27d20" sha1="88e83541e9ac9dbd57182c358caaceb1bc3629e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -277,7 +281,7 @@ checks whether the user is typing the program printed in the manual, for each le
 	</software>
 
 <!-- glitched gfx -->
-	<software name="deathtnk">
+	<software name="deathtnk" supported="partial">
 		<description>Death Tank</description>
 		<year>19??</year>
 		<publisher>York 10 Computerware</publisher>
@@ -379,7 +383,8 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- I have not been able to paly the game! am I doing something wrong, or is the tape at fault? -->
+<!-- I have not been able to play the game! am I doing something wrong, or is the tape at fault? -->
+<!-- Appears to be some kind of test - not a working program -->
 	<software name="drawdraw" supported="no">
 		<description>Draw Draw</description>
 		<year>198?</year>
@@ -392,6 +397,7 @@ checks whether the user is typing the program printed in the manual, for each le
 	</software>
 
 <!-- Not sure whether I don't know how to play, or the game does not load correctly... -->
+<!-- seems to be a bad tape -->
 	<software name="dungtres" supported="partial">
 		<description>Dungeon_Treasure</description>
 		<year>19??</year>
@@ -427,14 +433,13 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- LINE <>40 WHAT -->
-	<software name="escape" supported="no">
+	<software name="escape">
 		<description>Escape!!!</description>
 		<year>198?</year>
 		<publisher>E. Beckett</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1271980">
-				<rom name="e_beckett_escape!!!.wav" size="1271980" crc="07d54612" sha1="866eba13c2cd0d051e927362b1d20b938107b1f2"/>
+			<dataarea name="cass" size="1266506">
+				<rom name="Escape (E Beckett).wav" size="1266506" crc="d97740f0" sha1="59b4c80c43b2989a7fbb7312caa46961379b89ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -541,14 +546,14 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- LINE XXX NO LINE REFERENCED error -->
-	<software name="headhunt" supported="no">
+<!-- glitched gfx -->
+	<software name="headhunt" supported="partial">
 		<description>Head-Hunter</description>
 		<year>198?</year>
 		<publisher>G. R. Jones</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1388952">
-				<rom name="g_r_jones_head-hunter.wav" size="1388952" crc="f510ddc7" sha1="f83f55a8534571ba7a227b221772870d5a7decd0"/>
+			<dataarea name="cass" size="1007268">
+				<rom name="Head-Hunter(G R Jones).wav" size="1007268" crc="d1253d00" sha1="e19a0a679b07925a6dc0c09903ca1c5bbc0c4414"/>
 			</dataarea>
 		</part>
 	</software>
@@ -815,7 +820,8 @@ checks whether the user is typing the program printed in the manual, for each le
 	</software>
 
 <!-- Not sure if controls work fine... to investigate! -->
-	<software name="solarwar">
+<!-- LINE 311 EXPRESSION -->
+	<software name="solarwar" supported="partial">
 		<description>Solar Wars!</description>
 		<year>1983</year>
 		<publisher>Handmade Games</publisher>
@@ -932,38 +938,35 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- LINE <218 WHAT -->
-	<software name="suprfrog" supported="no">
+	<software name="suprfrog">
 		<description>Super Frog</description>
 		<year>198?</year>
 		<publisher>E. Beckett</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1244332">
-				<rom name="e_beckett_super_frog.wav" size="1244332" crc="30080597" sha1="349731435e305a117e9ad44b762f9ae852d0e81a"/>
+			<dataarea name="cass" size="1201840">
+				<rom name="Super Frog (E Beckett).wav" size="1201840" crc="dd6441a0" sha1="a1274fdc25cd47cd8eab802daacc2db972970eaf"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- LINE XXX NO LINE REFERENCED error -->
-	<software name="sy50diag" supported="no">
+	<software name="sy50diag">
 		<description>SY-50 IM-1 Diagnostics</description>
 		<year>1979</year>
 		<publisher>APF Electronics</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="3598780">
-				<rom name="apf_sy-50_im-1_diagnostics.wav" size="3598780" crc="0b3f3d4e" sha1="9185dc1801d50538b636e9fe5a071fc40425a9ec"/>
+			<dataarea name="cass" size="1135516">
+				<rom name="SY-50 Diagnostics.wav" size="1135516" crc="cba9e0b0" sha1="ae22af1a38721bb7ebdae15302d88b49cd6fc028"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- LINE XXX NO LINE REFERENCED error -->
-	<software name="theftam" supported="no">
+	<software name="theftam">
 		<description>Theft at the Art Museum</description>
 		<year>1982</year>
 		<publisher>Carl A. Echols</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1106348">
-				<rom name="carl_echols_theft_at_the_art_museum.wav" size="1106348" crc="e4e408e6" sha1="b944b36ebc8b6ef9abdb1d560bc30418796e2e8d"/>
+			<dataarea name="cass" size="1096204">
+				<rom name="Theft at the art museum (Carl A Echols)(1982).wav" size="1096204" crc="ad62f4f8" sha1="4958859f86e456db3d63ef3fa3dd17df11d27d42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -992,14 +995,13 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- it does not complete loading -->
-	<software name="treashnt" supported="no">
-		<description>Treasure Hunt (Bad?)</description>
+	<software name="treashnt">
+		<description>Treasure Hunt</description>
 		<year>1982</year>
 		<publisher>Carl A. Echols</publisher>
 		<part name="cass" interface="apf_cass">
-			<dataarea name="cass" size="1079468">
-				<rom name="carl_echols_treasure_hunt.wav" size="1079468" crc="7a3cbeb9" sha1="3661cf83211758cb6c5827169c077b17953924ef"/>
+			<dataarea name="cass" size="1073282">
+				<rom name="Treasure Hunt (Carl A Echols)(1982).wav" size="1073282" crc="f98c3972" sha1="f3fd8dbba89d45bcc5b9659022e2f9c192ebb072"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1066,7 +1068,7 @@ checks whether the user is typing the program printed in the manual, for each le
 		<publisher>R. Eisman</publisher>
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1558316">
-				<rom name="r_eisman_zap!!.wav" size="1558316" crc="6828de41" sha1="3f2e43c96a473c95e219e5605db682fdf4e574af"/>
+				<rom name="r_eisman_zap.wav" size="1558316" crc="6828de41" sha1="3f2e43c96a473c95e219e5605db682fdf4e574af"/>
 			</dataarea>
 		</part>
 	</software>

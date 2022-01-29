@@ -36,8 +36,8 @@ public:
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
 	virtual void config_map(address_map &map) override;
-	DECLARE_READ32_MEMBER(sdram_addr_r);
-	DECLARE_WRITE32_MEMBER(sdram_addr_w);
+	uint32_t sdram_addr_r();
+	void sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// PCI interrupts
 	DECLARE_WRITE_LINE_MEMBER(pci_intr_a);
@@ -48,21 +48,21 @@ public:
 	void update_pci_irq(const int index, const int state);
 
 	//cpu bus registers
-	DECLARE_READ32_MEMBER (cpu_reg_r);
-	DECLARE_WRITE32_MEMBER(cpu_reg_w);
-	DECLARE_READ32_MEMBER(serial_r);
-	DECLARE_WRITE32_MEMBER(serial_w);
+	uint32_t cpu_reg_r(offs_t offset);
+	void cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t serial_r(offs_t offset);
+	void serial_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void update_nile_irqs();
 
-	DECLARE_READ32_MEMBER (pci0_r);
-	DECLARE_WRITE32_MEMBER(pci0_w);
+	uint32_t pci0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pci0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (pci1_r);
-	DECLARE_WRITE32_MEMBER(pci1_w);
+	uint32_t pci1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pci1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void target1_map(address_map &map);
-	DECLARE_READ32_MEMBER (target1_r);
-	DECLARE_WRITE32_MEMBER(target1_w);
+	uint32_t target1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void target1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// Serial port
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);

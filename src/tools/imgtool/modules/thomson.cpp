@@ -112,10 +112,15 @@
  */
 
 #include "imgtool.h"
+#include "filter.h"
 #include "iflopimg.h"
-#include "formats/imageutl.h"
 
-#include <time.h>
+#include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <ctime>
 
 
 #define MAXSIZE 80*16*256*2 /* room for two faces, double-density, 80 tracks */
@@ -1740,7 +1745,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 			if ((c == '\r') || (c == '\n'))
 				break;
 
-			if (pos <= ARRAY_LENGTH(buf) - 1)
+			if (pos <= std::size(buf) - 1)
 			{
 				buf[pos++] = c;
 			}

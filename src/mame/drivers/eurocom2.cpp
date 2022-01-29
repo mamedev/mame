@@ -41,6 +41,7 @@
 #include "machine/wd_fdc.h"
 
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 
@@ -63,6 +64,8 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
+namespace {
+
 class eurocom2_state : public driver_device
 {
 public:
@@ -80,16 +83,17 @@ public:
 
 	void eurocom2(machine_config &config);
 	void microtrol(machine_config &config);
+
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(fdc_aux_r);
-	DECLARE_WRITE8_MEMBER(fdc_aux_w);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	uint8_t fdc_aux_r(offs_t offset);
+	void fdc_aux_w(offs_t offset, uint8_t data);
+	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE8_MEMBER(vico_w);
+	void vico_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(kbd_get);
+	uint8_t kbd_get();
 	void kbd_put(u8 data);
 
 	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
@@ -102,7 +106,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer *m_sst;
 
@@ -131,23 +135,23 @@ public:
 		, m_ptm(*this, "ptm")
 	{ }
 
-	DECLARE_READ8_MEMBER(waveterm_kb_r);
-	DECLARE_WRITE8_MEMBER(waveterm_kb_w);
+	void waveterm(machine_config &config);
+
+private:
+	uint8_t waveterm_kb_r();
+	void waveterm_kb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
 
-	DECLARE_READ8_MEMBER(pia3_pa_r);
-	DECLARE_WRITE8_MEMBER(pia3_pa_w);
-	DECLARE_WRITE8_MEMBER(pia3_pb_w);
+	void pia3_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia3_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia3_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
 
-	DECLARE_READ8_MEMBER(waveterm_adc);
-	DECLARE_WRITE8_MEMBER(waveterm_dac);
+	uint8_t waveterm_adc();
+	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
 
-	void waveterm(machine_config &config);
 	void waveterm_map(address_map &map);
-protected:
+
 	bool m_driveh;
 	uint8_t m_drive;
 
@@ -163,7 +167,7 @@ protected:
  * b6 -- irq
  * b7 -- drq
  */
-READ8_MEMBER(eurocom2_state::fdc_aux_r)
+uint8_t eurocom2_state::fdc_aux_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -185,7 +189,7 @@ READ8_MEMBER(eurocom2_state::fdc_aux_r)
  * b6 -- nc
  * b7 -- 1 = enable timer interrupt
  */
-WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
+void eurocom2_state::fdc_aux_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -214,7 +218,7 @@ WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
 	LOGDBG("Floppy %d <- %02x\n", offset, data);
 }
 
-WRITE8_MEMBER(eurocom2_state::vico_w)
+void eurocom2_state::vico_w(offs_t offset, uint8_t data)
 {
 	LOG("VICO %d <- %02x\n", offset, data);
 
@@ -242,7 +246,7 @@ WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);
@@ -255,7 +259,7 @@ READ_LINE_MEMBER(eurocom2_state::pia1_ca1_r)
 }
 
 /* bit 7 may be connected to something else -- see section 6.2 of Eurocom manual */
-READ8_MEMBER(eurocom2_state::kbd_get)
+uint8_t eurocom2_state::kbd_get()
 {
 	return m_kbd_data;
 }
@@ -269,7 +273,7 @@ void eurocom2_state::kbd_put(u8 data)
 }
 
 
-READ8_MEMBER(waveterm_state::waveterm_kb_r)
+uint8_t waveterm_state::waveterm_kb_r()
 {
 	uint8_t data = 0xff;
 
@@ -282,7 +286,7 @@ READ8_MEMBER(waveterm_state::waveterm_kb_r)
 	return data;
 }
 
-WRITE8_MEMBER(waveterm_state::waveterm_kb_w)
+void waveterm_state::waveterm_kb_w(uint8_t data)
 {
 	m_drive = (~data) >> 4;
 }
@@ -292,11 +296,11 @@ WRITE_LINE_MEMBER(waveterm_state::waveterm_kbh_w)
 	m_driveh = !state;
 }
 
-WRITE8_MEMBER(waveterm_state::pia3_pb_w)
+void waveterm_state::pia3_pb_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(waveterm_state::waveterm_adc)
+uint8_t waveterm_state::waveterm_adc()
 {
 	return m_screen->frame_number() % 255; // XXX
 }
@@ -304,19 +308,16 @@ READ8_MEMBER(waveterm_state::waveterm_adc)
 
 uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offset, page;
-	uint16_t gfx, *p;
+	int const page = (m_vico[0] & 3) << 14;
 
-	page = (m_vico[0] & 3) << 14;
-
-	for (y = 0; y < VC_DISP_VERT; y++)
+	for (int y = 0; y < VC_DISP_VERT; y++)
 	{
-		offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
-		p = &m_tmpbmp.pix16(y);
+		int const offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
+		uint16_t *p = &m_tmpbmp.pix(y);
 
-		for (x = offset; x < offset + VC_DISP_HORZ / 8; x++)
+		for (int x = offset; x < offset + VC_DISP_HORZ / 8; x++)
 		{
-			gfx = m_p_videoram[page + x];
+			uint16_t const gfx = m_p_videoram[page + x];
 
 			for (int i = 7; i >= 0; i--)
 			{
@@ -420,12 +421,15 @@ void eurocom2_state::machine_start()
 {
 	m_sst = timer_alloc(0);
 	m_tmpbmp.allocate(VC_DISP_HORZ, VC_DISP_VERT);
+	m_kbd_data = 0;
 }
 
 
-FLOPPY_FORMATS_MEMBER( eurocom2_state::floppy_formats )
-	FLOPPY_PPG_FORMAT
-FLOPPY_FORMATS_END
+void eurocom2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PPG_FORMAT);
+}
 
 static void eurocom_floppies(device_slot_interface &device)
 {
@@ -534,6 +538,8 @@ ROM_START(microtrol)
 	ROM_LOAD("mon1.bin", 0x0000, 0x0800, CRC(4e82af0f) SHA1(a708f0c8a4d7ab216bc065e82a4ad42009cc3696)) // "microtrol Control V5.1"
 	ROM_LOAD("mon2.bin", 0x0800, 0x0800, CRC(577a2b4c) SHA1(e7097a96417fa249a62c967039f039e637079cb6))
 ROM_END
+
+} // Anonymous namespace
 
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS

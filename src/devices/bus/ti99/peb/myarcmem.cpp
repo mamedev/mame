@@ -30,9 +30,9 @@
 #include "emu.h"
 #include "myarcmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MYARCMEM, bus::ti99::peb, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+DEFINE_DEVICE_TYPE(TI99_MYARCMEM, bus::ti99::peb::myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /* This card has two CRU bases where it answers. */
 #define MYARCMEM_CRU_BASE1 0x1000
@@ -72,7 +72,7 @@ int myarc_memory_expansion_device::get_base(int offset)
     RAM is at 2000-3fff, a000-ffff;
     ROM is at 4000-5fff (if CRU bit 0 is set)
 */
-READ8Z_MEMBER(myarc_memory_expansion_device::readz)
+void myarc_memory_expansion_device::readz(offs_t offset, uint8_t *value)
 {
 	int base = get_base(offset);
 
@@ -127,7 +127,7 @@ void myarc_memory_expansion_device::write(offs_t offset, uint8_t data)
 /*
     CRU read. None here.
 */
-READ8Z_MEMBER(myarc_memory_expansion_device::crureadz)
+void myarc_memory_expansion_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 
@@ -211,4 +211,4 @@ ioport_constructor myarc_memory_expansion_device::device_input_ports() const
 	return INPUT_PORTS_NAME(myarc_exp);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

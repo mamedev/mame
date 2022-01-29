@@ -72,19 +72,19 @@ Z80 CPU - 12MHz/2
 #include "includes/gundealr.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gundealr_state::bankswitch_w)
+void gundealr_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x07);
 }
 
 
 template<int Xor>
-WRITE8_MEMBER(gundealr_state::fg_scroll_w)
+void gundealr_state::fg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 	m_fg_tilemap->set_scrollx(0, m_scroll[0^Xor] | ((m_scroll[1^Xor] & 0x03) << 8));
@@ -92,7 +92,7 @@ WRITE8_MEMBER(gundealr_state::fg_scroll_w)
 }
 
 template<int Bit>
-WRITE8_MEMBER(gundealr_state::flipscreen_w)
+void gundealr_state::flipscreen_w(uint8_t data)
 {
 	machine().tilemap().set_flip_all(BIT(data, Bit) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
@@ -683,5 +683,5 @@ GAME( 1990, gundealrt,  gundealr, gundealr,   gundealt, gundealr_state, empty_in
 GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, yamyam,     0,        yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam! (Korea)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1990, wiseguy,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )

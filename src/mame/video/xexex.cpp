@@ -25,6 +25,14 @@ K053246_CB_MEMBER(xexex_state::sprite_callback)
 
 K056832_CB_MEMBER(xexex_state::tile_callback)
 {
+	/*
+	    Color format
+	    xxxx ---- Color
+	    ---- -x-- Alpha blend enable
+	    ---- --x- Used, Unknown
+	    Everything else : unknown
+	*/
+	*priority = *color & 1; // alpha flag
 	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
@@ -85,7 +93,11 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 		}
 		else if (!m_cur_alpha || layer[plane] != 1)
 		{
-			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], 0, 1 << plane);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], TILEMAP_DRAW_ALL_CATEGORIES, 1 << plane);
+		}
+		else
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], TILEMAP_DRAW_CATEGORY(0), 1 << plane);
 		}
 	}
 
@@ -97,10 +109,10 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 
 		if (alpha > 0)
 		{
-			m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha) | TILEMAP_DRAW_CATEGORY(1), 0);
 		}
 	}
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	return 0;
 }

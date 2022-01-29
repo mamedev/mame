@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/d82_dsk.h"
 
 d82_format::d82_format() : d80_format(file_formats)

@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t attr = m_videoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((attr & 0x1f) << 8),
 			((attr & 0xe0) >> 5) + 8 * m_tile_palbank,
 			0);
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 
 void spdodgeb_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdodgeb_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(spdodgeb_state::background_scan)), 8,8, 64,32);
 
 	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
 
@@ -104,12 +104,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
 	}
 }
 
-WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
+void spdodgeb_state::scrollx_lo_w(uint8_t data)
 {
 	m_lastscroll = (m_lastscroll & 0x100) | data;
 }
 
-WRITE8_MEMBER(spdodgeb_state::ctrl_w)
+void spdodgeb_state::ctrl_w(uint8_t data)
 {
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
@@ -131,7 +131,7 @@ WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 	m_sprite_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE8_MEMBER(spdodgeb_state::videoram_w)
+void spdodgeb_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "video/k007121.h"
+#include "machine/k007452.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -31,6 +32,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
+		m_k007452(*this, "k007452"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -61,18 +63,19 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121_1;
 	required_device<k007121_device> m_k007121_2;
-	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sirq_clear_w);
-	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(contra_fg_vram_w);
-	DECLARE_WRITE8_MEMBER(contra_fg_cram_w);
-	DECLARE_WRITE8_MEMBER(contra_bg_vram_w);
-	DECLARE_WRITE8_MEMBER(contra_bg_cram_w);
-	DECLARE_WRITE8_MEMBER(contra_text_vram_w);
-	DECLARE_WRITE8_MEMBER(contra_text_cram_w);
-	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_0_w);
-	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_1_w);
+	required_device<k007452_device> m_k007452;
+	void contra_bankswitch_w(uint8_t data);
+	void contra_sh_irqtrigger_w(uint8_t data);
+	void sirq_clear_w(uint8_t data);
+	void contra_coin_counter_w(uint8_t data);
+	void contra_fg_vram_w(offs_t offset, uint8_t data);
+	void contra_fg_cram_w(offs_t offset, uint8_t data);
+	void contra_bg_vram_w(offs_t offset, uint8_t data);
+	void contra_bg_cram_w(offs_t offset, uint8_t data);
+	void contra_text_vram_w(offs_t offset, uint8_t data);
+	void contra_text_cram_w(offs_t offset, uint8_t data);
+	void contra_K007121_ctrl_0_w(offs_t offset, uint8_t data);
+	void contra_K007121_ctrl_1_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

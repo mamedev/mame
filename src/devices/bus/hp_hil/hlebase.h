@@ -9,8 +9,7 @@
 #include "machine/keyboard.h"
 
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 class hle_device_base
 	: public device_t
@@ -30,6 +29,7 @@ protected:
 	// device_hp_hil_interface overrides
 	virtual bool hil_write(uint16_t *data) override;
 	virtual void hil_idd() = 0;
+	virtual void hil_typematic(uint8_t command) {};
 	virtual int hil_poll() = 0;
 private:
 
@@ -40,6 +40,5 @@ private:
 };
 
 } // namespace bus::hp_hil
-} // namespace bus
 
 #endif // MAME_DEVICES_HP_HIL_HLEBASE_H

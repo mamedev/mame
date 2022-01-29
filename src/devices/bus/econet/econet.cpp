@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device, "econet_slot", "Econet stati
 //-------------------------------------------------
 
 device_econet_interface::device_econet_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device), m_econet(nullptr), m_address(0), m_next(nullptr)
+	device_interface(device, "econet"), m_econet(nullptr), m_address(0), m_next(nullptr)
 {
 }
 
@@ -223,7 +223,7 @@ void econet_device::device_stop()
 
 void econet_device::add_device(device_t *target, int address)
 {
-	auto entry = global_alloc(daisy_entry(target));
+	auto entry = new daisy_entry(target);
 
 	entry->m_interface->m_econet = this;
 	entry->m_interface->m_address = address;

@@ -40,12 +40,12 @@ public:
 
 	void init_thunderx();
 
-private:
-	enum
-	{
-		TIMER_THUNDERX_FIRQ
-	};
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
+private:
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -64,31 +64,28 @@ private:
 	uint8_t      m_1f98_latch;
 	emu_timer *m_thunderx_firq_timer;
 
-	DECLARE_WRITE8_MEMBER(scontra_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(thunderx_videobank_w);
-	DECLARE_WRITE8_MEMBER(gbusters_videobank_w);
-	DECLARE_READ8_MEMBER(pmc_r);
-	DECLARE_WRITE8_MEMBER(pmc_w);
-	DECLARE_READ8_MEMBER(_1f98_r);
-	DECLARE_WRITE8_MEMBER(scontra_1f98_w);
-	DECLARE_WRITE8_MEMBER(thunderx_1f98_w);
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	void scontra_bankswitch_w(uint8_t data);
+	void thunderx_videobank_w(uint8_t data);
+	void gbusters_videobank_w(uint8_t data);
+	uint8_t pmc_r(offs_t offset);
+	void pmc_w(offs_t offset, uint8_t data);
+	uint8_t _1f98_r();
+	void scontra_1f98_w(uint8_t data);
+	void thunderx_1f98_w(uint8_t data);
+	void sh_irqtrigger_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
+	void k007232_bankswitch_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(thunderx_firq_cb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
 	void calculate_collisions(  );
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K052109_CB_MEMBER(gbusters_tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 
 	void gbusters_map(address_map &map);
 	void scontra_bank5800_map(address_map &map);
@@ -97,8 +94,6 @@ private:
 	void thunderx_bank5800_map(address_map &map);
 	void thunderx_map(address_map &map);
 	void thunderx_sound_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_THUNDERX_H

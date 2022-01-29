@@ -38,6 +38,7 @@ public:
 		m_palette(*this, "palette"),
 		m_latch(*this, "latch%u", 1U)
 	{
+		m_bg_split = 0;
 	}
 
 	void rougien(machine_config &config);
@@ -57,11 +58,15 @@ private:
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_helper;
 	bitmap_ind16 m_helper2;
+	bitmap_ind16 m_helper_mask;
 	int m_coll_bit0;
 	int m_coll_bit1;
 	int m_coll_bit2;
 	int m_coll_bit3;
 	int m_coll_bit6;
+	int m_bg_split;
+	int m_bg_mask;
+	int m_bg_bank;
 	int m_rougien_gfxbank1;
 	int m_rougien_gfxbank2;
 
@@ -83,25 +88,27 @@ private:
 	required_device_array<ls259_device, 2> m_latch;
 
 	uint8_t    m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
-	DECLARE_WRITE8_MEMBER(mermaid_ay8910_control_port_w);
+	void mermaid_ay8910_write_port_w(uint8_t data);
+	void mermaid_ay8910_control_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay1_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(ay2_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_lo_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_hi_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_playback_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(mermaid_videoram2_w);
-	DECLARE_WRITE8_MEMBER(mermaid_videoram_w);
-	DECLARE_WRITE8_MEMBER(mermaid_colorram_w);
+	void adpcm_data_w(uint8_t data);
+	void mermaid_videoram2_w(offs_t offset, uint8_t data);
+	void mermaid_videoram_w(offs_t offset, uint8_t data);
+	void mermaid_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(mermaid_bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(mermaid_fg_scroll_w);
+	void mermaid_bg_scroll_w(offs_t offset, uint8_t data);
+	void mermaid_fg_scroll_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(bg_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch1_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch2_w);
-	DECLARE_READ8_MEMBER(mermaid_collision_r);
+	uint8_t mermaid_collision_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

@@ -28,6 +28,7 @@ public:
 		, m_videoregs(*this, "videoregs.%u", 0)
 		, m_spriteram(*this, "spriteram.%u", 0)
 		, m_io_in0(*this, "IN0")
+		, m_io_bet(*this, "BET")
 		, m_touch_x(*this, "TOUCH%u_X", 1U)
 		, m_touch_y(*this, "TOUCH%u_Y", 1U)
 		, m_spriteregion(*this, "sprites%u", 0)
@@ -45,6 +46,7 @@ public:
 		, m_int_timer_right(*this, "int_timer_right")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
+		, m_spr_gfxdecode(*this, "spr_gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
 		, m_tilemap(*this, "tilemap.%u", 0U)
@@ -55,6 +57,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(korokoro_hopper_r);
 	DECLARE_READ_LINE_MEMBER(tjumpman_hopper_r);
+	DECLARE_READ_LINE_MEMBER(paccarn_bet4_r);
+	DECLARE_READ_LINE_MEMBER(paccarn_bet8_r);
 
 	void init_uopoko();
 	void init_donpachi();
@@ -79,6 +83,7 @@ public:
 	void sailormn(machine_config &config);
 	void paceight(machine_config &config);
 	void pacslot(machine_config &config);
+	void paccarn(machine_config &config);
 	void hotdogst(machine_config &config);
 	void crusherm(machine_config &config);
 	void donpachi(machine_config &config);
@@ -100,6 +105,14 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+
+	enum
+	{
+		TYPE_ZOOM = 0,
+		TYPE_NOZOOM = 1,
+		TYPE_ISPWRINST2 = 2
+	};
+
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
@@ -116,6 +129,7 @@ private:
 	void soundlatch_ack_w(u8 data);
 	void gaia_coin_w(u8 data);
 	u16 donpachi_videoregs_r(offs_t offset);
+	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	template<int Chip> void pwrinst2_vctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 sailormn_input0_r();
@@ -140,7 +154,6 @@ private:
 	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(spr_4bpp);
 	DECLARE_VIDEO_START(spr_8bpp);
-	DECLARE_VIDEO_START(korokoro);
 	DECLARE_VIDEO_START(ppsatan);
 	void cave_palette(palette_device &palette);
 	void dfeveron_palette(palette_device &palette);
@@ -167,8 +180,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	void update_irq_state();
 	void unpack_sprites(int chip);
-	void ddp_unpack_sprites(int chip);
-	void esprade_unpack_sprites(int chip);
 	void sailormn_unpack_tiles(int chip);
 
 	virtual void machine_start() override;
@@ -179,6 +190,7 @@ private:
 	optional_shared_ptr_array<u16, 4> m_spriteram;
 
 	optional_ioport m_io_in0;
+	optional_ioport m_io_bet;
 	optional_ioport_array<2> m_touch_x;
 	optional_ioport_array<2> m_touch_y;
 
@@ -229,6 +241,9 @@ private:
 	bitmap_ind16 m_sprite_zbuf[4];
 	u16       m_sprite_zbuf_baseval;
 
+	std::unique_ptr<u8[]> m_sprite_gfx[4];
+	offs_t                m_sprite_gfx_mask[4];
+
 	int       m_num_sprites[4];
 
 	int       m_spriteram_bank[4];
@@ -244,8 +259,8 @@ private:
 	int       m_kludge;
 	emu_timer *m_vblank_end_timer;
 
-	u16       m_sprite_base_pal;
 	u16       m_sprite_granularity;
+	u32       m_max_sprite_clk[4]; // max usable clock for sprites
 
 	/* misc */
 	int       m_time_vblank_irq;
@@ -280,6 +295,7 @@ private:
 	optional_device<timer_device> m_int_timer_right;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
+	optional_device_array<gfxdecode_device, 4> m_spr_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
 	optional_device_array<palette_device, 4> m_palette;
 	optional_device_array<tilemap038_device, 4> m_tilemap;
@@ -292,7 +308,7 @@ private:
 
 	inline void tilemap_draw(int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 priority, u32 priority2, int GFX);
 	void set_pens(int chip);
-	void vh_start(u16 sprcol_base, u16 sprcol_granularity);
+	void vh_start(u16 sprcol_granularity);
 	void get_sprite_info_cave(int chip);
 	void get_sprite_info_donpachi(int chip);
 	void sprite_init();
@@ -329,6 +345,7 @@ private:
 	void metmqstr_sound_portmap(address_map &map);
 	void oki2_map(address_map &map);
 	void oki_map(address_map &map);
+	void paccarn_map(address_map &map);
 	void paceight_map(address_map &map);
 	void pacslot_map(address_map &map);
 	void ppsatan_map(address_map &map);

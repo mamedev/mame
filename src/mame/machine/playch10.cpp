@@ -46,8 +46,8 @@ void playch10_state::machine_start()
 	/* move to individual boards as documentation of actual boards allows */
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this),write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(playch10_state::pc10_chr_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_chr_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(playch10_state::pc10_nt_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_nt_w)));
 
 	if (nullptr != m_vram)
 		set_videoram_bank(0, 8, 0, 8);
@@ -60,6 +60,8 @@ void playch10_state::machine_start()
 
 MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
+	m_timedigits.resolve();
+
 	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
 	/* allocate 4K of nametable ram here */
@@ -69,8 +71,8 @@ MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this), write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(playch10_state::pc10_chr_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_chr_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(playch10_state::pc10_nt_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_nt_w)));
 }
 
 /*************************************
@@ -126,14 +128,14 @@ WRITE_LINE_MEMBER(playch10_state::ppu_reset_w)
 		m_ppu->reset();
 }
 
-READ8_MEMBER(playch10_state::pc10_detectclr_r)
+uint8_t playch10_state::pc10_detectclr_r()
 {
 	m_pc10_int_detect = 0;
 
 	return 0;
 }
 
-WRITE8_MEMBER(playch10_state::cart_sel_w)
+void playch10_state::cart_sel_w(uint8_t data)
 {
 	m_cart_sel = data;
 }
@@ -145,7 +147,7 @@ WRITE8_MEMBER(playch10_state::cart_sel_w)
  *
  *************************************/
 
-READ8_MEMBER(playch10_state::pc10_prot_r)
+uint8_t playch10_state::pc10_prot_r()
 {
 	int data = 0xe7;
 
@@ -158,7 +160,7 @@ READ8_MEMBER(playch10_state::pc10_prot_r)
 	return data;
 }
 
-WRITE8_MEMBER(playch10_state::pc10_prot_w)
+void playch10_state::pc10_prot_w(uint8_t data)
 {
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
@@ -176,7 +178,7 @@ WRITE8_MEMBER(playch10_state::pc10_prot_w)
  *
  *************************************/
 
-WRITE8_MEMBER(playch10_state::pc10_in0_w)
+void playch10_state::pc10_in0_w(uint8_t data)
 {
 	/* Toggling bit 0 high then low resets both controllers */
 	if (data & 1)
@@ -194,7 +196,7 @@ WRITE8_MEMBER(playch10_state::pc10_in0_w)
 	}
 }
 
-READ8_MEMBER(playch10_state::pc10_in0_r)
+uint8_t playch10_state::pc10_in0_r()
 {
 	int ret = (m_input_latch[0]) & 1;
 
@@ -208,7 +210,7 @@ READ8_MEMBER(playch10_state::pc10_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(playch10_state::pc10_in1_r)
+uint8_t playch10_state::pc10_in1_r()
 {
 	int ret = (m_input_latch[1]) & 1;
 
@@ -264,19 +266,19 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
  *
  *************************************/
 
-WRITE8_MEMBER(playch10_state::pc10_nt_w)
+void playch10_state::pc10_nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nametable[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(playch10_state::pc10_nt_r)
+uint8_t playch10_state::pc10_nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nametable[page][offset & 0x3ff];
 }
 
-WRITE8_MEMBER(playch10_state::pc10_chr_w)
+void playch10_state::pc10_chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 	if (m_chr_page[bank].writable)
@@ -285,13 +287,13 @@ WRITE8_MEMBER(playch10_state::pc10_chr_w)
 	}
 }
 
-READ8_MEMBER(playch10_state::pc10_chr_r)
+uint8_t playch10_state::pc10_chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 	return m_chr_page[bank].chr[offset & 0x3ff];
 }
 
-void playch10_state::pc10_set_mirroring(int mirroring )
+void playch10_state::pc10_set_mirroring(int mirroring)
 {
 	switch (mirroring)
 	{
@@ -343,7 +345,11 @@ void playch10_state::pc10_set_videorom_bank( int first, int count, int bank, int
 	/* yeah, this is probably a horrible assumption to make.*/
 	/* but the driver is 100% consistant */
 
-	len = memregion("gfx2")->bytes();
+	if (memregion("gfx2"))   // playch10 bios doesn't have gfx2
+		len = memregion("gfx2")->bytes();
+	else
+		len = memregion("gfx1")->bytes();
+
 	len /= 0x400;   // convert to KB
 	len /= size;    // convert to bank resolution
 	len--;          // convert to mask
@@ -390,7 +396,7 @@ void playch10_state::init_playch10()
 	m_pc10_gun_controller = 0;
 
 	/* default mirroring */
-	m_mirroring = PPU_MIRROR_NONE;
+	m_mirroring = PPU_MIRROR_VERT;
 }
 
 /**********************************************************************************
@@ -428,7 +434,7 @@ void playch10_state::init_pc_hrz()
 /* MMC1 mapper, used by D and F boards */
 
 
-WRITE8_MEMBER(playch10_state::mmc1_rom_switch_w)
+void playch10_state::mmc1_rom_switch_w(offs_t offset, uint8_t data)
 {
 	/* basically, a MMC1 mapper from the nes */
 	static int size16k, switchlow, vrom4k;
@@ -547,7 +553,7 @@ WRITE8_MEMBER(playch10_state::mmc1_rom_switch_w)
 /**********************************************************************************/
 /* A Board games (Track & Field, Gradius) */
 
-WRITE8_MEMBER(playch10_state::aboard_vrom_switch_w)
+void playch10_state::aboard_vrom_switch_w(uint8_t data)
 {
 	pc10_set_videorom_bank(0, 8, (data & 3), 8);
 }
@@ -555,7 +561,7 @@ WRITE8_MEMBER(playch10_state::aboard_vrom_switch_w)
 void playch10_state::init_pcaboard()
 {
 	/* switches vrom with writes to the $803e-$8041 area */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x8fff, write8_delegate(FUNC(playch10_state::aboard_vrom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x8fff, write8smo_delegate(*this, FUNC(playch10_state::aboard_vrom_switch_w)));
 
 	/* common init */
 	init_playch10();
@@ -570,7 +576,7 @@ void playch10_state::init_pcaboard()
 /**********************************************************************************/
 /* B Board games (Contra, Rush N' Attach, Pro Wrestling) */
 
-WRITE8_MEMBER(playch10_state::bboard_rom_switch_w)
+void playch10_state::bboard_rom_switch_w(uint8_t data)
 {
 	int bankoffset = 0x10000 + ((data & 7) * 0x4000);
 	uint8_t *prg = memregion("cart")->base();
@@ -587,7 +593,7 @@ void playch10_state::init_pcbboard()
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::bboard_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(playch10_state::bboard_rom_switch_w)));
 
 	/* common init */
 	init_playch10();
@@ -604,7 +610,7 @@ void playch10_state::init_pcbboard()
 /**********************************************************************************/
 /* C Board games (The Goonies) */
 
-WRITE8_MEMBER(playch10_state::cboard_vrom_switch_w)
+void playch10_state::cboard_vrom_switch_w(uint8_t data)
 {
 	pc10_set_videorom_bank(0, 8, ((data >> 1) & 1), 8);
 }
@@ -612,7 +618,7 @@ WRITE8_MEMBER(playch10_state::cboard_vrom_switch_w)
 void playch10_state::init_pccboard()
 {
 	/* switches vrom with writes to $6000 */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(playch10_state::cboard_vrom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(playch10_state::cboard_vrom_switch_w)));
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	m_vram = nullptr;
@@ -635,7 +641,7 @@ void playch10_state::init_pcdboard()
 	m_mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::mmc1_rom_switch_w)));
 
 
 	/* common init */
@@ -651,7 +657,9 @@ void playch10_state::init_pcdboard()
 void playch10_state::init_pcdboard_2()
 {
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	/* common init */
 	init_pcdboard();
@@ -690,7 +698,7 @@ void playch10_state::mapper9_latch(offs_t offset )
 	}
 }
 
-WRITE8_MEMBER(playch10_state::eboard_rom_switch_w)
+void playch10_state::eboard_rom_switch_w(offs_t offset, uint8_t data)
 {
 	/* a variation of mapper 9 on a nes */
 	switch (offset & 0x7000)
@@ -746,13 +754,15 @@ void playch10_state::init_pceboard()
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* basically a mapper 9 on a nes */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::eboard_rom_switch_w)));
 
 	/* ppu_latch callback */
-	m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(playch10_state::mapper9_latch),this));
+	m_ppu->set_latch(*this, FUNC(playch10_state::mapper9_latch));
 
 	/* nvram at $6000-$6fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x1000);
+	save_pointer(NAME(m_extra_ram), 0x1000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff, m_extra_ram.get());
 
 	/* common init */
 	init_playch10();
@@ -776,7 +786,7 @@ void playch10_state::init_pcfboard()
 	m_mmc1_rom_mask = ((len - 0x10000) / 0x4000) - 1;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::mmc1_rom_switch_w)));
 
 	/* common init */
 	init_playch10();
@@ -787,7 +797,9 @@ void playch10_state::init_pcfboard()
 void playch10_state::init_pcfboard_2()
 {
 	/* extra ram at $6000-$6fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x1000);
+	save_pointer(NAME(m_extra_ram), 0x1000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x6fff, m_extra_ram.get());
 
 	m_vram = nullptr;
 
@@ -811,12 +823,12 @@ void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 
 		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			m_cartcpu->set_input_line(0, HOLD_LINE);
+			m_cartcpu->set_input_line(0, ASSERT_LINE);
 		}
 	}
 }
 
-WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
+void playch10_state::gboard_rom_switch_w(offs_t offset, uint8_t data)
 {
 	/* basically, a MMC3 mapper from the nes */
 
@@ -941,6 +953,7 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 
 		case 0x6000: /* disable irqs */
 			m_IRQ_enable = 0;
+			m_cartcpu->set_input_line(0, CLEAR_LINE);
 		break;
 
 		case 0x6001: /* enable irqs */
@@ -960,15 +973,15 @@ void playch10_state::init_pcgboard()
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::gboard_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::gboard_rom_switch_w)));
 
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
-	m_gboard_scanline_counter = 0;
-	m_gboard_scanline_latch = 0;
 	m_gboard_4screen = 0;
 	m_IRQ_enable = 0;
 	m_IRQ_count = m_IRQ_count_latch = 0;
@@ -976,7 +989,7 @@ void playch10_state::init_pcgboard()
 	/* common init */
 	init_playch10();
 
-	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
+	m_ppu->set_scanline_callback(*this, FUNC(playch10_state::gboard_scanline_cb));
 }
 
 void playch10_state::init_pcgboard_type2()
@@ -987,12 +1000,13 @@ void playch10_state::init_pcgboard_type2()
 
 	/* enable 4 screen mirror */
 	m_gboard_4screen = 1;
+	m_mirroring = PPU_MIRROR_NONE;
 }
 
 /**********************************************************************************/
 /* i Board games (Captain Sky Hawk, Solar Jetman) */
 
-WRITE8_MEMBER(playch10_state::iboard_rom_switch_w)
+void playch10_state::iboard_rom_switch_w(uint8_t data)
 {
 	int bank = data & 7;
 	uint8_t *prg = memregion("cart")->base();
@@ -1014,7 +1028,7 @@ void playch10_state::init_pciboard()
 	memcpy(&prg[0x08000], &prg[0x10000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::iboard_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(playch10_state::iboard_rom_switch_w)));
 
 	/* common init */
 	init_playch10();
@@ -1028,7 +1042,7 @@ void playch10_state::init_pciboard()
 /**********************************************************************************/
 /* H Board games (PinBot) */
 
-WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
+void playch10_state::hboard_rom_switch_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x7001)
 	{
@@ -1070,7 +1084,7 @@ WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
 				}
 			}
 	};
-	gboard_rom_switch_w(space,offset,data);
+	gboard_rom_switch_w(offset,data);
 }
 
 
@@ -1081,22 +1095,19 @@ void playch10_state::init_pchboard()
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* Roms are banked at $8000 to $bfff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::hboard_rom_switch_w),this));
-
-	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::hboard_rom_switch_w)));
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
-	m_gboard_scanline_counter = 0;
-	m_gboard_scanline_latch = 0;
 	m_gboard_last_bank = 0xff;
 	m_gboard_command = 0;
+	m_IRQ_enable = 0;
+	m_IRQ_count = m_IRQ_count_latch = 0;
 
 	/* common init */
 	init_playch10();
 
-	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
+	m_ppu->set_scanline_callback(*this, FUNC(playch10_state::gboard_scanline_cb));
 }
 
 /**********************************************************************************/
@@ -1113,10 +1124,12 @@ void playch10_state::init_pckboard()
 	m_mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
+	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_extra_ram), 0x2000);
+	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
 
 	/* Roms are banked at $8000 to $bfff */
-	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
+	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::mmc1_rom_switch_w)));
 
 	/* common init */
 	init_playch10();

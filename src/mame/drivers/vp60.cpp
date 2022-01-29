@@ -86,7 +86,7 @@ void vp60_state::vp60(machine_config &config)
 
 	I8275(config, m_crtc, 25.92_MHz_XTAL / 16);
 	m_crtc->set_character_width(16);
-	m_crtc->set_display_callback(FUNC(vp60_state::draw_character), this);
+	m_crtc->set_display_callback(FUNC(vp60_state::draw_character));
 	m_crtc->set_screen("screen");
 
 	i8035_device &kbdcpu(I8035(config, "kbdcpu", 3.579545_MHz_XTAL)); // 48-300-010 XTAL

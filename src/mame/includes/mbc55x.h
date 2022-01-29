@@ -102,8 +102,6 @@ protected:
 	virtual void video_reset() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	uint8_t iodecode_r(offs_t offset);
 	void iodecode_w(offs_t offset, uint8_t data);
 
@@ -151,7 +149,7 @@ private:
 	bool          m_ls123_strobe;
 	double        m_ls123_clear_time[4];
 
-	void video_debug(int ref, const std::vector<std::string> &params);
+	void video_debug(const std::vector<std::string> &params);
 };
 
 /*----------- defined in machine/mbc55x.c -----------*/

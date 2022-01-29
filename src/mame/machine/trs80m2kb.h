@@ -69,9 +69,9 @@ private:
 	uint8_t m_keylatch;
 
 	DECLARE_READ_LINE_MEMBER( kb_t1_r );
-	DECLARE_READ8_MEMBER( kb_p0_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	uint8_t kb_p0_r();
+	void kb_p1_w(uint8_t data);
+	void kb_p2_w(uint8_t data);
 };
 
 

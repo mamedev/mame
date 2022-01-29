@@ -70,10 +70,10 @@ private:
 	double m_color_weights_rg[3];
 	double m_color_weights_b[2];
 
-	DECLARE_WRITE8_MEMBER(port_0_w);
-	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_WRITE8_MEMBER(port_2_w);
-	DECLARE_READ8_MEMBER(audio_p2_r);
+	void port_0_w(uint8_t data);
+	void port_1_w(uint8_t data);
+	void port_2_w(uint8_t data);
+	uint8_t audio_p2_r();
 	DECLARE_READ_LINE_MEMBER(audio_t0_r);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 
@@ -97,7 +97,7 @@ private:
 	void spacefb_main_io_map(address_map &map);
 	void spacefb_main_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_SPACEFB

@@ -5,24 +5,20 @@
 
 #pragma once
 
+#include "imagedev/memcard.h"
+
 
 class psx_controller_port_device;
 
 
 class psxcard_device :  public device_t,
-						public device_image_interface
+						public device_memcard_image_interface
 {
 public:
 	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "mc"; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "mc"; }
 
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
@@ -44,7 +40,7 @@ private:
 	unsigned char checksum_data(const unsigned char *buf, const unsigned int sz);
 	void do_card();
 	bool transfer(uint8_t to, uint8_t *from);
-	void ack_timer(void *ptr, int param);
+	void ack_timer(int32_t param);
 
 	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd;
 	unsigned short addr;

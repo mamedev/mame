@@ -94,8 +94,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -105,7 +105,7 @@
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vendetta_state::eeprom_w)
+void vendetta_state::eeprom_w(uint8_t data)
 {
 	/* bit 0 - VOC0 - Video banking related */
 	/* bit 1 - VOC1 - Video banking related */
@@ -125,18 +125,18 @@ WRITE8_MEMBER(vendetta_state::eeprom_w)
 
 	m_irq_enabled = (data >> 6) & 1;
 
-	m_videobank0->set_bank(BIT(data, 0));
-	m_videobank1->set_bank(BIT(data, 0));
+	m_videoview0.select(BIT(data, 0));
+	m_videoview1.select(BIT(data, 0));
 }
 
 /********************************************/
 
-READ8_MEMBER(vendetta_state::K052109_r)
+uint8_t vendetta_state::K052109_r(offs_t offset)
 {
 	return m_k052109->read(offset + 0x2000);
 }
 
-WRITE8_MEMBER(vendetta_state::K052109_w)
+void vendetta_state::K052109_w(offs_t offset, uint8_t data)
 {
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
@@ -148,7 +148,7 @@ WRITE8_MEMBER(vendetta_state::K052109_w)
 }
 
 
-WRITE8_MEMBER(vendetta_state::_5fe0_w)
+void vendetta_state::_5fe0_w(uint8_t data)
 {
 	/* bit 0,1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -165,7 +165,7 @@ WRITE8_MEMBER(vendetta_state::_5fe0_w)
 	m_k053246->k053246_set_objcha_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -177,19 +177,19 @@ void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
+void vendetta_state::z80_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	timer_set(attotime::from_usec(25), TIMER_Z80_NMI);
 }
 
-WRITE8_MEMBER(vendetta_state::z80_irq_w)
+void vendetta_state::z80_irq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-READ8_MEMBER(vendetta_state::z80_irq_r)
+uint8_t vendetta_state::z80_irq_r()
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	return 0x00;
@@ -205,8 +205,10 @@ void vendetta_state::main_map(address_map &map)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 
-	map(0x4000, 0x4fff).m(m_videobank0, FUNC(address_map_bank_device::amap8));
-	map(0x5f80, 0x5f9f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x4000, 0x4fff).view(m_videoview0);
+	m_videoview0[0](0x4000, 0x4fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	m_videoview0[1](0x4000, 0x4fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
+	map(0x5f80, 0x5f9f).m(m_k054000, FUNC(k054000_device::map));
 	map(0x5fa0, 0x5faf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x5fb0, 0x5fb7).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x5fc0, 0x5fc0).portr("P1");
@@ -221,8 +223,9 @@ void vendetta_state::main_map(address_map &map)
 	map(0x5fe6, 0x5fe7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x5fe8, 0x5fe9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x5fea, 0x5fea).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0x6000, 0x6fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));
-
+	map(0x6000, 0x6fff).view(m_videoview1);
+	m_videoview1[0](0x6000, 0x6fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
+	m_videoview1[1](0x6000, 0x6fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
@@ -232,7 +235,9 @@ void vendetta_state::esckids_map(address_map &map)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));            // 052109 (Tilemap)
 
-	map(0x2000, 0x2fff).m(m_videobank0, FUNC(address_map_bank_device::amap8));    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
+	map(0x2000, 0x2fff).view(m_videoview0);    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
+	m_videoview0[0](0x2000, 0x2fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	m_videoview0[1](0x2000, 0x2fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
 	map(0x3f80, 0x3f80).portr("P1");
 	map(0x3f81, 0x3f81).portr("P2");
 	map(0x3f82, 0x3f82).portr("P3");             // ???  (But not used)
@@ -248,21 +253,11 @@ void vendetta_state::esckids_map(address_map &map)
 	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
 	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // 053246 (Sprite)
 	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
-	map(0x4000, 0x4fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));    // 0x2000-0x3fff, Tilemap mask ROM bank selector (mask ROM Test)
+	map(0x4000, 0x4fff).view(m_videoview1);    // Tilemap mask ROM bank selector (mask ROM Test)
+	m_videoview1[0](0x4000, 0x4fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
+	m_videoview1[1](0x4000, 0x4fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x6000, 0x7fff).bankr("bank1");                    // 053248 '975r01' 1M ROM (Banked)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);  // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
-}
-
-void vendetta_state::videobank0_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	map(0x1000, 0x1fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
-}
-
-void vendetta_state::videobank1_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
-	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 void vendetta_state::sound_map(address_map &map)
@@ -417,7 +412,7 @@ void vendetta_state::machine_reset()
 	m_irq_enabled = 0;
 }
 
-WRITE8_MEMBER( vendetta_state::banking_callback )
+void vendetta_state::banking_callback(uint8_t data)
 {
 	if (data >= 0x1c)
 		logerror("%s Unknown bank selected %02x\n", machine().describe_context(), data);
@@ -432,9 +427,6 @@ void vendetta_state::vendetta(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vendetta_state::irq));
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
-
-	ADDRESS_MAP_BANK(config, "videobank0").set_map(&vendetta_state::videobank0_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
-	ADDRESS_MAP_BANK(config, "videobank1").set_map(&vendetta_state::videobank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified with PCB */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vendetta_state::sound_map); /* interrupts are triggered by the main CPU */
@@ -457,22 +449,21 @@ void vendetta_state::vendetta(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 6);
 	m_k053246->set_palette(m_palette);
 
 	K053251(config, m_k053251, 0);
-
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);  /* verified with PCB */
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);  /* verified with PCB */
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified with PCB */
 	k053260.add_route(0, "lspeaker", 0.75);
@@ -494,7 +485,7 @@ void vendetta_state::esckids(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback));
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 

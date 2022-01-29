@@ -1,5 +1,6 @@
 /*
- * Copyright 2016-2019 Arm Limited
+ * Copyright 2016-2021 Arm Limited
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/*
+ * At your option, you may choose to accept this material under either:
+ *  1. The Apache License, Version 2.0, found at <http://www.apache.org/licenses/LICENSE-2.0>, or
+ *  2. The MIT License, found at <http://opensource.org/licenses/MIT>.
  */
 
 #include "spirv_cfg.hpp"
@@ -61,7 +68,7 @@ void CFG::build_immediate_dominators()
 			if (immediate_dominators[block])
 			{
 				assert(immediate_dominators[edge]);
-				immediate_dominators[block] = find_common_dominator(block, edge);
+				immediate_dominators[block] = find_common_dominator(immediate_dominators[block], edge);
 			}
 			else
 				immediate_dominators[block] = edge;

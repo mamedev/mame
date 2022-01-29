@@ -1,13 +1,14 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
- *
- * vim: set tabstop=4 expandtab:
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 /*
  *
- * AUTO GENERATED! DO NOT EDIT! ( source : $source )
+ * AUTO GENERATED FROM IDL! DO NOT EDIT! (source : $source)
+ *
+ * More info about IDL:
+ * https://gist.github.com/bkaradzic/05a1c86a6dd57bf86e2d828878e88dc2#bgfx-is-switching-to-idl-to-generate-api
  *
  */
 
@@ -33,7 +34,7 @@
 #    define BGFX_SHARED_LIB_USE 0
 #endif // BGFX_SHARED_LIB_USE
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #   define BGFX_SYMBOL_EXPORT __declspec(dllexport)
 #   define BGFX_SYMBOL_IMPORT __declspec(dllimport)
 #else

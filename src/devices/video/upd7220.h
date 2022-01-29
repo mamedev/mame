@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation
@@ -56,53 +56,14 @@ class upd7220_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)> display_pixels_delegate;
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)> draw_text_delegate;
+	using display_pixels_delegate = device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)>;
+	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)>;
 
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
-	{
-		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
-	{
-		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
-	{
-		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
-	{
-		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
-	{
-		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
-	{
-		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
-	{
-		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
-	template <class FunctionClass>
-	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
-	{
-		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
-	}
+	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }
@@ -124,11 +85,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+	void start_dma();
+	void stop_dma();
 private:
 	enum
 	{
@@ -137,8 +100,6 @@ private:
 		TIMER_BLANK
 	};
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();
@@ -151,16 +112,21 @@ private:
 	inline void update_blank_timer(int state);
 	inline void recompute_parameters();
 	inline void reset_figs_param();
-	inline void read_vram(uint8_t type, uint8_t mod);
-	inline void write_vram(uint8_t type, uint8_t mod);
+	inline void rdat(uint8_t type, uint8_t mod);
+	inline uint16_t read_vram();
+	inline void wdat(uint8_t type, uint8_t mod);
+	inline void write_vram(uint8_t type, uint8_t mod, uint16_t data, uint16_t mask = 0xffff);
 	inline void get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 
-	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
-	void draw_line(int x, int y);
-	void draw_rectangle(int x, int y);
-	void draw_arc(int x, int y);
-	void draw_char(int x, int y);
+	uint16_t get_pitch();
+	uint16_t get_pattern(uint8_t cycle);
+	void next_pixel(int direction);
+	void draw_pixel();
+	void draw_line();
+	void draw_rectangle();
+	void draw_arc();
+	void draw_char();
 	int translate_command(uint8_t data);
 	void process_fifo();
 	void continue_command();
@@ -178,10 +144,16 @@ private:
 	devcb_write_line   m_write_vsync;
 	devcb_write_line   m_write_blank;
 
+	uint16_t m_pattern;
+
+	uint8_t m_dma_type;               // DMA transfer type
+	uint8_t m_dma_mod;                // DMA transfer mode
+	uint16_t m_dma_data;              // current word transferred via DMA
+	uint32_t m_dma_transfer_length;   // DMA transfer length in bytes
+
 	uint16_t m_mask;                  // mask register
 	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
 	uint32_t m_ead;                   // execute word address
-	uint16_t m_dad;                   // dot address within the word
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM

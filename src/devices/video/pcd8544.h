@@ -28,7 +28,7 @@ public:
 
 	// construction/destruction
 	pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb = screen_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
 	DECLARE_WRITE_LINE_MEMBER(sdin_w);

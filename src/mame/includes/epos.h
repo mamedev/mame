@@ -34,13 +34,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
-	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_READ8_MEMBER(i8255_porta_r);
-	DECLARE_WRITE8_MEMBER(i8255_portc_w);
-	DECLARE_READ8_MEMBER(ay_porta_mpx_r);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(dealer_pal_w);
+	void dealer_decrypt_rom(offs_t offset, uint8_t data);
+	void port_1_w(uint8_t data);
+	uint8_t i8255_porta_r();
+	void i8255_portc_w(uint8_t data);
+	uint8_t ay_porta_mpx_r();
+	void flip_screen_w(uint8_t data);
+	void dealer_pal_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);
 	void epos_palette(palette_device &palette) const;

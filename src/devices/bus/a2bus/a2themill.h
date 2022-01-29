@@ -33,6 +33,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -41,13 +42,15 @@ protected:
 
 private:
 	required_device<cpu_device> m_6809;
+	required_ioport m_cfgsw;
+
 	bool m_bEnabled;
 	bool m_flipAddrSpace;
 	bool m_6809Mode;
 	uint8_t m_status;
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	void m6809_mem(address_map &map);
 };

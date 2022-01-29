@@ -45,7 +45,6 @@ public:
 	void lft(machine_config &config);
 
 private:
-
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
@@ -116,22 +115,21 @@ void lft_state::lft(machine_config &config)
 
 /* ROM definition */
 ROM_START( lft1230 )
-	ROM_REGION(0x4000, "roms", 0)
+	ROM_REGION16_LE(0x4000, "roms", 0)
 	ROM_LOAD16_BYTE( "1230lf29", 0x0000, 0x2000, CRC(11c87367) SHA1(0879650aa98e19a4e6ca7b6ee7874f81c9c8ccfa) )
 	ROM_LOAD16_BYTE( "1230lf42", 0x0001, 0x2000, CRC(ab82b620) SHA1(8c7d93950703f348e5ce0f9e376d157dd6098c6a) )
 ROM_END
 
 ROM_START( lft1510 )
-	ROM_REGION(0x4000, "roms", 0)
+	ROM_REGION16_LE(0x4000, "roms", 0)
 	ROM_LOAD16_BYTE( "1510lfev", 0x2000, 0x1000, CRC(47dbb290) SHA1(b557e9a54a30d9a16edfdef4a6b12a5393d30bf3) )
 	ROM_IGNORE(0x1000)
 	ROM_LOAD16_BYTE( "1510lfod", 0x2001, 0x1000, CRC(ba8c23fc) SHA1(d4b82f69fccd653b31e7bd05ee884b323ff0007b) )
 	ROM_IGNORE(0x1000)
 ROM_END
 
-
 /* Driver */
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                      FLAGS
-COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON)
-COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON)
+COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

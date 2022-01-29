@@ -7,6 +7,7 @@
 
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
+#include "softlist_dev.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -35,7 +36,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void check_inputs();
 
@@ -43,7 +44,7 @@ private:
 	void apexc_palette(palette_device &palette) const;
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
-	DECLARE_WRITE8_MEMBER(tape_write);
+	void tape_write(uint8_t data);
 	void draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
 	void draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
 	void draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);

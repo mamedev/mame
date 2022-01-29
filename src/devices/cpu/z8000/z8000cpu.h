@@ -166,11 +166,12 @@
 
 #define GET_IMM8(o)     uint8_t imm8 = (uint8_t)get_operand(o)
 
+// Be very careful with order of operations since get_operand has side effects
 #define GET_IMM16(o)    uint16_t imm16 = get_operand(o)
 #define GET_IDX16(o)    uint32_t idx16 = get_operand(o)
-#define GET_IMM32       uint32_t imm32 = (get_operand(1) << 16) + get_operand(2)
+#define GET_IMM32       uint32_t imm32 = get_operand(1); imm32 = (imm32 << 16) + get_operand(2)
 #define GET_DSP7        uint8_t dsp7 = get_operand(0) & 127
 #define GET_DSP8        int8_t dsp8 = (int8_t)get_operand(0)
-#define GET_DSP16       uint32_t dsp16 = addr_add(m_pc, (int16_t)get_operand(1))
+#define GET_DSP16       uint16_t tmp16 = get_operand(1); uint32_t dsp16 = addr_add(m_pc, (int16_t)tmp16)
 #define GET_ADDR(o)     uint32_t addr = (uint32_t)get_addr_operand(o)
 #define GET_ADDR_RAW(o)     uint32_t addr = (uint32_t)get_raw_addr_operand(o)

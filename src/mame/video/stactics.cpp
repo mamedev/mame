@@ -98,7 +98,7 @@ WRITE_LINE_MEMBER(stactics_state::palette_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::scroll_ram_w)
+void stactics_state::scroll_ram_w(offs_t offset, uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -132,7 +132,7 @@ READ_LINE_MEMBER(stactics_state::frame_count_d3_r)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::speed_latch_w)
+void stactics_state::speed_latch_w(uint8_t data)
 {
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -157,13 +157,13 @@ WRITE8_MEMBER(stactics_state::speed_latch_w)
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_trigger_w)
+void stactics_state::shot_trigger_w(uint8_t data)
 {
 	m_shot_standby = 0;
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
+void stactics_state::shot_flag_clear_w(uint8_t data)
 {
 	m_shot_arrive = 0;
 }
@@ -214,17 +214,14 @@ void stactics_state::update_beam()
 
 inline int stactics_state::get_pixel_on_plane(uint8_t *videoram, uint8_t y, uint8_t x, uint8_t y_scroll)
 {
-	uint8_t code;
-	uint8_t gfx;
-
 	/* compute effective row */
 	y = y - y_scroll;
 
 	/* get the character code at the given pixel */
-	code = videoram[((y >> 3) << 5) | (x >> 3)];
+	uint8_t code = videoram[((y >> 3) << 5) | (x >> 3)];
 
 	/* get the gfx byte */
-	gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
+	uint8_t gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
 
 	/* return the appropriate pixel within the byte */
 	return (gfx >> (~x & 0x07)) & 0x01;
@@ -233,17 +230,13 @@ inline int stactics_state::get_pixel_on_plane(uint8_t *videoram, uint8_t y, uint
 
 void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	bitmap.fill(0, cliprect);
 
 	/* for every row */
-	for (y = 0; y < 0x100; y++)
+	for (int y = 0; y < 0x100; y++)
 	{
-		int x;
-
 		/* for every pixel on the row */
-		for (x = 0; x < 0x100; x++)
+		for (int x = 0; x < 0x100; x++)
 		{
 			/* get the pixels for the four planes */
 			int pixel_b = get_pixel_on_plane(m_videoram_b, y, x, 0);
@@ -269,7 +262,7 @@ void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
-				bitmap.pix16(sy, sx) = pen;
+				bitmap.pix(sy, sx) = pen;
 		}
 	}
 }
@@ -430,10 +423,7 @@ void stactics_state::stactics_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_raw(15.46848_MHz_XTAL / 3, 328, 0, 256, 262, 0, 232);
 	screen.set_screen_update(FUNC(stactics_state::screen_update));
 	screen.set_palette("palette");
 

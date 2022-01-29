@@ -395,7 +395,7 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 	int const buffer_len = (int)ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	GLcharARB *const buffer = (GLcharARB *)malloc(buffer_len + 1);
+	auto *const buffer = (GLcharARB *)malloc(buffer_len + 1);
 	memset(buffer, 0, buffer_len + 1);
 
 	/* Load Shader Sources */

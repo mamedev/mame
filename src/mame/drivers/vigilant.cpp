@@ -28,9 +28,8 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
-#include "sound/2203intf.h"
-#include "sound/volt_reg.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,7 +39,7 @@ void vigilant_state::machine_start()
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(vigilant_state::bank_select_w)
+void vigilant_state::bank_select_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
@@ -48,7 +47,7 @@ WRITE8_MEMBER(vigilant_state::bank_select_w)
 /***************************************************************************
  vigilant_out2_w
  **************************************************************************/
-WRITE8_MEMBER(vigilant_state::vigilant_out2_w)
+void vigilant_state::vigilant_out2_w(uint8_t data)
 {
 	/* D0 = FILP = Flip screen? */
 	/* D1 = COA1 = Coin Counter A? */
@@ -61,7 +60,7 @@ WRITE8_MEMBER(vigilant_state::vigilant_out2_w)
 //  data & 0x01 cocktail mode
 }
 
-WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
+void vigilant_state::kikcubic_coin_w(uint8_t data)
 {
 	/* bits 0 is flip screen */
 
@@ -162,9 +161,9 @@ static INPUT_PORTS_START( vigilant )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -172,9 +171,9 @@ static INPUT_PORTS_START( vigilant )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
@@ -522,15 +521,12 @@ void vigilant_state::vigilant(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(0, "lspeaker", 0.55);
-	ymsnd.add_route(1, "rspeaker", 0.55);
+	ymsnd.add_route(0, "lspeaker", 0.28);
+	ymsnd.add_route(1, "rspeaker", 0.28);
 
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 void vigilant_state::buccanrs(machine_config &config)
@@ -584,7 +580,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	ym1.add_route(3, "lspeaker",  0.50);
 	ym1.add_route(3, "rspeaker", 0.50);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));;
+	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));
 	ym2.add_route(0, "lspeaker",  0.35);
 	ym2.add_route(0, "rspeaker", 0.35);
 	ym2.add_route(1, "lspeaker",  0.35);
@@ -597,9 +593,6 @@ void vigilant_state::buccanrs(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void vigilant_state::kikcubic(machine_config &config)
@@ -644,17 +637,13 @@ void vigilant_state::kikcubic(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(0, "lspeaker", 0.55);
-	ymsnd.add_route(1, "rspeaker", 0.55);
+	ymsnd.add_route(0, "lspeaker", 0.28);
+	ymsnd.add_route(1, "rspeaker", 0.28);
 
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
-
 
 
 /***************************************************************************
@@ -954,7 +943,13 @@ ROM_START( vigilantd ) // Japan Rev D
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
-ROM_START( vigilantbl ) /* Bootleg */
+/* Bootleg
+   "JB 306" silkscreen part# on bottom board, "VT-20" sticker on top board.
+   The various Nanao custom chips are implemented with standard ttl, makes the bottom board considerably larger.
+   The 3 additional proms are part of the KNA6074601 custom chip implementation.
+   The differing pal has some unused pins repurposed as part of the KNA6032701 custom chip implementation.
+   The board-board connectors are 2x 50-pin vs the 2x 60-pin used on original game. */
+ROM_START( vigilantbl )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "g07_c03.bin",  0x00000, 0x08000, CRC(9dcca081) SHA1(6d086b70e6bf1fbafa746ef5c82334645f199be9) )
 	ROM_LOAD( "j07_c04.bin",  0x10000, 0x10000, CRC(e0159105) SHA1(da6d74ec075863c67c0ce21b07a54029d138f688) )
@@ -985,10 +980,16 @@ ROM_START( vigilantbl ) /* Bootleg */
 	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
-	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - not convinced these exist in this form on bootleg */
-	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_REGION( 0x0600, "plds", 0 ) /* 3x pal16l8 */
+	ROM_LOAD( "p09_16l8.bin", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )  // == official set ic90
+	ROM_LOAD( "m05_16l8.bin", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )  // == official set ic38
+	ROM_LOAD( "b01_16l8.bin", 0x0400, 0x0104, CRC(1beae498) SHA1(031c2f589eb715dc3909614bab8d89994f69be80) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) /* 4x 82s129 */
+	ROM_LOAD( "a07_129.bin",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == official set ic52
+	ROM_LOAD( "t10_129a.bin", 0x0100, 0x0100, CRC(1513df33) SHA1(7ab5066e3b5eb47fc4d5498b168929a9ade9bb7c) )
+	ROM_LOAD( "u10_129b.bin", 0x0200, 0x0100, CRC(06661d00) SHA1(aa12a31751cad355ad545d92485432d6be12b45e) )
+	ROM_LOAD( "v10_129c.bin", 0x0300, 0x0100, CRC(3f186bc8) SHA1(e5270fbc16c5844294cf20b42e57f4edaabbe629) )
 ROM_END
 
 

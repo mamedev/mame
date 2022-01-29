@@ -12,6 +12,7 @@
 #pragma once
 
 
+// Note: the numbers here are offsets from the WPC device base address, which is 0x3FB0 on the WPC_AN hardware
 /* A = Alpha-numeric
  * M = DMD
  * F = Fliptronics
@@ -82,8 +83,8 @@ public:
 
 	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint16_t get_memprotect_mask() { return m_memprotect_mask; }
 	bool memprotect_active() { return m_memprotect != 0xb4; }
@@ -110,7 +111,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint8_t m_shift_addr_high;

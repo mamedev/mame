@@ -23,8 +23,8 @@ public:
 	// construction/destruction
 	mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	auto in_pa() { return m_in_a_pa_cb.bind(); }
 	auto in_pb() { return m_in_a_pb_cb.bind(); }
@@ -46,18 +46,18 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(i8255_a_port_a_r);
-	DECLARE_READ8_MEMBER(i8255_a_port_b_r);
-	DECLARE_READ8_MEMBER(i8255_a_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_a_w);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_b_w);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_c_w);
-	DECLARE_READ8_MEMBER(i8255_b_port_a_r);
-	DECLARE_READ8_MEMBER(i8255_b_port_b_r);
-	DECLARE_READ8_MEMBER(i8255_b_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_a_w);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_b_w);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_c_w);
+	uint8_t i8255_a_port_a_r(offs_t offset);
+	uint8_t i8255_a_port_b_r(offs_t offset);
+	uint8_t i8255_a_port_c_r(offs_t offset);
+	void i8255_a_port_a_w(offs_t offset, uint8_t data);
+	void i8255_a_port_b_w(offs_t offset, uint8_t data);
+	void i8255_a_port_c_w(offs_t offset, uint8_t data);
+	uint8_t i8255_b_port_a_r(offs_t offset);
+	uint8_t i8255_b_port_b_r(offs_t offset);
+	uint8_t i8255_b_port_c_r(offs_t offset);
+	void i8255_b_port_a_w(offs_t offset, uint8_t data);
+	void i8255_b_port_b_w(offs_t offset, uint8_t data);
+	void i8255_b_port_c_w(offs_t offset, uint8_t data);
 
 	required_device<i8255_device> m_i8255_a;
 	required_device<i8255_device> m_i8255_b;

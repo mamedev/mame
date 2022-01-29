@@ -15,12 +15,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> m5074x_device
+// ======================> mb9061x_device
 
 class mb9061x_device :  public f2mc16_device
 {
 	friend class mb90610_device;
 	friend class mb90611_device;
+	friend class mb90641_device;
 
 public:
 	const address_space_config m_program_config;
@@ -48,20 +49,20 @@ protected:
 private:
 	// TBC
 	TIMER_CALLBACK_MEMBER(tbtc_tick);
-	READ8_MEMBER(tbtc_r);
-	WRITE8_MEMBER(tbtc_w);
+	u8 tbtc_r();
+	void tbtc_w(u8 data);
 
 	// INTC
-	READ8_MEMBER(intc_r);
-	WRITE8_MEMBER(intc_w);
+	u8 intc_r(offs_t offset);
+	void intc_w(offs_t offset, u8 data);
 	void intc_trigger_irq(int icr, int vector);
 	void intc_clear_irq(int icr, int vector);
 
 	// TIMERS
 	TIMER_CALLBACK_MEMBER(timer0_tick);
 	TIMER_CALLBACK_MEMBER(timer1_tick);
-	READ8_MEMBER(timer_r);
-	WRITE8_MEMBER(timer_w);
+	u8 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u8 data);
 	void recalc_timer(int tnum);
 	void tin_common(int timer, int base, int state);
 
@@ -97,7 +98,18 @@ protected:
 	mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class mb90641_device : public mb9061x_device
+{
+public:
+	mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void mb90641_map(address_map &map);
+protected:
+	mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(MB90610A, mb90610_device)
 DECLARE_DEVICE_TYPE(MB90611A, mb90611_device)
+DECLARE_DEVICE_TYPE(MB90641A, mb90641_device)
 
 #endif // MAME_CPU_F2MC16_MB9061X_H

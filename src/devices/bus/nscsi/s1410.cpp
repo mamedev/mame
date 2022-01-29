@@ -3,7 +3,15 @@
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
 
-DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "scsi_s1410", "S1410 Hard Disk")
+#define LOG_GENERAL (1U << 0)
+#define LOG_COMMAND (1U << 1)
+#define LOG_DATA    (1U << 2)
+
+#define VERBOSE 0
+
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "scsi_s1410", "Xebec S1410 5.25 Inch Winchester Disk Controller")
 
 nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_harddisk_device(mconfig, NSCSI_S1410, tag, owner, clock)
@@ -30,7 +38,7 @@ void nscsi_s1410_device::scsi_command()
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 	case SC_REZERO:
-	case SC_REQUEST_SENSE:
+	case SC_FORMAT_UNIT: // TODO does not support starting LBA
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
@@ -42,12 +50,8 @@ void nscsi_s1410_device::scsi_command()
 		}
 		break;
 
-	case SC_FORMAT_UNIT:
-		if (scsi_cmdbuf[1] >> 5) {
-			scsi_status_complete(SS_NOT_READY);
-			return;
-		}
-
+	case SC_REQUEST_SENSE:
+		scsi_data_in(SBUF_SENSE, 4);
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -79,22 +83,22 @@ void nscsi_s1410_device::scsi_command()
 			return;
 		}
 
-		scsi_data_in(2, 3);
+		scsi_data_out(2, 3);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_INIT_DRIVE_PARAMS:
-		scsi_data_in(2, 8);
+		scsi_data_out(2, 8);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_WRITE_SECTOR_BUFFER:
-		scsi_data_in(2, 512);
+		scsi_data_out(2, bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_READ_SECTOR_BUFFER:
-		scsi_data_out(2, 512);
+		scsi_data_in(2, bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -134,15 +138,22 @@ uint8_t nscsi_s1410_device::scsi_get_data(int id, int pos)
 
 void nscsi_s1410_device::scsi_put_data(int id, int pos, uint8_t data)
 {
+	if(id != 2 && !pos) {
+		return nscsi_harddisk_device::scsi_put_data(id, pos, data);
+	}
+
 	switch(scsi_cmdbuf[0]) {
 	case SC_FORMAT_ALT_TRACK:
+		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		break;
 
 	case SC_INIT_DRIVE_PARAMS:
+		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		params[pos] = data;
 		break;
 
 	case SC_WRITE_SECTOR_BUFFER:
+		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		block[pos] = data;
 		break;
 

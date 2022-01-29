@@ -41,10 +41,10 @@ public:
 	void victory(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(lamp_control_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(video_control_r);
-	DECLARE_WRITE8_MEMBER(video_control_w);
+	void lamp_control_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	uint8_t video_control_r(offs_t offset);
+	void video_control_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

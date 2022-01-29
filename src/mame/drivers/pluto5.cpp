@@ -197,8 +197,8 @@ private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
-	DECLARE_READ32_MEMBER(pluto5_mem_r);
-	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
+	uint32_t pluto5_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pluto5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void pluto5_map(address_map &map);
 
@@ -208,16 +208,17 @@ private:
 	virtual void machine_start() override;
 };
 
-READ32_MEMBER(pluto5_state::pluto5_mem_r)
+uint32_t pluto5_state::pluto5_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
-		case 1:if (offset < 0x100000) // If reading beyond end of region, log error instead of crashing
-			return m_cpuregion[offset];
-
+		case 1:
+			if (offset < 0x100000) // If reading beyond end of region, log error instead of crashing
+				return m_cpuregion[offset];
+			[[fallthrough]];
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 
@@ -226,7 +227,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
+void pluto5_state::pluto5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);

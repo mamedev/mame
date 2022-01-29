@@ -15,8 +15,10 @@
 
 #include "zorro.h"
 #include "machine/autoconfig.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 
+
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,10 +34,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override;
 
 	// device_zorro2_card_interface overrides
@@ -46,27 +48,27 @@ protected:
 
 private:
 	// speed register
-	DECLARE_READ16_MEMBER( speed_r );
-	DECLARE_WRITE16_MEMBER( speed_w );
+	uint16_t speed_r(offs_t offset, uint16_t mem_mask = ~0);
+	void speed_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// ide register
-	DECLARE_READ16_MEMBER( ide_0_cs0_r );
-	DECLARE_WRITE16_MEMBER( ide_0_cs0_w );
-	DECLARE_READ16_MEMBER( ide_0_cs1_r );
-	DECLARE_WRITE16_MEMBER( ide_0_cs1_w );
-	DECLARE_READ16_MEMBER( ide_1_cs0_r );
-	DECLARE_WRITE16_MEMBER( ide_1_cs0_w );
-	DECLARE_READ16_MEMBER( ide_1_cs1_r );
-	DECLARE_WRITE16_MEMBER( ide_1_cs1_w );
+	uint16_t ide_0_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ide_0_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ide_1_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ide_1_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// interrupt register
-	DECLARE_READ16_MEMBER( ide_0_interrupt_r );
-	DECLARE_READ16_MEMBER( ide_1_interrupt_r );
-	DECLARE_WRITE16_MEMBER( ide_interrupt_enable_w );
+	uint16_t ide_0_interrupt_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t ide_1_interrupt_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( ide_0_interrupt_w );
 	DECLARE_WRITE_LINE_MEMBER( ide_1_interrupt_w );
 
-	void mmio_map(address_map &map);
+	void mmio_map(address_map &map) ATTR_COLD;
 
 	required_device<ata_interface_device> m_ata_0;
 	required_device<ata_interface_device> m_ata_1;
@@ -76,7 +78,9 @@ private:
 	int m_ide_1_interrupt;
 };
 
+} // namespace bus::amiga::zorro
+
 // device type definition
-DECLARE_DEVICE_TYPE(BUDDHA, buddha_device)
+DECLARE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H

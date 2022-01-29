@@ -133,7 +133,7 @@ void c64h156_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 	live_run();
@@ -197,7 +197,7 @@ bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
+	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
 		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
 
 	LOG("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
@@ -423,7 +423,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 //  yb_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64h156_device::yb_r )
+uint8_t c64h156_device::yb_r()
 {
 	if (checkpoint_live.accl) {
 		return checkpoint_live.accl_yb;
@@ -437,7 +437,7 @@ READ8_MEMBER( c64h156_device::yb_r )
 //  yb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64h156_device::yb_w )
+void c64h156_device::yb_w(uint8_t data)
 {
 	if (m_yb != data)
 	{

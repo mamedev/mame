@@ -68,13 +68,13 @@ private:
 	uint8_t m_mcu_p3;
 	int m_coin_result;
 
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(e004_r);
-	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_WRITE8_MEMBER(e100_w);
+	uint8_t protection_r();
+	void protection_w(uint8_t data);
+	uint8_t e004_r();
+	void nmi_w(uint8_t data);
+	void e100_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(textram_w);
+	void textram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

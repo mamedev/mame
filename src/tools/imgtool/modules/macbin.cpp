@@ -46,11 +46,14 @@
 
 *****************************************************************************/
 
-#include <string.h>
-
 #include "imgtool.h"
-#include "formats/imageutl.h"
+#include "filter.h"
+
 #include "macutil.h"
+
+#include "formats/imageutl.h"
+
+#include <cstring>
 
 
 

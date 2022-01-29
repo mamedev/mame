@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Cambridge Z88 ROM Cartridges -->
+Cambridge Z88 ROM Cartridges
+-->
 
 <softwarelist name="z88_cart" description="Z88 ROM cartridges">
 

@@ -103,20 +103,20 @@ Schematics show the jumper set to the 6mhz setting.
 #include "buggychl.lh"
 
 
-WRITE8_MEMBER(buggychl_state::bankswitch_w)
+void buggychl_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
 
-WRITE8_MEMBER(buggychl_state::sound_enable_w)
+void buggychl_state::sound_enable_w(uint8_t data)
 {
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
 	//logerror("Sound_enable_w written with data of %02x\n", data);
-	machine().sound().system_enable(data & 1);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
-READ8_MEMBER(buggychl_state::mcu_status_r)
+uint8_t buggychl_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -134,12 +134,12 @@ READ8_MEMBER(buggychl_state::mcu_status_r)
 // a cpu read of soundlatch2 sets ic12.1 so /Q is low, so cpu bit 0 and sound bit 1 read as clear
 // a sound read of soundlatch clears ic12.2 so /Q is high, so cpu bit 1 and sound bit 0 read as set
 // ic12.1 is set and ic12.2 is cleared by /SRESET
-READ8_MEMBER(buggychl_state::sound_status_main_r)
+uint8_t buggychl_state::sound_status_main_r()
 {
 	return (m_soundlatch2->pending_r() ? 1 : 0) | (m_soundlatch->pending_r() ? 0 : 2);
 }
 
-READ8_MEMBER(buggychl_state::sound_status_sound_r)
+uint8_t buggychl_state::sound_status_sound_r()
 {
 	return (m_soundlatch2->pending_r() ? 2 : 0) | (m_soundlatch->pending_r() ? 0 : 1);
 }
@@ -233,7 +233,7 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd820, 0xd83f).ram(); // TODO
 	map(0xd840, 0xd85f).writeonly().share("scrollv");
 	map(0xdb00, 0xdbff).writeonly().share("scrollh");
-	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
+	map(0xdc04, 0xdc04).nopw(); /* should be fg scroll */
 	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
 }
 
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -423,7 +423,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
 
 	PORT_START("WHEEL") /* wheel */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -458,29 +458,29 @@ static GFXDECODE_START( gfx_buggychl )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
+void buggychl_state::ta7630_volbal_msm_w(uint8_t data)
 {
 	m_ta7630->set_device_volume(m_msm, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay1_w)
+void buggychl_state::ta7630_volbal_ay1_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay1, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_0_w)
+void buggychl_state::port_b_0_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay2_w)
+void buggychl_state::ta7630_volbal_ay2_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay2, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_1_w)
+void buggychl_state::port_b_1_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }

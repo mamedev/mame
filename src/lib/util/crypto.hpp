@@ -1,18 +1,31 @@
-// license:MIT
-// copyright-holders:Miodrag Milanovic
-#ifndef CRYPTO_HPP
-#define CRYPTO_HPP
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
+#ifndef MAME_UTIL_CRYPTO_HPP
+#define MAME_UTIL_CRYPTO_HPP
 
-#include "base64.hpp"
-#include "sha1.hpp"
+#pragma once
+
+#include "hashing.h"
+
+#include <cstdint>
+#include <limits>
+#include <string>
+
 
 inline std::string sha1_encode(const std::string& input)
 {
-	char message_digest[20];
-	sha1::calc(input.c_str(),input.length(),reinterpret_cast<unsigned char*>(message_digest));
+	util::sha1_creator digester;
+	const char *ptr = input.c_str();
+	std::string::size_type remain = input.length();
+	while (remain > std::numeric_limits<uint32_t>::max())
+	{
+		digester.append(ptr, std::numeric_limits<uint32_t>::max());
+		ptr += std::numeric_limits<uint32_t>::max();
+		remain -= std::numeric_limits<uint32_t>::max();
+	}
+	digester.append(ptr, uint32_t(remain));
 
-	return std::string(message_digest, sizeof(message_digest));
-
+	return std::string(reinterpret_cast<const char *>(digester.finish().m_raw), 20);
 }
-#endif  /* CRYPTO_HPP */
 
+#endif // MAME_UTIL_CRYPTO_HPP

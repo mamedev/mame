@@ -15,10 +15,10 @@ public:
 	// construction/destruction
 	kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(kof2003_w);
-	DECLARE_WRITE16_MEMBER(kof2003p_w);
-	DECLARE_READ16_MEMBER(overlay_r);
+	uint16_t protection_r(offs_t offset);
+	void kof2003_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void kof2003p_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t overlay_r();
 	void bl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size);
 	void pl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size);
 	void upl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size);

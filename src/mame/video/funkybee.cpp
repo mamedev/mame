@@ -41,13 +41,13 @@ void funkybee_state::funkybee_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_videoram_w)
+void funkybee_state::funkybee_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
+void funkybee_state::funkybee_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(funkybee_state::gfx_bank_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
+void funkybee_state::funkybee_scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(funkybee_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
 	int color = m_colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfx_bank, code, color, 0);
+	tileinfo.set(m_gfx_bank, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
@@ -85,7 +85,7 @@ TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
 
 void funkybee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),this), 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funkybee_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(funkybee_state::funkybee_tilemap_scan)), 8, 8, 32, 32);
 }
 
 void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )

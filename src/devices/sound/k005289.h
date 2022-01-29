@@ -14,19 +14,19 @@ class k005289_device : public device_t,
 public:
 	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( k005289_control_A_w );
-	DECLARE_WRITE8_MEMBER( k005289_control_B_w );
-	DECLARE_WRITE8_MEMBER( ld1_w );
-	DECLARE_WRITE8_MEMBER( ld2_w );
-	DECLARE_WRITE8_MEMBER( tg1_w );
-	DECLARE_WRITE8_MEMBER( tg2_w );
+	void control_A_w(uint8_t data);
+	void control_B_w(uint8_t data);
+	void ld1_w(offs_t offset, uint8_t data);
+	void ld2_w(offs_t offset, uint8_t data);
+	void tg1_w(uint8_t data);
+	void tg2_w(uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void make_mixer_table(int voices);
@@ -36,9 +36,9 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
+	std::unique_ptr<stream_buffer::sample_t []> m_mixer_table;
+	stream_buffer::sample_t *m_mixer_lookup;
+	std::vector<short> m_mixer_buffer;
 
 	uint32_t m_counter[2];
 	uint16_t m_frequency[2];

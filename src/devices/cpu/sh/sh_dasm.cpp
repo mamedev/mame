@@ -38,7 +38,7 @@ uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opc
 		break;
 	case 0x0B:
 		stream << "RTS";
-		flags = STEP_OUT;
+		flags = STEP_OUT | step_over_extra(1);
 		break;
 	case 0x12:
 		util::stream_format(stream, "STS     GBR,%s", regname[Rn]);
@@ -72,7 +72,7 @@ uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opc
 		break;
 	case 0x2B:
 		stream << "RTE";
-		flags = STEP_OUT;
+		flags = STEP_OUT | step_over_extra(1);
 		break;
 	default:
 		switch(opcode & 15)
@@ -708,14 +708,14 @@ uint32_t sh_disassembler::op0000_sh34(std::ostream &stream, uint32_t pc, uint16_
 		{
 		case 0x00:
 			stream << "RTS";
-			flags = STEP_OUT;
+			flags = STEP_OUT | step_over_extra(1);
 			break;
 		case 0x10:
 			stream << "SLEEP";
 			break;
 		case 0x20:
 			stream << "RTE";
-			flags = STEP_OUT;
+			flags = STEP_OUT | step_over_extra(1);
 			break;
 		}
 		break;

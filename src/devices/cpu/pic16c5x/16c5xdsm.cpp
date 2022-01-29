@@ -26,7 +26,7 @@
 #include "emu.h"
 #include "16c5xdsm.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 

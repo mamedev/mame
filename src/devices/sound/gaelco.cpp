@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
                     Gaelco Sound Hardware
 
@@ -37,6 +37,7 @@ Registers per channel:
 
 #include "emu.h"
 #include "gaelco.h"
+
 #include "wavwrite.h"
 
 #define VERBOSE_SOUND 0
@@ -47,7 +48,7 @@ Registers per channel:
 //#define ALT_MIX
 
 #define LOG_WAVE  0
-static wav_file* wavraw; // Raw waveform
+static util::wav_file_ptr wavraw; // Raw waveform
 
 
 /*============================================================================
@@ -64,7 +65,7 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 27) // Unknown address bits
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 {
 }
@@ -76,10 +77,10 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* fill all data needed */
-	for (int j = 0; j < samples; j++)
+	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		int output_l = 0, output_r = 0;
 
@@ -177,19 +178,19 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		outputs[0][j] = output_l;
-		outputs[1][j] = output_r;
+		outputs[0].put_int(j, output_l, 32768);
+		outputs[1].put_int(j, output_r, 32768);
 	}
 
-	if (wavraw)
-		wav_add_data_32lr(wavraw, outputs[0], outputs[1], samples, 0);
+//  if (wavraw)
+//      util::wav_add_data_buffer(*wavraw, outputs[0], outputs[1]);
 }
 
 /*============================================================================
                         CG-1V/GAE1 Read Handler
   ============================================================================*/
 
-READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
+uint16_t gaelco_gae1_device::gaelcosnd_r(offs_t offset)
 {
 	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", machine().describe_context(), offset));
 
@@ -203,7 +204,7 @@ READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
                         CG-1V/GAE1 Write Handler
   ============================================================================*/
 
-WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
+void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sound_channel *channel = &m_channel[offset >> 3];
 
@@ -214,35 +215,53 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 
 	COMBINE_DATA(&m_sndregs[offset]);
 
-	switch(offset & 0x07)
+	switch (offset & 0x07)
 	{
-		case 0x03:
-			/* trigger sound */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+	case 0x03:
+		// if sample end position isn't 0, and length isn't 0
+		if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		{
+			LOG_SOUND(("(GAE1) Playing or Queuing 1st chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+
+			channel->loop = 1;
+
+			if (!channel->active)
 			{
-				if (!channel->active)
-				{
-					channel->active = 1;
-					channel->chunkNum = 0;
-					channel->loop = 0;
-					LOG_SOUND(("(GAE1) Playing sample channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
-				}
+				channel->chunkNum = 0;
 			}
-			else
-				channel->active = 0;
 
-			break;
+			channel->active = 1;
+		}
+		else
+		{
+			//channel->loop = 0;
+			channel->active = 0;
+		}
 
-		case 0x07: /* enable/disable looping */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		break;
+
+	case 0x07:
+		// if sample end position isn't 0, and length isn't 0
+		if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		{
+			LOG_SOUND(("(GAE1) Playing or Queuing 2nd chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+
+			channel->loop = 1;
+
+			if (!channel->active)
 			{
-				LOG_SOUND(("(GAE1) Looping in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
-				channel->loop = 1;
+				channel->chunkNum = 1;
 			}
-			else
-				channel->loop = 0;
 
-			break;
+			channel->active = 1;
+		}
+		else
+		{
+			channel->loop = 0;
+			// channel->active = 0;
+		}
+
+		break;
 	}
 }
 
@@ -261,15 +280,33 @@ void gaelco_gae1_device::device_start()
 			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(VOLUME_LEVELS - 1);
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", rate, 2);
+		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
+
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
+		save_item(NAME(m_channel[ch].active), ch);
+		save_item(NAME(m_channel[ch].loop), ch);
+		save_item(NAME(m_channel[ch].chunkNum), ch);
+	}
+
+	save_item(NAME(m_sndregs));
 }
 
+void gaelco_gae1_device::device_reset()
+{
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
+		m_channel[ch].active = 0;
+		m_channel[ch].loop = 0;
+		m_channel[ch].chunkNum = 0;
+	}
+
+	std::fill(std::begin(m_sndregs), std::end(m_sndregs), 0.0);
+}
 
 void gaelco_gae1_device::device_stop()
 {
-	if (wavraw)
-		wav_close(wavraw);
-	wavraw = nullptr;
+	wavraw.reset();
 }
 
 
@@ -283,11 +320,10 @@ void gaelco_gae1_device::device_clock_changed()
 {
 	u32 rate = clock() / 128;
 	m_stream->set_sample_rate(rate);
-	if (wavraw)
-		wav_close(wavraw);
+	wavraw.reset();
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", rate, 2);
+		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
 }
 
 

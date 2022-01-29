@@ -179,7 +179,7 @@ void pcf8584_device::set_control(u8 data)
 void pcf8584_device::set_clock_frequency(u8 data)
 {
 	LOG("%s: SCL frequency = %.2f kHz (fCLK is nominally %s MHz)\n", machine().describe_context(),
-		(clocks_to_attotime(s_divider[(data & 0x1c) >> 2] * s_prescaler[data & 0x03]) / 3).as_hz() / 1000.0,
+		(clocks_to_attotime(s_divider[(data & 0x1c) >> 2] * s_prescaler[data & 0x03]) / 3).as_khz(),
 		s_nominal_clock[(data & 0x1c) >> 2]);
 	m_s2_clock = data & 0x1f;
 }
@@ -231,7 +231,6 @@ void pcf8584_device::write(offs_t offset, u8 data)
 		set_clock_frequency(data);
 	else
 		set_own_address(data);
-
 }
 
 

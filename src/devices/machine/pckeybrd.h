@@ -22,8 +22,8 @@ class pc_keyboard_device : public device_t
 public:
 	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE_LINE_MEMBER(enable);
+	uint8_t read();
+	void enable(int state);
 
 	auto keypress() { return m_out_keypress_func.bind(); }
 
@@ -37,9 +37,10 @@ public:
 protected:
 	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void queue_insert(uint8_t data);
 	void clear_buffer();
 
@@ -84,11 +85,12 @@ public:
 
 	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(uint8_t data);
 
 	void set_type(KEYBOARD_TYPE type, int default_set) { m_scan_code_set = default_set; m_type = type; }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
 
@@ -114,7 +116,6 @@ private:
 };
 
 INPUT_PORTS_EXTERN( pc_keyboard );
-INPUT_PORTS_EXTERN( at_keyboard );
 
 DECLARE_DEVICE_TYPE(PC_KEYB, pc_keyboard_device)
 DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)

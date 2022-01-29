@@ -58,14 +58,14 @@
 
 /**************************************************************************************/
 
-WRITE16_MEMBER(saturn_state::saturn_soundram_w)
+void saturn_state::saturn_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//machine().scheduler().synchronize(); // force resync
 
 	COMBINE_DATA(&m_sound_ram[offset]);
 }
 
-READ16_MEMBER(saturn_state::saturn_soundram_r)
+uint16_t saturn_state::saturn_soundram_r(offs_t offset)
 {
 	//machine().scheduler().synchronize(); // force resync
 
@@ -73,7 +73,7 @@ READ16_MEMBER(saturn_state::saturn_soundram_r)
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
-WRITE32_MEMBER(saturn_state::minit_w)
+void saturn_state::minit_w(uint32_t data)
 {
 	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
@@ -82,7 +82,7 @@ WRITE32_MEMBER(saturn_state::minit_w)
 	m_slave->pulse_frt_input();
 }
 
-WRITE32_MEMBER(saturn_state::sinit_w)
+void saturn_state::sinit_w(uint32_t data)
 {
 	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
@@ -109,7 +109,7 @@ Shinrei Jusatsushi Taromaru (options menu)
 
 */
 
-WRITE32_MEMBER(saturn_state::saturn_minit_w)
+void saturn_state::saturn_minit_w(uint32_t data)
 {
 	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
@@ -123,7 +123,7 @@ WRITE32_MEMBER(saturn_state::saturn_minit_w)
 	m_slave->pulse_frt_input();
 }
 
-WRITE32_MEMBER(saturn_state::saturn_sinit_w)
+void saturn_state::saturn_sinit_w(uint32_t data)
 {
 	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
@@ -135,7 +135,7 @@ WRITE32_MEMBER(saturn_state::saturn_sinit_w)
 }
 
 
-READ8_MEMBER(saturn_state::saturn_backupram_r)
+uint8_t saturn_state::saturn_backupram_r(offs_t offset)
 {
 	if(!(offset & 1))
 		return 0; // yes, it makes sure the "holes" are there.
@@ -143,7 +143,7 @@ READ8_MEMBER(saturn_state::saturn_backupram_r)
 	return m_backupram[offset >> 1] & 0xff;
 }
 
-WRITE8_MEMBER(saturn_state::saturn_backupram_w)
+void saturn_state::saturn_backupram_w(offs_t offset, uint8_t data)
 {
 	if(!(offset & 1))
 		return;
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
 	printf("m68k RESET opcode triggered\n");
 }
 
-WRITE8_MEMBER(saturn_state::scsp_irq)
+void saturn_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	// don't bother the 68k if it's off
 	if (!m_en_68k)

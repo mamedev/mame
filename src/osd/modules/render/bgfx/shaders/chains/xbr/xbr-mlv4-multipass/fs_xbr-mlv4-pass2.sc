@@ -6,7 +6,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 /*
 
    Hyllian's xBR MultiLevel4 Shader - Pass2
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -225,7 +225,7 @@ void main()
 	vec4 jag9  = clamp(jag91 * jag93 + jag92 * jag94							 , 0.0, 1.0);
 
 	vec4 pe_select = eq(pe, zero) + ((one - nbrs) + jag1) * jag9;
-	
+
 	pe.x = pe_select.x > 0.0 ? pe.x : 1.0;
 	pe.y = pe_select.y > 0.0 ? pe.y : 1.0;
 	pe.z = pe_select.z > 0.0 ? pe.z : 1.0;

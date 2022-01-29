@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/***************************************************************************
+// thanks-to:digshadow, segher
+/*******************************************************************************
 
   Bandai Tamagotchi generation 1 hardware
   * PCB label TMG-M1
   * Seiko Epson E0C6S46 MCU under epoxy
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/e0c6200/e0c6s46.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -18,13 +21,14 @@
 #include "tama.lh"
 
 
+namespace {
+
 class tamag1_state : public driver_device
 {
 public:
 	tamag1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
@@ -33,14 +37,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(speaker_w);
 	void tama_palette(palette_device &palette) const;
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
 
 	required_device<e0c6s46_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
 	output_finder<16, 40> m_out_x;
 };
 
@@ -50,11 +52,9 @@ void tamag1_state::machine_start()
 }
 
 
-/***************************************************************************
-
-  Video
-
-***************************************************************************/
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
@@ -71,7 +71,7 @@ E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 
 	int y = com, x = seg2x[seg];
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = state;
+		bitmap.pix(y, x) = state;
 
 	// 2 rows of indicators:
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
@@ -90,25 +90,9 @@ void tamag1_state::tama_palette(palette_device &palette) const
 
 
 
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
-
-WRITE8_MEMBER(tamag1_state::speaker_w)
-{
-	// R43: speaker out
-	m_speaker->level_w(data >> 3 & 1);
-}
-
-
-
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
@@ -129,18 +113,16 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void tamag1_state::tama(machine_config &config)
 {
 	/* basic machine hardware */
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
 	m_maincpu->set_pixel_update_cb(FUNC(tamag1_state::pixel_update));
-	m_maincpu->write_r<4>().set(FUNC(tamag1_state::speaker_w));
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -156,25 +138,30 @@ void tamag1_state::tama(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
+	ROM_LOAD( "tama.bin", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
 
 	ROM_REGION( 0x3000, "maincpu:test", 0 )
-	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
+	ROM_LOAD( "test.bin", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 ROM_END
 
+} // anonymous namespace
+
+
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
 CONS( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

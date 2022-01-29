@@ -7,11 +7,17 @@
     This component implements the custom video controller and interface chip
     from the TI-99/2 console.
 
+    Also, we emulate the expansion port at the backside of the console; there
+    are no known expansions except for a RAM expansion that is mentioned
+    in the specifications.
+
     May 2018
+    June 2020
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "992board.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -19,11 +25,11 @@
 #define LOG_HEXBUS      (1U<<4)     // Hexbus logging
 #define LOG_BANK        (1U<<5)     // Change ROM banks
 #define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
+#define LOG_EXPRAM      (1U<<7)   // Expansion RAM
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
-#include "992board.h"
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2
@@ -123,13 +129,15 @@
    [2] VDC Controller CF40052
 */
 
-DEFINE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device, "video992_24", "TI-99/2 CRT Controller 24K version")
-DEFINE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device, "video992_32", "TI-99/2 CRT Controller 32K version")
-DEFINE_DEVICE_TYPE_NS(IO99224, bus::ti99::internal, io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
-DEFINE_DEVICE_TYPE_NS(IO99232, bus::ti99::internal, io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
+DEFINE_DEVICE_TYPE(VIDEO99224, bus::ti99::internal::video992_24_device, "video992_24", "TI-99/2 CRT Controller 24K version")
+DEFINE_DEVICE_TYPE(VIDEO99232, bus::ti99::internal::video992_32_device, "video992_32", "TI-99/2 CRT Controller 32K version")
+DEFINE_DEVICE_TYPE(IO99224, bus::ti99::internal::io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
+DEFINE_DEVICE_TYPE(IO99232, bus::ti99::internal::io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
 
+DEFINE_DEVICE_TYPE(TI992_EXPPORT, bus::ti99::internal::ti992_expport_device, "ti992_expport", "TI-99/2 Expansion Port")
+DEFINE_DEVICE_TYPE(TI992_RAM32K, bus::ti99::internal::ti992_expram_device, "ti992_ram32k", "TI-99/2 RAM Expansion 32K")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -167,7 +175,7 @@ std::string video992_device::tts(attotime t)
 }
 
 
-void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int raw_vpos = screen().vpos();
 
@@ -194,7 +202,7 @@ void video992_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	int vpos = raw_vpos * m_vertical_size / screen().height();
-	uint32_t *p = &m_tmpbmp.pix32(vpos);
+	uint32_t *p = &m_tmpbmp.pix(vpos);
 	bool endofline = false;
 
 	int linelength = 0;
@@ -348,16 +356,13 @@ void video992_device::device_reset()
 
 io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
-		m_hexbus(*this, "^" TI_HEXBUS_TAG),
-		m_cassette(*this, "^" TI_CASSETTE),
-		m_videoctrl(*this, "^" TI992_VDC_TAG),
+		m_hexbus(*owner, TI992_HEXBUS_TAG),
+		m_cassette(*owner, TI992_CASSETTE),
+		m_videoctrl(*owner, TI992_VDC_TAG),
 		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
 		m_key_row(0),
-		m_latch_out(0xd7),
-		m_latch_in(0xd7),
-		m_communication_disable(true),
-		m_response_phase(false)
+		m_hsk_released(true)
 {
 }
 
@@ -459,42 +464,42 @@ void io992_device::device_start()
 uint8_t io992_device::cruread(offs_t offset)
 {
 	int address = offset << 1;
-	uint8_t value = 0x7f;  // All Hexbus lines high
 	double inp = 0;
-	int i;
-	uint8_t bit = 1;
 
-	switch (address & 0xf800)
+	// CRU E000-E7fE: Keyboard
+	// Read: 1110 0*** **** xxx0 (mirror 07f0)
+	if ((address & 0xf800)==0xe000)
+		return BIT(m_keyboard[m_key_row]->read(), offset & 7);
+
+	// CRU E800-EFFE: Hexbus and other functions
+	//  Read: 1110 1*** **** xxx0 (mirror 007f0)
+	switch (address & 0xf80e)
 	{
-	case 0xe000:
-		// CRU E000-E7fE: Keyboard
-		//   Read: 0000 1110 0*** **** (mirror 007f)
-		value = m_keyboard[m_key_row]->read();
-		break;
+	// Hexbus
 	case 0xe800:
-		// CRU E800-EFFE: Hexbus and other functions
-		//  Read: 0000 1110 1*** **** (mirror 007f)
-		for (i=0; i < 6; i++)
-		{
-			if ((m_latch_in & m_hexbval[i])==0) value &= ~bit;
-			bit <<= 1;
-		}
-		// e80c (bit 6) seems to be a latch for the response phase
-		if (!m_response_phase)
-			value &= ~0x40;
+	case 0xe802:
+	case 0xe804:
+	case 0xe806:
+		return data_bit(offset&3);
+	case 0xe808:
+		return (bus_hsk_level()==ASSERT_LINE)? 0:1;
+	case 0xe80a:
+		return (bus_bav_level()==ASSERT_LINE)? 0:1;
 
+	case 0xe80c:
+		// e80c (bit 6) seems to indicate that the HSK* line has been released
+		// and is now asserted again
+		return (m_hsk_released && (bus_hsk_level()==ASSERT_LINE))? 1:0;
+
+	case 0xe80e:
 		inp = m_cassette->input();
-		if (inp > 0)
-			value |= 0x80;
 		LOGMASKED(LOG_CASSETTE, "value=%f\n", inp);
-		break;
+		return (inp > 0)? 1:0;
+
 	default:
-		LOGMASKED(LOG_CRU, "Unknown access to %04x\n", address);
+		LOGMASKED(LOG_CRU, "Invalid CRU access to %04x\n", address);
 	}
-
-	LOGMASKED(LOG_CRU, "CRU %04x ->  %02x\n", address, value);
-
-	return BIT(value, offset & 7);
+	return 0;
 }
 
 void io992_device::cruwrite(offs_t offset, uint8_t data)
@@ -502,8 +507,6 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 	int address = (offset << 1) & 0xf80e;
 
 	LOGMASKED(LOG_CRU, "CRU %04x <- %1x\n", address, data);
-
-	uint8_t olddata = m_latch_out;
 
 	switch (address)
 	{
@@ -518,7 +521,7 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 			LOGMASKED(LOG_BANK, "set bank = %d\n", data);
 			m_set_rom_bank(data==1);
 		}
-		// no break
+		[[fallthrough]];
 	case 0xe002:
 	case 0xe004:
 	case 0xe006:
@@ -539,46 +542,22 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 	case 0xe802:  // ID1
 	case 0xe804:  // ID2
 	case 0xe806:  // ID3
-		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
-		else m_latch_out &= ~m_hexbval[offset & 0x07];
-		LOGMASKED(LOG_HEXBUS, "Hexbus latch out = %02x\n", m_latch_out);
+		set_data_latch(data, offset & 0x03);
 		break;
-	case 0xe80a:  // BAV
-		// Undocumented, but makes sense according to the ROM
-		if (data==0)
-			m_response_phase = false;
-		// no break
-	case 0xe808:  // HSK
-		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
-		else m_latch_out &= ~m_hexbval[offset & 0x07];
 
-		if (m_latch_out != olddata)
-		{
-			LOGMASKED(LOG_HEXBUS, "%s %s\n", (address==0xe808)? "HSK*" : "BAV*", (data==0)? "assert" : "clear");
-			if (m_communication_disable)
-			{
-				// This is not explicitly stated in the specs, but since they
-				// also claim that communication is disabled on power-up,
-				// we must turn it on here; the ROM fails to do it.
-				LOGMASKED(LOG_HEXBUS, "Enabling Hexbus\n");
-				m_communication_disable = false;
-			}
-			LOGMASKED(LOG_HEXBUS, "Writing to Hexbus: BAV*=%d, HSK*=%d, DATA=%01x\n", (m_latch_out&0x04)!=0, (m_latch_out&0x10)!=0, ((m_latch_out>>4)&0x0c)|(m_latch_out&0x03));
-			hexbus_write(m_latch_out);
-			// Check how the bus has changed. This depends on the states of all
-			// connected peripherals
-			m_latch_in = hexbus_read();
-		}
+	case 0xe80a:  // BAV
+		set_bav_line(data!=0? CLEAR_LINE : ASSERT_LINE);
 		break;
+
+	case 0xe808:  // HSK
+		set_hsk_line(data!=0? CLEAR_LINE : ASSERT_LINE);
+		m_hsk_released = (bus_hsk_level()==CLEAR_LINE);
+		break;
+
 	case 0xe80c:
-		LOGMASKED(LOG_HEXBUS, "Hexbus inhibit = %d\n", data);
-		if (data == 1)
-		{
-			m_latch_in = 0xd7;
-			m_communication_disable = true;
-		}
-		else m_communication_disable = false;
+		set_communication_enabled(data == 0);
 		break;
+
 	case 0xe80e:
 		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
 		// Tape output. See also ti99_4x.cpp.
@@ -601,29 +580,23 @@ void io992_device::hexbus_value_changed(uint8_t data)
 {
 	// Only latch the incoming data when BAV* is asserted and the Hexbus
 	// is not inhibited
-	bool bav_asserted = ((m_latch_out & bus::hexbus::HEXBUS_LINE_BAV)==0);
-	if (!m_communication_disable && bav_asserted)
+	if (own_bav_level()==ASSERT_LINE)
 	{
-		LOGMASKED(LOG_HEXBUS, "Hexbus changed and latched: %02x\n", data);
-		m_latch_in = data;
-
-		if ((data & bus::hexbus::HEXBUS_LINE_HSK)==0)
+		if (bus_hsk_level()==ASSERT_LINE)
 		{
-			// If HSK* is lowered and we as the host have it up, this indicates
-			// the response phase.
-			if (!m_response_phase && (m_myvalue & bus::hexbus::HEXBUS_LINE_HSK)!=0)
-			{
-				LOGMASKED(LOG_HEXBUS, "Incoming response\n");
-				m_response_phase = true;
-			}
-			// We cannot wait for the CPU explicitly latching HSK*
-			// as designed, because this implies a true parallel execution
-			LOGMASKED(LOG_HEXBUS, "Latching HSK*\n");
-			m_myvalue &= ~bus::hexbus::HEXBUS_LINE_HSK;
+			// According to the Hexbus spec, the incoming HSK must be latched
+			// by hardware
+			LOGMASKED(LOG_HEXBUS, "Latching HSK*; got data %01x\n", (data>>4)|(data&3));
+			latch_hsk();
+		}
+		else
+		{
+			LOGMASKED(LOG_HEXBUS, "HSK* released\n");
+			m_hsk_released = true;
 		}
 	}
 	else
-		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), latch=%s, BAV*=%d\n", data, m_communication_disable? "inhibit":"enabled", bav_asserted? 0:1);
+		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), BAV*=%d\n", data, (own_bav_level()==ASSERT_LINE)? 0:1);
 }
 
 ioport_constructor io992_device::device_input_ports() const
@@ -631,6 +604,82 @@ ioport_constructor io992_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keys992 );
 }
 
-}   }   }
+/********************************************************************
+    Expansion port
+********************************************************************/
 
+ti992_expport_device::ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	:   device_t(mconfig, TI992_EXPPORT, tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_connected(nullptr)
+{
+}
+
+void ti992_expport_device::readz(offs_t offset, uint8_t *value)
+{
+	if (m_connected != nullptr)
+		m_connected->readz(offset, value);
+}
+
+void ti992_expport_device::write(offs_t offset, uint8_t data)
+{
+	if (m_connected != nullptr)
+		m_connected->write(offset, data);
+}
+
+void ti992_expport_device::device_config_complete()
+{
+	m_connected = static_cast<ti992_expport_attached_device*>(subdevices().first());
+}
+
+/*
+    32K Expansion cartridge
+    Maps at 6000 - DFFF
+    This is the only known expansion device
+*/
+ti992_expram_device::ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ti992_expport_attached_device(mconfig, TI992_RAM32K, tag, owner, clock),
+	m_ram(*this, "ram32k")
+{
+}
+
+void ti992_expram_device::readz(offs_t offset, uint8_t *value)
+{
+	// 000 -> 100     100 -> 000
+	// 001 -> 101     101 -> 001
+	// 010 -> 110     110 -> 010
+	// 011 -> 011     111 -> 111
+	offs_t address = offset;
+	if ((offset & 0x6000) != 0x6000) address ^= 0x8000;
+	if ((address & 0x8000)==0)
+	{
+		*value = m_ram->read(address);
+		LOGMASKED(LOG_EXPRAM, "expram %04x -> %02x\n", offset, *value);
+	}
+}
+
+void ti992_expram_device::write(offs_t offset, uint8_t value)
+{
+	offs_t address = offset;
+	if ((offset & 0x6000) != 0x6000) address ^= 0x8000;
+	if ((address & 0x8000)==0)
+	{
+		m_ram->write(address, value);
+		LOGMASKED(LOG_EXPRAM, "expram %04x <- %02x\n", offset, value);
+	}
+}
+
+void ti992_expram_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("32k");
+	m_ram->set_default_value(0);
+}
+
+} // namespace bus::ti99::internal
+
+void ti992_expport_options(device_slot_interface &device)
+{
+	device.option_add("ram32k", TI992_RAM32K);
+}
 

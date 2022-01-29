@@ -5,9 +5,10 @@
 //  debugwin.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DEBUGWIN_H
+#define MAME_DEBUGGER_WIN_DEBUGWIN_H
 
-#ifndef __DEBUG_WIN_DEBUG_WIN_H__
-#define __DEBUG_WIN_DEBUG_WIN_H__
+#pragma once
 
 // standard windows headers
 #include <windows.h>
@@ -17,7 +18,6 @@
 #ifdef _MSC_VER
 #include <zmouse.h>
 #endif
-
 
 
 class debugview_info;

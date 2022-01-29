@@ -108,7 +108,7 @@ int subs_state::steering_2()
 /***************************************************************************
 steer_reset
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::steer_reset_w)
+void subs_state::steer_reset_w(uint8_t data)
 {
 	m_steering_val1 = 0x00;
 	m_steering_val2 = 0x00;
@@ -117,7 +117,7 @@ WRITE8_MEMBER(subs_state::steer_reset_w)
 /***************************************************************************
 control_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::control_r)
+uint8_t subs_state::control_r(offs_t offset)
 {
 	int inport = ioport("IN0")->read();
 
@@ -139,7 +139,7 @@ READ8_MEMBER(subs_state::control_r)
 /***************************************************************************
 coin_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::coin_r)
+uint8_t subs_state::coin_r(offs_t offset)
 {
 	int inport = ioport("IN1")->read();
 
@@ -161,7 +161,7 @@ READ8_MEMBER(subs_state::coin_r)
 /***************************************************************************
 options_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::options_r)
+uint8_t subs_state::options_r(offs_t offset)
 {
 	int opts = ioport("DSW")->read();
 

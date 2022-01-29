@@ -47,7 +47,7 @@ void msx_cart_fmpac_device::device_start()
 	save_item(NAME(m_7ff6));
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(FUNC(msx_cart_fmpac_device::write_ym2413), this));
+	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
 }
 
 

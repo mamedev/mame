@@ -31,7 +31,7 @@ class saturn_state : public driver_device
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rom(*this, "bios", 0x20000),
+			m_rom(*this, "bios"),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	// SMPC HLE delegates
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
@@ -85,7 +85,7 @@ protected:
 	attotime  m_sinit_boost_timeslice;
 
 	struct {
-		uint16_t    **framebuffer_display_lines;
+		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
 		int       framebuffer_mode;
 		int       framebuffer_double_interlace;
 		int       fbcr_accessed;
@@ -96,9 +96,9 @@ protected:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		std::unique_ptr<uint16_t[]>   framebuffer[2];
-		uint16_t    **framebuffer_draw_lines;
-		std::unique_ptr<uint8_t[]>     gfx_decode;
+		std::unique_ptr<uint16_t []> framebuffer[2];
+		std::unique_ptr<uint16_t * []> framebuffer_draw_lines;
+		std::unique_ptr<uint8_t []> gfx_decode;
 		uint16_t    lopr;
 		uint16_t    copr;
 		uint16_t    ewdr;
@@ -139,32 +139,32 @@ protected:
 
 
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
-	DECLARE_READ16_MEMBER(saturn_soundram_r);
-	DECLARE_WRITE32_MEMBER(minit_w);
-	DECLARE_WRITE32_MEMBER(sinit_w);
-	DECLARE_WRITE32_MEMBER(saturn_minit_w);
-	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
-	DECLARE_READ8_MEMBER(saturn_backupram_r);
-	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
+	void saturn_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t saturn_soundram_r(offs_t offset);
+	void minit_w(uint32_t data);
+	void sinit_w(uint32_t data);
+	void saturn_minit_w(uint32_t data);
+	void saturn_sinit_w(uint32_t data);
+	uint8_t saturn_backupram_r(offs_t offset);
+	void saturn_backupram_w(offs_t offset, uint8_t data);
 
 	int m_scsp_last_line;
 
-	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp1_framebuffer0_r );
+	uint16_t saturn_vdp1_regs_r(offs_t offset);
+	uint32_t saturn_vdp1_vram_r(offs_t offset);
+	uint32_t saturn_vdp1_framebuffer0_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER ( saturn_vdp1_regs_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp1_vram_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp1_framebuffer0_w );
+	void saturn_vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void saturn_vdp1_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void saturn_vdp1_framebuffer0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER ( saturn_vdp2_vram_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp2_cram_r );
-	DECLARE_READ16_MEMBER ( saturn_vdp2_regs_r );
+	uint32_t saturn_vdp2_vram_r(offs_t offset);
+	uint32_t saturn_vdp2_cram_r(offs_t offset);
+	uint16_t saturn_vdp2_regs_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( saturn_vdp2_vram_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp2_cram_w );
-	DECLARE_WRITE16_MEMBER ( saturn_vdp2_regs_w );
+	void saturn_vdp2_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void saturn_vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void saturn_vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
 	/* VDP1 */
@@ -439,8 +439,8 @@ protected:
 	} stv_rbg_cache_data;
 
 //  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-//  DECLARE_READ16_MEMBER(scudsp_dma_r);
-//  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+//  uint16_t scudsp_dma_r(offs_t offset);
+//  void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 //  void debug_scudma_command(int ref, const std::vector<std::string> &params);
 //  void debug_scuirq_command(int ref, const std::vector<std::string> &params);

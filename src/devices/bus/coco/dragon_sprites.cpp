@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(DRAGON_SPRITES, dragon_sprites_device, "dragon_sprites", "Dra
 //  dragon_sprites_device - constructor
 //-------------------------------------------------
 
-dragon_sprites_device::dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dragon_sprites_device::dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DRAGON_SPRITES, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_eprom(*this, "eprom")
@@ -74,9 +74,9 @@ const tiny_rom_entry *dragon_sprites_device::device_rom_region() const
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_sprites_device::cts_read)
+u8 dragon_sprites_device::cts_read(offs_t offset)
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 	switch (offset)
 	{
 	case 0x2000:
@@ -97,7 +97,7 @@ READ8_MEMBER(dragon_sprites_device::cts_read)
 //  cts_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_sprites_device::cts_write)
+void dragon_sprites_device::cts_write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

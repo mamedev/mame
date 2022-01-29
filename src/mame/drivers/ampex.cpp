@@ -42,18 +42,18 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(write_54xx);
-	DECLARE_READ8_MEMBER(read_5840);
-	DECLARE_WRITE8_MEMBER(write_5840);
-	DECLARE_READ8_MEMBER(read_5841);
-	DECLARE_WRITE8_MEMBER(write_5841);
-	DECLARE_READ8_MEMBER(read_5842);
-	DECLARE_WRITE8_MEMBER(write_5843);
-	DECLARE_READ8_MEMBER(read_5846);
-	DECLARE_READ8_MEMBER(read_5847);
+	void write_54xx(u8 data);
+	u8 read_5840();
+	void write_5840(u8 data);
+	u8 read_5841();
+	void write_5841(u8 data);
+	u8 read_5842();
+	void write_5843(u8 data);
+	u8 read_5846();
+	u8 read_5847();
 
-	DECLARE_READ8_MEMBER(page_r);
-	DECLARE_WRITE8_MEMBER(page_w);
+	u8 page_r(offs_t offset);
+	void page_w(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
 	DECLARE_WRITE_LINE_MEMBER(so_w);
@@ -81,25 +81,25 @@ u32 ampex_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
-WRITE8_MEMBER(ampex_state::write_54xx)
+void ampex_state::write_54xx(u8 data)
 {
 	// Written during keyboard polling
 }
 
-READ8_MEMBER(ampex_state::read_5840)
+u8 ampex_state::read_5840()
 {
 	logerror("%s: Read from 5840\n", machine().describe_context());
 	return 0;
 }
 
-WRITE8_MEMBER(ampex_state::write_5840)
+void ampex_state::write_5840(u8 data)
 {
 	m_page = (data & 0x30) >> 4;
 
 	logerror("%s: Write %02X to 5840\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(ampex_state::read_5841)
+u8 ampex_state::read_5841()
 {
 	u8 result = m_uart->dav_r() << 3;
 	result |= m_uart->or_r() << 4;
@@ -108,37 +108,37 @@ READ8_MEMBER(ampex_state::read_5841)
 	return result;
 }
 
-WRITE8_MEMBER(ampex_state::write_5841)
+void ampex_state::write_5841(u8 data)
 {
 	m_uart_loopback = BIT(data, 7);
 	m_attr_readback = BIT(data, 5);
 }
 
-READ8_MEMBER(ampex_state::read_5842)
+u8 ampex_state::read_5842()
 {
 	//logerror("%s: Read from 5842\n", machine().describe_context());
 	return 0;
 }
 
-WRITE8_MEMBER(ampex_state::write_5843)
+void ampex_state::write_5843(u8 data)
 {
 	//logerror("%s: Write %02X to 5843\n", machine().describe_context(), data);
 	m_attr = (data & 0x78) >> 3;
 }
 
-READ8_MEMBER(ampex_state::read_5846)
+u8 ampex_state::read_5846()
 {
 	// probably acknowledges RST 6 interrupt (value not used)
 	return 0;
 }
 
-READ8_MEMBER(ampex_state::read_5847)
+u8 ampex_state::read_5847()
 {
 	// acknowledges RST 4/5 interrupt (value not used)
 	return 0;
 }
 
-READ8_MEMBER(ampex_state::page_r)
+u8 ampex_state::page_r(offs_t offset)
 {
 	if (m_attr_readback)
 		return 0x87 | m_paged_ram[m_page * 0x1800 + offset] >> 5;
@@ -146,7 +146,7 @@ READ8_MEMBER(ampex_state::page_r)
 		return 0xff & m_paged_ram[m_page * 0x1800 + offset];
 }
 
-WRITE8_MEMBER(ampex_state::page_w)
+void ampex_state::page_w(offs_t offset, u8 data)
 {
 	m_paged_ram[m_page * 0x1800 + offset] = data | m_attr << 8;
 }

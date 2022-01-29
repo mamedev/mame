@@ -21,7 +21,7 @@ class device_a2gameio_interface;
 
 // ======================> apple2_gameio_device
 
-class apple2_gameio_device : public device_t, public device_slot_interface
+class apple2_gameio_device : public device_t, public device_single_card_slot_interface<device_a2gameio_interface>
 {
 public:
 	// construction/destruction
@@ -67,6 +67,9 @@ public:
 	// utility strobe (active low)
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
+	// check if a device is connected
+	bool is_device_connected() { return (m_intf != nullptr); }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -82,14 +85,16 @@ private:
 
 // ======================> device_a2gameio_interface
 
-class device_a2gameio_interface : public device_slot_card_interface
+class device_a2gameio_interface : public device_interface
 {
 	friend class apple2_gameio_device;
+
+public:
+	virtual ~device_a2gameio_interface();
 
 protected:
 	// construction/destruction
 	device_a2gameio_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_a2gameio_interface();
 
 	// optional input overrides
 	virtual u8 pdl0_r() { return 0; }

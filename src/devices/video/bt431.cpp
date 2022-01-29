@@ -128,19 +128,19 @@ void bt431_device::reg_w(u8 data)
 
 	case REG_CURSOR_X_LO:
 		m_cursor_x = (m_cursor_x & 0x0f00) | data;
-		LOG("cursor x low register: 0x%02x\n", data);
+		LOG("cursor x low register: 0x%02x (%s)\n", data, machine().describe_context());
 		break;
 	case REG_CURSOR_X_HI:
 		m_cursor_x = (u16(data & 0xf) << 8) | (m_cursor_x & 0xff);
-		LOG("cursor x high register: 0x%02x\n", data);
+		LOG("cursor x high register: 0x%02x (%s)\n", data, machine().describe_context());
 		break;
 	case REG_CURSOR_Y_LO:
 		m_cursor_y = (m_cursor_y & 0x0f00) | data;
-		LOG("cursor y low register: 0x%02x\n", data);
+		LOG("cursor y low register: 0x%02x (%s)\n", data, machine().describe_context());
 		break;
 	case REG_CURSOR_Y_HI:
 		m_cursor_y = (u16(data & 0xf) << 8) | (m_cursor_y & 0xff);
-		LOG("cursor y high register: 0x%02x\n", data);
+		LOG("cursor y high register: 0x%02x (%s)\n", data, machine().describe_context());
 		break;
 
 	case REG_WINDOW_X_LO:

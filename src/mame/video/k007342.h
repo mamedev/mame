@@ -8,23 +8,23 @@
 #include "tilemap.h"
 
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags)> k007342_delegate;
-
 class k007342_device : public device_t
 {
 public:
+	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags)>;
+
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//  configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
-	template <typename... T> void set_tile_callback(T &&... args) { m_callback = k007342_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( scroll_r );
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	DECLARE_WRITE8_MEMBER( vreg_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t scroll_r(offs_t offset);
+	void scroll_w(offs_t offset, uint8_t data);
+	void vreg_w(offs_t offset, uint8_t data);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority);
@@ -49,7 +49,7 @@ private:
 	uint16_t   m_scrollx[2];
 	uint8_t    m_scrolly[2];
 	required_device<gfxdecode_device> m_gfxdecode;
-	k007342_delegate m_callback;
+	tile_delegate m_callback;
 	int m_gfxnum;
 
 	TILEMAP_MAPPER_MEMBER(scan);

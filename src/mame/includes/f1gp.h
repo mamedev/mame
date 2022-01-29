@@ -71,12 +71,12 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpb
 	required_device<acia6850_device> m_acia;
 
-	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
-	DECLARE_READ8_MEMBER(command_pending_r);
-	DECLARE_WRITE16_MEMBER(rozvideoram_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(gfxctrl_w);
+	void sh_bankswitch_w(uint8_t data);
+	uint8_t command_pending_r();
+	void rozvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fgscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfxctrl_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	virtual void machine_start() override;
@@ -93,8 +93,8 @@ private:
 	/* devices */
 	optional_device_array<vsystem_spr2_device, 2> m_spr_old; // f1gp
 
-	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
-	DECLARE_WRITE16_MEMBER(rozgfxram_w);
+	void f1gpb_misc_w(uint16_t data);
+	void rozgfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 
 	virtual void video_start() override;
@@ -124,7 +124,7 @@ private:
 	/* devices */
 	optional_device<vsystem_spr_device> m_spr; // f1gp2
 
-	DECLARE_WRITE8_MEMBER(rozbank_w);
+	void rozbank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 

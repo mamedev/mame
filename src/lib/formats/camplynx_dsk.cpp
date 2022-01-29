@@ -19,8 +19,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/camplynx_dsk.h"
 
 camplynx_format::camplynx_format() : wd177x_format(formats)

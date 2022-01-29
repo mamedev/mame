@@ -120,6 +120,8 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 #define LOGNVRAM(...)   LOGMASKED(LOG_NVRAM, __VA_ARGS__)
 
 
+namespace {
+
 class univac_state : public driver_device
 {
 public:
@@ -138,10 +140,8 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_p_nvram(*this, "nvram")
-		, m_bank_mask(0)
 		, m_parity_poison(false)
 		, m_display_enable(false)
-		, m_framecnt(0)
 		, m_nvram_protect(false)
 		, m_alarm_enable(false)
 		, m_alarm_toggle(false)
@@ -157,6 +157,9 @@ public:
 
 	void uts10(machine_config &config);
 	void uts20(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	u8 ram_r(offs_t offset);
@@ -187,7 +190,6 @@ private:
 	void mem_map(address_map &map);
 	void uts10_io_map(address_map &map);
 	void uts10_map(address_map &map);
-	virtual void machine_start() override;
 
 	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
@@ -206,24 +208,24 @@ private:
 	required_shared_ptr<u8> m_p_nvram;
 	std::unique_ptr<u8 []>  m_p_parity;
 
-	u16 m_disp_mask;
-	u16 m_bank_mask;
-	bool m_parity_poison;
-	bool m_display_enable;
-	u8  m_framecnt;
-	bool m_nvram_protect;
+	u16 m_disp_mask = 0U;
+	u16 m_bank_mask = 0U;
+	bool m_parity_poison = 0;
+	bool m_display_enable = 0;
+	u8 m_framecnt = 0U;
+	bool m_nvram_protect = 0;
 
-	bool m_alarm_enable;
-	bool m_alarm_toggle;
+	bool m_alarm_enable = 0;
+	bool m_alarm_toggle = 0;
 
-	bool m_loopback_control;
-	bool m_comm_rxd;
-	bool m_sio_txda;
-	bool m_aux_rxd;
-	bool m_sio_txdb;
-	bool m_sio_rtsb;
-	bool m_aux_dsr;
-	bool m_sio_wrdyb;
+	bool m_loopback_control = 0;
+	bool m_comm_rxd = 0;
+	bool m_sio_txda = 0;
+	bool m_aux_rxd = 0;
+	bool m_sio_txdb = 0;
+	bool m_sio_rtsb = 0;
+	bool m_aux_dsr = 0;
+	bool m_sio_wrdyb = 0;
 };
 
 
@@ -481,6 +483,9 @@ void univac_state::machine_start()
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_aux_dsr));
 	save_item(NAME(m_sio_wrdyb));
+	save_item(NAME(m_disp_mask));
+
+	m_disp_mask = 0;
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -501,7 +506,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	{
 		for (u8 ra = 0; ra < 14; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = ma; x < ma + 80; x++)
 			{
@@ -534,7 +539,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 }
 
 /* F4 Character Displayer */
-static const gfx_layout uts_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 14,                   /* 8 x 14 characters */
 	128,                    /* 128 characters */
@@ -548,7 +553,7 @@ static const gfx_layout uts_charlayout =
 };
 
 static GFXDECODE_START( gfx_uts )
-	GFXDECODE_ENTRY( "chargen", 0x0000, uts_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 static const z80_daisy_config daisy_chain[] =
@@ -670,6 +675,8 @@ ROM_START( uts20 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, BAD_DUMP CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

@@ -323,7 +323,10 @@ void upd7810_device::DIV_B()
 		B = remainder;
 	}
 	else
-		EA = 0xffff;    /* guess */
+	{
+		B = EAL;
+		EA = 0xffff;
+	}
 }
 
 /* 48 3f: 0100 1000 0011 1111 */
@@ -337,15 +340,18 @@ void upd7810_device::DIV_C()
 		C = remainder;
 	}
 	else
-		EA = 0xffff;    /* guess */
+	{
+		C = EAL;
+		EA = 0xffff;
+	}
 }
 
 /* 48 40: 0100 1000 0100 0000 */
 void upd7810_device::SKIT_NMI()
 {
-	if (IRR & INTNMI)
+	if (m_nmi == CLEAR_LINE) // 1 pin level
 		PSW |= SK;
-	IRR &= ~INTNMI;
+	// INTFNMI is not tested or changed
 }
 
 /* 48 41: 0100 1000 0100 0001 */
@@ -487,9 +493,9 @@ void upd7810_device::SKIT_SB()
 /* 48 60: 0100 1000 0110 0000 */
 void upd7810_device::SKNIT_NMI()
 {
-	if (0 == (IRR & INTNMI))
+	if (m_nmi == ASSERT_LINE) // 0 pin level
 		PSW |= SK;
-	IRR &= ~INTNMI;
+	// INTFNMI is not tested or changed
 }
 
 /* 48 61: 0100 1000 0110 0001 */
@@ -931,25 +937,25 @@ void upd7810_device::MOV_A_RXB()
 /* 4c e0: 0100 1100 1110 0000 */
 void upd7810_device::MOV_A_CR0()
 {
-	A = CR0;
+	A = CR[0];
 }
 
 /* 4c e1: 0100 1100 1110 0001 */
 void upd7810_device::MOV_A_CR1()
 {
-	A = CR1;
+	A = CR[1];
 }
 
 /* 4c e2: 0100 1100 1110 0010 */
 void upd7810_device::MOV_A_CR2()
 {
-	A = CR2;
+	A = CR[2];
 }
 
 /* 4c e3: 0100 1100 1110 0011 */
 void upd7810_device::MOV_A_CR3()
 {
-	A = CR3;
+	A = CR[3];
 }
 
 /* prefix 4D */
@@ -1047,25 +1053,37 @@ void upd7810_device::MOV_MCC_A()
 /* 4d d2: 0100 1101 1101 0010 */
 void upd7810_device::MOV_MA_A()
 {
+	if (MA == A)
+		return;
 	MA = A;
+	WP(UPD7810_PORTA, m_pa_out);
 }
 
 /* 4d d3: 0100 1101 1101 0011 */
 void upd7810_device::MOV_MB_A()
 {
+	if (MB == A)
+		return;
 	MB = A;
+	WP(UPD7810_PORTB, m_pb_out);
 }
 
 /* 4d d4: 0100 1101 1101 0100 */
 void upd7810_device::MOV_MC_A()
 {
+	if (MC == A)
+		return;
 	MC = A;
+	WP(UPD7810_PORTC, m_pc_out);
 }
 
 /* 4d d7: 0100 1101 1101 0111 */
 void upd7810_device::MOV_MF_A()
 {
+	if (MF == A)
+		return;
 	MF = A;
+	WP(UPD7810_PORTF, m_pf_out);
 }
 
 /* 4d d8: 0100 1101 1101 1000 */
@@ -9147,7 +9165,7 @@ void upd7810_device::DCX_EA()
 /* aa: 1010 1010 */
 void upd7810_device::EI()
 {
-	IFF = 1;
+	m_iff_pending = 1;
 }
 
 /* ab: 1010 1011 dddd dddd */
@@ -9277,7 +9295,7 @@ void upd7810_device::RETS()
 /* ba: 1011 1010 */
 void upd7810_device::DI()
 {
-	IFF = 0;
+	IFF = m_iff_pending = 0;
 }
 
 /* bb: 1011 1011 dddd dddd */

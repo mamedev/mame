@@ -54,16 +54,13 @@ public:
 	DECLARE_READ_LINE_MEMBER(eoc_r) { return get_output_pin(EOC); }
 	DECLARE_READ_LINE_MEMBER(so_r) { return get_output_pin(SO); }
 
-	/* Reead the received data */
+	/* Read the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
-	uint8_t get_received_data();
+	uint8_t receive();
 
 	/* Set the transmitter buffer */
 	/* The data to transmit is set on DB1-DB8 (pins 26-33) */
-	void set_transmit_data( uint8_t data );
-
-	DECLARE_READ8_MEMBER(receive);
-	DECLARE_WRITE8_MEMBER(transmit);
+	void transmit( uint8_t data );
 
 protected:
 	enum input_pin

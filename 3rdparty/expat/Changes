@@ -1,3 +1,599 @@
+NOTE: We are looking for help with a few things:
+      https://github.com/libexpat/libexpat/labels/help%20wanted
+      If you can help, please get in touch.  Thanks!
+
+Release 2.2.10 Sat October 3 2020
+        Bug fixes:
+  #390 #395 #398  Fix undefined behavior during parsing caused by
+                    pointer arithmetic with NULL pointers
+       #404 #405  Fix reading uninitialized variable during parsing
+            #406  xmlwf: Add missing check for malloc NULL return
+
+        Other changes:
+            #396  Windows: Drop support for Visual Studio <=8.0/2005
+            #409  Windows: Add missing file "Changes" to the installer
+                    to fix compilation with CMake from installed sources
+            #403  xmlwf: Document exit codes in xmlwf manpage and
+                    exit with code 3 (rather than code 1) for output errors
+                    when used with "-d DIRECTORY"
+       #356 #359  MinGW: Provide declaration of rand_s for mingwrt <5.3.0
+       #383 #392  Autotools: Use -Werror while configure tests the compiler
+                    for supported compile flags to avoid false positives
+  #383 #393 #394  Autotools: Improve handling of user (C|CPP|CXX|LD)FLAGS,
+                    e.g. ensure that they have the last word over flags added
+                    while running ./configure
+            #360  CMake: Create libexpatw.{dll,so} and expatw.pc (with emphasis
+                    on suffix "w") with -DEXPAT_CHAR_TYPE=(ushort|wchar_t)
+            #360  CMake: Detect and deny unsupported build combinations
+                    involving -DEXPAT_CHAR_TYPE=(ushort|wchar_t)
+            #360  CMake: Install pre-compiled shipped xmlwf.1 manpage in case
+                    of -DEXPAT_BUILD_DOCS=OFF
+  #375 #380 #419  CMake: Fix use of Expat by means of add_subdirectory
+       #407 #408  CMake: Keep expat target name constant at "expat"
+                    (i.e. refrain from using the target name to control
+                    build artifact filenames)
+            #385  CMake: Fix compilation with -DEXPAT_SHARED_LIBS=OFF for
+                    Windows
+                  CMake: Expose man page compilation as target "xmlwf-manpage"
+       #413 #414  CMake: Introduce option EXPAT_BUILD_PKGCONFIG
+                    to control generation of pkg-config file "expat.pc"
+            #424  CMake: Add minimalistic support for building binary packages
+                    with CMake target "package"; based on CPack
+            #366  CMake: Add option -DEXPAT_OSSFUZZ_BUILD=(ON|OFF) with
+                    default OFF to build fuzzer code against OSS-Fuzz and
+                    related environment variable LIB_FUZZING_ENGINE
+            #354  Fix testsuite for -DEXPAT_DTD=OFF and -DEXPAT_NS=OFF, each
+    #354 #355 ..
+       #356 #412  Address compiler warnings
+       #368 #369  Address pngcheck warnings with doc/*.png images
+                  Version info bumped from 7:11:6 to 7:12:6
+
+        Special thanks to:
+            asavah
+            Ben Wagner
+            Bhargava Shastry
+            Frank Landgraf
+            Jeffrey Walton
+            Joe Orton
+            Kleber Tarcísio
+            Ma Lin
+            Maciej Sroczyński
+            Mohammed Khajapasha
+            Vadim Zeitlin
+                 and
+            Cppcheck 2.0 and the Cppcheck team
+
+Release 2.2.9 Wed September 25 2019
+        Other changes:
+                  examples: Drop executable bits from elements.c
+            #349  Windows: Change the name of the Windows DLLs from expat*.dll
+                    to libexpat*.dll once more (regression from 2.2.8, first
+                    fixed in 1.95.3, issue #61 on SourceForge today,
+                    was issue #432456 back then); needs a fix due
+                    case-insensitive file systems on Windows and the fact that
+                    Perl's XML::Parser::Expat compiles into Expat.dll.
+            #347  Windows: Only define _CRT_RAND_S if not defined
+                  Version info bumped from 7:10:6 to 7:11:6
+
+        Special thanks to:
+            Ben Wagner
+
+Release 2.2.8 Fri September 13 2019
+        Security fixes:
+       #317 #318  CVE-2019-15903 -- Fix heap overflow triggered by
+                    XML_GetCurrentLineNumber (or XML_GetCurrentColumnNumber),
+                    and deny internal entities closing the doctype;
+                    fixed in commit c20b758c332d9a13afbbb276d30db1d183a85d43
+
+        Bug fixes:
+            #240  Fix cases where XML_StopParser did not have any effect
+                    when called from inside of an end element handler
+            #341  xmlwf: Fix exit code for operation without "-d DIRECTORY";
+                    previously, only "-d DIRECTORY" would give you a proper
+                    exit code:
+                      # xmlwf -d . <<<'<not well-formed>' 2>/dev/null ; echo $?
+                      2
+                      # xmlwf <<<'<not well-formed>' 2>/dev/null ; echo $?
+                      0
+                    Now both cases return exit code 2.
+
+        Other changes:
+       #299 #302  Windows: Replace LoadLibrary hack to access
+                    unofficial API function SystemFunction036 (RtlGenRandom)
+                    by using official API function rand_s (needs WinXP+)
+            #325  Windows: Drop support for Visual Studio <=7.1/2003
+                    and document supported compilers in README.md
+            #286  Windows: Remove COM code from xmlwf; in case it turns
+                    out needed later, there will be a dedicated repository
+                    below https://github.com/libexpat/ for that code
+            #322  Windows: Remove explicit MSVC solution and project files.
+                    You can generate Visual Studio solution files through
+                    CMake, e.g.: cmake -G"Visual Studio 15 2017" .
+            #338  xmlwf: Make "xmlwf -h" help output more friendly
+            #339  examples: Improve elements.c
+       #244 #264  Autotools: Add argument --enable-xml-attr-info
+       #239 #301  Autotools: Add arguments
+                    --with-getrandom
+                    --without-getrandom
+                    --with-sys-getrandom
+                    --without-sys-getrandom
+       #312 #343  Autotools: Fix linking issues with "./configure LD=clang"
+                  Autotools: Fix "make run-xmltest" for out-of-source builds
+       #329 #336  CMake: Pull all options from Expat <=2.2.7 into namespace
+                    prefix EXPAT_ with the exception of DOCBOOK_TO_MAN:
+                    - BUILD_doc            -> EXPAT_BUILD_DOCS (plural)
+                    - BUILD_examples       -> EXPAT_BUILD_EXAMPLES
+                    - BUILD_shared         -> EXPAT_SHARED_LIBS
+                    - BUILD_tests          -> EXPAT_BUILD_TESTS
+                    - BUILD_tools          -> EXPAT_BUILD_TOOLS
+                    - DOCBOOK_TO_MAN       -> DOCBOOK_TO_MAN (unchanged)
+                    - INSTALL              -> EXPAT_ENABLE_INSTALL
+                    - MSVC_USE_STATIC_CRT  -> EXPAT_MSVC_STATIC_CRT
+                    - USE_libbsd           -> EXPAT_WITH_LIBBSD
+                    - WARNINGS_AS_ERRORS   -> EXPAT_WARNINGS_AS_ERRORS
+                    - XML_CONTEXT_BYTES    -> EXPAT_CONTEXT_BYTES
+                    - XML_DEV_URANDOM      -> EXPAT_DEV_URANDOM
+                    - XML_DTD              -> EXPAT_DTD
+                    - XML_NS               -> EXPAT_NS
+                    - XML_UNICODE          -> EXPAT_CHAR_TYPE=ushort (!)
+                    - XML_UNICODE_WCHAR_T  -> EXPAT_CHAR_TYPE=wchar_t (!)
+       #244 #264  CMake: Add argument -DEXPAT_ATTR_INFO=(ON|OFF),
+                    default OFF
+            #326  CMake: Add argument -DEXPAT_LARGE_SIZE=(ON|OFF),
+                    default OFF
+            #328  CMake: Add argument -DEXPAT_MIN_SIZE=(ON|OFF),
+                    default OFF
+       #239 #277  CMake: Add arguments
+                    -DEXPAT_WITH_GETRANDOM=(ON|OFF|AUTO), default AUTO
+                    -DEXPAT_WITH_SYS_GETRANDOM=(ON|OFF|AUTO), default AUTO
+            #326  CMake: Install expat_config.h to include directory
+            #326  CMake: Generate and install configuration files for
+                    future find_package(expat [..] CONFIG [..])
+                  CMake: Now produces a summary of applied configuration
+                  CMake: Require C++ compiler only when tests are enabled
+            #330  CMake: Fix compilation for 16bit character types,
+                    i.e. ex -DXML_UNICODE=ON (and ex -DXML_UNICODE_WCHAR_T=ON)
+            #265  CMake: Fix linking with MinGW
+            #330  CMake: Add full support for MinGW; to enable, use
+                    -DCMAKE_TOOLCHAIN_FILE=[expat]/cmake/mingw-toolchain.cmake
+            #330  CMake: Port "make run-xmltest" from GNU Autotools to CMake
+            #316  CMake: Windows: Make binary postfix match MSVC
+                    Old: expat[d].lib
+                    New: expat[w][d][MD|MT].lib
+                  CMake: Migrate files from Windows to Unix line endings
+            #308  CMake: Integrate OSS-Fuzz fuzzers, option
+                    -DEXPAT_BUILD_FUZZERS=(ON|OFF), default OFF
+             #14  Drop an OpenVMS support leftover
+    #235 #268 ..
+    #270 #310 ..
+  #313 #331 #333  Address compiler warnings
+    #282 #283 ..
+       #284 #285  Address cppcheck warnings
+       #294 #295  Address Clang Static Analyzer warnings
+        #24 #293  Mass-apply clang-format 9 (and ensure conformance during CI)
+                  Version info bumped from 7:9:6 to 7:10:6
+
+        Special thanks to:
+            David Loffredo
+            Joonun Jang
+            Kishore Kunche
+            Marco Maggi
+            Mitch Phillips
+            Mohammed Khajapasha
+            Rolf Ade
+            xantares
+            Zhongyuan Zhou
+
+Release 2.2.7 Wed June 19 2019
+        Security fixes:
+       #186 #262  CVE-2018-20843 -- Fix extraction of namespace prefixes from
+                    XML names; XML names with multiple colons could end up in
+                    the wrong namespace, and take a high amount of RAM and CPU
+                    resources while processing, opening the door to
+                    use for denial-of-service attacks
+
+        Other changes:
+       #195 #197  Autotools/CMake: Utilize -fvisibility=hidden to stop
+                    exporting non-API symbols
+            #227  Autotools: Add --without-examples and --without-tests
+            #228  Autotools: Modernize configure.ac
+       #245 #246  Autotools: Fix check for -fvisibility=hidden for Clang
+       #247 #248  Autotools: Fix compilation for lack of docbook2x-man
+       #236 #258  Autotools: Produce .tar.{gz,lz,xz} release archives
+            #212  CMake: Make libdir of pkgconfig expat.pc support multilib
+       #158 #263  CMake: Build man page in PROJECT_BINARY_DIR not _SOURCE_DIR
+            #219  Remove fallback to bcopy, assume that memmove(3) exists
+            #257  Use portable "/usr/bin/env bash" shebang (e.g. for OpenBSD)
+            #243  Windows: Fix syntax of .def module definition files
+                  Version info bumped from 7:8:6 to 7:9:6
+
+        Special thanks to:
+            Benjamin Peterson
+            Caolán McNamara
+            Hanno Böck
+            KangLin
+            Kishore Kunche
+            Marco Maggi
+            Rhodri James
+            Sebastian Dröge
+            userwithuid
+            Yury Gribov
+
+Release 2.2.6 Sun August 12 2018
+        Bug fixes:
+       #170 #206  Avoid doing arithmetic with NULL pointers in XML_GetBuffer
+       #204 #205  Fix 2.2.5 regression with suspend-resume while parsing
+                    a document like '<root/>'
+
+        Other changes:
+       #165 #168  Autotools: Fix docbook-related configure syntax error
+            #166  Autotools: Avoid grep option `-q` for Solaris
+            #167  Autotools: Support
+                    ./configure DOCBOOK_TO_MAN="xmlto man --skip-validation"
+       #159 #167  Autotools: Support DOCBOOK_TO_MAN command which produces
+                    xmlwf.1 rather than XMLWF.1; also covers case insensitive
+                    file systems
+            #181  Autotools: Drop -rpath option passed to libtool
+            #188  Autotools: Detect and deny SGML docbook2man as ours is XML
+            #188  Autotools/CMake: Support command db2x_docbook2man as well
+            #174  CMake: Introduce option WARNINGS_AS_ERRORS, defaults to OFF
+       #184 #185  CMake: Introduce option MSVC_USE_STATIC_CRT, defaults to OFF
+       #207 #208  CMake: Introduce option XML_UNICODE and XML_UNICODE_WCHAR_T,
+                    both defaulting to OFF
+            #175  CMake: Prefer check_symbol_exists over check_function_exists
+            #176  CMake: Create the same pkg-config file as with GNU Autotools
+       #178 #179  CMake: Use GNUInstallDirs module to set proper defaults for
+                    install directories
+            #208  CMake: Utilize expat_config.h.cmake for XML_DEV_URANDOM
+            #180  Windows: Fix compilation of test suite for Visual Studio 2008
+  #131 #173 #202  Address compiler warnings
+  #187 #190 #200  Fix miscellaneous typos
+                  Version info bumped from 7:7:6 to 7:8:6
+
+        Special thanks to:
+            Anton Maklakov
+            Benjamin Peterson
+            Brad King
+            Franek Korta
+            Frank Rast
+            Joe Orton
+            luzpaz
+            Pedro Vicente
+            Rainer Jung
+            Rhodri James
+            Rolf Ade
+            Rolf Eike Beer
+            Thomas Beutlich
+            Tomasz Kłoczko
+
+Release 2.2.5 Tue October 31 2017
+        Bug fixes:
+              #8  If the parser runs out of memory, make sure its internal
+                    state reflects the memory it actually has, not the memory
+                    it wanted to have.
+             #11  The default handler wasn't being called when it should for
+                    a SYSTEM or PUBLIC doctype if an entity declaration handler
+                    was registered.
+       #137 #138  Fix a case of mistakenly reported parsing success where
+                    XML_StopParser was called from an element handler
+            #162  Function XML_ErrorString was returning NULL rather than
+                    a message for code XML_ERROR_INVALID_ARGUMENT
+                    introduced with release 2.2.1
+
+        Other changes:
+            #106  xmlwf: Add argument -N adding notation declarations
+        #75 #106  Test suite: Resolve expected failure cases where xmlwf
+                    output was incomplete
+            #127  Windows: Fix test suite compilation
+       #126 #127  Windows: Fix compilation for Visual Studio 2012
+                  Windows: Upgrade shipped project files to Visual Studio 2017
+        #33 #132  tests: Mass-fix compilation for XML_UNICODE_WCHAR_T
+            #129  examples: Fix compilation for XML_UNICODE_WCHAR_T
+            #130  benchmark: Fix compilation for XML_UNICODE_WCHAR_T
+            #144  xmlwf: Fix compilation for XML_UNICODE_WCHAR_T; still needs
+                    Windows or MinGW for 2-byte wchar_t
+              #9  Address two Clang Static Analyzer false positives
+             #59  Resolve troublesome macros hiding parser struct membership
+                    and dereferencing that pointer
+              #6  Resolve superfluous internal malloc/realloc switch
+       #153 #155  Improve docbook2x-man detection
+            #160  Undefine NDEBUG in the test suite (rather than rejecting it)
+            #161  Address compiler warnings
+                  Version info bumped from 7:6:6 to 7:7:6
+
+        Special thanks to:
+            Benbuck Nason
+            Hans Wennborg
+            José Gutiérrez de la Concha
+            Pedro Monreal Gonzalez
+            Rhodri James
+            Rolf Ade
+            Stephen Groat
+                 and
+            Core Infrastructure Initiative
+
+Release 2.2.4 Sat August 19 2017
+        Bug fixes:
+            #115  Fix copying of partial characters for UTF-8 input
+
+        Other changes:
+            #109  Fix "make check" for non-x86 architectures that default
+                    to unsigned type char (-128..127 rather than 0..255)
+            #109  coverage.sh: Cover -funsigned-char
+                  Autotools: Introduce --without-xmlwf argument
+             #65  Autotools: Replace handwritten Makefile with GNU Automake
+             #43  CMake: Auto-detect high quality entropy extractors, add new
+                    option USE_libbsd=ON to use arc4random_buf of libbsd
+             #74  CMake: Add -fno-strict-aliasing only where supported
+            #114  CMake: Always honor manually set BUILD_* options
+            #114  CMake: Compile man page if docbook2x-man is available, only
+            #117  Include file tests/xmltest.log.expected in source tarball
+                    (required for "make run-xmltest")
+            #117  Include (existing) Visual Studio 2013 files in source tarball
+                  Improve test suite error output
+            #111  Fix some typos in documentation
+                  Version info bumped from 7:5:6 to 7:6:6
+
+        Special thanks to:
+            Jakub Wilk
+            Joe Orton
+            Lin Tian
+            Rolf Eike Beer
+
+Release 2.2.3 Wed August 2 2017
+        Security fixes:
+             #82  CVE-2017-11742 -- Windows: Fix DLL hijacking vulnerability
+                    using Steve Holme's LoadLibrary wrapper for/of cURL
+
+        Bug fixes:
+             #85  Fix a dangling pointer issue related to realloc
+
+        Other changes:
+                  Increase code coverage
+             #91  Linux: Allow getrandom to fail if nonblocking pool has not
+                    yet been initialized and read /dev/urandom then, instead.
+                    This is in line with what recent Python does.
+             #81  Pre-10.7/Lion macOS: Support entropy from arc4random
+             #86  Check that a UTF-16 encoding in an XML declaration has the
+                    right endianness
+        #4 #5 #7  Recover correctly when some reallocations fail
+                  Repair "./configure && make" for systems without any
+                    provider of high quality entropy
+                    and try reading /dev/urandom on those
+                  Ensure that user-defined character encodings have converter
+                    functions when they are needed
+                  Fix mis-leading description of argument -c in xmlwf.1
+                  Rely on macro HAVE_ARC4RANDOM_BUF (rather than __CloudABI__)
+                    for CloudABI
+            #100  Fix use of SIPHASH_MAIN in siphash.h
+             #23  Test suite: Fix memory leaks
+                  Version info bumped from 7:4:6 to 7:5:6
+
+        Special thanks to:
+            Chanho Park
+            Joe Orton
+            Pascal Cuoq
+            Rhodri James
+            Simon McVittie
+            Vadim Zeitlin
+            Viktor Szakats
+                 and
+            Core Infrastructure Initiative
+
+Release 2.2.2 Wed July 12 2017
+        Security fixes:
+             #43  Protect against compilation without any source of high
+                    quality entropy enabled, e.g. with CMake build system;
+                    commit ff0207e6076e9828e536b8d9cd45c9c92069b895
+             #60  Windows with _UNICODE:
+                    Unintended use of LoadLibraryW with a non-wide string
+                    resulted in failure to load advapi32.dll and degradation
+                    in quality of used entropy when compiled with _UNICODE for
+                    Windows; you can launch existing binaries with
+                    EXPAT_ENTROPY_DEBUG=1 in the environment to inspect the
+                    quality of entropy used during runtime; commits
+                    * 95b95032f907ef1cd17ee7a9a1768010a825d61d
+                    * 73a5a2e9c081f49f2d775cf7ced864158b68dc80
+   [MOX-006]      Fix non-NULL parser parameter validation in XML_Parse;
+                    resulted in NULL dereference, previously;
+                    commit ac256dafdffc9622ab0dc2c62fcecb0dfcfa71fe
+
+        Bug fixes:
+             #69  Fix improper use of unsigned long long integer literals
+
+        Other changes:
+             #73  Start requiring a C99 compiler
+             #49  Fix "==" Bashism in configure script
+             #50  Fix too eager getrandom detection for Debian GNU/kFreeBSD
+             #52    and macOS
+             #51  Address lack of stdint.h in Visual Studio 2003 to 2008
+             #58  Address compile warnings
+             #68  Fix "./buildconf.sh && ./configure" for some versions
+                    of Dash for /bin/sh
+             #72  CMake: Ease use of Expat in context of a parent project
+                    with multiple CMakeLists.txt files
+             #72  CMake: Resolve mistaken executable permissions
+             #76  Address compile warning with -DNDEBUG (not recommended!)
+             #77  Address compile warning about macro redefinition
+
+        Special thanks to:
+            Alexander Bluhm
+            Ben Boeckel
+            Cătălin Răceanu
+            Kerin Millar
+            László Böszörményi
+            S. P. Zeidler
+            Segev Finer
+            Václav Slavík
+            Victor Stinner
+            Viktor Szakats
+                 and
+            Radically Open Security
+
+Release 2.2.1 Sat June 17 2017
+        Security fixes:
+                  CVE-2017-9233 -- External entity infinite loop DoS
+                    Details: https://libexpat.github.io/doc/cve-2017-9233/
+                    Commit c4bf96bb51dd2a1b0e185374362ee136fe2c9d7f
+   [MOX-002]      CVE-2016-9063 -- Detect integer overflow; commit
+                    d4f735b88d9932bd5039df2335eefdd0723dbe20
+                    (Fixed version of existing downstream patches!)
+   (SF.net) #539  Fix regression from fix to CVE-2016-0718 cutting off
+                    longer tag names; commits
+                    * 896b6c1fd3b842f377d1b62135dccf0a579cf65d
+                    * af507cef2c93cb8d40062a0abe43a4f4e9158fb2
+             #16    * 0dbbf43fdb20f593ddf4fa1ff67288000dd4a7fd
+             #25  More integer overflow detection (function poolGrow); commits
+                    * 810b74e4703dcfdd8f404e3cb177d44684775143
+                    * 44178553f3539ce69d34abee77a05e879a7982ac
+   [MOX-002]      Detect overflow from len=INT_MAX call to XML_Parse; commits
+                    * 4be2cb5afcc018d996f34bbbce6374b7befad47f
+                    * 7e5b71b748491b6e459e5c9a1d090820f94544d8
+   [MOX-005] #30  Use high quality entropy for hash initialization:
+                    * arc4random_buf on BSD, systems with libbsd
+                      (when configured with --with-libbsd), CloudABI
+                    * RtlGenRandom on Windows XP / Server 2003 and later
+                    * getrandom on Linux 3.17+
+                    In a way, that's still part of CVE-2016-5300.
+                    https://github.com/libexpat/libexpat/pull/30/commits
+   [MOX-005]      For the low quality entropy extraction fallback code,
+                    the parser instance address can no longer leak, commit
+                    04ad658bd3079dd15cb60fc67087900f0ff4b083
+   [MOX-003]      Prevent use of uninitialised variable; commit
+   [MOX-004]        a4dc944f37b664a3ca7199c624a98ee37babdb4b
+                  Add missing parameter validation to public API functions
+                    and dedicated error code XML_ERROR_INVALID_ARGUMENT:
+   [MOX-006]        * NULL checks; commits
+                      * d37f74b2b7149a3a95a680c4c4cd2a451a51d60a (merge/many)
+                      * 9ed727064b675b7180c98cb3d4f75efba6966681
+                      * 6a747c837c50114dfa413994e07c0ba477be4534
+                    * Negative length (XML_Parse); commit
+   [MOX-002]          70db8d2538a10f4c022655d6895e4c3e78692e7f
+   [MOX-001] #35  Change hash algorithm to William Ahern's version of SipHash
+                    to go further with fixing CVE-2012-0876.
+                    https://github.com/libexpat/libexpat/pull/39/commits
+
+        Bug fixes:
+             #32  Fix sharing of hash salt across parsers;
+                    relevant where XML_ExternalEntityParserCreate is called
+                    prior to XML_Parse, in particular (e.g. FBReader)
+             #28  xmlwf: Auto-disable use of memory-mapping (and parsing
+                    as a single chunk) for files larger than ~1 GB (2^30 bytes)
+                    rather than failing with error "out of memory"
+              #3  Fix double free after malloc failure in DTD code; commit
+                    7ae9c3d3af433cd4defe95234eae7dc8ed15637f
+             #17  Fix memory leak on parser error for unbound XML attribute
+                    prefix with new namespaces defined in the same tag;
+                    found by Google's OSS-Fuzz; commits
+                    * 16f87daae5a16132e479e4f71862128c7a915c73
+                    * b47dbc9745932c160893d433220e462bd605f8cd
+                  xmlwf on Windows: Add missing calls to CloseHandle
+
+        New features:
+             #30  Introduced environment switch EXPAT_ENTROPY_DEBUG=1
+                    for runtime debugging of entropy extraction
+
+        Other changes:
+                  Increase code coverage
+             #33  Reject use of XML_UNICODE_WCHAR_T with sizeof(wchar_t) != 2;
+                    XML_UNICODE_WCHAR_T was never meant to be used outside
+                    of Windows; 4-byte wchar_t is common on Linux
+   (SF.net) #538  Start using -fno-strict-aliasing
+   (SF.net) #540  Support compilation against cloudlibc of CloudABI
+                  Allow MinGW cross-compilation
+   (SF.net) #534  CMake: Introduce option "BUILD_doc" (enabled by default)
+                    to bypass compilation of the xmlwf.1 man page
+   (SF.net)  pr2  CMake: Introduce option "INSTALL" (enabled by default)
+                    to bypass installation of expat files
+                  CMake: Fix ninja support
+                  Autotools: Add parameters --enable-xml-context [COUNT]
+                    and --disable-xml-context; default of context of 1024
+                    bytes enabled unchanged
+             #14  Drop AmigaOS 4.x code and includes
+             #14  Drop ancient build systems:
+                    * Borland C++ Builder
+                    * OpenVMS
+                    * Open Watcom
+                    * Visual Studio 6.0
+                    * Pre-X Mac OS (MPW Makefile)
+                    If you happen to rely on some of these, please get in
+                    touch for joining with maintenance.
+             #10  Move from WIN32 to _WIN32
+             #13  Fix "make run-xmltest" order instability
+                  Address compile warnings
+                  Bump version info from 7:2:6 to 7:3:6
+                  Add AUTHORS file
+
+        Infrastructure:
+              #1  Migrate from SourceForge to GitHub (except downloads):
+                    https://github.com/libexpat/
+              #1  Re-create http://libexpat.org/ project website
+                  Start utilizing Travis CI
+
+        Special thanks to:
+            Andy Wang
+            Don Lewis
+            Ed Schouten
+            Karl Waclawek
+            Pascal Cuoq
+            Rhodri James
+            Sergei Nikulov
+            Tobias Taschner
+            Viktor Szakats
+                 and
+            Core Infrastructure Initiative
+            Mozilla Foundation (MOSS Track 3: Secure Open Source)
+            Radically Open Security
+
+Release 2.2.0 Tue June 21 2016
+        Security fixes:
+            #537  CVE-2016-0718 -- Fix crash on malformed input
+                  CVE-2016-4472 -- Improve insufficient fix to CVE-2015-1283 /
+                                   CVE-2015-2716 introduced with Expat 2.1.1
+            #499  CVE-2016-5300 -- Use more entropy for hash initialization
+                                   than the original fix to CVE-2012-0876
+            #519  CVE-2012-6702 -- Resolve troublesome internal call to srand
+                                   that was introduced with Expat 2.1.0
+                                   when addressing CVE-2012-0876 (issue #496)
+
+        Bug fixes:
+                  Fix uninitialized reads of size 1
+                    (e.g. in little2_updatePosition)
+                  Fix detection of UTF-8 character boundaries
+
+        Other changes:
+            #532  Fix compilation for Visual Studio 2010 (keyword "C99")
+                  Autotools: Resolve use of "$<" to better support bmake
+                  Autotools: Add QA script "qa.sh" (and make target "qa")
+                  Autotools: Respect CXXFLAGS if given
+                  Autotools: Fix "make run-xmltest"
+                  Autotools: Have "make run-xmltest" check for expected output
+             p90  CMake: Fix static build (BUILD_shared=OFF) on Windows
+            #536  CMake: Add soversion, support -DNO_SONAME=yes to bypass
+            #323  CMake: Add suffix "d" to differentiate debug from release
+                  CMake: Define WIN32 with CMake on Windows
+                  Annotate memory allocators for GCC
+                  Address all currently known compile warnings
+                  Make sure that API symbols remain visible despite
+                    -fvisibility=hidden
+                  Remove executable flag from source files
+                  Resolve COMPILED_FROM_DSP in favor of WIN32
+
+        Special thanks to:
+            Björn Lindahl
+            Christian Heimes
+            Cristian Rodríguez
+            Daniel Krügler
+            Gustavo Grieco
+            Karl Waclawek
+            László Böszörményi
+            Marco Grassi
+            Pascal Cuoq
+            Sergei Nikulov
+            Thomas Beutlich
+            Warren Young
+            Yann Droneaud
+
 Release 2.1.1 Sat March 12 2016
         Security fixes:
             #582: CVE-2015-1283 - Multiple integer overflows in XML_GetBuffer
@@ -7,31 +603,32 @@ Release 2.1.1 Sat March 12 2016
             #520: Symbol XML_SetHashSalt was not exported
             Output of "xmlwf -h" was incomplete
 
-        Other changes
+        Other changes:
             #503: Document behavior of calling XML_SetHashSalt with salt 0
             Minor improvements to man page xmlwf(1)
             Improvements to the experimental CMake build system
             libtool now invoked with --verbose
 
 Release 2.1.0 Sat March 24 2012
+        - Security fixes:
+          #2958794: CVE-2012-1148 - Memory leak in poolGrow.
+          #2895533: CVE-2012-1147 - Resource leak in readfilemap.c.
+          #3496608: CVE-2012-0876 - Hash DOS attack.
+          #2894085: CVE-2009-3560 - Buffer over-read and crash in big2_toUtf8().
+          #1990430: CVE-2009-3720 - Parser crash with special UTF-8 sequences.
         - Bug Fixes:
           #1742315: Harmful XML_ParserCreateNS suggestion.
-          #2895533: CVE-2012-1147 - Resource leak in readfilemap.c.
           #1785430: Expat build fails on linux-amd64 with gcc version>=4.1 -O3.
           #1983953, 2517952, 2517962, 2649838: 
                 Build modifications using autoreconf instead of buildconf.sh.
           #2815947, #2884086: OBJEXT and EXEEXT support while building.
-          #1990430: CVE-2009-3720 - Parser crash with special UTF-8 sequences.
           #2517938: xmlwf should return non-zero exit status if not well-formed.
           #2517946: Wrong statement about XMLDecl in xmlwf.1 and xmlwf.sgml.
           #2855609: Dangling positionPtr after error.
-          #2894085: CVE-2009-3560 - Buffer over-read and crash in big2_toUtf8().
-          #2958794: CVE-2012-1148 - Memory leak in poolGrow.
           #2990652: CMake support.
           #3010819: UNEXPECTED_STATE with a trailing "%" in entity value.
-          #3206497: Unitialized memory returned from XML_Parse.
+          #3206497: Uninitialized memory returned from XML_Parse.
           #3287849: make check fails on mingw-w64.
-          #3496608: CVE-2012-0876 - Hash DOS attack.
         - Patches:
           #1749198: pkg-config support.
           #3010222: Fix for bug #3010819.

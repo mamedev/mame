@@ -98,6 +98,7 @@ dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, co
 	, m_dots_per_line(char_width * chars_per_line)
 	, m_dots_per_row(char_width * chars_per_row)
 	, m_video_scan_lines(char_height * rows_per_frame)
+	, m_half_shift(false)
 	, m_lrc_callback(*this)
 	, m_clc_callback(*this)
 	, m_lc_callback(*this)

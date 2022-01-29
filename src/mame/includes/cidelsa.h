@@ -52,9 +52,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER( cdp1869_w );
-	DECLARE_WRITE8_MEMBER( destryer_out1_w );
-	DECLARE_WRITE8_MEMBER( altair_out1_w );
+	void cdp1869_w(offs_t offset, uint8_t data);
+	void destryer_out1_w(uint8_t data);
+	void altair_out1_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( clear_r );
 
@@ -79,7 +79,7 @@ public:
 	void destryera_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -109,13 +109,13 @@ public:
 			m_psg(*this, AY8910_TAG)
 	{ }
 
-	DECLARE_READ8_MEMBER( sound_in_r );
-	DECLARE_READ8_MEMBER( psg_r );
-	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( sound_g_w );
-	DECLARE_WRITE8_MEMBER( psg_w );
-	DECLARE_WRITE8_MEMBER( out1_w );
-	DECLARE_WRITE8_MEMBER( psg_pb_w );
+	uint8_t sound_in_r();
+	uint8_t psg_r();
+	void sound_bankswitch_w(uint8_t data);
+	void sound_g_w(uint8_t data);
+	void psg_w(uint8_t data);
+	void out1_w(uint8_t data);
+	void psg_pb_w(uint8_t data);
 
 	CDP1869_CHAR_RAM_READ_MEMBER(draco_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(draco_charram_w);

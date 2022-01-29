@@ -14,8 +14,8 @@ public:
 	wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_pic_device();
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 
 	void set_serial(const char *serial);
 

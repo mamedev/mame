@@ -71,12 +71,11 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(megazone_state::megazone_port_a_r)
+uint8_t megazone_state::megazone_port_a_r()
 {
 	int clock, timer;
 
@@ -95,7 +94,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 	return (timer << 4) | m_i8039_status;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_port_b_w)
+void megazone_state::megazone_port_b_w(uint8_t data)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -106,16 +105,16 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		m_filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
+		m_filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
+void megazone_state::megazone_i8039_irq_w(uint8_t data)
 {
 	m_daccpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
+void megazone_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	if ((data & 0x80) == 0)
 		m_daccpu->set_input_line(0, CLEAR_LINE);
@@ -149,7 +148,7 @@ void megazone_state::megazone_map(address_map &map)
 	map(0x2800, 0x2bff).ram().share("colorram");
 	map(0x2c00, 0x2fff).ram().share("colorram2");
 	map(0x3000, 0x33ff).ram().share("spriteram");
-	map(0x3800, 0x3fff).ram().share("share1");
+	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_share1[off]; }, "share_r", [this](offs_t off, u8 data) { m_share1[off] = data; }, "share_w");
 	map(0x4000, 0xffff).rom();     /* 4000->5FFF is a debug rom */
 }
 
@@ -309,7 +308,7 @@ void megazone_state::megazone(machine_config &config)
 	m_daccpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_daccpu->p2_out_cb().set(FUNC(megazone_state::i8039_irqen_and_status_w));
 
-	config.m_minimum_quantum = attotime::from_hz(900);
+	config.set_maximum_quantum(attotime::from_hz(900));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
 	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_2_w));
@@ -345,9 +344,6 @@ void megazone_state::megazone(machine_config &config)
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);

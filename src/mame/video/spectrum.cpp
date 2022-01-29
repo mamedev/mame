@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-  spectrum.c
+  spectrum.cpp
 
   Functions to emulate the video hardware of the ZX Spectrum.
 
@@ -22,7 +22,7 @@
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
-VIDEO_START_MEMBER(spectrum_state,spectrum)
+void spectrum_state::video_start()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -44,7 +44,7 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
-VIDEO_START_MEMBER(spectrum_state,spectrum_128)
+void spectrum_128_state::video_start()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 
 inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -235,7 +235,7 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 			{
 				// this can/must be optimised
 				if ((scrx & 7) == 0) {
-					uint16_t *bm = &m_screen_bitmap.pix16(m_previous_screen_y, m_previous_screen_x);
+					uint16_t *bm = &m_screen_bitmap.pix(m_previous_screen_y, m_previous_screen_x);
 					uint8_t attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
 					uint8_t scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
 					uint16_t ink = (attr & 0x07) + ((attr >> 3) & 0x08);
@@ -266,6 +266,10 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 	}
 }
 
+u16 spectrum_state::get_border_color() {
+	return m_port_fe_data & 0x07;
+}
+
 /* The code below is just a per-pixel 'partial update' for the border */
 
 void spectrum_state::spectrum_UpdateBorderBitmap()
@@ -278,13 +282,13 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 	if (m_border_bitmap.valid())
 	{
-		uint16_t border = m_port_fe_data & 0x07;
+		uint16_t border = get_border_color();
 
 		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
 
 		do
 		{
-			m_border_bitmap.pix16(m_previous_border_y, m_previous_border_x) = border;
+			m_border_bitmap.pix(m_previous_border_y, m_previous_border_x) = border;
 
 			m_previous_border_x += 1;
 

@@ -23,7 +23,7 @@ class colecovision_control_port_device;
 
 // ======================> device_colecovision_control_port_interface
 
-class device_colecovision_control_port_interface : public device_slot_card_interface
+class device_colecovision_control_port_interface : public device_interface
 {
 public:
 	virtual uint8_t joy_r() { return 0xff; }
@@ -44,7 +44,7 @@ protected:
 // ======================> colecovision_control_port_device
 
 class colecovision_control_port_device : public device_t,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_colecovision_control_port_interface>
 {
 public:
 	// construction/destruction
@@ -64,7 +64,6 @@ public:
 
 	// computer interface
 	uint8_t read() { uint8_t data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
-	DECLARE_READ8_MEMBER( read ) { return read(); }
 
 	DECLARE_WRITE_LINE_MEMBER( common0_w ) { if (exists()) m_device->common0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( common1_w ) { if (exists()) m_device->common1_w(state); }

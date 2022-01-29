@@ -27,21 +27,21 @@
         * QB-3
         * Space Ship
 
-    To do:
-        * look into bad sample latency
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/cinemat.h"
+#include "speaker.h"
 
 #include "armora.lh"
 #include "barrier.lh"
 #include "demon.lh"
 #include "starcas.lh"
 #include "solarq.lh"
+#include "speedfrk.lh"
 #include "sundance.lh"
 #include "tailg.lh"
+#include "warrior.lh"
 #include "wotw.lh"
 
 #define MASTER_CLOCK            XTAL(19'923'000)
@@ -84,15 +84,15 @@ void cinemat_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::inputs_r)
+u8 cinemat_state::inputs_r(offs_t offset)
 {
 	return (m_inputs->read() >> offset) & 1;
 }
 
 
-READ8_MEMBER(cinemat_state::switches_r)
+u8 cinemat_state::switches_r(offs_t offset)
 {
-	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
+	static const u8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
 	return (m_switches->read() >> switch_shuffle[offset]) & 1;
 }
 
@@ -112,7 +112,7 @@ INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
 }
 
 
-READ8_MEMBER(cinemat_state::coin_input_r)
+u8 cinemat_state::coin_input_r()
 {
 	return !m_coin_detected;
 }
@@ -146,13 +146,13 @@ WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::joystick_read)
+u8 cinemat_state::joystick_read()
 {
 	if (machine().phase() != machine_phase::RUNNING)
 		return 0;
 	else
 	{
-		int const xval = int16_t(m_maincpu->state_int(ccpu_cpu_device::CCPU_X) << 4) >> 4;
+		int const xval = s16(m_maincpu->state_int(ccpu_cpu_device::CCPU_X) << 4) >> 4;
 		return ((m_mux_select ? m_analog_x : m_analog_y).read_safe(0) - xval) < 0x800;
 	}
 }
@@ -165,13 +165,13 @@ READ8_MEMBER(cinemat_state::joystick_read)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
+u8 cinemat_state::speedfrk_wheel_r(offs_t offset)
 {
-	static const uint8_t speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
+	static const u8 speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = int8_t(m_wheel->read()) / 8;
+	delta_wheel = s8(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -181,20 +181,11 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 }
 
 
-READ8_MEMBER(cinemat_state::speedfrk_gear_r)
+u8 cinemat_state::speedfrk_gear_r(offs_t offset)
 {
-	int gearval = m_gear_input->read();
-
-	/* check the fake gear input port and determine the bit settings for the gear */
-	if ((gearval & 0x0f) != 0x0f)
-		m_gear = gearval & 0x0f;
-
-	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(m_inputs->read() & 0x80))
-		m_gear &= ~0x08;
-
-	return (m_gear >> offset) & 1;
+	return (m_gear != offset);
 }
+
 
 
 
@@ -207,7 +198,7 @@ READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 static const struct
 {
 	const char *portname;
-	uint16_t bitmask;
+	u16 bitmask;
 } sundance_port_map[16] =
 {
 	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */
@@ -232,7 +223,7 @@ static const struct
 };
 
 
-READ8_MEMBER(cinemat_16level_state::sundance_inputs_r)
+u8 cinemat_16level_state::sundance_inputs_r(offs_t offset)
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
@@ -249,7 +240,7 @@ READ8_MEMBER(cinemat_16level_state::sundance_inputs_r)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_color_state::boxingb_dial_r)
+u8 cinemat_color_state::boxingb_dial_r(offs_t offset)
 {
 	int value = ioport("DIAL")->read();
 	if (!m_mux_select) offset += 4;
@@ -264,7 +255,7 @@ READ8_MEMBER(cinemat_color_state::boxingb_dial_r)
  *
  *************************************/
 
-READ8_MEMBER(qb3_state::qb3_frame_r)
+u8 qb3_state::qb3_frame_r()
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
@@ -275,7 +266,7 @@ READ8_MEMBER(qb3_state::qb3_frame_r)
 }
 
 
-WRITE8_MEMBER(qb3_state::qb3_ram_bank_w)
+void qb3_state::qb3_ram_bank_w(u8 data)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -380,15 +371,13 @@ static INPUT_PORTS_START( spacewar )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Playfield") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( spaceshp )
-	PORT_INCLUDE(spacewar )
+	PORT_INCLUDE( spacewar )
 
 	PORT_MODIFY("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x00, "Time" ) PORT_DIPLOCATION("SW1:!4,!3")
@@ -396,9 +385,6 @@ static INPUT_PORTS_START( spaceshp )
 	PORT_DIPSETTING(    0x01, "1:30/coin" )
 	PORT_DIPSETTING(    0x02, "2:00/coin" )
 	PORT_DIPSETTING(    0x03, "2:30/coin" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:!1" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:!2" )
 INPUT_PORTS_END
 
 
@@ -443,7 +429,7 @@ static INPUT_PORTS_START( barrier )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -476,16 +462,19 @@ static INPUT_PORTS_START( speedfrk )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("1st gear") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("2nd gear") PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("3rd gear") PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("4th gear") PORT_PLAYER(2)
+	PORT_BIT (0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cinemat_state, speedfrk_gear_number_r)
+
+	PORT_START("GEARRAW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("1st gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("2nd gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("3rd gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<2>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("4th gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<3>)
 INPUT_PORTS_END
 
 
@@ -521,7 +510,7 @@ static INPUT_PORTS_START( starhawk )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -565,7 +554,7 @@ static INPUT_PORTS_START( sundance )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 
 	PORT_START("PAD1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 1") PORT_CODE(KEYCODE_7_PAD) PORT_PLAYER(1)
@@ -621,7 +610,7 @@ static INPUT_PORTS_START( tailg )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 
 	PORT_START("ANALOGX")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x200,0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
@@ -659,7 +648,7 @@ static INPUT_PORTS_START( warrior )
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_HIGH, "SW1:!5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_HIGH, "SW1:!6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW1:!7" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -695,7 +684,7 @@ static INPUT_PORTS_START( armora )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -731,7 +720,7 @@ static INPUT_PORTS_START( ripoff )
 	PORT_DIPSETTING(    0x00, "Individual" )
 	PORT_DIPSETTING(    0x20, "Combined" )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -768,7 +757,7 @@ static INPUT_PORTS_START( starcas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( starcasc )
@@ -835,7 +824,7 @@ static INPUT_PORTS_START( solarq )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -869,7 +858,7 @@ static INPUT_PORTS_START( boxingb )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_REVERSE PORT_SENSITIVITY(100) PORT_KEYDELTA(5)
@@ -911,7 +900,7 @@ static INPUT_PORTS_START( wotw )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -953,7 +942,7 @@ static INPUT_PORTS_START( demon )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -999,7 +988,7 @@ static INPUT_PORTS_START( qb3 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -1076,92 +1065,155 @@ void cinemat_state::cinemat_jmi_32k(machine_config &config)
 void cinemat_state::spacewar(machine_config &config)
 {
 	cinemat_nojmi_4k(config);
-	spacewar_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	SPACE_WARS_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
 }
 
 void cinemat_state::barrier(machine_config &config)
 {
 	cinemat_jmi_4k(config);
-	barrier_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	BARRIER_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
+{
+	/* start LED is controlled by bit 0x02 */
+	m_led = !state;
 }
 
 void cinemat_state::speedfrk(machine_config &config)
 {
 	cinemat_nojmi_8k(config);
-	speedfrk_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	SPEED_FREAK_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+//  m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
 }
 
 void cinemat_state::starhawk(machine_config &config)
 {
 	cinemat_jmi_4k(config);
-	starhawk_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	STAR_HAWK_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_16level_state::sundance(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	sundance_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	SUNDANCE_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_state::tailg(machine_config &config)
 {
 	cinemat_nojmi_8k(config);
-	tailg_sound(config);
 
+	SPEAKER(config, "mono").front_center();
+	TAIL_GUNNER_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
 }
 
 void cinemat_state::warrior(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	warrior_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	WARRIOR_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_state::armora(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	armora_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	ARMOR_ATTACK_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_state::ripoff(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	ripoff_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	RIPOFF_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_state::starcas(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	starcas_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	STAR_CASTLE_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_64level_state::solarq(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	solarq_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	SOLAR_QUEST_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_color_state::boxingb(machine_config &config)
 {
 	cinemat_jmi_32k(config);
-	boxingb_sound(config);
-	m_screen->set_visarea(0, 1024, 0, 788);
 
-	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
+	SPEAKER(config, "mono").front_center();
+	BOXING_BUGS_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_outlatch->q_out_cb<7>().append(FUNC(cinemat_state::mux_select_w));
+
+	m_screen->set_visarea(0, 1024, 0, 788);
 }
 
 void cinemat_state::wotw(machine_config &config)
 {
 	cinemat_jmi_16k(config);
 	m_screen->set_visarea(0, 1120, 0, 767);
-	wotw_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void cinemat_color_state::wotwc(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	wotw_sound(config);
+
+	SPEAKER(config, "mono").front_center();
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0)
+		.configure_latch_inputs(*m_outlatch)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void demon_state::demon(machine_config &config)
@@ -1254,6 +1306,9 @@ ROM_START( starhawk )
 	ROM_LOAD16_BYTE( "r7", 0x0001, 0x0800, CRC(bb71144f) SHA1(79591cd3ef8df78ec26e158f7e82ca0dcd72260d) )
 
 	CCPU_PROMS
+
+	ROM_REGION( 0x100, "soundboard:sound_nl:2085.5e8e", 0 )
+	ROM_LOAD("2085.5e8e", 0x000, 0x100, CRC(9edbf536) SHA1(036ad8a231284e05f44b1106d38fc0c7e041b6e8) )
 ROM_END
 
 
@@ -1415,10 +1470,10 @@ ROM_END
 
 ROM_START( solarq )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "solar.6t", 0x0000, 0x1000, CRC(1f3c5333) SHA1(58d847b5f009a0363ae116768b22d0bcfb3d60a4) )
-	ROM_LOAD16_BYTE( "solar.6p", 0x0001, 0x1000, CRC(d6c16bcc) SHA1(6953bdc698da060d37f6bc33a810ba44595b1257) )
-	ROM_LOAD16_BYTE( "solar.6u", 0x2000, 0x1000, CRC(a5970e5c) SHA1(9ac07924ca86d003964022cffdd6a0436dde5624) )
-	ROM_LOAD16_BYTE( "solar.6r", 0x2001, 0x1000, CRC(b763fff2) SHA1(af1fd978e46a4aee3048e6e36c409821d986f7ee) )
+	ROM_LOAD16_BYTE( "sq-2_le.6t", 0x0000, 0x1000, CRC(1f3c5333) SHA1(58d847b5f009a0363ae116768b22d0bcfb3d60a4) )
+	ROM_LOAD16_BYTE( "sq-2_lo.6p", 0x0001, 0x1000, CRC(d6c16bcc) SHA1(6953bdc698da060d37f6bc33a810ba44595b1257) )
+	ROM_LOAD16_BYTE( "sq-2_ue.6u", 0x2000, 0x1000, CRC(a5970e5c) SHA1(9ac07924ca86d003964022cffdd6a0436dde5624) )
+	ROM_LOAD16_BYTE( "sq-2_uo.6r", 0x2001, 0x1000, CRC(b763fff2) SHA1(af1fd978e46a4aee3048e6e36c409821d986f7ee) )
 
 	CCPU_PROMS
 ROM_END
@@ -1498,22 +1553,21 @@ ROM_END
 
 void cinemat_state::init_speedfrk()
 {
-	m_gear = 0xe;
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(FUNC(cinemat_state::speedfrk_gear_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
 	save_item(NAME(m_gear));
 }
 
 
 void cinemat_16level_state::init_sundance()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(FUNC(cinemat_16level_state::sundance_inputs_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8sm_delegate(*this, FUNC(cinemat_16level_state::sundance_inputs_r)));
 }
 
 
 void cinemat_color_state::init_boxingb()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(FUNC(cinemat_color_state::boxingb_dial_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8sm_delegate(*this, FUNC(cinemat_color_state::boxingb_dial_r)));
 }
 
 
@@ -1525,11 +1579,7 @@ void qb3_state::init_qb3()
 	save_item(NAME(m_qb3_lasty));
 }
 
-void cinemat_64level_state::init_solarq()
-{
-	save_item(NAME(m_target_volume));
-	save_item(NAME(m_current_volume));
-}
+
 
 /*************************************
  *
@@ -1537,28 +1587,28 @@ void cinemat_64level_state::init_solarq()
  *
  *************************************/
 
-GAME(  1977, spacewar, 0,        spacewar, spacewar, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Space Wars", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1978, spaceshp, spacewar, spacewar, spaceshp, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Sega license)", "Space Ship", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1979, barrier,  0,        barrier,  barrier,  cinemat_state,         empty_init,    ORIENTATION_FLIP_X ^ ROT270, "Cinematronics (Vectorbeam license)", "Barrier", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barrier ) // developed by Cinematronics, then (when they noticed it wasn't going to be a successful game) sold to Vectorbeam, and ultimately back in the hands of Cinematronics again after they bought the dying company Vectorbeam
-GAME(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Hawk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sundance )
-GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tailg )
-GAME(  1979, warrior,  0,        warrior,  warrior,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1980, armora,   0,        armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_armora )
-GAMEL( 1980, armorap,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_armora )
-GAMEL( 1980, armorar,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Rock-Ola license)", "Armor Attack (Rock-Ola)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_armora )
-GAME(  1980, ripoff,   0,        ripoff,   ripoff,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Rip Off", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1980, starcas,  0,        starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (version 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, starcas1, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, starcasc, starcas,  starcas,  starcasc, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
-GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wotw )
-GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, spacewar, 0,        spacewar, spacewar, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Space Wars", MACHINE_SUPPORTS_SAVE )
+GAME(  1978, spaceshp, spacewar, spacewar, spaceshp, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Sega license)", "Space Ship", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979, barrier,  0,        barrier,  barrier,  cinemat_state,         empty_init,    ORIENTATION_FLIP_X ^ ROT270, "Cinematronics (Vectorbeam license)", "Barrier", MACHINE_SUPPORTS_SAVE, layout_barrier ) // developed by Cinematronics, then (when they noticed it wasn't going to be a successful game) sold to Vectorbeam, and ultimately back in the hands of Cinematronics again after they bought the dying company Vectorbeam
+GAMEL(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_SUPPORTS_SAVE, layout_speedfrk )
+GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Hawk", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_SUPPORTS_SAVE, layout_sundance )
+GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_SUPPORTS_SAVE, layout_tailg )
+GAMEL( 1979, warrior,  0,        warrior,  warrior,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_SUPPORTS_SAVE, layout_warrior )
+GAMEL( 1980, armora,   0,        armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", MACHINE_SUPPORTS_SAVE, layout_armora )
+GAMEL( 1980, armorap,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", MACHINE_SUPPORTS_SAVE, layout_armora )
+GAMEL( 1980, armorar,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Rock-Ola license)", "Armor Attack (Rock-Ola)",  MACHINE_SUPPORTS_SAVE, layout_armora )
+GAME(  1980, ripoff,   0,        ripoff,   ripoff,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Rip Off", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1980, starcas,  0,        starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (version 3)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, starcas1, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, starcasc, starcas,  starcas,  starcasc, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (cocktail)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_SUPPORTS_SAVE, layout_wotw )
+GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1982, demon,    0,        demon,    demon,    demon_state,           empty_init,    ORIENTATION_FLIP_Y,   "Rock-Ola", "Demon", MACHINE_SUPPORTS_SAVE, layout_demon )
 GAME(  1982, qb3,      0,        qb3,      qb3,      qb3_state,             init_qb3,      ORIENTATION_FLIP_Y,   "Rock-Ola", "QB-3 (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

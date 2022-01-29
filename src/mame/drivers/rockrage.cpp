@@ -56,7 +56,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,7 +67,7 @@ WRITE_LINE_MEMBER(rockrage_state::vblank_irq)
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
+void rockrage_state::rockrage_bankswitch_w(uint8_t data)
 {
 	/* bits 4-6 = bank number */
 	m_rombank->set_entry((data & 0x70) >> 4);
@@ -79,18 +79,18 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
+void rockrage_state::rockrage_sh_irqtrigger_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(rockrage_state::rockrage_VLM5030_busy_r)
+uint8_t rockrage_state::rockrage_VLM5030_busy_r()
 {
 	return (m_vlm->bsy() ? 1 : 0);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
+void rockrage_state::rockrage_speech_w(uint8_t data)
 {
 	/* bit2 = data bus enable */
 	m_vlm->rst((data >> 1) & 0x01);
@@ -271,12 +271,12 @@ void rockrage_state::rockrage(machine_config &config)
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(rockrage_state::rockrage_tile_callback), this);
+	m_k007342->set_tile_callback(FUNC(rockrage_state::rockrage_tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(rockrage_state::rockrage_sprite_callback), this);
+	m_k007420->set_sprite_callback(FUNC(rockrage_state::rockrage_sprite_callback));
 	m_k007420->set_palette_tag(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rockrage);

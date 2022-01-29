@@ -99,8 +99,9 @@ void upd7752_device::device_stop()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd7752_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd7752_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 
 //**************************************************************************
@@ -133,7 +134,7 @@ void upd7752_device::status_change(uint8_t flag,bool type)
 		m_status &= ~flag;
 }
 
-READ8_MEMBER( upd7752_device::read )
+uint8_t upd7752_device::read(offs_t offset)
 {
 	switch(offset & 3)
 	{
@@ -151,7 +152,7 @@ READ8_MEMBER( upd7752_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( upd7752_device::write )
+void upd7752_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset & 3)
 	{

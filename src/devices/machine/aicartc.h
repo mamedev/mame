@@ -21,8 +21,8 @@ public:
 	aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t read(offs_t offset);
 
 	uint16_t m_rtc_reg_lo,m_rtc_reg_hi;
 	uint16_t m_rtc_tick;
@@ -33,7 +33,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }

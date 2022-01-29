@@ -30,14 +30,14 @@ public:
 	void targeth(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(output_latch_w);
+	void oki_bankswitch_w(uint8_t data);
+	void output_latch_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_READ8_MEMBER(shareram_r);
+	void shareram_w(offs_t offset, uint8_t data);
+	uint8_t shareram_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void vram_w(offs_t offset, uint16_t data);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 

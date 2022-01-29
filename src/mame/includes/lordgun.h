@@ -72,25 +72,25 @@ private:
 	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
 
 	uint16_t m_protection_data;
-	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
-	DECLARE_READ16_MEMBER(lordgun_protection_r);
-	DECLARE_WRITE16_MEMBER(aliencha_protection_w);
-	DECLARE_READ16_MEMBER(aliencha_protection_r);
+	void lordgun_protection_w(offs_t offset, uint16_t data);
+	uint16_t lordgun_protection_r(offs_t offset);
+	void aliencha_protection_w(offs_t offset, uint16_t data);
+	uint16_t aliencha_protection_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(priority_w);
-	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_0_y_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_1_x_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_1_y_r);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(fake_w);
-	DECLARE_WRITE8_MEMBER(fake2_w);
-	DECLARE_WRITE8_MEMBER(lordgun_eeprom_w);
-	DECLARE_WRITE8_MEMBER(aliencha_eeprom_w);
-	DECLARE_READ8_MEMBER(aliencha_dip_r);
-	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
-	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lordgun_gun_0_x_r();
+	uint16_t lordgun_gun_0_y_r();
+	uint16_t lordgun_gun_1_x_r();
+	uint16_t lordgun_gun_1_y_r();
+	void soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fake_w(uint8_t data);
+	void fake2_w(uint8_t data);
+	void lordgun_eeprom_w(uint8_t data);
+	void aliencha_eeprom_w(uint8_t data);
+	uint8_t aliencha_dip_r();
+	void aliencha_dip_w(uint8_t data);
+	void lordgun_okibank_w(uint8_t data);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 

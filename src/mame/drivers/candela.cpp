@@ -150,11 +150,11 @@ public:
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER (read);
-	DECLARE_WRITE8_MEMBER (write);
-	DECLARE_READ8_MEMBER( syspia_A_r );
-	DECLARE_READ8_MEMBER( syspia_B_r );
-	DECLARE_WRITE8_MEMBER( syspia_B_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t syspia_A_r();
+	uint8_t syspia_B_r();
+	void syspia_B_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( syspia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
@@ -257,7 +257,7 @@ void can09t_state::machine_start()
 	memset(m_ram2, 0, sizeof(m_ram2));
 };
 
-READ8_MEMBER( can09t_state::read )
+uint8_t can09t_state::read(offs_t offset)
 {
 	LOG("%s %02x\n", FUNCNAME, offset);
 	uint8_t pla_offset = 0;
@@ -340,7 +340,7 @@ READ8_MEMBER( can09t_state::read )
 	return byte;
 }
 
-WRITE8_MEMBER( can09t_state::write )
+void can09t_state::write(offs_t offset, uint8_t data)
 {
 	LOG("%s() %04x : %02x\n", FUNCNAME, offset, data);
 	uint8_t pla_offset = 0;
@@ -420,20 +420,20 @@ WRITE8_MEMBER( can09t_state::write )
 	}
 }
 
-READ8_MEMBER( can09t_state::syspia_A_r )
+uint8_t can09t_state::syspia_A_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-READ8_MEMBER( can09t_state::syspia_B_r )
+uint8_t can09t_state::syspia_B_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	u8 data = (m_cass->input() > 0.04) ? 0x80 : 0;
 	return data;
 }
 
-WRITE8_MEMBER( can09t_state::syspia_B_w )
+void can09t_state::syspia_B_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 
@@ -517,10 +517,10 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia1_A_r );
-	DECLARE_WRITE8_MEMBER( pia1_A_w );
-	DECLARE_READ8_MEMBER( pia1_B_r );
-	DECLARE_WRITE8_MEMBER( pia1_B_w );
+	uint8_t pia1_A_r();
+	void pia1_A_w(uint8_t data);
+	uint8_t pia1_B_r();
+	void pia1_B_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void can09_map(address_map &map);
@@ -570,7 +570,7 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				for (x = 0; x < 8; x++)
 				{
 					//                  if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + y, col + x) = x & 1; //(*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + y, col + x) = x & 1; //(*chardata & (1 << x)) ? 1 : 0;
 				}
 				//              chardata++;
 			}
@@ -582,24 +582,24 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER( can09_state::pia1_A_r )
+uint8_t can09_state::pia1_A_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0x40;
 }
 
-WRITE8_MEMBER( can09_state::pia1_A_w )
+void can09_state::pia1_A_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ8_MEMBER( can09_state::pia1_B_r )
+uint8_t can09_state::pia1_B_r()
 {
 	LOG("%s()\n", FUNCNAME);
 	return 0;
 }
 
-WRITE8_MEMBER( can09_state::pia1_B_w )
+void can09_state::pia1_B_w(uint8_t data)
 {
 	//  UINT8 *RAM = memregion("maincpu")->base();
 	LOG("%s(%02x)\n", FUNCNAME, data);
@@ -664,7 +664,6 @@ void can09_state::can09_map(address_map &map)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -774,7 +773,7 @@ void can09_state::can09(machine_config &config)
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop3_list").set_original("candela");
 #endif
 

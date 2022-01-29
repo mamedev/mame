@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    testcpu.c
+    testcpu.cpp
 
     Example driver for performing CPU stress tests.
 
@@ -38,7 +38,7 @@ public:
 	}
 
 	// timer callback; used to wrest control of the system
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override
 	{
 		static const u32 sample_instructions[] =
 		{
@@ -148,7 +148,7 @@ public:
 	}
 
 	// report reads from anywhere
-	READ64_MEMBER( general_r )
+	u64 general_r(offs_t offset, u64 mem_mask = ~0)
 	{
 		u64 fulloffs = offset;
 		u64 result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
@@ -157,7 +157,7 @@ public:
 	}
 
 	// report writes to anywhere
-	WRITE64_MEMBER( general_w )
+	void general_w(offs_t offset, u64 data, u64 mem_mask = ~0)
 	{
 		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
 	}

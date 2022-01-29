@@ -19,6 +19,7 @@
 #include "chainmanager.h"
 #include "target.h"
 #include "vertex.h"
+#include "rendlay.h"
 #include "screen.h"
 #include "clear.h"
 #include "modules/osdwindow.h"
@@ -76,14 +77,14 @@ void bgfx_chain::repopulate_targets()
 	}
 }
 
-void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
+void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
 {
-	screen_device_iterator screen_iterator(window.machine().root_device());
+	screen_device_enumerator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
-	uint16_t screen_count(window.target()->current_view()->screens().count());
-	uint16_t screen_width(floorf(prim->get_quad_width() + 0.5f));
-	uint16_t screen_height(floorf(prim->get_quad_height() + 0.5f));
+	uint16_t screen_count(window.target()->current_view().visible_screen_count());
+	uint16_t screen_width = prim.m_quad_width;
+	uint16_t screen_height = prim.m_quad_height;
 	uint32_t rotation_type =
 		(window.target()->orientation() & ROT90)  == ROT90  ? 1 :
 		(window.target()->orientation() & ROT180) == ROT180 ? 2 :
@@ -119,13 +120,13 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 	static int64_t last = m_current_time;
 	const int64_t frameTime = m_current_time - last;
 	last = m_current_time;
-	const double freq = double(bx::getHPFrequency());
+	const auto freq = double(bx::getHPFrequency());
 	const double toMs = 1000.0 / freq;
 	const double frameTimeInSeconds = (double)frameTime / 1000000.0;
 
 	for (bgfx_parameter* param : m_params)
 	{
-		param->tick(frameTimeInSeconds* toMs);
+		param->tick(frameTimeInSeconds * toMs);
 	}
 }
 
@@ -143,14 +144,14 @@ uint32_t bgfx_chain::applicable_passes()
 	return applicable_passes;
 }
 
-void bgfx_chain::prepend_converter(bgfx_effect *effect, chain_manager &chains)
+void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains)
 {
-	clear_state *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
+	auto *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
 	std::vector<bgfx_suppressor*> suppressors;
 
 	std::vector<bgfx_input_pair*> inputs;
 	std::vector<std::string> available_textures;
-	inputs.push_back(new bgfx_input_pair(0, "s_tex", "source",  available_textures, "", chains, m_screen_index));
+	inputs.push_back(new bgfx_input_pair(0, "s_tex", source,  available_textures, "", chains, m_screen_index));
 	inputs.push_back(new bgfx_input_pair(1, "s_pal", "palette", available_textures, "", chains, m_screen_index));
 
 	std::vector<bgfx_entry_uniform*> uniforms;
@@ -163,10 +164,10 @@ void bgfx_chain::prepend_converter(bgfx_effect *effect, chain_manager &chains)
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size0", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size1", bgfx::UniformType::Vec4), values, 4));
 
-	m_entries.insert(m_entries.begin(), new bgfx_chain_entry("XXconvert", effect, clear, suppressors, inputs, uniforms, m_targets, "screen"));
-	m_has_converter = true;
+	m_entries.insert(m_entries.begin() + index, new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, m_targets, "screen", false));
 
 	const uint32_t screen_width = chains.targets().width(TARGET_STYLE_GUEST, m_screen_index);
 	const uint32_t screen_height = chains.targets().height(TARGET_STYLE_GUEST, m_screen_index);
-	m_targets.create_target("screen", bgfx::TextureFormat::RGBA8, screen_width, screen_height, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
+	m_targets.destroy_target("screen", m_screen_index);
+	m_targets.create_target("screen", bgfx::TextureFormat::BGRA8, screen_width, screen_height, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
 }

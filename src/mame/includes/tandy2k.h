@@ -70,7 +70,7 @@ public:
 		m_rs232(*this, RS232_TAG),
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		m_hires_ram(*this, "hires_ram"),
-		m_char_ram(*this, "char_ram"),
+		m_char_ram(*this, "char_ram", 0x1000, ENDIANNESS_LITTLE),
 		m_pc_keyboard(*this, "pc_keyboard"),
 		m_dma_mux(0),
 		m_kbdclk(0),
@@ -138,13 +138,13 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<tandy2k_keyboard_device> m_kb;
 	required_shared_ptr<uint16_t> m_hires_ram;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_reset_after_children() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -152,39 +152,38 @@ private:
 	void dma_request(int line, int state);
 	void speaker_update();
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_WRITE8_MEMBER( char_ram_w );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_READ8_MEMBER( enable_r );
-	DECLARE_WRITE8_MEMBER( enable_w );
-	DECLARE_WRITE8_MEMBER( dma_mux_w );
-	DECLARE_READ8_MEMBER( kbint_clr_r );
-	DECLARE_READ8_MEMBER( fldtc_r );
-	DECLARE_WRITE8_MEMBER( fldtc_w );
-	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
+	uint8_t char_ram_r(offs_t offset);
+	void char_ram_w(offs_t offset, uint8_t data);
+	uint8_t videoram_r(offs_t offset);
+	uint8_t enable_r();
+	void enable_w(uint8_t data);
+	void dma_mux_w(uint8_t data);
+	uint8_t kbint_clr_r();
+	uint8_t fldtc_r();
+	void fldtc_w(uint8_t data);
+	void addr_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( outspkr_w );
 	DECLARE_WRITE_LINE_MEMBER( intbrclk_w );
 	DECLARE_WRITE_LINE_MEMBER( rfrqpulse_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_wben_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_cblank_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_slg_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_sld_w );
-	DECLARE_READ8_MEMBER( hires_status_r );
-	DECLARE_WRITE8_MEMBER( hires_plane_w );
-	DECLARE_WRITE8_MEMBER( hires_palette_w );
-	DECLARE_WRITE8_MEMBER( vidla_w );
-	DECLARE_WRITE8_MEMBER( drb_attr_w );
+	uint8_t hires_status_r();
+	void hires_plane_w(uint8_t data);
+	void vidla_w(uint8_t data);
+	void drb_attr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
-	DECLARE_READ8_MEMBER( clkmouse_r );
-	DECLARE_WRITE8_MEMBER( clkmouse_w );
-	DECLARE_READ8_MEMBER( irq_callback );
+	uint8_t clkmouse_r(offs_t offset);
+	void clkmouse_w(offs_t offset, uint8_t data);
+	uint8_t irq_callback(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hdl_w );
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
@@ -194,7 +193,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
 	enum

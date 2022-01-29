@@ -1,0 +1,1107 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="bbc_flop_hybrid" description="Hybrid Music System discs">
+
+	<!-- Music 500 -->
+
+	<software name="m500">
+		<description>Music 500</description>
+		<year>1984</year>
+		<publisher>Acorn Computers</publisher>
+		<sharedfeat name="compatibility" value="M500"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Music 500_Issue Disc.ssd" size="204800" crc="7ebc0c92" sha1="fba88e59c392c99bf18047693e09a0035808ccb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hybrid Music System -->
+
+	<software name="symphony">
+		<description>ATPL Symphony</description>
+		<year>1985</year>
+		<publisher>ATPL</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ATPL Symphony.ssd" size="204800" crc="478b6622" sha1="687f02f33dcfc9b8cc83b528dc8054843212fa9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="studio2">
+		<description>Studio-2</description>
+		<year>198?</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Studio-2_Issue Disc.ssd" size="102400" crc="2aac288c" sha1="95bb0d572cd12b58d6d69647afb20440e40cfe23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="studio3">
+		<description>Studio-3</description>
+		<year>1989</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Studio-3_Issue Disc.ssd" size="102400" crc="77441449" sha1="b7eb939318a9d2e0c8f3db819c204ff7eb85f91e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="studio5">
+		<description>Studio 5000</description>
+		<year>1986</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Studio 5000_System Disc.ssd" size="102400" crc="0bdd6707" sha1="893800a49313a696feb669287f53f4e37a8b2d58"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Studio 5000_Issue Disc.ssd" size="102400" crc="00f3d6fc" sha1="8ee44104c35e3d16321c407d5e51e010ac2b9d42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="studio54b">
+		<description>Studio 5000-4B</description>
+		<year>1989</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Studio 5000-4B_Issue Disc.ssd" size="102400" crc="a4dec092" sha1="1f4120a501c1d14b2ca71e14eca1e8598242deaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndspace">
+		<description>Sound Worlds 1: Soundspace</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundspace_Issue Disc.ssd" size="102400" crc="0faf6be1" sha1="5f11edae0772f751faa3806ff8d219b9c5c2a35b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndscape">
+		<description>Sound Worlds 2: Soundscape</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundscape_Issue Disc.ssd" size="102400" crc="0d3786bb" sha1="32d249ed0fca84beba7edd2ea3ebda861c24387c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndscore">
+		<description>Sound Worlds 4: Soundscore</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundscore_System Disc.ssd" size="102400" crc="b92d6d86" sha1="2da57d27a2e13c34c842fdc7904390bdfa1044f6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundscore_Issue Disc.ssd" size="102400" crc="aa1c45c9" sha1="489fe48d7ee0c6873d5917405c30f93c2f227e8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndshow">
+		<description>Soundshow</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundshow_Issue Disc.ssd" size="102400" crc="183b9d50" sha1="3fab8852238c9989eb6577dbe59ea8516accd246"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndstage" supported="no">
+		<description>Soundstage</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundstage_System Disc.ssd" size="102400" crc="daca75ba" sha1="907782390724bb857f2c36810eb5d92f59539bc2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundstage_Issue Disc.ssd" size="102400" crc="e6ac0807" sha1="1e8cb3028d5f4b7ca21b75f3564b9f7819916e32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndstory">
+		<description>Soundstory</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundstory_System Disc.ssd" size="102400" crc="ebb12cc1" sha1="a6743dae72e7784308fbbda198eb24e05e0ba621"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Soundstory_Issue Disc.ssd" size="102400" crc="eb123c50" sha1="48ec24b85b9f980b68e8b79f147de226bb9c77e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolbox">
+		<description>AMPLE Toolbox</description>
+		<year>1989</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Issue Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="AMPLE Toolbox_Issue Disc.ssd" size="102400" crc="c2f60e00" sha1="2b6cd885ecddd8ca86c6f590ccca738549533d39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wavedsgn">
+		<description>Wave Designer</description>
+		<year>1988</year>
+		<publisher>SoundSculptures</publisher>
+		<info name="author" value="Jonty Stockdale" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="75520">
+				<rom name="Wave Designer.1.ssd" size="75520" crc="3db5b981" sha1="c88c9c068685cbfd30bd51ced7770df8e4c61aeb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="91136">
+				<rom name="Wave Designer.2.ssd" size="91136" crc="55ee886b" sha1="ac40a3a1547a4c7d33aaa7e1d56e8207bd001103"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Music 87 -->
+
+	<software name="music87">
+		<description>Music 87 Software</description>
+		<year>1987</year>
+		<publisher>Peartree Computers</publisher>
+		<sharedfeat name="compatibility" value="M87"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348928">
+				<rom name="Music87.dsd" size="348928" crc="f19f40ea" sha1="8f1a7f22ab4d1db57b074581a61134e227c94e44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- AMPLE Albums -->
+
+	<software name="ampbyte1" cloneof="ampbyte2">
+		<description>AMPLE Bytes Back R1</description>
+		<year>1987</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="David Reed" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101376">
+				<rom name="Ample Bytes Back_R1.ssd" size="101376" crc="e6b09eb5" sha1="b02e31d12e2e80c93618c81b0f4127af6bc088f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampbyte2">
+		<description>AMPLE Bytes Back R2</description>
+		<year>1987</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="David Reed" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Ample Bytes Back_R2.ssd" size="102400" crc="1605f2c6" sha1="c855f61d75744b37fa1c0c3d80b926a8a9fc4c28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampvibr">
+		<description>AMPLE Vibrations</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="David Reed" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="115200">
+				<rom name="Ample Vibrations.ssd" size="115200" crc="013366cc" sha1="fa4e854194a7347ddc2a500fe51a9b94ac22c9cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashes">
+		<description>Ashes R1</description>
+		<year>1990</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Michael Harbour" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="63488">
+				<rom name="Ashes.ssd" size="63488" crc="9bd25fca" sha1="a3ed279dcb5a4c89d8d858b2372e684f03cce198"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmix">
+		<description>Cosmix R2</description>
+		<year>1987</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Pilgrim Beart" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Cosmix.ssd" size="102400" crc="ac0f9030" sha1="2fde9d91680f00617e50dc7468c339827f13a4a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="instories">
+		<description>Inside Stories</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Peter Chase" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Inside Stories.ssd" size="102400" crc="8bbb897f" sha1="455e603dcfc344d0956d8f41db71d16ea050bc87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeland1" cloneof="homeland2">
+		<description>Return to the Homeland R1</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Obernell" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="51712">
+				<rom name="Return to the Homeland_R1.ssd" size="51712" crc="dffa461c" sha1="de2b571ff7038cbd688b48dc7990b31eb8b97a30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeland2">
+		<description>Return to the Homeland R2</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Obernell" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Return to the Homeland_R2.ssd" size="204800" crc="26ed6d1d" sha1="f574fe74079fa4bcea1aa71cb373aaff0c64ce79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jazz1">
+		<description>Jazz Disc Vol.1</description>
+		<year>1989</year>
+		<publisher>JBSoftware</publisher>
+		<info name="author" value="John Bartlett" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101888">
+				<rom name="Jazz Vol I.1.ssd" size="101888" crc="79b59202" sha1="019c068d64e1c6b94118c6b266878eca8bf86998"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legendo">
+		<description>The Legend of Obernell</description>
+		<year>1990</year>
+		<publisher>Phil Comber</publisher>
+		<info name="author" value="Phil Comber" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="69888">
+				<rom name="The Legend of Obernell.ssd" size="69888" crc="2e74665b" sha1="a33fb633240352e5f8d54f2263b27708a6819c19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcity">
+		<description>Music City R2</description>
+		<year>1987</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Ian Guinan" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="40 track"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Music City_40t.ssd" size="102400" crc="9cd9bcfc" sha1="6e958366d158dd481e68d431ec2e54bc75d6d945"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="80 track"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Music City_80t.ssd" size="204800" crc="65621356" sha1="d1512754ef1896c64cd220761b3aa9a5bfe8865e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcity2">
+		<description>Music City 2</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Music City 2.ssd" size="204800" crc="25cea818" sha1="2d078945ef8e9ac4e71fd6871a9ca4cd0248f0d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notes">
+		<description>Notes</description>
+		<year>1987</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Pilgrim Beart" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Notes.ssd" size="102400" crc="a884a5c5" sha1="30efd636da421e3ae22ff093fedb972ba4025f6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plaice">
+		<description>Plaice R1</description>
+		<year>1988</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Fish Shop Boys" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="40 track"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Plaice_40t.ssd" size="102400" crc="760a6b9c" sha1="c0d12a330cf92414d66f2c42a327c1d928f4776e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="80 track"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Plaice_80t.ssd" size="204800" crc="101eba1e" sha1="525288de2f7a87a556faceef014709eaab6f5fb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shiver">
+		<description>Shivering Again</description>
+		<year>1989</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="author" value="Michael Harbour" />
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="70656">
+				<rom name="Shivering Again.ssd" size="70656" crc="f8cba7f8" sha1="46b9708b874f6aa29168977d411ed620422bad60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- AMPLE Information Exchange -->
+
+	<software name="ampex001">
+		<description>Amplinex 001</description>
+		<year>1987</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-001.ssd" size="204800" crc="5442c90b" sha1="b52fe8e5a69cbe2a1847c22f44dd49db20489dc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex002">
+		<description>Amplinex 002</description>
+		<year>1987</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-002.ssd" size="204800" crc="464140c6" sha1="0e54e76ba7f8c1bf3a168dc96f01a2c3352dcd27"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex003">
+		<description>Amplinex 003</description>
+		<year>1987</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-003.ssd" size="204800" crc="ad024d8c" sha1="ebcdbbb034c2bb0b83213e7e4ab628670f9fc789"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex004">
+		<description>Amplinex 004</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-004.ssd" size="204800" crc="2febe1af" sha1="55c996c15569dbbb918446618c8b595b93c626c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex005">
+		<description>Amplinex 005</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-005.ssd" size="204800" crc="5af23e84" sha1="ea36ce0ed99a018993caf7f5e19500bf7f52a7fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex006">
+		<description>Amplinex 006</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-006.ssd" size="204800" crc="a8649f39" sha1="20ca26c86cbc5c02541782c107cf1fe03d791b78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampexm06">
+		<description>Amplinex M06</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-M06.ssd" size="204800" crc="aa1c23ae" sha1="b67af3f59107a09e148c9477d1fe557c4793f8a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex007">
+		<description>Amplinex 007</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-007.ssd" size="204800" crc="8118bec2" sha1="b6d59efc0859b243a4a418f52799021cc690bbbf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex008">
+		<description>Amplinex 008</description>
+		<year>1988</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-008.ssd" size="204800" crc="afecb2b3" sha1="de0e2ee8eac1e51c96118fff77ff7f8ef68fd3fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex009">
+		<description>Amplinex 009</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-009.ssd" size="204800" crc="7ad77e4f" sha1="9d48c582e27af199c1a9e466734e7d1599cd148e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampexm09">
+		<description>Amplinex M09</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-M09.ssd" size="204800" crc="b25f074f" sha1="0c956d6237340c58b3418291b43161da12fc2080"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex010">
+		<description>Amplinex 010</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-010.ssd" size="204800" crc="b0a71d20" sha1="92f1fa2a466be5fa0613c4dc5a90a1f5b77d4abd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex011">
+		<description>Amplinex 011</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-011.ssd" size="204800" crc="40640c1a" sha1="e9d692f37f0ffa19126234389bf1716fabd6d7f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampexu11">
+		<description>Amplinex U11</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-U11.ssd" size="204800" crc="6d62cc85" sha1="b5886a17c759abeb593dab0df8ca64713353d21d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex012">
+		<description>Amplinex 012</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-012.ssd" size="204800" crc="d471c2fc" sha1="8e6e093e264746da672aa14322597e2a4e8573c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex013">
+		<description>Amplinex 013</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-013.ssd" size="204800" crc="30159b3f" sha1="7a2d9b4b150f4fab6f1166f6c2d4e80ab4ac4134"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampexm13">
+		<description>Amplinex M13</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-M13.ssd" size="204800" crc="23d1baf5" sha1="4e69efa57abf865f30c7d52c031b4aefd6e03f41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex014">
+		<description>Amplinex 014</description>
+		<year>1989</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-014.ssd" size="204800" crc="d8f779f3" sha1="93cbebaf2c9bde6c3ef79afaca9d13ef2f97a828"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex015">
+		<description>Amplinex 015</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-015.ssd" size="204800" crc="a2edb3db" sha1="67bf2467893fa813f1d44c6b99787768d20543b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex016">
+		<description>Amplinex 016</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-016.ssd" size="204800" crc="24f1f113" sha1="6925fd70bedc9dafb2b2fcc5270fdf732f54619a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex017">
+		<description>Amplinex 017</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-017.ssd" size="204800" crc="12ca0372" sha1="dd25bcb15abc5a8e6715b98f6b41f06dbb764c2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex018">
+		<description>Amplinex 018</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-018.ssd" size="204800" crc="1593bd63" sha1="cf2471b5a015856e0b4032e1236d8dff7657979b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex019">
+		<description>Amplinex 019</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-019.ssd" size="204800" crc="66d5669b" sha1="3ea727c68c1d5b826b15d35b607da26aef985662"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex020">
+		<description>Amplinex 020</description>
+		<year>1990</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-020.ssd" size="204800" crc="ca57d380" sha1="63437615269eb69d5d5b3e89ac9bfde9179b2942"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex021">
+		<description>Amplinex 021</description>
+		<year>1991</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-021.ssd" size="204800" crc="b2faf87e" sha1="7ff66db52e47bb3dccb7e7a57c3ef25bc1b5f824"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex022">
+		<description>Amplinex 022</description>
+		<year>1991</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-022.ssd" size="204800" crc="f599a0f8" sha1="6c058c9724c39c8edc008083a5aab2724666b864"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex023">
+		<description>Amplinex 023</description>
+		<year>1991</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-023.ssd" size="204800" crc="62f25074" sha1="2d4ca93e3007cc42e53a0af581d3f61c0917d58b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex024">
+		<description>Amplinex 024</description>
+		<year>1992</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-024.ssd" size="204800" crc="25890a1d" sha1="1363201ac5ecd73f276d265e6bac78e72d3eab10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex025">
+		<description>Amplinex 025</description>
+		<year>1992</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-025.ssd" size="204800" crc="d68b7255" sha1="1059cc80b7771a48229b0494c3d3028cb1e2f1b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex026">
+		<description>Amplinex 026</description>
+		<year>1992</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-026.ssd" size="204800" crc="687c530e" sha1="ccf348fdd48e155f99317e1f4d3dbbbbf38f3ff8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex027">
+		<description>Amplinex 027</description>
+		<year>1992</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-027.ssd" size="204800" crc="eacf7e84" sha1="e66992b6ecadee616fbd7a397b0a09b96c7cf2cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampex028">
+		<description>Amplinex 028</description>
+		<year>1992</year>
+		<publisher>AMPLE Information Exchange</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Amplinex-028.ssd" size="204800" crc="2af0c718" sha1="2731d63af740e77bf2d08468abbca22f4ce12fa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Panda Discs - double sided discs, imaged as ssd -->
+
+	<software name="panda1">
+		<description>Music 5000 Volume 1: Monster Computations 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="189440">
+				<rom name="Panda1.1.ssd" size="189440" crc="11e11cbf" sha1="8b5a42bed3d65daf80f1e27b28604b816ed02167"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="189440">
+				<rom name="Panda1.2.ssd" size="189440" crc="11e11cbf" sha1="8b5a42bed3d65daf80f1e27b28604b816ed02167"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda2">
+		<description>Music 5000 Volume 2: Phil Comber 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88320">
+				<rom name="Panda2.1.ssd" size="88320" crc="05a5209f" sha1="104bb730f31b4ce6b6b8de6fdf2a7a0964e310ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="87040">
+				<rom name="Panda2.2.ssd" size="87040" crc="9feb62dd" sha1="fde524edf2f586d8b750dd5b60baba7422ce3953"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda3">
+		<description>Music 5000 Volume 3: Bernie Dawson 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="108032">
+				<rom name="Panda3.1.ssd" size="108032" crc="7949b3e9" sha1="4367387712950cac58adc1341ad57c414f0d5c22"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="106752">
+				<rom name="Panda3.2.ssd" size="106752" crc="475d9ec6" sha1="4ebc837bbedc5cba0d86530fcd32c1df950140fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda4">
+		<description>Music 5000 Volume 4: Monster Computations 2</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174592">
+				<rom name="Panda4.1.ssd" size="174592" crc="22487883" sha1="4296c44de669d18aaf647ea035f4b1a5181639a2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="173312">
+				<rom name="Panda4.2.ssd" size="173312" crc="93114580" sha1="c8c9d3d05ab7387798b223e3d6ab20bb70d74292"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda5">
+		<description>Music 5000 Volume 5: Paul Nuttall 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146432">
+				<rom name="Panda5.1.ssd" size="146432" crc="e167430d" sha1="ceaf92bc79bf3b4bffe14eb3372b56842168b924"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="145152">
+				<rom name="Panda5.2.ssd" size="145152" crc="2e336256" sha1="95bffc4575804fb66d5598661dd30c30e52aacbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda6">
+		<description>Music 5000 Volume 6: Andy Knight 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="103680">
+				<rom name="Panda6.1.ssd" size="103680" crc="f0b84294" sha1="d3bbdaf087150b963510b87e45e9dfb75c797e3c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="103680">
+				<rom name="Panda6.2.ssd" size="103680" crc="2ec1cb06" sha1="d9dc29516f3457dd3bd60c611fc4dfb3ac34cac5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda7">
+		<description>Music 5000 Volume 7: David King 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="Panda7.1.ssd" size="89600" crc="7ea38d59" sha1="130e78a9cbe1005463c2e867b106b460419c6548"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="Panda7.2.ssd" size="89600" crc="7ea38d59" sha1="130e78a9cbe1005463c2e867b106b460419c6548"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda8">
+		<description>Music 5000 Volume 8: Children in Need 1</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="142080">
+				<rom name="Panda8.1.ssd" size="142080" crc="74e68f92" sha1="82b70062a93586c0e38d857c9be0cbf91d77ad16"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="136192">
+				<rom name="Panda8.2.ssd" size="136192" crc="b779f450" sha1="47008246d1e7c35b47b84368cb16da1747d9bfb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda9">
+		<description>Music 5000 Volume 9: The Noige &quot;Echoes&quot;</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35840">
+				<rom name="Panda9.1.ssd" size="35840" crc="e3b24094" sha1="a8ceb6b4744e80b11dabaea9708b7396e091bfe5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="29952">
+				<rom name="Panda9.2.ssd" size="29952" crc="69d8e542" sha1="14f7f223f9e772a2f010f6291442ef7f66e29d02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda10">
+		<description>Music 5000 Volume 10: Monster Computations 3</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="128512">
+				<rom name="Panda10.1.ssd" size="128512" crc="9558ae89" sha1="5b24793256da4b6401f6e7e7d466ed046f86af6f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="121600">
+				<rom name="Panda10.2.ssd" size="121600" crc="42b0ee6b" sha1="75370f6a19175f5dbf3b70b811fc11a826af7158"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda11">
+		<description>Music 5000 Volume 11: Phil Comber &quot;Deux&quot;</description>
+		<year>1989</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79616">
+				<rom name="Panda11.1.ssd" size="79616" crc="7c5a1753" sha1="70469990b5a866b224abe5a2d9b3e148a8a5974b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="73216">
+				<rom name="Panda11.2.ssd" size="73216" crc="7fde34c7" sha1="c9a26b95269b6f8d78b8906dcc87312ad6041cd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda12">
+		<description>Music 5000 Volume 12: The Noige's &quot;Moments in Time&quot;</description>
+		<year>1990</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47104">
+				<rom name="Panda12.1.ssd" size="47104" crc="87b5cfab" sha1="3aed7f4d18e20f0e0f58d80a3e45ef051bb06561"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="40192">
+				<rom name="Panda12.2.ssd" size="40192" crc="7293b909" sha1="d624bd46ba3cb51d234ab38d45d8cefda56cd28f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda13">
+		<description>Music 5000 Volume 13: Jean-Michel Jarre</description>
+		<year>1990</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="133120">
+				<rom name="Panda13.1.ssd" size="133120" crc="0953dd04" sha1="2af0167079fca34e7629d005710493a0914b8d00"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="133120">
+				<rom name="Panda13.2.ssd" size="133120" crc="6f437ae7" sha1="f1129771a17930ec90d58b70f7956419bf2bd42b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda14">
+		<description>Music 5000 Volume 14: Take a Bite</description>
+		<year>1990</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78080">
+				<rom name="Panda14.1.ssd" size="78080" crc="d6e2e6c5" sha1="cb02fc219fc53f3c259f53b714aec7e47db0dc92"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="71168">
+				<rom name="Panda14.2.ssd" size="71168" crc="11c1f826" sha1="ead701713dd784222ea5c4e57adb36e16a78951e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda15">
+		<description>Music 5000 Volume 15: Children in Need 2</description>
+		<year>1990</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="155392">
+				<rom name="Panda15.1.ssd" size="155392" crc="6bd7dfad" sha1="f6ab9e7f7a4f05e289d67b94cef4a962b91d493f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="148480">
+				<rom name="Panda15.2.ssd" size="148480" crc="a12d4687" sha1="10d5e7f88a8a7041aa666f11cc10e9d1202d8c36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panda16">
+		<description>Music 5000 Volume 16: Monster Computations 4</description>
+		<year>1990</year>
+		<publisher>Panda Discs</publisher>
+		<sharedfeat name="compatibility" value="M5000"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163072">
+				<rom name="Panda16.1.ssd" size="163072" crc="0234d991" sha1="cbce6316ffa9aa00dca770bf7593db4bbfd2e771"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="156160">
+				<rom name="Panda16.2.ssd" size="156160" crc="2d4a51e0" sha1="aab03364cc94acf82faef3779090d0b9ba53e394"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

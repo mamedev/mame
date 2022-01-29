@@ -149,7 +149,7 @@ void freeway_state::freeway(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.set_show_border_area(false);
 	crtc.set_screen("screen");
-	crtc.set_update_row_callback(FUNC(freeway_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(freeway_state::update_row));
 	crtc.out_hsync_callback().set("pit", FUNC(pit8254_device::write_clk0)); // guess
 
 	ns16450_device &uart(NS16450(config, "uart", 10_MHz_XTAL / 8)); // type unknown
@@ -187,5 +187,22 @@ ROM_START(freeway)
 	ROM_LOAD("sb_cor.bin", 0x0000, 0x8000, CRC(5f86a160) SHA1(f21b7e0e6a407371c252d6fde6fcb32a2682824c)) // all 0xFF fill until 0x7C00; valid data is only 4 bits wide
 ROM_END
 
+ROM_START(freewaya)
+	ROM_REGION(0x10000, "program", 0)
+	ROM_LOAD("memory_431b_eprom-512", 0x00000, 0x10000, CRC(64a23693) SHA1(ad8001c3652fb813d0f15875c7f9478fe2dd873c))
 
-GAME(1999, freeway, 0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_IS_SKELETON)
+	ROM_REGION(0x18000, "gfx", 0)
+	ROM_LOAD("rgb 1fw 256 vr 512b",  0x00000, 0x8000, CRC(b0bed9a0) SHA1(0275f1aa008963eb54f672565d3d5c1dd8c96213))
+	ROM_LOAD("rgb 2fw 256 vr 512b",  0x08000, 0x8000, CRC(ed1bb4d8) SHA1(78f9eced819c1fa269e685bb176671158ffcec26))
+	ROM_LOAD("rgb 3fw 256 vr 512b",  0x10000, 0x8000, CRC(c685c530) SHA1(deec9ce1df500f14b9ebd007d482473f97b3ecf3))
+
+	ROM_REGION(0x8000, "cor", 0)
+	ROM_LOAD("color_431b_eprom-256", 0x0000, 0x8000, CRC(e49fc782) SHA1(2c50cf644b7c6449880ed3d6e778ba116e123ae2)) // FIXED BITS (0000xxxx)
+
+	ROM_REGION(0x21ee, "nvram", 0)
+	ROM_LOAD("ram_m48t08_431", 0x0000, 0x21ee, CRC(e8fe8d9c) SHA1(bf93ead6ae0f03a646b4952cb999cf0dbc58d223)) // weird size, check when emulation is more mature
+ROM_END
+
+
+GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_IS_SKELETON)
+GAME(1997, freewaya, freeway, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V4.31)", MACHINE_IS_SKELETON)

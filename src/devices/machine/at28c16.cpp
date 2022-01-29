@@ -48,7 +48,7 @@ at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, d
 		m_a9_12v(0),
 		m_oe_12v(0),
 		m_last_write(-1),
-		m_default_data(*this, DEVICE_SELF, AT28C16_DATA_BYTES)
+		m_default_data(*this, DEVICE_SELF)
 {
 }
 
@@ -142,7 +142,7 @@ void at28c16_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( at28c16_device::write )
+void at28c16_device::write(offs_t offset, uint8_t data)
 {
 	if( m_last_write >= 0 )
 	{
@@ -180,7 +180,7 @@ WRITE8_MEMBER( at28c16_device::write )
 }
 
 
-READ8_MEMBER( at28c16_device::read )
+uint8_t at28c16_device::read(offs_t offset)
 {
 	if( m_last_write >= 0 )
 	{
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 }
 
 
-void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch( id )
 	{

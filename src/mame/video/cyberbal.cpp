@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
 #include "includes/cyberbal.h"
 
 
@@ -26,7 +25,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_alpha_tile_info)
 	uint16_t data = m_alpha->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
+	tileinfo.set(2, code, color, (data >> 15) & 1);
 }
 
 
@@ -35,7 +34,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 	uint16_t data = m_alpha2->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
+	tileinfo.set(2, code, color, (data >> 15) & 1);
 }
 
 
@@ -44,7 +43,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_playfield_tile_info)
 	uint16_t data = m_playfield->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -53,7 +52,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 	uint16_t data = m_playfield2->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -202,15 +201,15 @@ void cyberbal_base_state::scanline_update_one(screen_device &screen, int scanlin
 	i++;
 }
 
-void cyberbal_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal_state::scanline_update)
 {
-	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield, *m_alpha);
-	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2, *m_alpha2);
+	scanline_update_one(*m_lscreen, param, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_rscreen, param, 1, *m_playfield2, *m_alpha2);
 }
 
-void cyberbal2p_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal2p_state::scanline_update)
 {
-	scanline_update_one(*m_screen, scanline, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_screen, param, 0, *m_playfield, *m_alpha);
 }
 
 
@@ -234,13 +233,12 @@ uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = curmob.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					/* not verified: logic is all controlled in a PAL
-					*/
+					// not verified: logic is all controlled in a PAL
 					pf[x] = mo[x];
 				}
 		}

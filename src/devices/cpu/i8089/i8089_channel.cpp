@@ -83,11 +83,8 @@ void i8089_channel_device::device_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_prio));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
-	{
-		save_item(NAME(m_r[i].w), i);
-		save_item(NAME(m_r[i].t), i);
-	}
+	save_item(STRUCT_MEMBER(m_r, w));
+	save_item(STRUCT_MEMBER(m_r, t));
 }
 
 //-------------------------------------------------

@@ -59,15 +59,15 @@ private:
 	uint16_t m_old_mcu_nmi1;
 	uint16_t m_old_mcu_nmi2;
 
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_init_w);
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);
-	DECLARE_WRITE8_MEMBER(galpani2_coin_lockout_w);
-	DECLARE_READ16_MEMBER(galpani2_eeprom_r);
-	DECLARE_WRITE16_MEMBER(galpani2_eeprom_w);
-	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
-	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
-	DECLARE_WRITE16_MEMBER(subdatabank_select_w);
+	void galpani2_mcu_init_w(uint8_t data);
+	void galpani2_mcu_nmi1_w(uint8_t data);
+	void galpani2_mcu_nmi2_w(uint8_t data);
+	void galpani2_coin_lockout_w(uint8_t data);
+	uint16_t galpani2_eeprom_r();
+	void galpani2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void galpani2_oki1_bank_w(uint8_t data);
+	void galpani2_oki2_bank_w(uint8_t data);
+	void subdatabank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

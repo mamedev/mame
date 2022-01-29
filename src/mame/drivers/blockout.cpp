@@ -71,20 +71,20 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
 #define MAIN_CLOCK XTAL(10'000'000)
 #define AUDIO_CLOCK XTAL(3'579'545)
 
-WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
+void blockout_state::blockout_irq6_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
+void blockout_state::blockout_irq5_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
@@ -107,7 +107,7 @@ void blockout_state::main_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w));
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
@@ -128,7 +128,7 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w));
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
@@ -256,9 +256,9 @@ static INPUT_PORTS_START( agress )
 
 	PORT_MODIFY("DSW2")
 	/* Engrish here. The manual says "Number of Prayers". Maybe related to lives? */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Players ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END

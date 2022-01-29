@@ -36,14 +36,14 @@ class h83337_device : public h8_device {
 public:
 	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(wscr_r);
-	DECLARE_WRITE8_MEMBER(wscr_w);
-	DECLARE_READ8_MEMBER(stcr_r);
-	DECLARE_WRITE8_MEMBER(stcr_w);
-	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);
-	DECLARE_READ8_MEMBER(mdcr_r);
-	DECLARE_WRITE8_MEMBER(mdcr_w);
+	uint8_t wscr_r();
+	void wscr_w(uint8_t data);
+	uint8_t stcr_r();
+	void stcr_w(uint8_t data);
+	uint8_t syscr_r();
+	void syscr_w(uint8_t data);
+	uint8_t mdcr_r();
+	void mdcr_w(uint8_t data);
 
 protected:
 	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);

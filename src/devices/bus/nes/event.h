@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAEM_BUS_NES_EVENT_H
-#define MAEM_BUS_NES_EVENT_H
+#ifndef MAME_BUS_NES_EVENT_H
+#define MAME_BUS_NES_EVENT_H
 
 #pragma once
 
@@ -14,20 +14,16 @@ class nes_event_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual ioport_constructor device_input_ports() const override;
+	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void pcb_reset() override;
 
 protected:
-	static constexpr device_timer_id TIMER_EVENT = 0;
-
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void update_regs(int reg) override;
 	virtual void set_prg() override;
 	virtual void set_chr() override;
 
@@ -35,10 +31,10 @@ protected:
 
 	int m_nwc_init;
 
+	static constexpr device_timer_id TIMER_EVENT = 0;
 	emu_timer *event_timer;
-	attotime timer_freq;
 
-	uint32_t m_timer_count;
+	u32 m_timer_count;
 	int m_timer_on, m_timer_enabled;
 };
 
@@ -46,4 +42,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_EVENT, nes_event_device)
 
-#endif // MAEM_BUS_NES_EVENT_H
+#endif // MAME_BUS_NES_EVENT_H

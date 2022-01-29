@@ -8,9 +8,10 @@
 
 ***************************************************************************/
 
-#include "imgtool.h"
 #include "imgterrs.h"
-#include "osdcomm.h"
+
+#include <cassert>
+#include <iterator>
 
 static const char *const msgs[] =
 {
@@ -50,6 +51,6 @@ const char *imgtool_error(imgtoolerr_t err)
 {
 	err = (imgtoolerr_t)(ERRORCODE(err) - 1);
 	assert(err >= 0);
-	assert(err < ARRAY_LENGTH(msgs));
+	assert(err < std::size(msgs));
 	return msgs[err];
 }

@@ -3,101 +3,137 @@
 // thanks-to:Kevin Horton
 /***************************************************************************
 
-  Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
+most of them are VFD electronic games/toys.
 
-  known chips:
+known chips:
 
-  serial  device    etc.
+  serial  device   etc.
 ----------------------------------------------------------------
- @07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
- @08      HD38750A  1979, Bambino Dribble Away Basketball (ET-05)
- @45      HD38750A  1981, VTech Invaders
- *56      HD38750A  1981, Actronics(Hanzawa) Twinvader (small brown version)
- *58      HD38750A  1981, Actronics(Hanzawa) Challenge Racer/Ludotronic(Hanzawa) Grand Prix Turbo
- *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
+ @A07     HD38750  1979, Bambino Knock-Em Out Boxing (ET-06B)
+ @A08     HD38750  1979, Bambino Dribble Away Basketball (ET-05)
+ @A45     HD38750  1981, VTech Invaders
+ *A56     HD38750  1981, Actronics(Hanzawa) Twinvader (small brown version)
+ *A58     HD38750  1981, Actronics(Hanzawa) Challenge Racer/Ludotronic(Hanzawa) Grand Prix Turbo
+ *A62     HD38750  1982, Actronics(Hanzawa) Pack'n Maze
+ *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
- @04      HD38800A  1980, Gakken Heiankyo Alien
- @25      HD38800A  1981, Coleco Alien Attack
- @27      HD38800A  1981, Bandai Packri Monster
- @31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2
- @37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4
- @38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball
- *41      HD38800A  1982, Gakken Puck Monster
- *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
- @70      HD38800A  1982, Coleco Galaxian
- @73      HD38800A  1982, Mattel Star Hawk (PT-317B)
- @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
- @88      HD38800A  1984, Tomy Tron (THN-02)
+ @A04     HD38800  1980, Gakken Heiankyo Alien
+  A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
+ *A20     HD38800  1981, Entex Super Space Invader 2
+ @A25     HD38800  1981, Coleco Alien Attack
+ @A27     HD38800  1981, Bandai Packri Monster
+ @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
+  A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
+  A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
+  A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
+ *A41     HD38800  1982, Gakken Puck Monster
+ *A42     HD38800  1981, Akai GX-77
+ *A51     HD38800  1981, Actronics(Hanzawa) Twinvader (larger white version)
+ @A70     HD38800  1982, Coleco Galaxian
+ @A73     HD38800  1982, Mattel Star Hawk (PT-317B)
+ @A77     HD38800  1982, Bandai Frisky Tom (PT-327A)
+ @A88     HD38800  1982, Tomy Tron (THN-02)
+ @B01     HD38800  1982, Gakken Crazy Kong
+ @B19     HD38800  1982, Bandai Zaxxon
+ @B23     HD38800  1982, Tomy Kingman (THF-01II)
+ *B24     HD38800  1982, Actronics(Hanzawa) Wanted G-Man
+ *B29     HD38800  1984, Tomy Portable 6000 Bombman
+ *B31     HD38800  1983, Romtec Frog Prince (ET-806)
+ *B35     HD38800  1983, Bandai Gundam vs Gelgoog Zaku
+ *B42     HD38800  1983, Bandai Kiteyo Parman
+ @B43     HD38800  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
+ *B48     HD38800  1983, Bandai Go Go Dynaman
+ @B52     HD38800  1983, Bandai Ultraman Monster Battle (PT-424)
 
- @01      HD38800B  1982, Gakken Crazy Kong
- @19      HD38800B  1982, Bandai Zaxxon
- @23      HD38800B  1982, Tomy Kingman (THF-01II)
- *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
- *29      HD38800B  1984, Tomy Portable 6000 Bombman
- *31      HD38800B  1983, Gongoll Frog Prince (ET-806)
- *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
- @43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
- @52      HD38800B  1983, Bandai Ultraman Monster Battle (PT-424)
+ @A09     HD38820  1980, Mattel World Championship Baseball
+ @A13     HD38820  1981, Entex Galaxian 2
+ @A23     HD38820  1981, Entex Pac Man 2
+ @A28     HD38820  1981, Coleco Pac-Man (ver 1)
+ @A29     HD38820  1981, Coleco Pac-Man (ver 2)
+ @A32     HD38820  1982, Gakken Super Cobra
+ *A38     HD38820  1982, Entex Crazy Climber
+ @A42     HD38820  1982, Entex Stargate
+ @A43     HD38820  1982, Entex Turtles
+ @A45     HD38820  1982, Coleco Donkey Kong
+ @A49     HD38820  1983, Bandai Zackman
+ @A61     HD38820  1983, Coleco Ms. Pac-Man
+ *A62     HD38820  1983, Coleco Zaxxon
+ @A63     HD38820  1983, Bandai Pengo
+ @A65     HD38820  1983, Bandai Burger Time (PT-389)
+ @A69     HD38820  1983, Gakken Dig Dug
+ @A70     HD38820  1983, Parker Brothers Q*Bert
+ *A75     HD38820  1983, Bandai Toukon Juohmaru
+ @A85     HD38820  1984, Bandai Machine Man (PT-438)
+ @A88     HD38820  1984, Bandai Pair Match (PT-460) (1/2)
+ @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
 
- @09      HD38820A  1980, Mattel World Championship Baseball
- @13      HD38820A  1981, Entex Galaxian 2
- @23      HD38820A  1981, Entex Pac Man 2
- @28      HD38820A  1981, Coleco Pac-Man (ver 1)
- @29      HD38820A  1981, Coleco Pac-Man (ver 2)
- *32      HD38820A  198?, Gakken Super Cobra
- *38      HD38820A  1982, Entex Crazy Climber
- @42      HD38820A  1982, Entex Stargate
- @43      HD38820A  1982, Entex Turtles
- @45      HD38820A  1982, Coleco Donkey Kong
- @49      HD38820A  1983, Bandai Zackman
- @61      HD38820A  1983, Coleco Ms. Pac-Man
- @63      HD38820A  1983, Bandai Pengo
- @65      HD38820A  1983, Bandai Burger Time (PT-389)
- @69      HD38820A  1983, Gakken Dig Dug
- @70      HD38820A  1983, Parker Brothers Q*Bert
- @85      HD38820A  1984, Bandai Machine Man (PT-438)
- @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
- @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
+  A34     HD44801  1981, SciSys Mini Chess -> saitek_minichess.cpp
+  A50     HD44801  1981, CXG Sensor Computachess -> cxg_scptchess.cpp
+  A75     HD44801  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
+ *A85     HD44801  1982, SciSys Travel Sensor / Travel Mate / Chesspartner 5000/6000
+ *A92     HD44801  1982, SciSys Play Bridge Computer
+  B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
+  B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
+ *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
+  C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
+  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg_scptchess.cpp
 
-  75      HD44801A  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
+ *A86     HD44820  1983, Chess King Pocket Micro
+ *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
-  35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
-  42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
+ *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
- *89      HD44801C  1985, CXG Advanced Portachess
+ *B55     HD44860  1987, Saitek Pro Bridge 100
+
+ *A04     HD44868  1984, SciSys Rapier
+ *A07     HD44868  1984, Chess King Pocket Micro Deluxe
+ *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
+ *A14     HD44868  1985, SciSys Kasparov Plus
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
 
-  TODO:
-  - cgalaxn discrete sound (alien attacking sound effect)
-  - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
-    works ok if stack levels is increased, 38800 B rev. has more stack levels?
-    Or it could be a race condition: irq happening too late/early.
-  - epacman2 booting the game in demo mode, pacman should go straight to the
-    upper-left power pill: mcu cycle/interrupt timing related
-  - Though very uncommon when compared to games with LED/lamp display, some
-    games may manipulate VFD plate brightness by strobing it longer/shorter,
-    eg. cgalaxn when a ship explodes.
-  - bzaxxon 3D effect is difficult to simulate
-  - improve/redo SVGs of: bzaxxon, bpengo, bbtime
+ROM source notes when dumped from another publisher, but confident it's the same:
+- gckong: CGL Super Kong
+- ghalien: CGL Earth Invaders
+- kingman: Tandy Kingman
+- zackman: Tandy Zackman
+
+TODO:
+- cgalaxn discrete sound (alien attacking sound effect)
+- gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
+  It can be tested by jumping up repeatedly at the start position under the ladder,
+  if the glitch happens there, you can jump onto the 2nd floor.
+- epacman2 booting the game in demo mode, pacman should take the shortest route to
+  the upper-left power pill: mcu cycle/interrupt timing related
+- kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
+  the 2nd half of the ROM, none of the games access it though and it's impossible
+  to execute unless the chip is in testmode.
+- Though very uncommon when compared to games with LED/lamp display, some
+  games may manipulate VFD plate brightness by strobing it longer/shorter,
+  eg. cgalaxn when a ship explodes.
+- bzaxxon 3D effect is difficult to simulate
+- improve/redo SVGs of: bzaxxon, bbtime
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 // internal artwork (complete)
 #include "pairmtch.lh"
-#include "sag.lh"
 
 // internal artwork (bezel overlay)
 #include "bambball.lh"
@@ -247,15 +283,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void bambball(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bambball_state::plate_w)
+void bambball_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x(,D0-D3): vfd plate
 	int shift = (offset - 1) * 4;
@@ -266,7 +302,7 @@ WRITE8_MEMBER(bambball_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(bambball_state::grid_w)
+void bambball_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -278,10 +314,10 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + 1, data & 0xf);
+	plate_w(3 + 1, data & 0xf);
 }
 
-READ8_MEMBER(bambball_state::input_r)
+u8 bambball_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -372,9 +408,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void bmboxing(machine_config &config);
 };
 
@@ -387,7 +423,7 @@ void bmboxing_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bmboxing_state::plate_w)
+void bmboxing_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x: vfd plate
 	int shift = (offset - 1) * 4;
@@ -395,7 +431,7 @@ WRITE8_MEMBER(bmboxing_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bmboxing_state::grid_w)
+void bmboxing_state::grid_w(u16 data)
 {
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
@@ -408,7 +444,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 	update_display();
 }
 
-READ8_MEMBER(bmboxing_state::input_r)
+u8 bmboxing_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -519,8 +555,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -536,7 +572,7 @@ void bfriskyt_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bfriskyt_state::plate_w)
+void bfriskyt_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -544,7 +580,7 @@ WRITE8_MEMBER(bfriskyt_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bfriskyt_state::grid_w)
+void bfriskyt_state::grid_w(u16 data)
 {
 	// D6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -639,8 +675,8 @@ ROM_END
   * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
   known releases:
-  - Japan: FL Packri Monster
-  - USA(World?): Packri Monster
+  - Japan: FL Packri Monster, published by Bandai
+  - USA(World?): Packri Monster, published by Bandai
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
@@ -653,15 +689,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void packmon(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(packmon_state::plate_w)
+void packmon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -673,7 +709,7 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(packmon_state::grid_w)
+void packmon_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -685,10 +721,10 @@ WRITE16_MEMBER(packmon_state::grid_w)
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 9-12 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
-READ16_MEMBER(packmon_state::input_r)
+u16 packmon_state::input_r()
 {
 	// D5: multiplexed inputs
 	return read_inputs(5) & 0x20;
@@ -770,8 +806,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -780,7 +816,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(bzaxxon_state::plate_w)
+void bzaxxon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
@@ -792,7 +828,7 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bzaxxon_state::grid_w)
+void bzaxxon_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -809,7 +845,7 @@ WRITE16_MEMBER(bzaxxon_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0-D2: plate 7-9 (update display there)
-	plate_w(space, 4, data & 7);
+	plate_w(4, data & 7);
 }
 
 void bzaxxon_state::update_int1()
@@ -886,6 +922,10 @@ ROM_END
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
+  known releases:
+  - World: Zackman, published by Bandai
+  - USA: Zackman, published by Tandy
+
 ***************************************************************************/
 
 class zackman_state : public hh_hmcs40_state
@@ -895,8 +935,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -905,7 +945,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(zackman_state::plate_w)
+void zackman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D0,D1): vfd plate
 	int shift = offset * 4;
@@ -917,7 +957,7 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(zackman_state::grid_w)
+void zackman_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -934,7 +974,7 @@ WRITE16_MEMBER(zackman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0,D1: plate 12,13 (update display there)
-	plate_w(space, 7, data & 3);
+	plate_w(7, data & 3);
 }
 
 void zackman_state::update_int0()
@@ -1020,8 +1060,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -1037,7 +1077,7 @@ void bpengo_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bpengo_state::plate_w)
+void bpengo_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -1045,7 +1085,7 @@ WRITE8_MEMBER(bpengo_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bpengo_state::grid_w)
+void bpengo_state::grid_w(u16 data)
 {
 	// D10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1128,8 +1168,8 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_REGION( 565069, "screen", 0)
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(fb25ffeb) SHA1(fb4db5120f1e35e39c7fb2da4af3aa63417efaf1) )
 ROM_END
 
 
@@ -1153,8 +1193,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -1170,7 +1210,7 @@ void bbtime_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bbtime_state::plate_w)
+void bbtime_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -1178,7 +1218,7 @@ WRITE8_MEMBER(bbtime_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bbtime_state::grid_w)
+void bbtime_state::grid_w(u16 data)
 {
 	// D3: speaker out
 	m_speaker->level_w(data >> 3 & 1);
@@ -1281,14 +1321,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void bdoramon(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bdoramon_state::plate_w)
+void bdoramon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -1300,7 +1340,7 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bdoramon_state::grid_w)
+void bdoramon_state::grid_w(u16 data)
 {
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1309,7 +1349,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D3: plate 15-18 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
 // config
@@ -1390,14 +1430,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void bultrman(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bultrman_state::plate_w)
+void bultrman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
@@ -1409,7 +1449,7 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bultrman_state::grid_w)
+void bultrman_state::grid_w(u16 data)
 {
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1418,7 +1458,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	plate_w(space, 4, data & 7);
+	plate_w(4, data & 7);
 }
 
 // config
@@ -1492,8 +1532,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void machiman(machine_config &config);
 };
 
@@ -1505,7 +1545,7 @@ void machiman_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(machiman_state::plate_w)
+void machiman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x,R6012: vfd plate
 	int shift = (offset == 6) ? 16 : offset * 4;
@@ -1513,7 +1553,7 @@ WRITE8_MEMBER(machiman_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(machiman_state::grid_w)
+void machiman_state::grid_w(u16 data)
 {
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
@@ -1602,13 +1642,13 @@ public:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE16_MEMBER(speaker_w);
+	void sound_w(u8 data);
+	void sound2_w(u8 data);
+	void speaker_w(u16 data);
 	void pairmtch(machine_config &config);
 };
 
@@ -1619,7 +1659,7 @@ void pairmtch_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(pairmtch_state::plate_w)
+void pairmtch_state::plate_w(offs_t offset, u8 data)
 {
 	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 8 : (offset-2) * 4;
@@ -1627,7 +1667,7 @@ WRITE8_MEMBER(pairmtch_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(pairmtch_state::grid_w)
+void pairmtch_state::grid_w(u16 data)
 {
 	// D7: sound reset (to audiocpu reset line)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -1643,13 +1683,13 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 	update_display();
 }
 
-READ8_MEMBER(pairmtch_state::input_r)
+u8 pairmtch_state::input_r()
 {
 	// R4x: multiplexed inputs
 	return read_inputs(2);
 }
 
-WRITE8_MEMBER(pairmtch_state::sound_w)
+void pairmtch_state::sound_w(u8 data)
 {
 	// R5x: soundlatch (to audiocpu R2x)
 	m_soundlatch[0]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
@@ -1657,13 +1697,13 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 
 // handlers: audiocpu side
 
-WRITE8_MEMBER(pairmtch_state::sound2_w)
+void pairmtch_state::sound2_w(u8 data)
 {
 	// R2x: soundlatch (to maincpu R5x)
 	m_soundlatch[1]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
-WRITE16_MEMBER(pairmtch_state::speaker_w)
+void pairmtch_state::speaker_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -1721,7 +1761,7 @@ void pairmtch_state::pairmtch(machine_config &config)
 	m_audiocpu->read_r<2>().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	m_audiocpu->write_d().set(FUNC(pairmtch_state::speaker_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 12);
@@ -1769,15 +1809,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void alnattck(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(alnattck_state::plate_w)
+void alnattck_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -1788,7 +1828,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(alnattck_state::grid_w)
+void alnattck_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -1800,10 +1840,10 @@ WRITE16_MEMBER(alnattck_state::grid_w)
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 16-19 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
-READ16_MEMBER(alnattck_state::input_r)
+u16 alnattck_state::input_r()
 {
 	// D5: multiplexed inputs
 	return read_inputs(7) & 0x20;
@@ -1893,8 +1933,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
@@ -1903,6 +1943,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
+
+	std::vector<double> m_speaker_levels;
 };
 
 void cdkong_state::machine_start()
@@ -1938,7 +1980,7 @@ void cdkong_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(cdkong_state::plate_w)
+void cdkong_state::plate_w(offs_t offset, u8 data)
 {
 	// R13: speaker on
 	m_r[offset] = data;
@@ -1950,7 +1992,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cdkong_state::grid_w)
+void cdkong_state::grid_w(u16 data)
 {
 	// D3: speaker out
 	m_d = data;
@@ -2004,10 +2046,10 @@ void cdkong_state::cdkong(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	static s16 speaker_levels[0x8000];
+	m_speaker_levels.resize(0x8000);
 	for (int i = 0; i < 0x8000; i++)
-		speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, speaker_levels);
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
@@ -2049,9 +2091,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE16_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(u16 data);
+	u8 input_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
 	void cgalaxn(machine_config &config);
@@ -2073,7 +2115,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	update_display();
 }
 
-WRITE8_MEMBER(cgalaxn_state::grid_w)
+void cgalaxn_state::grid_w(offs_t offset, u8 data)
 {
 	// R10,R11: input mux
 	if (offset == 1)
@@ -2085,7 +2127,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cgalaxn_state::plate_w)
+void cgalaxn_state::plate_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2097,7 +2139,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 	update_display();
 }
 
-READ8_MEMBER(cgalaxn_state::input_r)
+u8 cgalaxn_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(2);
@@ -2180,7 +2222,7 @@ ROM_END
   - P1 Up:    Eat & Run
   - P1 Down:  Demo
 
-  BTANB note: 1st version doesn't show the whole maze on power-on
+  BTANB: 1st version doesn't show the whole maze on power-on
 
 ***************************************************************************/
 
@@ -2191,15 +2233,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void cpacman(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(cpacman_state::plate_w)
+void cpacman_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x(,D1,D2): vfd plate
 	int shift = (offset - 1) * 4;
@@ -2211,7 +2253,7 @@ WRITE8_MEMBER(cpacman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(cpacman_state::grid_w)
+void cpacman_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2223,10 +2265,10 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + 1, data >> 1 & 3);
+	plate_w(6 + 1, data >> 1 & 3);
 }
 
-READ8_MEMBER(cpacman_state::input_r)
+u8 cpacman_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(3);
@@ -2316,7 +2358,7 @@ ROM_END
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
 
-  BTANB note: in demo-mode, she hardly ever walks to the upper two rows
+  BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
 ***************************************************************************/
 
@@ -2327,15 +2369,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void cmspacmn(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(cmspacmn_state::plate_w)
+void cmspacmn_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x(,D0,D1): vfd plate
 	int shift = (offset - 1) * 4;
@@ -2347,7 +2389,7 @@ WRITE8_MEMBER(cmspacmn_state::plate_w)
 	m_display->matrix(grid, u64(BIT(m_plate,15)) << 32 | plate);
 }
 
-WRITE16_MEMBER(cmspacmn_state::grid_w)
+void cmspacmn_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -2359,10 +2401,10 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + 1, data & 3);
+	plate_w(6 + 1, data & 3);
 }
 
-READ8_MEMBER(cmspacmn_state::input_r)
+u8 cmspacmn_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(3);
@@ -2433,165 +2475,14 @@ ROM_END
 
 /***************************************************************************
 
-  Entex Select-A-Game (HMCS40 MCU cartridges)
-  * see gamelist for cartridge info
-  * cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
-
-  The console is the peripheral, the heart of the system is the cartridge.
-  Cartridges with a HMCS40 MCU are implemented in this driver.
-
-  MAME external artwork is recommended, needed for per-game VFD overlays.
-
-***************************************************************************/
-
-class sag_state : public hh_hmcs40_state
-{
-public:
-	sag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
-	{ }
-
-	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
-	void sag(machine_config &config);
-};
-
-// handlers
-
-void sag_state::update_display()
-{
-	// grid 0-7 are the 'pixels'
-	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
-
-	// grid 8-11 are 7segs
-	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
-	m_display->matrix_partial(8, 4, m_grid >> 8, seg);
-}
-
-WRITE8_MEMBER(sag_state::plate_w)
-{
-	// R0x-R3x: vfd plate
-	int shift = offset * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	update_display();
-}
-
-WRITE16_MEMBER(sag_state::grid_w)
-{
-	// D0: speaker out
-	m_speaker->level_w(data & 1);
-
-	// D2-D7: input mux
-	m_inp_mux = data >> 2 & 0x3f;
-
-	// D1-D12: vfd grid
-	m_grid = data >> 1 & 0xfff;
-	update_display();
-}
-
-READ16_MEMBER(sag_state::input_r)
-{
-	// D13-D15: multiplexed inputs
-	return read_inputs(6) << 13;
-}
-
-// config
-
-static INPUT_PORTS_START( sag )
-	PORT_START("IN.0") // D2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("P1 Button 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 3")
-	PORT_CONFNAME( 0x04, 0x04, "Game" )
-	PORT_CONFSETTING(    0x04, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
-
-	PORT_START("IN.1") // D3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
-
-	PORT_START("IN.2") // D4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
-	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x04, "2" )
-
-	PORT_START("IN.3") // D5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
-
-	PORT_START("IN.4") // D6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button 5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button 7")
-
-	PORT_START("IN.5") // D7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button 6")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
-
-	PORT_START("FAKE") // shared D3/D5
-	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x00, "Demo" )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x02, "2" )
-INPUT_PORTS_END
-
-void sag_state::sag(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 450000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_d().set(FUNC(sag_state::grid_w));
-	m_maincpu->read_d().set(FUNC(sag_state::input_r));
-
-	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(8+4, 14);
-	m_display->set_segmask(0xf00, 0x7f);
-	config.set_default_layout(layout_sag);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( sag_si2 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, BAD_DUMP CRC(29c8c100) SHA1(41cd413065659c6d7d5b2408de2ca6d51c49629a) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_bb4 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b-b5_hd38800a37", 0x0000, 0x1000, CRC(64852bd5) SHA1(fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_pb )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "pinb_hd38800a38", 0x0000, 0x1000, CRC(6e53a56b) SHA1(13f057eab2e4cfbb3ef1247a041abff15ae727c9) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
   Entex Galaxian 2 (manufactured in Japan)
   * PCB labels ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
+
+  known releases:
+  - USA: Galaxian 2, published by Entex
+  - UK: Astro Invader, published by Hales/Entex
 
 ***************************************************************************/
 
@@ -2603,9 +2494,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void egalaxn2(machine_config &config);
 };
 
@@ -2618,7 +2509,7 @@ void egalaxn2_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(egalaxn2_state::grid_w)
+void egalaxn2_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2631,7 +2522,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(egalaxn2_state::plate_w)
+void egalaxn2_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x: vfd plate
 	int shift = (offset - 1) * 4;
@@ -2639,7 +2530,7 @@ WRITE8_MEMBER(egalaxn2_state::plate_w)
 	update_display();
 }
 
-READ8_MEMBER(egalaxn2_state::input_r)
+u8 egalaxn2_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -2809,6 +2700,131 @@ ROM_END
 
 /***************************************************************************
 
+  Entex Super Space Invader 2 (black version)
+  * Hitachi HD38800A31 MCU
+  * cyan/red VFD display
+
+  This version has the same MCU as the Select-A-Game cartridge. Maybe from
+  surplus inventory after that console was discontinued?. It was also sold
+  as "Super Alien Invader 2".
+
+  Hold down the fire button at boot for demo mode to work.
+
+***************************************************************************/
+
+class einvader2_state : public hh_hmcs40_state
+{
+public:
+	einvader2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
+	void einvader2(machine_config &config);
+};
+
+// handlers
+
+void einvader2_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void einvader2_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void einvader2_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D3,D5,D6: input mux
+	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 6);
+
+	// D1-D12: vfd grid
+	m_grid = data >> 1 & 0xfff;
+	update_display();
+}
+
+u16 einvader2_state::input_r()
+{
+	// D13-D15: multiplexed inputs
+	return read_inputs(3) << 13;
+}
+
+// config
+
+static INPUT_PORTS_START( einvader2 )
+	PORT_START("IN.0") // D3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
+
+	PORT_START("IN.1") // D5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
+
+	PORT_START("IN.2") // D6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("FAKE") // shared D3/D5
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "Demo" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+INPUT_PORTS_END
+
+void einvader2_state::einvader2(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38800(config, m_maincpu, 450000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_d().set(FUNC(einvader2_state::grid_w));
+	m_maincpu->read_d().set(FUNC(einvader2_state::input_r));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(469, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(12, 14);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( einvader2 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, CRC(10e39521) SHA1(41d86696e518ea071e75ed37d5dc63c0408c262e) )
+	ROM_CONTINUE(                0x1e80, 0x0100 )
+
+	ROM_REGION( 217430, "screen", 0)
+	ROM_LOAD( "einvader2.svg", 0, 217430, CRC(b082d9a3) SHA1(67f7e0314c69ba146751ea12cf490805b8660489) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Turtles (manufactured in Japan)
   * PCB label 560359
   * Hitachi QFP HD38820A43 MCU
@@ -2829,14 +2845,14 @@ public:
 	required_device<cop411_cpu_device> m_audiocpu;
 
 	virtual void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	u8 m_cop_irq;
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(cop_irq_w);
-	DECLARE_READ8_MEMBER(cop_latch_r);
-	DECLARE_READ8_MEMBER(cop_ack_r);
+	void cop_irq_w(u8 data);
+	u8 cop_latch_r();
+	u8 cop_ack_r();
 
 	void update_int();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
@@ -2863,7 +2879,7 @@ void eturtles_state::update_display()
 	m_display->matrix(grid, plate | (grid >> 5 & 8)); // grid 8 also forces plate 3 high
 }
 
-WRITE8_MEMBER(eturtles_state::plate_w)
+void eturtles_state::plate_w(offs_t offset, u8 data)
 {
 	m_r[offset] = data;
 
@@ -2873,7 +2889,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(eturtles_state::grid_w)
+void eturtles_state::grid_w(u16 data)
 {
 	m_d = data;
 
@@ -2906,20 +2922,20 @@ WRITE_LINE_MEMBER(eturtles_state::speaker_w)
 	m_speaker->level_w(!state);
 }
 
-WRITE8_MEMBER(eturtles_state::cop_irq_w)
+void eturtles_state::cop_irq_w(u8 data)
 {
 	// D0: maincpu INT0 (active low)
 	m_cop_irq = ~data & 1;
 	update_int();
 }
 
-READ8_MEMBER(eturtles_state::cop_latch_r)
+u8 eturtles_state::cop_latch_r()
 {
 	// L0-L3: soundlatch from maincpu R0x
 	return m_r[0];
 }
 
-READ8_MEMBER(eturtles_state::cop_ack_r)
+u8 eturtles_state::cop_ack_r()
 {
 	// G0: ack from maincpu D0
 	return m_d & 1;
@@ -2977,7 +2993,7 @@ void eturtles_state::eturtles(machine_config &config)
 	m_audiocpu->read_l().set(FUNC(eturtles_state::cop_latch_r));
 	m_audiocpu->read_g().set(FUNC(eturtles_state::cop_ack_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -3028,7 +3044,7 @@ public:
 	{ }
 
 	virtual void update_display() override;
-	DECLARE_READ8_MEMBER(cop_data_r);
+	u8 cop_data_r();
 	void estargte(machine_config &config);
 };
 
@@ -3041,7 +3057,7 @@ void estargte_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-READ8_MEMBER(estargte_state::cop_data_r)
+u8 estargte_state::cop_data_r()
 {
 	// L0-L3: soundlatch from maincpu R0x
 	// L7: ack from maincpu D0
@@ -3099,7 +3115,7 @@ void estargte_state::estargte(machine_config &config)
 	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
 	m_audiocpu->read_l().set(FUNC(estargte_state::cop_data_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -3139,7 +3155,7 @@ ROM_END
   * cyan/red VFD display Futaba DM-11Z 1H
 
   known releases:
-  - Japan: Heiankyo Alien
+  - Japan: Heiankyo Alien, published by Gakken
   - USA: Earth Invaders, published by CGL
 
 ***************************************************************************/
@@ -3151,15 +3167,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void ghalien(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(ghalien_state::plate_w)
+void ghalien_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D10-D13): vfd plate
 	int shift = offset * 4;
@@ -3171,7 +3187,7 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(ghalien_state::grid_w)
+void ghalien_state::grid_w(u16 data)
 {
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
@@ -3183,10 +3199,10 @@ WRITE16_MEMBER(ghalien_state::grid_w)
 	m_grid = data & 0x3ff;
 
 	// D10-D13: more plates (update display there)
-	plate_w(space, 4, data >> 10 & 0xf);
+	plate_w(4, data >> 10 & 0xf);
 }
 
-READ16_MEMBER(ghalien_state::input_r)
+u16 ghalien_state::input_r()
 {
 	// D15: multiplexed inputs
 	return read_inputs(7) & 0x8000;
@@ -3266,7 +3282,7 @@ ROM_END
   * cyan/red/blue VFD display Futaba DM-54Z 2H, with bezel overlay
 
   known releases:
-  - Japan: Crazy Kong
+  - Japan: Crazy Kong, published by Gakken
   - USA: Super Kong, published by CGL
 
 ***************************************************************************/
@@ -3278,8 +3294,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -3288,7 +3304,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(gckong_state::plate_w)
+void gckong_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0,D1): vfd plate
 	int shift = offset * 4;
@@ -3300,7 +3316,7 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(gckong_state::grid_w)
+void gckong_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -3317,7 +3333,7 @@ WRITE16_MEMBER(gckong_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 4, data & 3);
+	plate_w(4, data & 3);
 }
 
 void gckong_state::update_int1()
@@ -3393,6 +3409,140 @@ ROM_END
 
 /***************************************************************************
 
+  Gakken Super Cobra
+  * PCB label SUPER COBRA 3000N
+  * Hitachi QFP HD38820A32 MCU
+  * cyan/red/green VFD display
+
+  known releases:
+  - World: Super Cobra, published by Gakken
+  - USA: Cobra Super Copter, published by Tandy
+
+  There are 2 versions, a green one and a white one. They have the same MCU,
+  though the VFD has color differences and is more compact.
+
+  BTANB(green version): 1 rocket seems out of place at the top-right area
+
+***************************************************************************/
+
+class gscobra_state : public hh_hmcs40_state
+{
+public:
+	gscobra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void gscobra(machine_config &config);
+};
+
+// handlers
+
+void gscobra_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R6x(,D1-D3): vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	m_display->matrix(m_grid, m_plate);
+}
+
+void gscobra_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D10-D15: input mux
+	u8 inp_mux = data >> 10 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D7-D15: vfd grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D1-D3: more plates (update display there)
+	plate_w(7, data >> 1 & 7);
+}
+
+void gscobra_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(6));
+}
+
+// config
+
+static INPUT_PORTS_START( gscobra )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.5") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+INPUT_PORTS_END
+
+void gscobra_state::gscobra(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 852);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 31);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gscobra )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, CRC(7bbd130f) SHA1(91dd280e4108fad7ba99191355364bd3217b9d17) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 232919, "screen", 0)
+	ROM_LOAD( "gscobra.svg", 0, 232919, CRC(5ceb4bfc) SHA1(77c9a45569d780838ebe75818acb2d2ced4bda00) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Gakken Dig Dug (manufactured in Japan)
   * PCB label Gakken DIG-DAG KS-004283(A/B)
   * Hitachi QFP HD38820A69 MCU
@@ -3407,8 +3557,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -3417,7 +3567,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(gdigdug_state::plate_w)
+void gdigdug_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -3428,7 +3578,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(gdigdug_state::grid_w)
+void gdigdug_state::grid_w(u16 data)
 {
 	// D6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -3445,7 +3595,7 @@ WRITE16_MEMBER(gdigdug_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 7, data & 0xf);
+	plate_w(7, data & 0xf);
 }
 
 void gdigdug_state::update_int1()
@@ -3519,14 +3669,14 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel World Championship Baseball
+  Mattel World Championship Baseball (model 3201)
   * PCB label MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
 
-  To start the game in 2-player mode, simply turn the game on. For 1-player,
-  turn the game on while holding the 1-key and use the visitor's side keypad
-  to play offsense.
+  It was patented under US4372557. To start the game in 2-player mode, simply
+  turn the game on. For 1-player, turn the game on while holding the 1-key
+  and use the visitor's side keypad to play offsense.
 
 ***************************************************************************/
 
@@ -3538,10 +3688,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	void speaker_w(u8 data);
+	u8 input_r();
 	void mwcbaseb(machine_config &config);
 };
 
@@ -3553,7 +3703,7 @@ void mwcbaseb_state::update_display()
 	m_display->matrix(grid, m_plate);
 }
 
-WRITE8_MEMBER(mwcbaseb_state::plate_w)
+void mwcbaseb_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 12 : (offset - 1) * 4;
@@ -3561,7 +3711,7 @@ WRITE8_MEMBER(mwcbaseb_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(mwcbaseb_state::grid_w)
+void mwcbaseb_state::grid_w(u16 data)
 {
 	// D9-D15: input mux
 	m_inp_mux = data >> 9 & 0x7f;
@@ -3571,13 +3721,13 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(mwcbaseb_state::speaker_w)
+void mwcbaseb_state::speaker_w(u8 data)
 {
 	// R50,R51+R52(tied together): speaker out
 	m_speaker->level_w(data & 7);
 }
 
-READ8_MEMBER(mwcbaseb_state::input_r)
+u8 mwcbaseb_state::input_r()
 {
 	// R4x: multiplexed inputs
 	return read_inputs(7);
@@ -3602,9 +3752,9 @@ READ8_MEMBER(mwcbaseb_state::input_r)
     SLOW     CURVE    FAST                                    SLOW     CURVE    FAST
 */
 
-static INPUT_PORTS_START( mwcbaseb )
+static INPUT_PORTS_START( mwcbaseb ) // P1 = left/visitor, P2 = right/home
 	PORT_START("IN.0") // D9 port R4x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4") // note: P1 = left/visitor, P2 = right/home
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("P2 3")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("P2 2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("P2 1")
@@ -3671,7 +3821,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	static const s16 speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
+	static const double speaker_levels[] = { 0.0, 0.5, -0.5, 0.0, -0.5, 0.0, -1.0, -0.5 };
 	m_speaker->set_levels(8, speaker_levels);
 }
 
@@ -3712,8 +3862,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -3729,7 +3879,7 @@ void msthawk_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(msthawk_state::plate_w)
+void msthawk_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -3737,7 +3887,7 @@ WRITE8_MEMBER(msthawk_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(msthawk_state::grid_w)
+void msthawk_state::grid_w(u16 data)
 {
 	// D5: speaker out
 	m_speaker->level_w(data >> 5 & 1);
@@ -3844,14 +3994,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void pbqbert(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(pbqbert_state::plate_w)
+void pbqbert_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D8): vfd plate
 	int shift = offset * 4;
@@ -3862,7 +4012,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(pbqbert_state::grid_w)
+void pbqbert_state::grid_w(u16 data)
 {
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
@@ -3871,7 +4021,7 @@ WRITE16_MEMBER(pbqbert_state::grid_w)
 	m_grid = data & 0xff;
 
 	// D8: plate 25 (update display there)
-	plate_w(space, 7, data >> 8 & 1);
+	plate_w(7, data >> 8 & 1);
 }
 
 // config
@@ -3929,132 +4079,6 @@ ROM_END
 
 /***************************************************************************
 
-  Tomy Kingman (manufactured in Japan)
-  * PCB label THF-01II 2E138E01/2E128E02
-  * Hitachi HD38800B23 MCU
-  * cyan/red/blue VFD display Futaba DM-65ZK 3A
-
-***************************************************************************/
-
-class kingman_state : public hh_hmcs40_state
-{
-public:
-	kingman_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
-	{ }
-
-	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void kingman(machine_config &config);
-};
-
-// handlers
-
-void kingman_state::update_display()
-{
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
-	m_display->matrix(grid, plate);
-}
-
-WRITE8_MEMBER(kingman_state::plate_w)
-{
-	// R0x-R3x: vfd plate
-	int shift = offset * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	update_display();
-}
-
-WRITE16_MEMBER(kingman_state::grid_w)
-{
-	// D6: speaker out
-	m_speaker->level_w(data >> 6 & 1);
-
-	// D12-D15: input mux
-	u8 inp_mux = data >> 12 & 0xf;
-	if (inp_mux != m_inp_mux)
-	{
-		m_inp_mux = inp_mux;
-		update_int0();
-	}
-
-	// D7-D15: vfd grid
-	m_grid = data >> 7 & 0x1ff;
-
-	// D0-D4: more plates
-	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	update_display();
-}
-
-void kingman_state::update_int0()
-{
-	// INT0 on multiplexed inputs
-	set_interrupt(0, read_inputs(4));
-}
-
-// config
-
-static INPUT_PORTS_START( kingman )
-	PORT_START("IN.0") // D12 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
-
-	PORT_START("IN.1") // D13 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
-
-	PORT_START("IN.2") // D14 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
-
-	PORT_START("IN.3") // D15 INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
-
-	PORT_START("IN.4") // INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
-INPUT_PORTS_END
-
-void kingman_state::kingman(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 400000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(kingman_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(kingman_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(kingman_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(kingman_state::plate_w));
-	m_maincpu->write_d().set(FUNC(kingman_state::grid_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(374, 1080);
-	screen.set_visarea_full();
-
-	PWM_DISPLAY(config, m_display).set_size(9, 23);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kingman )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38800b23", 0x0000, 0x1000, CRC(f8dfe14f) SHA1(660610d92ae7e5f92bddf5a3bcc2296b2ec3946b) )
-	ROM_CONTINUE(           0x1e80, 0x0100 )
-
-	ROM_REGION( 396320, "screen", 0)
-	ROM_LOAD( "kingman.svg", 0, 396320, CRC(3f52d2a9) SHA1(9291f1a1da3d19c3d6dedb995de0a5feba75b442) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
   Tomy(tronic) Tron (manufactured in Japan)
   * PCB label THN-02 2E114E07
   * Hitachi HD38800A88 MCU
@@ -4070,8 +4094,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -4087,7 +4111,7 @@ void tmtron_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(tmtron_state::plate_w)
+void tmtron_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -4095,7 +4119,7 @@ WRITE8_MEMBER(tmtron_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(tmtron_state::grid_w)
+void tmtron_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -4181,12 +4205,142 @@ ROM_END
 
 /***************************************************************************
 
+  Tomy Kingman (manufactured in Japan)
+  * PCB label THF-01II 2E138E01/2E128E02
+  * Hitachi HD38800B23 MCU
+  * cyan/red/blue VFD display Futaba DM-65ZK 3A
+
+  known releases:
+  - World: Kingman, published by Tomy
+  - USA: Kingman, published by Tandy
+
+***************************************************************************/
+
+class kingman_state : public hh_hmcs40_state
+{
+public:
+	kingman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void kingman(machine_config &config);
+};
+
+// handlers
+
+void kingman_state::update_display()
+{
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
+	m_display->matrix(grid, plate);
+}
+
+void kingman_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void kingman_state::grid_w(u16 data)
+{
+	// D6: speaker out
+	m_speaker->level_w(data >> 6 & 1);
+
+	// D12-D15: input mux
+	u8 inp_mux = data >> 12 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D7-D15: vfd grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D0-D4: more plates
+	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
+	update_display();
+}
+
+void kingman_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(4));
+}
+
+// config
+
+static INPUT_PORTS_START( kingman )
+	PORT_START("IN.0") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
+
+	PORT_START("IN.1") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
+
+	PORT_START("IN.2") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
+
+	PORT_START("IN.3") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, kingman_state, input_changed, 0)
+
+	PORT_START("IN.4") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
+INPUT_PORTS_END
+
+void kingman_state::kingman(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(kingman_state::grid_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(374, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 23);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( kingman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b23", 0x0000, 0x1000, CRC(f8dfe14f) SHA1(660610d92ae7e5f92bddf5a3bcc2296b2ec3946b) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 396320, "screen", 0)
+	ROM_LOAD( "kingman.svg", 0, 396320, CRC(3f52d2a9) SHA1(9291f1a1da3d19c3d6dedb995de0a5feba75b442) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   VTech Invaders (manufactured in Taiwan)
   * Hitachi HD38750A45 MCU
   * cyan/red VFD display Futaba DM-26Z 1G, with bezel
 
   known releases:
-  - USA: Invaders/Sonic Invader
+  - USA: Invaders/Sonic Invader, published by VTech
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
@@ -4199,14 +4353,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void vinvader(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(vinvader_state::plate_w)
+void vinvader_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x(,D4-D6): vfd plate
 	int shift = (offset - 1) * 4;
@@ -4217,7 +4371,7 @@ WRITE8_MEMBER(vinvader_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(vinvader_state::grid_w)
+void vinvader_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -4226,7 +4380,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + 1, data >> 4 & 7);
+	plate_w(3 + 1, data >> 4 & 7);
 }
 
 // config
@@ -4312,17 +4466,16 @@ CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_in
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, einvader2, 0,        0, einvader2,einvader2,einvader2_state,empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
@@ -4330,7 +4483,7 @@ CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_in
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1982, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
