@@ -142,7 +142,7 @@ GMA41    2001    Thrill Drive 2
 G?A45    2001    Boxing Mania
 G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / The Keisatsukan 2: Zenkoku Daitsuiseki Special (Japan)
 G?B33    2001    Mocap Golf
-G?B41    2001    Jurassic Park 3
+G?B41    2001    Jurassic Park III
 G?B4x    2002    Xtrial Racing
 G?C09    2002    Mahjong Fight Club
 G?C22    2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
@@ -3419,8 +3419,8 @@ GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_viperc
 GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UBC)", MACHINE_NOT_WORKING)
+GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
+GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
 GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
