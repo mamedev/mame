@@ -174,54 +174,66 @@ void s11b_state::machine_reset()
 
 void s11b_state::s11b_dig1_w(u8 data)
 {
-	u32 seg = get_segment2();
-	seg |= data;
-	seg |= 0x20000;
-	set_segment2(seg);
+	u8 lock = get_lock2() + 1;
+	if (lock == 1)
+	{
+		u16 seg;
+		if (m_is7seg34)
+		{
+			seg = data | (m_invert ? 0x7700 : 0);
+			if (BIT(seg, 6))
+				seg |= 0x800; // fix g seg
+			if (BIT(seg, 7))
+				seg |= 0x8000; // fix comma
+		}
+		else
+		{
+			seg = get_segment2() & 0xff00;
+			seg |= data;
+			set_segment2(seg);
+		}
+		u16 segd = m_invert ? ~seg : seg;
+		m_digits[get_strobe()+16] = bitswap<16>(segd, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+	}
+	set_lock2(lock);
 }
 
 void s11b_state::s11b_pia2c_pa_w(u8 data)
 {
-	u32 seg = get_segment1();
-	seg |= (data<<8);
-	seg |= 0x10000;
-	if((seg & 0x70000) == 0x30000)
+	if (get_lock1() == 1)
 	{
-		u16 segd = (m_invert) ? ~seg : seg;
+		u16 seg = get_segment1() & 0xff;
+		seg |= (data<<8);
+		u16 segd = m_invert ? ~seg : seg;
 		m_digits[get_strobe()] = bitswap<16>(segd, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		seg |= 0x40000;
+		set_segment1(seg);
 	}
-	set_segment1(seg);
 }
 
 void s11b_state::s11b_pia2c_pb_w(u8 data)
 {
-	u32 seg = get_segment1();
-	seg |= data;
-	seg |= 0x20000;
-	set_segment1(seg);
+	u8 lock = get_lock1() + 1;
+	if (lock == 1)
+	{
+		u16 seg = get_segment1() & 0xff00;
+		seg |= data;
+		u16 segd = m_invert ? ~seg : seg;
+		m_digits[get_strobe()] = bitswap<16>(segd, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment1(seg);
+	}
+	set_lock1(lock);
 }
 
 void s11b_state::s11b_pia34_pa_w(u8 data)
 {
-	u32 seg = get_segment2();
-	seg |= (data<<8);
-	seg |= 0x10000;
-	if((seg & 0x70000) == 0x30000)
+	if ((get_lock2() == 1) && (!m_is7seg34))
 	{
-		u16 segd = (m_invert) ? ~seg : seg;
-		if (m_is7seg34)
-		{
-			segd &= 0xff; // discard diagonal segs
-			if (BIT(segd, 6))
-				segd |= 0x800; // fix g seg
-			if (BIT(segd, 7))
-				segd |= 0x8000; // fix comma
-		}
+		u16 seg = get_segment2() & 0xff;
+		seg |= (data<<8);
+		u16 segd = m_invert ? ~seg : seg;
 		m_digits[get_strobe()+16] = bitswap<16>(segd, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		seg |= 0x40000;
+		set_segment2(seg);
 	}
-	set_segment2(seg);
 }
 
 void s11b_state::init_s11bnn()

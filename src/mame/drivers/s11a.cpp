@@ -135,7 +135,14 @@ INPUT_PORTS_END
 void s11a_state::s11a_dig0_w(u8 data)
 {
 	set_strobe(data & 15);
-	set_diag(BIT(data, 4, 3));
+	u8 diag = BIT(data, 4, 3);
+	if (diag == get_diag())
+	{
+		set_lock1(0);
+		set_lock2(0);
+	}
+	else
+		set_diag(diag);
 	m_digits[60] = 0;  // +5VDC (always on)
 	m_digits[61] = BIT(data, 4);  // connected to PA4
 	m_digits[62] = 0;  // Blanking (pretty much always on)
