@@ -251,10 +251,11 @@ MACHINE_START_MEMBER(vsnes_state, bootleg)
 	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
 
 	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x800);
 
-	ppu1_space.install_ram(0x2000, 0x2fff, m_nt_ram[0].get());
-	ppu1_space.install_ram(0x3000, 0x3eff, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x2000, 0x27ff, 0x800, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x3000, 0x37ff, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x3800, 0x3eff, m_nt_ram[0].get());
 
 	m_vrom[0] = m_gfx1_rom->base();
 	m_vrom_size[0] = m_gfx1_rom->bytes();
