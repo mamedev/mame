@@ -50,8 +50,8 @@
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "machine/timer.h"
 #include "machine/i2cmem.h"
+#include "machine/timer.h"
 #include "video/ef9345.h"
 
 #include "emupal.h"
@@ -102,7 +102,7 @@ private:
 	required_device<i80c32_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
-	optional_device<i2cmem_device> m_i2cmem;
+	required_device<i2cmem_device> m_i2cmem;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
