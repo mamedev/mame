@@ -954,7 +954,7 @@ Bottom (GFX) board
 |                                                                             |
 |   6116(S)                                   6116(S)                         |
 |                                             6116(S)                         |
-|                                                                             |
+|                                                                  GFX.IC175  |
 |                                             6116(S)                         |
 |                                             6116(S)                         |
 |                                                                             |
@@ -971,7 +971,7 @@ Bottom (GFX) board
 |------|-------------|-----------------------------------|-------------|------|
        |-------------|                                   |-------------|
 Notes:
-      All ROMs are 27512 OTP ROMs
+      All ROMs are 27512 OTP ROMs except 27256 at IC175
    6116(S) - 2kx8 SRAM (used for sprite display)
    6116(T) - 2kx8 SRAM (used for sprite tile generator)
    6116(C) - 2kx8 SRAM (used for color)
