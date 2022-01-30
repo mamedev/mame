@@ -113,7 +113,7 @@ protected:
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_pcg;

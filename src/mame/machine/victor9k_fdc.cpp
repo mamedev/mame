@@ -341,7 +341,7 @@ void victor_9000_fdc_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void victor_9000_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void victor_9000_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

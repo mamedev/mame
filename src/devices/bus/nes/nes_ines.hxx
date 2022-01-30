@@ -372,7 +372,7 @@ static const nes_mmc mmc_list[] =
 	{ 334, BMC_5IN1_1993 },
 	{ 335, BMC_CTC09 },
 	{ 336, BMC_K3046 },
-	// { 337, BMC_CTC_12IN1 }, not in nes.xml
+	{ 337, BMC_CTC_12IN1 },
 	{ 338, BMC_SA005A },
 	{ 339, BMC_K3006 },
 	{ 340, BMC_K3036 },
@@ -385,7 +385,7 @@ static const nes_mmc mmc_list[] =
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 	{ 348, BMC_830118C },
 	{ 349, BMC_G146 },
-	// { 350, BMC_891227 }, not in nes.xml
+	{ 350, BMC_891227 },
 	{ 351, BMC_TECHLINE9IN1 },
 	{ 352, KAISER_KS106C },        // 4-in-1
 	{ 353, BMC_810305C },          // Super Mario Family multicart
@@ -938,6 +938,10 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_vrc_lines(1, 0, 0);
 			if (mapper == 26)
 				m_cart->set_vrc_lines(0, 1, 0);
+			break;
+
+		case KONAMI_VRC7:
+			m_cart->set_vrc_lines((crc_hack || submapper == 2) ? 4 : 3, 0, 0);
 			break;
 
 		case IREM_G101:

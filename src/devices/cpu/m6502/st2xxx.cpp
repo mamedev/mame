@@ -38,11 +38,12 @@
 #define LOG_IRQ (1 << 1U)
 #define LOG_BT (1 << 2U)
 #define LOG_LCDC (1 << 3U)
+#define VERBOSE LOG_IRQ
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
-	: r65c02_device(mconfig, type, tag, owner, clock)
+	: w65c02s_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this)
 	, m_out_port_cb(*this)
@@ -281,24 +282,35 @@ void st2xxx_device::device_reset()
 	m_bctr = 0;
 }
 
-u8 st2xxx_device::acknowledge_irq()
+u8 st2xxx_device::read_vector(u16 adr)
 {
-	// IREQH interrupts have priority over IREQL interrupts
-	for (int pri = 0; pri < 16; pri++)
+	if (adr >= 0xfffe)
 	{
-		int level = pri ^ 8;
-		if (BIT(m_ireq & m_iena, level))
+		u16 ireq_active = m_ireq & m_iena;
+		if (ireq_active != 0 && irq_taken)
 		{
-			LOGMASKED(LOG_IRQ, "%s interrupt acknowledged (PC = $%04X, vector = $%04X)\n",
+			// IREQH interrupts have priority over IREQL interrupts
+			ireq_active = swapendian_int16(ireq_active);
+			int level = 31 - int(8 ^ count_leading_zeros_32(ireq_active & -ireq_active));
+			adr -= (level + 3) << 1;
+
+			LOGMASKED(LOG_IRQ, "Acknowledging %s interrupt (PC = $%04X, IREQ = $%04X, IENA = $%04X, vector pull from $%04X)\n",
 				st2xxx_irq_name(level),
 				PPC,
-				0x7ff8 - (level << 1));
-			m_ireq &= ~(1 << level);
-			update_irq_state();
-			return level;
+				m_ireq,
+				m_iena,
+				adr & 0x7fff);
+
+			if (BIT(adr, 0))
+			{
+				m_ireq &= ~(1 << level);
+				update_irq_state();
+			}
+			else
+				set_irq_service(true);
 		}
 	}
-	throw emu_fatalerror("ST2XXX: no IRQ to acknowledge!\n");
+	return downcast<mi_st2xxx &>(*mintf).read_vector(adr);
 }
 
 u8 st2xxx_device::pdata_r(offs_t offset)
@@ -892,5 +904,3 @@ void st2xxx_device::bdiv_w(u8 data)
 {
 	m_bdiv = data;
 }
-
-#include "cpu/m6502/st2xxx.hxx"

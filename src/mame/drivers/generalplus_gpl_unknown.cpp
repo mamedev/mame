@@ -13,7 +13,7 @@
 
    Multiple different units appear to share the same ROM with a jumper to select game.
    It should be verified in each case that the external ROM was not changed
-   
+
    It is confirmed that in some cases the external ROMs contain both versions for Micro Arcade and Tiny Arcade
    units, with different sound, but in some cases the expected game behavior differs too, so the code revisions
    could be different.  (for example the Micro Arcade Pac-Man doesn't display points when you eat a ghost)

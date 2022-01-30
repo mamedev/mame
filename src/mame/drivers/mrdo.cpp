@@ -193,8 +193,8 @@ void mrdo_state::machine_start()
 
 void mrdo_state::machine_reset()
 {
-    // initial outputs are high on power-up
-    m_pal_u001 = 0xff;
+	// initial outputs are high on power-up
+	m_pal_u001 = 0xff;
 }
 
 void mrdo_state::mrlo(machine_config &config)

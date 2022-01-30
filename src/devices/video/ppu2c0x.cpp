@@ -505,7 +505,7 @@ void ppu2c04_clone_device::init_palette_tables()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void ppu2c0x_device::device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr)
+void ppu2c0x_device::device_timer(emu_timer& timer, device_timer_id id, int param)
 {
 	int blanked, vblank;
 

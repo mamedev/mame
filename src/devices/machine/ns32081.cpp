@@ -630,7 +630,7 @@ void ns32081_device::execute()
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 }
 
-void ns32081_device::complete(void *buf, s32 param)
+void ns32081_device::complete(s32 param)
 {
 	m_out_scb(0);
 	m_out_scb(1);

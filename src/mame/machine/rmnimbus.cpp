@@ -1669,7 +1669,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1682,10 +1682,10 @@ static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
 void rmnimbus_state::do_mouse()
 {
-	int   mouse_x   = 0;    // Current mouse X and Y
-	int   mouse_y   = 0;
-	int   xdiff     = 0;    // Difference from previous X and Y
-	int   ydiff     = 0;
+	uint8_t mouse_x;        // Current mouse X and Y
+	uint8_t mouse_y;
+	int8_t  xdiff;          // Difference from previous X and Y
+	int8_t  ydiff;
 
 	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
 	uint8_t intstate_y;
@@ -1706,17 +1706,6 @@ void rmnimbus_state::do_mouse()
 
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
-
-	// check and compensate for wrap.....
-	if (xdiff > 0x80)
-		xdiff -= 0x100;
-	else if (xdiff < -0x80)
-		xdiff += 0x100;
-
-	if (ydiff > 0x80)
-		ydiff -= 0x100;
-	else if (ydiff < -0x80)
-		ydiff += 0x100;
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)

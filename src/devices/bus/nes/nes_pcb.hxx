@@ -267,6 +267,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
+	{ "bmc_891227",       BMC_891227 },
 	{ "bmc_970630c",      BMC_970630C },
 	{ "bmc_jy012005",     BMC_JY012005 },
 	{ "bmc_jy820845c",    BMC_JY820845C },
@@ -274,6 +275,7 @@ static const nes_pcb pcb_list[] =
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
+	{ "bmc_ctc12in1",     BMC_CTC_12IN1 },
 	{ "bmc_fam250",       BMC_FAM250 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
@@ -651,6 +653,9 @@ void nes_cart_slot_device::call_load_pcb()
 						0);
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
+
+	if (m_pcb_id == KONAMI_VRC7)
+		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc7-pin19")), 0, 0);
 
 	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
 	{

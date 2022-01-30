@@ -59,6 +59,7 @@
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - Z80 SCC DMA request
+	- [:2a:chb] - TX FIFO is full, discarding data
 
 */
 
@@ -105,16 +106,6 @@ enum
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  fc_r -
-//-------------------------------------------------
-
-uint8_t abc1600_state::fc_r()
-{
-	return m_maincpu->get_fc() & 0x07;
-}
-
 
 //-------------------------------------------------
 //  bus_r -
@@ -878,7 +869,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// devices
 	ABC1600_MAC(config, m_mac, 0);
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->fc_cb().set(FUNC(abc1600_state::fc_r));
+	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_base_device::get_fc));
 	m_mac->buserr_cb().set_inputline(m_maincpu, M68K_LINE_BUSERROR);
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
@@ -964,9 +955,9 @@ void abc1600_state::abc1600(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

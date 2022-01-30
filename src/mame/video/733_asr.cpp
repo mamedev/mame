@@ -407,7 +407,7 @@ void asr733_device::refresh(bitmap_ind16 &bitmap, int x, int y)
 /*
     Time callbacks
 */
-void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	check_keyboard();
 	m_lineint_line(ASSERT_LINE);

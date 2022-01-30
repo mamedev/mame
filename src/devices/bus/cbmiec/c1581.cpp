@@ -283,7 +283,7 @@ void c1581_device::device_add_mconfig(machine_config &config)
 	m_cia->pb_wr_callback().set(FUNC(c1581_device::cia_pb_w));
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true).enable_sound(true);
 }
 
 

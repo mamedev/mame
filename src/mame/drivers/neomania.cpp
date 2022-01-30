@@ -2,7 +2,7 @@
 // copyright-holders:
 /*
 Neo Mania:
- PC with Windows 98 (exact hardware not specified) and a Neo·Geo emulator, with a small PCB for converting 
+ PC with Windows 98 (exact hardware not specified) and a Neo·Geo emulator, with a small PCB for converting
  VGA + Parallel port (inputs) + sound (with volume knob) to JAMMA (named "NEO MANIA ADAPTER BOARD").
 The "NEO MANIA ADAPTER BOARD" contains:
    2 x Jumpers tio enable or disable features:

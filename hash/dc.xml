@@ -23410,27 +23410,27 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	Testers may be run in different modes if hold controller buttons while booting (A+B, Right+X, Left+X, Down+A+B+X, Down+X, Up+X and few others).
 
-    Eventually requires emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
+	Eventually requires emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
 	-->
 
 	<!-- <software name="chkrepair205r" cloneof="chkrepair216r"> -->
 	<software name="chkrepair205r" supported="no">
-	    <description>DC Checker for Repair v2.05R (World)</description>
-	    <year>1999</year>
-	    <publisher>Sega</publisher>
+		<description>DC Checker for Repair v2.05R (World)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Check-GD program
 Hangs with a black screen, needs [SH4] SCIF emulation, bypass with NOPs at PC=0xc018f42 and PC=0xc018f54
 Fails at MMU checks 2-3-4, tries everything back again, stalls on MMU Check_1 back again PC=0x800000a2.
 ]]></notes>
-	    <!--<info name="serial" value="DCSC205R"/>-->
+		<!--<info name="serial" value="DCSC205R"/>-->
 		<info name="serial" value="SPDS-5"/>
-	    <info name="release" value="19991027"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="dc checker for repair v2.05r (world)" sha1="2acfd570b14795da6339eda36a1e3dd0f8dce102"/>
-	        </diskarea>
-	    </part>
+		<info name="release" value="19991027"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dc checker for repair v2.05r (world)" sha1="2acfd570b14795da6339eda36a1e3dd0f8dce102"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="loopchk" supported="no">
@@ -23457,20 +23457,20 @@ cfr. https://github.com/mamedev/mame/issues/9106 for more info.
 
 	<software name="chkgd" supported="no">
 		<!-- build number: V0.720 -->
-	    <description>GD Drive Repair Program v0.1 (World)</description>
-	    <year>1998</year>
-	    <publisher>Sega</publisher>
+		<description>GD Drive Repair Program v0.1 (World)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Check-GD program
 Stuck with a Sega copyright printed on screen
 ]]></notes>
-	    <!--<info name="serial" value="DCFD01"/>-->
+		<!--<info name="serial" value="DCFD01"/>-->
 		<info name="serial" value="HKT-999999"/>
 		<info name="release" value="19981201"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="gd drive repair program ver 0.1 (world)" sha1="4b302df1d4bdffcbad2f2475687000352bb08311"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gd drive repair program ver 0.1 (world)" sha1="4b302df1d4bdffcbad2f2475687000352bb08311"/>
+			</diskarea>
+		</part>
 	</software>
 </softwarelist>

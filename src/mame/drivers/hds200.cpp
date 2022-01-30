@@ -118,7 +118,7 @@ void hds200_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x5fff).bankr(m_rombank);
-//	map(0x6000, 0x6001) // unknown device here
+//  map(0x6000, 0x6001) // unknown device here
 	map(0x6800, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x77ff).ram().share("vram");
 	map(0x8000, 0xbfff).ram();
@@ -153,7 +153,7 @@ void hds200_state::attrram_map(address_map &map)
 uint8_t hds200_state::char_r(offs_t offset)
 {
 	offs_t addr = 0;
-	
+
 	// there should be a better way
 	if (((offset << 1) & 0x7000) == 0x7000)
 	{

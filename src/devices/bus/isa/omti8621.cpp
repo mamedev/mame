@@ -289,7 +289,7 @@ void omti8621_device::device_start()
 
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
@@ -410,7 +410,7 @@ void omti8621_device::set_interrupt(enum line_state line_state)
 	m_isa->irq14_w(line_state);
 }
 
-void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	set_interrupt(ASSERT_LINE);
 }

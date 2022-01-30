@@ -347,7 +347,7 @@ void epson_lx810l_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case TIMER_CR:

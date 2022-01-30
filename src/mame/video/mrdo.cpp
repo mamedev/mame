@@ -200,7 +200,7 @@ void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
 	// protection.  each write latches a new value on IC u001 (PAL16R6)
 	const uint8_t i9 = BIT(data,0);
 	const uint8_t i8 = BIT(data,1);
-//	const uint8_t i7 = BIT(data,2); pin 7 not used in equations
+//  const uint8_t i7 = BIT(data,2); pin 7 not used in equations
 	const uint8_t i6 = BIT(data,3);
 	const uint8_t i5 = BIT(data,4);
 	const uint8_t i4 = BIT(data,5);

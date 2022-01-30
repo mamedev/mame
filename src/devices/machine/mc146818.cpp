@@ -107,7 +107,7 @@ void mc146818_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

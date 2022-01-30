@@ -280,7 +280,7 @@ private:
 	optional_shared_ptr<uint16_t> m_nvram16;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint8_t towns_system_r(offs_t offset);
 	void towns_system_w(offs_t offset, uint8_t data);

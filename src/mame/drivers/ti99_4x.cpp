@@ -163,7 +163,7 @@ private:
 
 	// Used by EVPC
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -723,7 +723,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
 /*
     Used by the EVPC
 */
-void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Pulse it
 	if (m_datamux != nullptr)

@@ -181,7 +181,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
 // and a timer for the cycle based IRQ mode, which both call irq_clock
 
-void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

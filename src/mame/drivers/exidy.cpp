@@ -215,7 +215,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_color_latch;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void video_start() override;
 
 	void base(machine_config &config);
@@ -1297,7 +1297,7 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

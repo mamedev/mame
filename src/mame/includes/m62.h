@@ -56,10 +56,15 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<irem_audio_device> m_audio;
+
 	tilemap_t*             m_bg_tilemap;
+	uint8_t                m_kidniki_background_bank;
+
 	void m62_flipscreen_w(uint8_t data);
 	void m62_hscroll_low_w(uint8_t data);
 	void m62_hscroll_high_w(uint8_t data);
+	void kidniki_background_bank_w(uint8_t data);
+
 	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 
 private:
@@ -79,7 +84,6 @@ private:
 	optional_region_ptr<uint8_t> m_fg_color_proms;
 	int32_t                m_m62_background_hscroll;
 	int32_t                m_m62_background_vscroll;
-	uint8_t                m_kidniki_background_bank;
 	int32_t                m_kidniki_text_vscroll;
 	int                  m_ldrun3_topbottom_mask;
 	int32_t                m_spelunkr_palbank;
@@ -104,7 +108,6 @@ private:
 	void ldrun3_topbottom_mask_w(uint8_t data);
 	void kidniki_text_vscroll_low_w(uint8_t data);
 	void kidniki_text_vscroll_high_w(uint8_t data);
-	void kidniki_background_bank_w(uint8_t data);
 	void spelunkr_palbank_w(uint8_t data);
 	void spelunk2_gfxport_w(uint8_t data);
 	void horizon_scrollram_w(offs_t offset, uint8_t data);

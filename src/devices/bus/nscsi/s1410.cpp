@@ -39,7 +39,6 @@ void nscsi_s1410_device::scsi_command()
 	case SC_TEST_UNIT_READY:
 	case SC_REZERO:
 	case SC_FORMAT_UNIT: // TODO does not support starting LBA
-	case SC_REQUEST_SENSE:
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
@@ -49,6 +48,11 @@ void nscsi_s1410_device::scsi_command()
 		} else {
 			nscsi_harddisk_device::scsi_command();
 		}
+		break;
+
+	case SC_REQUEST_SENSE:
+		scsi_data_in(SBUF_SENSE, 4);
+		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_FORMAT_TRACK: {
@@ -89,12 +93,12 @@ void nscsi_s1410_device::scsi_command()
 		break;
 
 	case SC_WRITE_SECTOR_BUFFER:
-		scsi_data_out(2, 512);
+		scsi_data_out(2, bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_READ_SECTOR_BUFFER:
-		scsi_data_in(2, 512);
+		scsi_data_in(2, bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 

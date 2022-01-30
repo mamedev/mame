@@ -112,7 +112,7 @@ private:
 	uint16_t m_ula_char_buffer;
 	double m_cassette_cur_level;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void drop_sync();
 	void recalc_hsync();

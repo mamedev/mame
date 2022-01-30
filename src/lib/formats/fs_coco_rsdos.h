@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_coco_rsdos.h
+    fs_coco_rsdos.h
 
-	Management of CoCo "RS-DOS" floppy images
+    Management of CoCo "RS-DOS" floppy images
 
 ***************************************************************************/
 
@@ -56,20 +56,20 @@ private:
 
 		struct rsdos_dirent
 		{
-			char	m_filename[11];
-			u8		m_filetype;
-			u8		m_asciiflag;
-			u8		m_first_granule;
-			u8		m_last_sector_bytes_msb;
-			u8		m_last_sector_bytes_lsb;
+			char    m_filename[11];
+			u8      m_filetype;
+			u8      m_asciiflag;
+			u8      m_first_granule;
+			u8      m_last_sector_bytes_msb;
+			u8      m_last_sector_bytes_lsb;
 		};
 
 		struct rsdos_dirent_sector
 		{
 			struct
 			{
-				rsdos_dirent	m_dirent;
-				u8				m_unused[16];
+				rsdos_dirent    m_dirent;
+				u8              m_unused[16];
 			} m_entries[4];
 		};
 
@@ -79,10 +79,10 @@ private:
 			bool next(u8 &granule, u16 &byte_count);
 
 		private:
-			fsblk_t::block_t	m_granule_map;
-			std::optional<u8>	m_current_granule;
-			u8					m_maximum_granules;
-			u16					m_last_sector_bytes;
+			fsblk_t::block_t    m_granule_map;
+			std::optional<u8>   m_current_granule;
+			u8                  m_maximum_granules;
+			u16                 m_last_sector_bytes;
 		};
 
 		class file : public ifile_t {
@@ -96,8 +96,8 @@ private:
 			virtual std::vector<u8> read_all() override;
 
 		private:
-			impl &			m_fs;
-			rsdos_dirent	m_dirent;
+			impl &          m_fs;
+			rsdos_dirent    m_dirent;
 		};
 
 		impl(fsblk_t &blockdev);

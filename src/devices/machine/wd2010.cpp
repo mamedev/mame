@@ -875,7 +875,7 @@ void wd2010_device::buffer_ready(bool state)
 }
 
 
-void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

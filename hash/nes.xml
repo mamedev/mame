@@ -21508,7 +21508,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A4" />
+			<feature name="vrc7-pin19" value="PRG A4" />
 			<dataarea name="prg" size="524288">
 				<rom name="rc851j00p" size="524288" crc="743387ff" sha1="2dc2c795421a5db2427c460f35828a23beba9274" offset="00000" />
 			</dataarea>
@@ -39732,7 +39732,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A3" />
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="prg" size="131072">
 				<rom name="rv051j00p" size="131072" crc="1aa0479c" sha1="8ab54a69f551d954179109fb5ae33df42ba2eb30" offset="00000" />
 			</dataarea>
@@ -75823,7 +75823,7 @@ Other
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A3" /> <!-- unconfirmed, based on Tiny Toon 2 -->
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros 14 (unl).chr" size="131072" crc="24e491ea" sha1="324f922f8f7cdecb948a5348d79e37428654c1bc" offset="00000" status="baddump" />
 			</dataarea>
@@ -78054,6 +78054,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc7" />
 			<feature name="pcb" value="UNL-VRC7" />
+			<feature name="vrc7-pin19" value="PRG A3" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat v pro [p1][u].chr" size="262144" crc="879fadf1" sha1="9f38b8fa75d70b518ac5cb5886718bba51c43846" offset="00000" status="baddump" />
 			</dataarea>
@@ -79363,6 +79364,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="famipico">
+		<description>Famicompo Pico</description>
+		<year>2014</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="2a03pur" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="524288">
+				<rom name="pico.prg" size="524288" crc="0eb47d80" sha1="5a71e9936045df6408926fe9d5d97cd60af359b7" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="glider">
 		<description>Glider</description>
 		<year>2008</year>
@@ -79950,6 +79967,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_12gc">
+		<description>12 in 1 Game Card</description>
+		<year>1989</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_ctc12in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="12-in-1 game card (ctc) (unl).prg" size="524288" crc="e669e67c" sha1="d9ba86eb3ccf778c447e022f43db83d8e47047f6" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 08 Chess only runs with PAL/Dendy timing? Tank 1990 has incorrect mirroring or does this cart have a different mirroring bit (mapper 177 doesn't work)? -->
 	<software name="mc_12hs">
 		<description>12 in 1 Hwang Shinwei</description>
 		<year>19??</year>
@@ -79957,15 +79990,15 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
 				<rom name="12-in-1 hwang shinwei (unl).prg" size="524288" crc="016d60c5" sha1="cded1d0be27b8351bd2ea86f682f36a46d6e59c1" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 8k WRAM on cartridge? -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -84218,6 +84251,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 256k VRAM on cartridge -->
 			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_s15gc" supported="partial">
+		<description>Super 15 in 1 Game Card</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_891227" />
+			<dataarea name="prg" size="655360">
+				<rom name="super 15-in-1 game card (891227)(unl).prg0" size="524288" crc="e0f9e193" sha1="17f46453e96ec1f1eab98cf3e38bd8bb84c1e3f1" offset="0x000000" status="baddump" />
+				<rom name="super 15-in-1 game card (891227)(unl).prg1" size="131072" crc="ca697423" sha1="3ba14cb78aaa8d39cd6547db988001965c67dbb8" offset="0x080000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

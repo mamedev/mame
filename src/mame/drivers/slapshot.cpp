@@ -147,7 +147,7 @@ Region byte at offset 0x031:
                 INTERRUPTS
 ***********************************************************/
 
-void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

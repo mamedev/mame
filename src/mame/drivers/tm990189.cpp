@@ -496,7 +496,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<tms9902_device> m_tms9902;
 };
@@ -514,7 +514,7 @@ void tm990_189_rs232_image_device::device_start()
 {
 }
 
-void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint8_t buf;
 	if (/*m_rs232_rts &&*/ /*(mame_ftell(m_rs232_fp) < mame_fsize(m_rs232_fp))*/1)

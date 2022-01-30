@@ -111,7 +111,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1062,7 +1062,7 @@ void dpb7000_state::machine_reset()
 	m_tablet_state = 0;
 }
 
-void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_DISKSEQ_COMPLETE)
 		req_b_w(1);

@@ -197,7 +197,7 @@ void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
 	m_timer_scanline->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
-void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

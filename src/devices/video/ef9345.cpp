@@ -194,7 +194,7 @@ void ef9345_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

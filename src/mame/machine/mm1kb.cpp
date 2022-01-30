@@ -247,7 +247,7 @@ void mm1_keyboard_device::shut_down_mm1()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// handle scan timer
 	uint8_t data = 0xff;

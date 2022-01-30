@@ -48,7 +48,7 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	virtual void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
+	virtual void device_timer(emu_timer& timer, device_timer_id id, int param) override;
 
 	virtual uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -110,7 +110,7 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	virtual void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
+	virtual void device_timer(emu_timer& timer, device_timer_id id, int param) override;
 
 	virtual uint16_t porta_r() override;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -121,7 +121,7 @@ private:
 	emu_timer *m_pulse_timer2;
 };
 
-void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -132,7 +132,7 @@ void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id i
 	}
 }
 
-void spg2xx_game_marc250_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg2xx_game_marc250_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

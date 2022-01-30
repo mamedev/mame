@@ -137,7 +137,7 @@ void ncr539x_device::device_start()
 	m_out_irq_cb.resolve_safe();
 	m_out_drq_cb.resolve_safe();
 
-	m_operation_timer = timer_alloc(0, nullptr);
+	m_operation_timer = timer_alloc(0);
 }
 
 //-------------------------------------------------
@@ -177,7 +177,7 @@ void ncr539x_device::dma_write_data(int bytes, uint8_t *pData)
 	write_data(pData, bytes);
 }
 
-void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	//printf("539X: device_timer expired, param = %d, m_command = %02x\n", param, m_command);
 

@@ -253,7 +253,7 @@ void tmnt_state::sound_nmi_callback( int param )
 }
 #endif
 
-void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -141,7 +141,7 @@ void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)
 	//m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
 }
 
-void dpb7000_combiner_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dpb7000_combiner_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == FSCK_TIMER)
 	{

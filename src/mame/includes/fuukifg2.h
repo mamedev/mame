@@ -91,7 +91,7 @@ private:
 	void fuuki16_sound_io_map(address_map &map);
 	void fuuki16_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_FUUKIFG2_H

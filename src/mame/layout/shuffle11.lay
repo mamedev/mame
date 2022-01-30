@@ -11,11 +11,6 @@ copyright-holders:Robbbert
 			<color red="1.0" green="0.25" blue="0.0" />
 		</led7seg>
 	</element>
-	<element name="red_led">
-		<disk state="0">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</disk>
-	</element>
 	<element name="P0"><text string="Frame / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -118,12 +113,5 @@ copyright-holders:Robbbert
 		<element ref="P7"><bounds left="60" right="140" top="190" bottom="202" /></element>
 		<element ref="P8"><bounds left="260" right="340" top="190" bottom="202" /></element>
 
-		<!-- LEDs -->
-		<element name="led0" ref="red_led">
-			<bounds left="310" right="325" top="300" bottom="315" />
-		</element>
-		<element name="led1" ref="red_led">
-			<bounds left="344" right="359" top="300" bottom="315" />
-		</element>
 	</view>
 </mamelayout>

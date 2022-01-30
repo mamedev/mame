@@ -2,20 +2,20 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-	prodosromdrive.cpp
+    prodosromdrive.cpp
 
-	Implementation of the ProDOS ROM Drive card
+    Implementation of the ProDOS ROM Drive card
 
-	This is a hobbyist board which provides a minimal SmartPort API
-	interface to boot from a 1 MiB disk image stored in a 27C080 or
-	compatible EPROM.
+    This is a hobbyist board which provides a minimal SmartPort API
+    interface to boot from a 1 MiB disk image stored in a 27C080 or
+    compatible EPROM.
 
-	Board and firmware by Terence J. Boldt
-	http://apple2.ca/
-	https://github.com/tjboldt/ProDOS-ROM-Drive
+    Board and firmware by Terence J. Boldt
+    http://apple2.ca/
+    https://github.com/tjboldt/ProDOS-ROM-Drive
 
-	The firmware requires a IIe or better, and some of the games
-	included require a 65C02 (enhanced IIe).
+    The firmware requires a IIe or better, and some of the games
+    included require a 65C02 (enhanced IIe).
 
 *********************************************************************/
 
