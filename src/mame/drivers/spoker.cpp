@@ -64,6 +64,7 @@ public:
 	void _3super8(machine_config &config);
 
 	void init_spkleftover();
+	void init_spk100();
 	void init_spk114it();
 	void init_spk116it();
 	void init_3super8();
@@ -844,7 +845,7 @@ ROM_START( spk102ua )
 	ROM_LOAD( "mx28f2000p_v102_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
-ROM_START( spk102u ) // no labels on the ROMs
+ROM_START( spk100 ) // no labels on the ROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u43",   0x0000, 0x10000, CRC(7c17bf58) SHA1(dd16b9f52d8c08a61fe234978cc84b95c25c5dec) )
 
@@ -1033,6 +1034,18 @@ void spoker_state::init_spk114it()
 	}
 }
 
+void spoker_state::init_spk100()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int A = 0; A < 0x10000; A++)
+	{
+		rom[A] ^= 0x22;
+		if ((A & 0x0090) == 0x0080) rom[A] ^= 0x20;
+		if ((A & 0x04a0) == 0x04a0) rom[A] ^= 0x02;
+		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
+	}
+}
+
 void spoker_state::init_3super8()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -1088,5 +1101,5 @@ GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk11
 GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk102u,    spk306us, spokeru,  spoker,   spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v102U)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs decryption, proper machine driver
+GAME( 1996,  spk100,     spk306us, spoker,   spoker,   spoker_state,  init_spk100,      ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // bad dump of the GFX ROMs?
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
