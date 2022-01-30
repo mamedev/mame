@@ -32,6 +32,7 @@ public:
 		  m_dma(*this, "dma"),
 		  m_sdcard(*this, "sdcard"),
 		  m_glukrs(*this, "glukrs"),
+		  m_rendering_gfx_y_offset(0),
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
 		  m_cram(*this, "cram"),
