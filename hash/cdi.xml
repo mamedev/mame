@@ -10701,7 +10701,7 @@ license:CC0
 	</software>
 
 	<software name="aliengatu">
-		<description>Alien Gate (US)</description>
+		<description>Alien Gate (US, set 1)</description>
 		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
@@ -10712,7 +10712,7 @@ license:CC0
 	</software>
 
 	<software name="aliengatu1">
-		<description>Alien Gate (US, set 1)</description>
+		<description>Alien Gate (US, set 2)</description>
 		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
