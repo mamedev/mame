@@ -267,7 +267,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 					}
 				}
 			}
-			m_rendering_gfx_y_offset = ++m_rendering_gfx_y_offset & 0x1ff;
+			m_rendering_gfx_y_offset = (m_rendering_gfx_y_offset + 1) & 0x1ff;
 		}
 	}
 
