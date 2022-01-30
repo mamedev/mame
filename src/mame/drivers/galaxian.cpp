@@ -3970,7 +3970,7 @@ static INPUT_PORTS_START( atlantib )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( devilfsg )
+static INPUT_PORTS_START( devilfshg )
 	PORT_INCLUDE(pacmanbl)
 
 	PORT_MODIFY("IN0")
@@ -7477,7 +7477,7 @@ void tenspot_state::tenspot(machine_config &config)
 	m_gfxdecode->set_info(gfx_tenspot);
 }
 
-void galaxian_state::devilfsg(machine_config &config)
+void galaxian_state::devilfshg(machine_config &config)
 {
 	pacmanbl(config);
 
@@ -8758,6 +8758,20 @@ void galaxian_state::init_pacmanbl()
 
 	/* ...but coin lockout disabled/disconnected */
 	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
+}
+
+void galaxian_state::init_devilfshg()
+{
+	init_galaxian();
+
+	// descramble address lines
+	uint8_t *rom = memregion("maincpu")->base();
+	const size_t len = memregion("maincpu")->bytes();
+
+	std::vector<uint8_t> buf(len);
+	memcpy(&buf[0], rom, len);
+	for (int i = 0; i < len; i++)
+		rom[i] = buf[(i & ~0x1f) | bitswap<5>(i,1,0,3,4,2)];
 }
 
 uint8_t tenspot_state::dsw_read()
@@ -10682,8 +10696,31 @@ ROM_START( skyraidr )
 ROM_END
 
 
-ROM_START( devilfsg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+ROM_START( devilfshg ) // Artic Multi-System, CPU enclosed in epoxy block
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "df1",  0x0000, 0x0800, CRC(5af8db02) SHA1(e2b4c75b1e23f38b640881359aab071c3f26527e) )
+	ROM_LOAD( "df2",  0x0800, 0x0800, CRC(6e4eb2af) SHA1(4a1c2d5683ddec66e9eec28c853d624c7fadade9) )
+	ROM_LOAD( "df3",  0x1000, 0x0800, CRC(ef37cc08) SHA1(547fb75dc46c1fbcc0677d6e970ebd3e0af5d921) )
+	ROM_LOAD( "df4",  0x1800, 0x0800, CRC(d344706f) SHA1(d5d1890cbae342b277de3da123cc3673a0419fb0) )
+	ROM_LOAD( "df5",  0x2000, 0x0800, CRC(ab9f2f7c) SHA1(a22027c663adb6321875589183071bd069949c97) )
+	ROM_LOAD( "df6",  0x2800, 0x0800, CRC(5681d1f9) SHA1(c2a7c37901fc6c0d7ac1aa663800afc74c288a15) )
+	ROM_LOAD( "df7",  0x3000, 0x0800, CRC(16a4b6c3) SHA1(45e4917f55ab915b676860a88ed75c9334a2dcc6) )
+	ROM_LOAD( "df8",  0x3800, 0x0800, CRC(236fd69d) SHA1(4681d4621dbadfb52368399ecd557086384fad13) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "df12", 0x0000, 0x0800, CRC(aa62441d) SHA1(04b61b0e660dba962bf7f18ab5b37b0d8edd8534) )
+	ROM_LOAD( "df11", 0x0800, 0x0800, CRC(12a1f15d) SHA1(e6666abaa92bb443760bf8e1746a11196bc30322) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "df10", 0x0000, 0x0800, CRC(5da97ccf) SHA1(653c5df3ecc895c0aa5275c45c87ac0e38984085) )
+	ROM_LOAD( "df9",  0x0800, 0x0800, CRC(edd41c4c) SHA1(88c1b1f57a64e2cd66975b680a94a1384c08dc31) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( devilfshgb )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "dfish1.7f",    0x2000, 0x0800, CRC(2ab19698) SHA1(8450981d3cf3fa8abf2fb5487aa98b03a4cf03a1) )
 	ROM_CONTINUE(             0x0000, 0x0800 )
 	ROM_LOAD( "dfish2.7h",    0x2800, 0x0800, CRC(4e77f097) SHA1(aeaa5ff210ccbbe77114edf5dee992d2720636ae) )
@@ -12136,7 +12173,6 @@ void galaxian_state::init_ckonggx()
 	for (int i = 0; i < 88; i++)
 	{
 		memcpy(&buffer[i*0x100], rom+ckonggx_remap[i], 0x100);
-
 	}
 
 	memcpy(rom, &buffer[0], 0x5800);
@@ -15502,7 +15538,6 @@ GAME( 1980, astrians,    galaxian, galaxian,   swarm,      galaxian_state, init_
 
 GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "<unknown>", "Galaxian Test ROM", MACHINE_SUPPORTS_SAVE )
 
-
 // Other games on basic galaxian hardware
 GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, init_galaxian,   ROT90,  "TDS & MINTS",                     "Black Hole",       MACHINE_SUPPORTS_SAVE )
 GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, init_galaxian,   ROT270, "Comsoft (Signatron USA license)", "Orbitron",         MACHINE_SUPPORTS_SAVE ) // there's a Comsoft copyright in one of the roms, and the gameplay is the same as Victory below
@@ -15570,7 +15605,8 @@ GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_
 GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                   MACHINE_NOT_WORKING ) // Work out how menu works
 
 // Separate tile/sprite ROMs, plus INT instead of NMI
-GAME( 1984, devilfsg,    devilfsh, devilfsg,   devilfsg,   galaxian_state, init_galaxian,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, devilfshg,   devilfsh, devilfshg,  devilfshg,  galaxian_state, init_devilfshg,  ROT270, "Artic", "Devil Fish (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, devilfshgb,  devilfsh, devilfshg,  devilfshg,  galaxian_state, init_galaxian,   ROT270, "bootleg (Vision)", "Devil Fish (Galaxian hardware, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Sound hardware replaced with AY8910
 // We're missing the original set by Taito do Brasil, we only have the bootlegs

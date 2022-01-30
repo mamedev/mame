@@ -32,8 +32,7 @@ Sound:
       line per sound. There's 4 "chime" lines and the tilt line.
 - The later games could send any of 15 codes (but never did), so only needed 4 lines.
 - All soundcard games also have an "alternator" line. By activating this, followed by
-      activating bit 0, the startup tune would play. For it to work properly, both bit
-      4 and 7 must operate at the same time, otherwise the tune gets cut off.
+      activating bit 0, the startup tune would play.
 
 Status:
 - All games are playable

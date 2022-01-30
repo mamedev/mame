@@ -160,6 +160,7 @@ public:
 	void init_mooncrgx();
 	void init_moonqsr();
 	void init_pacmanbl();
+	void init_devilfshg();
 	void init_jumpbug();
 	void init_checkman();
 	void init_checkmaj();
@@ -279,7 +280,7 @@ public:
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
 	void highroll(machine_config &config);
-	void devilfsg(machine_config &config);
+	void devilfshg(machine_config &config);
 	void froggers(machine_config &config);
 	void froggervd(machine_config &config);
 	void anteateruk(machine_config &config);

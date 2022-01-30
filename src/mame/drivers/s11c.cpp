@@ -1,8 +1,42 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
-/*
-    Williams System 11c
-*/
+// copyright-holders:Miodrag Milanovic, Robbbert
+/*******************************************************************************************************************
+
+PINBALL
+Williams System 11C
+
+If it says FACTORY SETTING, hit F3.
+
+Here are the key codes to enable play:
+
+Game                             NUM  Start game             End ball
+---------------------------------------------------------------------------------------------
+**** Williams ****
+Diner                            571  Hold CDE hit 1         CDE
+Rollergames                      576  Hold CDE hit 1         CDE
+**** Bally (Midway) ****
+The Bally Game Show             2003  Hold CD hit 1          CD
+Pool Sharks                     2014  Hold CD hit 1          CD
+Radical!                        2015  Hold CD hit 1          CD
+Dr Dude and his Excellent Ray   2016  Hold CDE hit 1         CDE
+Bugs Bunny's Birthday Ball     20009  Hold CD hit 1          CD
+**** Williams (WPC) ****
+Riverboat Gambler              50007  Hold CDE hit 1         CDE
+**** Krell Development ****
+Star Trax                        ---  unknown                unknown
+
+Status:
+- All pinball machines are playable
+- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned), so will not be able to run
+
+
+ToDo:
+- Riverboat Gambler: first 4 digits of Player 4 don't work. (see code around BBB8)
+- Some digits flicker
+- Star Trax: there's no documentation. Need manual, schematics, etc
+
+
+*******************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/s11.h"
@@ -14,91 +48,91 @@
 
 
 static INPUT_PORTS_START( s11c )
-	PORT_START("SW.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // always plumb-bob tilt
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RSHIFT) // a relay from the power section
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LSHIFT) // usually slam tilt
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RCONTROL) // usually high score reset
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Plumb Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("C Relay")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
 
-	PORT_START("SW.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) // usually playfield tilt
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP16")
 
-	PORT_START("SW.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
 
-	PORT_START("SW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP40")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DEL)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGUP)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP48")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP49")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP50")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP51")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP52")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP53")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP54")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP55")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP56")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP57")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP58")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP59")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("INP60")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("INP61")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP62")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP63")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP64")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11c_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11c_state, main_nmi, 1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, audio_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
 	PORT_CONFSETTING( 0x00, "German" )
 	PORT_CONFSETTING( 0x10, "English" )
@@ -115,6 +149,12 @@ void s11c_state::init_s11c()
 	set_invert(true);
 	set_timer(timer);
 	timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
+}
+
+void s11c_state::init_s11c7()
+{
+	init_s11c();
+	set_7seg(true);
 }
 
 void s11c_state::s11c(machine_config &config)
@@ -693,38 +733,38 @@ ROM_START(strax_p7)
 ROM_END
 
 
-GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_lu1,     dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LU-1) Europe",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_lu1,     dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LU-1) Europe",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)

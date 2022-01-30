@@ -690,8 +690,6 @@ public:
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_g();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_READ_LINE_MEMBER(read_si);
 	void lchicken(machine_config &config);
 
 protected:
@@ -752,19 +750,6 @@ u8 lchicken_state::read_g()
 	return read_inputs(4, m_g);
 }
 
-WRITE_LINE_MEMBER(lchicken_state::write_so)
-{
-	// SO: speaker out
-	m_speaker->level_w(state);
-	m_so = state;
-}
-
-READ_LINE_MEMBER(lchicken_state::read_si)
-{
-	// SI: SO
-	return m_so;
-}
-
 // config
 
 static INPUT_PORTS_START( lchicken )
@@ -802,8 +787,8 @@ void lchicken_state::lchicken(machine_config &config)
 	m_maincpu->write_d().set(FUNC(lchicken_state::write_d));
 	m_maincpu->write_g().set(FUNC(lchicken_state::write_g));
 	m_maincpu->read_g().set(FUNC(lchicken_state::read_g));
-	m_maincpu->write_so().set(FUNC(lchicken_state::write_so));
-	m_maincpu->read_si().set(FUNC(lchicken_state::read_si));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_si().set(m_maincpu, FUNC(cop400_cpu_device::so_r));
 
 	TIMER(config, "chicken_motor").configure_periodic(FUNC(lchicken_state::motor_sim_tick), attotime::from_msec(6000/0x100)); // ~6sec for a full rotation
 

@@ -98,10 +98,10 @@ private:
 
 	void main_map(address_map &map);
 
-	u8 m_strobe = 0;
-	u8 m_row = 0;
+	u8 m_strobe = 0U;
+	u8 m_row = 0U;
 	bool m_data_ok = 0;
-	u8 m_lamp_data = 0;
+	u8 m_lamp_data = 0U;
 	emu_timer* m_irq_timer;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
