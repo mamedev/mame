@@ -659,14 +659,18 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		m_maincpu->set_clock(3.5_MHz_XTAL * (1 << (data & 0x03)));
 		break;
 
+	case HS_INT:
+	case VS_INT_L:
+	case VS_INT_H:
+		if (val_changed)
+			update_frame_timer();
+		break;
+
 	case FMAPS:
 	case PAL_SEL:
 	case TS_CONFIG:
 	case G_X_OFFS_L:
 	case G_X_OFFS_H:
-	case HS_INT:
-	case VS_INT_L:
-	case VS_INT_H:
 	case INT_MASK:
 		break;
 
@@ -779,7 +783,7 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 	m_zctl_di |= data;
 }
 
-INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
+void tsconf_state::update_frame_timer()
 {
 	u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
 	u16 hpos = m_regs[HS_INT];
@@ -788,6 +792,15 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 		// Only if not overlapping with scanline. Otherwise we need to prioritize.
 		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
 	}
+	else
+	{
+		m_frame_irq_timer->adjust(attotime::never);
+	}
+}
+
+INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
+{
+	update_frame_timer();
 	m_line_irq_timer->adjust(attotime::zero);
 }
 

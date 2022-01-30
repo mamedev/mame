@@ -130,6 +130,7 @@ private:
 		T1_Y_OFFSER_H = 0x47
 	};
 
+	void update_frame_timer();
 	emu_timer *m_frame_irq_timer;
 	emu_timer *m_line_irq_timer;
 
