@@ -20,12 +20,12 @@
     - Main MCU
     - Video output
     - Keyboard
+    - 24C02 EPROM
 
     What is not yet implemented :
 
     - Modem and sound output.
     - The rear serial port.
-    - Parameters I2C 24C02 EEPROM.
     - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
@@ -40,8 +40,8 @@
     F6 -> Guide
     F7 -> Sommaire
     F8 -> Connexion/Fin
-    F9 -> Fonction
     F10-> ON / OFF
+    Alt Gr -> Fonction
 
     With the official ROM you need to press F10 to switch on the CRT.
 
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( minitel2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Connexion/Fin") PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fonction") PORT_CODE(KEYCODE_F9)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fonction") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) // Right maj
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) // Left maj
 
