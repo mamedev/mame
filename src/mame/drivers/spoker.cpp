@@ -850,9 +850,9 @@ ROM_START( spk100 ) // no labels on the ROMs
 	ROM_LOAD( "u43",   0x0000, 0x10000, CRC(7c17bf58) SHA1(dd16b9f52d8c08a61fe234978cc84b95c25c5dec) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "u25",  0x80000, 0x40000, CRC(67f2a1d6) SHA1(115655cf4718105e7ff054dd662d9d53e9ea91e0) )
+	ROM_LOAD( "u25",  0x00000, 0x40000, CRC(67f2a1d6) SHA1(115655cf4718105e7ff054dd662d9d53e9ea91e0) )
 	ROM_LOAD( "u24",  0x40000, 0x40000, CRC(fb9d8c09) SHA1(6cbefa90f6b866ee682f7981d6f5d30e9346a123) )
-	ROM_LOAD( "u23",  0x00000, 0x40000, CRC(98b71478) SHA1(b5bd9eef91f5cc2e9628e5181fbbd6fd453487f0) )
+	ROM_LOAD( "u23",  0x80000, 0x40000, CRC(98b71478) SHA1(b5bd9eef91f5cc2e9628e5181fbbd6fd453487f0) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
 	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
@@ -1101,5 +1101,5 @@ GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk11
 GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk100,     spk306us, spoker,   spoker,   spoker_state,  init_spk100,      ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // bad dump of the GFX ROMs?
+GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,      ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
