@@ -45,7 +45,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum timer_id : u8
@@ -143,6 +143,8 @@ private:
 	// Changing this consider to revert 'virtual' in spectrum.h
 	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void spectrum_UpdateScreenBitmap(bool eof = false) override;
+	void spectrum_UpdateBorderBitmap() override;
+	void spectrum_UpdateZxScreenBitmap(bool eof);
 	void tsconf_palette(palette_device &palette) const;
 	u16 get_border_color() override;
 	void draw_sprites(const rectangle &cliprect);
