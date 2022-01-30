@@ -63,11 +63,11 @@
 // IO expander latch usage definitions
 enum
 {
-	CTRL_REG_DTMF = 0x02,
-	CTRL_REG_MCBC = 0x04,
-	CTRL_REG_OPTO = 0x08,
-	CTRL_REG_RELAY = 0x10,
-	CTRL_REG_CRTON = 0x20
+	CTRL_REG_MCBC  = 0x01,
+	CTRL_REG_DTMF  = 0x02,
+	CTRL_REG_CRTON = 0x08,
+	CTRL_REG_OPTO  = 0x10,
+	CTRL_REG_RELAY = 0x20
 };
 
 // 80C32 Port IO usage definitions
