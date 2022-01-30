@@ -81,17 +81,15 @@ license:CC0
 		<element ref="orange"><bounds x="121" y="0" width="14" height="115" /></element>
 		<element ref="orange"><bounds x="5" y="0" width="130" height="19" /></element>
 
-		<element ref="white"><bounds x="59" y="0" width="22" height="19.5" /></element>
-		<element ref="black"><bounds x="60" y="0" width="20" height="19" /></element>
-
-		<element ref="whited"><bounds x="64.5" y="16" width="11" height="7" /></element>
-		<element ref="blackd"><bounds x="65.5" y="17" width="9" height="5" /></element>
-
-		<element ref="black"><bounds x="0" y="0" width="52" height="12" /></element>
-		<element ref="black"><bounds x="88" y="0" width="52" height="12" /></element>
+		<element ref="black"><bounds x="0" y="0" width="140" height="12" /></element>
 		<element ref="black"><bounds x="0" y="0" width="12" height="120" /></element>
 		<element ref="black"><bounds x="128" y="0" width="12" height="120" /></element>
 		<element ref="black"><bounds x="0" y="104" width="140" height="120" /></element>
+
+		<element ref="white"><bounds x="59" y="0" width="22" height="19.5" /></element>
+		<element ref="black"><bounds x="60" y="0" width="20" height="19" /></element>
+		<element ref="whited"><bounds x="64.5" y="16" width="11" height="7" /></element>
+		<element ref="blackd"><bounds x="65.5" y="17" width="9" height="5" /></element>
 		<element ref="black"><bounds x="-1" y="-1" width="150" height="4.5" /></element>
 
 		<!-- leds -->
