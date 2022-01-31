@@ -519,11 +519,10 @@ void shuffle_state::s4(machine_config &config)
 void shuffle_state::s9(machine_config &config)
 {
 	s4(config);
-	config.device_remove("maincpu");
 	config.device_remove("pia22");
 	config.device_remove("s4sound");
 
-	M6802(config, m_maincpu, XTAL(4'000'000));
+	M6802(config.replace(), m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s9_map);
 
 	config.set_default_layout(layout_shuffle9);
