@@ -18,6 +18,8 @@ TODO:
 #include "emu.h"
 #include "machine/cdislavehle.h"
 
+#include <algorithm>
+
 #define LOG_IRQS        (1 << 0)
 #define LOG_COMMANDS    (1 << 1)
 #define LOG_READS       (1 << 2)
@@ -56,62 +58,57 @@ void cdislave_hle_device::prepare_readback(const attotime &delay, uint8_t channe
 	m_interrupt_timer->adjust(delay);
 }
 
-void cdislave_hle_device::perform_mouse_update()
+INPUT_CHANGED_MEMBER( cdislave_hle_device::mouse_update )
 {
-	uint16_t x = m_mousex->read();
-	uint16_t y = m_mousey->read();
-	uint8_t buttons = m_mousebtn->read();
+	const uint8_t button_state = m_mousebtn->read();
+	uint8_t button_bits = 0x01;
+	if (BIT(button_state, 0))
+		button_bits |= 0x02;
+	if (BIT(button_state, 1))
+		button_bits |= 0x04;
+	if (BIT(button_state, 2))
+		button_bits |= 0x06;
 
-	uint16_t old_mouse_x = m_real_mouse_x;
-	uint16_t old_mouse_y = m_real_mouse_y;
+	const uint16_t x = m_mousex->read();
+	const uint16_t y = m_mousey->read();
 
-	if (m_real_mouse_x == 0xffff)
+	int16_t deltax = 0;
+	int16_t deltay = 0;
+
+	if (m_input_mouse_x != 0xffff && m_input_mouse_y != 0xffff)
 	{
-		old_mouse_x = x & 0x3ff;
-		old_mouse_y = y & 0x3ff;
+		deltax = -(m_input_mouse_x - x);
+		deltay = -(m_input_mouse_y - y);
 	}
 
-	m_real_mouse_x = x & 0x3ff;
-	m_real_mouse_y = y & 0x3ff;
+	m_input_mouse_x = x;
+	m_input_mouse_y = y;
 
-	m_fake_mouse_x += (m_real_mouse_x - old_mouse_x);
-	m_fake_mouse_y += (m_real_mouse_y - old_mouse_y);
-
-	while (m_fake_mouse_x > 0x3ff)
-	{
-		m_fake_mouse_x += 0x400;
-	}
-
-	while (m_fake_mouse_y > 0x3ff)
-	{
-		m_fake_mouse_y += 0x400;
-	}
-
-	x = m_fake_mouse_x;
-	y = m_fake_mouse_y;
+	m_device_mouse_x = std::clamp(m_device_mouse_x + deltax, 0, 767);
+	m_device_mouse_y = std::clamp(m_device_mouse_y + deltay, 0, 559);
 
 	if (m_polling_active)
 	{
-		prepare_readback(attotime::zero, 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+		const uint8_t byte3 = ((m_device_mouse_x & 0x380) >> 7) | (button_bits << 3);
+		const uint8_t byte2 = m_device_mouse_x & 0x7f;
+		const uint8_t byte1 = (m_device_mouse_y & 0x380) >> 7;
+		const uint8_t byte0 = m_device_mouse_y & 0x7f;
+		prepare_readback(attotime::zero, 0, 4, byte3, byte2, byte1, byte0, 0xf7);
 	}
-}
-
-INPUT_CHANGED_MEMBER( cdislave_hle_device::mouse_update )
-{
-	perform_mouse_update();
 }
 
 static INPUT_PORTS_START(cdislave_mouse)
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0xffff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0xffff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 ioport_constructor cdislave_hle_device::device_input_ports() const
@@ -156,20 +153,8 @@ uint16_t cdislave_hle_device::slave_r(offs_t offset)
 
 void cdislave_hle_device::set_mouse_position()
 {
-//    uint16_t x, y;
-
-	//printf( "Set mouse position: %02x %02x %02x\n", m_in_buf[0], m_in_buf[1], m_in_buf[2] );
-
-	m_fake_mouse_y = ((m_in_buf[1] & 0x0f) << 6) | (m_in_buf[0] & 0x3f);
-	m_fake_mouse_x = ((m_in_buf[1] & 0x70) << 3) | m_in_buf[2];
-
-//    x = m_fake_mouse_x;
-//    y = m_fake_mouse_y;
-
-	if (m_polling_active)
-	{
-		//prepare_readback(attotime::zero, 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
-	}
+	m_device_mouse_x = ((m_in_buf[1] & 0x70) << 3) | (m_in_buf[2] & 0x7f);
+	m_device_mouse_y = ((m_in_buf[1] & 0x0f) << 6) | (m_in_buf[0] & 0x3f);
 }
 
 void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
@@ -290,20 +275,24 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 				switch (data & 0x00ff)
 				{
 					case 0x82: // Mute Audio
+					{
 						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Mute Audio (0x82)\n", offset);
-						m_dmadac[0]->enable(0);
-						m_dmadac[1]->enable(0);
+						m_dmadac[0]->set_volume(0);
+						m_dmadac[1]->set_volume(0);
 						m_in_index = 0;
 						m_in_count = 0;
 						//cdic->audio_sample_timer->adjust(attotime::never);
 						break;
+					}
 					case 0x83: // Unmute Audio
+					{
 						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset);
-						m_dmadac[0]->enable(1);
-						m_dmadac[1]->enable(1);
+						m_dmadac[0]->set_volume(0x100);
+						m_dmadac[1]->set_volume(0x100);
 						m_in_index = 0;
 						m_in_count = 0;
 						break;
+					}
 					case 0xf0: // Set Front Panel LCD
 						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset);
 						m_in_count = 17;
@@ -476,11 +465,11 @@ void cdislave_hle_device::device_start()
 
 	save_item(NAME(m_lcd_state));
 
-	save_item(NAME(m_real_mouse_x));
-	save_item(NAME(m_real_mouse_y));
+	save_item(NAME(m_input_mouse_x));
+	save_item(NAME(m_input_mouse_y));
 
-	save_item(NAME(m_fake_mouse_x));
-	save_item(NAME(m_fake_mouse_y));
+	save_item(NAME(m_device_mouse_x));
+	save_item(NAME(m_device_mouse_y));
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdislave_hle_device::trigger_readback_int), this));
 	m_interrupt_timer->adjust(attotime::never);
@@ -513,11 +502,11 @@ void cdislave_hle_device::device_reset()
 
 	memset(m_lcd_state, 0, 16);
 
-	m_real_mouse_x = 0xffff;
-	m_real_mouse_y = 0xffff;
+	m_input_mouse_x = 0xffff;
+	m_input_mouse_y = 0xffff;
 
-	m_fake_mouse_x = 0;
-	m_fake_mouse_y = 0;
+	m_device_mouse_x = 0;
+	m_device_mouse_y = 0;
 
 	m_int_callback(CLEAR_LINE);
 }

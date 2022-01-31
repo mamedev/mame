@@ -228,7 +228,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_MAP_SWITCH = 0;
 	static const device_timer_id TIMER_HBLANK = 1;
@@ -965,7 +965,7 @@ template<int cpunum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
 }
 
-void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

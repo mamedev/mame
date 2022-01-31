@@ -281,12 +281,27 @@ void gaelco_gae1_device::device_start()
 
 	if (LOG_WAVE)
 		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
+
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
+		save_item(NAME(m_channel[ch].active), ch);
+		save_item(NAME(m_channel[ch].loop), ch);
+		save_item(NAME(m_channel[ch].chunkNum), ch);
+	}
+
+	save_item(NAME(m_sndregs));
 }
 
 void gaelco_gae1_device::device_reset()
 {
 	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
 		m_channel[ch].active = 0;
+		m_channel[ch].loop = 0;
+		m_channel[ch].chunkNum = 0;
+	}
+
+	std::fill(std::begin(m_sndregs), std::end(m_sndregs), 0.0);
 }
 
 void gaelco_gae1_device::device_stop()

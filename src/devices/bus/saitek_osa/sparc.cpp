@@ -11,13 +11,24 @@ Hardware notes:
 - Fujitsu MB86930-20 SPARClite @ 20MHz
 - 256KB ROM (4*AMD AM27C512)
 - 1MB DRAM (8*NEC 424256-60), expandable to 4MB
+- ESAN 31A-5500 delay line (only on newer PCB)
+
+Two PCB revisions are known, the older one is a lighter green PCB, it has
+empty positions for more ICs (maybe expanded RAM?), and does not have a
+delay line chip.
 
 The module doesn't have its own LCD screen. It has a grill+fan underneath
 at the front part, and a heatsink on the CPU.
 
+About expanded RAM: The 4MB expansion mentioned in the manual works well,
+but it doesn't look like the software was designed to work with other options.
+At 2MB it doesn't work at all. At 8MB or 16MB it becomes very inefficient,
+only using 5MB or 9MB of the available RAM for hash tables.
+
 TODO:
-- runs too slow? opening book moves take around 3 seconds per ply, but on the
-  real device less than 1 second, maybe cpu cache related?
+- runs too slow? solving mate problems is around 60% slower than real device,
+  maybe cpu cache related?
+- opening book moves take 3 around seconds per ply, should be almost immediate
 
 ***************************************************************************/
 
@@ -60,6 +71,8 @@ void saitekosa_sparc_device::device_reset()
 		set_ram_mask(ioport("RAM")->read() ? 22 : 20);
 		m_installed = true;
 	}
+
+	host_io_w(0, 0x1c00);
 }
 
 

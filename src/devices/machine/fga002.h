@@ -57,7 +57,7 @@ class fga002_device :  public device_t
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 #endif
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	devcb_write_line    m_out_int_cb;
 	devcb_read8         m_liack4_cb;

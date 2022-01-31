@@ -21,7 +21,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/kb_7007_3.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

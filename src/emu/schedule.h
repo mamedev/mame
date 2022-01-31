@@ -22,7 +22,7 @@
 //  MACROS
 //**************************************************************************
 
-#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
+#define TIMER_CALLBACK_MEMBER(name)     void name(s32 param)
 
 
 //**************************************************************************
@@ -30,7 +30,7 @@
 //**************************************************************************
 
 // timer callbacks look like this
-typedef named_delegate<void (void *, s32)> timer_expired_delegate;
+typedef named_delegate<void (s32)> timer_expired_delegate;
 
 // ======================> emu_timer
 
@@ -45,8 +45,8 @@ class emu_timer
 	~emu_timer();
 
 	// allocation and re-use
-	emu_timer &init(running_machine &machine, timer_expired_delegate callback, void *ptr, bool temporary);
-	emu_timer &init(device_t &device, device_timer_id id, void *ptr, bool temporary);
+	emu_timer &init(running_machine &machine, timer_expired_delegate callback, bool temporary);
+	emu_timer &init(device_t &device, device_timer_id id, bool temporary);
 	emu_timer &release();
 
 public:
@@ -55,12 +55,10 @@ public:
 	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
 	bool enabled() const { return m_enabled; }
 	int param() const { return m_param; }
-	void *ptr() const { return m_ptr; }
 
 	// setters
 	bool enable(bool enable = true);
 	void set_param(int param) { m_param = param; }
-	void set_ptr(void *ptr) { m_ptr = ptr; }
 
 	// control
 	void reset(const attotime &duration = attotime::never) { adjust(duration, m_param, m_period); }
@@ -78,7 +76,7 @@ private:
 	void register_save();
 	void schedule_next_period();
 	void dump() const;
-	static void device_timer_expired(emu_timer &timer, void *ptr, s32 param);
+	static void device_timer_expired(emu_timer &timer, s32 param);
 
 	// internal state
 	running_machine *   m_machine;      // reference to the owning machine
@@ -86,7 +84,6 @@ private:
 	emu_timer *         m_prev;         // previous timer in order in the list
 	timer_expired_delegate m_callback;  // callback function
 	s32                 m_param;        // integer parameter
-	void *              m_ptr;          // pointer parameter
 	bool                m_enabled;      // is the timer enabled?
 	bool                m_temporary;    // is the timer temporary?
 	attotime            m_period;       // the repeat frequency of the timer
@@ -124,13 +121,13 @@ public:
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
-	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = nullptr);
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
-	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, param, ptr); }
+	emu_timer *timer_alloc(timer_expired_delegate callback);
+	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
+	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0) { timer_set(attotime::zero, callback, param); }
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = nullptr);
+	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0);
+	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0);
 
 	// debugging
 	void dump_timers() const;
@@ -140,7 +137,7 @@ public:
 
 private:
 	// callbacks
-	void timed_trigger(void *ptr, s32 param);
+	void timed_trigger(s32 param);
 	void presave();
 	void postload();
 

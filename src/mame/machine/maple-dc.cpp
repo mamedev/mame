@@ -68,7 +68,7 @@ void maple_dc_device::device_reset()
 	dma_endflag = false;
 }
 
-void maple_dc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void maple_dc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	timer.adjust(attotime::never);
 

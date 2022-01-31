@@ -36,7 +36,7 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
-Aminosan (satellite)                        837-15041    F*           yes  JP     253-5508-0613J  AAFG-01A40195003, Medal
+Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
@@ -71,10 +71,11 @@ Monopoly: The Medal 2nd Edition             ???-?????                 no        
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mushiking 2K7 1ST                           ???-?????       MDA-C0028 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Ocha-Ken Hot Medal (Medalink)               837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
+Puyo Puyo! The Medal Edition (Medalink)     837-14875    F            ROM  JP     253-5508-0568J  AAFE-01E78365014
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-UNO the Medal (Medalink)                    ???-?????                 ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
+UNO the Medal (Medalink)                    837-14804    F*           ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
 Yataimura Kingyosukui (1-player, Japan)     8340003      D            ROM  JP     253-5509-5151J  AAFE-01C68774814
 Yataimura Kingyosukui (4-player, China)     837-14875                 CF   EXP    253-5508-0563J  AAFE-xxxxxxxxxxx
 Unknown                                     834-14865                      JAP
@@ -201,7 +202,7 @@ void segasp_state::segasp_map(address_map &map)
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
-	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).m(m_g2if, FUNC(dc_g2if_device::amap));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
@@ -254,8 +255,6 @@ void segasp_state::onchip_port(address_map &map)
 
 
 INPUT_PORTS_START( segasp )
-	PORT_INCLUDE( naomi_debug )
-
 	PORT_START("CFG")
 	PORT_DIPNAME( 0x01, 0x01, "ROM Board type" )
 	PORT_DIPSETTING(    0x00, "other" )
@@ -309,7 +308,6 @@ INPUT_PORTS_START( segasp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 void segasp_state::segasp(machine_config &config)
@@ -598,6 +596,22 @@ ROM_START( ochaken )
 	ROM_LOAD( "317-unknown.ic15", 0, 0x800, BAD_DUMP CRC(0a6e8627) SHA1(01a0b66bffbf7caca8199b132a6014813f04843f) )
 ROM_END
 
+ROM_START( puyomedal )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(4fcfb8c7) SHA1(d1e7dfe7ff95d433c24a27befbb81de2a3527203) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(0db8a64a) SHA1(6b6144d1e9b90cb1beb4ac65801ee0b261339106) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0568-jpn.ic15", 0, 0x800, CRC(313e6987) SHA1(9bec2a2806e4ba018518b9f3cc157c35d08a0490) )
+ROM_END
+
 ROM_START( tetgiant )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -813,6 +827,7 @@ GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2013, manpuku,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Manpuku Suizokukan", GAME_FLAGS ) // まんぷくすいぞくかん
 GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
+GAME( 2009, puyomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Puyo Puyo! The Medal Edition", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 // These use a CF card

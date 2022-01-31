@@ -33,14 +33,14 @@ tmoshspa   Tokimeki Memorial Oshiete Your Heart Seal Version Plus   GV999       
 tmoshsp    Tokimeki Memorial Oshiete Your Heart Seal Version Plus   GV999          GE756   JAB          97.09.27   9:10
 nagano98   Winter Olypmics in Nagano 98                             GV999          GX720   EAA01 1.03   98.01.08  10:45
 naganoj    Hyper Olympic in Nagano                                  GV999          GX720   JAA01 1.02   98.01.07  01:10
-simpbowl   Simpsons Bowling                                         GV999          GQ829   UAA          ?
+simpbowl   The Simpsons Bowling                                     GV999          GQ829   UAA          ?
 
 Notes:
 
 The Tokimeki Memorial Oshiete Your Heart games use an extra PCB plugged in on top for controlling the printer and the sensors.
 Additionally, there is a small PCB for connecting to a sensor... PCB number GE755-PWB(S)
 
-Simpsons Bowling uses an extra PCB plugged in on top containing flash ROMs and circuitry to control the trackball.
+The Simpsons Bowling uses an extra PCB plugged in on top containing flash ROMs and circuitry to control the trackball.
 
 Some of the other games may also have extra PCBs.
 
@@ -101,13 +101,13 @@ Notes:
 
       - These two PCBs are functionally equivalent and can be exchanged between games and work fine (see CD-swapping note below).
 
-      - Simpsons Bowling and Dead Eye use a GV999 with a daughtercard containing flash ROMs and CPLDs:
+      - The Simpsons Bowling and Dead Eye use a GV999 with a daughtercard containing flash ROMs and CPLDs:
         PWB402610
         Xilinx XC3020A
         Xilinx 1718DPC
         74F244N (2 of these)
         LVT245SS (2 of theses)
-        On Simpsons Bowling, this also has one µPD4701AC and an empty space for a second.
+        On The Simpsons Bowling, this also has one µPD4701AC and an empty space for a second.
 
       - 000180 is used for driving the RGB output. It's a very thin piece of very brittle ceramic
         containing a circuit, a LM1203 chip, some smt transistors/caps/resistors etc (let's just say
@@ -135,7 +135,7 @@ Notes:
 
       - CN4 is present only on GV999 and is used to connect extra PCBs with additional functionality.
         For example:
-        Simpsons Bowling additional flash ROM & trackball control PCB.
+        The Simpsons Bowling additional flash ROM & trackball control PCB.
         Tokimeki Memorial Oshiete Your Heart printer and sensor control PCB.
 
       - 001231, 058239 are PALCE16V8H PALs.
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 INPUT_PORTS_END
 
-// Simpsons Bowling
+// The Simpsons Bowling
 
 uint16_t simpbowl_state::flash_r(offs_t offset)
 {
@@ -981,4 +981,4 @@ GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, empty_init, 
 GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "The Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

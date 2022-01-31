@@ -75,7 +75,6 @@
 #define read_8_DXI(A)       g65816i_read_8_normal(A)
 #define read_8_DIY(A)       g65816i_read_8_normal(A)
 #define read_8_DLIY(A)      g65816i_read_8_normal(A)
-#define read_8_AXI(A)       g65816i_read_8_normal(A)
 #define read_8_S(A)         g65816i_read_8_normal(A)
 #define read_8_SIY(A)       g65816i_read_8_normal(A)
 
@@ -96,7 +95,7 @@
 #define read_16_DXI(A)      g65816i_read_16_normal(A)
 #define read_16_DIY(A)      g65816i_read_16_normal(A)
 #define read_16_DLIY(A)     g65816i_read_16_normal(A)
-#define read_16_AXI(A)      g65816i_read_16_normal(A)
+#define read_16_AXI(A)      g65816i_read_16_immediate(A)
 #define read_16_S(A)        g65816i_read_16_normal(A)
 #define read_16_SIY(A)      g65816i_read_16_normal(A)
 
@@ -117,7 +116,6 @@
 #define read_24_DXI(A)      g65816i_read_24_normal(A)
 #define read_24_DIY(A)      g65816i_read_24_normal(A)
 #define read_24_DLIY(A)     g65816i_read_24_normal(A)
-#define read_24_AXI(A)      g65816i_read_24_normal(A)
 #define read_24_S(A)        g65816i_read_24_normal(A)
 #define read_24_SIY(A)      g65816i_read_24_normal(A)
 
@@ -137,7 +135,6 @@
 #define write_8_DXI(A, V)   g65816i_write_8_normal(A, V)
 #define write_8_DIY(A, V)   g65816i_write_8_normal(A, V)
 #define write_8_DLIY(A, V)  g65816i_write_8_normal(A, V)
-#define write_8_AXI(A, V)   g65816i_write_8_normal(A, V)
 #define write_8_S(A, V)     g65816i_write_8_normal(A, V)
 #define write_8_SIY(A, V)   g65816i_write_8_normal(A, V)
 
@@ -157,7 +154,6 @@
 #define write_16_DXI(A, V)  g65816i_write_16_normal(A, V)
 #define write_16_DIY(A, V)  g65816i_write_16_normal(A, V)
 #define write_16_DLIY(A, V) g65816i_write_16_normal(A, V)
-#define write_16_AXI(A, V)  g65816i_write_16_normal(A, V)
 #define write_16_S(A, V)    g65816i_write_16_normal(A, V)
 #define write_16_SIY(A, V)  g65816i_write_16_normal(A, V)
 
@@ -178,7 +174,6 @@
 #define OPER_8_DXI()        read_8_DXI(EA_DXI())
 #define OPER_8_DIY()        read_8_DIY(EA_DIY())
 #define OPER_8_DLIY()       read_8_DLIY(EA_DLIY())
-#define OPER_8_AXI()        read_8_AXI(EA_AXI())
 #define OPER_8_S()          read_8_S(EA_S())
 #define OPER_8_SIY()        read_8_SIY(EA_SIY())
 
@@ -198,7 +193,6 @@
 #define OPER_16_DXI()       read_16_DXI(EA_DXI())
 #define OPER_16_DIY()       read_16_DIY(EA_DIY())
 #define OPER_16_DLIY()      read_16_DLIY(EA_DLIY())
-#define OPER_16_AXI()       read_16_AXI(EA_AXI())
 #define OPER_16_S()         read_16_S(EA_S())
 #define OPER_16_SIY()       read_16_SIY(EA_SIY())
 
@@ -218,7 +212,6 @@
 #define OPER_24_DXI()       read_24_DXI(EA_DXI())
 #define OPER_24_DIY()       read_24_DIY(EA_DIY())
 #define OPER_24_DLIY()      read_24_DLIY(EA_DLIY())
-#define OPER_24_AXI()       read_24_AXI(EA_AXI())
 #define OPER_24_S()         read_24_S(EA_S())
 #define OPER_24_SIY()       read_24_SIY(EA_SIY())
 

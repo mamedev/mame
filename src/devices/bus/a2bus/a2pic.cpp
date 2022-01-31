@@ -49,11 +49,11 @@ private:
 	TIMER_CALLBACK_MEMBER(release_strobe);
 
 	// synchronised inputs
-	void set_ack_in(void *ptr, s32 param);
-	void set_perror_in(void *ptr, s32 param);
-	void set_select_in(void *ptr, s32 param);
-	void set_fault_in(void *ptr, s32 param);
-	void data_write(void *ptr, s32 param);
+	void set_ack_in(s32 param);
+	void set_perror_in(s32 param);
+	void set_select_in(s32 param);
+	void set_fault_in(s32 param);
+	void data_write(s32 param);
 
 	// helpers
 	void reset_mode();
@@ -426,7 +426,7 @@ TIMER_CALLBACK_MEMBER(a2bus_pic_device::release_strobe)
 //  synchronised inputs
 //----------------------------------------------
 
-void a2bus_pic_device::set_ack_in(void *ptr, s32 param)
+void a2bus_pic_device::set_ack_in(s32 param)
 {
 	if (u32(param) != m_ack_in)
 	{
@@ -441,7 +441,7 @@ void a2bus_pic_device::set_ack_in(void *ptr, s32 param)
 }
 
 
-void a2bus_pic_device::set_perror_in(void *ptr, s32 param)
+void a2bus_pic_device::set_perror_in(s32 param)
 {
 	if (u32(param) != m_perror_in)
 	{
@@ -451,7 +451,7 @@ void a2bus_pic_device::set_perror_in(void *ptr, s32 param)
 }
 
 
-void a2bus_pic_device::set_select_in(void *ptr, s32 param)
+void a2bus_pic_device::set_select_in(s32 param)
 {
 	if (u32(param) != m_select_in)
 	{
@@ -461,7 +461,7 @@ void a2bus_pic_device::set_select_in(void *ptr, s32 param)
 }
 
 
-void a2bus_pic_device::set_fault_in(void *ptr, s32 param)
+void a2bus_pic_device::set_fault_in(s32 param)
 {
 	if (u32(param) != m_fault_in)
 	{
@@ -471,7 +471,7 @@ void a2bus_pic_device::set_fault_in(void *ptr, s32 param)
 }
 
 
-void a2bus_pic_device::data_write(void *ptr, s32 param)
+void a2bus_pic_device::data_write(s32 param)
 {
 	// latch output data - remember MSB can be forced low by jumper
 	if (BIT(param, 8))

@@ -56,7 +56,7 @@ void spg290_timer_device::device_clock_changed()
 		m_tick_timer->adjust(attotime::never);
 }
 
-void spg290_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg290_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!BIT(m_control, 31))
 		return;

@@ -10,8 +10,10 @@
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"
 #include "video/k053936.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class crshrace_state : public driver_device
 {
@@ -76,6 +78,8 @@ private:
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+	[[maybe_unused]] void patch_code(uint16_t offset);
 };
 
 #endif // MAME_INCLUDES_CRSHRACE_H

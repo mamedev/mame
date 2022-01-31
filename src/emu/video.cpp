@@ -15,6 +15,7 @@
 #include "crsshair.h"
 #include "rendersw.hxx"
 #include "output.h"
+#include "screen.h"
 
 #include "corestr.h"
 #include "png.h"
@@ -492,7 +493,7 @@ void video_manager::exit()
 //  when there are no screens to drive it
 //-------------------------------------------------
 
-void video_manager::screenless_update_callback(void *ptr, int param)
+void video_manager::screenless_update_callback(int param)
 {
 	// force an update
 	frame_update(false);
@@ -506,8 +507,13 @@ void video_manager::screenless_update_callback(void *ptr, int param)
 
 void video_manager::postload()
 {
+	attotime const emutime = machine().time();
 	for (const auto &x : m_movie_recordings)
-		x->set_next_frame_time(machine().time());
+		x->set_next_frame_time(emutime);
+
+	// reset speed measurements
+	m_speed_last_realtime = osd_ticks();
+	m_speed_last_emutime = emutime;
 }
 
 
@@ -1129,7 +1135,7 @@ std::error_condition video_manager::open_next(emu_file &file, const char *extens
 
 	if (pos_time != -1)
 	{
-		char t_str[15];
+		char t_str[16];
 		const std::time_t cur_time = std::time(nullptr);
 		strftime(t_str, sizeof(t_str), "%Y%m%d_%H%M%S", std::localtime(&cur_time));
 		strreplace(snapstr, "%t", t_str);

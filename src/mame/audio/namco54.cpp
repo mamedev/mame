@@ -52,10 +52,6 @@
 #include "emu.h"
 #include "namco54.h"
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
-{
-	m_latched_cmd = param;
-}
 
 WRITE_LINE_MEMBER( namco_54xx_device::reset )
 {
@@ -92,16 +88,18 @@ void namco_54xx_device::R1_w(uint8_t data)
 
 void namco_54xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::latch_callback),this), data);
-
-	// TODO: should use chip_select line for this
-	m_cpu->pulse_input_line(0, m_irq_duration);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::write_sync),this), data);
 }
+
+TIMER_CALLBACK_MEMBER( namco_54xx_device::write_sync )
+{
+	m_latched_cmd = param;
+}
+
 
 WRITE_LINE_MEMBER( namco_54xx_device::chip_select )
 {
-	// TODO: broken sound when using this
-	//m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(0, state);
 }
 
 
@@ -120,7 +118,6 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_54XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
-	m_irq_duration(attotime::from_usec(100)),
 	m_basenode(0),
 	m_latched_cmd(0)
 {

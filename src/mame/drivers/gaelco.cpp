@@ -8,33 +8,90 @@
 
 Games supported:
 
-Year   Game                PCB            NOTES
--------------------------------------------------------------
-1991   Big Karnak          REF 901112-1   Unprotected
-1992   Squash              REF 922804/1   Encrypted Video RAM
-1992   Thunder Hoop        REF 922804/1   Encrypted Video RAM
-1995   Biomechanical Toy   REF 922804/2   Unprotected
-1996   Maniac Square       REF 922804/2   Prototype
-
-TODO: Figure out why Thunder Hoop crashes if you die on Level 4
-      This can be bypassed by killing yourself at the same time as
-      the Level 3 boss dies, suggesting the end stage animation is
-      somehow corrupting the game state. Could this be a bug in
-      the supported revision of the game?  It doesn't depend on
-      CPU clock, vblank timing, there are no unmapped reads or
-      writes of significance.  Could it be related to a dipswitch
-      setting?
+Year   Game                PCB                       NOTES
+------------------------------------------------------------------------
+1991   Big Karnak          REF 901112-1              Unprotected
+1992   Maniac Square       REF 922804/2              Prototype
+1992   Squash              REF 922804/2 or 922804/1  Encrypted Video RAM
+1992   Thunder Hoop        REF 922804/2 or 922804/1  Encrypted Video RAM
+1995   Biomechanical Toy   REF 922804/2 or 922804/1  Unprotected
+1995   Last Km             REF 922804/2              Prototype
 
       Priorities for all games - the games don't make extensive
       enough use of the priority scheme to properly draw any
       conclusions.
 
+-------------------------------------------------------------
+      Note about 57.42 'FRAMERATE_922804' screen refresh
+      frequency and protection checks.
+
+      In thoop there's a timing loop at 0x49e-4ac.  It's
+      counting frames between interrupt-triggers.
+
+      0x49e writes the count to 0xffdb62.
+
+      While fighting the second-stage boss, when the pink
+      things fly out,  0x8970 is called.  0x8988 fetches
+      from 0xffdb62.  If the value is > 0xdd1 (via 0x898a)
+      or < 0xdb1 (via 0x8992), then 0x89ac sets 0xffdc45
+      to 5.
+
+      At 60hz the value returned is 0xd29, which causes
+      the fail condition to trigger. Values >=57.3 or
+      <=57.7 give a result within the required range. The
+      failure is not obvious at this point.
+
+      While fighting the third boss, 0xc2e8 is called.
+      After passing checks to know exactly when to trigger
+      (specifically, after the boss is defeated and the
+      power-up animation is finishes), 0xc350 checks if
+      0xffdc45 is 5.  If it is, then we reach 0xc368, which
+      0xc368 sets 0xffe08e to 0x27.  Again the failure is
+      not obvious at this point.
+
+      0xffe08e is checked during player respawn after
+      losing a life or continuing at 0x16d00, with an
+      explicit compare against 0x27, if this condition is
+      met, then the game will intentionally corrupt memory
+      and crash.
+
+      Many of these checks are done with obfuscated code
+      to hide the target addresses eg.
+
+      writing 0x27 to 0xffe08e
+      00C35C: lea     $ffc92b.l, A4
+      00C362: adda.l  #$1763, A4
+      00C368: move.b  #$27, (A4)
+
+      This makes it more difficult to find where the checks
+      are being performed as an additional layer of
+      security
+
+      Squash has a similar timing loop, but with the
+      expected values adjusted due to the different 68000
+      clock on the otherwise identical Squash PCB (10Mhz on
+      Squash vs. 12Mhz on Thunder Hoop)  In the case of
+      Squash the most obvious sign of failure is bad
+      'Insert Coin' sprites at the bottom of the screen
+      after a continue.
+
+      A refresh rate of 57.42, while not yet accurately
+      measured, allows a video of thoop to stay in sync with
+      MAME over a 10 minute period.
+
+      No checks have been observed in Biomechanical Toy,
+      the Maniac Square prototype, or the Last KM prototype.
+
+      Big Karnak runs on a different board type and does fail
+      if the CPU clock is set to 10Mhz rather than 12Mhz, it
+      also has additional checks which may still fail and
+      need more extensive research to determine exactly what
+      is being timed.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/gaelco.h"
-
-#include "includes/gaelcrpt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
@@ -88,7 +145,7 @@ void gaelco_state::irqack_w(uint16_t data)
 void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	vram_w(offset, data, mem_mask);
 }
 
@@ -96,23 +153,7 @@ void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_m
 void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&m_screenram[offset]);
-}
-
-/*********** Thunder Hoop Encryption Related Code ******************/
-
-void gaelco_state::thoop_vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
-	vram_w(offset, data, mem_mask);
-}
-
-void gaelco_state::thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	COMBINE_DATA(&m_screenram[offset]);
 }
 
@@ -191,10 +232,10 @@ void gaelco_state::squash_map(address_map &map)
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram"); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                      // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -337,10 +378,10 @@ static INPUT_PORTS_START( biomtoy )
 
 	PORT_START("DSW2")
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW2:8" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
@@ -707,7 +748,7 @@ void gaelco_state::maniacsq(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -736,6 +777,9 @@ void gaelco_state::squash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0f, 0x4228);
+
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
@@ -745,7 +789,7 @@ void gaelco_state::squash(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -774,6 +818,9 @@ void gaelco_state::thoop(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0e, 0x4228);
+
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)); // not inverted
@@ -783,7 +830,7 @@ void gaelco_state::thoop(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -832,8 +879,8 @@ ROM_START( bigkarnk ) // PCB silkscreened REF.901112
 	ROM_LOAD( "bigkarnak_gal20v8.d21", 0x117, 0x157, BAD_DUMP CRC(0dcb286e) SHA1(4071af05ba0fd17446691e53bdbba736e416bf4a) ) // Bruteforced but verified
 ROM_END
 
-ROM_START( maniacsp ) /* PCB - REF 922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+ROM_START( maniacsp ) // PCB - REF 922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE(    "d18",  0x000000, 0x020000, CRC(740ecab2) SHA1(8d8583364cc6aeea58ea2b9cb9a2aab2a43a44df) )
 	ROM_LOAD16_BYTE(    "d16",  0x000001, 0x020000, CRC(c6c42729) SHA1(1aac9f93d47a4eb57e06e206e9f50e349b1817da) )
 
@@ -895,13 +942,13 @@ NOTE: Sadly Gaelco didn't differentiate between versions on the ROM labels.
 ***************************************************************************/
 
 
-ROM_START( biomtoy ) /* PCB - REF.922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "18.d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) /* v1.0.1885 */
-	ROM_LOAD16_BYTE( "16.d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) /* v1.0.1885 */
+ROM_START( biomtoy ) // PCB - REF.922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "18.d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) // v1.0.1885
+	ROM_LOAD16_BYTE( "16.d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) // v1.0.1885
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	/* weird gfx ordering */
+	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
 	ROM_LOAD( "j6",     0x000000, 0x040000, CRC(e923728b) SHA1(113eac1de73c74ef7c9d3e2e72599a1ff775176d) )
@@ -919,20 +966,20 @@ ROM_START( biomtoy ) /* PCB - REF.922804/2 */
 	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
 	ROM_CONTINUE(       0x380000, 0x040000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
 ROM_END
 
 
-ROM_START( biomtoya ) /* PCB - REF.922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) /* v1.0.1884 - sldh */
-	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) /* v1.0.1884 - sldh */
+ROM_START( biomtoya ) // PCB - REF.922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) // v1.0.1884 - sldh
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) // v1.0.1884 - sldh
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	/* weird gfx ordering */
+	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
 	ROM_LOAD( "j6",     0x000000, 0x040000, CRC(e923728b) SHA1(113eac1de73c74ef7c9d3e2e72599a1ff775176d) )
@@ -950,20 +997,20 @@ ROM_START( biomtoya ) /* PCB - REF.922804/2 */
 	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
 	ROM_CONTINUE(       0x380000, 0x040000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
 ROM_END
 
 
-ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) /* v1.0.1878 - sldh */
-	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) /* v1.0.1878 - sldh */
+ROM_START( biomtoyb ) // PCB - REF.922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) // v1.0.1878 - sldh
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) // v1.0.1878 - sldh
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Graphics & Sound ROMs soldered in, not verified 100% correct for this set */
-	/* weird gfx ordering */
+	ROM_REGION( 0x400000, "gfx1", 0 ) // Graphics & Sound ROMs soldered in, not verified 100% correct for this set
+	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
 	ROM_LOAD( "j6",     0x000000, 0x040000, CRC(e923728b) SHA1(113eac1de73c74ef7c9d3e2e72599a1ff775176d) )
@@ -981,50 +1028,50 @@ ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
 	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
 	ROM_CONTINUE(       0x380000, 0x040000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
 ROM_END
 
 
-ROM_START( biomtoyc ) /* PCB - REF.922804/1 & REF.922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(05ad7d30) SHA1(4b2596d225bf9b314db5a150921d7d6c99096ddb) ) /* v1.0.1870 - sldh */
-	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(a288e73f) SHA1(13a53981e3fe6961494013e7466badae56481958) ) /* v1.0.1870 - sldh */
+ROM_START( biomtoyc ) // PCB - REF.922804/1 or REF.922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "program18.d18", 0x000000, 0x080000, CRC(05ad7d30) SHA1(4b2596d225bf9b314db5a150921d7d6c99096ddb) ) // v1.0.1870 - sldh
+	ROM_LOAD16_BYTE( "program16.d16", 0x000001, 0x080000, CRC(a288e73f) SHA1(13a53981e3fe6961494013e7466badae56481958) ) // v1.0.1870 - sldh
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Graphics & Sound ROMs soldered in, not verified 100% correct for this set Using prototype graphics from the set below */
-	/* weird gfx ordering */
-	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
-	ROM_CONTINUE(               0x0c0000, 0x040000 )
-	ROM_LOAD( "toy-low-3.j6",   0x000000, 0x040000, CRC(927f5cd7) SHA1(ad5e75091146ca7935a18e5dd045410e28d8b170) )
-	ROM_CONTINUE(               0x080000, 0x040000 )
-	ROM_LOAD( "toy-high-2.h7",  0x140000, 0x040000, CRC(fd975d89) SHA1(89bb85ccb1ba0bb82f393ef27757c0778dd696b3) )
-	ROM_CONTINUE(               0x1c0000, 0x040000 )
-	ROM_LOAD( "toy-low-2.j7",   0x100000, 0x040000, CRC(6cbf9937) SHA1(77123a8afea3108df54f45033dfb7f86c1d0d1b8) )
-	ROM_CONTINUE(               0x180000, 0x040000 )
-	ROM_LOAD( "toy-high-1.h9",  0x240000, 0x040000, CRC(09de4799) SHA1(120b7bd8e20288c3aec62d3b2bf3f87e251c3eea) )
-	ROM_CONTINUE(               0x2c0000, 0x040000 )
-	ROM_LOAD( "toy-low-1.j9",   0x200000, 0x040000, CRC(57922c41) SHA1(ffbe5b418ed93e8705a7aabe69d3fad2919a160f) )
-	ROM_CONTINUE(               0x280000, 0x040000 )
-	ROM_LOAD( "toy-high-0.h10", 0x340000, 0x040000, CRC(5bee6df7) SHA1(ecf759de2f0909f793c84c71feb08801896e2474) )
-	ROM_CONTINUE(               0x3c0000, 0x040000 )
-	ROM_LOAD( "toy-low-0.j10",  0x300000, 0x040000, CRC(26c49ca2) SHA1(82079eaa2c9523c9acb72fccfbbe9493bc62e84f) )
-	ROM_CONTINUE(               0x380000, 0x040000 )
+	ROM_REGION( 0x400000, "gfx1", 0 ) // Graphics & Sound ROMs redumped from a REF.922804/1 PCB
+	// weird gfx ordering
+	ROM_LOAD( "gfx6.h6",              0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
+	ROM_CONTINUE(                     0x0c0000, 0x040000 )
+	ROM_LOAD( "gfx10.j6",             0x000000, 0x040000, CRC(7b2dc36c) SHA1(2b227c24b26505148d304bb0a6cca1091ec077c8) )
+	ROM_CONTINUE(                     0x080000, 0x040000 )
+	ROM_LOAD( "gfx7.h7",              0x140000, 0x040000, CRC(4bc82598) SHA1(8247d9003ef815f35991cfb17068c87333120b85) )
+	ROM_CONTINUE(                     0x1c0000, 0x040000 )
+	ROM_LOAD( "gfx11.j7",             0x100000, 0x040000, CRC(aff7fd0e) SHA1(41d57b6e5b29f1d4ac9fbd2268e8239ca342ae2c) )
+	ROM_CONTINUE(                     0x180000, 0x040000 )
+	ROM_LOAD( "gfx8.h9",              0x240000, 0x040000, CRC(09de4799) SHA1(120b7bd8e20288c3aec62d3b2bf3f87e251c3eea) )
+	ROM_CONTINUE(                     0x2c0000, 0x040000 )
+	ROM_LOAD( "gfx12.j9",             0x200000, 0x040000, CRC(7b27b2a9) SHA1(3d9d52266d2422dafa5a33a43d90fe32d7e18c47) )
+	ROM_CONTINUE(                     0x280000, 0x040000 )
+	ROM_LOAD( "gfx9.h10",             0x340000, 0x040000, CRC(38bcd72d) SHA1(ced1aee3841cddefb3ad4b3b0bf90a067278e76c) )
+	ROM_CONTINUE(                     0x3c0000, 0x040000 )
+	ROM_LOAD( "gfx13.j10",            0x300000, 0x040000, CRC(52c984df) SHA1(138f434119e84d5efb3d42ebaafe6c2cdc1a06aa) )
+	ROM_CONTINUE(                     0x380000, 0x040000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "sound1.c1",            0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+	ROM_LOAD( "sound2.c3",            0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
 ROM_END
 
-ROM_START( bioplayc ) /* PCB - REF.922804/2??  -  Spanish version */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "t.d18",  0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) /* v1.0.1823 */
-	ROM_LOAD16_BYTE( "t.d16",  0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) /* v1.0.1823 */
+ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "t.d18",  0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) // v1.0.1823
+	ROM_LOAD16_BYTE( "t.d16",  0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) // v1.0.1823
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	/* weird gfx ordering */
+	// weird gfx ordering
 	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
 	ROM_CONTINUE(               0x0c0000, 0x040000 )
 	ROM_LOAD( "toy-low-3.j6",   0x000000, 0x040000, CRC(927f5cd7) SHA1(ad5e75091146ca7935a18e5dd045410e28d8b170) )
@@ -1042,17 +1089,17 @@ ROM_START( bioplayc ) /* PCB - REF.922804/2??  -  Spanish version */
 	ROM_LOAD( "toy-low-0.j10",  0x300000, 0x040000, CRC(26c49ca2) SHA1(82079eaa2c9523c9acb72fccfbbe9493bc62e84f) )
 	ROM_CONTINUE(               0x380000, 0x040000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
 	// Missing the audio rom, the board didn't have it populated. The programmer said it was not there because the audio was ripped from other games.
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
 ROM_END
 
-ROM_START( lastkm ) /* PCB - REF 922804/2 */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "prog-bici-e-8.11.95.d18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) /*1.0.0275 */
-	ROM_LOAD16_BYTE(    "prog-bici-o-8.11.95.d16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) /*1.0.0275 */
+ROM_START( lastkm ) // PCB - REF 922804/2
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE(    "prog-bici-e-8.11.95.d18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) // 1.0.0275
+	ROM_LOAD16_BYTE(    "prog-bici-o-8.11.95.d16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) // 1.0.0275
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "bici-f3.h6",     0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb))
@@ -1060,7 +1107,7 @@ ROM_START( lastkm ) /* PCB - REF 922804/2 */
 	ROM_LOAD( "bici-f1.h9",     0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
 	ROM_LOAD( "bici-f0.h10",    0x180000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374))
 
-	ROM_REGION( 0x80000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x80000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
 	ROM_LOAD( "sonido-bici-0-8.11.95.c1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e))
 ROM_END
 
@@ -1112,7 +1159,7 @@ Notes:
            SQUASH_SOUND.1D   27C040      Sound
 */
 
-ROM_START( squash ) // PCB - REF.922804/1
+ROM_START( squash ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
@@ -1134,7 +1181,22 @@ ROM_START( squash ) // PCB - REF.922804/1
 	ROM_LOAD ( "squashv1_gal20v8.h11", 0x385, 0x157, CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Unprotected
 ROM_END
 
-
+/*
+There is a Thunder Hoop on a REF.922804/2 PCB, with exactly the same ROM contents,
+but on a different chips layout / capacity:
+   program.d16             th161eb4.020            IDENTICAL
+   program.d18             th18dea1.040            IDENTICAL
+   gfx.j10                 c09          [1/2]      IDENTICAL
+   gfx.j6                  c12          [1/2]      IDENTICAL
+   gfx.j7                  c11          [1/2]      IDENTICAL
+   gfx.j9                  c10          [1/2]      IDENTICAL
+   sound.c1                sound        [1/2]      IDENTICAL
+   gfx.h10                 c09          [2/2]      IDENTICAL
+   gfx.h6                  c12          [2/2]      IDENTICAL
+   gfx.h7                  c11          [2/2]      IDENTICAL
+   gfx.h9                  c10          [2/2]      IDENTICAL
+   sound.c3                sound        [2/2]      IDENTICAL
+*/
 ROM_START( thoop ) // PCB - REF.922804/1
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
@@ -1177,13 +1239,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco", "Big Karnak",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1870)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
-GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)",                   MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
-GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)",                      MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
-GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco",        "Big Karnak (ver. 1.0, checksum 1e38c94)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1885, checksum 69f5e032)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1884, checksum 3f316c70)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1878, checksum d84b28ff)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1870, checksum ba682195)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Bioplaything Cop (ver. 1.0.1823, checksum cd960fc9, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
+GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco",        "Maniac Square (ver 1.0, checksum b602, prototype)",              MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Last KM (ver 1.0.0275, checksum 13bff751, prototype)",           MACHINE_SUPPORTS_SAVE ) // Similar 'bike controller' idea to the Salter gym equipment Gaelco developed, but in game form
+GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco",        "Squash (ver. 1.0, checksum 015aef61)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                       MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

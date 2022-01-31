@@ -186,7 +186,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class seawolf2_state : public astrocde_state

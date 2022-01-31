@@ -41,6 +41,7 @@
 #include "machine/wd_fdc.h"
 
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 
@@ -105,7 +106,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer *m_sst;
 
@@ -245,7 +246,7 @@ WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);

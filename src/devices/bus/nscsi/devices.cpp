@@ -10,6 +10,7 @@
 #include "bus/nscsi/cdu75s.h"
 #include "bus/nscsi/cdu415.h"
 #include "bus/nscsi/cdu561.h"
+#include "bus/nscsi/cfp1080s.h"
 #include "bus/nscsi/crd254sh.h"
 #include "bus/nscsi/cw7501.h"
 #include "bus/nscsi/hd.h"
@@ -32,10 +33,11 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("smoc501", SMOC501);
 	device.option_add("aplcd150", APPLECD150);
 	device.option_add("aplcdsc", NSCSI_CDROM_APPLE);
+	device.option_add("cfp1080s", CFP1080S);
 }
 
 void mac_scsi_devices(device_slot_interface &device)
 {
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM_APPLE);
+	default_scsi_devices(device);
+	device.option_replace("cdrom", NSCSI_CDROM_APPLE);
 }

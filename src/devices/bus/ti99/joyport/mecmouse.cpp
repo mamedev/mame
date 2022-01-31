@@ -132,7 +132,7 @@ void mecmouse_device::write_dev(uint8_t data)
 	}
 }
 
-void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Poll the movement
 	int new_mx, new_my;

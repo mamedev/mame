@@ -748,11 +748,11 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPNAME( 0x10, 0x00, "Enemy Regeneration" )    PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( High ) )
-	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!6,!7")
-	PORT_DIPSETTING(    0x60, "10,000 Pts" )
-	PORT_DIPSETTING(    0x20, "20,000 Pts" )
-	PORT_DIPSETTING(    0x40, "40,000 Pts" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!6,!7")
+	PORT_DIPSETTING(    0x00, "10,000 Pts" )
+	PORT_DIPSETTING(    0x40, "20,000 Pts" )
+	PORT_DIPSETTING(    0x20, "40,000 Pts" )
+	PORT_DIPSETTING(    0x60, DEF_STR( None ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       /* Manual states this is Unused */
 INPUT_PORTS_END
 
@@ -794,7 +794,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsbball )
 	PORT_INCLUDE( vsnes_dual )
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_DIPNAME( 0x03, 0x02, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -816,7 +816,7 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0xc0, "Strong" )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -1735,9 +1735,7 @@ void vsnes_state::vsnes(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
-	screen1.set_refresh_hz(60);
-	screen1.set_size(32*8, 262);
-	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_raw(N2A03_NTSC_XTAL / 4, 341, 1, VISIBLE_SCREEN_WIDTH + 1, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
@@ -1805,15 +1803,11 @@ void vsnes_state::vsdual(machine_config &config)
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
-	screen1.set_refresh_hz(60);
-	screen1.set_size(32*8, 262);
-	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_raw(N2A03_NTSC_XTAL / 4, 341, 1, VISIBLE_SCREEN_WIDTH + 1, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
-	screen2.set_size(32*8, 262);
-	screen2.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen2.set_raw(N2A03_NTSC_XTAL / 4, 341, 1, VISIBLE_SCREEN_WIDTH + 1, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
@@ -2858,7 +2852,7 @@ GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsno
 GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", 0) // timer starts at 200(!)
 GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", 0) // timer starts at 300
 GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
-GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
+GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
 GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
 GAME( 1984, smgolf,   0,         vsnes,         golf4s,   vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
 GAME( 1984, smgolfb,  smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )

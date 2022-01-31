@@ -61,7 +61,7 @@
 #include "includes/microtan.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 void microtan_state::mt65_map(address_map &map)

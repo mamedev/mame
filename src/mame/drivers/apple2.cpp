@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    apple2.c - Apple II/II Plus and clones
+    apple2.cpp - Apple II/II Plus and clones
 
     Next generation driver written in September/October 2014 by R. Belmont.
     Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont
@@ -46,7 +46,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "imagedev/cassette.h"
 
 #include "machine/74259.h"
-#include "machine/bankdev.h"
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -54,59 +53,14 @@ II Plus: RAM options reduced to 16/32/48 KB.
 
 #include "sound/spkrdev.h"
 
-#include "bus/a2bus/4play.h"
-#include "bus/a2bus/a2alfam2.h"
-#include "bus/a2bus/a2applicard.h"
-#include "bus/a2bus/a2arcadebd.h"
-#include "bus/a2bus/a2cffa.h"
-#include "bus/a2bus/a2corvus.h"
-#include "bus/a2bus/a2diskii.h"
-#include "bus/a2bus/a2diskiing.h"
-#include "bus/a2bus/a2dx1.h"
-#include "bus/a2bus/a2echoii.h"
-#include "bus/a2bus/a2iwm.h"
-#include "bus/a2bus/a2mcms.h"
-#include "bus/a2bus/a2memexp.h"
-#include "bus/a2bus/a2midi.h"
-#include "bus/a2bus/a2mockingboard.h"
-#include "bus/a2bus/a2parprn.h"
-#include "bus/a2bus/a2pic.h"
-#include "bus/a2bus/a2sam.h"
-#include "bus/a2bus/a2scsi.h"
-#include "bus/a2bus/a2softcard.h"
-#include "bus/a2bus/a2ssc.h"
-#include "bus/a2bus/a2swyft.h"
-#include "bus/a2bus/a2themill.h"
-#include "bus/a2bus/a2thunderclock.h"
-#include "bus/a2bus/a2ultraterm.h"
-#include "bus/a2bus/a2videoterm.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/byte8251.h"
-#include "bus/a2bus/computereyes2.h"
-#include "bus/a2bus/ccs7710.h"
-#include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grappler.h"
-#include "bus/a2bus/laser128.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/ramcard128k.h"
-#include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/ssbapple.h"
-#include "bus/a2bus/ssprite.h"
-#include "bus/a2bus/suprterminal.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/transwarp.h"
-#include "bus/a2bus/uniprint.h"
-#include "bus/a2bus/booti.h"
-#include "bus/a2bus/q68.h"
-
+#include "bus/a2bus/cards.h"
 #include "bus/a2gameio/gameio.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ap2_dsk.h"
-
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -135,8 +89,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG),
-		m_softlatch(*this, "softlatch")
+		m_softlatch(*this, "softlatch"),
+		m_upperbank(*this, A2_UPPERBANK_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -154,8 +108,8 @@ public:
 	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_device<address_map_bank_device> m_upperbank;
 	required_device<addressable_latch_device> m_softlatch;
+	memory_view m_upperbank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -163,9 +117,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	template <bool invert, bool flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
+	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
+	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
+	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -203,9 +163,10 @@ public:
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
 	void dodo(machine_config &config);
+	void albert(machine_config &config);
+	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
-	void inhbank_map(address_map &map);
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -277,7 +238,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1);
+							m_upperbank.select(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -285,7 +246,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0);
+							m_upperbank.select(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -299,7 +260,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0);
+			m_upperbank.select(0);
 			m_inh_bank = 0;
 		}
 	}
@@ -317,7 +278,7 @@ void apple2_state::machine_start()
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
-	m_upperbank->set_bank(0);
+	m_upperbank.select(0);
 	m_inh_bank = 0;
 	m_strobe = 0;
 	m_transchar = 0;
@@ -408,7 +369,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	}
 }
 
-
+template <bool invert, bool flip>
 u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
@@ -421,14 +382,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr"))
-				{
-					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-				}
-				else
-				{
-					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
-				}
+				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -440,14 +394,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr"))
-				{
-					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-				}
-				else
-				{
-					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
-				}
+				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -457,14 +404,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 	else
 	{
-		if (!strcmp(machine().system().name, "ivelultr"))
-		{
-			m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
-		}
-		else
-		{
-			m_video->text_update_orig(screen, bitmap, cliprect, 0, 191);
-		}
+		m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -510,7 +450,7 @@ u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -522,19 +462,19 @@ u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
 			}
 		}
-		else    // lo-res
+		else // lo-res
 		{
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -544,7 +484,7 @@ u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		m_video->text_update_dodo(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -989,13 +929,9 @@ void apple2_state::apple2_map(address_map &map)
 	map(0xc080, 0xc0ff).rw(FUNC(apple2_state::c080_r), FUNC(apple2_state::c080_w));
 	map(0xc100, 0xc7ff).rw(FUNC(apple2_state::c100_r), FUNC(apple2_state::c100_w));
 	map(0xc800, 0xcfff).rw(FUNC(apple2_state::c800_r), FUNC(apple2_state::c800_w));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
-}
-
-void apple2_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
+	map(0xd000, 0xffff).view(m_upperbank);
+	m_upperbank[0](0xd000, 0xffff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
+	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
 }
 
 /***************************************************************************
@@ -1292,78 +1228,6 @@ static INPUT_PORTS_START( apple2p )
 	PORT_DIPSETTING( 0x00, "RESET" )
 INPUT_PORTS_END
 
-static void apple2_slot0_cards(device_slot_interface &device)
-{
-	device.option_add("lang", A2BUS_RAMCARD16K);      /* Apple II RAM Language Card */
-	device.option_add("ssram", A2BUS_RAMCARD128K);    /* Saturn Systems 128K extended language card */
-}
-
-static void apple2_cards(device_slot_interface &device)
-{
-	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
-	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card, cycle-accurate version */
-	device.option_add("diskiing13", A2BUS_DISKIING13);  /* Disk II Controller Card, cycle-accurate version */
-	device.option_add("diskiiiwm", A2BUS_IWM_CARD);  /* IWM Disk II Controller Card */
-	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
-	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
-	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
-	device.option_add("cffa202", A2BUS_CFFA2_6502);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	device.option_add("memexp", A2BUS_MEMEXP);  /* Apple II Memory Expansion Card */
-	device.option_add("ramfactor", A2BUS_RAMFACTOR);    /* Applied Engineering RamFactor */
-	device.option_add("thclock", A2BUS_THUNDERCLOCK);    /* ThunderWare ThunderClock Plus */
-	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
-	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
-	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
-	device.option_add("ssi", APRICORN_SSI);    /* Apricorn Super Serial Imager */
-	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
-	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
-	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
-	device.option_add("alfam2", A2BUS_ALFAM2);    /* ALF Apple Music II */
-	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
-	device.option_add("ap16", A2BUS_IBSAP16);    /* IBS AP16 (German VideoTerm clone) */
-	device.option_add("ap16alt", A2BUS_IBSAP16ALT);    /* IBS AP16 (German VideoTerm clone), alternate revision */
-	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone */
-	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
-	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
-	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
-	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
-	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
-	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
-	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
-	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
-	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
-	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
-	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
-	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
-	device.option_add("grappler", A2BUS_GRAPPLER); /* Orange Micro Grappler Printer Interface card */
-	device.option_add("grapplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
-	device.option_add("bufgrapplus", A2BUS_BUFGRAPPLERPLUS); /* Orange Micro Buffered Grappler+ Printer Interface card */
-	device.option_add("bufgrapplusa", A2BUS_BUFGRAPPLERPLUSA); /* Orange Micro Buffered Grappler+ (rev A) Printer Interface card */
-	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
-	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
-	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
-	device.option_add("dx1", A2BUS_DX1);    /* Decillonix DX-1 sampler card */
-	device.option_add("tm2ho", A2BUS_TIMEMASTERHO); /* Applied Engineering TimeMaster II H.O. */
-	device.option_add("mouse", A2BUS_MOUSE);    /* Apple II Mouse Card */
-	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
-	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
-	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
-	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
-	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
-	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
-	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
-	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
-	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
-//  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
-	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
-	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
-	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
-	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
-	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
-	device.option_add("q68", A2BUS_Q68);      /* Stellation Q68 68000 card */
-	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
-}
-
 void apple2_state::apple2_common(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1380,15 +1244,12 @@ void apple2_state::apple2_common(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update));
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tt));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
-
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
@@ -1481,7 +1342,19 @@ void apple2_state::apple2jp(machine_config &config)
 void apple2_state::dodo(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_dodo));
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tf));
+}
+
+void apple2_state::albert(machine_config &config)
+{
+	apple2p(config);
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ft));
+}
+
+void apple2_state::ivelultr(machine_config &config)
+{
+	apple2p(config);
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ultr));
 }
 
 #if 0
@@ -1846,21 +1719,21 @@ COMP( 198?, elppa,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1982, microeng, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_SUPPORTS_SAVE )
-// reverse font direction -\/
-COMP( 1984, ivelultr, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+// reverse font direction + wider character cell -\/
+COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
 COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser2c,  apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, albert,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, albert,   apple2, 0,      albert,   apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
-COMP( 198?, dodo,     apple2, 0,         dodo,  apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, dodo,     apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )

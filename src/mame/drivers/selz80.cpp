@@ -62,8 +62,8 @@ protected:
 
 	void selz80_io(address_map &map);
 
-	u8 m_digit;
-	u8 m_seg;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	void setup_baud();
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;

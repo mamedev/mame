@@ -53,8 +53,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_kbd_row;
-	bool m_spk_pol;
+	u8 m_kbd_row = 0U;
+	bool m_spk_pol = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	memory_passthrough_handler *m_rom_shadow_tap;

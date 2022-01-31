@@ -43,10 +43,10 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	uint8_t m_term_data;
-	uint8_t m_term_out;
-	bool m_rin;
-	bool m_rbrl;
+	uint8_t m_term_data = 0U;
+	uint8_t m_term_out = 0U;
+	bool m_rin = 0;
+	bool m_rbrl = 0;
 	required_device<tms9995_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

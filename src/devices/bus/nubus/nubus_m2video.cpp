@@ -99,7 +99,7 @@ void nubus_m2video_device::device_start()
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
 	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32s_delegate(*this, FUNC(nubus_m2video_device::m2video_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::m2video_w)));
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
@@ -121,7 +121,7 @@ void nubus_m2video_device::device_reset()
 }
 
 
-void nubus_m2video_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void nubus_m2video_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (!m_vbl_disable)
 	{

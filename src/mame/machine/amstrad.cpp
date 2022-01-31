@@ -221,18 +221,18 @@ TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 }
 
 
-void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PC2_LOW:
-		amstrad_pc2_low(ptr, param);
+		amstrad_pc2_low(param);
 		break;
 	case TIMER_VIDEO_UPDATE:
-		amstrad_video_update_timer(ptr, param);
+		amstrad_video_update_timer(param);
 		break;
 	case TIMER_SET_RESOLUTION:
-		cb_set_resolution(ptr, param);
+		cb_set_resolution(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in amstrad_state::device_timer");
@@ -2341,7 +2341,7 @@ void amstrad_state::amstrad_reset_machine()
 	/* set ram config 0 */
 	amstrad_GateArray_write(0x0c0);
 
-	// Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
+	// Get manufacturer name and TV refresh rate from PCB link (dipswitch for MAME emulation)
 	m_ppi_port_inputs[amstrad_ppi_PortB] = (((m_io_solder_links->read()&MANUFACTURER_NAME)<<1) | (m_io_solder_links->read()&TV_REFRESH_RATE));
 
 	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
@@ -2553,8 +2553,8 @@ Bit Description
 7   Cassette read data
 6   Parallel/Printer port ready signal ("1" = not ready, "0" = Ready)
 5   /EXP signal on expansion port (note 6)
-4   50/60 Hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5)
-3   | PCB links to define manufacturer name. For this MESS driver I have used the dipswitch feature. (note 1) (note 4)
+4   50/60 Hz (link on PCB. For this MAME driver I have used the dipswitch feature) (note 5)
+3   | PCB links to define manufacturer name. For this MAME driver I have used the dipswitch feature. (note 1) (note 4)
 2   | (note 2)
 1   | (note 3)
 0   VSYNC State from 6845. "1" = VSYNC active, "0" = VSYNC inactive

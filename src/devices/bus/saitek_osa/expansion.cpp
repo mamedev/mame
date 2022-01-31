@@ -75,7 +75,7 @@ void saitekosa_expansion_device::device_add_mconfig(machine_config &config)
 	// optional embedded screen
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_size(99, 16);
+	screen.set_size(6 * 16 + 3, 16);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(saitekosa_expansion_device::screen_update));
 }

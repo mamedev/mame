@@ -225,16 +225,16 @@ protected:
 	uint8_t m_cp_sequence_err;
 
 	// fields separated out from PSR (Processor State Register)
-	uint8_t m_impl;   // implementation (always 0 in SPARCv7)
-	uint8_t m_ver;    // version (always 0 in SPARCv7)
-	uint8_t m_icc;    // integer condition codes
+	uint8_t m_impl; // implementation (always 0 in SPARCv7)
+	uint8_t m_ver;  // version (always 0 in SPARCv7)
+	uint8_t m_icc;  // integer condition codes
 	bool m_ec;      // enable coprocessor
 	bool m_ef;      // enable FPU
-	uint8_t m_pil;    // processor interrupt level
+	uint8_t m_pil;  // processor interrupt level
 	bool m_s;       // supervisor mode
 	bool m_ps;      // prior S state
 	bool m_et;      // enable traps
-	uint8_t m_cwp;    // current window pointer
+	uint8_t m_cwp;  // current window pointer
 
 	bool m_alu_op3_assigned[64];
 	bool m_ldst_op3_assigned[64];
@@ -242,6 +242,7 @@ protected:
 
 	// register windowing helpers
 	uint32_t* m_regs[32];
+	int m_nwindows;
 
 	// other internal states
 	bool m_privileged_asr[32];
@@ -250,7 +251,6 @@ protected:
 	bool m_no_annul;
 	bool m_hold_bus;
 	int m_icount;
-	int m_stashed_icount;
 	int m_insn_space;
 	int m_data_space;
 
@@ -266,9 +266,6 @@ protected:
 	std::map<uint16_t, std::string> m_ss1_fcode_table;
 	bool m_log_fcodes;
 #endif
-
-	// processor configuration
-	static const int NWINDOWS;
 
 	std::function<void (sparc_disassembler *)> m_asi_desc_adder;
 };
@@ -342,8 +339,10 @@ public:
 	auto cs5_write_cb() { return m_cs_w[5].bind(); }
 
 protected:
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	virtual bool execute_extra_group2(uint32_t op) override;
 
@@ -409,10 +408,12 @@ protected:
 	void dcache_data_map(address_map &map);
 
 	void update_addr_masks();
+	void update_wait_states();
 
 	devcb_read32::array<6> m_cs_r;
 	devcb_write32::array<6> m_cs_w;
 
+	u32 m_ssctrl;
 	u32 m_spmr;
 	u64 m_spmr_mask;
 	u32 m_arsr[6];

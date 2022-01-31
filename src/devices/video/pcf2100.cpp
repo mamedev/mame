@@ -78,7 +78,7 @@ void pcf2100_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void pcf2100_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcf2100_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// transfer latches to output
 	m_write_segs(m_bpout, m_latch[m_bpout]);

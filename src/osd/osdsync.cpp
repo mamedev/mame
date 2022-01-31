@@ -85,14 +85,15 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 //  osd_num_processors
 //============================================================
 
-int osd_get_num_processors()
+int osd_get_num_processors(bool heavy_mt)
 {
 #if defined(SDLMAME_EMSCRIPTEN)
 	// multithreading is not supported at this time
 	return 1;
 #else
+	unsigned int threads = std::thread::hardware_concurrency();
 	// max out at 4 for now since scaling above that seems to do poorly
-	return std::min(std::thread::hardware_concurrency(), 4U);
+	return heavy_mt ? threads : std::min(std::thread::hardware_concurrency(), 4U);
 #endif
 }
 
@@ -105,8 +106,7 @@ struct work_thread_info
 	work_thread_info(uint32_t aid, osd_work_queue &aqueue)
 	: queue(aqueue)
 	, handle(nullptr)
-	, wakeevent(false, false)  // auto-reset, not signalled
-	, active(0)
+	, wakeevent(true, false)  // manual reset, not signalled
 	, id(aid)
 #if KEEP_STATISTICS
 	, itemsdone(0)
@@ -120,7 +120,6 @@ struct work_thread_info
 	osd_work_queue &    queue;          // pointer back to the queue
 	std::thread *       handle;         // handle to the thread
 	osd_event           wakeevent;      // wake event for the thread
-	std::atomic<int32_t>  active;         // are we actively processing work?
 	uint32_t              id;
 
 #if KEEP_STATISTICS
@@ -211,7 +210,7 @@ int osd_num_processors = 0;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-static int effective_num_processors();
+static int effective_num_processors(bool heavy_mt);
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
@@ -251,7 +250,7 @@ int thread_adjust_priority(std::thread *thread, int adjust)
 osd_work_queue *osd_work_queue_alloc(int flags)
 {
 	int threadnum;
-	int numprocs = effective_num_processors();
+	int numprocs = effective_num_processors(!(flags & WORK_QUEUE_FLAG_HIGH_FREQ));
 	osd_work_queue *queue;
 	int osdthreadnum = 0;
 	int allocthreadnum;
@@ -544,10 +543,9 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		{
 			work_thread_info *thread = queue->thread[threadnum];
 
-			// if this thread is not active, wake him up
-			if (!thread->active)
+			// Attempt to wake the thread
+			if (thread->wakeevent.set())
 			{
-				thread->wakeevent.set();
 				add_to_stat(queue->setevents, 1);
 
 				// for non-shared, the first one we find is good enough
@@ -639,9 +637,9 @@ void osd_work_item_release(osd_work_item *item)
 //  effective_num_processors
 //============================================================
 
-static int effective_num_processors()
+static int effective_num_processors(bool heavy_mt)
 {
-	int physprocs = osd_get_num_processors();
+	int physprocs = osd_get_num_processors(heavy_mt);
 
 	// osd_num_processors == 0 for 'auto'
 	if (osd_num_processors > 0)
@@ -692,7 +690,6 @@ static void *worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		thread->active = true;
 		++queue.livethreads;
 
 		// process work items
@@ -717,7 +714,7 @@ static void *worker_thread_entry(void *param)
 		}
 
 		// decrement the live thread count
-		thread->active = false;
+		thread->wakeevent.reset();
 		--queue.livethreads;
 	}
 

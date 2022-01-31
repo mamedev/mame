@@ -154,4 +154,4 @@ private:
 	static const u8 sm590_mnemonic[0x100];
 };
 
-#endif
+#endif // MAME_CPU_SM510_SM510D_H

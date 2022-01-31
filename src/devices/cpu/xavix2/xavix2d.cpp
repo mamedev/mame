@@ -121,7 +121,7 @@ std::string xavix2_disassembler::val3u()
 
 std::string xavix2_disassembler::off19s()
 {
-	u16 r = m_opcode & 0x7ffff;
+	u32 r = m_opcode & 0x7ffff;
 	if(r & 0x40000)
 		return util::string_format(" - %05x", 0x80000 - r);
 	else if(r)

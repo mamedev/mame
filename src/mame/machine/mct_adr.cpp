@@ -185,7 +185,7 @@ void mct_adr_device::device_reset()
 
 	m_interval_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	irq_check(nullptr, 0);
+	irq_check(0);
 }
 
 void mct_adr_device::set_irq_line(int irq, int state)

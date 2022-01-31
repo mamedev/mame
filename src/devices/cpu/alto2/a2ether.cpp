@@ -483,7 +483,7 @@ uint32_t f9401_7(uint32_t crc, uint32_t data)
  * This is probably lacking the updates to one or more of
  * the status flip flops.
  */
-void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
+void alto2_cpu_device::rx_breath_of_life(int32_t arg)
 {
 	uint32_t data;
 
@@ -533,7 +533,7 @@ void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
  * @param ptr unused pointer
  * @param arg word count if >= 0, -1 if CRC is to be transmitted (last word)
  */
-void alto2_cpu_device::tx_packet(void* ptr, int32_t arg)
+void alto2_cpu_device::tx_packet(int32_t arg)
 {
 	uint32_t data;
 

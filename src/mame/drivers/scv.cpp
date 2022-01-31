@@ -13,7 +13,7 @@
 #include "bus/scv/rom.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -38,7 +38,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void porta_w(uint8_t data);
@@ -265,7 +265,7 @@ void scv_state::scv_palette(palette_device &palette) const
 }
 
 
-void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

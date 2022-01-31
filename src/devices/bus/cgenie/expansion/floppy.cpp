@@ -14,7 +14,7 @@
 #include "floppy.h"
 #include "formats/cgenie_dsk.h"
 #include "bus/generic/carts.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  CONSTANTS/MACROS

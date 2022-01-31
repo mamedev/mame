@@ -75,9 +75,9 @@ class nes_futuremedia_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -87,8 +87,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint16_t m_irq_count, m_irq_count_latch;
-	uint8_t m_irq_clear;
+	u8 m_irq_count, m_irq_count_latch;
 	int m_irq_enable;
 };
 
@@ -99,15 +98,9 @@ class nes_magseries_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 

@@ -126,7 +126,7 @@ protected:
 	virtual void update_ppi_pa(uint8_t data) override;
 	virtual void update_ppi_pb(uint8_t data) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -302,7 +302,7 @@ INPUT_CHANGED_MEMBER( sitcom_timer_state::update_speed )
 	}
 }
 
-void sitcom_timer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sitcom_timer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -310,7 +310,7 @@ void sitcom_timer_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		m_shutter = false;
 		break;
 	default:
-		sitcom_state::device_timer(timer, id, param, ptr);
+		sitcom_state::device_timer(timer, id, param);
 	}
 }
 

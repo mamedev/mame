@@ -7,17 +7,18 @@
 
 // handler_entry_read_delegate/handler_entry_write_delegate
 
-// Executes an access through called a delegate, usually containing a handler or a lambda
+// Executes an access through a delegate, usually containing a handler or a lambda
 
 template<int Width, int AddrShift, typename READ> class handler_entry_read_delegate : public handler_entry_read_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_delegate(address_space *space, const READ &delegate) : handler_entry_read_address<Width, AddrShift>(space, 0), m_delegate(delegate) {}
+	handler_entry_read_delegate(address_space *space, u16 flags, const READ &delegate) : handler_entry_read_address<Width, AddrShift>(space, flags), m_delegate(delegate) {}
 	~handler_entry_read_delegate() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 
 	std::string name() const override;
 
@@ -72,10 +73,11 @@ template<int Width, int AddrShift, typename WRITE> class handler_entry_write_del
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_delegate(address_space *space, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift>(space, 0), m_delegate(delegate) {}
+	handler_entry_write_delegate(address_space *space, u16 flags, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift>(space, flags), m_delegate(delegate) {}
 	~handler_entry_write_delegate() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 
 	std::string name() const override;
 
@@ -135,10 +137,11 @@ template<int Width, int AddrShift> class handler_entry_read_ioport : public hand
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_ioport(address_space *space, ioport_port *port) : handler_entry_read<Width, AddrShift>(space, 0), m_port(port) {}
+	handler_entry_read_ioport(address_space *space, u16 flags, ioport_port *port) : handler_entry_read<Width, AddrShift>(space, flags), m_port(port) {}
 	~handler_entry_read_ioport() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 
 	std::string name() const override;
 
@@ -151,10 +154,11 @@ template<int Width, int AddrShift> class handler_entry_write_ioport : public han
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_ioport(address_space *space, ioport_port *port) : handler_entry_write<Width, AddrShift>(space, 0), m_port(port) {}
+	handler_entry_write_ioport(address_space *space, u16 flags, ioport_port *port) : handler_entry_write<Width, AddrShift>(space, flags), m_port(port) {}
 	~handler_entry_write_ioport() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 
 	std::string name() const override;
 

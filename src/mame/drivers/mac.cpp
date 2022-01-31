@@ -45,7 +45,7 @@
 #include "bus/nubus/pds30_mc30.h"
 
 #include "machine/macadb.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "mac.lh"
 

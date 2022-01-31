@@ -1186,6 +1186,11 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
+
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
@@ -1195,11 +1200,6 @@ project "bimg"
 			}
 		end
 	end
-
-	configuration { "gmake" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-		}
 
 	defines {
 		"__STDC_LIMIT_MACROS",
@@ -2215,6 +2215,11 @@ project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
+
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
@@ -2224,11 +2229,6 @@ project "asmjit"
 			}
 		end
 	end
-
-	configuration { "gmake" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit.h",

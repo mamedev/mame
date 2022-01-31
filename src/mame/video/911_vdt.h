@@ -60,7 +60,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);

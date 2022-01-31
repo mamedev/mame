@@ -281,8 +281,8 @@ O to A-F AND, at the same time, O to P ... Any help is appreciated ...
 Notes & Todo:
 -------------
 
-- Look at Ninja Gaiden 3. It has some slight timming issues on the
-  second level. Probably related to the mapper's irq timming.
+- Look at Ninja Gaiden 3. It has some slight timing issues on the
+  second level. Probably related to the mapper's irq timing.
 - Fix some remaining bad gfx in Rad Racer II.
 - Implement Dipswitches properly once Mame can support it.
 - Better control layout?. This thing has odd buttons.
@@ -894,11 +894,13 @@ void playch10_state::playch10_k(machine_config &config)
 	ROM_SYSTEM_BIOS( 1, "single",  "Single Monitor Version" ) \
 	ROM_SYSTEM_BIOS( 2, "alt",     "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
+	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this bios doesn't work properly, was found on a PCH1-03-CPU PCB */ \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t",         0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t",     0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
-	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t",     0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )
+	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t",     0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) ) \
+	ROM_LOAD_BIOS( 4, "pch1-c__8t_e-1.8t", 0x00000, 0x4000, CRC(88a8f87e) SHA1(d1d7ffe68d2e7aa2faf8ad41a7ec8421265ede42) )
 
 
 #define BIOS_GFX                                            \
@@ -1878,12 +1880,12 @@ void playch10_state::init_ttoon()
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  */
 
 /* Standard Games */
-GAME( 1983, pc_tenis, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
-GAME( 1983, pc_mario, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
-GAME( 1984, pc_bball, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
-GAME( 1984, pc_bfght, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
-GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", 0 )
-GAME( 1984, pc_golf,  playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
+GAME( 1983, pc_tenis, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )
+GAME( 1983, pc_mario, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
+GAME( 1984, pc_bball, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
+GAME( 1984, pc_bfght, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
+GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // scanline in middle of screen scrolls when it should not
+GAME( 1984, pc_golf,  playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
 GAME( 1985, pc_kngfu, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
 GAME( 1985, pc_smb,   playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )
 GAME( 1986, pc_vball, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Volley Ball (PlayChoice-10)", 0 )
@@ -1913,7 +1915,7 @@ GAME( 1986, pc_goons, playch10, playch10_c, playch10, playch10_state, init_pccbo
 
 /* D-Board Games */
 GAME( 1986, pc_mtoid, playch10, playch10_d2,playch10, playch10_state, init_pcdboard_2, ROT0, "Nintendo",                               "Metroid (PlayChoice-10)", 0 )
-GAME( 1987, pc_radrc, playch10, playch10_d, playch10, playch10_state, init_pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", 0 )
+GAME( 1987, pc_radrc, playch10, playch10_d, playch10, playch10_state, init_pcdboard, ROT0, "Square",                                   "Rad Racer (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* E-Board Games */
 GAME( 1987, pc_miket, playch10, playch10_e,   playch10, playch10_state, init_pceboard, ROT0, "Nintendo",                                 "Mike Tyson's Punch-Out!! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1939,14 +1941,14 @@ GAME( 1990, pc_mman3, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1990, pc_suprc, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Super C (PlayChoice-10)", 0 )
 GAME( 1990, pc_tmnt2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles II: The Arcade Game (PlayChoice-10)", 0 )
 GAME( 1990, pc_wcup,  playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Technos Japan (Nintendo license)",         "Nintendo World Cup (PlayChoice-10)", 0 )
-GAME( 1990, pc_ngai2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", 0 )
+GAME( 1990, pc_ngai2, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // level 2 BG graphics are a total mess
 GAME( 1991, pc_ngai3, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
 GAME( 1991, pc_ttoon, playch10, playch10_g, playch10, playch10_state, init_ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
 
 /* variant with 4 screen mirror */
-GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
+GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */

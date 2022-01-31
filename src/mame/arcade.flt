@@ -83,6 +83,7 @@ atarisy1.cpp
 atarisy2.cpp
 atarisy4.cpp
 atarittl.cpp
+atari_4x4.cpp
 atari_s1.cpp
 atari_s2.cpp
 atetris.cpp
@@ -255,6 +256,7 @@ combatsc.cpp
 comebaby.cpp
 commando.cpp
 compgolf.cpp
+compucranes.cpp
 contra.cpp
 coolpool.cpp
 coolridr.cpp
@@ -306,6 +308,7 @@ dassault.cpp
 dblcrown.cpp
 dblewing.cpp
 dbz.cpp
+dc_atomiswave.cpp
 dcheese.cpp
 dcon.cpp
 dday.cpp
@@ -400,6 +403,7 @@ exzisus.cpp
 ez2d.cpp
 f-32.cpp
 f1gp.cpp
+falgas_m89.cpp
 famibox.cpp
 fantland.cpp
 fastfred.cpp
@@ -433,6 +437,7 @@ fresh.cpp
 fromanc2.cpp
 fromance.cpp
 fruitpc.cpp
+funeball.cpp
 fungames.cpp
 funkball.cpp
 funkybee.cpp
@@ -527,6 +532,7 @@ gts80a.cpp
 gts80b.cpp
 guab.cpp
 gumbo.cpp
+gumrally.cpp
 gunbustr.cpp
 gundealr.cpp
 gunpey.cpp
@@ -568,7 +574,6 @@ icecold.cpp
 ice_bozopail.cpp
 ice_hhhippos.cpp
 ice_tbd.cpp
-ichiban.cpp
 idsa.cpp
 igs009.cpp
 igs011.cpp
@@ -672,6 +677,7 @@ kyugo.cpp
 labyrunr.cpp
 ladybug.cpp
 ladyfrog.cpp
+lancelot.cpp
 laserbas.cpp
 laserbat.cpp
 lasso.cpp
@@ -714,6 +720,7 @@ m52.cpp
 m57.cpp
 m58.cpp
 m62.cpp
+m62_bkungfu.cpp
 m63.cpp
 m72.cpp
 m79amb.cpp
@@ -894,6 +901,7 @@ nbmj8991.cpp
 nbmj9195.cpp
 nemesis.cpp
 neogeo.cpp
+neomania.cpp
 neopcb.cpp
 neoprint.cpp
 neptunp2.cpp
@@ -1282,6 +1290,7 @@ supduck.cpp
 superchs.cpp
 supercrd.cpp
 superdq.cpp
+superga2.cpp
 superqix.cpp
 supertnk.cpp
 superwng.cpp
@@ -1467,6 +1476,7 @@ witch.cpp
 wiz.cpp
 wmg.cpp
 wms.cpp
+wms_shuffle.cpp
 wolfpack.cpp
 wpc_95.cpp
 wpc_an.cpp

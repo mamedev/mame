@@ -26,6 +26,7 @@ actions_atj2279b.cpp
 acvirus.cpp
 adacp150.cpp
 adam.cpp
+adds2020.cpp
 adm11.cpp
 adm23.cpp
 adm31.cpp
@@ -35,6 +36,7 @@ agat.cpp
 aid80f.cpp
 aim65.cpp
 aim65_40.cpp
+airbase99.cpp
 akaiax80.cpp
 akaivx600.cpp
 alcat7100.cpp
@@ -117,7 +119,6 @@ bbcbc.cpp
 bcs3.cpp
 bebox.cpp
 bert.cpp
-besta.cpp
 beta.cpp
 betacam.cpp
 bigbord2.cpp
@@ -240,6 +241,7 @@ dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
 digel804.cpp
+digilog320.cpp
 digijet.cpp
 dim68k.cpp
 dm7000.cpp
@@ -306,8 +308,9 @@ exorterm.cpp
 exp85.cpp
 f387x.cpp
 facit4440.cpp
-falco5220.cpp
+falco500.cpp
 falcots.cpp
+falcots28.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -395,6 +398,7 @@ harriet.cpp
 hawk.cpp
 hazeltin.cpp
 hazl1420.cpp
+hds200.cpp
 hec2hrp.cpp
 hektor.cpp
 hhtiger.cpp
@@ -449,6 +453,7 @@ ie15.cpp
 iez80.cpp
 if800.cpp
 ikt5a.cpp
+im01.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -501,6 +506,7 @@ jupiter.cpp
 k1003.cpp
 k28.cpp
 k8915.cpp
+kawai_acr20.cpp
 kawai_k1.cpp
 kawai_k4.cpp
 kawai_k5.cpp
@@ -531,6 +537,7 @@ lb186.cpp
 lbpc.cpp
 lc80.cpp
 lcmate2.cpp
+ld50.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
 leapfrog_leapster_explorer.cpp
@@ -1012,7 +1019,6 @@ sun3x.cpp
 sun4.cpp
 super6.cpp
 super80.cpp
-superga2.cpp
 superslave.cpp
 supracan.cpp
 sv8000.cpp
@@ -1101,6 +1107,7 @@ ts3000.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
+tsconf.cpp
 tsispch.cpp
 tulip1.cpp
 tutor.cpp
@@ -1210,6 +1217,7 @@ ympsr16.cpp
 ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
+ymrx15.cpp
 ymsy35.cpp
 ymtx81z.cpp
 ymvl70.cpp
@@ -1217,6 +1225,7 @@ z100.cpp
 z1013.cpp
 z22.cpp
 z29.cpp
+z80clock.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp

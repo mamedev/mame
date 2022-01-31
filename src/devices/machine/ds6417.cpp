@@ -10,7 +10,7 @@ DEFINE_DEVICE_TYPE(DS6417, ds6417_device, "ds6417", "Dallas DS6417 CyberCard")
 
 ds6417_device::ds6417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS6417, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_memcard_image_interface(mconfig, *this)
 {
 }
 

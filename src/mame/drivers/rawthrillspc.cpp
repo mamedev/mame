@@ -139,5 +139,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2014, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                                "The Fast And The Furious (v3.06)", MACHINE_IS_SKELETON)
+GAME(2004, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                                "The Fast And The Furious (v3.06)", MACHINE_IS_SKELETON)
 GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami licensed)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)

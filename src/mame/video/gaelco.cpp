@@ -8,8 +8,12 @@
 
   TODO:
   verify priority implementations
-  understand bad sprites in Squash after the continue screen, these do not
-  occur on real hardware.
+
+  NOTE:
+  if Squash fails a protection check it will leave bad 'Insert Coin' text
+  on the screen after a continue, this is not a sprite emulation bug, the
+  machine expects a 68k clock of around 10Mhz and a refresh of around 57.4
+  to pass the protection, see notes in main driver file.
 
 ***************************************************************************/
 

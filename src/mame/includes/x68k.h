@@ -340,7 +340,7 @@ public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);

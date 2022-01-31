@@ -7,7 +7,7 @@
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /*
@@ -52,7 +52,7 @@ static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0
 //  TIMERS
 //**************************************************************************
 
-void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void st_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -825,7 +825,7 @@ void ste_state::dmasound_tick()
 }
 
 
-void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -836,7 +836,7 @@ void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		microwire_tick();
 		break;
 	default:
-		st_state::device_timer(timer, id, param, ptr);
+		st_state::device_timer(timer, id, param);
 	}
 }
 

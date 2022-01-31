@@ -683,9 +683,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Non-raster display cannot have a variable width\n");
 	}
 
-	// check for zero frame rate
-	if (m_refresh == 0)
-		osd_printf_error("Invalid (zero) refresh rate\n");
+	// check for invalid frame rate
+	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
+		osd_printf_error("Invalid (under 1Hz) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
@@ -934,7 +934,7 @@ void screen_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -18,6 +18,32 @@
 
 DEFINE_DEVICE_TYPE(MIDIIN, midiin_device, "midiin", "MIDI In image device")
 
+namespace {
+
+INPUT_PORTS_START(midiin)
+	PORT_START("CFG")
+	PORT_CONFNAME(0xff, 0xff, "MIDI file mode")
+	PORT_CONFSETTING(   0xff, "Multi")
+	PORT_CONFSETTING(   0x00, "Poly: Channel 1")
+	PORT_CONFSETTING(   0x01, "Poly: Channel 2")
+	PORT_CONFSETTING(   0x02, "Poly: Channel 3")
+	PORT_CONFSETTING(   0x03, "Poly: Channel 4")
+	PORT_CONFSETTING(   0x04, "Poly: Channel 5")
+	PORT_CONFSETTING(   0x05, "Poly: Channel 6")
+	PORT_CONFSETTING(   0x06, "Poly: Channel 7")
+	PORT_CONFSETTING(   0x07, "Poly: Channel 8")
+	PORT_CONFSETTING(   0x08, "Poly: Channel 9")
+	PORT_CONFSETTING(   0x09, "Poly: Channel 10")
+	PORT_CONFSETTING(   0x0a, "Poly: Channel 11")
+	PORT_CONFSETTING(   0x0b, "Poly: Channel 12")
+	PORT_CONFSETTING(   0x0c, "Poly: Channel 13")
+	PORT_CONFSETTING(   0x0d, "Poly: Channel 14")
+	PORT_CONFSETTING(   0x0e, "Poly: Channel 15")
+	PORT_CONFSETTING(   0x0f, "Poly: Channel 16")
+INPUT_PORTS_END
+
+} // anonymous namespace
+
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
@@ -27,12 +53,18 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi(),
+		m_config(*this, "CFG"),
 		m_timer(nullptr),
 		m_input_cb(*this),
 		m_xmit_read(0),
 		m_xmit_write(0),
 		m_tx_busy(false)
 {
+}
+
+ioport_constructor midiin_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(midiin);
 }
 
 /*-------------------------------------------------
@@ -62,7 +94,7 @@ void midiin_device::device_reset()
     device_timer
 -------------------------------------------------*/
 
-void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == 0)
 	{
@@ -87,8 +119,15 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				// if it's time to process the current event, do it and advance
 				if (curtime >= event->time())
 				{
-					for (auto &curbyte : event->data())
+					const u8 force_channel = m_config->read();
+
+					for (u8 curbyte : event->data())
+					{
+						if (force_channel <= 15 && curbyte >= 0x80 && curbyte < 0xf0)
+							curbyte = (curbyte & 0xf0) | force_channel;
+
 						xmit_char(curbyte);
+					}
 					event = m_sequence.advance_event();
 				}
 
@@ -469,9 +508,7 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		if (eclass != 15)
 		{
 			// simple events: all but program change and aftertouch have a second parameter
-			// TODO: should we respect the channel for these? or maybe the drivers should
-			// configure us with the number of channels they support?
-			event.append(type & 0xf0);
+			event.append(type);
 			event.append(buffer.byte());
 			if (eclass != 12 && eclass != 13)
 				event.append(buffer.byte());
@@ -480,6 +517,7 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		{
 			// handle non-meta events
 			midi_parser eventdata = buffer.subset(buffer.variable());
+			event.append(type);
 			while (!eventdata.eob())
 				event.append(eventdata.byte());
 		}

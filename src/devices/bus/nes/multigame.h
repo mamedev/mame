@@ -299,10 +299,6 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -542,6 +538,31 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+};
+
+
+// ======================> nes_bmc_tf2740_device
+
+class nes_bmc_tf2740_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_tf2740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_chr();
+	u8 m_reg[3];
+	u8 m_jumper;
 };
 
 
@@ -1153,6 +1174,42 @@ private:
 };
 
 
+// ======================> nes_bmc_ctc12in1_device
+
+class nes_bmc_ctc12in1_device : public nes_vram_protect_device
+{
+public:
+	// construction/destruction
+	nes_bmc_ctc12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_bmc_ctc12in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	u8 m_reg[2];
+};
+
+
+// ======================> nes_bmc_891227_device
+
+class nes_bmc_891227_device : public nes_bmc_ctc12in1_device
+{
+public:
+	// construction/destruction
+	nes_bmc_891227_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
 // ======================> nes_bmc_k1029_device
 
 class nes_bmc_k1029_device : public nes_vram_protect_device
@@ -1162,6 +1219,32 @@ public:
 	nes_bmc_k1029_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// construction/destruction
+	nes_bmc_k1029_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_bmc_fam250_device
+
+class nes_bmc_fam250_device : public nes_bmc_k1029_device
+{
+public:
+	// construction/destruction
+	nes_bmc_fam250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch, m_reg;
 };
 
 
@@ -1220,9 +1303,12 @@ DECLARE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device)
+DECLARE_DEVICE_TYPE(NES_BMC_891227,     nes_bmc_891227_device)
 DECLARE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device)
 DECLARE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
+DECLARE_DEVICE_TYPE(NES_BMC_CTC12IN1,   nes_bmc_ctc12in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device)
@@ -1232,6 +1318,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device)
+DECLARE_DEVICE_TYPE(NES_BMC_TF2740,     nes_bmc_tf2740_device)
 DECLARE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device)
 DECLARE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device)

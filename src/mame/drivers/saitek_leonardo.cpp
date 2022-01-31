@@ -9,10 +9,10 @@ This is SciSys's answer to H+G Mephisto modular chesscomputers, but unlike the
 Mephistos, these boards are actual chesscomputers and not an accessory.
 
 They called the expansion capability "OSA", for "Open Systems Architecture".
-One for a link port to a PC, and one for a module slot. The expansion modules
-are basically entire chesscomputers, making the whole thing combined a
-'dual brain' chesscomputer. The embedded chess engine is by Julio Kaplan
-and Craig Barnes, same as the one in SciSys Turbo S-24K.
+A serial port for linking to a PC, and a parallel port for expansion modules.
+The expansion modules are basically entire chesscomputers, making the whole
+thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
+Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
 Hardware notes:
 
@@ -35,11 +35,18 @@ Galileo PCB is different, but essentially it's the same hardware as Leonardo.
 The 1.4 ROM is identical to it too, even though it's a different MCU type.
 And on the outside, the button panel was redesigned a bit.
 
-Expansion modules released:
+Known expansion modules:
 - Maestro (65C02, Kaplan/Barnes)
 - Analyst (65C02, Kaplan/Barnes)
+- Brute Force (prototype) (65C02?, Ulf Rathsman)
 - Brute Force (H8, Frans Morsch)
 - Sparc (SPARClite, Spracklen's)
+
+The H8 Brute Force module doesn't work with the 1st program version of Leonardo,
+this is mentioned in the repair manual and it says it requires an EPROM upgrade.
+The Sparc module doesn't appear to work with it either. Moreover, the Sparc module
+manual mentions that for it to work properly on Leonardo, the chesscomputer needs
+to be upgraded with an EMI PCB (power supply related).
 
 TODO:
 - OSA module comms is not completely understood
@@ -368,7 +375,7 @@ void leo_state::leonardo(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
-	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(~u32(3));
+	INPUT_MERGER_ANY_LOW(config, m_stb);
 	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -409,17 +416,22 @@ void leo_state::galileo(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( leonardo )
+ROM_START( leonardo ) // OSA version string: Version 1.4
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sw6.1_osa1.4_510.u9", 0x8000, 0x8000, CRC(e39676b2) SHA1(288c5f2608277cb4c3ca71cb2e642a6a62c01dca) ) // D27C256AD-12
 ROM_END
 
-ROM_START( leonardoa )
+ROM_START( leonardoa ) // OSA version string: Leonardo Chess System - Version 1.2
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sx6_617l_osa1.2.u9", 0x8000, 0x8000, CRC(4620f827) SHA1(4ae566646d032dd5bcca48316dd90a11e06772f1) ) // D27C256AD-12
 ROM_END
 
-ROM_START( galileo )
+ROM_START( leonardob ) // OSA version string: Leonardo Chess System - Version 1.0
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("sw6-830b.u9", 0x8000, 0x8000, CRC(dc892c1b) SHA1(5f7a92080a4062e1de61c7273a2fd0cfd9ede9f3) ) // D27C256AD-15
+ROM_END
+
+ROM_START( galileo ) // OSA version string: Version 1.4
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sw6.1_osa1.4_510.u9", 0x8000, 0x8000, CRC(e39676b2) SHA1(288c5f2608277cb4c3ca71cb2e642a6a62c01dca) ) // MBM27C256H-10
 ROM_END
@@ -433,7 +445,8 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, leonardob, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

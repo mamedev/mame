@@ -89,9 +89,9 @@ namespace {
 // IDSEL = AD22, PCI expansion
 // IDSEL = AD23, PCI expansion
 // IDSEL = AD24, PCI expansion
-#define PCI_ID_IDE      ":pci:08.0"
-#define PCI_ID_NILE     ":pci:0a.0"
-#define PCI_ID_9050     ":pci:0b.0"
+#define PCI_ID_IDE      "pci:08.0"
+#define PCI_ID_NILE     "pci:0a.0"
+#define PCI_ID_9050     "pci:0b.0"
 
 #define DEBUG_CONSOLE   (0)
 #define LOG_RTC         (0)
@@ -101,8 +101,8 @@ namespace {
 class atlantis_state : public driver_device
 {
 public:
-	atlantis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	atlantis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -124,7 +124,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -659,7 +659,7 @@ void atlantis_state::machine_reset()
 /*************************************
 *  Timer
 *************************************/
-void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// ADC Ready Timer
 	board_ctrl[STATUS] |= (1 << A2D_IRQ_SHIFT);
@@ -814,7 +814,7 @@ void atlantis_state::mwskins(machine_config &config)
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_system_clock(66666666);
 
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, 0, m_maincpu));
 	vrc4373.set_ram_size(0x00800000);

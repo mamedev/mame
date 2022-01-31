@@ -148,13 +148,13 @@ void albazc_state::out_2_w(uint8_t data)
 
 void albazc_state::vregs_w(offs_t offset, uint8_t data)
 {
-	#ifdef UNUSED_FUNCTION
+#if 0
 	{
 		static uint8_t x[5];
 		x[offset] = data;
 		popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 	}
-	#endif
+#endif
 
 	if (offset == 0)
 		flip_screen_set((data & 0x40) >> 6);

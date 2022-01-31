@@ -56,7 +56,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
 		, m_nvram(*this,"nvram")
-		, m_io_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_buzzer(*this, "buzzer")
 		, m_7474(*this, "7474")
 		, m_rs232(*this, "rs232")
@@ -77,8 +77,8 @@ private:
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 
-	bool m_bow;
-	bool m_cent_busy;
+	bool m_bow = 0;
+	bool m_cent_busy = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;

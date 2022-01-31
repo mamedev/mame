@@ -528,7 +528,7 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 ******************************************************************/
 
-void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1736,8 +1736,11 @@ static INPUT_PORTS_START( qzquest )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)  //??
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Countdown Timer" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Very Slow" )
+	PORT_DIPSETTING(    0x04, "Slow" )
+	PORT_DIPSETTING(    0x0c, "Medium" )
+	PORT_DIPSETTING(    0x08, "Fast" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )

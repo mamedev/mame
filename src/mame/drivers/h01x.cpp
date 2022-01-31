@@ -84,7 +84,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<11> m_io_keyboard;
 
-	uint8_t m_bank = 0;
+	uint8_t m_bank = 0U;
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	uint8_t *m_ram_ptr, *m_vram_ptr;

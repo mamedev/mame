@@ -211,10 +211,12 @@ static const int noise_freq[16] =
 	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
 };
 
-/* dpcm transfer freqs */
-static const int dpcm_clocks[16] =
+// dpcm (cpu) cycle period
+// each frequency is determined as: freq = master / period
+static const int dpcm_clocks[2][16] =
 {
-	428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54
+	{ 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54 }, // NTSC
+	{ 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118, 98, 78, 66, 50 } // PAL
 };
 
 /* ratios of pos/neg pulse for square waves */

@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.cpp
-
         NC100/NC150/NC200 Notepad computer
 
         system driver
@@ -83,15 +81,11 @@
         Self Test:
 
         - requires memory save and real time clock save to be working!
-        (i.e. for MESS nc100 driver, nc100.nv can be created)
+        (i.e. for MAME nc100 driver, nc100.nv can be created)
         - turn off nc (use NMI button)
         - reset+FUNCTION+SYMBOL must be pressed together.
 
         Note: NC200 Self test does not test disc hardware :(
-
-
-
-        Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 
@@ -985,11 +979,11 @@ INPUT_PORTS_END
 #if 0
 void nc_state::nc150_init_machine()
 {
-		m_membank_internal_ram_mask = 7;
+	m_membank_internal_ram_mask = 7;
 
-		m_membank_card_ram_mask = 0x03f;
+	m_membank_card_ram_mask = 0x03f;
 
-		nc_state::machine_reset();
+	nc_state::machine_reset();
 }
 #endif
 
@@ -998,18 +992,16 @@ void nc_state::nc150_init_machine()
 /**********************************************************************************************************/
 /* NC200 hardware */
 
-#ifdef UNUSED_FUNCTION
 void nc200_state::nc200_display_memory_start_w(uint8_t data)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4-0: not used */
-	m_display_memory_start = (data & 0x0e0)<<(12-4);
+	m_display_memory_start = (data & 0x0e0) << (12 - 4);
 
 	LOG("disp memory w: %04x\n", m_display_memory_start);
 }
-#endif
 
 
 WRITE_LINE_MEMBER(nc200_state::write_nc200_centronics_ack)
@@ -1085,15 +1077,13 @@ WRITE_LINE_MEMBER(nc200_state::nc200_fdc_interrupt)
 	nc_update_interrupts();
 }
 
-#ifdef UNUSED_FUNCTION
-void nc_state::nc200_floppy_drive_index_callback(int drive_id)
+void nc200_state::nc200_floppy_drive_index_callback(int drive_id)
 {
 	LOGDEBUG("nc200 index pulse\n");
 //  m_irq_status |= (1<<4);
 
 //  nc_update_interrupts(Machine);
 }
-#endif
 
 void nc200_state::machine_reset()
 {

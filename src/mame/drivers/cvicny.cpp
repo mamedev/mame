@@ -58,8 +58,8 @@ private:
 	void digit_w(u8 data);
 	void segment_w(u8 data);
 
-	u8 m_digit;
-	u8 m_seg;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<8> m_io_keyboard;

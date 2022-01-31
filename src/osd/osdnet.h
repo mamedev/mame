@@ -44,7 +44,7 @@ protected:
 	virtual int recv_dev(uint8_t **buf);
 
 private:
-	void recv(void *ptr, int param);
+	void recv(int param);
 
 	class device_network_interface *m_dev;
 	emu_timer *m_timer;
