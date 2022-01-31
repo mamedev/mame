@@ -84,11 +84,13 @@
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_WDFDC   (1U << 1) // Shows register setup
+#define LOG_WDIO    (1U << 2) // Shows Data read and write
 
-//#define VERBOSE (LOG_GENERAL )
+//#define VERBOSE (LOG_GENERAL | LOG_WDFDC)
 #include "logmacro.h"
 
 #define LOGWDFDC(...)   LOGMASKED(LOG_WDFDC,  __VA_ARGS__)
+#define LOGWDIO(...)   LOGMASKED(LOG_WDIO,  __VA_ARGS__)
 
 /***************************************************************************
     PARAMETERS
@@ -185,6 +187,8 @@ void coco_fdc_device_base::device_add_mconfig(machine_config &config)
 	WD1773(config, m_wd17xx, 8_MHz_XTAL);
 	m_wd17xx->intrq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_intrq_w));
 	m_wd17xx->drq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_drq_w));
+	m_wd17xx->set_disable_motor_control(true);
+	m_wd17xx->set_force_ready(true);
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "525dd", coco_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "525dd", coco_fdc_device_base::floppy_formats).enable_sound(true);
@@ -418,7 +422,7 @@ void coco_fdc_device_base::update_lines()
 			else if( (m_cache_controler & 0x07) == 0x06 ) /* Copy Write cache to controller */
 			{
 				u8 data = m_cache_buffer->read(m_cache_pointer++);
-				LOG("Cached drq write: %2.2x\n", data );
+				LOG("Cached copy drq write: %2.2x\n", data );
 				m_wd17xx->data_w(data);
 			}
 			else
@@ -537,7 +541,7 @@ u8 coco_fdc_device_base::scs_read(offs_t offset)
 			break;
 		case 11:
 			result = m_wd17xx->data_r();
-			LOGWDFDC("m_wd17xx->data_r: %2.2x\n", result );
+			LOGWDIO("m_wd17xx->data_r: %2.2x\n", result );
 			break;
 	}
 
@@ -594,7 +598,7 @@ void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 			m_wd17xx->sector_w(data);
 			break;
 		case 11:
-			LOGWDFDC("m_wd17xx->data_w: %2.2x\n", data );
+			LOGWDIO("m_wd17xx->data_w: %2.2x\n", data );
 			m_wd17xx->data_w(data);
 			break;
 	};
