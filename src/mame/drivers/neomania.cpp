@@ -2,11 +2,16 @@
 // copyright-holders:
 /*
 Neo Mania:
- PC with Windows 98 (exact hardware not specified) and a Neo·Geo emulator, with a small PCB for converting
- VGA + Parallel port (inputs) + sound (with volume knob) to JAMMA (named "NEO MANIA ADAPTER BOARD").
+ The Portuguese (Vila Nova de Gaia) company "Hyper M.A.R." created this machine on 2002 with 40 games, 
+ and updated it on 2003 increasing the number of games up to 48. There was a latest newer version
+ where they added "Strikers 1945" and "Prehistoric Isle 2", reaching 50 games.
+ There are Spanish and Portuguese localizations.
+ The hardware is a PC with Windows 98 (exact hardware not specified) and a Neo·Geo emulator, with a
+ small PCB for converting VGA + Parallel port (inputs) + sound (with volume knob) to JAMMA (named
+ "NEO MANIA ADAPTER BOARD").
 The "NEO MANIA ADAPTER BOARD" contains:
-   2 x Jumpers tio enable or disable features:
-    JMP1 (two positions) - With or Without Coin Dist.
+   3 x Blocks of jumpers to enable or disable features:
+    JMP1 (two positions) - With or without Coin Dist.
     JMP2 (two positions)  - With or without Audio Amplifier
     JMP3 (three positions) - Unknown function
    2 x Coin acceptors ports
@@ -91,10 +96,11 @@ ROM_START( neomania )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP) // MB BIOS
 
+	// Portuguese version with 48 games, from 2003
 	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
 	DISK_IMAGE( "neomania", 0, SHA1(4a865d1ed67901b98b37f94cfdd591fad38b404a) )
 ROM_END
 
 } // Anonymous namespace
 
-GAME( 2002, neomania, 0, neomania, neomania, neomania_state, empty_init, ROT0, "bootleg", "Neo Mania", MACHINE_IS_SKELETON ) // Neo·Geo emulator from 2002
+GAME( 2003, neomania, 0, neomania, neomania, neomania_state, empty_init, ROT0, "bootleg (Hyper M.A.R.)", "Neo Mania (Portugal)", MACHINE_IS_SKELETON )
