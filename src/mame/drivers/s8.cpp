@@ -98,7 +98,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	u8 sound_r();
@@ -113,10 +113,10 @@ private:
 	void switch_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
 	void audio_map(address_map &map);
@@ -317,7 +317,7 @@ WRITE_LINE_MEMBER( s8_state::pia_irq )
 	}
 }
 
-void s8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

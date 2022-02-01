@@ -53,8 +53,8 @@ protected:
 	void cmap_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_channel[m_gsel].cmap[m_channel[m_gsel].ctag]); }
 	void gsel_w(u8 data) { m_gsel = data; }
 
-	void irq_check(void *ptr = nullptr, s32 param = 0);
-	void dma_check(void *ptr = nullptr, s32 param = 0);
+	void irq_check(s32 param = 0);
+	void dma_check(s32 param = 0);
 
 	required_address_space m_bus;
 

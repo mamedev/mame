@@ -315,7 +315,7 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
 	live_sync();

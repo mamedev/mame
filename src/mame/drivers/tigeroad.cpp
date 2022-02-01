@@ -890,43 +890,143 @@ ROM_START( toramich ) // N86614A-5 + N86614B-6 board combo
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) - N82S129A or compatible
 ROM_END
 
+/*
+Tiger Road (Capcom 1987)
+Hardware info by Guru
+
+This documents the US bootleg which has a near identical PCB layout to the
+original Capcom board but without any custom chips.
+
+
+PCB Layout
+----------
+
+Top (CPU) board
+
+MY 0083A
+#6484 T.ROAD (sticker)
+       |-------------|                                   |-------------|
+|------|-------------|-----------------------------------|-------------|------|
+|                                                                             |
+|                                                                      6116(O)|
+|                                             68000                    6116(O)|
+|                                                                             |
+|                                                        6264          6264   |
+|                            6116(V)                                          |
+|                            6116(V)                     CPU.IC18   CPU.IC5   |
+|J                                                                            |
+|A                                                       CPU.IC19   CPU.IC6   |
+|M                                                                            |
+|M                                                                            |
+|A                                                                            |
+|                            CPU.IC60                                         |
+|                                                                             |
+|   24MHz     DSW2                          10MHz  3.579545MHz                |
+|                                                                             |
+|             DSW1                  YM3014     YM2203                CPU.IC12 |
+|                    VOL  LM324                                               |
+|    uPC1182                        YM3014     YM2203      Z80       6116     |
+|-----------------------------------------------------------------------------|
+Notes:
+       68000 - Clock 10.000MHz
+         Z80 - Clock 3.579545MHz
+      YM2203 - Clock 3.579545MHz (both)
+     6116(V) - 2kx8 SRAM (this is the VRAM shown on the POST screen)
+     6116(O) - 2kx8 SRAM (this is the OBJ RAM shown on the POST screen)
+        6264 - 8kx8 SRAM (this is the WORK RAM shown on the POST screen)
+     uPC1182 - Audio AMP
+       LM324 - Op AMP
+      YM3014 - Yamaha YM3014 DAC
+       HSYNC - ~15.5kHz
+       VSYNC - ~59Hz
+
+      Program ROMs IC5,6 & IC18,19 are 27512. Other ROMs are 27256.
+
+
+Bottom (GFX) board
+
+|-----------------------------------------------------------------------------|
+| GFX.IC2        GFX.IC49    GFX.IC81     GFX.IC112    GFX.IC129   GFX.IC168  |
+| GFX.IC3        GFX.IC50    GFX.IC82     GFX.IC113    GFX.IC130   GFX.IC169  |
+|                                                                             |
+| GFX.IC4        GFX.IC51    GFX.IC83     GFX.IC114    GFX.IC131   GFX.IC170  |
+| GFX.IC5        GFX.IC52    GFX.IC84     GFX.IC115    GFX.IC132   GFX.IC171  |
+|                                                                             |
+|   6116(S)                                   6116(S)                         |
+|                                             6116(S)                         |
+|                                                                  GFX.IC175  |
+|                                             6116(S)                         |
+|                                             6116(S)                         |
+|                                                                             |
+|   6116(S)           82S129.IC74                                             |
+|                                                                             |
+|                                             6116(T)                         |
+|                                             6116(T)                         |
+|                                                                             |
+|                                                                             |
+|                                                                 6116(C)     |
+|                                                                             |
+|                                                                 6116(C)     |
+|                                                                             |
+|------|-------------|-----------------------------------|-------------|------|
+       |-------------|                                   |-------------|
+Notes:
+      All ROMs are 27512 OTP ROMs except 27256 at IC175
+   6116(S) - 2kx8 SRAM (used for sprite display)
+   6116(T) - 2kx8 SRAM (used for sprite tile generator)
+   6116(C) - 2kx8 SRAM (used for color)
+    82S129 - Signetics 82S129 Bi-polar PROM
+
+*/
+
 ROM_START( tigeroadb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 256K for 68000 code
-	ROM_LOAD16_BYTE( "tgrroad.3",    0x00000, 0x10000, CRC(14c87e07) SHA1(31363b56dd9d387f3ebd7ca1c209148c389ec1aa) )
-	ROM_LOAD16_BYTE( "tgrroad.5",    0x00001, 0x10000, CRC(0904254c) SHA1(9ce7b8a699bc21618032db9b0c5494242ad77a6b) )
-	ROM_LOAD16_BYTE( "tgrroad.2",    0x20000, 0x10000, CRC(cedb1f46) SHA1(bc2d5730ff809fb0f38327d72485d472ab9da54d) )
-	ROM_LOAD16_BYTE( "tgrroad.4",    0x20001, 0x10000, CRC(e117f0b1) SHA1(ed0050247789bedaeb213c3d7c2d2cdb239bb4b4) )
+	ROM_LOAD16_BYTE( "cpu.ic18", 0x00000, 0x10000, CRC(14c87e07) SHA1(31363b56dd9d387f3ebd7ca1c209148c389ec1aa) )
+	ROM_LOAD16_BYTE( "cpu.ic5",  0x00001, 0x10000, CRC(0904254c) SHA1(9ce7b8a699bc21618032db9b0c5494242ad77a6b) )
+	ROM_LOAD16_BYTE( "cpu.ic19", 0x20000, 0x10000, CRC(cedb1f46) SHA1(bc2d5730ff809fb0f38327d72485d472ab9da54d) )
+	ROM_LOAD16_BYTE( "cpu.ic6",  0x20001, 0x10000, CRC(e117f0b1) SHA1(ed0050247789bedaeb213c3d7c2d2cdb239bb4b4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tru05.bin",    0x0000, 0x8000, CRC(f9a7c9bf) SHA1(4d37c71aa6523ac21c6e8b23f9957e75ec4304bf) )
+	ROM_LOAD( "cpu.ic12", 0x0000, 0x8000, CRC(f9a7c9bf) SHA1(4d37c71aa6523ac21c6e8b23f9957e75ec4304bf) )
 
 	// no samples player in the English version
 
 	ROM_REGION( 0x008000, "text", 0 )
-	ROM_LOAD( "tr01.bin",     0x00000, 0x08000, CRC(74a9f08c) SHA1(458958c8d9a2af5df88bb24c9c5bcbd37d6856bc) ) // 8x8 text
+	ROM_LOAD( "cpu.ic60", 0x00000, 0x08000, CRC(74a9f08c) SHA1(458958c8d9a2af5df88bb24c9c5bcbd37d6856bc) ) // 8x8 text
 
 	ROM_REGION( 0x100000, "tiles", 0 )
-	ROM_LOAD( "tr-01a.bin",   0x00000, 0x20000, CRC(a8aa2e59) SHA1(792f50d688a4ffb574e41257816bc304d41f0458) )
-	ROM_LOAD( "tr-04a.bin",   0x20000, 0x20000, CRC(8863a63c) SHA1(11bfce5b09c5b8a781c658f035d5658c3710d189) )
-	ROM_LOAD( "tr-02a.bin",   0x40000, 0x20000, CRC(1a2c5f89) SHA1(2a2aa2f1e2a0cdd4bbdb25236e49c7cc573db9e9) )
-	ROM_LOAD( "tr05.bin",     0x60000, 0x20000, CRC(5bf453b3) SHA1(5eef151974c6b818a17756549d24a702e1f3a859) )
-	ROM_LOAD( "tr-03a.bin",   0x80000, 0x20000, CRC(1e0537ea) SHA1(bc65f7104d5f7728b68b3dcb45151c41fc30aa0d) )
-	ROM_LOAD( "tr-06a.bin",   0xa0000, 0x20000, CRC(b636c23a) SHA1(417e289745996bd00114df6ade591e702265d3a5) )
-	ROM_LOAD( "tr-07a.bin",   0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
-	ROM_LOAD( "tgrroad.17",   0xe0000, 0x10000, CRC(3f7539cc) SHA1(ca3ef1fabcb0c7abd7bc211ba128d2433e3dbf26) )
-	ROM_LOAD( "tgrroad.18",   0xf0000, 0x10000, CRC(e2e053cb) SHA1(eb9432140fc167dec5d3273112933201be2be1b3) )
+	ROM_LOAD( "gfx.ic84",  0x00000, 0x10000, CRC(3db68b96) SHA1(d62a8f12e3a1c5583672a292f2a000f8528db2d8) )
+	ROM_LOAD( "gfx.ic82",  0x10000, 0x10000, CRC(a12fa19d) SHA1(07b0f4ba1f45628310a4f1b95fafe3676684e883) )
+	ROM_LOAD( "gfx.ic115", 0x20000, 0x10000, CRC(c9c396aa) SHA1(2447a4475dd0ed85bac101ddf3f1bb33763007e7) )
+	ROM_LOAD( "gfx.ic113", 0x30000, 0x10000, CRC(6bfc90a4) SHA1(d5b37995b0382721eba1b527add983e04c2b6edf) )
+	ROM_LOAD( "gfx.ic132", 0x40000, 0x10000, CRC(dccf34bb) SHA1(938933916cc3e911aa7040c375d83492756f2a9c) )
+	ROM_LOAD( "gfx.ic130", 0x50000, 0x10000, CRC(a1cee4cd) SHA1(d8dfbeecd6e961ab825b3536ef715b6fb5d62b45) )
+	ROM_LOAD( "gfx.ic171", 0x60000, 0x10000, CRC(7266e3ad) SHA1(c00648f6d420ad97c52f755bcafd7446aed2896b) )
+	ROM_LOAD( "gfx.ic169", 0x70000, 0x10000, CRC(5ec867a6) SHA1(46d278c4b0f2c090e45c5a8c433af343e1514dc7) )
+	ROM_LOAD( "gfx.ic83",  0x80000, 0x10000, CRC(95c69541) SHA1(890c576a7996a8d707c162f281f979f68215e020) )
+	ROM_LOAD( "gfx.ic81",  0x90000, 0x10000, CRC(ecb67157) SHA1(ba1d30f50e22e426d8ad4a35cf005a410d974dbc) )
+	ROM_LOAD( "gfx.ic114", 0xa0000, 0x10000, CRC(53f24910) SHA1(984b8e5eb6a9bc72625179df82f9dfd30645b86f) )
+	ROM_LOAD( "gfx.ic112", 0xb0000, 0x10000, CRC(5a309d8b) SHA1(81cf3b98b1f5782f41998e14533dde2c1a4fbed3) )
+	ROM_LOAD( "gfx.ic131", 0xc0000, 0x10000, CRC(710feda8) SHA1(5561b784b75d02791c7cb96d453a85c97bd264a4) )
+	ROM_LOAD( "gfx.ic129", 0xd0000, 0x10000, CRC(24b08a7e) SHA1(867fee3e41fedf1a66038e7c8ee8eb66aa35f20f) )
+	ROM_LOAD( "gfx.ic170", 0xe0000, 0x10000, CRC(3f7539cc) SHA1(ca3ef1fabcb0c7abd7bc211ba128d2433e3dbf26) )
+	ROM_LOAD( "gfx.ic168", 0xf0000, 0x10000, CRC(e2e053cb) SHA1(eb9432140fc167dec5d3273112933201be2be1b3) )
 
 	ROM_REGION( 0x080000, "spritegen", 0 )
-	ROM_LOAD32_BYTE( "tr-09a.bin",   0x00003, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) )
-	ROM_LOAD32_BYTE( "tr-10a.bin",   0x00002, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
-	ROM_LOAD32_BYTE( "tr-11a.bin",   0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
-	ROM_LOAD32_BYTE( "tr-12a.bin",   0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
+	ROM_LOAD32_BYTE( "gfx.ic51", 0x00000, 0x10000, CRC(298c40a7) SHA1(a0ba3d2e05aeeadd9bb2e3f854403c227a646960) )
+	ROM_LOAD32_BYTE( "gfx.ic52", 0x00001, 0x10000, CRC(39866869) SHA1(db0140dc813c35f0850d68454f510c30833f3984) )
+	ROM_LOAD32_BYTE( "gfx.ic4",  0x00002, 0x10000, CRC(4a89c11d) SHA1(2d3fd2a582feeb71bb19e45babbbf874778c42f0) )
+	ROM_LOAD32_BYTE( "gfx.ic5",  0x00003, 0x10000, CRC(b0b94294) SHA1(0bafcaf870982a3dac62e081dc1e8bec5968f1ba) )
+	ROM_LOAD32_BYTE( "gfx.ic49", 0x40000, 0x10000, CRC(7db7f0f1) SHA1(a19d5007dae15031fd41e84c77ff81e41be0c311) )
+	ROM_LOAD32_BYTE( "gfx.ic50", 0x40001, 0x10000, CRC(f48f94e1) SHA1(d841de5374288e98c48c59c86c66a643f26e95e6) )
+	ROM_LOAD32_BYTE( "gfx.ic2",  0x40002, 0x10000, CRC(a0b4615c) SHA1(f9df393c1f4a7b88fbc4c870da1819f36f29e111) )
+	ROM_LOAD32_BYTE( "gfx.ic3",  0x40003, 0x10000, CRC(f956392e) SHA1(e0da0c353067e32fc6015e84b00070a7c7fa1de9) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "tr13.bin",     0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
+	ROM_LOAD( "gfx.ic175", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used)
+	ROM_LOAD( "82s129.ic74", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used)
 ROM_END
 
 ROM_START( f1dream ) // N86614A-5 + N86614B-6 board combo
@@ -1232,14 +1332,22 @@ ROM_START( bballsa )
 ROM_END
 
 
+void tigeroad_state::init_tigeroadb()
+{
+	uint8_t *spriterom = memregion("spritegen")->base();
+	uint32_t length = memregion("spritegen")->bytes();
+
+	for (int i = 0; i < length; i++)
+		spriterom[i] = bitswap<8>(spriterom[i], 4, 5, 6, 7, 0, 1, 2, 3);
+}
 
 /***************************************************************************/
 
 
-GAME( 1987, tigeroad,  0,        tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "Capcom",                   "Tiger Road (US)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tigeroadu, tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, toramich,  tigeroad, toramich, toramich, tigeroad_state, empty_init, ROT0, "Capcom",                   "Tora e no Michi (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tigeroadb, tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "bootleg",                  "Tiger Road (US bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tigeroad,  0,        tigeroad, tigeroad, tigeroad_state, empty_init,     ROT0, "Capcom",                   "Tiger Road (US)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tigeroadu, tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init,     ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, toramich,  tigeroad, toramich, toramich, tigeroad_state, empty_init,     ROT0, "Capcom",                   "Tora e no Michi (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tigeroadb, tigeroad, tigeroad, tigeroad, tigeroad_state, init_tigeroadb, ROT0, "bootleg",                  "Tiger Road (US bootleg)",          MACHINE_SUPPORTS_SAVE )
 
 // F1 Dream has an Intel 8751 microcontroller for protection
 GAME( 1988, f1dream,  0,       f1dream,  f1dream, f1dream_state,  empty_init, ROT0, "Capcom (Romstar license)", "F-1 Dream",                  MACHINE_SUPPORTS_SAVE )

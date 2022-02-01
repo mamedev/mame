@@ -781,6 +781,30 @@ ROM_START(shaqattq2)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Machina Zois (hack of Shaq Attack)
+/-------------------------------------------------------------------*/
+ROM_START(mac_zois)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprommz.bin", 0x0000, 0x10000, CRC(7a967fd1) SHA1(c06e2aad9452150d92cfd3ba37b8e4a932cf4324))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(3b63f9c6) SHA1(b06ea3b8f7d3c4b22a8bbc687698654366c35f22) )
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(16a03261) SHA1(25f5a3d32d2ec80766381106445fd624360fea78))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1mz.bin", 0x00000, 0x80000, CRC(68ceeb43) SHA1(debe5a0683b1806c9813ba89a6438afb3eecb188) )
+	ROM_LOAD("arom2mz.bin", 0x80000, 0x40000, CRC(7dabc8ca) SHA1(ca6dc59891222f8534b0a2de8cd29c52e5b33efc) )
+	ROM_RELOAD(0x80000+0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e81e2928) SHA1(4bfe57efa99bb762e4de6c7e88e79b8c5ff57626))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Stargate (#742)
 /-------------------------------------------------------------------*/
 ROM_START(stargatp)
@@ -1381,3 +1405,4 @@ GAME(1995,  andretti,   0,        gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "
 GAME(1995,  andretti4,  andretti, gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti (rev.T4)",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  barbwire,   0,        gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Barb Wire",                                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  brooks,     0,        gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Brooks & Dunn (rev.T1)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2003,  mac_zois,   shaqattq, gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "Machina Zois Virtual Training Centre",      MACHINE_IS_SKELETON_MECHANICAL)

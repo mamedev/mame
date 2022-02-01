@@ -118,7 +118,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
 	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<ay31015_device> m_uart;

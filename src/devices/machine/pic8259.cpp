@@ -29,7 +29,7 @@
 
 ALLOW_SAVE_TYPE(pic8259_device::state_t); // allow save_item on a non-fundamental type
 
-void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	/* check the various IRQs */
 	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)

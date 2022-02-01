@@ -397,10 +397,12 @@ Notes:
                           Armadillo Racing 'AM1 Ver.A'
                           Armadillo Racing 'AM2 Ver.A'
                           Cyber Cycles     'CB2 Ver.C'
+                          Cyber Cycles     'CB1 Ver.C'
                           Dirt Dash        'DT2 Ver.B'
                           Prop Cycle       'PR2 Ver.A'
                           Time Crisis      'TS2 Ver.B'
                           Tokyo Wars       'TW2 Ver.A'
+                          Tokyo Wars       'TW1 Ver.A'
 
 Type 2
 SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
@@ -4915,6 +4917,60 @@ ROM_START( cybrcycc )
 	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x2000, CRC(57fbd7d3) SHA1(c93e0d7875f5e66a661aed757fb4a314fe2025c2) )
 ROM_END
 
+ROM_START( cybrcyccj )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "cb1ver-c.1", 0x00003, 0x100000, CRC(91166c69) SHA1(08e4d0d8226234b01b7d4fbc8ba2ade1ae409fe4) )
+	ROM_LOAD32_BYTE( "cb1ver-c.2", 0x00002, 0x100000, CRC(b2e25e15) SHA1(095df28601dbc98b8974cd99b9329312980eacaf) )
+	ROM_LOAD32_BYTE( "cb1ver-c.3", 0x00001, 0x100000, CRC(97fa2f39) SHA1(865e016553f733430aac70809b21a3b2914bb638) )
+	ROM_LOAD32_BYTE( "cb1ver-c.4", 0x00000, 0x100000, CRC(529bd227) SHA1(6d7979643d015ae388a4a93b9dccc7f43f93baff) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
+	ROM_LOAD( "cb1datab.8k", 0, 0x080000, CRC(e2404221) SHA1(b88810dd45aee8a5475c30806cdfded25fa14e0e) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "cb1scg0.12f", 0x200000*0, 0x200000,CRC(7aaca90d) SHA1(9808819db5d86d555a03bb20a2fbedf060d04f0e) ) /* identical to "cb1scg0.12l" */
+
+	ROM_REGION( 0x200000*7, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "cb1cg0.12b",  0x200000*0x0, 0x200000,CRC(762a47a0) SHA1(8a49c700dca7afec5d8d6a38fedcd3ad4b0e6713) ) /* identical to "cb1cg0.8d" */
+	ROM_LOAD( "cb1cg1.10d",  0x200000*0x1, 0x200000,CRC(df92c3e6) SHA1(302d7ee7e073a45e7baa948543bd30251f903a6d) ) /* identical to "cb1cg1.13b" */
+	ROM_LOAD( "cb1cg2.12d",  0x200000*0x2, 0x200000,CRC(07bc508e) SHA1(7675694d10b50e57bb10b350559bd321df75d1ea) ) /* identical to "cb1cg2.14b" */
+	ROM_LOAD( "cb1cg3.13d",  0x200000*0x3, 0x200000,CRC(50c86dea) SHA1(7837a1d2bd3ade470f7fbc732513dd598badd219) ) /* identical to "cb1cg3.16b" */
+	ROM_LOAD( "cb1cg4.14d",  0x200000*0x4, 0x200000,CRC(e93b8894) SHA1(4d28b557b7ed2667e6af9f970f3e99cda785b940) ) /* identical to "cb1cg4.18b" */
+	ROM_LOAD( "cb1cg5.16d",  0x200000*0x5, 0x200000,CRC(9ee610a1) SHA1(ebc7892b6a66461ca6b6b912a264da1594340b2d) ) /* identical to "cb1cg5.19b" */
+	ROM_LOAD( "cb1cg6.18a",  0x200000*0x6, 0x200000,CRC(ddc3b5cc) SHA1(34edffee9eb6fbf4a00fce0da34d9354b1a1155f) ) /* identical to "cb1cg6.18d" */
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "cb1ccrl.3d",  0x000000, 0x200000,CRC(2f171c48) SHA1(52b76213e37379b4a5cea7de40cf5396dc2998d8) ) /* identical to "cb1ccrl.7b" */
+	ROM_LOAD( "cb1ccrh.1d",  0x200000, 0x080000,CRC(86124b93) SHA1(f2cfd726313cbeff162d402a15de2360377630e7) ) /* identical to "cb1ccrh.5b" */
+
+	ROM_REGION( 0x80000*12, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "cb1ptrl0.18k", 0x80000*0x0, 0x80000,CRC(f1393a03) SHA1(c9e808601eef5839e6bff630e5f83380e073c5c0) )
+	ROM_LOAD( "cb1ptrl1.16k", 0x80000*0x1, 0x80000,CRC(2ad51de7) SHA1(efd102b960ca10cda70da84661acf61e4bbb9f00) )
+	ROM_LOAD( "cb1ptrl2.15k", 0x80000*0x2, 0x80000,CRC(78f77c0d) SHA1(5183a8909c2ac0a3d80e707393bcbb4441d79a3c) )
+	ROM_LOAD( "cb1ptrl3.14k", 0x80000*0x3, 0x80000,CRC(804bfb4a) SHA1(74b3fc3931265398e23605d3da7ca84a002da632) )
+	ROM_LOAD( "cb1ptrm0.18j", 0x80000*0x4, 0x80000,CRC(f4eece49) SHA1(3f34d1ae5986f0d340563ab0fb637bfdacb8712c) )
+	ROM_LOAD( "cb1ptrm1.16j", 0x80000*0x5, 0x80000,CRC(5f3cbd7d) SHA1(d00d0a96b71d6a3b98907c4ba7c702e549dd0adb) )
+	ROM_LOAD( "cb1ptrm2.15j", 0x80000*0x6, 0x80000,CRC(02c7e4af) SHA1(6a541a28163b1026a824f6f8aed05d0eb0c8ae93) )
+	ROM_LOAD( "cb1ptrm3.14j", 0x80000*0x7, 0x80000,CRC(ace3123b) SHA1(2b590ed967572d77b3cc6b37e341a5bdc55c762f) )
+	ROM_LOAD( "cb1ptru0.18f", 0x80000*0x8, 0x80000,CRC(58d35341) SHA1(a5fe00bdcf39521f0465743664ff0dd78be5d6e8) )
+	ROM_LOAD( "cb1ptru1.16f", 0x80000*0x9, 0x80000,CRC(f4d005b0) SHA1(0862ed1dd0818bfb765d97f1f9d996c321b0ec83) )
+	ROM_LOAD( "cb1ptru2.15f", 0x80000*0xa, 0x80000,CRC(68ffcd50) SHA1(5ca5f71b6b079fde14d76c869d211a815bffae68) )
+	ROM_LOAD( "cb1ptru3.14f", 0x80000*0xb, 0x80000,CRC(d89c1c2b) SHA1(9c25df696b2d120ce33d7774381460297740007a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "cb1wavea.2l", 0x000000, 0x400000, CRC(b79a624d) SHA1(c0ee358a183ba6d0835731dbdd191b64718fde6e) )
+	ROM_LOAD( "cb1waveb.1l", 0x800000, 0x200000, CRC(33bf08f6) SHA1(bf9d68b26a8158ea1abfe8428b7454cac25242c5) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x2000, CRC(57fbd7d3) SHA1(c93e0d7875f5e66a661aed757fb4a314fe2025c2) )
+ROM_END
+
 
 ROM_START( alpinerd )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
@@ -5344,6 +5400,63 @@ ROM_START( tokyowar )
 	ROM_LOAD32_BYTE( "tw2ver-a.2",   0x000002, 0x100000, CRC(12da84e3) SHA1(a9406d0b77f60ba930c30e60bf4b3656c8905585) )
 	ROM_LOAD32_BYTE( "tw2ver-a.3",   0x000001, 0x100000, CRC(7d42c516) SHA1(28c1596dd55c15207bbb41a8b9a5abc97abc2bc8) )
 	ROM_LOAD32_BYTE( "tw2ver-a.4",   0x000000, 0x100000, CRC(b904ed16) SHA1(773e11536e1b3fe4971608a63a8e6eca702f8667) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "tw1data.8k",   0x000000, 0x080000, CRC(bd046e4b) SHA1(162bc4ab69959ccab49fd69de291d34d472fb1c8) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "tw1scg0.12f",  0x000000, 0x200000, CRC(e3ec4daa) SHA1(f3a71ae9820d62075b814ffa2fecf3343ae09ffe) )
+	ROM_LOAD( "tw1scg1.10f",  0x200000, 0x200000, CRC(b18a06e9) SHA1(ecf6a1e11603b8ea5119a036a57595dea021d778) )
+	ROM_LOAD( "tw1scg2.8f",   0x400000, 0x200000, CRC(36f8c3d8) SHA1(d5c965d5cdd258c77b9db3137ce33404a5a3641c) )
+	ROM_LOAD( "tw1scg3.7f",   0x600000, 0x200000, CRC(8e14d013) SHA1(ca63105a5c07bb9653499eef7a757db52612b59b) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "tw1cg0.8d",    0x000000, 0x200000, CRC(98b9b070) SHA1(cb920a34700dab330c967cc634717134c04b7e1d) )
+	ROM_LOAD( "tw1cg1.10d",   0x200000, 0x200000, CRC(f96a723a) SHA1(5ba14963a4c51c875ac8d3b42049bc334de90038) )
+	ROM_LOAD( "tw1cg2.12d",   0x400000, 0x200000, CRC(573e9ded) SHA1(815bda1ac000532c915c2d65ffdb04fee6fa8201) )
+	ROM_LOAD( "tw1cg3.13d",   0x600000, 0x200000, CRC(302d5c74) SHA1(5a823f6842cf0f79eb93da47d5bf8c5f51e420db) )
+	ROM_LOAD( "tw1cg4.14d",   0x800000, 0x200000, CRC(ab8aa1df) SHA1(355192d999f493e0761fbc822fa9b30c33d8e1c4) )
+	ROM_LOAD( "tw1cg5.16d",   0xa00000, 0x200000, CRC(5063f3d0) SHA1(ad8dd2f4184373a3a3ca748b411a5eec1835dc97) )
+	ROM_LOAD( "tw1cg6.18d",   0xc00000, 0x200000, CRC(d764027c) SHA1(5cbf93392683885c220628936ba50c09cb40fcfb) )
+	ROM_LOAD( "tw1cg7.19d",   0xe00000, 0x200000, CRC(12da0a43) SHA1(99287348a5219146bcd3e61fde3f2bc26b0c5a25) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "tw1ccrl.3d",   0x000000, 0x200000, CRC(d08f5794) SHA1(336a97a2b060505e259e3bcedb9eb8aa4ea8815e) )
+	ROM_LOAD( "tw1ccrh.1d",   0x200000, 0x080000, CRC(ad17e693) SHA1(4f06dc82c03159894fb8e10383862920f94563b1) )
+
+	ROM_REGION( 0x600000, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "tw1ptrl0.18k", 0x000000, 0x080000, CRC(44ac5e86) SHA1(5e42db58f2e352c0fe5e49588a9283817dd15ab1) )
+	ROM_LOAD( "tw1ptrl1.16k", 0x080000, 0x080000, CRC(3c769860) SHA1(19b32c3d262f2a9d07354fbd6ac6be97b05f176e) )
+	ROM_LOAD( "tw1ptrl2.15k", 0x100000, 0x080000, CRC(6e94103c) SHA1(ee90b77939a9f5780ce271882133cdf977eb643e) )
+	ROM_LOAD( "tw1ptrl3.14k", 0x180000, 0x080000, CRC(e3ce5eb2) SHA1(4e15a6f630be15eb017cd51c5e7901db3138a061) )
+	ROM_LOAD( "tw1ptrm0.18j", 0x200000, 0x080000, CRC(e170cea2) SHA1(ca259508d76fdab97a9d0502f871f0e560e6c308) )
+	ROM_LOAD( "tw1ptrm1.16j", 0x280000, 0x080000, CRC(36a32237) SHA1(f46851dc5c094810ddc42d56310a9f85908bf715) )
+	ROM_LOAD( "tw1ptrm2.15j", 0x300000, 0x080000, CRC(c426c278) SHA1(64232ac3c1649e0d0adb4b03e58b8b5ea4013f83) )
+	ROM_LOAD( "tw1ptrm3.14j", 0x380000, 0x080000, CRC(d9b9a651) SHA1(0c49a051526081149d894d629f19cb0f2b66a698) )
+	ROM_LOAD( "tw1ptru0.18f", 0x400000, 0x080000, CRC(62a9e9fb) SHA1(24739adba029b0acf2d7078962c9d01098a29a6c) )
+	ROM_LOAD( "tw1ptru1.16f", 0x480000, 0x080000, CRC(2fd36177) SHA1(368b915261d914be01ae9daeb52571bead52d14d) )
+	ROM_LOAD( "tw1ptru2.15f", 0x500000, 0x080000, CRC(ceacb1c9) SHA1(b86cf576e16bbe26ad0d6d6df8bf28d0071c25e2) )
+	ROM_LOAD( "tw1ptru3.14f", 0x580000, 0x080000, CRC(939044c2) SHA1(f4c1c0a1c2f07ca7f784d59ef4162a2a6a8bbc43) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "tw1wavea.2l",  0x000000, 0x400000, CRC(ebce6366) SHA1(44ebe90ff3c7af5bebbf1baba3b7a2b1863daebb) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x2000, CRC(e8bd7d09) SHA1(7e59017b9d5eb78984b4f177b50a4727ad72a623) )
+ROM_END
+
+ROM_START( tokyowarj )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "tw1ver-a.1",   0x000003, 0x100000, CRC(29b38f05) SHA1(d55a34dce5f61d72e3edc331d3a346397069a5fc) )
+	ROM_LOAD32_BYTE( "tw1ver-a.2",   0x000002, 0x100000, CRC(5f8e2e9e) SHA1(14513480fed483e5381ac5bf4467a1c17b0d9e75) )
+	ROM_LOAD32_BYTE( "tw1ver-a.3",   0x000001, 0x100000, CRC(17146e7f) SHA1(0fd270152eef1966e0960531554cbe115668205f) )
+	ROM_LOAD32_BYTE( "tw1ver-a.4",   0x000000, 0x100000, CRC(12698e2a) SHA1(51761ea96cb458f56d832cd233afbc374ded7f20) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -5976,6 +6089,7 @@ GAME( 1994, alpinerc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alp
 GAME( 1994, alpinerjc, alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b,  0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, cybrcycc,  0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, cybrcyccj, cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
 GAME( 1995, dirtdash,  0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
 GAME( 1995, dirtdasha, dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, dirtdashj, dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
@@ -5985,6 +6099,7 @@ GAME( 1996, propcycl,  0,        propcycl,  propcycl,  namcos22s_state, init_pro
 GAME( 1996, propcyclj, propcycl, propcycl,  propcycl,  namcos22s_state, init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
 GAME( 1996, alpinesa,  0,        alpinesa,  alpiner,   namcos22s_state, init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
 GAME( 1996, tokyowar,  0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
+GAME( 1996, tokyowarj, tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
 GAME( 1996, aquajet,   0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a,  alpinr2b, alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05

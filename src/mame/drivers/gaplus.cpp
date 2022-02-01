@@ -210,15 +210,15 @@ void gaplus_base_state::machine_reset()
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_NAMCOIO0_RUN:
-		namcoio0_run(ptr, param);
+		namcoio0_run(param);
 		break;
 	case TIMER_NAMCOIO1_RUN:
-		namcoio1_run(ptr, param);
+		namcoio1_run(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gaplus_base_state::device_timer");

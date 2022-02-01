@@ -85,7 +85,7 @@ void gt913_device::map(address_map &map)
 	// (specifically, the pins are also used for key velocity detection, so port 3 is probably used by very few models, if any at all)
 	map(0xfff4, 0xfff4).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	// unknown - ctk551 sets/clears a few bits on boot and before going to sleep
-//	map(0xfff5, 0xfff5).noprw();
+//  map(0xfff5, 0xfff5).noprw();
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)

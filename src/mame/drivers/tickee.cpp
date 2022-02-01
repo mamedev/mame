@@ -102,7 +102,7 @@ private:
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -133,18 +133,18 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *
  *************************************/
 
-void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_TRIGGER_GUN_INTERRUPT:
-		trigger_gun_interrupt(ptr, param);
+		trigger_gun_interrupt(param);
 		break;
 	case TIMER_CLEAR_GUN_INTERRUPT:
-		clear_gun_interrupt(ptr, param);
+		clear_gun_interrupt(param);
 		break;
 	case TIMER_SETUP_GUN_INTERRUPTS:
-		setup_gun_interrupts(ptr, param);
+		setup_gun_interrupts(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in tickee_state::device_timer");

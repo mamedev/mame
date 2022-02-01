@@ -5933,7 +5933,7 @@ ROM_END
 ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM board ID# 834-13600-01 RCS EXP (Export), Security board ID# 837-13599-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	
+
 	// Marked as BAD_DUMP because a single instruction appears to be faulty (a bit is flipped) requiring a patch in the SuperModel emulator to run
 	// It is possible only one of these is faulty, but at a minimum these 4 should be redumped, and ideally the whole set should be checked.
 	ROM_LOAD64_WORD_SWAP( "epr-21435.17",  0x000006, 0x200000, BAD_DUMP CRC(9b169446) SHA1(285cbe5afd439d83c50f0499a878f71b8e5b94e5) )

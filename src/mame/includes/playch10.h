@@ -94,8 +94,8 @@ private:
 	void cboard_vrom_switch_w(uint8_t data);
 	void eboard_rom_switch_w(offs_t offset, uint8_t data);
 	void gboard_rom_switch_w(offs_t offset, uint8_t data);
-	void iboard_rom_switch_w(uint8_t data);
 	void hboard_rom_switch_w(offs_t offset, uint8_t data);
+	void iboard_rom_switch_w(uint8_t data);
 	void playch10_videoram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -180,8 +180,6 @@ private:
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
 	int m_mmc1_rom_mask;
-	int m_gboard_scanline_counter;
-	int m_gboard_scanline_latch;
 	int m_gboard_banks[2];
 	int m_gboard_4screen;
 	int m_gboard_last_bank;

@@ -9,6 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "http.h"
+#include "server_http.hpp"
+#include "server_ws.hpp"
 
 #ifdef __sun
 #define ASIO_DISABLE_DEV_POLL

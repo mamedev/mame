@@ -146,7 +146,7 @@ void vino_device::device_add_mconfig(machine_config &config)
 	IMAGE_AVIVIDEO(config, m_avivideo);
 }
 
-void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_FETCH_CHA || id == TIMER_FETCH_CHB)
 		fetch_pixel((int)id);

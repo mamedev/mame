@@ -741,8 +741,6 @@ protected:
 	virtual void device_start() override;
 
 	u8 m_reg[4];
-
-private:
 	u8 m_count;
 };
 
@@ -759,6 +757,41 @@ public:
 
 protected:
 	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+};
+
+
+// ======================> nes_bmc_jy302_device
+
+class nes_bmc_jy302_device : public nes_bmc_hik8_device
+{
+public:
+	// construction/destruction
+	nes_bmc_jy302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+};
+
+
+// ======================> nes_bmc_kc885_device
+
+class nes_bmc_kc885_device : public nes_bmc_hik8_device
+{
+public:
+	// construction/destruction
+	nes_bmc_kc885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	required_ioport m_jumper;
 };
 
 
@@ -1212,6 +1245,8 @@ DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device)
 DECLARE_DEVICE_TYPE(NES_BMC_JY208,     nes_bmc_jy208_device)
+DECLARE_DEVICE_TYPE(NES_BMC_JY302,     nes_bmc_jy302_device)
+DECLARE_DEVICE_TYPE(NES_BMC_KC885,     nes_bmc_kc885_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SFC12,     nes_bmc_sfc12_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device)
 DECLARE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device)

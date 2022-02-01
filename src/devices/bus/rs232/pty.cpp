@@ -79,7 +79,7 @@ void pseudo_terminal_device::device_reset()
 	queue();
 }
 
-void pseudo_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pseudo_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

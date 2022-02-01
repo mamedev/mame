@@ -9,7 +9,7 @@ disks. It could have up to 224k of ram.  Consists of:
     Electronics Module 6580
     Display 3300
     Keyboard 5330 [a "beamspring"-type]
-    Dual Diskette Unit 6360
+    Diskette Unit 6360
 Optional:
     Printers: 5215, 5218, 5228
     Printer Sharing feature
@@ -18,7 +18,8 @@ Optional:
     66-line display and adapter (800x1056 px, 8x16 character cell)
 
 
-All chips have IBM part numbers on them.  F.e. on system board:
+    All chips have IBM part numbers on them.  F.e. on system board:
+
     8493077 - 8086
     4178619 - 8251A
     4178617 - 8257-5
@@ -27,7 +28,14 @@ All chips have IBM part numbers on them.  F.e. on system board:
     4178625 - 8253-5
 
 
-IRQ levels per PSM p. 6-5
+    Useful parts of PSM Feb83 (document / PDF page numbers):
+
+    - 6-3/87 -- bus buffers ... separate ... into four sections during BAT
+    - 6-5/89 -- irq levels
+    - 6-6/90 -- timer tick is 50ms
+
+    IRQ levels:
+
     0   incoming data for printer sharing/3277 DE
     1   transfer data to commo data link
     2   printer and mag card data xfer
@@ -36,10 +44,11 @@ IRQ levels per PSM p. 6-5
     5   (not in use)
     6   software timer [50 ms period]
     7   error on commo data link
-    nmi "or when a dump switch operation is initiated" ["memory record" button]
+    NMI "when a dump switch operation is initiated" ["memory record" button]
 
 
 To do:
+
 - verify all frequency sources, document ROM revisions
 - memory size options
 - bus errors, interrupts
@@ -47,13 +56,12 @@ To do:
 - 92-key keyboard variant, keyboard click/beep, keyboard layouts
 
 - 25-line video board (instant scroll, sub/superscripts, graphics mode)
-- 66-line video board
+- 66-line video board (apparently requires 'new' ROM)
 
-- either emulate floppy board, or complete its HLE (drive select, etc.)
-- add support for 8" drives with no track 0 sensor
-  (recalibrate command is expected to return 0x70 in ST0)
-- double density floppies
+- floppy adapter board, single and double density floppies
 - "memory record" (system dump) generation to floppies
+- printer
+- speaker
 
 - pass BAT with no errors (Basic Assurance Test)
 - pass RNA with no errors (Resident Non-Automatic Test)
@@ -78,6 +86,64 @@ Wanted:
 Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 and 5675827
 "IBM Displaywriter System Printer Guide," Order No. S544-0861-2, Copyright 1980.
 "Displaywriter System Product Support Manual," Order No. S241-6248-1, Copyright 1980
+
+
+Notes on floppy drive:
+
+    Diskette Unit 6360 models -010, -011 have Type 1D (SS/SD) drives;
+    models -020, -021 -- Type 2D (DS/DD).  Each drive has "file control card".
+
+
+    Useful parts of PSM Feb83 (pdf page numbers):
+
+    - 6-7/91 -- brief description
+    - 7-14..20/116..122 -- more detailed description
+    - 8-13/161 -- S1 (internal diskette signal cable), system board side
+    - 8-16/164 -- 5 (internal diskette signal cable), panel side
+    - 8-32/180 -- B1 (diskette signal cable), diskette adapter side
+    - 9-10..12/202..204 -- description of RNA tests
+
+
+    S1 connector has more signals than B1.  Only these are present in B1:
+
+    Address Bit 1-4 -- from host
+    Data Bus Bit 0-7 -- bidirectional
+    Interrupt 4 -- to host
+    I/O Read -- from host
+    I/O Write -- from host
+    DMA Request -- to host
+    DMA Acknowledge -- from host
+    Terminal Count -- from host
+    Interface Ready -- to host
+    Diskette Select -- from host
+
+
+    Signals between adapter board and file control cards:
+
+    from/to 765:
+
+    write data, inner tracks, write gate, erase gate ->
+    write/erase enable, file data <-
+
+    from/to MCU:
+
+    drive present -> ground
+    diskette sense <- always ground on 1D; 2D disk index hole sends +5V
+    head engage ->
+    index (1.5 to 3.0 ms pulse) <-
+    select head, switch filter (2D drive) ->
+
+
+    RNA test L performs in the following sequence:
+
+    1. PORs the Diskette Adapter Cards
+    2. Samples the Diskette Index Pulse
+    3. Checks the Drive Set Ready Signal
+    4. Engages the Read/Write Head
+    5. Checks the Write/Erase Enable Line (This ensures the system will not write on the customer's diskette.)
+    6. Reads the Track ID
+    7. Disengages the Head.
+
 
 ****************************************************************************/
 
@@ -147,7 +213,6 @@ public:
 		, m_fdc(*this, UPD765_TAG)
 		, m_flop(*this, UPD765_TAG ":%u", 0U)
 		, m_p_chargen(*this, "chargen")
-		, m_io_dump(*this, "DUMP")
 		, m_leds(*this, "led%u", 5U)
 	{ }
 
@@ -156,7 +221,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	void pic_latch_w(uint16_t data);
@@ -197,7 +261,7 @@ private:
 
 	uint16_t m_gate;
 	uint8_t m_p40, m_p4a, m_p50, m_e000;
-	uint8_t m_kb_data, m_ppi_c;
+	uint8_t m_kb_data, m_ppi_c, m_led_state;
 	bool m_kb_data_bit, m_kb_strobe, m_kb_clock;
 
 	util::fifo<uint8_t, 4> m_floppy_mcu_sr, m_floppy_mcu_cr;
@@ -222,7 +286,6 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_flop;
 	required_region_ptr<u8> m_p_chargen;
-	required_ioport m_io_dump;
 	output_finder<4> m_leds;
 };
 
@@ -334,9 +397,13 @@ void ibm6580_state::video_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
+	// some kind of gate
 	case 2:
-		// some kind of gate
-		m_e000 = data;
+		m_e000 = true;
+		break;
+
+	case 4:
+		m_e000 = false;
 		break;
 	}
 }
@@ -348,12 +415,13 @@ uint8_t ibm6580_state::video_r(offs_t offset)
 	switch (offset)
 	{
 	case 8:
-		data = 1;   // 25-line video board ID.  66-line is 0x40.
-		data |= (m_screen->hblank() ? 8 : 0);
-		data |= (m_screen->vblank() ? 4 : 0);
-		// pure guesswork.  0x2, 0x10 and 0x20 are unknown video signals.
-		// 0x20 cannot be zero when 0x10 is zero.
-		data |= ((m_screen->vpos() < 2) ? 2 : 0);
+		// 25-line video board ID.  66-line is 0x40.
+		data = 1;
+		// pure guesswork.  0x20 cannot be zero when 0x10 is zero.  0x2 is unknown, may be vsync.
+		data |= (m_screen->hblank() ? 4 : 0);
+		data |= (m_screen->vblank() ? 8 : 0);
+		data |= ((m_screen->frame_number() & 1) ? 6 : 0);
+		data |= ((m_screen->vpos() > 196) ? 0x80 : 0);
 		if (m_e000) {
 			data |= (m_screen->vblank() ? 0x20 : 0);
 			data |= (m_screen->vblank() ? 0 : 0x10);
@@ -372,8 +440,7 @@ WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 //  if (state)
 //      m_pic8259->ir6_w(state);
 
-	if (m_io_dump->read())
-		m_p40 |= 4;
+	m_p40 |= m_kbd->memory_record_r();
 }
 
 void ibm6580_state::pic_latch_w(uint16_t data)
@@ -413,6 +480,12 @@ void ibm6580_state::led_w(uint8_t data)
 	if (data & 0xf)
 		return;
 
+	if (data == m_led_state)
+		return;
+
+	m_led_state = data;
+
+#ifdef VERBOSE
 	switch (data >> 4)
 	{
 	case 0x1:
@@ -463,6 +536,7 @@ void ibm6580_state::led_w(uint8_t data)
 //      printf ("LED 0x%08x: unknown\n", data);
 		break;
 	}
+#endif
 }
 
 void ibm6580_state::ppi_c_w(uint8_t data)
@@ -781,13 +855,6 @@ void ibm6580_state::ibm6580_io(address_map &map)
 }
 
 
-/* Input ports */
-static INPUT_PORTS_START( ibm6580 )
-	PORT_START("DUMP")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Memory Record") PORT_CODE(KEYCODE_PRTSCR) PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
-INPUT_PORTS_END
-
-
 uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t sy=0,ma=25;
@@ -857,7 +924,7 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					if (attr & 0x20)
 						ca |= (ra < 13) ? ra + 3 : 0;
 					// subscript
-					if (attr & 0x20)
+					if (attr & 0x40)
 						ca |= (ra > 2) ? ra - 3 : 0;
 #endif
 
@@ -901,14 +968,16 @@ void ibm6580_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
-	m_fdc->set_rate(500000); // XXX workaround
+	m_fdc->set_rate(500000); // FIXME: workaround
 
 	m_leds.resolve();
+
+	memset(m_p_videoram, 0x0, 0x1000);
 }
 
 void ibm6580_state::machine_reset()
 {
-	m_p40 = m_p4a = m_p50 = m_gate = m_e000 = m_ppi_c = m_floppy_sr = 0;
+	m_p40 = m_p4a = m_p50 = m_gate = m_e000 = m_ppi_c = m_floppy_sr = m_led_state = 0;
 	m_kb_data_bit = false;
 	m_kb_clock = false;
 	m_kb_strobe = true;
@@ -917,8 +986,7 @@ void ibm6580_state::machine_reset()
 
 	m_pit8253->set_clockin(0, 0.0);
 
-	if (m_io_dump->read())
-		m_p40 |= 4;
+	m_p40 |= m_kbd->memory_record_r();
 
 	m_flop[0]->get_device()->mon_w(!m_flop[0]->get_device()->exists());
 	m_flop[1]->get_device()->mon_w(!m_flop[1]->get_device()->exists());
@@ -926,11 +994,6 @@ void ibm6580_state::machine_reset()
 	m_floppy_mcu_sr.clear();
 	m_floppy_mcu_cr.clear();
 	m_floppy_mcu_cr_fifo = 0;
-}
-
-void ibm6580_state::video_start()
-{
-	memset(m_p_videoram, 0x0, 0x1000);
 }
 
 static void dw_floppies(device_slot_interface &device)
@@ -971,6 +1034,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	PIT8253(config, m_pit8253, 0);
+	m_pit8253->out_handler<0>().set([this] (int state) { m_p40 = (m_p40 & ~1) | state; });
 
 	DW_KEYBOARD(config, m_kbd, 0);
 	m_kbd->out_data_handler().set(FUNC(ibm6580_state::kb_data_w));
@@ -1028,6 +1092,19 @@ ROM_START( ibm6580 )
 	ROMX_LOAD("8493823_8k.bin", 0x0001, 0x2000, CRC(aa5524c0) SHA1(9938f2a82828b17966cb0be7fdbf73803c1f10d3), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("8493822_8k.bin", 0x0000, 0x2000, CRC(90e7e73a) SHA1(d3ee7a4d2cb8f4920b5d95e8c7f4fef06599d24e), ROM_SKIP(1) | ROM_BIOS(0))
 
+	// disable halts in video test
+	ROM_FILL(0x501,1,0x90)
+	ROM_FILL(0x51b,1,0x90)
+	ROM_FILL(0x52f,1,0x90)
+	ROM_FILL(0x587,1,0x90)
+	ROM_FILL(0x5a0,1,0x90)
+	ROM_FILL(0x5a6,1,0x90)
+	ROM_FILL(0x5f4,1,0x90)
+	ROM_FILL(0x609,1,0x90)
+
+	// disable rom checksum halt
+	ROM_FILL(0x2027,1,0x01)
+
 	ROM_SYSTEM_BIOS(1, "new", "new bios - 1983?")
 	// was downloaded via DDT86
 	ROMX_LOAD( "dwrom16kb.bin", 0x0000, 0x4000, BAD_DUMP CRC(ced87929) SHA1(907a46f288809bc93a1f59f3fbef18bd44be42d9), ROM_BIOS(1))
@@ -1038,5 +1115,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
-COMP( 1980, ibm6580, 0,      0,      ibm6580, ibm6580, ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
+COMP( 1980, ibm6580, 0,      0,      ibm6580, 0,     ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)

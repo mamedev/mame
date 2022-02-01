@@ -2875,6 +2875,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ibmcom1">
+		<description>Asynchronous Communications Support (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<!-- Bad dump, DOS already copied and extra files added -->
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="fcc34ee6" sha1="7ff482ca3ceacb05e647123fd107cc666d08a6d4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbmovie">
 		<description>Banner Blue Movie Guide</description>
 		<year>1991</year>
@@ -3123,6 +3136,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="diag100">
+		<description>Diagnostics (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="163840">
+				<rom name="diags100.img" size="163840" crc="6a98472a" sha1="6c0e360ba0dcea67ad7828f00dd08d324ceea6dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="easypc">
 		<description>Easy-PC Demonstrator for Printed Circuit Boards and Schematics</description>
 		<year>1991</year>
@@ -3132,6 +3157,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="easy-pc demonstrator for printed circuit boards and schematics (rev i0123).img" size="368640" crc="1e105d54" sha1="a63629b56539a1d52fdbe25642a71a860ad89e7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easywr1">
+		<description>EasyWriter (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="51789">
+				<rom name="EASYWRIT.IMD" size="51789" crc="0c43b9bc" sha1="9147aabf6e49a8d6979d25325e151cac5617953f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3272,6 +3309,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Printgraph, Translate &amp; Help Disk"/>
 			<dataarea name="flop" size = "737280">
 				<rom name="Lotus-Amstel-2.img" size="737280" crc="6ba54dce" sha1="8d5be21d71f30372271e336c7526b7febde6a74e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masm1">
+		<description>Macro Assembler (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="163840">
+				<rom name="Disk01.img" size="163840" crc="aa2d9e46" sha1="90b6378332404f6185b39322a6fedc6e7e62d99e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3435,6 +3484,28 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Subito 3 - Wordprocessor Io Scrivo"/>
 			<dataarea name="flop" size = "737280">
 				<rom name="Per Cominciare Subito 3.dsk" size="737280" crc="9e258d1b" sha1="f27f6b9831c821a65cd79b7e8dbb0dd469e9a06d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascom1">
+		<description>Pascal Compiler (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<!-- Origin: WinWorld -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="badec3d7" sha1="25f09731cd2e6939aabcb42612084c3e8c7ba009"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk02.img" size="163840" crc="d33c8051" sha1="3be06495c2c9610899822b53e7b36e65ac13bb7c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk03.img" size="163840" crc="9ca6270a" sha1="c3eeab648d93874286c1cdbf59aac67abc74721a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3926,6 +3997,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="typtut">
+		<description>Typing Tutor (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<!-- Bad dump, DOS already copied and user profiles created -->
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="4692f500" sha1="caf202708031bf740cf6959835f0327414078558" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="videocmp">
 		<description>Video Companion: The Software (Spring '92 Edition)</description>
 		<year>1992</year>
@@ -3961,6 +4045,21 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="161562">
 				<rom name="visicalc.imd" size="161562" crc="23089a93" sha1="70f3914e07c52657294fe618a341c25f8c423189"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vc156y0" supported="no">
+		<description>VisiCalc (VC-156Y0-IBM)</description>
+		<year>1981</year>
+		<publisher>Personal Software</publisher>
+		<!-- Origin: WinWorld, SCP image converted to MFM using HxC 2.5.6.6 -->
+		<!-- Doesn't work, gives either fake "Bad command or file name" error (failed copy protection check)
+		     or "Disk read error" -->
+		<!-- Tested working on 86Box v3.0 -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1639095">
+				<rom name="disk01.mfm" size="1639095" crc="210692c8" sha1="d4fda94c9dd65a81cee460410e0f86b3b42cae05"/>
 			</dataarea>
 		</part>
 	</software>

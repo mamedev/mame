@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "r65c02.h"
+#include "w65c02s.h"
 
-class st2xxx_device : public r65c02_device {
+class st2xxx_device : public w65c02s_device {
 public:
 	enum {
 		ST_PAOUT = M6502_IR + 1,
@@ -91,9 +91,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_reset() override;
 
-	virtual void do_exec_full() override;
-	virtual void do_exec_partial() override;
-
 	virtual u16 st2xxx_ireq_mask() const = 0;
 	virtual const char *st2xxx_irq_name(int i) const = 0;
 	virtual u8 st2xxx_pmcr_mask() const = 0;
@@ -133,11 +130,12 @@ protected:
 	void init_lcd_timer(u16 ireq);
 	void save_common_registers();
 
-	u8 read_vector(u16 adr) { return downcast<mi_st2xxx &>(*mintf).read_vector(adr); }
-	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
+	virtual u8 read_vector(u16 adr) override;
+	virtual void end_interrupt() override { set_irq_service(false); }
 
+	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
 	void update_irq_state() { irq_state = (m_ireq & m_iena) != 0; }
-	u8 acknowledge_irq();
+	u8 active_irq_level() const;
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);
 	TIMER_CALLBACK_MEMBER(lcd_interrupt);
@@ -242,14 +240,6 @@ protected:
 	u8 bdiv_r();
 	void bdiv_w(u8 data);
 
-#define O(o) void o ## _full(); void o ## _partial()
-
-	O(brk_st_imp);
-	O(rti_st_imp);
-	O(reset_st);
-
-#undef O
-
 	address_space_config m_data_config;
 
 	devcb_read8::array<7> m_in_port_cb;
@@ -279,6 +269,7 @@ protected:
 
 	u16 m_ireq;
 	u16 m_iena;
+	u8 m_irq_level;
 
 	u16 m_lssa;
 	u8 m_lvpw;

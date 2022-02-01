@@ -81,7 +81,7 @@ void ibm21s851_device::device_reset()
 	m_regs[REG_COUNT_OFFS] |= 0x0b;     // 11 registers following the standard block on 21S851
 }
 
-void ibm21s85x_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ibm21s85x_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_RESET)
 	{

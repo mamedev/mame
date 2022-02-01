@@ -37,15 +37,15 @@ driver by Chris Moore
  *
  *************************************/
 
-void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_CLEAR_SCREEN_DONE:
-		clear_screen_done_callback(ptr, param);
+		clear_screen_done_callback(param);
 		break;
 	case TIMER_VIA_IRQ_DELAYED:
-		via_irq_delayed(ptr, param);
+		via_irq_delayed(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gameplan_state::device_timer");

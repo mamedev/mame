@@ -972,7 +972,7 @@ void pit8254_device::readback_command(uint8_t data)
 			m_counter[timer]->readback(read_command);
 }
 
-void pit_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pit_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update();
 	switch (id)

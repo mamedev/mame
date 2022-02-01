@@ -206,7 +206,7 @@ geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machi
 /*
     Called by the poll timer
 */
-void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id==0)
 	{

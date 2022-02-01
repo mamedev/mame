@@ -2003,7 +2003,7 @@ void seibuspi_state::sys386f(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
 	/* sound hardware */
-	 // Single PCBs only output mono sound
+	// Single PCBs only output mono sound
 	SPEAKER(config, "mono").front_center();
 
 	YMZ280B(config, "ymz", XTAL(16'384'000)).add_route(ALL_OUTPUTS, "mono", 1.0);

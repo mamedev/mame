@@ -45,7 +45,7 @@ protected:
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 private:

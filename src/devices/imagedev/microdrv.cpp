@@ -106,7 +106,7 @@ void microdrive_image_device::call_unload()
 		memset(m_right.get(), 0, MDV_IMAGE_LENGTH / 2);
 }
 
-void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_bit_offset++;
 

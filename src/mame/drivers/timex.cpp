@@ -530,7 +530,7 @@ void ts2068_state::ts2068_io(address_map &map)
 	map(0xf4, 0xf4).rw(FUNC(ts2068_state::port_f4_r), FUNC(ts2068_state::port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(FUNC(ts2068_state::spectrum_port_fe_r), FUNC(ts2068_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(ts2068_state::spectrum_ula_r), FUNC(ts2068_state::spectrum_ula_w)).select(0xff00);
 	map(0xff, 0xff).rw(FUNC(ts2068_state::port_ff_r), FUNC(ts2068_state::port_ff_w)).mirror(0xff00);
 }
 
@@ -573,7 +573,7 @@ void tc2048_state::port_ff_w(offs_t offset, uint8_t data)
 
 void tc2048_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(tc2048_state::spectrum_port_fe_r), FUNC(tc2048_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x00, 0x00).rw(FUNC(tc2048_state::spectrum_ula_r), FUNC(tc2048_state::spectrum_ula_w)).select(0xfffe);
 	map(0xff, 0xff).rw(FUNC(tc2048_state::port_ff_r), FUNC(tc2048_state::port_ff_w)).mirror(0xff00);
 }
 

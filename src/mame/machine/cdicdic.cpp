@@ -1061,8 +1061,8 @@ void cdicdic_device::process_disc_sector()
 
 			for (int j = 0; j < 3; j++)
 			{
-				*toc_buffer++ = 0x01;		// Track type (CD-DA)
-				*toc_buffer++ = track_bcd;	// Track number
+				*toc_buffer++ = 0x01;       // Track type (CD-DA)
+				*toc_buffer++ = track_bcd;  // Track number
 				*toc_buffer++ = audio_mins_bcd;
 				*toc_buffer++ = audio_secs_bcd;
 				*toc_buffer++ = audio_frac_bcd;

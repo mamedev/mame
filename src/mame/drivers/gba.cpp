@@ -312,7 +312,7 @@ void gba_state::dma_exec(int ch)
 
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (uint32_t)m_dma_timer[ch]);
 //  m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	dma_complete(nullptr, ch);
+	dma_complete(ch);
 }
 
 void gba_state::audio_tick(int ref)

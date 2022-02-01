@@ -943,7 +943,7 @@ ROM_END
 /* cust  */GAME( 1982, rockyf,   rocky,   gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME( 1982, spirit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1982, punk,     0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME( 1983, krullp,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1983, qbquest,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1983, sorbit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)

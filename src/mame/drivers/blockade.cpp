@@ -62,7 +62,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -455,7 +455,7 @@ void blockade_state::machine_reset()
 	m_coin_inserted = 0;
 }
 
-void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// resume cpu, on the real system, this is connected the READY input
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);

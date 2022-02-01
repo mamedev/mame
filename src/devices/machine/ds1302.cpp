@@ -132,7 +132,7 @@ void ds1302_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void ds1302_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds1302_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!CLOCK_HALT)
 	{

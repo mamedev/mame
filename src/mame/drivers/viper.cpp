@@ -111,7 +111,7 @@
                             but this part of memory is never written to after its initial clearing on boot.
                             If 0xffff is placed at 0x157d4ee then the game will pass the RTC check.
                             The game will later complain about "Hardware Error: Security Key Error" if you try starting the game.
-        code1d,b            Can boot but crashes randomly and quickly so it's hard to do anything.
+        code1d,b,a          Can boot but crashes randomly and quickly so it's hard to do anything.
 
         mocapglf            Security code error
         sscopex,sogeki      Graphics very heavily glitched. Gun controller is not emulated.
@@ -2866,6 +2866,19 @@ ROM_START(code1db) //*
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1da) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("m48t58_uaa.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "922uaa02", 0, SHA1(795d82d51a37f197c36366cb36a2dfa8797e5f9f) )
 ROM_END
 
 ROM_START(gticlub2) //*

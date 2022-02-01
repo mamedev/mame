@@ -620,12 +620,12 @@ void pmd85_state::mato_io_w(offs_t offset, uint8_t data)
 	}
 }
 
-void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_CASSETTE:
-		cassette_timer_callback(ptr, param);
+		cassette_timer_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pmd85_state::device_timer");

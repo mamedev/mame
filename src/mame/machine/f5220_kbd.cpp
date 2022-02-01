@@ -227,7 +227,7 @@ void f5220_kbd_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void f5220_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void f5220_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	logerror("Reset\n");
 

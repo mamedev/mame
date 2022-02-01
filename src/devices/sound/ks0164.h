@@ -30,7 +30,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;

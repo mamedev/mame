@@ -404,7 +404,7 @@ static void prof80_floppies(device_slot_interface &device)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void prof80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void prof80_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

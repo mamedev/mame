@@ -111,7 +111,7 @@ private:
 
 	void m68k_mem(address_map &map);
 
-	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 uint16_t symbolics_state::buserror_r()
@@ -281,12 +281,12 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-/*void symbolics_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+/*void symbolics_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
     switch (id)
     {
     case TIMER_OUTFIFO_READ:
-        outfifo_read_cb(ptr, param);
+        outfifo_read_cb(param);
         break;
     default:
         throw emu_fatalerror("Unknown id in symbolics_state::device_timer");

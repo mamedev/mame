@@ -40,7 +40,7 @@ private:
 	unsigned char checksum_data(const unsigned char *buf, const unsigned int sz);
 	void do_card();
 	bool transfer(uint8_t to, uint8_t *from);
-	void ack_timer(void *ptr, int param);
+	void ack_timer(int32_t param);
 
 	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd;
 	unsigned short addr;

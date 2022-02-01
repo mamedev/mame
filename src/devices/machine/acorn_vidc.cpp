@@ -218,7 +218,7 @@ void acorn_vidc10_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void acorn_vidc10_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void acorn_vidc10_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -625,9 +625,9 @@ void arm_vidc20_device::device_reset()
 	m_vco_v_modulo = 1;
 }
 
-void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
-	acorn_vidc10_device::device_timer(timer, id, param, ptr);
+	acorn_vidc10_device::device_timer(timer, id, param);
 }
 
 inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
