@@ -74,10 +74,6 @@ private:
 	uint8_t vsnes_in0_1_r();
 	uint8_t vsnes_in1_1_r();
 	uint8_t gun_in0_r();
-	void vsnes_nt0_w(offs_t offset, uint8_t data);
-	void vsnes_nt1_w(offs_t offset, uint8_t data);
-	uint8_t vsnes_nt0_r(offs_t offset);
-	uint8_t vsnes_nt1_r(offs_t offset);
 	void vsnormal_vrom_banking(uint8_t data);
 	void gun_in0_w(uint8_t data);
 	void vskonami_rom_banking(offs_t offset, uint8_t data);
@@ -97,7 +93,6 @@ private:
 	void vsdual_vrom_banking_main(uint8_t data);
 	void vsdual_vrom_banking_sub(uint8_t data);
 	void vssmbbl_sn_w(offs_t offset, uint8_t data);
-	void v_set_mirroring(int ppu, int mirroring);
 
 	DECLARE_MACHINE_START(vsnes);
 	DECLARE_MACHINE_RESET(vsnes);
@@ -127,7 +122,6 @@ private:
 	uint8_t* m_vrom[2];
 	std::unique_ptr<uint8_t[]> m_nt_ram[2];
 	memory_bank_array_creator<8> m_bank_vrom;
-	uint8_t* m_nt_page[2][4];
 	uint32_t m_vrom_size[2];
 	int m_vrom_banks;
 	int m_zapstore;
