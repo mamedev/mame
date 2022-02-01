@@ -4,7 +4,7 @@
 
  Scramble hardware
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+NOTE:  Eventually to be merged into GALAXIAN.CPP
 
 Interesting tidbit:
 
@@ -2064,7 +2064,7 @@ GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, marsarf,  mars,     mars,     mars,     scramble_state, empty_init,        ROT90, "bootleg (Arfyc)",     "Mars (bootleg)",                     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // unencrypted, very similar to the original. Bad sound ROM
 
-GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",               MACHINE_SUPPORTS_SAVE )

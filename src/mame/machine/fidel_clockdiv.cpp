@@ -23,7 +23,7 @@ TODO:
 void fidel_clockdiv_state::machine_start()
 {
 	// dummy timer for cpu divider
-	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(), this);
+	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 

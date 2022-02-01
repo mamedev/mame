@@ -18500,4 +18500,92 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mickspca">
+		<description>Mickey's Space Adventure</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-12-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Mickey's Space Adventure" is a 1984 adventure game developed by Roberta Williams, Peter Oliphant, Robert Eric Heitman, Mark Crowe, Doug MacNeill, Jennifer Nelsen, Terry Pierce, Al Lowe, and Annette Childs, and distributed by Sierra On-Line. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side a.woz" size="234942" crc="0b4f70db" sha1="9b4f799ad6ab2ffcff9edac36f2c19eddf20b689"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side b.woz" size="234942" crc="4213cb80" sha1="d5e2bd7b3dc7bd9a11b7e22f74da4da5848c4211"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side a.woz" size="234942" crc="c035ffcc" sha1="a46004c7bd16b2a9b012347496efe66f4c56af42"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side b.woz" size="234942" crc="5e4cae02" sha1="4624eda8ef93e71ca8237a5cb44cf874f1f7e55e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="envlifed">
+		<description>The Environment Life Dynamic</description>
+		<year>1980</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2021-12-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Environment Life Dynamic" is a 1980 set of action games (Lightning Bug, Moon-Catcher, Jungle Safari, Turn 'Em Loose) developed and distributed by Avant-Garde Creations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the environment life dynamic.woz" size="234809" crc="2add673d" sha1="93d69773a0d8e84ff0a1dfe5de5f54e19815e8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stelpowr">
+		<description>Stellar Power</description>
+		<year>1984</year>
+		<publisher>STI Software</publisher>
+		<info name="release" value="2022-01-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Stellar Power" is a 1984 strategy game developed by David Strimple and distributed by STI Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="stellar power.woz" size="234829" crc="230af062" sha1="b3bb6cedfcd1063ee7b04d537b33d97723323012"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glutton">
+		<description>Glutton</description>
+		<year>1983</year>
+		<publisher>Superior Software</publisher>
+		<info name="release" value="2022-01-19"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Please refer to the following websites for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/20220121195058/https://twitter.com/KaySavetz/status/1482204397903904768
+		https://archive.org/details/atari-youth-advisory-board-tracey-cullinan
+		-->
+		<!--"Glutton" is a 1983 action game developed by Tracey Cullinan and intended to be distributed by Superior Software. (It was never commercially released.) It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248074">
+				<rom name="glutton.woz" size="248074" crc="55b019a9" sha1="07948a603fac11629b1f135bda1c7ef42b1359df"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -361,7 +361,7 @@ void generic_terminal_device::device_reset()
 	m_framecnt = 0;
 }
 
-void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

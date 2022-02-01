@@ -111,6 +111,8 @@ Game is V30 based, with rom banking (2Mb)
 #include "fashion.lh"
 
 
+namespace {
+
 class highvdeo_state : public driver_device
 {
 public:
@@ -1641,6 +1643,20 @@ ROM_START( cuncino )
 	ROM_LOAD( "sound-capitan uncino-hcu vers.1.u16", 0x00000, 0x80000, CRC(de87edb0) SHA1(a54c17dd21a756b1dbaec94b144db797d25ab7d6) ) // 1ST AND 2ND HALF IDENTICAL, matches grancapi's one when split in half
 ROM_END
 
+ROM_START( unksmk ) // VIDEO/SMK-1 C PCB. V30 + OKI M6376. Feigns to be a NeoGeo multigame to cover gambling game? Needs investigation.
+	ROM_REGION( 0x100000, "maincpu", 0 ) // no labels
+	ROM_LOAD16_BYTE( "ic7", 0x00000, 0x40000, CRC(ce1f303c) SHA1(8563ba217357857d0bc49cc64426406fa12a2f9b) )
+	ROM_RELOAD(             0x80000, 0x40000 )
+	ROM_LOAD16_BYTE( "ic8", 0x00001, 0x40000, CRC(b85575e5) SHA1(4fcda845c8e1b6c843cfe0a1f9b06df806325a7d) )
+	ROM_RELOAD(             0x80001, 0x40000 )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "ng 1.ic25", 0x00000, 0x80000, CRC(89291fe6) SHA1(f729e6b90a98151ff64baa1d852137a86bd0ef93) ) // handwritten label
+ROM_END
+
+} // Anonymous namespace
+
+
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4000",                              0,                   layout_fashion )
 GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 4.0",                       0,                   layout_fashion )
 GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.0",                       0,                   layout_fashion )
@@ -1659,3 +1675,4 @@ GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state, empty_init, R
 GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Magic Bomb (Version 1)",                 MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",                     0,                   layout_fashion )
 GAMEL( 2000, cuncino,   0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Capitan Uncino (High Video, version 2)", MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, unksmk,    0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "unknown SMK game",                       MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs

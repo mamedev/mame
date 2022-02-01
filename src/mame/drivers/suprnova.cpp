@@ -1125,7 +1125,7 @@ ROM_START( cyvernj )
 	ROM_LOAD( "cv300-00.u4", 0x000000, 0x400000, CRC(fbeda465) SHA1(4d5066a22f4589b6b7f85b3e77c348d900ac4bdd) )
 ROM_END
 
-ROM_START( galpani4 ) // only main CPU and plds dumps were provided
+ROM_START( galpani4 )
 	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
@@ -1146,7 +1146,7 @@ ROM_START( galpani4 ) // only main CPU and plds dumps were provided
 
 	ROM_REGION( 0x400000, "ymz", 0 ) // Samples
 	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) // Doesn't seem to use these samples at all
-	ROM_LOAD( "gp4-301-00.u7", 0x200000, 0x200000, NO_DUMP ) // Different then GP4-301-01 - Changed some samples when compared to U4 ROM
+	ROM_LOAD( "gp4-301-00.u7", 0x200000, 0x200000, CRC(53e9f8fb) SHA1(72104f31089f42cd3384d9494952f33b15cd18ad) ) // Changed some samples when compared to U4 ROM - Different then GP4-301-01 used below
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "skns-r09.u9",  0x000, 0x117, CRC(b02058d9) SHA1(77d07e0f329fb1969aa4543cd124e36ad34b07ba) ) // Atmel ATF16V8B
@@ -1982,7 +1982,7 @@ ROM_END
 
 GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // 2nd sound ROM wasn't dumped, it's different than GP4-301-01
+GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4j, galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, galpaniex, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic EX (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?

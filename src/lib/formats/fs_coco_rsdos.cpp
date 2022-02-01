@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_coco_rsdos.cpp
+    fs_coco_rsdos.cpp
 
-	Management of CoCo "RS-DOS" floppy images
+    Management of CoCo "RS-DOS" floppy images
 
 ***************************************************************************/
 
@@ -249,11 +249,11 @@ meta_data coco_rsdos_image::impl::file::metadata()
 
 	// build the metadata and return it
 	meta_data result;
-	result.set(meta_name::name,				get_filename_from_dirent(m_dirent));
-	result.set(meta_name::file_type,		m_dirent.m_filetype);
-	result.set(meta_name::ascii_flag,		std::string(1, file_type_char));
-	result.set(meta_name::size_in_blocks,	granule_count);
-	result.set(meta_name::length,			file_size);
+	result.set(meta_name::name,             get_filename_from_dirent(m_dirent));
+	result.set(meta_name::file_type,        m_dirent.m_filetype);
+	result.set(meta_name::ascii_flag,       std::string(1, file_type_char));
+	result.set(meta_name::size_in_blocks,   granule_count);
+	result.set(meta_name::length,           file_size);
 	return result;
 }
 

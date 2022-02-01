@@ -378,7 +378,7 @@ void abc80_state::kbd_w(u8 data)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

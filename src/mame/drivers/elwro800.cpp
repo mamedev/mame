@@ -325,7 +325,7 @@ void elwro800_state::elwro800jr_io_w(offs_t offset, uint8_t data)
 	if (!BIT(cs,0))
 	{
 		// CFE
-		spectrum_port_fe_w(offset, data);
+		spectrum_ula_w(offset, data);
 	}
 	else if (!BIT(cs,1))
 	{

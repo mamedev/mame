@@ -21,7 +21,7 @@ enum { spaceod_bg_detect_tile_color = 1 };
  *
  *************************************/
 
-void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

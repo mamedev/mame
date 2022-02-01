@@ -412,7 +412,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -477,7 +477,7 @@ private:
 };
 
 
-void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_bus_error = false;
 }

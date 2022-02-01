@@ -36,7 +36,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;
@@ -48,7 +48,7 @@ private:
 
 	uint8_t translate(uint8_t row, uint8_t column);
 	void send_key(uint8_t code);
-	
+
 	emu_timer *m_reset_timer;
 
 	uint8_t m_data;

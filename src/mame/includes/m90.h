@@ -38,6 +38,7 @@ public:
 	void dynablsb(machine_config &config);
 	void matchit2(machine_config &config);
 	void quizf1(machine_config &config);
+	void dicegame(machine_config &config);
 
 	void init_bomblord();
 	void init_quizf1();

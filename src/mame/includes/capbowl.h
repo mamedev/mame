@@ -85,7 +85,7 @@ public:
 	void capbowl_map(address_map &map);
 	void sound_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_CAPBOWL_H

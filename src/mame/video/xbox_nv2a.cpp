@@ -4772,7 +4772,7 @@ WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 #endif*/
 	if ((state != 0) && (puller_waiting == 1)) {
 		puller_waiting = 0;
-		puller_timer_work(nullptr, 0);
+		puller_timer_work(0);
 	}
 	if (state != 0) {
 		pcrtc[0x100 / 4] |= 1;
@@ -5129,6 +5129,6 @@ void nv2a_renderer::set_ram_base(void *base)
 
 void nv2a_renderer::start(address_space *cpu_space)
 {
-	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
+	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(&nv2a_renderer::puller_timer_work, "NV2A Puller Timer", this));
 	puller_timer->enable(false);
 }

@@ -135,7 +135,7 @@ void at29x_device::nvram_write(emu_file &file)
 /*
     Programming timer callback
 */
-void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (m_pgm)
 	{

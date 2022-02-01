@@ -173,7 +173,7 @@ ioport_constructor nes_event_device::device_input_ports() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_event_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_event_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_EVENT && m_timer_on)
 	{

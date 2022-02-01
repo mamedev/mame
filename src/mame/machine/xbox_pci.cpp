@@ -757,10 +757,10 @@ void mcpx_ohci_device::device_config_complete()
 	}
 }
 
-void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (ohci_usb)
-		ohci_usb->timer(timer, id, param, ptr);
+		ohci_usb->timer(timer, id, param);
 }
 
 uint32_t mcpx_ohci_device::ohci_r(offs_t offset)
@@ -883,7 +883,7 @@ void mcpx_apu_device::device_reset()
 	pci_device::device_reset();
 }
 
-void mcpx_apu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mcpx_apu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int cmd;
 	int bb, b, v;

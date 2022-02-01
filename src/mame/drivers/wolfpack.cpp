@@ -14,12 +14,12 @@
 #include "speaker.h"
 
 
-void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PERIODIC:
-		periodic_callback(ptr, param);
+		periodic_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in wolfpack_state::device_timer");

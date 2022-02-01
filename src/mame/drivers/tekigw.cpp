@@ -102,7 +102,7 @@ protected:
 	// novram data out handler
 	void nov_do(int state);
 
-	void buserror(void *ptr, s32 param);
+	void buserror(s32 param);
 
 	required_device<ns32016_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
@@ -490,7 +490,7 @@ void tekigw_state_base::nov_do(int state)
 		m_nmr &= ~NOV_NDAT;
 }
 
-void tekigw_state_base::buserror(void *ptr, s32 param)
+void tekigw_state_base::buserror(s32 param)
 {
 	if (m_scr & SCR_BERRE)
 	{

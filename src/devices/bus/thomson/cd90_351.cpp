@@ -122,7 +122,7 @@ void cd90_351_device::device_reset()
 	m_cur_floppy = nullptr;
 }
 
-void cd90_351_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cd90_351_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id) {
 	case ID_MOTOROFF:

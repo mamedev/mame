@@ -144,7 +144,7 @@ public:
 	virtual bool adjust_left() = 0;
 	virtual bool adjust_right() = 0;
 
-	virtual void save_ini(emu_file &file, unsigned indent) const = 0;
+	virtual void save_ini(util::core_file &file, unsigned indent) const = 0;
 
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
@@ -198,7 +198,7 @@ public:
 	virtual std::string adorned_display_name(type n) const = 0;
 
 	static ptr create(type n, machine_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file, machine_filter_data const &data) { return create(file, data, 0); }
+	static ptr create(util::core_file &file, machine_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -208,8 +208,8 @@ public:
 protected:
 	machine_filter();
 
-	static ptr create(type n, machine_filter_data const &data, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, machine_filter_data const &data, unsigned indent);
+	static ptr create(type n, machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent);
+	static ptr create(util::core_file &file, machine_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
@@ -249,7 +249,7 @@ public:
 	virtual std::string adorned_display_name(type n) const = 0;
 
 	static ptr create(type n, software_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file, software_filter_data const &data) { return create(file, data, 0); }
+	static ptr create(util::core_file &file, software_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -259,8 +259,8 @@ public:
 protected:
 	software_filter();
 
-	static ptr create(type n, software_filter_data const &data, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, software_filter_data const &data, unsigned indent);
+	static ptr create(type n, software_filter_data const &data, char const *value, util::core_file *file, unsigned indent);
+	static ptr create(util::core_file &file, software_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
@@ -294,7 +294,7 @@ public:
 		return (m_filters.end() != it) ? it->second.get() : nullptr;
 	}
 	std::string get_config_string() const;
-	bool load_ini(emu_file &file);
+	bool load_ini(util::core_file &file);
 
 private:
 	using filter_map = std::map<machine_filter::type, machine_filter::ptr>;

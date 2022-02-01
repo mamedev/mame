@@ -382,7 +382,7 @@ public:
 	void init_pc9801vm_kanji();
 
 protected:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void pc9801rs_io(address_map &map);
 	void pc9801rs_map(address_map &map);

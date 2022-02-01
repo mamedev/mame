@@ -312,7 +312,7 @@ void vme_cp31_card_device::device_reset()
 	});
 }
 
-void vme_cp31_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vme_cp31_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_bus_error = false;
 }

@@ -144,7 +144,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 	}
 }
 
-void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

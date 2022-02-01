@@ -136,7 +136,7 @@ void ym2148_device::update_irq()
 }
 
 
-void ym2148_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ym2148_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	receive_clock();
 	transmit_clock();

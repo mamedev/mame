@@ -152,9 +152,9 @@ protected:
 	}
 
 	// timer callbacks
-	void fm_mode_write(void *ptr, int param) { m_engine->engine_mode_write(param); }
-	void fm_check_interrupts(void *ptr, int param) { m_engine->engine_check_interrupts(); }
-	void fm_timer_handler(void *ptr, int param) { m_engine->engine_timer_expired(param); }
+	void fm_mode_write(int param) { m_engine->engine_mode_write(param); }
+	void fm_check_interrupts(int param) { m_engine->engine_check_interrupts(); }
+	void fm_timer_handler(int param) { m_engine->engine_timer_expired(param); }
 
 	// internal state
 	attotime m_busy_end;             // busy end time

@@ -159,7 +159,7 @@ void ticket_dispenser_device::device_reset()
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// if we still have power, keep toggling ticket states
 	if (m_power)
