@@ -18,7 +18,7 @@ TODO:
 
 #include "emu.h"
 #include "sk1100.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 

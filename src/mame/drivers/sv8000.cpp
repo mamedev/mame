@@ -33,7 +33,7 @@ Looking at the code of the cartridges it seems there is:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class sv8000_state : public driver_device

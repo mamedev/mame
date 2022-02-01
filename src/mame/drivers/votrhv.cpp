@@ -109,7 +109,7 @@ public:
 	static const device_timer_id TIMER_SCAN = 1;
 private:
 	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void mem_map(address_map &map);
 
@@ -391,7 +391,7 @@ INPUT_PORTS_END
  Timer and machine/start/reset handlers
 ******************************************************************************/
 
-void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

@@ -2,7 +2,7 @@
 // copyright-holders:Quench
 /***************************************************************************
 
-        ToaPlan game hardware from 1987
+        Toaplan game hardware from 1987
         --------------------------------
         Driver by: Quench
 
@@ -25,6 +25,7 @@ Notes:
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
+
 Z80:(0)  Main CPU
 0000-6fff Main ROM
 7000-7fff Main RAM
@@ -121,7 +122,6 @@ out:
 00      address of Z80:(0) to read/write to
 01      data to write to addressed Z80:(0) address space (Main RAM/Sprite RAM)
 03      bit 15 goes to BIO line of TMS320C10. BIO is a polled input line.
-
 
 ***************************************************************************/
 

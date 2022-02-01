@@ -829,6 +829,7 @@ MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
+MACHINES["BITMAP_PRINTER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1184,6 +1185,8 @@ FORMATS["XDF_DSK"] = true
 FORMATS["ZX81_P"] = true
 FORMATS["FS_PRODOS"] = true
 FORMATS["FS_ORIC_JASMIN"] = true
+FORMATS["FS_COCO_RSDOS"] = true
+FORMATS["FS_COCO_OS9"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -1274,6 +1277,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exorterm",
 		"fairch",
 		"fairlight",
+		"falco",
 		"fidelity",
 		"force",
 		"francedr",
@@ -1574,11 +1578,12 @@ files {
 	MAME_DIR .. "src/mame/machine/mapledev.h",
 	MAME_DIR .. "src/mame/machine/mie.cpp",
 	MAME_DIR .. "src/mame/machine/mie.h",
-	MAME_DIR .. "src/mame/machine/naomi.cpp",
 	MAME_DIR .. "src/mame/machine/naomibd.cpp",
 	MAME_DIR .. "src/mame/machine/naomibd.h",
 	MAME_DIR .. "src/mame/machine/naomig1.cpp",
 	MAME_DIR .. "src/mame/machine/naomig1.h",
+	MAME_DIR .. "src/mame/machine/dc_g2if.cpp",
+	MAME_DIR .. "src/mame/machine/dc_g2if.h",
 	MAME_DIR .. "src/mame/machine/naomigd.cpp",
 	MAME_DIR .. "src/mame/machine/naomigd.h",
 	MAME_DIR .. "src/mame/machine/naomim1.cpp",
@@ -2039,6 +2044,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ctk2000.cpp",
 	MAME_DIR .. "src/mame/drivers/ctk551.cpp",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
+	MAME_DIR .. "src/mame/drivers/ld50.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv2000.cpp",
@@ -2463,6 +2469,15 @@ files {
 	MAME_DIR .. "src/mame/machine/cmi_ankbd.h",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.cpp",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.h",
+}
+
+createMESSProjects(_target, _subtarget, "falco")
+files {
+	MAME_DIR .. "src/mame/drivers/falco500.cpp",
+	MAME_DIR .. "src/mame/machine/f5220_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/f5220_kbd.h",
+	MAME_DIR .. "src/mame/drivers/falcots.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots28.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
@@ -4514,6 +4529,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/adacp150.cpp",
+	MAME_DIR .. "src/mame/drivers/adds2020.cpp",
 	MAME_DIR .. "src/mame/drivers/aid80f.cpp",
 	MAME_DIR .. "src/mame/drivers/airbase99.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
@@ -4580,6 +4596,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/diablo1300.cpp",
 	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
+	MAME_DIR .. "src/mame/drivers/digilog320.cpp",
+	MAME_DIR .. "src/mame/machine/digilog320_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/digilog320_kbd.h",
 	MAME_DIR .. "src/mame/drivers/digijet.cpp",
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
@@ -4603,8 +4622,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",
-	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
-	MAME_DIR .. "src/mame/drivers/falcots.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",

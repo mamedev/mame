@@ -100,7 +100,7 @@ private:
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

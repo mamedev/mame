@@ -56,7 +56,7 @@
 #define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "cpu/g65816/g65816.h"

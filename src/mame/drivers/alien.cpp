@@ -348,7 +348,7 @@ GAME( 2004, masmario,  0,        alien, alien, alien_state, empty_init,    ROT0,
 GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
-GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi No JanJanLand", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 // Medalusion 2
 GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

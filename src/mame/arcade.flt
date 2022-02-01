@@ -308,6 +308,7 @@ dassault.cpp
 dblcrown.cpp
 dblewing.cpp
 dbz.cpp
+dc_atomiswave.cpp
 dcheese.cpp
 dcon.cpp
 dday.cpp
@@ -436,6 +437,7 @@ fresh.cpp
 fromanc2.cpp
 fromance.cpp
 fruitpc.cpp
+funeball.cpp
 fungames.cpp
 funkball.cpp
 funkybee.cpp
@@ -530,6 +532,7 @@ gts80a.cpp
 gts80b.cpp
 guab.cpp
 gumbo.cpp
+gumrally.cpp
 gunbustr.cpp
 gundealr.cpp
 gunpey.cpp
@@ -717,6 +720,7 @@ m52.cpp
 m57.cpp
 m58.cpp
 m62.cpp
+m62_bkungfu.cpp
 m63.cpp
 m72.cpp
 m79amb.cpp
@@ -897,6 +901,7 @@ nbmj8991.cpp
 nbmj9195.cpp
 nemesis.cpp
 neogeo.cpp
+neomania.cpp
 neopcb.cpp
 neoprint.cpp
 neptunp2.cpp
@@ -1471,6 +1476,7 @@ witch.cpp
 wiz.cpp
 wmg.cpp
 wms.cpp
+wms_shuffle.cpp
 wolfpack.cpp
 wpc_95.cpp
 wpc_an.cpp

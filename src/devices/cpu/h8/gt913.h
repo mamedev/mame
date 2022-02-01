@@ -21,7 +21,7 @@
 #include "machine/gt913_kbd.h"
 #include "machine/gt913_snd.h"
 
-class gt913_device : public h8_device {
+class gt913_device : public h8_device, public device_mixer_interface {
 public:
 	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

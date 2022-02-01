@@ -72,7 +72,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// disassembly override
 	offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
@@ -179,7 +179,7 @@ void positron_state::machine_reset()
 }
 
 
-void positron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void positron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

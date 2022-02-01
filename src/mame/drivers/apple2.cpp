@@ -57,7 +57,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2gameio/gameio.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ap2_dsk.h"

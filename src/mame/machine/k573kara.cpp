@@ -112,7 +112,7 @@ void k573kara_device::device_add_mconfig(machine_config &config)
 	duart_chan0.out_rts_callback().set("rs232_chan0", FUNC(rs232_port_device::write_rts));
 }
 
-void k573kara_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void k573kara_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 }
 

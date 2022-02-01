@@ -1917,7 +1917,7 @@ void dmg_ppu_device::increment_scanline()
 }
 
 
-void dmg_ppu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dmg_ppu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update_state();
 }

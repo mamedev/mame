@@ -33,6 +33,7 @@ TODO:
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/dl1416.h"
+#include "softlist_dev.h"
 
 // internal artwork
 #include "lk3000.lh"

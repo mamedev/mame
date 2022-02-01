@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "sv603.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

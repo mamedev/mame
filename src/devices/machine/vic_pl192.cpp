@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(PL190_VIC, vic_pl190_device, "vic_pl190", "ARM PL190 VIC")
 DEFINE_DEVICE_TYPE(UPD800468_VIC, vic_upd800468_device, "vic_upd800468", "NEC uPD800468 VIC")
 DEFINE_DEVICE_TYPE(PL192_VIC, vic_pl192_device, "vic_pl192", "ARM PL192 VIC")
 
-void vic_pl190_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vic_pl190_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	u32 intrs = (raw_intr | soft_intr) & intr_en;
 

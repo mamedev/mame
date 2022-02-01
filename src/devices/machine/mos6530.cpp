@@ -157,7 +157,7 @@ uint8_t mos6530_device::get_timer()
     timer
 -------------------------------------------------*/
 
-void mos6530_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mos6530_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

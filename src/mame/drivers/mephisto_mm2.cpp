@@ -92,7 +92,7 @@ MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 #include "sound/dac.h"
 #include "video/mmdisplay1.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

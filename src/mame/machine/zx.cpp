@@ -119,22 +119,9 @@ uint8_t zx_state::zx80_io_r(offs_t offset)
 
 	if (!(offset & 0x01))
 	{
-		if ((offset & 0x0100) == 0)
-			data &= m_io_row0->read();
-		if ((offset & 0x0200) == 0)
-			data &= m_io_row1->read();
-		if ((offset & 0x0400) == 0)
-			data &= m_io_row2->read();
-		if ((offset & 0x0800) == 0)
-			data &= m_io_row3->read();
-		if ((offset & 0x1000) == 0)
-			data &= m_io_row4->read();
-		if ((offset & 0x2000) == 0)
-			data &= m_io_row5->read();
-		if ((offset & 0x4000) == 0)
-			data &= m_io_row6->read();
-		if ((offset & 0x8000) == 0)
-			data &= m_io_row7->read();
+		for (int i = 0; i < 8; i++)
+			if (!BIT(offset, i + 8))
+				data &= m_io_row[i]->read();
 
 		if (!m_io_config->read())
 			data &= ~0x40;
@@ -163,22 +150,9 @@ uint8_t zx_state::zx81_io_r(offs_t offset)
 
 	if (!(offset & 0x01))
 	{
-		if ((offset & 0x0100) == 0)
-			data &= m_io_row0->read();
-		if ((offset & 0x0200) == 0)
-			data &= m_io_row1->read();
-		if ((offset & 0x0400) == 0)
-			data &= m_io_row2->read();
-		if ((offset & 0x0800) == 0)
-			data &= m_io_row3->read();
-		if ((offset & 0x1000) == 0)
-			data &= m_io_row4->read();
-		if ((offset & 0x2000) == 0)
-			data &= m_io_row5->read();
-		if ((offset & 0x4000) == 0)
-			data &= m_io_row6->read();
-		if ((offset & 0x8000) == 0)
-			data &= m_io_row7->read();
+		for (int i = 0; i < 8; i++)
+			if (!BIT(offset, i + 8))
+				data &= m_io_row[i]->read();
 
 		if (!m_io_config->read())
 			data &= ~0x40;
@@ -217,22 +191,9 @@ uint8_t zx_state::pc8300_io_r(offs_t offset)
 	else
 	if (offs == 0xfe)
 	{
-		if ((offset & 0x0100) == 0)
-			data &= m_io_row0->read();
-		if ((offset & 0x0200) == 0)
-			data &= m_io_row1->read();
-		if ((offset & 0x0400) == 0)
-			data &= m_io_row2->read();
-		if ((offset & 0x0800) == 0)
-			data &= m_io_row3->read();
-		if ((offset & 0x1000) == 0)
-			data &= m_io_row4->read();
-		if ((offset & 0x2000) == 0)
-			data &= m_io_row5->read();
-		if ((offset & 0x4000) == 0)
-			data &= m_io_row6->read();
-		if ((offset & 0x8000) == 0)
-			data &= m_io_row7->read();
+		for (int i = 0; i < 8; i++)
+			if (!BIT(offset, i + 8))
+				data &= m_io_row[i]->read();
 
 		m_cassette->output(+1.0);
 		if(m_cassette_cur_level <= 0)
@@ -267,22 +228,9 @@ uint8_t zx_state::pow3000_io_r(offs_t offset)
 	else
 	if (offs == 0xfe)
 	{
-		if ((offset & 0x0100) == 0)
-			data &= m_io_row0->read();
-		if ((offset & 0x0200) == 0)
-			data &= m_io_row1->read();
-		if ((offset & 0x0400) == 0)
-			data &= m_io_row2->read();
-		if ((offset & 0x0800) == 0)
-			data &= m_io_row3->read();
-		if ((offset & 0x1000) == 0)
-			data &= m_io_row4->read();
-		if ((offset & 0x2000) == 0)
-			data &= m_io_row5->read();
-		if ((offset & 0x4000) == 0)
-			data &= m_io_row6->read();
-		if ((offset & 0x8000) == 0)
-			data &= m_io_row7->read();
+		for (int i = 0; i < 8; i++)
+			if (!BIT(offset, i + 8))
+				data &= m_io_row[i]->read();
 
 		m_cassette->output(+1.0);
 		if(m_cassette_cur_level <= 0)

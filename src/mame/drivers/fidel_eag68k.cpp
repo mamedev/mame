@@ -173,7 +173,7 @@ B0000x-xxxxxx: see V7, -800000
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

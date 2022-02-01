@@ -356,6 +356,18 @@
 #include "os9_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_COCO_RAWDSK
+#include "coco_rawdsk.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_COCO_RSDOS
+#include "fs_coco_rsdos.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_COCO_OS9
+#include "fs_coco_os9.h"
+#endif
+
 #ifdef HAS_FORMATS_JFD_DSK
 #include "jfd_dsk.h"
 #endif
@@ -687,7 +699,7 @@
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
-	en.add(FS_UNFORMATTED);
+	en.add(fs::UNFORMATTED);
 	en.add(cassette_default_formats);
 #ifdef HAS_FORMATS_UEF_CAS
 	en.add(uef_cassette_formats); // uef_cas.h
@@ -711,7 +723,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 
 	en.category("Apple");
 #ifdef HAS_FORMATS_FS_PRODOS
-	en.add(FS_PRODOS);
+	en.add(fs::PRODOS);
 #endif
 #ifdef HAS_FORMATS_AP2_DSK
 	en.add(FLOPPY_A216S_FORMAT); // ap2_dsk.h
@@ -1071,6 +1083,15 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_JV1_FORMAT); // trs80_dsk.h
 	en.add(FLOPPY_JV3_FORMAT); // trs80_dsk.h
 #endif
+#ifdef HAS_FORMATS_COCO_RAWDSK
+	en.add(FLOPPY_COCO_RAWDSK_FORMAT); // coco_rawdsk.h
+#endif
+#ifdef HAS_FORMATS_FS_COCO_RSDOS
+	en.add(fs::COCO_RSDOS); // fs_coco_rsdos.h
+#endif
+#ifdef HAS_FORMATS_FS_COCO_OS9
+	en.add(fs::COCO_OS9); // fs_coco_os9.h
+#endif
 
 	en.category("Kaypro");
 #ifdef HAS_FORMATS_KAYPRO_DSK
@@ -1144,7 +1165,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_ORIC_JASMIN_FORMAT); // oric_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_ORIC_JASMIN
-	en.add(FS_ORIC_JASMIN); // fs_oric_jasmin.h
+	en.add(fs::ORIC_JASMIN); // fs_oric_jasmin.h
 #endif
 
 	en.category("Atari");
@@ -1391,7 +1412,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_VTECH
-	en.add(FS_VTECH); // fs_vtech.h
+	en.add(fs::VTECH); // fs_vtech.h
 #endif
 
 	en.category("Canon");

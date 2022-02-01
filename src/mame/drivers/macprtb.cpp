@@ -107,7 +107,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define C32M (31.3344_MHz_XTAL)

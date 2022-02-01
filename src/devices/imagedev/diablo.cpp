@@ -34,8 +34,7 @@ DEFINE_DEVICE_TYPE(DIABLO, diablo_image_device, "diablo_image", "Diablo")
 //-------------------------------------------------
 
 diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIABLO, tag, owner, clock),
-		device_image_interface(mconfig, *this),
+	: harddisk_image_base_device(mconfig, DIABLO, tag, owner, clock),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
 		m_device_image_load(*this),

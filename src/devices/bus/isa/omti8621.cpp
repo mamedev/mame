@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "omti8621.h"
 #include "image.h"
+#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
@@ -47,25 +48,17 @@ static int verbose = VERBOSE;
 // forward declaration of image class
 DECLARE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device)
 
-class omti_disk_image_device :  public device_t,
-								public device_image_interface
+class omti_disk_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "awd"; }
-	virtual const char *custom_instance_name() const noexcept override { return "winchester"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "winchester"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
@@ -296,7 +289,7 @@ void omti8621_device::device_start()
 
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
@@ -417,7 +410,7 @@ void omti8621_device::set_interrupt(enum line_state line_state)
 	m_isa->irq14_w(line_state);
 }
 
-void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	set_interrupt(ASSERT_LINE);
 }
@@ -1383,8 +1376,7 @@ uint8_t omti8621_device::fd_disk_chg_r()
 DEFINE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device, "omti_disk_image", "OMTI 8621 ESDI disk")
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OMTI_DISK, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: harddisk_image_base_device(mconfig, OMTI_DISK, tag, owner, clock)
 	, m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {
 }

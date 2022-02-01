@@ -132,7 +132,7 @@ Natural Keyboard and Paste:
 #include "includes/z80ne.h"
 #include "formats/dmk_dsk.h"
 #include "machine/ram.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Layout */

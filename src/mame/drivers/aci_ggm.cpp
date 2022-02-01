@@ -58,7 +58,7 @@ TODO:
 #include "video/pwm.h"
 
 #include "speaker.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 // internal artwork
 #include "aci_ggm.lh" // clickable

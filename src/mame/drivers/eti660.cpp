@@ -44,6 +44,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define CDP1802_TAG     "ic3"

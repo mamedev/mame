@@ -18846,6 +18846,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sfrush">
+		<!-- Notes: GBC only -->
+		<description>San Francisco Rush - Extreme Racing (prototype)</description>
+		<year>199?</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="524288">
+				<rom name="san francisco rush - extreme racing (prototype).bin" size="524288" crc="4d26ea38" sha1="4d48a6cd886543bae555d0dc4b8012e13c7cdb55"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2049">
 		<!-- Notes: GBC only -->
 		<description>San Francisco Rush 2049 (Europe, USA)</description>

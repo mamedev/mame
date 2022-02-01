@@ -620,7 +620,7 @@ attotime mfm_harddisk_device::track_end_time()
 	return endtime;
 }
 
-void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

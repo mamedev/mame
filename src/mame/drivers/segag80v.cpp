@@ -1252,7 +1252,7 @@ ROM_START( zektor )
 	ROM_LOAD( "1606.prom-u21",   0xa800, 0x0800, CRC(7965f636) SHA1(5c8720beedab4979a813ce7f0e8961c863973ff7) )
 
 	ROM_REGION( 0x0800, "speech:cpu", 0 )
-	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
+	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
 	ROM_REGION( 0x0020, "speech:proms", 0 )
 	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
@@ -1327,7 +1327,7 @@ ROM_START( startrek )
 	ROM_LOAD( "1870.prom-u23",   0xb800, 0x0800, CRC(4340616d) SHA1(e93686a29377933332523425532d102e30211111) )
 
 	ROM_REGION( 0x0800, "speech:cpu", 0 )
-	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
+	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
 	ROM_REGION( 0x0020, "speech:proms", 0 )
 	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing

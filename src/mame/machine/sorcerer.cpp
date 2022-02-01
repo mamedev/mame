@@ -28,15 +28,15 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 }
 
 
-void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SERIAL:
-		serial_tc(ptr, param);
+		serial_tc(param);
 		break;
 	case TIMER_CASSETTE:
-		cassette_tc(ptr, param);
+		cassette_tc(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in sorcerer_state::device_timer");

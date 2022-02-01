@@ -263,7 +263,7 @@ void i8275_device::dma_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	//int y = screen().vpos();
 	//int x = screen().hpos();

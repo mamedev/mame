@@ -41,7 +41,7 @@
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace {

@@ -27,7 +27,7 @@ TODO:
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "z80clock.lh"

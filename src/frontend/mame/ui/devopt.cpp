@@ -13,6 +13,7 @@
 
 #include "ui/ui.h"
 #include "romload.h"
+#include "screen.h"
 
 
 namespace ui {

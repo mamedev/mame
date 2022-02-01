@@ -2262,6 +2262,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bladewar">
+		<description>Blade Warrior (prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="32768">
+				<rom name="blade warrior (prototype).bin" size="32768" crc="cfd54dbc" sha1="53c1e67430f923f74a611e675ca0cad8d0b13d76" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bladestl">
 		<description>Blades of Steel (Europe)</description>
 		<year>1991</year>
@@ -5815,6 +5827,18 @@ license:CC0
 				<rom name="dmg-dgj-0.u1" size="131072" crc="11be4b45" sha1="e354b0e78992f66bd598399998790231ff81b86f" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungnwar">
+		<description>Dungeon Warrior (prototype)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="65536">
+				<rom name="dungeon warrior (prototype).bin" size="65536" crc="2910429c" sha1="21a6fba83faa7649fbb2e75176649bcd7d846d25" />
 			</dataarea>
 		</part>
 	</software>
@@ -10087,6 +10111,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="jetpakj">
+		<description>Jet Pak Jak (prototype)</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="jet pak jak (prototype).bin" size="131072" crc="2040e99b" sha1="da739097364e31f3be5851461170eaccbcd2aeb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetpakm" cloneof="jetpakj">
+		<description>Jet Pak Man (prototype)</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="32768">
+				<rom name="jet pak man (prototype).bin" size="32768" crc="e40dfc1b" sha1="0080f76961164810d6c0543d951a465cfa1cab54" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jetsons">
 		<description>The Jetsons - Robot Panic (USA, Rev 1)</description>
 		<year>1992</year>
@@ -10095,13 +10143,13 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-jse-1.u1" size="131072" crc="cc38cf0d" sha1="38b5ec2c74316696b7731cd88e56be4519084168"/>
+				<rom name="dmg-jse-1.u1" size="131072" crc="cc38cf0d" sha1="38b5ec2c74316696b7731cd88e56be4519084168" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jetsonsa" cloneof="jetsons">
-		<!--    European release is a relabeled USA version -->
+		<!-- European release is a relabeled USA version -->
 		<description>The Jetsons - Robot Panic (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -10227,6 +10275,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="joe &amp; mac (usa).bin" size="262144" crc="5da86ed4" sha1="dc4dc933c3138a05ab1d11bf77b4c7405cdd524b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madden">
+		<description>John Madden Football (prototype)</description>
+		<year>1993?</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="john madden football (prototype a).bin" size="131072" crc="4f03ee8c" sha1="c79ecb697723f98448423d311c3d7c76328a46a8" />
 			</dataarea>
 		</part>
 	</software>
@@ -11741,6 +11801,18 @@ license:CC0
 				<rom name="lazlos' leap (usa).bin" size="65536" crc="31fb404b" sha1="c111470fcdadf191cf843e50c8f3d3dbb995a5c5" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lapbjsol" supported="no">
+		<description>Learn and Play Blackjack &amp; Solitaire (prototype)</description>
+		<year>1994</year>
+		<publisher>Spidersoft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="learn and play - blackjack &amp; solitaire (aug 9, 1994 prototype).bin" size="131072" crc="60837c15" sha1="d69062736dfde2af8e0ede2cc3dd5d2b95996e79" />
 			</dataarea>
 		</part>
 	</software>
@@ -26912,6 +26984,18 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="0x8000">
 				<rom name="game boy test cartridge (usa, europe).bin" size="0x8000" crc="ae13a5c3" sha1="ce9c211852b4357b1356bb015db6f675def69c9f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmgtest">
+		<description>Nintendo Game Boy Aging Cartridge (Ver 1.1)</description>
+		<year>199?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="32768">
+				<rom name="nintendo game boy aging cartridge.bin" size="32768" crc="4db33858" sha1="3f27a044131548d528783f0d43f918f04418519e" />
 			</dataarea>
 		</part>
 	</software>

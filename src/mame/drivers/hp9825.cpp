@@ -49,7 +49,7 @@
 #include "speaker.h"
 #include "sound/beep.h"
 #include "hp9825.lh"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 // Debugging
 #define VERBOSE 0

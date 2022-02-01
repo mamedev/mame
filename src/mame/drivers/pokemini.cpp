@@ -17,7 +17,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -51,7 +51,7 @@ protected:
 		TIMER_PRC
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -1696,7 +1696,7 @@ void pokemini_state::machine_start()
 }
 
 
-void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

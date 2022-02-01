@@ -29,7 +29,7 @@ protected:
 	virtual void device_reset() override;
 
 	void execute();
-	void complete(void *buf, s32 param);
+	void complete(s32 param);
 
 private:
 	emu_timer *m_complete;

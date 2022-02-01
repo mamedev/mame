@@ -1320,7 +1320,7 @@ void dblaxle_state::dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
                         INTERRUPTS
 ***********************************************************/
 
-void sci_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sci_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

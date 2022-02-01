@@ -111,7 +111,7 @@
                             but this part of memory is never written to after its initial clearing on boot.
                             If 0xffff is placed at 0x157d4ee then the game will pass the RTC check.
                             The game will later complain about "Hardware Error: Security Key Error" if you try starting the game.
-        code1d,b            Can boot but crashes randomly and quickly so it's hard to do anything.
+        code1d,b,a          Can boot but crashes randomly and quickly so it's hard to do anything.
 
         mocapglf            Security code error
         sscopex,sogeki      Graphics very heavily glitched. Gun controller is not emulated.
@@ -404,6 +404,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "machine/lpci.h"
@@ -447,6 +448,7 @@ public:
 
 	void viper(machine_config &config);
 	void viper_ppp(machine_config &config);
+	void viper_omz(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
@@ -502,6 +504,7 @@ private:
 
 	void viper_map(address_map &map);
 	void viper_ppp_map(address_map &map);
+	void omz3d_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -2725,6 +2728,19 @@ void viper_state::viper_ppp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
 }
 
+void viper_state::omz3d_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("ioboard", 0);
+}
+
+void viper_state::viper_omz(machine_config &config)
+{
+	viper(config);
+
+	upd784031_device &omz3dcpu(UPD784031(config, "omz3dcpu", 12000000));
+	omz3dcpu.set_addrmap(AS_PROGRAM, &viper_state::omz3d_map);
+}
+
 /*****************************************************************************/
 
 void viper_state::init_viper()
@@ -2852,6 +2868,19 @@ ROM_START(code1db) //*
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
 ROM_END
 
+ROM_START(code1da) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("m48t58_uaa.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "922uaa02", 0, SHA1(795d82d51a37f197c36366cb36a2dfa8797e5f9f) )
+ROM_END
+
 ROM_START(gticlub2) //*
 	VIPER_BIOS
 
@@ -2917,6 +2946,9 @@ ROM_START(mocapglf) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x2000, CRC(5eece882) SHA1(945e5e9882bd16513a2947f6823b985d51501fad))
+
+	ROM_REGION(0x10000, "ioboard", 0) // OMZ-3DCPU PCB
+	ROM_LOAD("kzkn1.bin", 0x00000, 0x10000, CRC(b87780d8) SHA1(bae84785d218daa9666143f08e2632ca1b7a4f72))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b33a02", 0, SHA1(819d8fac5d2411542c1b989105cffe38a5545fc2) )
@@ -3398,11 +3430,12 @@ GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperh
 GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
 GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper,     mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2001, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver AAE)", MACHINE_NOT_WORKING)

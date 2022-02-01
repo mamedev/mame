@@ -4296,21 +4296,29 @@ ROM_START( coh1002v )
 	ROM_REGION( 0x8, "cat702_2", 0 ) ROM_COPY( "cat702_1", 0x0, 0x0, 0x8 )
 ROM_END
 
-/*
-
-There is known to exist (but not dumped) an USA version with hand written labels:
-
-1/8 PROG 0 USA AA9E @ IC5
-1/8 PROG 1 USA 0A1E @ IC6
-1/8 PROG 2 USA C3B3 @ IC7
-1/8 PROG 3 USA E108 @ IC8
-1/8 PROG 4 USA 9127 @ IC9
-
-The SUM16 values differ from both the Japanese and Taiwanese versions.
-
-*/
-
 ROM_START( aerofgts )
+	KN_BIOS
+
+	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
+	ROM_LOAD( "1-8_prog0_usa_aa9e.ic5", 0x0000000, 0x080000, CRC(d15a4904) SHA1(4e329f56584df4b057b56e21f0230dda4ec46bcf) ) // hand written label: 1/8 PROG 0 USA AA9E @ IC5
+	ROM_LOAD( "1-8_prog1_usa_0a1e.ic6", 0x0080000, 0x080000, CRC(d6625176) SHA1(018bba263effda1a0b64023aa08b384f0590245b) ) // hand written label: 1/8 PROG 1 USA 0A1E @ IC6
+	ROM_LOAD( "1-8_prog2_usa_c4b3.ic7", 0x0100000, 0x080000, CRC(df5ba2f7) SHA1(19153084e7cff632380b67a2fff800644a2fbf7d) ) // hand written label: 1/8 PROG 2 USA C4B3 @ IC7
+	ROM_LOAD( "1-8_prog3_usa_e1d8.ic8", 0x0180000, 0x080000, CRC(8711574a) SHA1(d02a9dac78ee468985c2f2c8d3b9a588f6fc7c02) ) // hand written label: 1/8 PROG 3 USA E1D8 @ IC8
+	ROM_LOAD( "1-8_prog4_usa_9127.ic9", 0x0200000, 0x080000, CRC(670d9b27) SHA1(a4bca91c36d06cb0663d2478096bbc1668e01d60) ) // hand written label: 1/8 PROG 4 USA 9127 @ IC9
+
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
+	ROM_LOAD( "ic11.bin", 0x0000000, 0x400000, CRC(a93f6fee) SHA1(6f079643b50833f8fb497c49945ad23326cc9170) )
+	ROM_LOAD( "ic12.bin", 0x0400000, 0x400000, CRC(9f584ef7) SHA1(12c04e198f17d1915f58e83aff45ca2e76773df8) )
+	ROM_LOAD( "ic13.bin", 0x0800000, 0x400000, CRC(652e9c78) SHA1(a929b2944de72606338acb822c1031463e2b1cc5) )
+	ROM_LOAD( "ic14.bin", 0x0c00000, 0x400000, CRC(c4ef1424) SHA1(1734a6ee6d0be94d24afefcf2a125b74747f53d0) )
+	ROM_LOAD( "ic15.bin", 0x1000000, 0x400000, CRC(2551d816) SHA1(e1500d4bfa8cc55220c366a5852263ac2070da82) )
+	ROM_LOAD( "ic16.bin", 0x1400000, 0x400000, CRC(21b401bc) SHA1(89374b80453c474aa1dd3a219422f557f95a262c) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "kn02", 0x000000, 0x000008, CRC(0d2001b4) SHA1(740d7794a1b94a42351d81947cbfae138c56ecc9) )
+ROM_END
+
+ROM_START( aerofgtst )
 	KN_BIOS
 
 	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
@@ -5394,7 +5402,8 @@ GAME( 2001, mfjump,    coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_in
 
 /* Video System */
 GAME( 1996, coh1002v,  0,        coh1002v,    zn,       visco_zn_state, empty_init, ROT0,   "Video System Co.", "Video System PSX",               MACHINE_IS_BIOS_ROOT )
-GAME( 1996, aerofgts,  coh1002v, coh1002v,    aerofgts, visco_zn_state, empty_init, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, aerofgts,  coh1002v, coh1002v,    aerofgts, visco_zn_state, empty_init, ROT270, "McO'River, Inc.",  "Aero Fighters Special (USA)",    MACHINE_IMPERFECT_SOUND )
+GAME( 1996, aerofgtst, aerofgts, coh1002v,    aerofgts, visco_zn_state, empty_init, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sncwgltd,  aerofgts, coh1002v,    aerofgts, visco_zn_state, empty_init, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    MACHINE_IMPERFECT_SOUND )
 
 /* Taito FX-1A */

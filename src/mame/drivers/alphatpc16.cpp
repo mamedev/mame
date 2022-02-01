@@ -528,7 +528,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
 
-	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, void *ptr, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
+	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
 
 	// these are supported by the bios, they may not have been available on real hardware
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,192K,256K,384K,448K,512K");

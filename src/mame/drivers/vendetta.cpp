@@ -165,7 +165,7 @@ void vendetta_state::_5fe0_w(uint8_t data)
 	m_k053246->k053246_set_objcha_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

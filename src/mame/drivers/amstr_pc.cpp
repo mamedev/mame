@@ -200,6 +200,8 @@ Notes:
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 

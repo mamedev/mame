@@ -350,7 +350,7 @@ Notes:
 #include "machine/vt83c461.h"
 #include "sound/cdda.h"
 #include "cdrom.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define COJAG_CLOCK         XTAL(52'000'000)

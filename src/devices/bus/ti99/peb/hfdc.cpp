@@ -507,7 +507,7 @@ void myarc_hfdc_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Monoflop has gone back to the OFF state.
 */
-void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	set_floppy_motors_running(false);
 }

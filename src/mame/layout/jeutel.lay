@@ -7,9 +7,9 @@ copyright-holders:Robbbert
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">
-		<led14seg>
+		<led8seg_gts1>
 			<color red="0.0" green="0.75" blue="1.0" />
-		</led14seg>
+		</led8seg_gts1>
 	</element>
 	<element name="red_led">
 		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
@@ -28,108 +28,108 @@ copyright-holders:Robbbert
 
 		<!-- Player 1 Score -->
 
-		<element name="digit6" ref="digit">
+		<element name="digit5" ref="digit">
 			<bounds left="10" top="45" right="44" bottom="84" />
 		</element>
-		<element name="digit5" ref="digit">
+		<element name="digit4" ref="digit">
 			<bounds left="54" top="45" right="88" bottom="84" />
 		</element>
-		<element name="digit4" ref="digit">
+		<element name="digit3" ref="digit">
 			<bounds left="98" top="45" right="132" bottom="84" />
 		</element>
-		<element name="digit3" ref="digit">
+		<element name="digit2" ref="digit">
 			<bounds left="142" top="45" right="176" bottom="84" />
 		</element>
-		<element name="digit2" ref="digit">
+		<element name="digit1" ref="digit">
 			<bounds left="186" top="45" right="220" bottom="84" />
 		</element>
-		<element name="digit1" ref="digit">
+		<element name="digit0" ref="digit">
 			<bounds left="230" top="45" right="264" bottom="84" />
 		</element>
-		<element name="digit0" ref="digit">
+		<element name="digit16" ref="digit">
 			<bounds left="274" top="45" right="308" bottom="84" />
 		</element>
 
 		<!-- Player 2 Score -->
-		<element name="digit16" ref="digit">
+		<element name="digit15" ref="digit">
 			<bounds left="10" top="105" right="44" bottom="144" />
 		</element>
-		<element name="digit15" ref="digit">
+		<element name="digit14" ref="digit">
 			<bounds left="54" top="105" right="88" bottom="144" />
 		</element>
-		<element name="digit14" ref="digit">
+		<element name="digit13" ref="digit">
 			<bounds left="98" top="105" right="132" bottom="144" />
 		</element>
-		<element name="digit13" ref="digit">
+		<element name="digit12" ref="digit">
 			<bounds left="142" top="105" right="176" bottom="144" />
 		</element>
-		<element name="digit12" ref="digit">
+		<element name="digit11" ref="digit">
 			<bounds left="186" top="105" right="220" bottom="144" />
 		</element>
-		<element name="digit11" ref="digit">
+		<element name="digit10" ref="digit">
 			<bounds left="230" top="105" right="264" bottom="144" />
 		</element>
-		<element name="digit10" ref="digit">
+		<element name="digit6" ref="digit">
 			<bounds left="274" top="105" right="308" bottom="144" />
 		</element>
 
 		<!-- Player 3 Score -->
-		<element name="digit26" ref="digit">
+		<element name="digit25" ref="digit">
 			<bounds left="10" top="165" right="44" bottom="204" />
 		</element>
-		<element name="digit25" ref="digit">
+		<element name="digit24" ref="digit">
 			<bounds left="54" top="165" right="88" bottom="204" />
 		</element>
-		<element name="digit24" ref="digit">
+		<element name="digit23" ref="digit">
 			<bounds left="98" top="165" right="132" bottom="204" />
 		</element>
-		<element name="digit23" ref="digit">
+		<element name="digit22" ref="digit">
 			<bounds left="142" top="165" right="176" bottom="204" />
 		</element>
-		<element name="digit22" ref="digit">
+		<element name="digit21" ref="digit">
 			<bounds left="186" top="165" right="220" bottom="204" />
 		</element>
-		<element name="digit21" ref="digit">
+		<element name="digit20" ref="digit">
 			<bounds left="230" top="165" right="264" bottom="204" />
 		</element>
-		<element name="digit20" ref="digit">
+		<element name="digit36" ref="digit">
 			<bounds left="274" top="165" right="308" bottom="204" />
 		</element>
 
 		<!-- Player 4 Score -->
-		<element name="digit36" ref="digit">
+		<element name="digit35" ref="digit">
 			<bounds left="10" top="225" right="44" bottom="264" />
 		</element>
-		<element name="digit35" ref="digit">
+		<element name="digit34" ref="digit">
 			<bounds left="54" top="225" right="88" bottom="264" />
 		</element>
-		<element name="digit34" ref="digit">
+		<element name="digit33" ref="digit">
 			<bounds left="98" top="225" right="132" bottom="264" />
 		</element>
-		<element name="digit33" ref="digit">
+		<element name="digit32" ref="digit">
 			<bounds left="142" top="225" right="176" bottom="264" />
 		</element>
-		<element name="digit32" ref="digit">
+		<element name="digit31" ref="digit">
 			<bounds left="186" top="225" right="220" bottom="264" />
 		</element>
-		<element name="digit31" ref="digit">
+		<element name="digit30" ref="digit">
 			<bounds left="230" top="225" right="264" bottom="264" />
 		</element>
-		<element name="digit30" ref="digit">
+		<element name="digit26" ref="digit">
 			<bounds left="274" top="225" right="308" bottom="264" />
 		</element>
 
 		<!-- Credits and Balls -->
-		<element name="digit41" ref="digit">
+		<element name="digit47" ref="digit">
 			<bounds left="30" top="345" right="64" bottom="384" />
 		</element>
-		<element name="digit40" ref="digit">
+		<element name="digit46" ref="digit">
 			<bounds left="69" top="345" right="103" bottom="384" />
 		</element>
-		<element name="digit44" ref="digit">
+		<element name="digit52" ref="digit">
 			<bounds left="171" top="345" right="205" bottom="384" />
 		</element>
-		<element name="digit43" ref="digit">
+		<element name="digit51" ref="digit">
 			<bounds left="210" top="345" right="244" bottom="384" />
 		</element>
 		<element ref="P1"><bounds left="200" right="258" top="330" bottom="342" /></element>

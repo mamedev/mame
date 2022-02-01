@@ -73,7 +73,7 @@ BTANB:
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class rx78_state : public driver_device

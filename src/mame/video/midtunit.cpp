@@ -616,7 +616,7 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

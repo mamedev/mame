@@ -19,7 +19,7 @@ that were its initial focus.
 
 |
 | **MAME®**
-| **Copyright © 1997-2021 Nicola Salmoria and the MAME team**
+| **Copyright © 1997-2022 Nicola Salmoria and the MAME team**
 | **MAME is a registered trademark of Gregory Ember**
 |
 

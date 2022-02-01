@@ -65,7 +65,7 @@
 #include "video/upd7220.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 //#include "sound/ay8910.h"
 

@@ -97,7 +97,7 @@ void inifile_manager::load_ini_category(size_t file, size_t category, std::unord
 //  initialize category
 //-------------------------------------------------
 
-void inifile_manager::init_category(std::string &&filename, emu_file &file)
+void inifile_manager::init_category(std::string &&filename, util::core_file &file)
 {
 	categoryindex index;
 	char rbuf[MAX_CHAR_INFO];
@@ -110,7 +110,11 @@ void inifile_manager::init_category(std::string &&filename, emu_file &file)
 			auto const tail(std::find_if(head, std::end(rbuf), [] (char ch) { return !ch || (']' == ch); }));
 			name.assign(head, tail);
 			if ("FOLDER_SETTINGS" != name)
-				index.emplace_back(std::move(name), file.tell());
+			{
+				u64 result;
+				if (!file.tell(result))
+					index.emplace_back(std::move(name), result);
+			}
 		}
 	}
 	std::stable_sort(index.begin(), index.end(), [] (auto const &x, auto const &y) { return 0 > core_stricmp(x.first.c_str(), y.first.c_str()); });

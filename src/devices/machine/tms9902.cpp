@@ -256,7 +256,7 @@ void tms9902_device::rcv_break(bool value)
 /*
     Timer callback
 */
-void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

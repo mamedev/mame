@@ -95,7 +95,7 @@ TODO (socrates):
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -214,7 +214,7 @@ protected:
 	void socrates_io(address_map &map);
 	void socrates_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -386,18 +386,18 @@ void socrates_state::machine_reset()
 	m_speech_load_settings_count = 0;
 }
 
-void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_KBMCU_SIM:
-		kbmcu_sim_cb(ptr, param);
+		kbmcu_sim_cb(param);
 		break;
 	case TIMER_CLEAR_SPEECH:
-		clear_speech_cb(ptr, param);
+		clear_speech_cb(param);
 		break;
 	case TIMER_CLEAR_IRQ:
-		clear_irq_cb(ptr, param);
+		clear_irq_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in socrates_state::device_timer");

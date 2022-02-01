@@ -8,19 +8,39 @@ Stern MP-200 MPU
 
 
 Status:
+- All games are playable, but see the key code list below.
 - All games have missing or wrong sound
-- meteorp, meteorpi, galaxypi, ali, biggame, cheetah, quicksil, seawitch, stargzr, dragfist,
-  cue: Playable
-- cheetahb: units digit in scores flickers. Playable.
-- lightning, nineball, spltsecp, catacomp, lazrlord, flight2k, gamatron: multiball, unplayable
-- freefall, viperp, ironmaid, orbitor1: multiball, scores stay blank, no inputs
 - cue uses first player display for all players, one at a time (this is by design)
-- flight2k, gamatron: take a while to finish booting
-- st_game: no inputs, seems to be nonfunctional. Might be for different hardware.
+- flight2k, gamatron: take a while to finish booting if balls are missing
+- st_sam: This is a test unit. Internal tests are working.
 - gamatron is actually a Bally conversion - it won't physically fit into a Stern machine.
 - drgnfist, cue, nineball, lightnin, spltsecp, catacomb, lazrlord: need a new layout to
   handle different credit/ball display (shows 17 at boot).
 - Speech mostly doesn't work.
+
+SAM IV tester
+- No schematic or manuals have been found
+- Unknown how to use it
+- Unknown what the PIAs connect to
+- 5x 6-digit displays
+- The LED flashes a few times followed by nothing
+
+Here are the key codes to enable play:
+
+Game              NUM  Start game                End ball
+-----------------------------------------------------------------------------------------------
+Nine Ball         125  X'; hit 1                 X';
+Lightning         126  X./ hit 1                 X./
+Flight 2000       128  X./ hit 1                 X./
+Freefall          134  X./ hit 1                 X./
+Split Second      144  X./ hit 1                 X./
+Catacomb          147  1                         unknown
+Viper             148  X./ hit 1                 X./
+Iron Maiden       151  X./ hit 1                 X./
+Orbitor 1         165  X. hit 1                  X. (last ball is difficult to end)
+Lazer Lord        ---  1                         unknown
+Gamatron          ---  X./ hit 1                 X./
+Others            ---  1                         X
 
 ToDo:
 - Sound - All machines have a B605/C605 sound card containing a 6840 and many other chips
@@ -73,6 +93,7 @@ public:
 
 	void st_mp201(machine_config &config);
 	void st_mp200(machine_config &config);
+	void st_sam4(machine_config &config);
 
 	void init_st_mp200();
 	void init_st_mp201();
@@ -100,6 +121,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 
 	void mem_map(address_map &map);
+	void sam4_map(address_map &map);
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -145,6 +167,21 @@ void st_mp200_state::mem_map(address_map &map)
 	map(0x1000, 0x1fff).rom();
 	map(0x5000, 0x5fff).rom();
 	map(0xf800, 0xffff).rom().region("maincpu", 0x5800);  // vectors
+}
+
+void st_mp200_state::sam4_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x007f).ram(); // internal to the cpu
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x207f).ram();
+	map(0x2104, 0x2107).rw("sam4_pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2108, 0x210b).rw("sam4_pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2110, 0x2113).rw("sam4_pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2120, 0x2123).rw("sam4_pia3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2140, 0x2143).rw("sam4_pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3000, 0x3fff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START( mp200 )
@@ -639,6 +676,20 @@ void st_mp200_state::st_mp201(machine_config &config)
 	m_s14001a->ext_read().set(FUNC(st_mp200_state::speech_r));
 }
 
+void st_mp200_state::st_sam4(machine_config &config)
+{
+	st_mp200(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &st_mp200_state::sam4_map);
+	config.device_remove("nvram");
+	PIA6821(config, "sam4_pia0", 0);
+	PIA6821(config, "sam4_pia1", 0);
+	PIA6821(config, "sam4_pia2", 0);
+	pia6821_device &pia3(PIA6821(config, "sam4_pia3", 0));
+	pia3.writepa_handler().set_nop();
+	pia3.writepb_handler().set_nop();
+	PIA6821(config, "sam4_pia4", 0);
+}
+
 /* ========== ALTERNATE ROMS =======================================================================
 
 This is a list of known alternate roms. Nothing has been tested. They are modified for free play unless otherwise noted.
@@ -1063,13 +1114,25 @@ ROM_START(gamatron)
 	ROM_CONTINUE( 0x5800, 0x0800)
 ROM_END
 
-/*----------------------------------
-/ Unknown game and manufacturer
-/---------------------------------*/
-ROM_START(st_game)
+/*----------------------------------------
+/ Stern SAM III Test Fixture
+/  working - see the manual
+/----------------------------------------*/
+ROM_START(st_sam)
 	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+	ROM_LOAD( "sam_iii_rev5.u2", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
+	ROM_LOAD( "sam_iii_rev5.u6", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+ROM_END
+
+/*----------------------------------------
+/ Stern SAM IV Test Fixture
+/----------------------------------------*/
+ROM_START(st_sam4)
+	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD( "sam_iv_r_c5.u1", 0x0c00, 0x0400, CRC(5fc44fc9) SHA1(aef3b9dbb0ba1c110b20b8e577168f4c67b6c99d) )
+	ROM_LOAD( "sam_iv_r_c5.u3", 0x0800, 0x0400, CRC(121a4db0) SHA1(a6a94fb4e17ca1ebcd009b96de6a3c253c7fb510) )
+	ROM_LOAD( "sam_iv_r_c5.u5", 0x0400, 0x0400, CRC(361af770) SHA1(1d9698bf261e4f34c7304569c3b5c6d31edaa16a) )
+	ROM_LOAD( "sam_iv_r_c5.u7", 0x0000, 0x0400, CRC(8766c667) SHA1(d6e6d1927016487f1429d084ec6b1abf54c004c5) )
 ROM_END
 
 } // Anonymous namespace
@@ -1105,4 +1168,5 @@ GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_m
 
 // other manufacturer
 GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown MP-200 pinball game", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III Test Fixture",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_sam4,    st_sam,     st_sam4,    mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM IV Test Fixture",         MACHINE_IS_SKELETON_MECHANICAL)

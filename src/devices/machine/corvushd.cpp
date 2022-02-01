@@ -1317,7 +1317,7 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 // Returns:
 //      Nothing
 //
-void corvus_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void corvus_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int function = param;
 
