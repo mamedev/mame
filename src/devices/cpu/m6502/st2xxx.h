@@ -135,6 +135,7 @@ protected:
 
 	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
 	void update_irq_state() { irq_state = (m_ireq & m_iena) != 0; }
+	u8 active_irq_level() const;
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);
 	TIMER_CALLBACK_MEMBER(lcd_interrupt);
@@ -268,6 +269,7 @@ protected:
 
 	u16 m_ireq;
 	u16 m_iena;
+	u8 m_irq_level;
 
 	u16 m_lssa;
 	u8 m_lvpw;

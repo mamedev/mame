@@ -14562,7 +14562,8 @@ ckongis                         //
 ckongmc                         // 1981 bootleg
 ckongmc2                        // 1981 bootleg
 ckongs                          // bootleg
-devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
+devilfshg                       // (c) 1982 Artic (bootleg?)
+devilfshgb                      // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 eagle                           // [1980] Centuri
@@ -16407,7 +16408,9 @@ h2hsoccerc                      // Coleco
 lafootb                         // Mattel
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
+mbaskb2                         // Mattel
 mdallas                         // Mattel
+msoccer2                        // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
 solution                        // SCAT
@@ -32156,6 +32159,7 @@ alpinr2b                        // (c) 1995
 aquajet                         // (c) 1996
 cybrcomm                        // (c) 1995
 cybrcycc                        // (c) 1995
+cybrcyccj                       // (c) 1995
 dirtdash                        // (c) 1995
 dirtdasha                       // (c) 1995
 dirtdashj                       // (c) 1995
@@ -32175,6 +32179,7 @@ ridgeracj                       // (c) 1993
 timecris                        // (c) 1995
 timecrisa                       // (c) 1995
 tokyowar                        // (c) 1996
+tokyowarj                       // (c) 1996
 victlapw                        // (c) 1996
 victlapj                        // (c) 1996
 
@@ -39538,17 +39543,17 @@ spset026                        // (c) 1996 IGT - International Game Technology
 spss4240                        // (c) 1987 IGT - International Game Technology
 
 @source:spoker.cpp
-spk306us                        // (c) 1996 IGS
-spk205us                        // (c) 1996 IGS
-spk203us                        // (c) 1996 IGS
-spk200ua                        // (c) 1996 IGS
+3super8                         // unknown
+spk100                          // (c) 1996 IGS
+spk102ua                        // (c) 1996 IGS
+spk114it                        // (c) 199? IGS
+spk115it                        // (c) 199? IGS
 spk116it                        // (c) 199? IGS
 spk116itmx                      // (c) 199? IGS
-spk115it                        // (c) 199? IGS
-spk114it                        // (c) 199? IGS
-spk102u                         // (c) 1996 IGS
-spk102ua                        // (c) 1996 IGS
-3super8                         // unknown
+spk200ua                        // (c) 1996 IGS
+spk203us                        // (c) 1996 IGS
+spk205us                        // (c) 1996 IGS
+spk306us                        // (c) 1996 IGS
 
 @source:spool99.cpp
 spool99                         // (c) 1998 Electronic Projects
