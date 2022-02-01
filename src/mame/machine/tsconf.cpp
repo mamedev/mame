@@ -461,9 +461,10 @@ u16 tsconf_state::spi_read16()
 
 void tsconf_state::cram_write(u16 offset, u8 data)
 {
-	m_cram->write(offset, data);
-	u8 pen = offset >> 1;
-	rgb_t rgb = from_pwm((m_cram->read(offset | 1) << 8 | m_cram->read(offset & 0xfffe)));
+	u16 dest = offset & 0x1ff;
+	m_cram->write(dest, data);
+	u8 pen = dest >> 1;
+	rgb_t rgb = from_pwm((m_cram->read(dest | 1) << 8 | m_cram->read(dest & 0x1fe)));
 	m_palette->set_pen_color(pen, rgb);
 };
 
@@ -475,8 +476,9 @@ void tsconf_state::cram_write16(offs_t offset, u16 data)
 
 void tsconf_state::sfile_write16(offs_t offset, u16 data)
 {
-	m_sfile->write(offset & 0xfffe, data >> 8);
-	m_sfile->write(offset | 1, data & 0xff);
+	u16 dest = offset & 0x1fe;
+	m_sfile->write(dest, data >> 8);
+	m_sfile->write(dest | 1, data & 0xff);
 };
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
