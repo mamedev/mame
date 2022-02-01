@@ -133,7 +133,7 @@ Game ID  Year    Game
 --------------------------------------------------------------------------------------------------------------------
 GK922    2000    Code One Dispatch
 G????    2001    ParaParaParadise 2nd Mix
-GM941    2000    Driving Party: Racing in Italy (World) / GTI Club: Corso Italiano (Japan)
+GM941    2000    Driving Party: Racing in Italy (World) / GTI Club: Corso Italiano (Japan) / GTI Club 2 (USA?)
 G?A00    2000    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24-ji (Asia/Japan/Korea)
 GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
 G?A29    2001    Mocap Boxing
