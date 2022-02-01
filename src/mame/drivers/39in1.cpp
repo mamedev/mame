@@ -17,18 +17,27 @@
  *
  * PCB also contains a custom ASIC, probably used for the decryption
  *
+ * International Amusement Machine (I.A.M.) slots from the second half of the
+ * 2000s use very similar PCBs (almost same main components, very similar layout,
+ * same encryption (but for Plutus).
+ *
  * TODO:
  *   - PXA255 peripherals
  *   - 4in1a and 4in1b are very similar to 39in1, currently boot but stuck at
  *     'Hardware Check' with an error
  *   - rodent should be correctly decrypted but expects something different
        from the CPLD (probably)
- *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c,60in1 have more conditional XORs,
+ *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c, 60in1 have more conditional XORs,
  *     encryption isn't completely beaten yet
+     - plutus seems to be the only dumped game for which the standard decryption
+       scheme doesn't apply.
+ *   - I.A.M. games are all incomplete dumps and they might use different
+ *     hardware features. If they diverge too much, move to own driver.
+ *
  *
  * 39in1 notes:
  * The actual PCB just normally boots up to the game, whereas in MAME it
- * defaults to test mode and checks the rom, then jumps out to the game
+ * defaults to test mode and checks the ROM, then jumps out to the game
  * after loading all 39 games. It is almost like it is defaulting to test
  * mode on at bootup. On the real PCB, it just loads the 39 games then
  * shows the game selection menu. Going into the test mode does the same
@@ -44,15 +53,19 @@
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 
+
+namespace {
+
 class _39in1_state : public driver_device
 {
 public:
 	_39in1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pxa_periphs(*this, "pxa_periphs")
-		, m_ram(*this, "ram")
-		, m_eeprom(*this, "eeprom")
 		, m_maincpu(*this, "maincpu")
+		, m_pxa_periphs(*this, "pxa_periphs")
+		, m_eeprom(*this, "eeprom")
+		, m_ram(*this, "ram")
+		, m_mcu_ipt(*this, "MCUIPT")
 	{ }
 
 	void _39in1(machine_config &config);
@@ -67,17 +80,26 @@ public:
 	void init_60in1();
 	void init_rodent();
 
+	// I.A.M. slots
+	void init_fruitwld();
+	void init_jumanji();
+	void init_plutus();
+	void init_pokrwild();
+
+protected:
+	virtual void driver_init() override;
+
 private:
 	uint32_t m_seed;
 	uint32_t m_magic;
 	uint32_t m_state;
 	uint32_t m_mcu_ipt_pc;
 
-	void driver_init() override;
-
+	required_device<cpu_device> m_maincpu;
 	required_device<pxa255_periphs_device> m_pxa_periphs;
-	required_shared_ptr<uint32_t> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_shared_ptr<uint32_t> m_ram;
+	required_ioport m_mcu_ipt;
 
 	uint32_t eeprom_r();
 	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
@@ -85,7 +107,7 @@ private:
 	uint32_t cpld_r(offs_t offset);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t prot_cheater_r();
-	required_device<cpu_device> m_maincpu;
+
 	void _39in1_map(address_map &map);
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
@@ -125,7 +147,7 @@ void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 		m_eeprom->di_write(BIT(data, 4));
 }
 
-uint32_t _39in1_state::cpld_r(offs_t offset)
+uint32_t _39in1_state::cpld_r(offs_t offset) // TODO: this works for 39in1, but not for other sets
 {
 	// if (m_maincpu->pc() != m_mcu_ipt_pc) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), m_state);
 
@@ -135,7 +157,7 @@ uint32_t _39in1_state::cpld_r(offs_t offset)
 	}
 	else if (m_maincpu->pc() == m_mcu_ipt_pc)
 	{
-		return ioport("MCUIPT")->read();
+		return m_mcu_ipt->read();
 	}
 	else
 	{
@@ -180,7 +202,7 @@ uint32_t _39in1_state::cpld_r(offs_t offset)
 	return 0;
 }
 
-void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask) // TODO: this works for 39in1, but not for other sets
 {
 	if (mem_mask == 0xffff)
 	{
@@ -207,12 +229,12 @@ void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 #endif
 }
 
-uint32_t _39in1_state::prot_cheater_r()
+uint32_t _39in1_state::prot_cheater_r() // TODO: this works for 39in1, but not for other sets
 {
 	return 0x37;
 }
 
-void _39in1_state::driver_init()
+void _39in1_state::driver_init() // TODO: this works for 39in1, but not for other sets
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler (0xa0151648, 0xa015164b, read32smo_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
@@ -323,17 +345,6 @@ void _39in1_state::further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor10
 			rom[i] ^= xor8000; // TODO: currently unverified if the games actually use this
 		// TODO: 0x10000, 0x20000, 0x40000?
 	}
-
-	/*{
-	    char filename[256];
-	    sprintf(filename,"p_decrypted_%s", machine().system().name);
-	    FILE *fp = fopen(filename, "w+b");
-	    if (fp)
-	    {
-	    fwrite(rom, 0x80000, 1, fp);
-	    fclose(fp);
-	    }
-	}*/
 }
 
 void _39in1_state::init_39in1()  { driver_init(); decrypt(0xc0, 0x02, 0x40, 0x04, 0x80, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
@@ -345,6 +356,12 @@ void _39in1_state::init_48in1a() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // sa
 void _39in1_state::init_48in1c() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_rodent() { init_4in1b(); /*m_mcu_ipt_pc = 0x?????;*/ } // same encryption as 4in1b, thus good, but doesn't boot because of different CPLD calls
 void _39in1_state::init_60in1()  { driver_init(); decrypt(0x00, 0x40, 0x10, 0x80, 0x20, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
+
+// I.A.M. slots
+void _39in1_state::init_fruitwld()  { driver_init(); decrypt(0x0a, 0x20, 0x80, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: 0x1000 and >= 0x4000 XORs unverified
+void _39in1_state::init_jumanji()   { driver_init(); decrypt(0x00, 0x02, 0x00, 0x40, 0x08, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: 0x1000 and >= 0x4000 XORs unverified
+void _39in1_state::init_plutus()    { driver_init(); /* decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 7, 6, 5, 4, 3, 2, 1, 0); further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: seems to use a different encryption
+void _39in1_state::init_pokrwild()  { driver_init(); decrypt(0x20, 0x40, 0x08, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: 0x1000 and >= 0x4000 XORs unverified
 
 void _39in1_state::_39in1(machine_config &config)
 {
@@ -502,13 +519,81 @@ ROM_START( rodent )
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_4in1a,  ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_4in1b,  ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_19in1,  ROT90, "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1,  ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_48in1a, ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.02, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1c, 39in1, _39in1, 39in1, _39in1_state, init_48in1c, ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.08, HPH-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, _39in1, 39in1, _39in1_state, init_60in1,  ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, init_rodent, ROT0,  "The Game Room", "Rodent Exterminator",                            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+
+// The following are dumps from I.A.M. slot machines
+
+ROM_START( fruitwld ) // PCB451 - FRUIT WORLD FP101 sticker on PCB outside the lid
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "fruit world v111.u2", 0x00000, 0x80000, CRC(44092be5) SHA1(a579455c4581fc2f6be37979d651f3f685353e8e) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+ROM_START( fruitwlda ) // PCB383 - FRUIT WORLD FP101 sticker on PCB outside the lid, FRUIT WORLD V102 on another sticker on big FPGA
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "fruit world v110.u2", 0x00000, 0x80000, CRC(d81bdd3c) SHA1(79ec9d12bb94537655778ac1138d3611bda9179e) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+ROM_START( jumanji ) // PCB383 - CHZ FP100 sticker on RAM under the lid. Dump was presented as Jumanji but has CHZ both on stickers and in ROM strings.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "u2", 0x00000, 0x80000, CRC(45bd43c7) SHA1(0da61fc1f5f17b2b9531ccfc69495a61aa272efd) ) // no label
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+ROM_START( plutus ) // PCB451 - POKER'S WILD FP100 sticker on PCB outside the lid
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "plutus v100.u2", 0x00000, 0x80000, CRC(3ac49895) SHA1(6de3dcac42afc4d9f927c9c9accf592b3d974fd3) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+ROM_START( pokrwild ) // PCB451 - POKER'S WILD FP102 sticker on PCB outside the lid
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "pokers wild v117.u2", 0x00000, 0x80000, CRC(96e18540) SHA1(b8fbf0a78a496e4ebea3e4603f4e3a52823c1f31) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+} // anonymous namespace
+
+
+GAME(2004, 4in1a,     39in1,    _39in1, 39in1, _39in1_state, init_4in1a,    ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,     39in1,    _39in1, 39in1, _39in1_state, init_4in1b,    ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,     39in1,    _39in1, 39in1, _39in1_state, init_19in1,    ROT90, "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,     0,        _39in1, 39in1, _39in1_state, init_39in1,    ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,     39in1,    _39in1, 39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b,    39in1,    _39in1, 39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a,    39in1,    _39in1, 39in1, _39in1_state, init_48in1a,   ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.02, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1c,    39in1,    _39in1, 39in1, _39in1_state, init_48in1c,   ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.08, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,     39in1,    _39in1, 39in1, _39in1_state, init_60in1,    ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent,    0,        _39in1, 39in1, _39in1_state, init_rodent,   ROT0,  "The Game Room", "Rodent Exterminator",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// I.A.M. slots. Versions are taken from program ROM stickers or ROM strings, where available
+GAME(2008, fruitwld,  0,        _39in1, 39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
+GAME(2007, fruitwlda, fruitwld, _39in1, 39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
+GAME(2007, jumanji,   0,        _39in1, 39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(200?, plutus,    0,        _39in1, 39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(200?, pokrwild,  0,        _39in1, 39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
