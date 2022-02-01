@@ -231,7 +231,7 @@ void tsconf_state::machine_reset()
 	m_regs[VS_INT_H] = 0x00; // 0000xxx0
 	// FDDVirt      = 0x00; // 0000xxx0
 	m_regs[INT_MASK] = 0x01; // xxxxx001
-	// CacheConfig  = 0x01; // xxxxx001
+	m_regs[CACHE_CONFIG] &= 0xf0; // xxxx0000
 
 	if (m_beta->started())
 		m_beta->enable();

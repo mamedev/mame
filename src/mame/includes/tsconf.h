@@ -118,6 +118,7 @@ private:
 		DMA_CTRL = 0x27,
 		DMA_NUM_L = 0x28,
 		INT_MASK = 0x2a,
+		CACHE_CONFIG = 0x2b,
 		DMA_NUM_H = 0x2c,
 
 		T0_X_OFFSER_L = 0x40,

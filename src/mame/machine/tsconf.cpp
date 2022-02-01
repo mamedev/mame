@@ -112,10 +112,10 @@ void tsconf_state::tsconf_update_video_mode()
 		break;
 	}
 
-	m_ts_tilemap[TM_TILES0]->set_scrollx(((m_regs[T0_X_OFFSER_H] << 8) | m_regs[T0_X_OFFSER_L]) - get_screen_area().left());
-	m_ts_tilemap[TM_TILES0]->set_scrolly(((m_regs[T0_Y_OFFSER_H] << 8) | m_regs[T0_Y_OFFSER_L]) - get_screen_area().top());
-	m_ts_tilemap[TM_TILES1]->set_scrollx(((m_regs[T1_X_OFFSER_H] << 8) | m_regs[T1_X_OFFSER_L]) - get_screen_area().left());
-	m_ts_tilemap[TM_TILES1]->set_scrolly(((m_regs[T1_Y_OFFSER_H] << 8) | m_regs[T1_Y_OFFSER_L]) - get_screen_area().top());
+	m_ts_tilemap[TM_TILES0]->set_scrolldx(get_screen_area().left(), 0);
+	m_ts_tilemap[TM_TILES0]->set_scrolldy(get_screen_area().top(), 0);
+	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
+	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
 
 	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, HZ_TO_ATTOSECONDS(50));
 }
@@ -420,8 +420,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	if (ram_addr >= PAGE4K(m_regs[T_MAP_PAGE]) && ram_addr < (PAGE4K(m_regs[T_MAP_PAGE] + 1)))
 	{
 		//TODO invalidate sprites, not entire map
-		m_ts_tilemap[TM_TILES0]->mark_all_dirty();
-		m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+		m_ts_tilemap[offset & 64 ? TM_TILES1 : TM_TILES0]->mark_all_dirty();
 	}
 	else
 	{
@@ -563,12 +562,12 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case T0_X_OFFSER_L:
 	case T0_X_OFFSER_H:
-		m_ts_tilemap[TM_TILES0]->set_scrollx(((m_regs[T0_X_OFFSER_H] << 8) | m_regs[T0_X_OFFSER_L]) - get_screen_area().left());
+		m_ts_tilemap[TM_TILES0]->set_scrollx((m_regs[T0_X_OFFSER_H] << 8) | m_regs[T0_X_OFFSER_L]);
 		break;
 
 	case T0_Y_OFFSER_L:
 	case T0_Y_OFFSER_H:
-		m_ts_tilemap[TM_TILES0]->set_scrolly(((m_regs[T0_Y_OFFSER_H] << 8) | m_regs[T0_Y_OFFSER_L]) - get_screen_area().top());
+		m_ts_tilemap[TM_TILES0]->set_scrolly((m_regs[T0_Y_OFFSER_H] << 8) | m_regs[T0_Y_OFFSER_L]);
 		break;
 
 	case T1_G_PAGE:
@@ -577,12 +576,12 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case T1_X_OFFSER_L:
 	case T1_X_OFFSER_H:
-		m_ts_tilemap[TM_TILES1]->set_scrollx(((m_regs[T1_X_OFFSER_H] << 8) | m_regs[T1_X_OFFSER_L]) - get_screen_area().left());
+		m_ts_tilemap[TM_TILES1]->set_scrollx((m_regs[T1_X_OFFSER_H] << 8) | m_regs[T1_X_OFFSER_L]);
 		break;
 
 	case T1_Y_OFFSER_L:
 	case T1_Y_OFFSER_H:
-		m_ts_tilemap[TM_TILES1]->set_scrolly(((m_regs[T1_Y_OFFSER_H] << 8) | m_regs[T1_Y_OFFSER_L]) - get_screen_area().top());
+		m_ts_tilemap[TM_TILES1]->set_scrolly((m_regs[T1_Y_OFFSER_H] << 8) | m_regs[T1_Y_OFFSER_L]);
 		break;
 
 	case SG_PAGE:
@@ -657,6 +656,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case SYS_CONFIG:
 		// 0 - 3.5MHz, 1 - 7MHz, 2 - 14MHz, 3 - reserved
 		m_maincpu->set_clock(3.5_MHz_XTAL * (1 << (data & 0x03)));
+		m_regs[CACHE_CONFIG] = BIT(data, 2) ? 0x0f : 0x00;
 		break;
 
 	case HS_INT:
