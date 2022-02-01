@@ -15606,7 +15606,7 @@ GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_
 
 // Separate tile/sprite ROMs, plus INT instead of NMI
 GAME( 1982, devilfshg,   devilfsh, devilfshg,  devilfshg,  galaxian_state, init_devilfshg,  ROT270, "Artic", "Devil Fish (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, devilfshgb,  devilfsh, devilfshg,  devilfshg,  galaxian_state, init_galaxian,   ROT270, "bootleg (Vision)", "Devil Fish (Galaxian hardware, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, devilfshgb,  devilfsh, devilfshg,  devilfshg,  galaxian_state, init_galaxian,   ROT270, "bootleg (Vision)", "Devil Fish (Galaxian hardware, bootleg)", MACHINE_SUPPORTS_SAVE ) // unencrypted
 
 // Sound hardware replaced with AY8910
 // We're missing the original set by Taito do Brasil, we only have the bootlegs

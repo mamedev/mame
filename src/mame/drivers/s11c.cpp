@@ -31,8 +31,7 @@ Status:
 
 
 ToDo:
-- Riverboat Gambler: first 4 digits of Player 4 don't work. (see code around BBB8)
-- Some digits flicker
+- Slight flicker
 - Star Trax: there's no documentation. Need manual, schematics, etc
 
 

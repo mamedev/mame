@@ -252,7 +252,14 @@ void s11_state::dig0_w(u8 data)
 {
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_strobe = data & 15;
-	m_diag = BIT(data, 4, 3);
+	u8 diag = BIT(data, 4, 3);
+	if (diag == get_diag())
+	{
+		set_lock1(0);
+		set_lock2(0);
+	}
+	else
+		set_diag(diag);
 	m_digits[60] = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -260,8 +267,15 @@ void s11_state::dig0_w(u8 data)
 
 void s11_state::dig1_w(u8 data)
 {
-	m_segment2 |= data;
-	m_segment2 |= 0x20000;
+	u8 lock = get_lock2() + 1;
+	if (lock == 1)
+	{
+		u16 seg = get_segment2() & 0xff00;
+		seg |= data;
+		set_segment2(seg);
+		m_digits[get_strobe()+16] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+	}
+	set_lock2(lock);
 }
 
 u8 s11_state::pia28_w7_r()
@@ -279,19 +293,26 @@ u8 s11_state::pia28_w7_r()
 
 void s11_state::pia2c_pa_w(u8 data)
 {
-	m_segment1 |= (data<<8);
-	m_segment1 |= 0x10000;
-	if ((m_segment1 & 0x70000) == 0x30000)
+	if (get_lock1() == 1)
 	{
-		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment1 |= 0x40000;
+		u16 seg = get_segment1() & 0xff;
+		seg |= (data<<8);
+		m_digits[get_strobe()] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment1(seg);
 	}
 }
 
 void s11_state::pia2c_pb_w(u8 data)
 {
-	m_segment1 |= data;
-	m_segment1 |= 0x20000;
+	u8 lock = get_lock1() + 1;
+	if (lock == 1)
+	{
+		u16 seg = get_segment1() & 0xff00;
+		seg |= data;
+		m_digits[get_strobe()] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment1(seg);
+	}
+	set_lock1(lock);
 }
 
 u8 s11_state::switch_r()
@@ -313,12 +334,12 @@ void s11_state::switch_w(u8 data)
 
 void s11_state::pia34_pa_w(u8 data)
 {
-	m_segment2 |= (data<<8);
-	m_segment2 |= 0x10000;
-	if ((m_segment2 & 0x70000) == 0x30000)
+	if (get_lock2() == 1)
 	{
-		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment2 |= 0x40000;
+		u16 seg = get_segment2() & 0xff;
+		seg |= (data<<8);
+		m_digits[get_strobe()+16] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment2(seg);
 	}
 }
 

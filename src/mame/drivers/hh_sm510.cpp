@@ -107,7 +107,7 @@ BF-803    cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
 
 RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
-The "Mini Classics" keychains are by Nelsonic, not Nintendo.
+The "Mini Classics" keychains are by Stadlbauer, not Nintendo.
 
 Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
 but it's not part of the game series.
@@ -137,7 +137,6 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "emu.h"
 #include "includes/hh_sm510.h"
 
-#include "cpu/sm510/sm500.h"
 #include "screen.h"
 #include "speaker.h"
 
