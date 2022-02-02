@@ -2,15 +2,16 @@
 // copyright-holders:Sergey Svishchev
 
 #include "emu.h"
+#include "machine/genpc.h"
 
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
-#include "formats/asst128_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/genpc.h"
 #include "machine/pc_fdc.h"
+
+#include "formats/asst128_dsk.h"
 
 
 DECLARE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device)

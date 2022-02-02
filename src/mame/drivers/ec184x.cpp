@@ -14,13 +14,14 @@
 
 
 #include "emu.h"
+#include "machine/genpc.h"
 
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
-#include "machine/genpc.h"
 #include "machine/ram.h"
+
 #include "softlist_dev.h"
 
 

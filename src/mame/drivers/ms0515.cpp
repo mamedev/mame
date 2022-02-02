@@ -29,7 +29,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
-#include "formats/ms0515_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -39,6 +38,8 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
+
+#include "formats/ms0515_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -58,6 +59,8 @@
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 #define LOGSYSREG(format, ...)  LOGMASKED(LOG_SYSREG, "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
+
+namespace {
 
 class ms0515_state : public driver_device
 {
@@ -616,6 +619,9 @@ ROM_START( ms0515 )
 	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

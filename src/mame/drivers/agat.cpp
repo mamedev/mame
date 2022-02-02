@@ -69,6 +69,9 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "machine/agatkeyb.h"
+#include "video/agat7.h"
+#include "video/agat9.h"
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
@@ -80,12 +83,9 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "imagedev/cassette.h"
-#include "machine/agatkeyb.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "video/agat7.h"
-#include "video/agat9.h"
 
 #include "screen.h"
 #include "softlist.h"

@@ -1648,9 +1648,12 @@ ioport:count_players()
     Returns the number of player controllers in the system.
 ioport:type_pressed(type, [player])
     Returns a Boolean indicating whether the specified input is currently
-    pressed.  The input port type is an enumerated value.  The player number is
-    a zero-based index.  If the player number is not supplied, it is assumed to
-    be zero.
+    pressed.  The input type may be an enumerated value or an
+    :ref:`input type <luareference-input-inputtype>` entry.  If the input type
+    is an enumerated value, the player number may be supplied as a zero-based
+    index; if the player number is not supplied, it is assumed to be zero.  If
+    the input type is an input type entry, the player number may not be supplied
+    separately.
 ioport:type_name(type, [player])
     Returns the display name for the specified input type and player number.
     The input type is an enumerated value.  The player number is a zero-based
@@ -1665,22 +1668,31 @@ ioport:type_group(type, player)
     canonical grouping in an input configuration UI.
 ioport:type_seq(type, [player], [seqtype])
     Get the configured :ref:`input sequence <luareference-input-iptseq>` for the
-    specified input type, player number and sequence type.  The input type is an
-    enumerated value.  The player number is a zero-based index.  If the player
-    number is not supplied, it is assumed to be zero.  If the sequence type is
-    supplied, it must be ``"standard"``, ``"increment"`` or ``"decrement"``; if
-    it is not supplied, it is assumed to be ``"standard"``.
+    specified input type, player number and sequence type.  The input type may
+    be an enumerated value or an
+    :ref:`input type <luareference-input-inputtype>` entry.  If the input type
+    is an enumerated value, the player number may be supplied as a zero-based
+    index; if the player number is not supplied, it is assumed to be zero.  If
+    the input type is an input type entry, the player number may not be supplied
+    separately.  If the sequence type is supplied, it must be ``"standard"``,
+    ``"increment"`` or ``"decrement"``; if it is not supplied, it is assumed to
+    be ``"standard"``.
 
     This provides access to general input configuration.
-ioport:set_type_seq(type, player, seqtype, seq)
+ioport:set_type_seq(type, [player], seqtype, seq)
     Set the configured :ref:`input sequence <luareference-input-iptseq>` for the
-    specified input type, player number and sequence type.  The input type is an
-    enumerated value.  The player number is a zero-based index.  The sequence
-    type must be ``"standard"``, ``"increment"`` or ``"decrement"``.
+    specified input type, player number and sequence type.  The input type may
+    be an enumerated value or an
+    :ref:`input type <luareference-input-inputtype>` entry.  If the input type
+    is an enumerated value, the player number must be supplied as a zero-based
+    index.  If the input type is an input type entry, the player number may not
+    be supplied separately.  The sequence type must be ``"standard"``,
+    ``"increment"`` or ``"decrement"``.
 
     This allows general input configuration to be set.
 ioport:token_to_input_type(string)
-    Returns the input type and player number for the specified input type token.
+    Returns the input type and player number for the specified input type token
+    string.
 ioport:input_type_to_token(type, [player])
     Returns the token string for the specified input type and player number.  If
     the player number is not supplied, it assumed to be zero.
@@ -1688,6 +1700,9 @@ ioport:input_type_to_token(type, [player])
 Properties
 ^^^^^^^^^^
 
+ioport.types[] (read-only)
+    Gets the supported :ref:`input types <luareference-input-inputtype>`.  Keys
+    are arbitrary indices.  All supported operations have O(1) complexity.
 ioport.ports[]
     Gets the emulated :ref:`I/O ports <luareference-input-ioport>` in the
     system.  Keys are absolute tags.  The ``at`` and ``index_of`` methods have
@@ -1984,6 +1999,41 @@ Properties
 
 live.name
     Display name for the field.
+
+.. _luareference-input-inputtype:
+
+Input type
+~~~~~~~~~~
+
+Wraps MAME’s ``input_type_entry`` class, representing an emulated input type or
+emulator UI input type.  Input types are uniquely identified by the combination
+of their enumerated type value and player index.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.ioport.types[index]
+    Gets a supported input type.
+
+Properties
+^^^^^^^^^^
+
+type.type (read-only)
+    An enumerated value representing the type of input.
+type.group (read-only)
+    An integer giving the grouping for the input type.  Should be used to
+    provide canonical grouping in an input configuration UI.
+type.player (read-only)
+    The zero-based player number, or zero for non-player controls.
+type.token (read-only)
+    The token string for the input type, used in configuration files.
+type.name (read-only)
+    The display name for the input type.
+type.is_analog (read-only)
+    A Boolean indicating whether the input type is analog or digital.  Inputs
+    that only have on and off states are considered digital, while all other
+    inputs are considered analog, even if they can only represent discrete
+    values or positions.
 
 .. _luareference-input-inputman:
 
@@ -2745,10 +2795,12 @@ screens in the emulated system.
 Instantiation
 ^^^^^^^^^^^^^
 
-Layout scripts generally
-
 manager.machine.render.targets[index].current_view
     Gets the currently selected view for a given render target.
+file.views[name]
+    Gets the view with the specified name from a
+    :ref:`layout file <luareference-render-layfile>`.  This is how layout
+    scripts generally obtain views.
 
 Methods
 ^^^^^^^
@@ -2982,8 +3034,192 @@ Debugger
 --------
 
 Some of MAME’s core debugging features can be controlled from Lua script.  The
-debugger must be enabled to use the debugging features (usually by passing
+debugger must be enabled to use the debugger features (usually by passing
 ``-debug`` on the command line).
+
+.. _luareference-debug-symtable:
+
+Symbol table
+~~~~~~~~~~~~
+
+Wrap’s MAME’s ``symbol_table`` class, providing named symbols that can be used
+in expressions.  Note that symbol tables can be created and used even when the
+debugger is not enabled.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.symbol_table(machine, [parent], [device])
+    Creates a new symbol table in the context of the specified machine,
+    optionally supplying a parent symbol table.  If a parent symbol table is
+    supplied, it must not be destroyed before the new symbol table.  If a device
+    is specified and it implements ``device_memory_interface``, it is used as
+    the base for looking up address spaces and memory regions.  Note that if a
+    device that does not implement ``device_memory_interface`` is supplied, it
+    will not be used (address spaces and memory regions will be looked up
+    relative to the root device).
+
+Methods
+^^^^^^^
+
+symbols:set_memory_modified_func(cb)
+    Set a function to call when memory is modified via the symbol table.  No
+    arguments are passed to the function and any return values are ignored.
+    Call with ``nil`` to remove the callback.
+symbols:add(name, [value])
+    Adds a named integer symbol.  The name must be a string.  If a value is
+    supplied, it must be an integer.  If a value is supplied, a read-only symbol
+    is added with the supplied value.  If no value is supplied, a read/write
+    symbol is created with and initial value of zero.  If a symbol entry with
+    the specified name already exists in the symbol table, it will be replaced.
+symbols:add(name, getter, [setter], [format])
+    Adds a named integer symbol using getter and optional setter callbacks.  The
+    name must be a string.  The getter must be a function returning an integer
+    for the symbol value.  If supplied, the setter must be a function that
+    accepts a single integer argument for the new value of the symbol.  A format
+    string for displaying the symbol value may optionally be supplied.  If a
+    symbol entry with the specified name already exists in the symbol table, it
+    will be replaced.
+symbols:add(name, minparams, maxparams, execute)
+    Adds a named function symbol.  The name must be a string.  The minimum and
+    maximum numbers of parameters must be integers.  If a symbol entry with the
+    specified name already exists in the symbol table, it will be replaced.
+symbols:find(name)
+    Returns the :ref:`symbol entry <luareference-debug-symentry>` with the
+    specified name, or ``nil`` if there is no symbol with the specified name in
+    the symbol table.
+symbols:find_deep(name)
+    Returns the :ref:`symbol entry <luareference-debug-symentry>` with the
+    specified name, or ``nil`` if there is no symbol with the specified name in
+    the symbol table or any of its parent symbol tables.
+symbols:value(name)
+    Returns the integer value of the symbol with the specified name, or zero if
+    there is no symbol with the specified name in the symbol table or any of its
+    parent symbol tables.  Raises an error if the symbol with specified name is
+    a function symbol.
+symbols:set_value(name, value)
+    Sets the value of the symbol with the specified name.  Raises an error if
+    the symbol with the specified name is a read-only integer symbol or if it is
+    a function symbol.  Has no effect if there is no symbol with the specified
+    name in the symbol table or any of its parent symbol tables.
+symbols:memory_value(name, space, offset, size, disable_se)
+    Read a value from memory.  Supply the name or tag of the address space or
+    memory region to read from, or ``nil`` to use the address space or memory
+    region implied by the ``space`` argument.  See
+    :ref:`memory accesses in debugger expressions <debugger-express-mem>` for
+    access type specifications that can be used for the ``space`` argument.
+    The access size is specified in bytes, and must be 1, 2, 4 or 8.  The
+    ``disable_se`` argument specifies whether memory access side effects should
+    be disabled.
+symbols:set_memory_value(name, space, offset, value, size, disable_se)
+    Write a value to memory.  Supply the name or tag of the address space or
+    memory region to write to, or ``nil`` to use the address space or memory
+    region implied by the ``space`` argument.  See
+    :ref:`memory accesses in debugger expressions <debugger-express-mem>` for
+    access type specifications that can be used for the ``space`` argument.
+    The access size is specified in bytes, and must be 1, 2, 4 or 8.  The
+    ``disable_se`` argument specifies whether memory access side effects should
+    be disabled.
+
+Properties
+^^^^^^^^^^
+
+symbols.entries[]
+    The :ref:`symbol entries <luareference-debug-symentry>` in the symbol table,
+    indexed by name.  The ``at`` and ``index_of`` methods have O(n) complexity;
+    all other supported operations have O(1) complexity.
+symbols.parent (read-only)
+    The parent symbol table, or ``nil`` if the symbol table has no parent.
+
+.. _luareference-debug-expression:
+
+Parsed expression
+~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``parsed_expression`` class, which represents a tokenised debugger
+expression.  Note that parsed expressions can be created and used even when the
+debugger is not enabled.
+
+Intantiation
+^^^^^^^^^^^^
+
+emu.parsed_expression(symbols)
+    Creates an empty expression that will use the supplied
+    :ref:`symbol table <luareference-debug-symtable>` to look up symbols.
+emu.parsed_expression(symbols, string, [default_base])
+    Creates an expression by parsing the supplied string, looking up symbols in
+    the supplied :ref:`symbol table <luareference-debug-symtable>`.  If the
+    default base for interpreting integer literals is not supplied, 16 is used
+    (hexadecimal).  Raises an error if the string contains syntax errors or uses
+    undefined symbols.
+emu.parsed_expression(expression)
+    Creates a copy of an existing parsed expression.
+
+Methods
+^^^^^^^
+
+expression:set_default_base(base)
+    Set the default base for interpreting numeric literals.  The base must be a
+    positive integer.
+expression:parse(string)
+    Parse a debugger expression string.  Replaces the current contents of the
+    expression if it is not empty.  Raises an error if the string contains
+    syntax errors or uses undefined symbols.  The previous content of the
+    expression is not preserved when attempting to parse an invalid expression
+    string.
+expression:execute()
+    Evaluates the expression, returning an unsigned integer result.  Raises an 
+    error if the expression cannot be evaluated (e.g. calling a function with an
+    invalid number of arguments).
+
+Properties
+^^^^^^^^^^
+
+expression.is_empty (read-only)
+    A Boolean indicating whether the expression contains no tokens.
+expression.original_string (read-only)
+    The original string that was parsed to create the expression.
+expression.symbols (read/write)
+    The :ref:`symbol table <luareference-debug-symtable>` used for to look up
+    symbols in the expression.
+
+.. _luareference-debug-symentry:
+
+Symbol entry
+~~~~~~~~~~~~
+
+Wraps MAME’s ``symbol_entry`` class, which represents an entry in a
+:ref:`symbol table <luareference-debug-symtable>`.
+
+Instantiation
+^^^^^^^^^^^^^
+
+symbols:find(name)
+    Obtains the symbol entry with the specified name from a
+    :ref:`symbol table <luareference-debug-symtable>`, but does not search
+    parent symbol tables.
+symbols:deep_find(name)
+    Obtains the symbol entry with the specified name from a
+    :ref:`symbol table <luareference-debug-symtable>`, recursively searching
+    parent symbol tables.
+
+Properties
+^^^^^^^^^^
+
+entry.name (read-only)
+    The name of the symbol entry.
+entry.format (read-only)
+    The format string used to convert the symbol entry to text for display.
+entry.is_function (read-only)
+    A Boolean indicating whether the symbol entry is a callable function.
+entry.is_lval (read-only)
+    A Boolean indicating whether the symbol entry is an integer symbol that can
+    be set (i.e. whether it can be used on the left-hand side of assignment
+    expressions).
+entry.value (read/write)
+    The integer value of the symbol entry.  Attempting to set the value raises
+    an error if the symbol entry is read-only.  Attempting to get or set the
+    value of a function symbol raises an error.
 
 .. _luareference-debug-manager:
 

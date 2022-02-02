@@ -356,17 +356,16 @@ Software to look for
 ******************************************************************************/
 
 #include "emu.h"
+#include "machine/hp_ipc_optrom.h"
 
 #include "bus/hp_hil/hil_devices.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_ipc_io/hp_ipc_io.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m68000/m68000.h"
-#include "formats/hp_ipc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/cop452.h"
-#include "machine/hp_ipc_optrom.h"
 #include "machine/input_merger.h"
 #include "machine/mm58167.h"
 #include "machine/ram.h"
@@ -374,11 +373,13 @@ Software to look for
 #include "machine/wd_fdc.h"
 #include "softlist_dev.h"
 #include "sound/dac.h"
-#include "speaker.h"
 #include "video/hp1ll3.h"
+
+#include "formats/hp_ipc_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
