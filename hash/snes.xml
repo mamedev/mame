@@ -35256,6 +35256,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="asterixp" cloneof="asterix">
+		<description>Asterix (prototype 19930311)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="asterix (mar 11, 1993 prototype).sfc" size="524288" crc="766dc9d9" sha1="bf53366b70de01f4d99b068a0eaf7495fbeaa273" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="atlas">
 		<description>The Atlas - Renaissance Voyager (Jpn)</description>
 		<year>1995</year>
@@ -43332,6 +43344,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="illgaiap1" cloneof="illtime" supported="no">
+		<description>Illusion of Gaia (prototype B)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="illusion of gaia (prototype b).sfc" size="2097152" crc="721941df" sha1="a95cf7850c03618fe54b09172b3531f5e9b5b932" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="illtime">
 		<description>Illusion of Time (Euro)</description>
 		<year>1994</year>
@@ -47126,6 +47152,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="magicboyp" cloneof="magicboy">
+		<description>Magic Boy (prototype)</description>
+		<year>1996</year>
+		<publisher>JVC</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="magic boy (prototype).sfc" size="524288" crc="e6c54883" sha1="52e9f69a16bd3c1c1f91ab8def42e91e2988825a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magicboyu" cloneof="magicboy">
 		<description>Magic Boy (USA)</description>
 		<year>1996</year>
@@ -47763,8 +47801,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="mshjp" cloneof="msh">
+		<description>Marvel Super Heroes - War of the Gems (Japan, prototype)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="marvel super heroes - war of the gems (prototype b).sfc" size="2097152" crc="4ec91d9c" sha1="bd68ba19211bddb37d7b763ac0934a9c36184c5e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mshj" cloneof="msh">
-		<description>Marvel Super Heroes - War of the Gems (Jpn)</description>
+		<description>Marvel Super Heroes - War of the Gems (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-AHZJ-JPN" />
@@ -47956,6 +48006,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="mecarobot golf (usa).sfc" size="1048576" crc="82ceee3a" sha1="7fc213cf74189df1ada9633852a3843e082ee677" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mechwarrp" cloneof="mechwarr">
+		<description>MechWarrior (prototype)</description>
+		<year>1993</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mechwarrior (prototype b).sfc" size="1048576" crc="bef0c5fe" sha1="ac4b9fe266c71aef05e46c3fc167d44264aaac36" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -49304,6 +49368,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="nbaallstp" cloneof="nbaallst">
+		<description>NBA All-Star Challenge (prototype)</description>
+		<year>1992</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="nba all-star challenge (prototype).sfc" size="1048576" crc="618703fa" sha1="96f57be3443e0fc3a410394aa39965dd35c45b3b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nbaallstu" cloneof="nbaallst">
 		<description>NBA All-Star Challenge (USA)</description>
 		<year>1992</year>
@@ -49530,6 +49606,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="nba live 96 (europe).sfc" size="1572864" crc="17689c62" sha1="dc7ebb56279740557d59bb84c5e7d43a5f4c518d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbaliv97p" cloneof="nbaliv97">
+		<description>NBA Live 97 (prototype 19960920)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="nba live 97 (sep 20, 1996 prototype).sfc" size="2097152" crc="d7c0cad3" sha1="a4ac7a5ed84692bfd93714185cc3d999e18fda0a" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -52557,6 +52647,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="prehistorik man (europe) (en,fr,de).sfc" size="1048576" crc="b0e4e48a" sha1="77c96255ce51ad8abbef06909a6464656329c76f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmanp" cloneof="pman">
+		<description>Prehistorik Man (prototype)</description>
+		<year>1994</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="prehistorik man (prototype).sfc" size="1048576" crc="6c0174a3" sha1="cb3aba215747d83f32cf0031dd78aa6735f7335d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
