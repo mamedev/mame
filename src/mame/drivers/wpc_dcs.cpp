@@ -442,9 +442,9 @@ void wpc_dcs_state::wpc_dcs(machine_config &config)
 	DCS_AUDIO_8K(config, dcs, 0);
 }
 
-/*-------------
+/*----------------------
 / Demolition Man #50028
-/--------------*/
+/----------------------*/
 ROM_START(dm_pa2)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("u6-pa2.rom", 0x00000, 0x80000, CRC(862be56a) SHA1(95e1f899963762cb1a9de4eb5d6d57183ed1da38))
@@ -533,9 +533,9 @@ ROM_START(dm_h6)
 	ROM_LOAD16_BYTE("dm.9", 0xe00000, 0x080000, CRC(4c1a34e8) SHA1(3eacc3c63b2d9db57fc86447f1408635b987ef69))
 ROM_END
 
-/*-----------------
+/*----------------------
 /  Indiana Jones #50017
-/------------------*/
+/----------------------*/
 ROM_START(ij_l7)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ijone_l7.rom", 0x00000, 0x80000, CRC(4658c877) SHA1(b47ab064ff954bd182919f714ed8930cf0bed896))
@@ -614,9 +614,9 @@ ROM_START(ij_l3)
 	ROM_LOAD16_BYTE("ijsnd_l3.u8", 0xc00000, 0x080000, CRC(45e35bd7) SHA1(782b406be341d55d22a96acb8c2459f3058940df))
 ROM_END
 
-/*-----------------
+/*--------------------
 /  Judge Dredd #20020
-/------------------*/
+/--------------------*/
 ROM_START(jd_l7)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jdrd_l7.rom", 0x00000, 0x80000, CRC(87b2a5c3) SHA1(e487e9ff78353ee96d5fb5f036b1a6cef586f5b4))
@@ -687,9 +687,9 @@ ROM_START(jd_l4)
 	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
 ROM_END
 
-/*-----------------
+/*-------------------------------
 / Popeye Saves The Earth #50022
-/------------------*/
+/-------------------------------*/
 ROM_START(pop_lx5)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("peye_lx5.rom", 0x00000, 0x80000, CRC(ee1f7a67) SHA1(f02518546de93256b00bc1f5b92452a10f9e56dd))
@@ -727,9 +727,9 @@ ROM_START(pop_la4)
 ROM_END
 
 
-/*-----------------
+/*--------------------------------------
 / Star Trek: The Next Generation #50023
-/------------------*/
+/--------------------------------------*/
 ROM_START(sttng_l7)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx7.rom", 0x00000, 0x80000, CRC(d439fdbb) SHA1(12d1c72cd6cc18db53e51ebb4c1e55ca9bcf9908))
@@ -874,9 +874,9 @@ ROM_START(sttng_l5)
 ROM_END
 
 
-/*-------------
-/ Addams Family Values (Coin Dropper)
-/--------------*/
+/*-------------------------------------------
+/ Addams Family Values #60022 (Coin Dropper)
+/-------------------------------------------*/
 ROM_START(afv_l4)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("afv_u6.l4", 0x00000, 0x80000, CRC(37369339) SHA1(e44a91faca80ffa00d6db78e2df7aa9bf14e957c))
