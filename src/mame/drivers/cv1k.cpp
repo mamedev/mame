@@ -837,7 +837,7 @@ ROM_START( pinkswtsx )
 ROM_END
 
 // hack based on 2006/04/06 MASTER VER....
-// This set is dumped from bootleg PCB with pre-patched Suicide Club hack, These CRC32 checksums are matches compares to owners homepage's one.
+// This set is dumped from bootleg PCB with pre-patched Suicide Club hack, These CRC32 checksums are matches compares to authors homepage's one.
 ROM_START( pinkswtssc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "suicideclub.u4", 0x0000, 0x200000, CRC(5e03662f) SHA1(b974204b8dcd55fc1b7775f7c1806150919caff3) ) // (2017/10/31 SUICIDECLUB VER.)
