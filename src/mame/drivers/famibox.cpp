@@ -33,7 +33,7 @@ released for it.  Why?
 
 Here's a list of some of the games known to have come with the FamicomBox:
 1943; Baseball; Bomber Man; Devil World; Donkey Kong; Donkey Kong Jr.; Duck Hunt;
-Excite Bike; F1 Race; Fighting Golf; Golf; Gradius; Hogan's Alley; Ice Climbers;
+Excitebike; F1 Race; Fighting Golf; Golf; Gradius; Hogan's Alley; Ice Climbers;
 Ice Hockey; Knight Rider; Makaimura: Ghosts 'n Goblins; McKids; Mah-Jong; Mario Bros.;
 Mike Tyson's Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
 Rygar; Senjou no Ookami; Soccer League Winner's Cup; Super Chinese 2; Super Mario Bros;
