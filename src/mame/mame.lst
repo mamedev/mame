@@ -12440,6 +12440,9 @@ ep804                           //
 @source:digilog320.cpp
 digilog320                      //
 
+@source:digilog400.cpp
+digilog400                      //
+
 @source:digijet.cpp
 digijet                         //
 

@@ -4597,6 +4597,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
 	MAME_DIR .. "src/mame/drivers/digilog320.cpp",
+	MAME_DIR .. "src/mame/drivers/digilog400.cpp",
 	MAME_DIR .. "src/mame/machine/digilog_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/digilog_kbd.h",
 	MAME_DIR .. "src/mame/drivers/digijet.cpp",
