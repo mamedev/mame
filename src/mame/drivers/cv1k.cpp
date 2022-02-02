@@ -836,7 +836,7 @@ ROM_START( pinkswtsx )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
 ROM_END
 
-// hack based on 2006/04/06 MASTER VER....
+// modification based on 2006/04/06 MASTER VER....
 // This set is dumped from bootleg PCB with pre-patched Suicide Club hack, These CRC32 checksums are matches compares to authors homepage's one.
 ROM_START( pinkswtssc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
@@ -1019,7 +1019,7 @@ GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",                        MACHINE_IMPERFECT_TIMING )
 GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",                          MACHINE_IMPERFECT_TIMING )
 GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",                          MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
-GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "hack (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",              MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
+GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",           MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
 
 // CA015  Mushihime-Sama Futari
 GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",                   MACHINE_IMPERFECT_TIMING )
