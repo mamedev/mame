@@ -131,7 +131,7 @@ private:
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
@@ -382,6 +382,15 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 		m_ram[offset] = data;
 	else
 		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
+}
+
+void wpc_an_state::machine_start()
+{
+	m_digits.resolve();
+	save_item(NAME(m_vblank_count));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_bankmask));
+	save_item(NAME(m_ram));
 }
 
 void wpc_an_state::machine_reset()

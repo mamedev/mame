@@ -34,7 +34,7 @@ ToDo:
 
 *********************************************************************************************/
 #include "emu.h"
-#include "includes/wpc_flip2.h"
+#include "includes/wpc_dot.h"
 #include "screen.h"
 #include "speaker.h"
 

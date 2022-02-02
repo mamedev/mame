@@ -191,6 +191,15 @@ void wpc_dot_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
+void wpc_dot_state::machine_start()
+{
+	save_item(NAME(m_vblank_count));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_bankmask));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_dmdram));
+}
+
 void wpc_dot_state::machine_reset()
 {
 	m_cpubank->set_entry(0);
