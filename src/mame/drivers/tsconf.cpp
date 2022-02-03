@@ -211,6 +211,7 @@ void tsconf_state::machine_reset()
 
 	m_port_f7_ext = DISABLED;
 
+	m_scanline_delayed_regs_update = {};
 	m_regs[V_CONFIG] = 0x00;
 	m_regs[V_PAGE] = 0x05;
 	m_regs[G_X_OFFS_L] = 0x00;

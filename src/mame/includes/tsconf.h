@@ -121,14 +121,14 @@ private:
 		CACHE_CONFIG = 0x2b,
 		DMA_NUM_H = 0x2c,
 
-		T0_X_OFFSER_L = 0x40,
-		T0_X_OFFSER_H = 0x41,
-		T0_Y_OFFSER_L = 0x42,
-		T0_Y_OFFSER_H = 0x43,
-		T1_X_OFFSER_L = 0x44,
-		T1_X_OFFSER_H = 0x45,
-		T1_Y_OFFSER_L = 0x46,
-		T1_Y_OFFSER_H = 0x47
+		T0_X_OFFSET_L = 0x40,
+		T0_X_OFFSET_H = 0x41,
+		T0_Y_OFFSET_L = 0x42,
+		T0_Y_OFFSET_H = 0x43,
+		T1_X_OFFSET_L = 0x44,
+		T1_X_OFFSET_H = 0x45,
+		T1_Y_OFFSET_L = 0x46,
+		T1_Y_OFFSET_H = 0x47
 	};
 
 	void update_frame_timer();
@@ -147,6 +147,8 @@ private:
 	void spectrum_UpdateScreenBitmap(bool eof = false) override;
 	void spectrum_UpdateBorderBitmap() override;
 	void spectrum_UpdateZxScreenBitmap(bool eof);
+	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
+	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_palette(palette_device &palette) const;
 	u16 get_border_color() override;
 	void draw_sprites(const rectangle &cliprect);
@@ -186,6 +188,7 @@ private:
 	u16 ram_read16(offs_t offset);
 	u16 spi_read16();
 
+	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
 	address_space *m_program;
