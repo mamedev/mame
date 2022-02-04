@@ -142,7 +142,7 @@ void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
 	if (bm->valid())
 	{
 		u8 pal_offset = m_regs[PAL_SEL] << 4;
-		u16 border_color = get_border_color() | pal_offset;
+		u16 border_color = m_regs[BORDER];
 		bool border_only = VM != VM_ZX || BIT(m_regs[V_CONFIG], 5);
 		rectangle screen = screen_area[0];
 		do
