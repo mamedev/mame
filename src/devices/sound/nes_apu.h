@@ -79,7 +79,7 @@ private:
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
-	stream_buffer::sample_t m_square_lut[16][16];   // Non-linear Square wave output LUT
+	stream_buffer::sample_t m_square_lut[31];       // Non-linear Square wave output LUT
 	stream_buffer::sample_t m_tnd_lut[16][16][128]; // Non-linear Triangle, Noise, DMC output LUT
 
 	sound_stream *m_stream;
@@ -88,10 +88,10 @@ private:
 
 	void calculate_rates();
 	void create_syncs(unsigned long sps);
-	u8 apu_square(apu_t::square_t *chan);
-	u8 apu_triangle(apu_t::triangle_t *chan);
-	u8 apu_noise(apu_t::noise_t *chan);
-	u8 apu_dpcm(apu_t::dpcm_t *chan);
+	void apu_square(apu_t::square_t *chan);
+	void apu_triangle(apu_t::triangle_t *chan);
+	void apu_noise(apu_t::noise_t *chan);
+	void apu_dpcm(apu_t::dpcm_t *chan);
 	inline void apu_regwrite(int address, u8 value);
 };
 

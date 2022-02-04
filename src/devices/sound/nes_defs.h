@@ -56,12 +56,12 @@ struct apu_t
 		int vbl_length = 0;
 		int freq = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		float sweep_phase = 0.0;
 		uint8 adder = 0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* Triangle Wave */
@@ -78,10 +78,11 @@ struct apu_t
 		int vbl_length = 0;
 		int write_latency = 0;
 		float phaseacc = 0.0;
-		uint8 output_vol = 0;
 		uint8 adder = 0;
 		bool counter_started = false;
 		bool enabled = false;
+		uint8 output = 0;
+		uint8 output_next = 0;
 	};
 
 	/* Noise Wave */
@@ -97,10 +98,10 @@ struct apu_t
 		u32 seed = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* DPCM Wave */
@@ -117,11 +118,11 @@ struct apu_t
 		uint32 length = 0;
 		int bits_left = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		uint8 cur_byte = 0;
 		bool enabled = false;
 		bool irq_occurred = false;
 		int16 vol = 0;
+		uint8 output = 0;
 	};
 
 

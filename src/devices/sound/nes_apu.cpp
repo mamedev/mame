@@ -144,24 +144,45 @@ void nesapu_device::device_start()
 	calculate_rates();
 
 	// calculate mixer output
-	for (int p1 = 0; p1 < 16; p1++)
+	/*
+	pulse channel output:
+
+		     95.88
+	-----------------------
+	      8128
+	----------------- + 100
+	pulse 1 + pulse 2
+
+	*/
+	for (int i = 0; i < 31; i++)
 	{
-		for (int p2 = 0; p2 < 16; p2++)
-		{
-			int muxed_pulse = p1 + p2;
-			stream_buffer::sample_t pulse_out = 95.52 / (8128.0 / muxed_pulse + 100);
-			m_square_lut[p1][p2] = pulse_out;
-		}
+		stream_buffer::sample_t pulse_out = (i == 0) ? 0 : 95.88 / ((8128.0 / i) + 100.0);
+		m_square_lut[i] = pulse_out;
 	}
 
+	/*
+	triangle, noise, DMC channel output:
+
+		         159.79
+	-------------------------------
+	            1
+	------------------------- + 100
+	triangle   noise    dmc
+	-------- + ----- + -----
+	  8227     12241   22638
+
+	*/
 	for (int t = 0; t < 16; t++)
 	{
 		for (int n = 0; n < 16; n++)
 		{
 			for (int d = 0; d < 128; d++)
 			{
-				int muxed_tnd = t * 3 + n * 2 + d;
-				stream_buffer::sample_t tnd_out = 163.67 / (24329.0 / muxed_tnd + 100);
+				stream_buffer::sample_t tri_out = (t == 0) ? 0 : (t / 8227.0);
+				stream_buffer::sample_t noise_out = (n == 0) ? 0 : (n / 12241.0);
+				stream_buffer::sample_t dmc_out = (d == 0) ? 0 : (d / 22638.0);
+				stream_buffer::sample_t tnd_out = tri_out + noise_out + dmc_out;
+				tnd_out = (tnd_out == 0.0) ? 0.0 : 159.79 / ((1.0 / tnd_out) + 100.0);
 				m_tnd_lut[t][n][d] = tnd_out;
 			}
 		}
@@ -174,12 +195,12 @@ void nesapu_device::device_start()
 		save_item(NAME(m_APU.squ[i].vbl_length), i);
 		save_item(NAME(m_APU.squ[i].freq), i);
 		save_item(NAME(m_APU.squ[i].phaseacc), i);
-		save_item(NAME(m_APU.squ[i].output_vol), i);
 		save_item(NAME(m_APU.squ[i].env_phase), i);
 		save_item(NAME(m_APU.squ[i].sweep_phase), i);
 		save_item(NAME(m_APU.squ[i].adder), i);
 		save_item(NAME(m_APU.squ[i].env_vol), i);
 		save_item(NAME(m_APU.squ[i].enabled), i);
+		save_item(NAME(m_APU.squ[i].output), i);
 	}
 
 	save_item(NAME(m_APU.tri.regs));
@@ -187,30 +208,31 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tri.vbl_length));
 	save_item(NAME(m_APU.tri.write_latency));
 	save_item(NAME(m_APU.tri.phaseacc));
-	save_item(NAME(m_APU.tri.output_vol));
 	save_item(NAME(m_APU.tri.adder));
 	save_item(NAME(m_APU.tri.counter_started));
 	save_item(NAME(m_APU.tri.enabled));
+	save_item(NAME(m_APU.tri.output));
+	save_item(NAME(m_APU.tri.output_next));
 
 	save_item(NAME(m_APU.noi.regs));
 	save_item(NAME(m_APU.noi.seed));
 	save_item(NAME(m_APU.noi.vbl_length));
 	save_item(NAME(m_APU.noi.phaseacc));
-	save_item(NAME(m_APU.noi.output_vol));
 	save_item(NAME(m_APU.noi.env_phase));
 	save_item(NAME(m_APU.noi.env_vol));
 	save_item(NAME(m_APU.noi.enabled));
+	save_item(NAME(m_APU.noi.output));
 
 	save_item(NAME(m_APU.dpcm.regs));
 	save_item(NAME(m_APU.dpcm.address));
 	save_item(NAME(m_APU.dpcm.length));
 	save_item(NAME(m_APU.dpcm.bits_left));
 	save_item(NAME(m_APU.dpcm.phaseacc));
-	save_item(NAME(m_APU.dpcm.output_vol));
 	save_item(NAME(m_APU.dpcm.cur_byte));
 	save_item(NAME(m_APU.dpcm.enabled));
 	save_item(NAME(m_APU.dpcm.irq_occurred));
 	save_item(NAME(m_APU.dpcm.vol));
+	save_item(NAME(m_APU.dpcm.output));
 
 	save_item(NAME(m_APU.regs));
 
@@ -227,11 +249,10 @@ void nesapu_device::device_start()
 /* TODO: sound channels should *ALL* have DC volume decay */
 
 /* OUTPUT SQUARE WAVE SAMPLE (VALUES FROM 0 to +15) */
-u8 nesapu_device::apu_square(apu_t::square_t *chan)
+void nesapu_device::apu_square(apu_t::square_t *chan)
 {
 	int env_delay;
 	int sweep_delay;
-	u8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold, 6-7=duty cycle
 	** reg1: 0-2=sweep shifts, 3=sweep inc/dec, 4-6=sweep length, 7=sweep on
@@ -240,7 +261,10 @@ u8 nesapu_device::apu_square(apu_t::square_t *chan)
 	*/
 
 	if (!chan->enabled)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	/* enveloping */
 	env_delay = m_sync_times1[chan->regs[0] & 0x0f];
@@ -261,7 +285,10 @@ u8 nesapu_device::apu_square(apu_t::square_t *chan)
 		chan->vbl_length--;
 
 	if (!chan->vbl_length)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	/* freqsweeps */
 	if ((chan->regs[1] & 0x80) && (chan->regs[1] & 7))
@@ -280,7 +307,10 @@ u8 nesapu_device::apu_square(apu_t::square_t *chan)
 
 	if ((!(chan->regs[1] & 8) && (chan->freq >> 16) > freq_limit[chan->regs[1] & 7])
 			|| (chan->freq >> 16) < 4)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	chan->phaseacc -= 4;
 
@@ -291,27 +321,27 @@ u8 nesapu_device::apu_square(apu_t::square_t *chan)
 	}
 
 	if (chan->regs[0] & 0x10) /* fixed volume */
-		output = chan->regs[0] & 0x0f;
+		chan->output = chan->regs[0] & 0x0f;
 	else
-		output = 0x0f - chan->env_vol;
+		chan->output = 0x0f - chan->env_vol;
 
-	output *= BIT((duty_lut[chan->regs[0] >> 6]), 7 - BIT(chan->adder, 1, 3));
-
-	return output;
+	chan->output *= BIT(duty_lut[chan->regs[0] >> 6], 7 - BIT(chan->adder, 1, 3));
 }
 
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM 0 to +15) */
-u8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
+void nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 {
 	int freq;
-	u8 output;
 	/* reg0: 7=holdnote, 6-0=linear length counter
 	** reg2: low 8 bits of frequency
 	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
 	*/
 
 	if (!chan->enabled)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	if (!chan->counter_started && !(chan->regs[0] & 0x80))
 	{
@@ -329,16 +359,25 @@ u8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 				chan->vbl_length--;
 
 		if (!chan->vbl_length)
-			return 0;
+		{
+			chan->output = 0;
+			return;
+		}
 	}
 
 	if (!chan->linear_length)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	freq = (((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1;
 
 	if (freq < 4) /* inaudible */
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
@@ -347,21 +386,18 @@ u8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 		chan->adder = (chan->adder + 1) & 0x1f;
 
 		if (chan->adder & 0x10)
-			output = chan->adder & 0xf;
+			chan->output_next = chan->adder & 0xf;
 		else
-			output = 0xf - (chan->adder & 0xf);
-
-		chan->output_vol = output;
+			chan->output_next = 0xf - (chan->adder & 0xf);
 	}
 
-	return chan->output_vol;
+	chan->output = chan->output_next;
 }
 
 /* OUTPUT NOISE WAVE SAMPLE (VALUES FROM 0 to +15) */
-u8 nesapu_device::apu_noise(apu_t::noise_t *chan)
+void nesapu_device::apu_noise(apu_t::noise_t *chan)
 {
 	int freq, env_delay;
-	u8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold
 	** reg2: 7=small(93 byte) sample,3-0=freq lookup
@@ -369,7 +405,10 @@ u8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	*/
 
 	if (!chan->enabled)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	/* enveloping */
 	env_delay = m_sync_times1[chan->regs[0] & 0x0f];
@@ -393,7 +432,10 @@ u8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	}
 
 	if (!chan->vbl_length)
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
 	freq = noise_freq[m_is_pal][chan->regs[2] & 0x0f];
 	chan->phaseacc -= 4;
@@ -403,15 +445,16 @@ u8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 		chan->seed = (chan->seed >> 1) | ((BIT(chan->seed, 0) ^ BIT(chan->seed, (chan->regs[2] & 0x80) ? 6 : 1)) << 14);
 	}
 
-	if (chan->regs[0] & 0x10) /* fixed volume */
-		output = chan->regs[0] & 0x0f;
-	else
-		output = 0x0f - chan->env_vol;
-
 	if (BIT(chan->seed, 0)) /* make it silence */
-		return 0;
+	{
+		chan->output = 0;
+		return;
+	}
 
-	return output;
+	if (chan->regs[0] & 0x10) /* fixed volume */
+		chan->output = chan->regs[0] & 0x0f;
+	else
+		chan->output = 0x0f - chan->env_vol;
 }
 
 /* RESET DPCM PARAMETERS */
@@ -427,7 +470,7 @@ static inline void apu_dpcmreset(apu_t::dpcm_t *chan)
 
 /* OUTPUT DPCM WAVE SAMPLE (VALUES FROM 0 to +127) */
 /* TODO: centerline naughtiness */
-u8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
+void nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 {
 	int freq, bit_pos;
 
@@ -482,7 +525,7 @@ u8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 		}
 	}
 
-	return (u8) (chan->vol);
+	chan->output = (u8)(chan->vol);
 }
 
 /* WRITE REGISTER VALUE */
@@ -740,8 +783,14 @@ void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 	{
-		accum = m_square_lut[apu_square(&m_APU.squ[0])][apu_square(&m_APU.squ[1])];
-		accum += m_tnd_lut[apu_triangle(&m_APU.tri)][apu_noise(&m_APU.noi)][apu_dpcm(&m_APU.dpcm)];
+		apu_square(&m_APU.squ[0]);
+		apu_square(&m_APU.squ[1]);
+		apu_triangle(&m_APU.tri);
+		apu_noise(&m_APU.noi);
+		apu_dpcm(&m_APU.dpcm);
+
+		accum = m_square_lut[m_APU.squ[0].output + m_APU.squ[1].output];
+		accum += m_tnd_lut[m_APU.tri.output][m_APU.noi.output][m_APU.dpcm.output];
 
 		output.put(sampindex, accum);
 	}
