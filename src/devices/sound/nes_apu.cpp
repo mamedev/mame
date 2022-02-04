@@ -156,7 +156,7 @@ void nesapu_device::device_start()
 	*/
 	for (int i = 0; i < 31; i++)
 	{
-		stream_buffer::sample_t pulse_out = (i == 0) ? 0 : 95.88 / ((8128.0 / i) + 100.0);
+		stream_buffer::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
 		m_square_lut[i] = pulse_out;
 	}
 
