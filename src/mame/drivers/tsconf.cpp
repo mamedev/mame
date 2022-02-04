@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset];
 	u8 hi = tile_info_addr[1];
 
-	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
+	u32 /*u16*/ tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
 	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols()); // same as: tmp_tile_oversized_to_code()
 	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
 	tileinfo.set(TM_TILES0 + Layer, tile, pal, TILE_FLIPYX(BIT(hi, 6, 2)));

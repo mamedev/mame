@@ -28,7 +28,7 @@ enum v_mode : u8
 	VM_TXT
 };
 
-static constexpr u16 tmp_tile_oversized_to_code(u16 code)
+static constexpr u32 tmp_tile_oversized_to_code(u16 code)
 {
 	return code / 64 * 64 * 8 + (code % 64);
 }
@@ -537,7 +537,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
 {
 	spectrum_ula_w(offset, data);
-	tsconf_port_xxaf_w(BORDER << 8, (data & 0x07) | 0xf0);
+	tsconf_port_xxaf_w(BORDER << 8, (data & 0x07) | (m_regs[PAL_SEL] << 4));
 }
 
 u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
