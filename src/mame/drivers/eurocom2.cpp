@@ -45,11 +45,11 @@
 #include "screen.h"
 
 
-#define VC_TOTAL_HORZ 678
-#define VC_DISP_HORZ  512
+static constexpr int VC_TOTAL_HORZ = 678;
+static constexpr int VC_DISP_HORZ = 512;
 
-#define VC_TOTAL_VERT 312
-#define VC_DISP_VERT  256
+static constexpr int VC_TOTAL_VERT = 312;
+static constexpr int VC_DISP_VERT = 256;
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -78,8 +78,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_p_videoram(*this, "videoram")
 		, m_screen(*this, "screen")
-	{
-	}
+	{ }
 
 	void eurocom2(machine_config &config);
 	void microtrol(machine_config &config);
@@ -106,7 +105,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer *m_sst;
 
@@ -246,7 +245,7 @@ WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);
@@ -302,7 +301,7 @@ void waveterm_state::pia3_pb_w(uint8_t data)
 
 uint8_t waveterm_state::waveterm_adc()
 {
-	return m_screen->frame_number() % 255; // XXX
+	return m_screen->frame_number() % 255; // FIXME
 }
 
 

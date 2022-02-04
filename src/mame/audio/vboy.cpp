@@ -211,7 +211,7 @@ void vboysnd_device::device_start()
 	// create the stream
 	m_stream = stream_alloc(0, 2, rate);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
 
 	for (int i=0; i<2048; i++)
@@ -259,7 +259,7 @@ void vboysnd_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }

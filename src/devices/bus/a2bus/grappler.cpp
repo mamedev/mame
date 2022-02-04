@@ -89,9 +89,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(slct_w);
 
 	// synchronised printer status inputs
-	void set_busy_in(void *ptr, s32 param);
-	void set_pe_in(void *ptr, s32 param);
-	void set_slct_in(void *ptr, s32 param);
+	void set_busy_in(s32 param);
+	void set_pe_in(s32 param);
+	void set_slct_in(s32 param);
 
 	u16 m_rom_bank;     // U2D (pin 13)
 	u8  m_busy_in;      // printer connector pin 21 (synchronised)
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER(a2bus_grappler_device_base::slct_w)
 //  synchronised printer status inputs
 //--------------------------------------------------
 
-void a2bus_grappler_device_base::set_busy_in(void *ptr, s32 param)
+void a2bus_grappler_device_base::set_busy_in(s32 param)
 {
 	if (u32(param) != m_busy_in)
 	{
@@ -202,7 +202,7 @@ void a2bus_grappler_device_base::set_busy_in(void *ptr, s32 param)
 }
 
 
-void a2bus_grappler_device_base::set_pe_in(void *ptr, s32 param)
+void a2bus_grappler_device_base::set_pe_in(s32 param)
 {
 	if (u32(param) != m_pe_in)
 	{
@@ -212,7 +212,7 @@ void a2bus_grappler_device_base::set_pe_in(void *ptr, s32 param)
 }
 
 
-void a2bus_grappler_device_base::set_slct_in(void *ptr, s32 param)
+void a2bus_grappler_device_base::set_slct_in(s32 param)
 {
 	if (u32(param) != m_slct_in)
 	{
@@ -250,9 +250,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
 
 	// synchronised signals
-	void set_data(void *ptr, s32 param);
-	void set_strobe(void *ptr, s32 param);
-	void set_ack_in(void *ptr, s32 param);
+	void set_data(s32 param);
+	void set_strobe(s32 param);
+	void set_ack_in(s32 param);
 
 	u8  m_strobe;       // U3 (pin 4)
 	u8  m_ack_latch;    // U3 (pin 13)
@@ -373,14 +373,14 @@ WRITE_LINE_MEMBER(a2bus_grappler_device::ack_w)
 //  synchronised signals
 //--------------------------------------------------
 
-void a2bus_grappler_device::set_data(void *ptr, s32 param)
+void a2bus_grappler_device::set_data(s32 param)
 {
 	LOG("Output data %02X\n", u8(u32(param)));
 	m_printer_out->write(u8(u32(param)));
 }
 
 
-void a2bus_grappler_device::set_strobe(void *ptr, s32 param)
+void a2bus_grappler_device::set_strobe(s32 param)
 {
 	LOG("Output /STROBE=%d\n", param);
 	m_printer_conn->write_strobe(param);
@@ -403,7 +403,7 @@ void a2bus_grappler_device::set_strobe(void *ptr, s32 param)
 }
 
 
-void a2bus_grappler_device::set_ack_in(void *ptr, s32 param)
+void a2bus_grappler_device::set_ack_in(s32 param)
 {
 	if (u32(param) != m_ack_in)
 	{
@@ -460,7 +460,7 @@ protected:
 
 private:
 	// synchronised printer status inputs
-	void set_ack_in(void *ptr, s32 param);
+	void set_ack_in(s32 param);
 
 	// for derived devices to implement
 	virtual void data_latched(u8 data) = 0;
@@ -592,7 +592,7 @@ WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::ack_w)
 //  synchronised printer status inputs
 //--------------------------------------------------
 
-void a2bus_grapplerplus_device_base::set_ack_in(void *ptr, s32 param)
+void a2bus_grapplerplus_device_base::set_ack_in(s32 param)
 {
 	if (u32(param) != m_ack_in)
 	{
@@ -877,9 +877,9 @@ private:
 	void mcu_bus_w(u8 data);
 
 	// synchronised signals
-	void set_buf_data(void *ptr, s32 param);
-	void set_buf_ack_in(void *ptr, s32 param);
-	void clear_ibusy(void *ptr, s32 param);
+	void set_buf_data(s32 param);
+	void set_buf_ack_in(s32 param);
+	void clear_ibusy(s32 param);
 
 	required_device<mcs48_cpu_device>   m_mcu;
 	std::unique_ptr<u8 []>              m_ram;
@@ -1177,13 +1177,13 @@ void a2bus_buf_grapplerplus_device::mcu_bus_w(u8 data)
 //  synchronised signals
 //--------------------------------------------------
 
-void a2bus_buf_grapplerplus_device::set_buf_data(void *ptr, s32 param)
+void a2bus_buf_grapplerplus_device::set_buf_data(s32 param)
 {
 	m_data_latch = u8(u32(param));
 }
 
 
-void a2bus_buf_grapplerplus_device::set_buf_ack_in(void *ptr, s32 param)
+void a2bus_buf_grapplerplus_device::set_buf_ack_in(s32 param)
 {
 	if (u32(param) != m_buf_ack_in)
 	{
@@ -1201,7 +1201,7 @@ void a2bus_buf_grapplerplus_device::set_buf_ack_in(void *ptr, s32 param)
 }
 
 
-void a2bus_buf_grapplerplus_device::clear_ibusy(void *ptr, s32 param)
+void a2bus_buf_grapplerplus_device::clear_ibusy(s32 param)
 {
 	if (m_ibusy)
 	{

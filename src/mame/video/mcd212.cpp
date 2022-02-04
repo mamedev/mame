@@ -25,18 +25,18 @@ TODO:
 #include "video/mcd212.h"
 #include "screen.h"
 
-#define LOG_UNKNOWNS		(1U << 1)
-#define LOG_REGISTERS		(1U << 2)
-#define LOG_ICA				(1U << 3)
-#define LOG_DCA				(1U << 4)
-#define LOG_VSR				(1U << 5)
-#define LOG_STATUS			(1U << 6)
-#define LOG_MAIN_REG_READS	(1U << 7)
-#define LOG_MAIN_REG_WRITES	(1U << 8)
-#define LOG_CLUT			(1U << 9)
-#define LOG_ALL				(LOG_UNKNOWNS | LOG_REGISTERS | LOG_ICA | LOG_DCA | LOG_VSR | LOG_STATUS | LOG_MAIN_REG_READS | LOG_MAIN_REG_WRITES | LOG_CLUT)
+#define LOG_UNKNOWNS        (1U << 1)
+#define LOG_REGISTERS       (1U << 2)
+#define LOG_ICA             (1U << 3)
+#define LOG_DCA             (1U << 4)
+#define LOG_VSR             (1U << 5)
+#define LOG_STATUS          (1U << 6)
+#define LOG_MAIN_REG_READS  (1U << 7)
+#define LOG_MAIN_REG_WRITES (1U << 8)
+#define LOG_CLUT            (1U << 9)
+#define LOG_ALL             (LOG_UNKNOWNS | LOG_REGISTERS | LOG_ICA | LOG_DCA | LOG_VSR | LOG_STATUS | LOG_MAIN_REG_READS | LOG_MAIN_REG_WRITES | LOG_CLUT)
 
-#define VERBOSE				(0)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 // device type definition
@@ -226,11 +226,12 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-		{
-			const uint8_t clut_index = m_clut_bank[Channel] * 0x40 + (reg - 0x80);
-			LOGMASKED(LOG_CLUT, "%s: Channel %d: CLUT[%d] = %08x\n", machine().describe_context(), Channel, clut_index, value);
-			m_clut[clut_index] = value & 0x00fcfcfc;
-		}	break;
+			{
+				const uint8_t clut_index = m_clut_bank[Channel] * 0x40 + (reg - 0x80);
+				LOGMASKED(LOG_CLUT, "%s: Channel %d: CLUT[%d] = %08x\n", machine().describe_context(), Channel, clut_index, value);
+				m_clut[clut_index] = value & 0x00fcfcfc;
+			}
+			break;
 		case 0xc0: // Image Coding Method
 			if (Channel == 0)
 			{

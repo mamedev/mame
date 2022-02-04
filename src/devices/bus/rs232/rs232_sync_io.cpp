@@ -141,7 +141,7 @@ void rs232_sync_io_device::device_reset()
 	output_rxc(1);
 }
 
-void rs232_sync_io_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rs232_sync_io_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case TMR_ID_CLK:

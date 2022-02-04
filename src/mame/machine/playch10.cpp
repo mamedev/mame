@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(playch10_state::disp_mask_w)
 
 WRITE_LINE_MEMBER(playch10_state::sound_mask_w)
 {
-	/* should mute the APU - unimplemented yet */
+	machine().sound().system_mute(!state);
 }
 
 WRITE_LINE_MEMBER(playch10_state::nmi_enable_w)
@@ -293,7 +293,7 @@ uint8_t playch10_state::pc10_chr_r(offs_t offset)
 	return m_chr_page[bank].chr[offset & 0x3ff];
 }
 
-void playch10_state::pc10_set_mirroring(int mirroring )
+void playch10_state::pc10_set_mirroring(int mirroring)
 {
 	switch (mirroring)
 	{
@@ -396,7 +396,7 @@ void playch10_state::init_playch10()
 	m_pc10_gun_controller = 0;
 
 	/* default mirroring */
-	m_mirroring = PPU_MIRROR_NONE;
+	m_mirroring = PPU_MIRROR_VERT;
 }
 
 /**********************************************************************************
@@ -823,7 +823,7 @@ void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 
 		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			m_cartcpu->set_input_line(0, HOLD_LINE);
+			m_cartcpu->set_input_line(0, ASSERT_LINE);
 		}
 	}
 }
@@ -953,6 +953,7 @@ void playch10_state::gboard_rom_switch_w(offs_t offset, uint8_t data)
 
 		case 0x6000: /* disable irqs */
 			m_IRQ_enable = 0;
+			m_cartcpu->set_input_line(0, CLEAR_LINE);
 		break;
 
 		case 0x6001: /* enable irqs */
@@ -981,8 +982,6 @@ void playch10_state::init_pcgboard()
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
-	m_gboard_scanline_counter = 0;
-	m_gboard_scanline_latch = 0;
 	m_gboard_4screen = 0;
 	m_IRQ_enable = 0;
 	m_IRQ_count = m_IRQ_count_latch = 0;
@@ -1001,6 +1000,7 @@ void playch10_state::init_pcgboard_type2()
 
 	/* enable 4 screen mirror */
 	m_gboard_4screen = 1;
+	m_mirroring = PPU_MIRROR_NONE;
 }
 
 /**********************************************************************************/
@@ -1097,17 +1097,12 @@ void playch10_state::init_pchboard()
 	/* Roms are banked at $8000 to $bfff */
 	m_cartcpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(playch10_state::hboard_rom_switch_w)));
 
-	/* extra ram at $6000-$7fff */
-	m_extra_ram = std::make_unique<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_extra_ram), 0x2000);
-	m_cartcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extra_ram.get());
-
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
-	m_gboard_scanline_counter = 0;
-	m_gboard_scanline_latch = 0;
 	m_gboard_last_bank = 0xff;
 	m_gboard_command = 0;
+	m_IRQ_enable = 0;
+	m_IRQ_count = m_IRQ_count_latch = 0;
 
 	/* common init */
 	init_playch10();

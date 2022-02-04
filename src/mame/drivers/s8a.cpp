@@ -3,10 +3,13 @@
 /***********************************************************************************
 
 PINBALL
-Williams System 8: Still Crazy
+Williams System 8: Still Crazy (#543)
 
-The first time run, the display will show the model number (543).
-Press F3 to clear this.
+The first time run, the display will show the model number. Press F3 to clear this.
+
+IMDB shows the number as 534, however both the game and the manual say 543. The
+undumped System 10 game 4-in-1 (Pigskin/Poker/Willy at the Bat/Willy's Cup) also
+was assigned number 543.
 
 A novelty game where the playfield is completely vertical. It has 4 flippers and the
   idea is to get the ball up to the alcohol 'still' before the 'revenuers' do. The
@@ -32,8 +35,8 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6800.h"
+#include "audio/williams.h"
 #include "machine/6821pia.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 #include "s8a.lh"
@@ -47,8 +50,7 @@ public:
 	s8a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_pias(*this, "pias")
+		, m_s9sound(*this, "s9sound")
 		, m_pia21(*this, "pia21")
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
@@ -61,36 +63,30 @@ public:
 	void s8a(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	u8 sound_r();
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
 	void lamp0_w(u8 data);
 	void lamp1_w(u8 data);
 	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
 	void sol3_w(u8 data); // solenoids 0-7
-	void sound_w(u8 data);
 	u8 switch_r();
 	void switch_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // not used
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4 (not used)
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2 (not used)
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
-	void audio_map(address_map &map);
 	void main_map(address_map &map);
 
-	u8 m_sound_data = 0;
 	u8 m_strobe = 0;
 	u8 m_row = 0;
 	bool m_data_ok = 0;
@@ -98,15 +94,14 @@ private:
 	emu_timer* m_irq_timer;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<m6802_cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<pia6821_device> m_pias;
+	required_device<williams_s9_sound_device> m_s9sound;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<61> m_digits;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s8a_state::main_map(address_map &map)
@@ -119,13 +114,6 @@ void s8a_state::main_map(address_map &map)
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
-}
-
-void s8a_state::audio_map(address_map &map)
-{
-	map(0x0000, 0x00ff).ram();
-	map(0x2000, 0x2003).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
 static INPUT_PORTS_START( s8a )
@@ -157,7 +145,6 @@ static INPUT_PORTS_START( s8a )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, audio_nmi, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
@@ -170,13 +157,6 @@ INPUT_CHANGED_MEMBER( s8a_state::main_nmi )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INPUT_CHANGED_MEMBER( s8a_state::audio_nmi )
-{
-	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 void s8a_state::sol3_w(u8 data)
 {
 	if (data==0x0a)
@@ -186,21 +166,10 @@ void s8a_state::sol3_w(u8 data)
 		m_io_outputs[i] = BIT(data, i);
 }
 
-void s8a_state::sound_w(u8 data)
-{
-	m_sound_data = data;
-}
-
 READ_LINE_MEMBER( s8a_state::pia21_ca1_r )
 {
 // sound busy
 	return 1;
-}
-
-WRITE_LINE_MEMBER( s8a_state::pia21_ca2_w )
-{
-// sound ns
-	m_pias->ca1_w(state);
 }
 
 void s8a_state::lamp0_w(u8 data)
@@ -214,7 +183,7 @@ void s8a_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s8a_state::dig0_w(u8 data)
@@ -253,11 +222,6 @@ void s8a_state::switch_w(u8 data)
 	m_row = data;
 }
 
-u8 s8a_state::sound_r()
-{
-	return m_sound_data;
-}
-
 WRITE_LINE_MEMBER( s8a_state::pia_irq )
 {
 	if(state == CLEAR_LINE)
@@ -273,7 +237,7 @@ WRITE_LINE_MEMBER( s8a_state::pia_irq )
 	}
 }
 
-void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -306,7 +270,6 @@ void s8a_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_sound_data));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -334,12 +297,11 @@ void s8a_state::s8a(machine_config &config)
 
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
-	m_pia21->readpa_handler().set(FUNC(s8a_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->readca1_handler().set(FUNC(s8a_state::pia21_ca1_r));
-	m_pia21->writepa_handler().set(FUNC(s8a_state::sound_w));
+	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(s8a_state::sol2_w));
-	m_pia21->ca2_handler().set(FUNC(s8a_state::pia21_ca2_w));
+	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
 	m_pia21->cb2_handler().set(FUNC(s8a_state::pia21_cb2_w));
 	m_pia21->irqa_handler().set(FUNC(s8a_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s8a_state::pia_irq));
@@ -369,18 +331,8 @@ void s8a_state::s8a(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
-	M6808(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s8a_state::audio_map);
-
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
-	PIA6821(config, m_pias, 0);
-	m_pias->readpa_handler().set(FUNC(s8a_state::sound_r));
-	m_pias->set_port_a_input_overrides_output_mask(0xff);
-	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	SPEAKER(config, "mono").front_center();
+	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -391,9 +343,9 @@ ROM_START(scrzy_l1)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("ic20.bin", 0x0000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
 
-	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
 	// 1st and 2nd halves are identical
-	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
+	ROM_LOAD("ic49.bin", 0x4000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
 } // Anonymous namespace

@@ -202,7 +202,7 @@ protected:
 	void tmnt_audio_map(address_map &map);
 	void tmnt_main_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class glfgreat_state : public tmnt_state

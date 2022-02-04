@@ -326,7 +326,7 @@ void arm7500fe_iomd_device::device_reset()
 	m_iolines_ddr = 0xff;
 }
 
-void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

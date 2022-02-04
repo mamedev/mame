@@ -164,7 +164,7 @@ void uv201_device::device_reset()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = screen().vpos();
 

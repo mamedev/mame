@@ -305,11 +305,6 @@ void coco3_state::coco3(machine_config &config)
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
 	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
 	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
@@ -332,6 +327,12 @@ void coco3_state::coco3(machine_config &config)
 
 	// floating space
 	coco_floating(config);
+
+	// cartridge
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");

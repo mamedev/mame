@@ -111,7 +111,7 @@
                             but this part of memory is never written to after its initial clearing on boot.
                             If 0xffff is placed at 0x157d4ee then the game will pass the RTC check.
                             The game will later complain about "Hardware Error: Security Key Error" if you try starting the game.
-        code1d,b            Can boot but crashes randomly and quickly so it's hard to do anything.
+        code1d,b,a          Can boot but crashes randomly and quickly so it's hard to do anything.
 
         mocapglf            Security code error
         sscopex,sogeki      Graphics very heavily glitched. Gun controller is not emulated.
@@ -2868,6 +2868,19 @@ ROM_START(code1db) //*
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
 ROM_END
 
+ROM_START(code1da) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("m48t58_uaa.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "922uaa02", 0, SHA1(795d82d51a37f197c36366cb36a2dfa8797e5f9f) )
+ROM_END
+
 ROM_START(gticlub2) //*
 	VIPER_BIOS
 
@@ -3417,6 +3430,7 @@ GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperh
 GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
 GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2001, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING)

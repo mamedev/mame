@@ -51,7 +51,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint8_t clamp(int value);
 
@@ -83,7 +83,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	devcb_read8 m_ch5_cb, m_ch6_cb, m_ch7_cb, m_ch8_cb;

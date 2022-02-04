@@ -383,7 +383,7 @@ private:
 		TIMER_POWER_FAIL
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -1747,7 +1747,7 @@ void aristmk4_state::machine_reset()
 	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
-void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

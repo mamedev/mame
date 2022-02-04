@@ -301,7 +301,7 @@ namespace {
  *************************************/
 
 #define LOG_TIMEKEEPER      (0)
-#define LOG_SIO             (0)
+#define LOG_SIO             (1)
 
 /*************************************
  *
@@ -2013,10 +2013,10 @@ void vegas_state::denver(machine_config &config)
 	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
 
 	NS16550(config, m_uart2, XTAL(1'843'200));
-	m_uart1->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
-	m_uart1->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
-	m_uart1->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
-	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
+	m_uart2->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
+	m_uart2->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
+	m_uart2->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
+	m_uart2->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
 
 	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", 0));
 	ttys01.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));

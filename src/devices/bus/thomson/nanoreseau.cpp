@@ -166,7 +166,7 @@ ioport_constructor nanoreseau_device::device_input_ports() const
 
 */
 
-void nanoreseau_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nanoreseau_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_answer_step ++;
 	m_mc6854->set_cts(m_answer_step & 1);

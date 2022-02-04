@@ -98,7 +98,7 @@ namespace {
 
 // PCM card offsets in PCM chip memory space
 // Right now this is an assumption based on the existing sample tables and wasn't confirmed with the firmware yet.
-static const offs_t PCMCARD_SIZE = 0x080000;	// 512 KB
+static const offs_t PCMCARD_SIZE = 0x080000;    // 512 KB
 static const std::array<offs_t, 3> PCMCARD_OFFSETS = {0x080000, 0x180000, 0x280000};
 
 class roland_r8_base_state : public driver_device
@@ -124,7 +124,7 @@ protected:
 
 	required_device<upd78k2_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
-	//required_device<generic_slot_device> m_ramcard;	// TODO
+	//required_device<generic_slot_device> m_ramcard;   // TODO
 };
 
 class roland_r8_state : public roland_r8_base_state

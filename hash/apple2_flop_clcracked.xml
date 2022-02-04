@@ -46640,4 +46640,406 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="esinttrv">
+		<description>Earth Science: Interplanetary Travel (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Prentice-Hall</publisher>
+		<info name="release" value="2021-12-20"/>
+		<!--"Earth Science: Interplanetary Travel" is a 1986 educational program developed by Edunetics and distributed by Prentice-Hall. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 1.dsk" size="143360" crc="c35d21b7" sha1="8f753832cd892925538de7c21521ff603a83899c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 2.dsk" size="143360" crc="4d9a25ae" sha1="db26b7f57db6ac98380bccccb4bda1866c09013c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 3.dsk" size="143360" crc="9b0a10a4" sha1="938464be04fd9691c9c72f8711f35c61161e8881"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 4.dsk" size="143360" crc="9abbfa0b" sha1="1f07718a51f685ac5df3eaa88ce99cdd26e8eae2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ifnewton">
+		<description>Isaac Newton and F.I.G. Newton (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Isaac Newton and F.I.G. Newton" is a 1981 educational program developed and distributed by Krell Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="isaac newton and f.i.g. newton (4am crack).dsk" size="143360" crc="ace8866e" sha1="c8ddb5c2993392cce73ac18cd6456e64be93aeb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtrcallwild">
+		<description>Return to Reading: The Call of the Wild (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Media Basics</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Return to Reading: The Call of the Wild" is a 1983 educational program developed and distributed by Media Basics. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="return to reading- the call of the wild (4am crack).dsk" size="143360" crc="5044a6b5" sha1="58fda8da6d6e459ba5aba446fe412a498cfe4709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germhangman">
+		<description>The German Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"The German Hangman" (a.k.a. "German Practice") is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the german hangman (4am crack).dsk" size="143360" crc="8c448486" sha1="221e6db2deee877d86ea41715b1e42603c9ca8a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legiona">
+		<description>Legionnaire (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Legionnaire" is a 1982 strategy game developed and distributed by The Avalon Hill Game Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="legionnaire (4am crack).dsk" size="143360" crc="c470dca5" sha1="fb0f40ac5397c288317806217715405f2a81257c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridpasb">
+		<description>Bridge Tutor with Precision and Scientific Bidding (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-12-27"/>
+		<!--"Bridge Tutor with Precision and Scientific Bidding" is a 1980 educational program developed by Alex Hanuse and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Volume 1 Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 1.dsk" size="143360" crc="e08ab07d" sha1="b91d055b92c3a6dc6a1e3f14912aba65636a540a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Volume 2 Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 2.dsk" size="143360" crc="926f46f9" sha1="650ccf62f1aa4b7227d36cdd50fa71bd5c7da165"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frhangmn">
+		<description>The French Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-28"/>
+		<!--"The French Hangman" is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the french hangman (4am crack).dsk" size="143360" crc="67e321ee" sha1="c0ed5bf1bac516e1c45f7ab9acfa3545ff83d2f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruhangmn">
+		<description>The Russian Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-28"/>
+		<!--"The Russian Hangman" (a.k.a. "Russian Practice") is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the russian hangman (4am crack).dsk" size="143360" crc="a5e4e256" sha1="bab661ab9695e44bf22441f20597d15324e6febe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kenus112">
+		<description>Ken Uston's Professional Blackjack (Version 1.12) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intelligent Statements</publisher>
+		<info name="release" value="2021-12-31"/>
+		<!--"Ken Uston's Professional Blackjack" is a 1983 card game developed and distributed by Intelligent Statements. This is version 1.12. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ken uston's professional blackjack v1.12 (4am crack).dsk" size="143360" crc="027933c6" sha1="a73a1648879a3e0223c67b7b71670b92ffd9926c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinolnch">
+		<description>Dinosaur's Lunch (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Dinosaur's Lunch" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur's lunch (4am crack).dsk" size="143360" crc="87f9d6c6" sha1="426ef821a5448d9ce8955195cf7c46efaa5736af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racekeys">
+		<description>Race Car Keys (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Race Car Keys" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="race car keys (4am crack).dsk" size="143360" crc="ae68c7c6" sha1="69dca0d7e57edb59fadde9c6da482d045558c19f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhbchord">
+		<description>Functional Harmony: Basic Chords (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Basic Chords" is a 1987 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- basic chords (4am crack).dsk" size="143360" crc="3cf27e56" sha1="c74402014e1fb0d372e925df22eeb0c4f151b21e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhdia7th">
+		<description>Functional Harmony: Diatonic Seventh Chords (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Diatonic Seventh Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- diatonic seventh chords (4am crack).dsk" size="143360" crc="d9e14b76" sha1="70cdb71b772f0124901a1efec89663b6ac54277c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhboachr">
+		<description>Functional Harmony: Borrowed and Altered Chords (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Borrowed and Altered Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- borrowed and altered chords (4am crack).dsk" size="143360" crc="cd53e752" sha1="1bc8a7db008717854b9c1b2493939e533f63e03f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brsltrsnd">
+		<description>Building Reading Skills: The Letter-Sound Farm (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Borg-Warner Educational Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Building Reading Skills: The Letter-Sound Farm" is a 1984 educational program developed and distributed by Borg-Warner Educational Systems. It requires a Ufonic Voice System peripheral card. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="building reading skills- the letter-sound farm (4am crack).dsk" size="143360" crc="e856ffbe" sha1="4ad13935ebc7d9ba2c62c041a459f2620dc34b40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="followme">
+		<description>Follow Me (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="usage" value="Requires MIDI keyboard" />
+		<info name="release" value="2022-01-03"/>
+		<!--"Follow Me" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It requires a MIDI keyboard. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="follow me (4am crack).dsk" size="143360" crc="2f7d52d5" sha1="174d8d956bf71a1820ad8fed563245354e48b507"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germhangmanr2">
+		<description>The German Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The German Hangman" (a.k.a. "German Practice") is a 1982 educational program developed and distributed by George Earl. This undated revision contains spelling corrections. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the german hangman rev. 2 (4am crack).dsk" size="143360" crc="27b0db8b" sha1="ddcdd35c993dcb96bf0bb87fb7fdabe7251a2cfe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruhangmnr2">
+		<description>The Russian Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The Russian Hangman" (a.k.a. "Russian Practice") is a 1982 educational program developed and distributed by George Earl. This undated revision fixes several spelling errors. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the russian hangman rev. 2 (4am crack).dsk" size="143360" crc="6d0a737a" sha1="4da3bdcc9b34c4363b3774d2baf5f1315adc68df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spnhangr2">
+		<description>The Spanish Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The Spanish Hangman" is a 1983 educational program developed and distributed by George Earl. This undated revision fixes several spelling errors. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish hangman rev. 2 (4am crack) side a.dsk" size="143360" crc="c2ffb4aa" sha1="0e2f433415d48c628c448d5e0653132f25664dd3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish hangman rev. 2 (4am crack) side b.dsk" size="143360" crc="9356d978" sha1="5a078e8488eb531f37698d9b336bfc666a524ce5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expllibl">
+		<description>Exploring Library Land (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Exploring Library Land" is a 1986 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="exploring library land (4am crack).dsk" size="143360" crc="fc31fd2f" sha1="82da6dc63a73333c2bacc0a801d4e589c57bd150"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="libthunt">
+		<description>Library Treasure Hunt (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Library Treasure Hunt" is a 1986 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="library treasure hunt (4am crack).dsk" size="143360" crc="db217b7f" sha1="d162824a2b6586334b0cfa0464d527727840968e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expusa">
+		<description>Expedition U.S.A.! (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Expedition U.S.A.!" is a 1989 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) boot.dsk" size="143360" crc="9c9a159a" sha1="b142154a1a29e3545b089a19fef0923ac44a59e4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 1a.dsk" size="143360" crc="eb056baf" sha1="64061545cf10638e6c466679471554551f9581cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 1b.dsk" size="143360" crc="5061245e" sha1="01341f959e453b4abddaf065d3fab96e26452819"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 2a.dsk" size="143360" crc="f94bb7ba" sha1="ebe6b62e46d9b10c1cd64e9cfbc5df20c3ac6051"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 2b.dsk" size="143360" crc="167c615f" sha1="06892f7a397011bfd6acf851aa06f282f00f4552"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codecyph">
+		<description>Codes and Cyphers (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2022-01-10"/>
+		<!--"Codes and Cyphers" is a 1985 educational program developed by Richard Hefter, Susan Dubicki, and David Cunningham, and distributed by Optimum Resource. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="codes and cyphers (4am and san inc crack).dsk" size="143360" crc="ae8cf9e1" sha1="67ef4606dd8c0b1ec5db07119057c6884144739e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beglibrs">
+		<description>Ripley's Believe It Or Not: Beginning Library Research Skills (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-11"/>
+		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;Enter TEACHER (password TEACHER) for the administration menu.&lt;/div&gt;-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's beginning library research skills (4am crack) side a.dsk" size="143360" crc="6dbfbf09" sha1="b89426448321dcdf2d50bb8b6687b8cf9d771846"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's beginning library research skills (4am crack) side b.dsk" size="143360" crc="ece690ff" sha1="7eae9eed3ed1bfa0ed1037a9f995aefaeeebc0dc"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -20,7 +20,7 @@ protected:
 	void device_start() override;
 	void tra_callback() override;
 	void tra_complete() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void push_tx(uint8_t data) { ++m_head %= 16; m_buffer[m_head] = data; }

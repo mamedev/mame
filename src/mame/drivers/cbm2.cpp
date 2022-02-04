@@ -139,7 +139,7 @@ public:
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	DECLARE_MACHINE_START( cbm2 );
 	DECLARE_MACHINE_START( cbm2_ntsc );
@@ -2046,7 +2046,7 @@ void cbm2_state::ext_cia_pb_w(uint8_t data)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_tpi1->i0_w(m_todclk);
 

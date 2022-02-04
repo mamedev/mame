@@ -1185,7 +1185,7 @@ void z80scc_channel::device_reset()
 	m_extint_states = m_rr0;
 }
 
-void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 //  LOG("%s %d\n", FUNCNAME, id);
 

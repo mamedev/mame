@@ -214,7 +214,7 @@ void pc11_device::write(offs_t offset, uint16_t data)
 	}
 }
 
-void pc11_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc11_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint8_t reply;
 

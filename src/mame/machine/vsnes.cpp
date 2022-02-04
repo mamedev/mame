@@ -161,7 +161,7 @@ MACHINE_RESET_MEMBER(vsnes_state,vsdual)
  *
  *************************************/
 
-void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_bank )
+void vsnes_state::v_set_videorom_bank(int start, int count, int vrom_start_bank)
 {
 	int i;
 
@@ -185,13 +185,9 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 
 	/* establish nametable ram */
 	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
-	/* set mirroring */
-	m_nt_page[0][0] = m_nt_ram[0].get();
-	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
-	m_nt_page[0][2] = m_nt_ram[0].get() + 0x800;
-	m_nt_page[0][3] = m_nt_ram[0].get() + 0xc00;
 
-	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_w)));
+	ppu1_space.install_ram(0x2000, 0x2fff, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x3000, 0x3eff, m_nt_ram[0].get());
 
 	if (m_gfx1_rom != nullptr)
 	{
@@ -234,18 +230,12 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	/* establish nametable ram */
 	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_ram[1] = std::make_unique<uint8_t[]>(0x1000);
-	/* set mirroring */
-	m_nt_page[0][0] = m_nt_ram[0].get();
-	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
-	m_nt_page[0][2] = m_nt_ram[0].get() + 0x800;
-	m_nt_page[0][3] = m_nt_ram[0].get() + 0xc00;
-	m_nt_page[1][0] = m_nt_ram[1].get();
-	m_nt_page[1][1] = m_nt_ram[1].get() + 0x400;
-	m_nt_page[1][2] = m_nt_ram[1].get() + 0x800;
-	m_nt_page[1][3] = m_nt_ram[1].get() + 0xc00;
 
-	m_ppu1->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_w)));
-	m_ppu2->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt1_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt1_w)));
+	m_ppu1->space(AS_PROGRAM).install_ram(0x2000, 0x2fff, m_nt_ram[0].get());
+	m_ppu1->space(AS_PROGRAM).install_ram(0x3000, 0x3eff, m_nt_ram[0].get());
+	m_ppu2->space(AS_PROGRAM).install_ram(0x2000, 0x2fff, m_nt_ram[1].get());
+	m_ppu2->space(AS_PROGRAM).install_ram(0x3000, 0x3eff, m_nt_ram[1].get());
+
 	// read only!
 	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_vrom[0]);
 	// read only!
@@ -261,11 +251,11 @@ MACHINE_START_MEMBER(vsnes_state, bootleg)
 	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
 
 	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
-	/* set mirroring */
-	v_set_mirroring(0, PPU_MIRROR_VERT);
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x800);
 
-	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_r)), write8sm_delegate(*this, FUNC(vsnes_state::vsnes_nt0_w)));
+	ppu1_space.install_ram(0x2000, 0x27ff, 0x800, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x3000, 0x37ff, m_nt_ram[0].get());
+	ppu1_space.install_ram(0x3800, 0x3eff, m_nt_ram[0].get());
 
 	m_vrom[0] = m_gfx1_rom->base();
 	m_vrom_size[0] = m_gfx1_rom->bytes();
@@ -275,69 +265,6 @@ MACHINE_START_MEMBER(vsnes_state, bootleg)
 	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_vrom[0]);
 	m_bank_vrom[0]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
 	m_bank_vrom[0]->set_entry(0);
-}
-
-/*************************************
- *
- *  External mappings for PPU bus
- *
- *************************************/
-
-void vsnes_state::vsnes_nt0_w(offs_t offset, uint8_t data)
-{
-	int page = ((offset & 0xc00) >> 10);
-	m_nt_page[0][page][offset & 0x3ff] = data;
-}
-
-void vsnes_state::vsnes_nt1_w(offs_t offset, uint8_t data)
-{
-	int page = ((offset & 0xc00) >> 10);
-	m_nt_page[1][page][offset & 0x3ff] = data;
-}
-
-uint8_t vsnes_state::vsnes_nt0_r(offs_t offset)
-{
-	int page = ((offset&0xc00) >> 10);
-	return m_nt_page[0][page][offset & 0x3ff];
-}
-
-uint8_t vsnes_state::vsnes_nt1_r(offs_t offset)
-{
-	int page = ((offset & 0xc00) >> 10);
-	return m_nt_page[1][page][offset & 0x3ff];
-}
-
-void vsnes_state::v_set_mirroring(int ppu, int mirroring)
-{
-	switch (mirroring)
-	{
-	case PPU_MIRROR_LOW:
-		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu].get();
-		break;
-	case PPU_MIRROR_HIGH:
-		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
-		break;
-	case PPU_MIRROR_HORZ:
-		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
-		m_nt_page[ppu][1] = m_nt_ram[ppu].get();
-		m_nt_page[ppu][2] = m_nt_ram[ppu].get() + 0x400;
-		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
-		break;
-	case PPU_MIRROR_VERT:
-		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
-		m_nt_page[ppu][1] = m_nt_ram[ppu].get() + 0x400;
-		m_nt_page[ppu][2] = m_nt_ram[ppu].get();
-		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
-		break;
-	case PPU_MIRROR_NONE:
-	default:
-		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
-		m_nt_page[ppu][1] = m_nt_ram[ppu].get() + 0x400;
-		m_nt_page[ppu][2] = m_nt_ram[ppu].get() + 0x800;
-		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0xc00;
-		break;
-	}
-
 }
 
 /**********************************************************************************
@@ -561,34 +488,10 @@ void vsnes_state::drmario_rom_banking(offs_t offset, uint8_t data)
 		{
 			case 0:     /* mirroring and options */
 				{
-					int mirroring;
-
 					m_vrom4k = m_drmario_shiftreg & 0x10;
 					m_size16k = m_drmario_shiftreg & 0x08;
 					m_switchlow = m_drmario_shiftreg & 0x04;
-
-					switch (m_drmario_shiftreg & 3)
-					{
-						case 0:
-							mirroring = PPU_MIRROR_LOW;
-						break;
-
-						case 1:
-							mirroring = PPU_MIRROR_HIGH;
-						break;
-
-						case 2:
-							mirroring = PPU_MIRROR_VERT;
-						break;
-
-						default:
-						case 3:
-							mirroring = PPU_MIRROR_HORZ;
-						break;
-					}
-
-					/* apply mirroring */
-					v_set_mirroring(1, mirroring);
+					// 0x03: mirroring bits unused on VS
 				}
 			break;
 

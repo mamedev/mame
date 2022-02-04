@@ -22,8 +22,17 @@ Games:
 
 When first used, it appears frozen (the score should alternate). Press F3 to fix.
 
-For those games with a sound card, pressing NUM-8 will select a different set of
- sounds. This is switch SW2 on the real board.
+Sound:
+- All games have a knocker.
+- Hot Tip and Lucky Seven use chimes. There was a noise drum to simulate the sound
+      of EM score reels.
+- Hot Tip, Lucky Seven, World Cup, Disco Fever have a dedicated tilt line to operate
+      a mechanical buzzer.
+- World Cup and Disco Fever, being chime-based internally, would activate one sound
+      line per sound. There's 4 "chime" lines and the tilt line.
+- The later games could send any of 15 codes (but never did), so only needed 4 lines.
+- All soundcard games also have an "alternator" line. By activating this, followed by
+      activating bit 0, the startup tune would play.
 
 Status:
 - All games are playable
@@ -37,10 +46,10 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6800.h"
+#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 #include "s3.lh"
@@ -91,14 +100,15 @@ protected:
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
 	u8 m_game = 0;
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	bool m_disco = false;
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void main_map(address_map &map);
 
@@ -112,7 +122,7 @@ protected:
 	required_ioport_array<2> m_dips;
 	output_finder<32> m_digits;
 	output_finder<2> m_leds;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
 private:
 	void sol0_w(u8 data);
@@ -125,24 +135,15 @@ class s3a_state : public s3_state
 public:
 	s3a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s3_state(mconfig, type, tag)
-		, m_audiocpu(*this, "audiocpu")
-		, m_pias(*this, "pias")
-		, m_io_snd(*this, "SND")
+		, m_s4sound(*this, "s4sound")
 	{ }
 
 	void s3a(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
-	virtual void machine_start() override;
-	u8 sound_r();
-	u8 m_sound_data = 0;
 	void s3a_sol0_w(u8 data);
 	void s3a_sol1_w(u8 data);
-	void audio_map(address_map &map);
-	required_device<cpu_device> m_audiocpu;
-	required_device<pia6821_device> m_pias;
-	required_ioport m_io_snd;
+	required_device<williams_s4_sound_device> m_s4sound;
 };
 
 
@@ -156,13 +157,6 @@ void s3_state::main_map(address_map &map)
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
-}
-
-void s3a_state::audio_map(address_map &map)
-{
-	map.global_mask(0xfff);
-	map(0x0400, 0x0403).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sounds
-	map(0x0800, 0x0fff).rom().region("audiocpu", 0);
 }
 
 
@@ -296,16 +290,6 @@ static INPUT_PORTS_START( s3 )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( s3a )
-	PORT_INCLUDE(s3)
-
-	PORT_START("SND")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Music") PORT_CODE(KEYCODE_8_PAD) PORT_TOGGLE
-
-	PORT_MODIFY("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s3a_state, audio_nmi, 1)
-INPUT_PORTS_END
-
 // Unassigned inputs will tilt or reset the machine, so remove them
 static INPUT_PORTS_START( httip )
 	PORT_INCLUDE(s3)
@@ -333,7 +317,7 @@ static INPUT_PORTS_START( lucky )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wldcp )
-	PORT_INCLUDE(s3a)
+	PORT_INCLUDE(s3)
 	PORT_MODIFY("X0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_MODIFY("X1")
@@ -346,7 +330,7 @@ static INPUT_PORTS_START( wldcp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cntct )
-	PORT_INCLUDE(s3a)
+	PORT_INCLUDE(s3)
 	PORT_MODIFY("X0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_MODIFY("X2")
@@ -357,7 +341,7 @@ static INPUT_PORTS_START( cntct )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( disco )
-	PORT_INCLUDE(s3a)
+	PORT_INCLUDE(s3)
 	PORT_MODIFY("X0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_MODIFY("X2")
@@ -371,7 +355,7 @@ static INPUT_PORTS_START( disco )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( phnix )
-	PORT_INCLUDE(s3a)
+	PORT_INCLUDE(s3)
 	PORT_MODIFY("X2")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // Playfield tilt
 	PORT_MODIFY("X4")
@@ -380,7 +364,7 @@ static INPUT_PORTS_START( phnix )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pkrno )
-	PORT_INCLUDE(s3a)
+	PORT_INCLUDE(s3)
 	PORT_MODIFY("X2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // Playfield tilt
 	PORT_MODIFY("X3")
@@ -404,12 +388,6 @@ void s3_state::machine_start()
 	save_item(NAME(m_game));
 }
 
-void s3a_state::machine_start()
-{
-	s3_state::machine_start();
-	save_item(NAME(m_sound_data));
-}
-
 void s3_state::machine_reset()
 {
 	genpin_class::machine_reset();
@@ -424,13 +402,6 @@ INPUT_CHANGED_MEMBER( s3_state::main_nmi )
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-INPUT_CHANGED_MEMBER( s3a_state::audio_nmi )
-{
-	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void s3_state::sol0_w(u8 data)
@@ -462,11 +433,20 @@ void s3a_state::s3a_sol0_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[i] = BIT(data, i);
 
-	if ((m_game == 3) && BIT(data, 4)) // disco
+	// disco has the sound-alternator in a different place
+	if (m_game == 3)
 	{
-		m_sound_data = 0x3f | m_io_snd->read();
-		m_pias->cb1_w(1);
-		m_pias->cb1_w(0);
+		if (data == 0x10)
+		{
+			m_disco = true;
+			m_s4sound->write(0x30);
+		}
+		else
+		if (m_disco)
+		{
+			m_disco = false;
+			m_s4sound->write(0xff);
+		}
 	}
 }
 
@@ -493,17 +473,17 @@ void s3_state::sol1_w(u8 data)
 
 void s3a_state::s3a_sol1_w(u8 data)
 {
-	u8 sound_data = m_io_snd->read() | (data & 15);
+	u8 sound_data = data & 15;
 
-	if (!BIT(m_game, 0) && BIT(data, 4))
-		sound_data |= 0x80;  // cntct, phnix, pkrno
+	// wldcp and disco have a dedicated tilt line
+	if (((m_game == 1) || (m_game == 3))&& BIT(data, 6))
+		sound_data = 0x10;
 
-	bool cb1 = (sound_data & 0x8f);
+	// enable alternator line (all except disco)
+	if (BIT(data, 4))
+		sound_data |= 0x80;
 
-	if (cb1)
-		m_sound_data = ~sound_data;
-
-	m_pias->cb1_w(cb1);
+	m_s4sound->write(~sound_data);
 
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
@@ -524,7 +504,7 @@ void s3_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 u8 s3_state::dips_r()
@@ -568,11 +548,6 @@ u8 s3_state::switch_r()
 void s3_state::switch_w(u8 data)
 {
 	m_row = data;
-}
-
-u8 s3a_state::sound_r()
-{
-	return m_sound_data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
@@ -647,19 +622,8 @@ void s3a_state::s3a(machine_config &config)
 	m_pia22->writepb_handler().set(FUNC(s3a_state::s3a_sol1_w));
 
 	// Add the soundcard
-	M6802(config, m_audiocpu, 3580000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s3a_state::audio_map);
-
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
-	PIA6821(config, m_pias, 0);
-	m_pias->readpb_handler().set(FUNC(s3a_state::sound_r));
-	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
-	m_pias->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<2>));
-
-	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
+	SPEAKER(config, "mono").front_center();
+	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -695,7 +659,7 @@ ROM_START(wldcp_l1)
 	ROM_LOAD("white1.716",   0x1000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2wc.716", 0x1800, 0x0800, CRC(618d15b5) SHA1(527387893eeb2cd4aa563a4cfb1948a15d2ed741))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("481_s0_world_cup.716",   0x0000, 0x0800, CRC(cf012812) SHA1(26074f6a44075a94e6f91de1dbf92f8ec3ff8ca4))
 ROM_END
 
@@ -708,7 +672,7 @@ ROM_START(cntct_l1)
 	ROM_LOAD("white1.716",   0x1000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("482_s0_contact.716",   0x0000, 0x0800, CRC(d3c713da) SHA1(1fc4a8fadf472e9a04b3a86f60a9d625d07764e1))
 ROM_END
 
@@ -721,7 +685,7 @@ ROM_START(disco_l1)
 	ROM_LOAD("white1.716",   0x1000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("483_s0_disco_fever.716",   0x0000, 0x0800, CRC(d1cb5047) SHA1(7f36296975df19feecc6456ffb91f4a23bcad037))
 ROM_END
 
@@ -734,7 +698,7 @@ ROM_START(phnix_l1)
 	ROM_LOAD("white1.716",   0x1000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("485_s0_phoenix.716",   0x0000, 0x0800, CRC(1c3dea6e) SHA1(04bfe952be2eab66f023b204c21a1bd461ea572f))
 ROM_END
 
@@ -747,7 +711,7 @@ ROM_START(pkrno_l1)
 	ROM_LOAD("white1.716",   0x1000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
-	ROM_REGION(0x0800, "audiocpu", 0)
+	ROM_REGION(0x0800, "s4sound:audiocpu", 0)
 	ROM_LOAD("488_s0_pokerino.716",   0x0000, 0x0800, CRC(5de02e62) SHA1(f838439a731511a264e508a576ae7193d9fed1af))
 ROM_END
 
@@ -756,7 +720,7 @@ ROM_END
 GAME( 1977, httip_l1, 0, s3,  httip, s3_state,  empty_init, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1977, lucky_l1, 0, s3,  lucky, s3_state,  init_4,     ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, wldcp_l1, 0, s3a, wldcp, s3a_state, init_1,     ROT0, "Williams", "World Cup (L-1)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, cntct_l1, 0, s3a, cntct, s3a_state, init_2,     ROT0, "Williams", "Contact (L-1)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, disco_l1, 0, s3a, disco, s3a_state, init_3,     ROT0, "Williams", "Disco Fever (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, cntct_l1, 0, s3a, cntct, s3a_state, init_2,     ROT0, "Williams", "Contact (L-1)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, phnix_l1, 0, s3a, phnix, s3a_state, init_2,     ROT0, "Williams", "Phoenix (L-1)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, pkrno_l1, 0, s3a, pkrno, s3a_state, empty_init, ROT0, "Williams", "Pokerino (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )

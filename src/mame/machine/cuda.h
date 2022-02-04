@@ -87,7 +87,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint8_t ddrs[3];

@@ -793,7 +793,7 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -880,7 +880,7 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1097,7 +1097,7 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 
  -------------------------------------------------*/
 
-void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1184,7 +1184,7 @@ u8 nes_smb2j_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1239,7 +1239,7 @@ u8 nes_smb2ja_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1388,7 +1388,7 @@ void nes_0353_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1460,7 +1460,7 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1511,7 +1511,7 @@ void nes_l001_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1892,7 +1892,7 @@ void nes_lh51_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -2128,7 +2128,7 @@ uint8_t nes_rt01_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_yung08_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_yung08_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

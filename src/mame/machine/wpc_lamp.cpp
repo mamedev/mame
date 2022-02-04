@@ -57,7 +57,7 @@ void wpc_lamp_device::device_reset()
 	timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
-void wpc_lamp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wpc_lamp_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	for(int i=0; i<64; i++) {
 		uint8_t s = state[i];
