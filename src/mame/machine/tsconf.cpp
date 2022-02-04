@@ -91,25 +91,13 @@ void tsconf_state::tsconf_update_bank0()
 void tsconf_state::tsconf_update_video_mode()
 {
 	rectangle visarea = screen_area[3];
-	u8 *messram = m_ram->pointer();
-	switch (VM)
-	{
-	case VM_TXT: // Text Mode
+	if (VM == VM_TXT)
 	{
 		// scale screen for Text Mode
 		rectangle origin_screen = screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
 		visarea.set_width(visarea.width() + origin_screen.width());
-		m_gfxdecode->gfx(TM_TS_CHAR)->set_source(messram + PAGE4K(m_regs[V_PAGE] ^ 0x01));
+		m_gfxdecode->gfx(TM_TS_CHAR)->set_source(m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01));
 		m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
-		break;
-	}
-	case VM_ZX: // Zx
-	{
-		m_screen_location = messram + ((m_port_7ffd_data & 8) ? PAGE4K(7) : PAGE4K(5));
-		break;
-	}
-	default:
-		break;
 	}
 
 	m_ts_tilemap[TM_TILES0]->set_scrolldx(get_screen_area().left(), 0);
@@ -155,19 +143,20 @@ void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
 	{
 		u16 border_color = get_border_color();
 		bool border_only = VM != VM_ZX || BIT(m_regs[V_CONFIG], 5);
+		rectangle screen = screen_area[0];
 		do
 		{
-			rectangle screen = get_screen_area();
-			u16 x = m_previous_screen_x - screen.left();
-			u16 y = m_previous_screen_y - screen.top();
-
-			if (screen.contains(m_previous_screen_x, m_previous_screen_y) && !border_only)
+			if (border_only || !screen.contains(m_previous_screen_x, m_previous_screen_y))
+				bm->pix(m_previous_screen_y, m_previous_screen_x) = border_color;
+			else
 			{
+				u16 x = m_previous_screen_x - screen.left();
 				if ((x & 7) == 0)
 				{
+					u16 y = m_previous_screen_y - screen.top();
 					u16 *pix = &bm->pix(m_previous_screen_y, m_previous_screen_x);
-					u8 attr = *(m_screen_location + ((y & 0xF8) << 2) + (x >> 3) + 0x1800);
-					u8 scr = *(m_screen_location + ((y & 7) << 8) + ((y & 0x38) << 2) + ((y & 0xC0) << 5) + (x >> 3));
+					u8 attr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 0xF8) << 2) + (x >> 3) + 0x1800);
+					u8 scr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 7) << 8) + ((y & 0x38) << 2) + ((y & 0xC0) << 5) + (x >> 3));
 					u16 ink = ((attr & 0x07) + ((attr >> 3) & 0x08)) | 0xf0;
 					u16 pap = ((attr >> 3) & 0x0f) | 0xf0;
 
@@ -178,8 +167,6 @@ void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
 						*pix++ = (scr & b) ? ink : pap;
 				}
 			}
-			else
-				bm->pix(m_previous_screen_y, m_previous_screen_x) = border_color;
 
 			to_display(m_screen->visible_area(), ++m_previous_screen_x, m_previous_screen_y);
 		} while (!((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y)));
@@ -310,7 +297,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 	unsigned int from_x = m_previous_screen_x;
 	unsigned int from_y = m_previous_screen_y;
 
-	spectrum_UpdateZxScreenBitmap(eof);
+	spectrum_UpdateZxScreenBitmap(false);
 	if (!BIT(m_regs[V_CONFIG], 5) && VM != VM_ZX)
 	{
 		to_display(screen, from_x, from_y);
@@ -470,7 +457,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	if (ram_addr >= PAGE4K(m_regs[T_MAP_PAGE]) && ram_addr < (PAGE4K(m_regs[T_MAP_PAGE] + 1)))
 	{
 		//TODO invalidate sprites, not entire map
-		m_ts_tilemap[offset & 64 ? TM_TILES1 : TM_TILES0]->mark_all_dirty();
+		m_ts_tilemap[offset & 128 ? TM_TILES1 : TM_TILES0]->mark_all_dirty();
 	}
 	else
 	{
@@ -533,24 +520,26 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
-	/* disable paging */
-	if (m_port_7ffd_data & 0x20)
-		return;
-
-	/* store new state */
-	m_port_7ffd_data = data;
-	m_regs[MEM_CONFIG] = (m_regs[MEM_CONFIG] & 0xfe) | BIT(data, 4); // ROM128
-	m_regs[V_PAGE] = BIT(data, 3) ? 7 : 5;
-
-	/* update memory */
-	tsconf_update_bank0();
-	tsconf_update_video_mode();
+	//LOCK? BIT(data, 5);
+	u8 page3 = (m_regs[PAGE3] & ~0x07) | BIT(data, 0, 3); // 128K: 0..2 -> 0..2
+	switch (BIT(m_regs[MEM_CONFIG], 6, 2))
+	{
+	case 4:
+		page3 = (page3 & ~0x20) | (data & 0x20); // 1024K: 5 -> 5
+	case 0:
+		page3 = (page3 & ~0x18) | (BIT(data, 6, 2) << 3); //512K: 6..7 -> 3..4
+	default:
+		break;
+	}
+	tsconf_port_xxaf_w(PAGE3 << 8, page3);
+	tsconf_port_xxaf_w(MEM_CONFIG << 8, (m_regs[MEM_CONFIG] & 0xfe) | BIT(data, 4)); // ROM128
+	tsconf_port_xxaf_w(V_PAGE << 8, BIT(data, 3) ? 7 : 5);
 }
 
 void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
 {
-	m_regs[BORDER] = (data & 0x07) | 0xf0;
 	spectrum_ula_w(offset, data);
+	tsconf_port_xxaf_w(BORDER << 8, (data & 0x07) | 0xf0);
 }
 
 u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
@@ -588,6 +577,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 {
 	u8 nreg = port >> 8;
 
+	// 1. Updates which effect is delayed till next scanline
 	bool delay_update = true;
 	switch (nreg)
 	{
@@ -603,22 +593,26 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		delay_update = false;
 		break;
 	}
-
 	if (delay_update)
 		return;
 
+	bool val_changed = m_regs[nreg] != data;
+
+	// 2. Updates which require any pre-work before change
 	switch (nreg)
 	{
 	case BORDER:
-		spectrum_UpdateScreenBitmap();
+		if (val_changed)
+			spectrum_UpdateScreenBitmap();
 		break;
 
 	default:
 		break;
 	}
 
-	bool val_changed = m_regs[nreg] != data;
 	m_regs[nreg] = data;
+
+	// 3. Regular updates
 	switch (nreg)
 	{
 	case V_CONFIG:
@@ -665,10 +659,6 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case MEM_CONFIG:
-		m_port_7ffd_data = (m_port_7ffd_data & 0xef) | (ROM128 << 4);
-		tsconf_update_bank0();
-		break;
-
 	case PAGE0:
 		tsconf_update_bank0();
 		break;

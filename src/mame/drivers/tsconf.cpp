@@ -57,7 +57,6 @@
   # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
 
   TODO:
-  - ZX-Mode locks
   - Ram cache
   - VDos
   - Many more...
@@ -228,16 +227,14 @@ void tsconf_state::machine_reset()
 	m_regs[SYS_CONFIG] = 0x00;
 	m_regs[MEM_CONFIG] = 0x04;
 	m_regs[HS_INT] = 0x01;	 // 00000001
-	m_regs[VS_INT_L] = 0x00; // 00000001
-	m_regs[VS_INT_H] = 0x00; // 0000xxx0
+	m_regs[VS_INT_L] = 0x00; // 00000000
+	m_regs[VS_INT_H] &= 0x0e; // 0000xxx0
 	// FDDVirt      = 0x00; // 0000xxx0
 	m_regs[INT_MASK] = 0x01; // xxxxx001
 	m_regs[CACHE_CONFIG] &= 0xf0; // xxxx0000
 
 	if (m_beta->started())
 		m_beta->enable();
-
-	m_port_7ffd_data = 0;
 
 	m_zctl_cs = 1;
 	m_zctl_di = 0xff;
