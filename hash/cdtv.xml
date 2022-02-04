@@ -2673,12 +2673,11 @@ cd32: boot OK
 		<year>1995</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
-Collection of Amiga ParNet and SerNet tools, unsupported
-cd32: AmigaKicks\chess has GFX pitch corruption and uncontrollable pointer, [joytest] reset
-
+Disc 1 has various unsupported collection of Amiga ParNet and SerNet tools
+cd32: disc 1 AmigaKicks\chess has GFX pitch corruption and uncontrollable pointer, [joytest] reset
 cd32: disc 10 black screen
 ]]></notes>
-		<info name="usage" value="Insert disc 1 then hold right mouse button at startup for being prompted to disc swap with any other CD in this collection"/>
+		<info name="usage" value="In order to load any other disc in this collection: insert disc 1 then hold right mouse button at startup for being prompted to disc swap with any other CD in this collection, then soft reset machine"/>
 		<part name="cdrom1" interface="cdrom">
 			<!-- <category>Applications</category> -->
 			<!-- http://redump.org/disc/18550/ -->
