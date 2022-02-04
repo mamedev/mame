@@ -1,12 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/**************************************************************************************************
 
     Amiga floppy disk controller emulation "Trackdisk"
 
     Contained inside MOS 8364 Paula device
 
-***************************************************************************/
+    TODO:
+    - Some games currently writes 2+ dsksync to the buffer (marked as "[FDC] dsksync" in SW list):
+      Current workaround:
+      1. comment out dma_write in DMA_WAIT_START handling and change the dma_state *only*;
+      2. remove all of the non-DMA_WAIT_START phase inside the dsksync sub-section;
+      NB: according to documentation syncing doesn't really write anything on the bus,
+      so technically this "workaround" is more correct.
+      However it unfortunately causes other SW regressions, most notably in Workbench.
+    - Other games trashes memory or refuses to boot, in a few instances randomly
+      (marked as "[FDC] with adkcon=1100", implies dsksync disabled):
+      they often uses the AmigaDOS trackdisk BIOS functions, which may be expecting a
+      different timing. May be worth testing this out with the SDK;
+    - "[FDC] format" or in general writing to disks doesn't work properly.
+      i.e. formatting a disk in any Workbench version will cause a system crash once it completes.
+    - Fix ready line read handling;
+    - FDC LED output callback;
+
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -36,7 +53,7 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 }
 
 amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : device_t(mconfig, AMIGA_FDC, tag, owner, clock)
+	: device_t(mconfig, AMIGA_FDC, tag, owner, clock)
 	, m_write_index(*this)
 	, m_read_dma(*this)
 	, m_write_dma(*this)
@@ -268,18 +285,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 			if(!(dskbyt & 0x2000)) {
 				if(cur_live.shift_reg == dsksync) {
 					if(adkcon & 0x0400) {
-						// FIXME: exact dsksync behaviour
-						// - Some games currently writes two dsksync to the buffer (marked as "[FDC] dsksync"),
-						//   To workaround:
-						//   1. comment out dma_write here and change the dma_state *only*;
-						//   2. remove all of the non-DMA_WAIT_START phase here;
-						//   NB: according to documentation syncing doesn't really write anything on the bus,
-						//   so technically this "workaround" is more correct.
-						//   However it unfortunately causes other SW regressions, most notably in Workbench.
-						// - Other games trashes memory, mostly the ones with "[FDC] dsksync bootblock":
-						//   they attempt to load the tracks in AmigaDOS in the same way that's done by the
-						//   Kickstart to check if the disk is bootable.
-						//   This is generally reported as 0-upper cylinder bad in the ATK suite;
+						// FIXME: exact dsksync behaviour, cfr. note at top
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 

@@ -537,7 +537,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 0;	
+	next_copper_x = 0;
 	// FIXME: without the add this increment will skip bitplane ops
 	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
 	// (*) because there's a comparison with <= in the bitplane code.
@@ -556,7 +556,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_COLOR00) = save_color0;
 			next_copper_x = m_copper->execute_next(
 				x,
-				m_last_scanline & 0xff, 
+				m_last_scanline & 0xff,
 				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
@@ -573,10 +573,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// lastbtle sets 0x34-0xd0, lores
 			// swordsod sets 0x38-0xd6 (on gameplay), lores
 			// TODO: verify hires, fix mask for ECS (which can set bit 1 too)
-//			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+//          ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
 			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & 0xfc) * 2;
 			ddf_start_pixel += hires ? 9 : 17;
-//			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+//          ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
 			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & 0xfc) * 2;
 			ddf_stop_pixel += hires ? (9 + defbitoffs) : (17 + defbitoffs);
 
@@ -754,7 +754,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
-					// TODO: verify if PF2Px priority applies to HAM too 
+					// TODO: verify if PF2Px priority applies to HAM too
 					// (technically it's a non-dual too?)
 					if (sprpix && pf1pri > pri)
 					{
@@ -814,7 +814,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
-					// alfred OCS won't draw player sprite if PF1Px is used here 
+					// alfred OCS won't draw player sprite if PF1Px is used here
 					// (writes $0038 to bplcon2)
 					// According to HRM PF2Px is used there for non-dual playfield
 					if (sprpix && pf2pri > pri)

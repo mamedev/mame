@@ -4,11 +4,11 @@
 
     Commodore Amiga
 
-	Notes:
-	- On Kickstart 2.0 onward holding down both port 1 fire buttons
-	  will bring you to the Amiga Early Startup Control Screen.
-	  This gives you several diagnostic options, including booting from
-	  non-DF0 drive, switch video modes and test expansion boards.
+    Notes:
+    - On Kickstart 2.0 onward holding down both port 1 fire buttons
+      will bring you to the Amiga Early Startup Control Screen.
+      This gives you several diagnostic options, including booting from
+      non-DF0 drive, switch video modes and test expansion boards.
 
 ***************************************************************************/
 
@@ -1816,7 +1816,7 @@ void cdtv_state::cdtv(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cdtv_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	// FIXME: CDTV is actually ECS Agnus but OCS Denise
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cdtv_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cdtv_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	// standard sram
@@ -1881,7 +1881,7 @@ void a3000_state::a3000(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a3000_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a3000_state::ecs_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a3000_state::ecs_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	// real-time clock
@@ -1920,7 +1920,7 @@ void a500p_state::a500p(machine_config &config)
 	kbd.krst_handler().set(FUNC(a500p_state::kbreset_w));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a500p_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a500p_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a500p_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	// real-time clock
@@ -1962,7 +1962,7 @@ void a600_state::a600(machine_config &config)
 	kbd.krst_handler().set(FUNC(a600_state::kbreset_w));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a600_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a600_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a600_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
@@ -2006,11 +2006,12 @@ void a1200_state::a1200(machine_config &config)
 	amiga_base(config);
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a1200_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a1200_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a1200_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	// keyboard
-	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1200_us")); // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
+	// FIXME: replace with Amiga 1200 devices when we have mask ROM dump
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1200_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(a1200_state::kbreset_w));
@@ -2067,7 +2068,7 @@ void a4000_state::a4000(machine_config &config)
 	amiga_base(config);
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a4000_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a4000_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a4000_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	// keyboard
@@ -2140,7 +2141,7 @@ void cd32_state::cd32(machine_config &config)
 	amiga_base(config);
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cd32_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cd32_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cd32_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
 	FLOPPY_CONNECTOR(config.replace(), "fdc:0", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
