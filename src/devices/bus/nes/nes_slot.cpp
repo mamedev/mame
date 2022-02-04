@@ -371,14 +371,15 @@ void device_nes_cart_interface::bank_chr(int shift, int start, int bank, int sou
 		chr_chunks = m_vrom_chunks;
 	}
 
-	int kbyte = 1 << shift;
-	int size = 0x400 << shift;
 	bank &= (chr_chunks << (3 - shift)) - 1;
+	int size = 0x400 << shift;
+	int bank_start = bank * size;
+	int kbyte = 1 << shift;
 
 	for (int i = 0; i < kbyte; i++)
 	{
 		m_chr_src[i + start] = source;
-		m_chr_orig[i + start] = (bank * size) + (i * 0x400); // for save state uses!
+		m_chr_orig[i + start] = bank_start + i * 0x400; // for save state uses!
 		m_chr_access[i + start] = &base_ptr[m_chr_orig[i + start]];
 	}
 }
