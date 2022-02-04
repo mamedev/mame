@@ -9769,6 +9769,7 @@ m_mpac                          //
 mdntmrdr                        //
 medusa                          //
 monrobwl                        //
+mysteria                        //
 mystic                          //
 myststar                        //
 newwave                         //
@@ -12021,6 +12022,7 @@ ddribble                        // GX690 (c) 1986
 ddribblep                       // GX690 (c) 1986
 
 @source:ddz.cpp
+btlfront                        // 2005 TJF
 crzclass                        // 200? TJF
 ddz                             // 200?
 
@@ -37931,6 +37933,7 @@ shdancer1                       // 1989.?? Shadow Dancer (World)
 shdancerj                       // 1989.11 Shadow Dancer (Japan)
 wwallyj                         // 1992.06 Wally wo Sagase! (Japan, FD1094)
 wwallyja                        // 1992.06 Wally wo Sagase! (Japan, FD1094)
+wwallyja3p                      // 1992.06 Wally wo Sagase! (Japan, FD1094)
 wwallyjad                       //
 wwallyjd                        //
 
