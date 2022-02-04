@@ -150,7 +150,6 @@ private:
 	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_palette(palette_device &palette) const;
-	u16 get_border_color() override;
 	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
 	rectangle get_screen_area();

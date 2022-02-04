@@ -141,7 +141,8 @@ void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
 	bitmap_ind16 *bm = &m_screen->curbitmap().as_ind16();
 	if (bm->valid())
 	{
-		u16 border_color = get_border_color();
+		u8 pal_offset = m_regs[PAL_SEL] << 4;
+		u16 border_color = get_border_color() | pal_offset;
 		bool border_only = VM != VM_ZX || BIT(m_regs[V_CONFIG], 5);
 		rectangle screen = screen_area[0];
 		do
@@ -157,8 +158,8 @@ void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
 					u16 *pix = &bm->pix(m_previous_screen_y, m_previous_screen_x);
 					u8 attr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 0xF8) << 2) + (x >> 3) + 0x1800);
 					u8 scr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 7) << 8) + ((y & 0x38) << 2) + ((y & 0xC0) << 5) + (x >> 3));
-					u16 ink = ((attr & 0x07) + ((attr >> 3) & 0x08)) | 0xf0;
-					u16 pap = ((attr >> 3) & 0x0f) | 0xf0;
+					u16 ink = ((attr & 0x07) + ((attr >> 3) & 0x08)) | pal_offset;
+					u16 pap = ((attr >> 3) & 0x0f) | pal_offset;
 
 					if (m_flash_invert && (attr & 0x80))
 						scr = ~scr;
@@ -357,11 +358,6 @@ void tsconf_state::spectrum_UpdateBorderBitmap()
 	spectrum_UpdateScreenBitmap();
 }
 
-u16 tsconf_state::get_border_color()
-{
-	return m_regs[BORDER];
-}
-
 /*
 SFILE	Reg.16	7		6		5		4		3		2		1		0
 0		R0L		Y[7:0]
@@ -526,8 +522,10 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 	{
 	case 4:
 		page3 = (page3 & ~0x20) | (data & 0x20); // 1024K: 5 -> 5
+		[[fallthrough]];
 	case 0:
 		page3 = (page3 & ~0x18) | (BIT(data, 6, 2) << 3); //512K: 6..7 -> 3..4
+		break;
 	default:
 		break;
 	}
