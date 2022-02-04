@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 
+#include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "video/ppu2c0x.h"
 
@@ -15,8 +16,7 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
-		, m_work_ram(*this, "work_ram")
-		, m_work_ram_1(*this, "work_ram_1")
+		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
 		, m_chr_banks(*this, "chr%u", 0U)
 		, m_bank_vrom(*this, "vrom%u", 0U)
@@ -56,8 +56,7 @@ private:
 	optional_device<sn76489_device> m_sn1;
 	optional_device<sn76489_device> m_sn2;
 
-	required_shared_ptr<uint8_t> m_work_ram;
-	optional_shared_ptr<uint8_t> m_work_ram_1;
+	optional_device<nvram_device> m_nvram;
 
 	optional_memory_region m_gfx1_rom;
 	memory_bank_array_creator<8> m_chr_banks;
@@ -73,7 +72,6 @@ private:
 	void vsnes_in0_1_w(uint8_t data);
 	uint8_t vsnes_in0_1_r();
 	uint8_t vsnes_in1_1_r();
-	uint8_t gun_in0_r();
 	void vsnormal_vrom_banking(uint8_t data);
 	void gun_in0_w(uint8_t data);
 	void vskonami_rom_banking(offs_t offset, uint8_t data);
@@ -87,7 +85,7 @@ private:
 	uint8_t supxevs_read_prot_3_r();
 	uint8_t supxevs_read_prot_4_r();
 	uint8_t tko_security_r(offs_t offset);
-	void mapper68_rom_banking(offs_t offset, uint8_t data);
+	void sunsoft3_rom_banking(offs_t offset, uint8_t data);
 	void set_bnglngby_irq_w(uint8_t data);
 	uint8_t set_bnglngby_irq_r();
 	void vsdual_vrom_banking_main(uint8_t data);
@@ -97,7 +95,6 @@ private:
 	DECLARE_MACHINE_START(vsnes);
 	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
-	DECLARE_MACHINE_RESET(vsdual);
 	DECLARE_MACHINE_START(bootleg);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
 
@@ -115,16 +112,13 @@ private:
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];
-	int m_sound_fix;
-	uint8_t m_last_bank;
+	int m_input_strobe[2];
 	std::unique_ptr<uint8_t[]> m_vram;
-	std::unique_ptr<uint8_t[]> m_extraram;
 	uint8_t* m_vrom[2];
 	std::unique_ptr<uint8_t[]> m_nt_ram[2];
 	memory_bank_array_creator<8> m_bank_vrom;
 	uint32_t m_vrom_size[2];
 	int m_vrom_banks;
-	int m_zapstore;
 	int m_old_bank;
 	int m_drmario_shiftreg;
 	int m_drmario_shiftcount;
