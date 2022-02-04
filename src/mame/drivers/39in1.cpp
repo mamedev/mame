@@ -394,7 +394,7 @@ ROM_START( 39in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -408,7 +408,7 @@ ROM_START( 48in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -423,7 +423,7 @@ ROM_START( 48in1b )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", 0 )
-	ROM_LOAD( "48_flash.u19", 0x000000, 0x400000, CRC(a975db44) SHA1(5be6520b2ba7728e9e2de3c62ae7c3b88b25172a) )
+	ROM_LOAD( "48_flash.u19", 0x000000, 0x400000, CRC(a975db44) SHA1(5be6520b2ba7728e9e2de3c62ae7c3b88b25172a) )  // CGC-NP205 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -438,7 +438,7 @@ ROM_START( 48in1a )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -453,7 +453,7 @@ ROM_START( 48in1c )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -468,7 +468,7 @@ ROM_START( 60in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x400000, CRC(0cfed2a0) SHA1(9aac23f5267af56255e6f8aefade9f00bc106325) )
+	ROM_LOAD( "flash.u19", 0x000000, 0x400000, CRC(0cfed2a0) SHA1(9aac23f5267af56255e6f8aefade9f00bc106325) )  // CGC-NP206 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -482,7 +482,7 @@ ROM_START( 4in1a )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1,   CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -496,7 +496,7 @@ ROM_START( 4in1b )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -512,7 +512,7 @@ ROM_START( 19in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // assuming same flash rom
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // assuming same flash rom, CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -581,11 +581,11 @@ ROM_START( pokrwild ) // PCB451 - POKER'S WILD FP102 sticker on PCB outside the 
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "pokers wild v117.u2", 0x00000, 0x80000, CRC(96e18540) SHA1(b8fbf0a78a496e4ebea3e4603f4e3a52823c1f31) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(824fd188) SHA1(38517a78e853a600abcb6256ff77482a250c6ee6) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF, PKWILD-FP103 string
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "at93c66a.u32", 0x000, 0x200, CRC(27c7a209) SHA1(4d8e0ab18adb882362d800e2c247b3e27e6949e1) )
 ROM_END
 
 } // anonymous namespace
