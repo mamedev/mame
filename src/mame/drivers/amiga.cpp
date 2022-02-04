@@ -2145,7 +2145,8 @@ void cd32_state::cd32(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cd32_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
 
-	FLOPPY_CONNECTOR(config.replace(), "fdc:0", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	// disable floppy as default (available only via back port as expansion)
+	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
