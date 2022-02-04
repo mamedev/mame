@@ -1654,6 +1654,7 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "apps_list").set_original("amiga_apps");
 	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
+	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
 }
 
 void a1000_state::a1000(machine_config &config)
