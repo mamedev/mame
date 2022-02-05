@@ -45,6 +45,25 @@ public:
 
 	void bus_error() { m_bus_error = true; }
 
+	/*
+	 * This method allows bit 19 of the Boot-Mode Settings to be flipped. See Chapter 9, page 223 of the R4000 User Manual.
+	 * When this bit is 0 (interrupt_disabled = false), then the CP0 timer will set interrupt 5 whenever it expires.
+	 * When this bit is 1 (interrupt_disabled = true), the CP0 timer interrupt is disabled.
+	 * When the timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
+	 */
+	void set_timer_interrupt_disable(bool interrupt_disabled) { m_timer_interrupt_enabled = !interrupt_disabled; }
+
+	// Secondary cache configuration
+	void set_scache_size(u32 size)
+	{
+		if (size != 0)
+			m_cp0[CP0_Config] &= ~CONFIG_SC;
+
+		m_scache_size = size;
+	}
+
+	void set_secondary_cache_line_size(u8 size) { m_scache_line_size = size; }
+
 protected:
 	enum cache_size
 	{
@@ -291,6 +310,8 @@ protected:
 		TAGLO_PTAGLO = 0xffffff00, // physical adddress bits 35:12
 		TAGLO_PSTATE = 0x000000c0, // primary cache state
 		TAGLO_P      = 0x00000001, // primary tag even parity
+		TAGLO_CS     = 0x00001c00, // scache status
+		TAGLO_STAG   = 0xffffe000, // scache tag
 	};
 	enum icache_mask : u32
 	{
@@ -305,6 +326,12 @@ protected:
 		DCACHE_P    = 0x02000000, // even parity for ptag and cs
 		DCACHE_W    = 0x02000000, // write-back
 		DCACHE_WP   = 0x02000000, // even parity for write-back
+	};
+	enum scache_mask : u32
+	{
+		SCACHE_CS   = 0x01c00000, // cache state
+		SCACHE_STAG = 0x0007ffff, // physical tag
+		SCACHE_PIDX = 0x00380000, // primary cache index
 	};
 
 	// device_t overrides
@@ -342,6 +369,7 @@ protected:
 	void cpu_sdr(u32 const op);
 
 	// cp0 implementation
+	void cp0_cache(u32 const op);
 	void cp0_execute(u32 const op);
 	u64 cp0_get(unsigned const reg);
 	void cp0_set(unsigned const reg, u64 const data);
@@ -442,6 +470,7 @@ protected:
 	}
 	m_tlb[48];
 	unsigned m_tlb_mru[3][48];
+	bool m_timer_interrupt_enabled = true;
 
 	// cp1 state
 	u64 m_f[32]; // floating point registers
@@ -456,6 +485,14 @@ protected:
 	unsigned m_icache_shift;
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
+
+	// experimental scache state
+	u32 m_scache_size; // Size in bytes
+	u8 m_scache_line_size;
+	u32 m_scache_line_index; // Secondary cache line shift
+	u32 m_scache_tag_mask; // Mask for extracting the tag from a physical address
+	u32 m_scache_tag_size;
+	std::unique_ptr<u32[]> m_scache_tag;
 
 	// statistics
 	u64 m_tlb_scans;
@@ -482,7 +519,7 @@ public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133)
 	{
-		// no secondary cache
+		// no secondary cache by default
 		m_cp0[CP0_Config] |= CONFIG_SC;
 	}
 };
