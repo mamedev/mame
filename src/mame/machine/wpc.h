@@ -140,6 +140,7 @@ private:
 	devcb_write8 m_sounds11_w;
 	devcb_write8 m_bank_w;
 	devcb_write8 m_dmdbank_w;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 DECLARE_DEVICE_TYPE(WPCASIC, wpc_device)

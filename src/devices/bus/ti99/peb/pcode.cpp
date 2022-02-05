@@ -149,7 +149,7 @@ void ti_pcode_card_device::debugger_read(offs_t offset, uint8_t& value)
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
-		if (isrom0) value = m_rom[m_address & 0x0fff];
+		if (isrom0) value = m_rom[offset & 0x0fff];
 		else
 			if (isrom12) value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
 	}
@@ -161,6 +161,7 @@ void ti_pcode_card_device::readz(offs_t offset, uint8_t *value)
 	if (machine().side_effects_disabled())
 	{
 		debugger_read(offset, *value);
+		return;
 	}
 
 	if (m_active && m_inDsrArea && m_selected)

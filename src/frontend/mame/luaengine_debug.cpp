@@ -14,6 +14,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
+#include "debug/express.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debugger.h"
@@ -93,6 +94,140 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "rw", read_or_write::READWRITE },
 		{ "wr", read_or_write::READWRITE }
 	};
+
+	static const enum_parser<expression_space, 15> s_expression_space_parser =
+	{
+		{ "p", EXPSPACE_PROGRAM_LOGICAL }, { "lp", EXPSPACE_PROGRAM_LOGICAL }, { "pp", EXPSPACE_PROGRAM_PHYSICAL },
+		{ "d", EXPSPACE_DATA_LOGICAL },    { "ld", EXPSPACE_DATA_LOGICAL },    { "pd", EXPSPACE_DATA_PHYSICAL },
+		{ "i", EXPSPACE_IO_LOGICAL },      { "li", EXPSPACE_IO_LOGICAL },      { "pi", EXPSPACE_IO_PHYSICAL },
+		{ "3", EXPSPACE_OPCODE_LOGICAL },  { "l3", EXPSPACE_OPCODE_LOGICAL },  { "p3", EXPSPACE_OPCODE_PHYSICAL },
+		{ "r", EXPSPACE_PRGDIRECT },
+		{ "o", EXPSPACE_OPDIRECT },
+		{ "m", EXPSPACE_REGION }
+	};
+
+	auto const do_add_symbol = [this] (symbol_table &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format)
+	{
+		symbol_table::setter_func setfun;
+		if (setter)
+			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+		st.add(
+				name,
+				[this, cbfunc = std::move(getter)] () -> u64
+				{
+					auto result = invoke(cbfunc).get<sol::optional<u64> >();
+					if (result)
+					{
+						return *result;
+					}
+					else
+					{
+						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
+						return 0;
+					}
+				},
+				std::move(setfun),
+				(format && *format) ? *format : "");
+	};
+
+	auto symbol_table_type = emu.new_usertype<symbol_table>(
+			"symbol_table",
+			sol::call_constructor, sol::factories(
+				[] (running_machine &machine, symbol_table *parent, device_t *device) { return std::make_unique<symbol_table>(machine, parent, device); },
+				[] (running_machine &machine, symbol_table *parent) { return std::make_unique<symbol_table>(machine, parent); },
+				[] (running_machine &machine, device_t &device) { return std::make_unique<symbol_table>(machine, nullptr, &device); },
+				[] (running_machine &machine) { return std::make_unique<symbol_table>(machine); }));
+	symbol_table_type["set_memory_modified_func"] =
+			[this] (symbol_table &st, sol::object cb)
+			{
+				if (cb == sol::lua_nil)
+					st.set_memory_modified_func(nullptr);
+				else if (cb.is<sol::protected_function>())
+					st.set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+				else
+					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
+			};
+	symbol_table_type["add"] = sol::overload(
+			[] (symbol_table &st, char const *name) { st.add(name, symbol_table::READ_WRITE); },
+			static_cast<void (symbol_table::*)(char const *, u64)>(&symbol_table::add),
+			do_add_symbol,
+			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format)
+			{
+				do_add_symbol(st, name, getter, std::nullopt, format);
+			},
+			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter)
+			{
+				do_add_symbol(st, name, getter, setter, nullptr);
+			},
+			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, char const *format)
+			{
+				do_add_symbol(st, name, getter, std::nullopt, format);
+			},
+			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter)
+			{
+				do_add_symbol(st, name, getter, std::nullopt, nullptr);
+			},
+			[this] (symbol_table &st, char const *name, int minparams, int maxparams, sol::protected_function execute)
+			{
+				st.add(
+						name,
+						minparams,
+						maxparams,
+						[this, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
+						{
+							sol::stack_reference traceback(m_lua_state, -sol::stack::push(m_lua_state, sol::default_traceback_error_handler));
+							cbref.push();
+							sol::stack_aligned_stack_handler_function func(m_lua_state, -1, traceback);
+							for (int i = 0; numparams > i; ++i)
+								lua_pushinteger(m_lua_state, paramlist[i]);
+							auto result = func(sol::stack_count(numparams)).get<sol::optional<u64> >();
+							traceback.pop();
+							return result ? *result : 0;
+						});
+			});
+	symbol_table_type["find"] = &symbol_table::find;
+	symbol_table_type["find_deep"] = &symbol_table::find_deep;
+	symbol_table_type["value"] = &symbol_table::value;
+	symbol_table_type["set_value"] = &symbol_table::set_value;
+	symbol_table_type["memory_value"] =
+			[] (symbol_table &st, char const *name, char const *space, u32 offset, int size, bool disable_se)
+			{
+				expression_space const es = s_expression_space_parser(space);
+				return st.memory_value(name, es, offset, size, disable_se);
+			};
+	symbol_table_type["set_memory_value"] =
+			[] (symbol_table &st, char const *name, char const *space, u32 offset, int size, u64 value, bool disable_se)
+			{
+				expression_space const es = s_expression_space_parser(space);
+				st.set_memory_value(name, es, offset, size, value, disable_se);
+			};
+	//symbol_table_type["read_memory"] = &symbol_table::read_memory; crashes if you try to use it, need to work out why
+	//symbol_table_type["write_memory"] = &symbol_table::write_memory; crashes if you try to use it, need to work out why
+	symbol_table_type["entries"] = sol::property([] (symbol_table const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.entries()); });
+	symbol_table_type["parent"] = sol::property(&symbol_table::parent);
+
+
+	auto parsed_expression_type = emu.new_usertype<parsed_expression>(
+			"parsed_expression",
+			sol::call_constructor, sol::factories(
+				[] (symbol_table &symtable) { return std::make_unique<parsed_expression>(symtable); },
+				[] (symbol_table &symtable, char const *expression, int default_base) { return std::make_unique<parsed_expression>(symtable, expression, default_base); },
+				[] (symbol_table &symtable, char const *expression) { return std::make_unique<parsed_expression>(symtable, expression); },
+				[] (parsed_expression const &src) { return std::make_unique<parsed_expression>(src); }));
+	parsed_expression_type["set_default_base"] = &parsed_expression::set_default_base;
+	parsed_expression_type["parse"] = [] (parsed_expression &e, char const *string) { e.parse(string); };
+	parsed_expression_type["execute"] = &parsed_expression::execute;
+	parsed_expression_type["is_empty"] = sol::property(&parsed_expression::is_empty);
+	parsed_expression_type["original_string"] = sol::property(&parsed_expression::original_string);
+	parsed_expression_type["symbols"] = sol::property(&parsed_expression::symbols, &parsed_expression::set_symbols);
+
+
+	auto symbol_entry_type = sol().registry().new_usertype<symbol_entry>("symbol_entry", sol::no_constructor);
+	symbol_entry_type["name"] = sol::property(&symbol_entry::name);
+	symbol_entry_type["format"] = sol::property(&symbol_entry::format);
+	symbol_entry_type["is_function"] = sol::property(&symbol_entry::is_function);
+	symbol_entry_type["is_lval"] = sol::property(&symbol_entry::is_lval);
+	symbol_entry_type["value"] = sol::property(&symbol_entry::value, &symbol_entry::set_value);
 
 
 	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", sol::no_constructor);
@@ -177,7 +312,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 	device_debug_type["wpset"] =
 		[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
 		{
-			read_or_write wptype = s_read_or_write_parser(type);
+			read_or_write const wptype = s_read_or_write_parser(type);
 			int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
 			dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 			return result;

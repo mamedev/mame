@@ -1029,11 +1029,11 @@ ROM_START( 99lstwarb ) // copyright blanked, seems based on 99lstwara, given it 
 	ROM_LOAD( "6.27128",      0x10000, 0x4000, CRC(7d9e1e7e) SHA1(81dd8e933a1195e5f119a2b957828a4bf22bea35) ) // sprites - plane 2
 	ROM_LOAD( "7.27128",      0x14000, 0x4000, CRC(8b6fa1c4) SHA1(061ae1849e685dd838f61ea1d6e72a579f38ecc6) ) // sprites - plane 2
 
-	ROM_REGION( 0x0340, "proms", 0 ) // not dumped for this PCB
-	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) // blue
-	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) // green
-	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) // red
-	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) // char lookup table
+	ROM_REGION( 0x0340, "proms", 0 ) // not dumped for this PCB, the 1st stage background requires a palette not present here, so these are not correct for this set.
+	ROM_LOAD( "b.1j",         0x0000, 0x0100, BAD_DUMP CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) // blue
+	ROM_LOAD( "g.1h",         0x0100, 0x0100, BAD_DUMP CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) // green
+	ROM_LOAD( "r.1f",         0x0200, 0x0100, BAD_DUMP CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) // red
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, BAD_DUMP CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) // char lookup table
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) // timing? (not used)
 
 	ROM_REGION( 0x400, "plds", 0 )

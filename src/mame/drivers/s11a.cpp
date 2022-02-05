@@ -135,7 +135,14 @@ INPUT_PORTS_END
 void s11a_state::s11a_dig0_w(u8 data)
 {
 	set_strobe(data & 15);
-	set_diag(BIT(data, 4, 3));
+	u8 diag = BIT(data, 4, 3);
+	if (diag == get_diag())
+	{
+		set_lock1(0);
+		set_lock2(0);
+	}
+	else
+		set_diag(diag);
 	m_digits[60] = 0;  // +5VDC (always on)
 	m_digits[61] = BIT(data, 4);  // connected to PA4
 	m_digits[62] = 0;  // Blanking (pretty much always on)
@@ -193,6 +200,8 @@ void s11a_state::s11a_base(machine_config &config)
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11a_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11a_state::pia2c_pb_w));
+	m_pia2c->ca2_handler().set(FUNC(s11a_state::pia2c_ca2_w));
+	m_pia2c->cb2_handler().set(FUNC(s11a_state::pia2c_cb2_w));
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
@@ -200,6 +209,7 @@ void s11a_state::s11a_base(machine_config &config)
 	m_pia30->readpa_handler().set(FUNC(s11a_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11a_state::switch_w));
+	m_pia30->ca2_handler().set(FUNC(s11a_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s11a_state::pia30_cb2_w));
 	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
@@ -207,6 +217,7 @@ void s11a_state::s11a_base(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11a_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11a_state::pia34_pb_w));
+	m_pia34->ca2_handler().set_nop();
 	m_pia34->cb2_handler().set(FUNC(s11a_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));

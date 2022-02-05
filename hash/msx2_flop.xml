@@ -7394,7 +7394,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="marchen">
-		<description>M√§rchen Veil (Jpn)</description>
+		<description>Märchen Veil (Jpn)</description>
 		<year>1986</year>
 		<publisher>System Sacom</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7405,7 +7405,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="marchena" cloneof="marchen">
-		<description>M√§rchen Veil (Jpn, Alt)</description>
+		<description>Märchen Veil (Jpn, Alt)</description>
 		<year>1986</year>
 		<publisher>System Sacom</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7416,7 +7416,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="marchenb" cloneof="marchen">
-		<description>M√§rchen Veil (Jpn, Alt 2)</description>
+		<description>Märchen Veil (Jpn, Alt 2)</description>
 		<year>1986</year>
 		<publisher>System Sacom</publisher>
 		<part name="flop1" interface="floppy_3_5">
