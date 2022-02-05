@@ -585,16 +585,14 @@ void dp83932c_device::dump_bytes(u8 *buf, int length)
 	}
 }
 
-u16 dp83932c_device::read_bus_word(offs_t address)
+u32 dp83932c_device::read_bus_word(offs_t address)
 {
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
-
-	return width == 2 ? m_bus->read_word(address) : m_bus->read_dword(address, 0xffff);
+	return width == 2 ? m_bus->read_word(address) : m_bus->read_dword(address);
 }
 
-void dp83932c_device::write_bus_word(offs_t address, u16 data)
+void dp83932c_device::write_bus_word(offs_t address, u32 data)
 {
 	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
-
-	width == 2 ? m_bus->write_word(address, data) : m_bus->write_dword(address, data, 0xffff);
+	width == 2 ? m_bus->write_word(address, data) : m_bus->write_dword(address, data);
 }
