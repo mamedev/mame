@@ -2169,7 +2169,7 @@ ROM_START( cluclu )
 ROM_END
 
 
-ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
+ROM_START( excitebk ) /* EB4-3 = Excitebike, Palette 3, revision 'E' */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-3e.1d",  0x8000, 0x2000, CRC(f58a392e) SHA1(ca721e47e5dbe72d6f231d9b20b1ca33304c5370) )
 	ROM_LOAD( "mds-eb4-3e.1c",  0xa000, 0x2000, CRC(6ae01102) SHA1(f3f49644f7e2887e14655e8934c7c75d4b92968e) )
@@ -2183,7 +2183,7 @@ ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
 	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
-ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
+ROM_START( excitebko ) /* EB4-3 = Excitebike, Palette 3, unknown revision */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-3.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-eb4-3.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) ) /* Need to verify correct label */
@@ -2197,7 +2197,7 @@ ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
 	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
-ROM_START( excitebkj ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
+ROM_START( excitebkj ) /* EB4-4 A = Excitebike, Palette 4, rev A */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-4 a.6d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
 	ROM_LOAD( "mds-eb4-4 a.6c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
