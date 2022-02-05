@@ -18588,4 +18588,59 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="theinsti">
+		<description>The Institute</description>
+		<year>1983</year>
+		<publisher>Screenplay</publisher>
+		<info name="release" value="2022-02-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Institute" is a 1983 adventure game developed by Jymm Pearson, Robin Pearson, Norm Sailer, and Richard Incrocci, and distributed by Screenplay. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234818">
+				<rom name="the institute side a.woz" size="234818" crc="e9d314f8" sha1="880171c29d025fa1753193d68fc8f0bb2210fdcf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234818">
+				<rom name="the institute side b.woz" size="234818" crc="90777e40" sha1="2f7c9d6ca142df55fe2b3c6d447571190fd07d88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hazvolt">
+		<description>The Hazards of Voltageville</description>
+		<year>1994</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-02-04"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"The Hazards of Voltageville" is a 1994 educational game developed by Prentice Associates and distributed by Scholastic. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="the hazards of voltageville.woz" size="234796" crc="b1855bf8" sha1="18c5b614c0d4cee46eee7958a41d05025e6f56f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gonzwrdridr">
+		<description>The Great Gonzo in Word Rider</description>
+		<year>1985</year>
+		<publisher>Simon and Schuster</publisher>
+		<info name="release" value="2022-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Great Gonzo in Word Rider" is a 1985 educational game developed by Joyce Hakansson Associates and Christopher Cerf Associates, and distributed by Simon and Schuster. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234843">
+				<rom name="the great gonzo in word rider.woz" size="234843" crc="feec447d" sha1="088e691f2447f6e8277c95dd88da7568fab6cda0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
