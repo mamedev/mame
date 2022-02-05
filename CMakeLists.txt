@@ -17,7 +17,7 @@ else()
 	set(projectname ${TARGET}${SUBTARGET})
 endif()
 
-project(${projectname} VERSION 0.239 LANGUAGES CXX C)
+project(${projectname} VERSION 0.240 LANGUAGES CXX C)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	enable_language(OBJCXX OBJC)
 endif()

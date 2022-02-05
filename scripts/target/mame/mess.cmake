@@ -4210,7 +4210,6 @@ createMESSProjects(_target _subtarget "xussrpc"
 	${MAME_DIR}/src/mame/drivers/iskr103x.cpp
 	${MAME_DIR}/src/mame/drivers/mc1502.cpp
 	${MAME_DIR}/src/mame/machine/kb_7007_3.h
-	${MAME_DIR}/src/mame/includes/mc1502.h
 	${MAME_DIR}/src/mame/drivers/poisk1.cpp
 	${MAME_DIR}/src/mame/machine/kb_poisk1.h
 )
@@ -4327,8 +4326,9 @@ createMESSProjects(_target _subtarget "skeleton"
 	${MAME_DIR}/src/mame/drivers/didact.cpp
 	${MAME_DIR}/src/mame/drivers/digel804.cpp
 	${MAME_DIR}/src/mame/drivers/digilog320.cpp
-	${MAME_DIR}/src/mame/machine/digilog320_kbd.cpp
-	${MAME_DIR}/src/mame/machine/digilog320_kbd.h
+	${MAME_DIR}/src/mame/drivers/digilog400.cpp
+	${MAME_DIR}/src/mame/machine/digilog_kbd.cpp
+	${MAME_DIR}/src/mame/machine/digilog_kbd.h
 	${MAME_DIR}/src/mame/drivers/digijet.cpp
 	${MAME_DIR}/src/mame/drivers/dim68k.cpp
 	${MAME_DIR}/src/mame/drivers/dm7000.cpp

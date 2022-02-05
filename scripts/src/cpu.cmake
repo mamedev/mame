@@ -1638,6 +1638,7 @@ endif()
 ##@src/devices/cpu/m6502/st2xxx.h,list(APPEND CPUS ST2XXX)
 ##@src/devices/cpu/m6502/st2204.h,list(APPEND CPUS ST2XXX)
 ##@src/devices/cpu/m6502/st2205u.h,list(APPEND CPUS ST2XXX)
+##@src/devices/cpu/m6502/w65c02s.h,list(APPEND CPUS M6502)
 ##@src/devices/cpu/m6502/xavix.h,list(APPEND CPUS XAVIX)
 ##@src/devices/cpu/m6502/xavix.h,list(APPEND CPUS XAVIX2000)
 
@@ -1679,6 +1680,8 @@ if("M6502" IN_LIST CPUS)
 		${MAME_DIR}/src/devices/cpu/m6502/r65c02.h
 		${MAME_DIR}/src/devices/cpu/m6502/r65c19.cpp
 		${MAME_DIR}/src/devices/cpu/m6502/r65c19.h
+		${MAME_DIR}/src/devices/cpu/m6502/w65c02s.cpp
+		${MAME_DIR}/src/devices/cpu/m6502/w65c02s.h
 		${MAME_DIR}/src/devices/cpu/m6502/m740.cpp
 		${MAME_DIR}/src/devices/cpu/m6502/m740.h
 		${MAME_DIR}/src/devices/cpu/m6502/m3745x.cpp
@@ -1696,6 +1699,7 @@ if("M6502" IN_LIST CPUS)
 		${GEN_DIR}/emu/cpu/m6502/n2a03.hxx
 		${GEN_DIR}/emu/cpu/m6502/r65c02.hxx
 		${GEN_DIR}/emu/cpu/m6502/r65c19.hxx
+		${GEN_DIR}/emu/cpu/m6502/w65c02s.hxx
 		${GEN_DIR}/emu/cpu/m6502/m740.hxx
 	)
 
@@ -1704,77 +1708,84 @@ if("M6502" IN_LIST CPUS)
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s deco16 ${MAME_DIR}/src/devices/cpu/m6502/odeco16.lst ${MAME_DIR}/src/devices/cpu/m6502/ddeco16.lst ${GEN_DIR}/emu/cpu/m6502/deco16.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/odeco16.lst ${MAME_DIR}/src/devices/cpu/m6502/ddeco16.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/deco16.hxx
-		COMMENT "Generating deco16 source file..."
+		COMMENT "Generating deco16 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m4510 ${MAME_DIR}/src/devices/cpu/m6502/om4510.lst ${MAME_DIR}/src/devices/cpu/m6502/dm4510.lst ${GEN_DIR}/emu/cpu/m6502/m4510.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om4510.lst ${MAME_DIR}/src/devices/cpu/m6502/dm4510.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m4510.hxx
-		COMMENT "Generating m4510 source file..."
+		COMMENT "Generating m4510 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m6502 ${MAME_DIR}/src/devices/cpu/m6502/om6502.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6502.lst ${GEN_DIR}/emu/cpu/m6502/m6502.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om6502.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6502.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m6502.hxx
-		COMMENT "Generating m6502 source file..."
+		COMMENT "Generating m6502 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m65c02 ${MAME_DIR}/src/devices/cpu/m6502/om65c02.lst ${MAME_DIR}/src/devices/cpu/m6502/dm65c02.lst ${GEN_DIR}/emu/cpu/m6502/m65c02.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om65c02.lst ${MAME_DIR}/src/devices/cpu/m6502/dm65c02.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m65c02.hxx
-		COMMENT "Generating m65c02 source file..."
+		COMMENT "Generating m65c02 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m65ce02 ${MAME_DIR}/src/devices/cpu/m6502/om65ce02.lst ${MAME_DIR}/src/devices/cpu/m6502/dm65ce02.lst ${GEN_DIR}/emu/cpu/m6502/m65ce02.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om65ce02.lst ${MAME_DIR}/src/devices/cpu/m6502/dm65ce02.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m65ce02.hxx
-		COMMENT "Generating m65ce02 source file..."
+		COMMENT "Generating m65ce02 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m6509 ${MAME_DIR}/src/devices/cpu/m6502/om6509.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6509.lst ${GEN_DIR}/emu/cpu/m6502/m6509.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om6509.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6509.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m6509.hxx
-		COMMENT "Generating m6509 source file..."
+		COMMENT "Generating m6509 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m6510 ${MAME_DIR}/src/devices/cpu/m6502/om6510.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6510.lst ${GEN_DIR}/emu/cpu/m6502/m6510.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om6510.lst ${MAME_DIR}/src/devices/cpu/m6502/dm6510.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m6510.hxx
-		COMMENT "Generating m6510 source file..."
+		COMMENT "Generating m6510 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s n2a03_core ${MAME_DIR}/src/devices/cpu/m6502/on2a03.lst ${MAME_DIR}/src/devices/cpu/m6502/dn2a03.lst ${GEN_DIR}/emu/cpu/m6502/n2a03.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/on2a03.lst ${MAME_DIR}/src/devices/cpu/m6502/dn2a03.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/n2a03.hxx
-		COMMENT "Generating n2a03 source file..."
+		COMMENT "Generating n2a03 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s m740 ${MAME_DIR}/src/devices/cpu/m6502/om740.lst ${MAME_DIR}/src/devices/cpu/m6502/dm740.lst ${GEN_DIR}/emu/cpu/m6502/m740.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/om740.lst ${MAME_DIR}/src/devices/cpu/m6502/dm740.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/m740.hxx
-		COMMENT "Generating m740 source file..."
+		COMMENT "Generating m740 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s r65c02 - ${MAME_DIR}/src/devices/cpu/m6502/dr65c02.lst ${GEN_DIR}/emu/cpu/m6502/r65c02.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/dr65c02.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/r65c02.hxx
-		COMMENT "Generating r65c02 source file..."
+		COMMENT "Generating r65c02 instruction source file..."
 	)
 	add_custom_command(
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s r65c19 ${MAME_DIR}/src/devices/cpu/m6502/or65c19.lst ${MAME_DIR}/src/devices/cpu/m6502/dr65c19.lst ${GEN_DIR}/emu/cpu/m6502/r65c19.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/or65c19.lst ${MAME_DIR}/src/devices/cpu/m6502/dr65c19.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/r65c19.hxx
-		COMMENT "Generating r65c19 source file..."
+		COMMENT "Generating r65c19 instruction source file..."
+	)
+	add_custom_command(
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
+		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s w65c02s ${MAME_DIR}/src/devices/cpu/m6502/ow65c02s.lst ${MAME_DIR}/src/devices/cpu/m6502/dw65c02s.lst ${GEN_DIR}/emu/cpu/m6502/w65c02s.hxx
+		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/ow65c02s.lst ${MAME_DIR}/src/devices/cpu/m6502/dw65c02s.lst
+		OUTPUT ${GEN_DIR}/emu/cpu/m6502/w65c02s.hxx
+		COMMENT "Generating w65c02s instruction source file..."
 	)
 endif()
 
@@ -1786,14 +1797,6 @@ if("ST2XXX" IN_LIST CPUS)
 		${MAME_DIR}/src/devices/cpu/m6502/st2204.h
 		${MAME_DIR}/src/devices/cpu/m6502/st2205u.cpp
 		${MAME_DIR}/src/devices/cpu/m6502/st2205u.h
-		${GEN_DIR}/emu/cpu/m6502/st2xxx.hxx
-	)
-	add_custom_command(
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/m6502/
-		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s st2xxx ${MAME_DIR}/src/devices/cpu/m6502/ost2xxx.lst ${MAME_DIR}/src/devices/cpu/m6502/dst2xxx.lst ${GEN_DIR}/emu/cpu/m6502/st2xxx.hxx
-		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/ost2xxx.lst ${MAME_DIR}/src/devices/cpu/m6502/dst2xxx.lst
-		OUTPUT ${GEN_DIR}/emu/cpu/m6502/st2xxx.hxx
-		COMMENT "Generating st2xxx source file..."
 	)
 endif()
 
@@ -1807,7 +1810,7 @@ if("XAVIX" IN_LIST CPUS)
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s xavix ${MAME_DIR}/src/devices/cpu/m6502/oxavix.lst ${MAME_DIR}/src/devices/cpu/m6502/dxavix.lst ${GEN_DIR}/emu/cpu/m6502/xavix.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/oxavix.lst ${MAME_DIR}/src/devices/cpu/m6502/dxavix.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/xavix.hxx
-		COMMENT "Generating st2xxx source file..."
+		COMMENT "Generating st2xxx instruction source file..."
 	)
 endif()
 
@@ -1821,7 +1824,7 @@ if("XAVIX2000" IN_LIST CPUS)
 		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py s xavix2000 ${MAME_DIR}/src/devices/cpu/m6502/oxavix2000.lst ${MAME_DIR}/src/devices/cpu/m6502/dxavix2000.lst ${GEN_DIR}/emu/cpu/m6502/xavix2000.hxx
 		DEPENDS ${MAME_DIR}/src/devices/cpu/m6502/m6502make.py ${MAME_DIR}/src/devices/cpu/m6502/oxavix2000.lst ${MAME_DIR}/src/devices/cpu/m6502/dxavix2000.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/m6502/xavix2000.hxx
-		COMMENT "Generating xavix2000 source file..."
+		COMMENT "Generating xavix2000 instruction source file..."
 	)
 endif()
 
