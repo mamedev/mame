@@ -673,7 +673,7 @@ void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
 	}
 }
 
-void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	step(true);
 }

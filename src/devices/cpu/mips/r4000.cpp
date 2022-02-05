@@ -199,24 +199,22 @@ void r4000_base_device::device_start()
 
 	R4000_ENDIAN_LE_BE(accessors(m_le), accessors(m_be));
 
-	// MIPS-III secondary cache tag size depends on the cache line size
-	// (how many bytes are transferred with one cache operation) and the
-	// size of the cache itself.
-	// For example, the Sony NEWS NWS-5000X has a 1MB secondary cache
-	// and a cache line size of 16 words. So, the slice of the physical
-	// address used to index into the cache is bits 19:6.
-	// See chapter 11 of the R4000 user manual for more details.
-	if(SCACHE)
+	/*
+	 * MIPS-III secondary cache tag size depends on the cache line size
+	 * (how many bytes are transferred with one cache operation) and the
+	 * size of the cache itself.
+	 * For example, the Sony NEWS NWS-5000X has a 1MB secondary cache
+	 * and a cache line size of 16 words. So, the slice of the physical
+	 * address used to index into the cache is bits 19:6.
+	 * See chapter 11 of the R4000 user manual for more details.
+	 */
+	if (SCACHE)
 	{
-		if(m_scache_line_size == 0)
-		{
+		if (m_scache_line_size == 0)
 			fatalerror("SCACHE line size was not set!");
-		}
 
 		if (m_scache_line_size <= 0x10)
-		{
 			m_scache_line_index = 4;
-		}
 		else if (m_scache_line_size <= 0x20)
 		{
 			m_scache_line_index = 5;
@@ -1290,47 +1288,39 @@ void r4000_base_device::cp0_cache(u32 const op)
 		break;
 	case 0x06: // index load tag (SI)
 	case 0x07: // index load tag (SD)
-	{
-		if(SCACHE)
+		if (SCACHE)
 		{
 			// Get physical address and extract tag
 			// TODO: translation type for CACHE instruction?
 			u64 physical_address = ADDR(m_r[RSREG], s16(op));
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
-			{
 				return;
-			}
+
 			u32 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
-			if(index < m_scache_tag_size)
+			if (index < m_scache_tag_size)
 			{
-				auto const tag = m_scache_tag[index];
+				u32 const tag = m_scache_tag[index];
 
 				// Decode entry and marshal each field to the TagLo register
 				// TODO: Load the ECC register here
-				auto const cs = (tag & 0x1c00000) >> 22;
-				auto const stag = (tag & 0x7ffff);
-				auto const pidx = (tag & 0x380000) >> 19;
+				u32 const cs = (tag & SCACHE_CS) >> 22;
+				u32 const stag = (tag & SCACHE_STAG);
+				u32 const pidx = (tag & SCACHE_PIDX) >> 19;
 				m_cp0[CP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
 			}
 			else
-			{
 				fatalerror("r4000 scache load tag index out of range!");
-			}
 		}
 		else
-		{
 			LOGMASKED(LOG_CACHE, "cache 0x%08x called without scache enabled (%s)\n", op, machine().describe_context());
-		}
 		break;
-	}
 	case 0x09: // index store tag (D)
 		//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
 		break;
 	case 0x0a: // index store tag (SI)
 	case 0x0b: // index store tag (SD)
-	{
-		if(SCACHE)
+		if (SCACHE)
 		{
 			// Get virtual and physical addresses
 			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
@@ -1339,33 +1329,26 @@ void r4000_base_device::cp0_cache(u32 const op)
 			u64 physical_address = virtual_address;
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
-			{
 				return;
-			}
 
 			// Prepare index for tag
 			u64 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
-			if(index < m_scache_tag_size)
+			if (index < m_scache_tag_size)
 			{
 				// Assemble and set tag entry
 				// TODO: Calculate ECC bits here
-				auto const tag_lo = m_cp0[CP0_TagLo];
-				auto const cs = (tag_lo & 0x1c00) >> 10;
-				auto const stag = (tag_lo & 0xffffe000) >> 13;
-				auto const pidx = (virtual_address & 0x7000) >> 12;
+				u64 const tag_lo = m_cp0[CP0_TagLo];
+				u32 const cs = (tag_lo & TAGLO_CS) >> 10;
+				u32 const stag = (tag_lo & TAGLO_STAG) >> 13;
+				u32 const pidx = (virtual_address & 0x7000) >> 12;
 				m_scache_tag[index] = cs << 22 | pidx << 19 | stag;
 			}
 			else
-			{
 				fatalerror("r4000 scache store tag index out of range!");
-			}
 		}
 		else
-		{
 			LOGMASKED(LOG_CACHE, "cache 0x%08x called without scache enabled (%s)\n", op, machine().describe_context());
-		}
 		break;
-	}
 	case 0x0d: // create dirty exclusive (D)
 	case 0x0f: // create dirty exclusive (SD)
 
@@ -1565,9 +1548,7 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 	case CP0_Compare:
 		m_cp0[CP0_Compare] = u32(data);
 		if(m_timer_interrupt_enabled)
-		{
 			CAUSE &= ~CAUSE_IPEX5;
-		}
 		cp0_update_timer(true);
 		break;
 	case CP0_Status:
@@ -1641,7 +1622,7 @@ void r4000_base_device::cp0_tlbr()
 
 		m_cp0[CP0_PageMask] = entry.mask;
 		m_cp0[CP0_EntryHi] = entry.vpn;
-		const u64 global = (entry.vpn & EH_G) ? EL_G : 0x0;
+		u64 const global = (entry.vpn & EH_G) ? EL_G : 0x0;
 		m_cp0[CP0_EntryLo0] = entry.pfn[0] | global;
 		m_cp0[CP0_EntryLo1] = entry.pfn[1] | global;
 	}
@@ -1718,9 +1699,7 @@ void r4000_base_device::cp0_update_timer(bool start)
 TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 {
 	if(m_timer_interrupt_enabled)
-	{
 		m_cp0[CP0_Cause] |= CAUSE_IPEX5;
-	}
 }
 
 bool r4000_base_device::cp0_64() const
