@@ -8,11 +8,11 @@
     can be connected to any French telephone line. This terminal was widely used in France
     during the 80's and 90's.
 
-    There are several modeles and version. Most of them are based on a mcu from the 8051 family
-    and a EF9345 like semi graphic video chip.
+    There are several models and versions. Most of them are based on 8051 compatible MCUs
+    and EF9345 semi graphic video chip.
 
     The current implementation is an Minitel 2 from "La RADIOTECHNIQUE PORTENSEIGNE" / RPIC (Philips)
-    You can found more informations about this hardware there :
+    More Minitel hardware related informations are available on this page :
     http://hxc2001.free.fr/minitel
 
     What is implemented and working :
@@ -21,11 +21,15 @@
     - Video output
     - Keyboard
     - 24C02 EPROM
+    - Modem serial interface.
+
+    What is implemented but not working :
+
+    - The rear serial port. (Internal 8051 serial port emulation missing).
 
     What is not yet implemented :
 
-    - Modem and sound output.
-    - The rear serial port.
+    - Sound output.
     - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
@@ -45,11 +49,18 @@
 
     With the official ROM you need to press F10 to switch on the CRT.
 
+    Modem and external port can be exported with the "modport0" and "serport0"
+    interfaces.
+    Example : Options to use to create an TCP socket connected to the modem port :
+              "-modport0 null_modem -bitb socket.127.0.0.1:20000"
+
 ****************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/clock.h"
 #include "machine/i2cmem.h"
 #include "machine/timer.h"
 #include "video/ef9345.h"
@@ -60,28 +71,32 @@
 
 #include "logmacro.h"
 
-// IO expander latch usage definitions
-enum
-{
-	CTRL_REG_MCBC  = 0x01,
-	CTRL_REG_DTMF  = 0x02,
-	CTRL_REG_CRTON = 0x08,
-	CTRL_REG_OPTO  = 0x10,
-	CTRL_REG_RELAY = 0x20
-};
+// 14174 Control register bits definition
+
+#define CTRL_REG_MCBC_BIT      0
+#define CTRL_REG_DTMF_BIT      1
+#define CTRL_REG_CRTON_BIT     3
+#define CTRL_REG_OPTO_BIT      4
+#define CTRL_REG_LINERELAY_BIT 5
 
 // 80C32 Port IO usage definitions
-enum
-{
-	PORT_1_KBSERIN = 0x01,
-	PORT_1_MDM_DCD = 0x02,
-	PORT_1_MDM_PRD = 0x04,
-	PORT_1_MDM_TXD = 0x08,
-	PORT_1_MDM_RTS = 0x10,
-	PORT_1_KBLOAD = 0x20,
-	PORT_1_SCL = 0x40,
-	PORT_1_SDA = 0x80
-};
+
+#define PORT_1_KBSERIN_BIT     0
+#define PORT_1_MDM_DCDn_BIT    1
+#define PORT_1_MDM_PRD_BIT     2
+#define PORT_1_MDM_TXD_BIT     3
+#define PORT_1_MDM_RTS_BIT     4
+#define PORT_1_KBLOAD_BIT      5
+#define PORT_1_SCL_BIT         6
+#define PORT_1_SDA_BIT         7
+
+#define PORT_3_SER_RXD_BIT     0
+#define PORT_3_SER_TXD_BIT     1
+#define PORT_3_SER_ZCO_BIT     2
+#define PORT_3_MDM_RXD_BIT     3
+#define PORT_3_SER_RDY_BIT     5
+
+#define MASK(bit) (0x01 << bit)
 
 class minitel_state : public driver_device
 {
@@ -92,6 +107,8 @@ public:
 		, m_ts9347(*this, "ts9347")
 		, m_palette(*this, "palette")
 		, m_i2cmem(*this, "i2cmem")
+		, m_modem(*this, "modport0")
+		, m_serport(*this, "serport0")
 		, m_io_kbd(*this, "Y%u", 0)
 		{
 		}
@@ -103,8 +120,12 @@ private:
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
 	required_device<i2cmem_device> m_i2cmem;
+	required_device<rs232_port_device> m_modem;
+	required_device<rs232_port_device> m_serport;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
+
+	void update_modem_state();
 
 	void port1_w(uint8_t data);
 	void port3_w(uint8_t data);
@@ -129,6 +150,9 @@ private:
 	uint8_t keyboard_x_row_reg;
 
 	uint8_t last_ctrl_reg;
+
+	int lineconnected;
+	int tonedetect;
 };
 
 void minitel_state::machine_start()
@@ -147,51 +171,56 @@ void minitel_state::port1_w(uint8_t data)
 {
 	LOG("port_w: write %02X to PORT1\n", data);
 
-	if( (port1 ^ data) & PORT_1_KBSERIN )
+	if( BIT( port1 ^ data, PORT_1_KBSERIN_BIT ) )
 	{
-		LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
+		LOG("PORT_1_KBSERIN : %d \n", BIT( data, PORT_1_KBSERIN_BIT ) );
 	}
 
-	if( (port1 ^ data) & PORT_1_MDM_DCD )
+	if( BIT( port1 ^ data, PORT_1_MDM_DCDn_BIT ) )
 	{
-		LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
+		LOG("PORT_1_MDM_DCD : %d \n", BIT( data, PORT_1_MDM_DCDn_BIT ) );
 	}
 
-	if( (port1 ^ data) & PORT_1_MDM_PRD )
+	if( BIT( port1 ^ data, PORT_1_MDM_PRD_BIT ) )
 	{
-		LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
+		LOG("PORT_1_MDM_PRD : %d \n", BIT( data, PORT_1_MDM_PRD_BIT ) );
 	}
 
-	if( (port1 ^ data) & PORT_1_MDM_TXD )
+	if( BIT( port1 ^ data, PORT_1_MDM_TXD_BIT ) )
 	{
-		LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
+		LOG("PORT_1_MDM_TXD : %d \n", BIT( data, PORT_1_MDM_TXD_BIT ) );
 	}
 
-	if( (port1 ^ data) & PORT_1_MDM_RTS )
+	if(lineconnected)
 	{
-		LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
+		m_modem->write_txd(BIT(data, PORT_1_MDM_TXD_BIT));
 	}
 
-	if( (port1 ^ data) & PORT_1_KBLOAD )
+	if( BIT( port1 ^ data, PORT_1_MDM_RTS_BIT ) )
 	{
-		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
+		LOG("PORT_1_MDM_RTS : %d \n", BIT( data, PORT_1_MDM_RTS_BIT ) );
+	}
 
-		if(data & PORT_1_KBLOAD)
+	if( BIT( port1 ^ data, PORT_1_KBLOAD_BIT ) )
+	{
+		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", BIT( data, PORT_1_KBLOAD_BIT ),m_maincpu->pc() );
+
+		if( BIT( data, PORT_1_KBLOAD_BIT ) )
 			keyboard_para_ser = 1;
 		else
 			keyboard_para_ser = 0;
 	}
 
-	if( (port1 ^ data) & PORT_1_SCL )
+	if( BIT( port1 ^ data, PORT_1_SCL_BIT ) )
 	{
-		LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
-		m_i2cmem->write_scl( (data & PORT_1_SCL) ? 1 : 0);
+		LOG("PORT_1_SCL : %d \n", BIT( data, PORT_1_SCL_BIT ) );
+		m_i2cmem->write_scl( BIT( data, PORT_1_SCL_BIT ) ? 1 : 0);
 	}
 
-	if( (port1 ^ data) & PORT_1_SDA )
+	if( BIT( port1 ^ data, PORT_1_SDA_BIT ) )
 	{
-		LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
-		m_i2cmem->write_sda( (data & PORT_1_SDA) ? 1 : 0);
+		LOG("PORT_1_SDA : %d \n", BIT( data, PORT_1_SDA_BIT ) );
+		m_i2cmem->write_sda( BIT( data, PORT_1_SDA_BIT ) ? 1 : 0);
 	}
 
 	port1 = data;
@@ -200,8 +229,35 @@ void minitel_state::port1_w(uint8_t data)
 void minitel_state::port3_w(uint8_t data)
 {
 	LOG("port_w: write %02X to PORT3\n", data);
+
+	m_serport->write_txd(BIT(data, PORT_3_SER_TXD_BIT));
+
 	port3 = data;
 }
+
+
+
+void minitel_state::update_modem_state()
+{
+	// 1300 Hz tone detection :  PORT_1_MDM_RTS = 1, CTRL_REG_DTMF = 0, CTRL_REG_MCBC = 0
+	if(  BIT( last_ctrl_reg,CTRL_REG_LINERELAY_BIT) &&
+		 BIT( port1,PORT_1_MDM_RTS_BIT) &&
+		!BIT( last_ctrl_reg,CTRL_REG_DTMF_BIT) &&
+		!BIT( last_ctrl_reg,CTRL_REG_MCBC_BIT) )
+	{
+		tonedetect = 1;
+	}
+	else
+	{
+		tonedetect = 0;
+	}
+
+	// Main transmission mode :  PORT_1_MDM_RTS = 0, CTRL_REG_DTMF = 1, CTRL_REG_MCBC = 0
+	if( BIT(last_ctrl_reg, CTRL_REG_LINERELAY_BIT) )
+		lineconnected = 1;
+	else
+		lineconnected = 0;
+};
 
 uint8_t minitel_state::port1_r()
 {
@@ -209,16 +265,30 @@ uint8_t minitel_state::port1_r()
 
 	LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
 
-	data = ( ( (port1 & (0xFE & ~PORT_1_SDA) ) | ( (keyboard_x_row_reg>>7)&1) ) );
-	data |= (m_i2cmem->read_sda() ? PORT_1_SDA : 0);
+	data = ( ( (port1 & (0xFE & ~MASK(PORT_1_SDA_BIT)) ) | ( (keyboard_x_row_reg>>7)&1) ) );
+	data |= (m_i2cmem->read_sda() ? MASK(PORT_1_SDA_BIT) : 0);
+
+	update_modem_state();
+
+	if( lineconnected )
+		data &= ~MASK(PORT_1_MDM_DCDn_BIT);
+	else
+		data |=  MASK(PORT_1_MDM_DCDn_BIT);
 
 	return data;
 }
 
 uint8_t minitel_state::port3_r()
 {
+	uint8_t data;
+
 	LOG("port_r: read %02X from PORT3\n", port3);
-	return port3;
+
+	update_modem_state();
+
+	data = (port3 & ~(MASK(PORT_3_SER_RDY_BIT))); // External port ready state
+
+	return data;
 }
 
 void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
@@ -227,29 +297,29 @@ void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
 	{
 		LOG("minitel_state::hw_ctrl_reg : %x %x\n",offset, data);
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_DTMF )
+		if( BIT( last_ctrl_reg ^ data, CTRL_REG_DTMF_BIT ) )
 		{
-			LOG("CTRL_REG_DTMF : %d \n", data & CTRL_REG_DTMF );
+			LOG("CTRL_REG_DTMF : %d \n", BIT( data, CTRL_REG_DTMF_BIT ) );
 		}
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_MCBC )
+		if( BIT( last_ctrl_reg ^ data, CTRL_REG_MCBC_BIT ) )
 		{
-			LOG("CTRL_REG_MCBC : %d \n", data & CTRL_REG_MCBC );
+			LOG("CTRL_REG_MCBC : %d \n", BIT( data, CTRL_REG_MCBC_BIT ) );
 		}
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_OPTO )
+		if( BIT( last_ctrl_reg ^ data, CTRL_REG_OPTO_BIT ) )
 		{
-			LOG("CTRL_REG_OPTO : %d \n", data & CTRL_REG_OPTO );
+			LOG("CTRL_REG_OPTO : %d \n", BIT( data, CTRL_REG_OPTO_BIT ) );
 		}
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_RELAY )
+		if( BIT( last_ctrl_reg ^ data, CTRL_REG_LINERELAY_BIT ) )
 		{
-			LOG("CTRL_REG_RELAY : %d \n", data & CTRL_REG_RELAY );
+			LOG("CTRL_REG_RELAY : %d \n", BIT( data, CTRL_REG_LINERELAY_BIT ) );
 		}
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_CRTON )
+		if( BIT( last_ctrl_reg ^ data, CTRL_REG_CRTON_BIT ) )
 		{
-			LOG("CTRL_REG_CRTON : %d \n", data & CTRL_REG_CRTON );
+			LOG("CTRL_REG_CRTON : %d \n", BIT( data, CTRL_REG_CRTON_BIT ) );
 		}
 	}
 
@@ -430,6 +500,14 @@ void minitel_state::minitel2(machine_config &config)
 
 	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
 
+	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
+	m_modem->rxd_handler().set_inputline("maincpu", MCS51_INT1_LINE).invert();
+
+	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
+	m_serport->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
+
+	lineconnected = 0;
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -438,7 +516,28 @@ void minitel_state::minitel2(machine_config &config)
 	screen.set_visarea(2, 512-10, 0, 278-1);
 
 	PALETTE(config, m_palette).set_entries(8+1);
+
+	// Send a fake 1300 Hz carrier (emulate the modem ZCO output)
+	auto &fake_1300hz_clock(CLOCK(config, "fake_1300hz_clock", 1300));
+	fake_1300hz_clock.set_pulse_width(attotime::from_usec(384));
+	fake_1300hz_clock.signal_handler().set_inputline(m_maincpu, MCS51_INT0_LINE);
 }
+
+static DEVICE_INPUT_DEFAULTS_START( m_modem )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_75 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( m_serport )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 ROM_START( minitel2 )
 
