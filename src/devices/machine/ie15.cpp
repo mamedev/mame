@@ -677,7 +677,7 @@ GFXDECODE_END
 void ie15_device::ie15core(machine_config &config)
 {
 	/* Basic machine hardware */
-	IE15_CPU(config, m_maincpu, XTAL(30'800'000)/10);
+	IE15_CPU(config, m_maincpu, XTAL(30'800'000) / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ie15_device::ie15_mem);
 	m_maincpu->set_addrmap(AS_IO, &ie15_device::ie15_io);
 

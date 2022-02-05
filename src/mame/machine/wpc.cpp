@@ -24,7 +24,8 @@ wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t 
 		m_soundctrl_w(*this),
 		m_sounds11_w(*this),
 		m_bank_w(*this),
-		m_dmdbank_w(*this)
+		m_dmdbank_w(*this),
+		m_io_keyboard(*this, ":X%d", 0U)
 {
 }
 
@@ -67,7 +68,6 @@ void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 uint8_t wpc_device::read(offs_t offset)
 {
 	uint8_t ret = 0x00;
-	char kbdrow[8];
 
 	switch(offset)
 	{
@@ -84,13 +84,12 @@ uint8_t wpc_device::read(offs_t offset)
 		m_zerocross = false;
 		break;
 	case WPC_SWROWREAD:
-		sprintf(kbdrow,":INP%X",m_switch_col);
-		ret = ~ioport(kbdrow)->read();
-//      for(x=0;x<8;x++)
-//      {
-//          if(m_switch_col & (1<<x))
-//              ret = m_switches[3+x];
-//      }
+		{
+			ret = 0xff;
+			for (u8 i = 0; i < 8; i++)
+				if (BIT(m_switch_col, i))
+					ret &= ~m_io_keyboard[i]->read();
+		}
 		break;
 	case WPC_SWCOINDOOR:
 		ret = ~ioport(":COIN")->read();

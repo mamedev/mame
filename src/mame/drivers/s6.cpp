@@ -103,14 +103,14 @@ private:
 	u8 dips_r();
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
 	void main_map(address_map &map);
@@ -131,7 +131,7 @@ private:
 	required_ioport_array<2> m_dips;
 	output_finder<61> m_digits;
 	output_finder<2> m_leds;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s6_state::main_map(address_map &map)
@@ -221,11 +221,6 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("INP57")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LALT) PORT_NAME("INP58")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP59")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, main_nmi, 1)
@@ -349,7 +344,7 @@ void s6_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 u8 s6_state::dips_r()

@@ -45,7 +45,7 @@ CMDL01 - Medal Mahjong Moukari Bancho
 ?????? - Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
 ?????? - Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
-Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
+Note: CA018 - Deathsmiles II: Makai no Merry Christmas on PC based platform (see cavepc.cpp)
       CA020 - DoDonPachi DaiOuJou Tamashii on PGM2 platform
 
 
@@ -836,7 +836,8 @@ ROM_START( pinkswtsx )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
 ROM_END
 
-// bootleg/hack based on 2006/04/06 MASTER VER....
+// modification based on 2006/04/06 MASTER VER....
+// This set is dumped from bootleg PCB with pre-patched Suicide Club hack, These CRC32 checksums are matches compares to authors homepage's one.
 ROM_START( pinkswtssc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "suicideclub.u4", 0x0000, 0x200000, CRC(5e03662f) SHA1(b974204b8dcd55fc1b7775f7c1806150919caff3) ) // (2017/10/31 SUICIDECLUB VER.)
@@ -994,56 +995,56 @@ void cv1k_state::init_ddpdfk()
 // The black label versions are intentionally not set as clones, they were re-releases with different game codes, not bugfixes.
 
 // CA011  Mushihime-Sama
-GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12.MASTER VER.)",                         MACHINE_IMPERFECT_TIMING )
-GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER.)",                         MACHINE_IMPERFECT_TIMING )
-GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER)",                          MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12.MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12 MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12 MASTER VER)",                                        MACHINE_IMPERFECT_TIMING )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)", "Ibara (2005/03/22 MASTER VER..)",                                 MACHINE_IMPERFECT_TIMING )
+GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER..)",                                               MACHINE_IMPERFECT_TIMING )
 
 // CA012B Ibara Kuro Black Label
-GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                MACHINE_IMPERFECT_TIMING )
-GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 MACHINE_IMPERFECT_TIMING )
+GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                              MACHINE_IMPERFECT_TIMING )
+GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                               MACHINE_IMPERFECT_TIMING )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",        MACHINE_IMPERFECT_TIMING )
-GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",                      MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA???  Puzzle! Mushihime-Tama
-GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                  MACHINE_IMPERFECT_TIMING )
-GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                  MACHINE_IMPERFECT_TIMING )
+GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
+GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
 
 // CA014  Pink Sweets: Ibara Sorekara
-GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",         MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
-GAME( 2006, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg",            "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",                       MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",                        MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",                          MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",                          MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",           MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
 
 // CA015  Mushihime-Sama Futari
-GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     MACHINE_IMPERFECT_TIMING )
-GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",       MACHINE_IMPERFECT_TIMING )
-GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",          MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",                     MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",                        MACHINE_IMPERFECT_TIMING )
 
 // CA015B Mushihime-Sama Futari Black Label
-GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", MACHINE_IMPERFECT_TIMING ) // re-released for Chinese market
-GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  MACHINE_IMPERFECT_TIMING )
+GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", MACHINE_IMPERFECT_TIMING ) // re-released for Chinese market
+GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",                MACHINE_IMPERFECT_TIMING )
 
 // CA016  Muchi Muchi Pork!
-GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      MACHINE_IMPERFECT_TIMING )
+GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                                    MACHINE_IMPERFECT_TIMING )
 
 // CA017  Deathsmiles
-GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             MACHINE_IMPERFECT_TIMING )
+GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)",   "Deathsmiles (2007/10/09 MASTER VER)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CA017B Deathsmiles Black Label
-GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",    MACHINE_IMPERFECT_TIMING )
+GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)",   "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",                  MACHINE_IMPERFECT_TIMING )
 
 // CA019  Do-Don-Pachi Dai-Fukkatsu
-GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",     MACHINE_IMPERFECT_TIMING )
-GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",         MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",                       MACHINE_IMPERFECT_TIMING )
 
 // CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
 //GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
@@ -1052,4 +1053,4 @@ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 //GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           MACHINE_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
