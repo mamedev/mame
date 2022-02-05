@@ -12459,29 +12459,29 @@ license:CC0
 	</software>
 
 	<software name="eyebeho3a" cloneof="eyebeho3">
-		<description>Eye of the Beholder 3: Assault on Myth Drannor (Eye of Beholder Triology release)</description>
+		<description>Eye of the Beholder 3: Assault on Myth Drannor (Eye of Beholder Trilogy release)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Triology) [SSI] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e585dfa" sha1="98b646cec495a4f1ce27c53ea1d3c9209911080b"/>
+				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e585dfa" sha1="98b646cec495a4f1ce27c53ea1d3c9209911080b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Triology) [SSI] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="641a2891" sha1="6e6038a0c4df870dda6f7b9f0a79a839dd9bb7c3"/>
+				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="641a2891" sha1="6e6038a0c4df870dda6f7b9f0a79a839dd9bb7c3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Eye of the Beholder 3 (Triology) [SSI] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="cb7004bf" sha1="c3704132bb7c14a50107df11595342d9dff8e7c2"/>
+				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="cb7004bf" sha1="c3704132bb7c14a50107df11595342d9dff8e7c2"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="Eye of the Beholder 3 (Triology) [SSI] [1993] [3.5DD] [Disk 4 of 4].img" size="737280" crc="a0e5934b" sha1="c3d7fef4f2019b2e23de543dbc33efb9487c0d90"/>
+				<rom name="Eye of the Beholder 3 (Trilogy) [SSI] [1993] [3.5DD] [Disk 4 of 4].img" size="737280" crc="a0e5934b" sha1="c3d7fef4f2019b2e23de543dbc33efb9487c0d90"/>
 			</dataarea>
 		</part>
 	</software>
