@@ -13,7 +13,7 @@
     - 32K ROM
     - 128K RAM (includes frame buffer)
     - 3 serial ports, each driven by 6850 ACIA
-    - some kind of baud rate generator, possibly COM8016
+    - unknown baud rate generator (possibly COM8016)
     - sync serial port, driven by 6854 but apparently never supported by ROM
     - 682x PIA
     - AY-3-891x PSG
@@ -59,6 +59,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+
 #define M68K_TAG "maincpu"
 #define PPU_TAG "ppu"
 
@@ -86,6 +87,7 @@
 
 #define LOGPIA(...) LOGMASKED(LOG_PIA, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 namespace {
 
@@ -245,7 +247,7 @@ READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
 
 WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 {
-	// XXX shut up verbose log
+	// no-op to shut up verbose log
 }
 
 uint8_t bitgraph_state::pia_pa_r()
@@ -525,7 +527,6 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232d.dcd_handler().set(m_acia2, FUNC(acia6850_device::write_dcd));
 	rs232d.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
-	// XXX actual part may be something else
 	COM8116(config, m_dbrga, 5.0688_MHz_XTAL);
 	m_dbrga->fr_handler().set(FUNC(bitgraph_state::com8116_a_fr_w));
 	m_dbrga->ft_handler().set(FUNC(bitgraph_state::com8116_a_ft_w));

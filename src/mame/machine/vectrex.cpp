@@ -70,8 +70,20 @@ void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int 
 	case TIMER_VECTREX_ZERO_INTEGRATORS:
 		vectrex_zero_integrators(param);
 		break;
-	case TIMER_UPDATE_SIGNAL:
-		update_signal(param);
+	case TIMER_UPDATE_ANALOG:
+		update_vector();
+		m_analog[param] = m_via_out[PORTA];
+		break;
+	case TIMER_UPDATE_BLANK:
+		update_vector();
+		m_blank = param;
+		break;
+	case TIMER_UPDATE_MUX_ENABLE:
+		update_vector();
+		break;
+	case TIMER_UPDATE_RAMP:
+		update_vector();
+		m_ramp = param;
 		break;
 	default:
 		fatalerror("Unknown id in vectrex_base_state::device_timer");

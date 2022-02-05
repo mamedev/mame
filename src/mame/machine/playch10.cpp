@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(playch10_state::disp_mask_w)
 
 WRITE_LINE_MEMBER(playch10_state::sound_mask_w)
 {
-	/* should mute the APU - unimplemented yet */
+	machine().sound().system_mute(!state);
 }
 
 WRITE_LINE_MEMBER(playch10_state::nmi_enable_w)

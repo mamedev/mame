@@ -66,6 +66,11 @@ slspirit                        // (c) 1999 Promat
 4in1a                           // MAME based bootleg
 4in1b                           // MAME based bootleg
 60in1                           // MAME based bootleg
+fruitwld                        // (c) 2008 I.A.M.
+fruitwlda                       // (c) 2007 I.A.M.
+jumanji                         // (c) 2007 I.A.M.
+plutus                          // (c) 200? I.A.M.
+pokrwild                        // (c) 200? I.A.M.
 rodent                          // (c) 2005 The Game Room
 
 @source:3do.cpp
@@ -9764,6 +9769,7 @@ m_mpac                          //
 mdntmrdr                        //
 medusa                          //
 monrobwl                        //
+mysteria                        //
 mystic                          //
 myststar                        //
 newwave                         //
@@ -12016,6 +12022,7 @@ ddribble                        // GX690 (c) 1986
 ddribblep                       // GX690 (c) 1986
 
 @source:ddz.cpp
+btlfront                        // 2005 TJF
 crzclass                        // 200? TJF
 ddz                             // 200?
 
@@ -12434,6 +12441,9 @@ ep804                           //
 
 @source:digilog320.cpp
 digilog320                      //
+
+@source:digilog400.cpp
+digilog400                      //
 
 @source:digijet.cpp
 digijet                         //
@@ -13988,6 +13998,7 @@ feag2100                        //
 feag2100a                       //
 fpres                           //
 fpresbu                         //
+fpresgla                        //
 
 @source:fidel_excel.cpp
 fdes2000                        //
@@ -14562,7 +14573,8 @@ ckongis                         //
 ckongmc                         // 1981 bootleg
 ckongmc2                        // 1981 bootleg
 ckongs                          // bootleg
-devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
+devilfshg                       // (c) 1982 Artic (bootleg?)
+devilfshgb                      // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 eagle                           // [1980] Centuri
@@ -16407,7 +16419,9 @@ h2hsoccerc                      // Coleco
 lafootb                         // Mattel
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
+mbaskb2                         // Mattel
 mdallas                         // Mattel
+msoccer2                        // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
 solution                        // SCAT
@@ -31859,6 +31873,7 @@ gdvsgdnx                        //
 gundzaft                        //
 kinniku                         //
 kinniku2                        //
+minnadk                         //
 motogp                          //
 netchu02                        //
 prdgp03                         //
@@ -32156,6 +32171,7 @@ alpinr2b                        // (c) 1995
 aquajet                         // (c) 1996
 cybrcomm                        // (c) 1995
 cybrcycc                        // (c) 1995
+cybrcyccj                       // (c) 1995
 dirtdash                        // (c) 1995
 dirtdasha                       // (c) 1995
 dirtdashj                       // (c) 1995
@@ -32175,6 +32191,7 @@ ridgeracj                       // (c) 1993
 timecris                        // (c) 1995
 timecrisa                       // (c) 1995
 tokyowar                        // (c) 1996
+tokyowarj                       // (c) 1996
 victlapw                        // (c) 1996
 victlapj                        // (c) 1996
 
@@ -33531,6 +33548,10 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 raiders5ta                      //
+
+@source:novadesitec.cpp
+clrmatch
+sportmem
 
 @source:novag_cexpert.cpp
 cexpert
@@ -37914,6 +37935,7 @@ shdancer1                       // 1989.?? Shadow Dancer (World)
 shdancerj                       // 1989.11 Shadow Dancer (Japan)
 wwallyj                         // 1992.06 Wally wo Sagase! (Japan, FD1094)
 wwallyja                        // 1992.06 Wally wo Sagase! (Japan, FD1094)
+wwallyja3p                      // 1992.06 Wally wo Sagase! (Japan, FD1094)
 wwallyjad                       //
 wwallyjd                        //
 
@@ -39538,17 +39560,17 @@ spset026                        // (c) 1996 IGT - International Game Technology
 spss4240                        // (c) 1987 IGT - International Game Technology
 
 @source:spoker.cpp
-spk306us                        // (c) 1996 IGS
-spk205us                        // (c) 1996 IGS
-spk203us                        // (c) 1996 IGS
-spk200ua                        // (c) 1996 IGS
+3super8                         // unknown
+spk100                          // (c) 1996 IGS
+spk102ua                        // (c) 1996 IGS
+spk114it                        // (c) 199? IGS
+spk115it                        // (c) 199? IGS
 spk116it                        // (c) 199? IGS
 spk116itmx                      // (c) 199? IGS
-spk115it                        // (c) 199? IGS
-spk114it                        // (c) 199? IGS
-spk102u                         // (c) 1996 IGS
-spk102ua                        // (c) 1996 IGS
-3super8                         // unknown
+spk200ua                        // (c) 1996 IGS
+spk203us                        // (c) 1996 IGS
+spk205us                        // (c) 1996 IGS
+spk306us                        // (c) 1996 IGS
 
 @source:spool99.cpp
 spool99                         // (c) 1998 Electronic Projects
@@ -40532,6 +40554,7 @@ liquidku                        // 1990.?? C49 (c) 1990 Taito America Corporatio
 majest12j                       // 1990.11 C64 (c) 1990 Taito Corporation (Japan)
 majest12u                       // 1990.11 C64 (c) 1990 Taito America Corporation (US)
 majest12ua                      // 1990.11 C64 (c) 1990 Taito America Corporation (US)
+majest12ub                      // 1990.11 C64 (c) 1990 Taito America Corporation (US)
 megablst                        // 1989.?? C11 (c) 1989 Taito Corporation Japan (World)
 megablstj                       // 1989.11 C11 (c) 1989 Taito Corporation (Japan)
 megablstu                       // 1989.?? C11 (c) 1989 Taito America Corporation (US)
@@ -43548,6 +43571,7 @@ gw_p7                           //
 gw_pb                           //
 gw_pc                           //
 lc_11                           //
+rush                            // Dave Astill
 strik_l4                        //
 tafg_h3                         //
 tafg_la2                        //

@@ -45,7 +45,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="avsp">
-		<description>Alien vs Predator (USA, Prototype)</description>
+		<description>Alien vs Predator (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -213,7 +213,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="centiped">
-		<description>Centipede (USA, Prototype)</description>
+		<description>Centipede (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Shadowsoft</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -278,7 +278,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="daemongt">
-		<description>Daemonsgate (USA, Prototype)</description>
+		<description>Daemonsgate (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -381,7 +381,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="eyebehol">
-		<description>Eye of the Beholder (USA, Prototype)</description>
+		<description>Eye of the Beholder (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>NuFX</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -616,7 +616,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="loopz">
-		<description>Loopz (USA, Prototype)</description>
+		<description>Loopz (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF2009" />
@@ -655,7 +655,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="marlboro">
-		<description>Marlboro Go! (Euro, Prototype)</description>
+		<description>Marlboro Go! (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Digital Image</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -875,7 +875,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="roadriot">
-		<description>Road Riot 4WD (USA, Prototype)</description>
+		<description>Road Riot 4WD (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -1248,7 +1248,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="lynx2tst">
-		<description>Lynx II Production Test Program V0.02 (Prototype)</description>
+		<description>Lynx II Production Test Program V0.02 (prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">

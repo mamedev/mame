@@ -77,7 +77,7 @@ void ms7004_device::device_add_mconfig(machine_config &config)
 
 const tiny_rom_entry *ms7004_device::device_rom_region() const
 {
-	return ROM_NAME( ms7004 );
+	return ROM_NAME(ms7004);
 }
 
 //-------------------------------------------------
@@ -339,7 +339,7 @@ INPUT_PORTS_END
 
 ioport_constructor ms7004_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( ms7004 );
+	return INPUT_PORTS_NAME(ms7004);
 }
 
 //**************************************************************************
@@ -351,13 +351,13 @@ ioport_constructor ms7004_device::device_input_ports() const
 //-------------------------------------------------
 
 ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MS7004, tag, owner, clock),
-	m_maincpu(*this, MS7004_CPU_TAG),
-	m_speaker(*this, MS7004_SPK_TAG),
-	m_i8243(*this, "i8243"),
-	m_kbd(*this, "KBD%u", 0),
-	m_tx_handler(*this),
-	m_rts_handler(*this)
+	: device_t(mconfig, MS7004, tag, owner, clock)
+	, m_maincpu(*this, MS7004_CPU_TAG)
+	, m_speaker(*this, MS7004_SPK_TAG)
+	, m_i8243(*this, "i8243")
+	, m_kbd(*this, "KBD%u", 0)
+	, m_tx_handler(*this)
+	, m_rts_handler(*this)
 {
 }
 
@@ -382,7 +382,7 @@ void ms7004_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( ms7004_device::write_rxd )
+WRITE_LINE_MEMBER(ms7004_device::write_rxd)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -467,9 +467,9 @@ void ms7004_device::i8243_port_w(uint8_t data)
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ms7004_device::t1_r )
+READ_LINE_MEMBER(ms7004_device::t1_r)
 {
-	if (!BIT(m_p1,4))
+	if (!BIT(m_p1, 4))
 		return m_keylatch;
 	else
 		return 0;

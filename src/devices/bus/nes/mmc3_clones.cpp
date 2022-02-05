@@ -2678,12 +2678,11 @@ void nes_bmc_jy208_device::write_m(offs_t offset, u8 data)
 	nes_bmc_hik8_device::write_m(offset, data);
 
 	if (BIT(m_reg[2], 6))
-	{
-		set_nt_mirroring(PPU_MIRROR_4SCREEN);  // actually change NT pointers
-		m_mirroring = PPU_MIRROR_4SCREEN;      // prevent MMC3 mirror switching
-	}
+		m_mirroring = PPU_MIRROR_4SCREEN;  // prevent MMC3 mirror switching
 	else
-		m_mirroring = PPU_MIRROR_NONE;         // allow MMC3 mirror switching
+		m_mirroring = BIT(m_mmc_mirror, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT;  // allow MMC3 mirror switching and get its current setting
+
+	set_nt_mirroring(m_mirroring);  // actually change nametable pointers
 }
 
 /*-------------------------------------------------
