@@ -1409,7 +1409,7 @@ void z80scc_channel::update_rts()
 
 		// data terminal ready output follows the state programmed into the DTR bit
 		// unless configured to use the DTR pin as the transmit REQ pin for DMA
-		if(!(m_wr14 & WR14_DTR_REQ_FUNC))
+		if (!(m_wr14 & WR14_DTR_REQ_FUNC))
 		{
 			set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
 		}
