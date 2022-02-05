@@ -114,9 +114,9 @@ ROM_START( clrmatch )
 
 	ROM_REGION( 0x200000, "gfx", 0 ) // TODO: verify ROM loading
 	ROM_LOAD( "color match 1.u13",  0x000000, 0x080000, CRC(8f3978f6) SHA1(0a1b19c2df2a5b6d4875dce2809181d08dcf48c2) )
-	ROM_LOAD( "color match 2.u14",  0x080000, 0x080000, CRC(42e35ca7) SHA1(cd4e2e34055d7fb71765e6dd0cecaca0f3e54ead) ) // u location not readable, guessed
+	ROM_LOAD( "color match 2.u14",  0x080000, 0x080000, CRC(42e35ca7) SHA1(cd4e2e34055d7fb71765e6dd0cecaca0f3e54ead) )
 	ROM_LOAD( "color match 3.u16",  0x100000, 0x080000, CRC(88b3241e) SHA1(5636addb04c5a9a94ecfd6c72b9d91a5935ba6b0) )
-	ROM_LOAD( "color match 4.u15",  0x180000, 0x080000, CRC(aa9e1764) SHA1(757a175dda53f3a6ad74cf2203c24443b77e8949) ) // u location not readable, guessed
+	ROM_LOAD( "color match 4.u15",  0x180000, 0x080000, CRC(aa9e1764) SHA1(757a175dda53f3a6ad74cf2203c24443b77e8949) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "color match 5.u29", 0x00000, 0x80000, CRC(ad9778c9) SHA1(43bd016e8bdb43772159f088a465c5e5df9505fe) )
@@ -128,9 +128,9 @@ ROM_START( sportmem )
 
 	ROM_REGION( 0x200000, "gfx", 0 ) // TODO: verify ROM loading
 	ROM_LOAD( "sport memory 1.u13",  0x000000, 0x080000, CRC(937b4e3d) SHA1(2f8a6b5639cc1558428ce27ee42be81e389e8748) )
-	ROM_LOAD( "sport memory 2.u14",  0x080000, 0x080000, CRC(e5201108) SHA1(767eae3fbc761cdf4233693863f52b1a5eceddeb) ) // u location not readable, guessed
+	ROM_LOAD( "sport memory 2.u14",  0x080000, 0x080000, CRC(e5201108) SHA1(767eae3fbc761cdf4233693863f52b1a5eceddeb) )
 	ROM_LOAD( "sport memory 3.u16",  0x100000, 0x080000, CRC(92798401) SHA1(99445aeb990e585c22a12ddb48137699ff6a147e) )
-	ROM_LOAD( "sport memory 4.u15",  0x180000, 0x080000, CRC(0950af57) SHA1(743b592a87a7dd11cf6835ec9415386250e99783) ) // u location not readable, guessed
+	ROM_LOAD( "sport memory 4.u15",  0x180000, 0x080000, CRC(0950af57) SHA1(743b592a87a7dd11cf6835ec9415386250e99783) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sport memory 5.u29", 0x00000, 0x80000, CRC(b840682c) SHA1(7f2bda09f209fa72732a08fc05767219e13777ce) )

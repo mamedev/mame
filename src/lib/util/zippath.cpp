@@ -83,7 +83,7 @@ bool is_7z_file(std::string_view path)
 
 bool is_zip_file(std::string_view path)
 {
-	return core_filename_ends_with(path, ".zip");
+	return core_filename_ends_with(path, ".zip") || core_filename_ends_with(path, ".imz");
 }
 
 

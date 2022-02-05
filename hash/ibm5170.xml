@@ -15038,6 +15038,18 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- unfinished; VGA mode has heavy screen flickering as compared with DOSBox, but EGA mode is OK -->
+	<software name="ltquest" supported="partial">
+		<description>Light Quest (prototype)</description>
+		<year>1991</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LightQuest.img" size="1474560" crc="9dfa9b8e" sha1="0e26e42a94fce9c0d61d32daff11eb6f3d13e720"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lightspd">
 		<description>Lightspeed</description>
 		<year>1990</year>
