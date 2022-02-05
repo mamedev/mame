@@ -132,8 +132,6 @@ void cxd8442q_device::map_fifo_ram(address_map &map)
 												{ COMBINE_DATA(&fifo_ram[offset]); })));
 }
 
-void cxd8442q_device::device_add_mconfig(machine_config &config) {}
-
 void cxd8442q_device::device_start()
 {
 	fifo_ram = std::make_unique<uint32_t[]>(FIFO_MAX_RAM_SIZE);

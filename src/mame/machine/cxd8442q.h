@@ -134,7 +134,6 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	static constexpr int FIFO_CH_TOTAL = 4;
 	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
