@@ -64,132 +64,12 @@ private:
 		FIFO
 	};
 
-	// State tracking variables
-	scsi_mode mode;
-	scsi_data_target xfr_data_source;
-	int state;
-	int xfr_phase;
-	int command_pos;
-	bool irq = false;
-	bool drq = false;
-	uint32_t tcounter;
-	uint8_t sync_period;
-	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
-	emu_timer *tm;
-	int bus_id;
-	std::queue<uint32_t> m_even_fifo;
-	std::queue<uint32_t> m_odd_fifo;
-
-	// I/O ports
-	devcb_write_line m_irq_handler;
-	devcb_write_line m_drq_handler;
-
-	enum
-	{
-		IDLE
-	};
-
-	enum
-	{
-		// Bus initiated sequences
-		BUSINIT_SETTLE_DELAY = 1,
-		BUSINIT_ASSERT_BUS_SEL,
-		BUSINIT_MSG_OUT,
-		BUSINIT_RECV_BYTE,
-		BUSINIT_ASSERT_BUS_RESEL,
-		BUSINIT_WAIT_REQ,
-		BUSINIT_RECV_BYTE_NACK,
-
-		// Bus SCSI Reset
-		BUSRESET_WAIT_INT,
-		BUSRESET_RESET_BOARD,
-
-		// Disconnected state commands
-		DISC_SEL_ARBITRATION_INIT,
-		DISC_SEL_ARBITRATION,
-		DISC_SEL_ATN_WAIT_REQ,
-		DISC_SEL_ATN_SEND_BYTE,
-		DISC_SEL_WAIT_REQ,
-		DISC_SEL_SEND_BYTE,
-		DISC_REC_ARBITRATION,
-		DISC_REC_MSG_IN,
-		DISC_REC_SEND_BYTE,
-		DISC_RESET,
-
-		// Command sequence
-		CMDSEQ_CMD_PHASE,
-		CMDSEQ_RECV_BYTE,
-
-		// Target commands
-		TARGET_SEND_BYTE,
-		TARGET_CMD_RECV_BYTE,
-		TARGET_MSG_RECV_BYTE,
-		TARGET_MSG_RECV_PAD,
-		TARGET_DISC_SEND_BYTE,
-		TARGET_DISC_MSG_IN,
-		TARGET_DISC_SEND_BYTE_2,
-
-		// Initiator commands
-		INIT_MSG_WAIT_REQ,
-		INIT_XFR,
-		INIT_XFR_SEND_BYTE,
-		INIT_XFR_SEND_PAD_WAIT_REQ,
-		INIT_XFR_SEND_PAD,
-		INIT_XFR_RECV_PAD_WAIT_REQ,
-		INIT_XFR_RECV_PAD,
-		INIT_XFR_RECV_BYTE_ACK,
-		INIT_XFR_RECV_BYTE_NACK,
-		INIT_XFR_FUNCTION_COMPLETE,
-		INIT_XFR_BUS_COMPLETE,
-		INIT_XFR_WAIT_REQ,
-		INIT_CPT_RECV_BYTE_ACK,
-		INIT_CPT_RECV_WAIT_REQ,
-		INIT_CPT_RECV_BYTE_NACK,
-		INIT_XFR_RECV_BYTE_ACK_AUTOMSG
-	};
-
-	enum
-	{
-		// Arbitration
-		ARB_WAIT_BUS_FREE = 1,
-		ARB_COMPLETE,
-		ARB_ASSERT_SEL,
-		ARB_SET_DEST,
-		ARB_RELEASE_BUSY,
-		ARB_TIMEOUT_BUSY,
-		ARB_TIMEOUT_ABORT,
-		ARB_DESKEW_WAIT,
-
-		// Send/receive byte
-		SEND_WAIT_SETTLE,
-		SEND_WAIT_REQ_0,
-		RECV_WAIT_REQ_1,
-		RECV_WAIT_SETTLE,
-		RECV_WAIT_REQ_0
-	};
-
-	enum
-	{
-		STATE_MASK = 0x00ff,
-		SUB_SHIFT = 8,
-		SUB_MASK = 0xff00
-	};
-
-	enum
-	{
-		BUS_BUSY,
-		BUS_FREE_WAIT,
-		BUS_FREE
-	};
-
 	enum dma_direction
 	{
 		DMA_NONE,
 		DMA_IN,
 		DMA_OUT
 	};
-
-	dma_direction dma_dir;
 
 	static inline bool dma_command(dma_direction current_direction)
 	{
@@ -339,6 +219,27 @@ private:
 
 		spifi_cmd_entry cmbuf[8];
 	} spifi_reg;
+
+	// State tracking variables
+	dma_direction dma_dir;
+	scsi_mode mode;
+	scsi_data_target xfr_data_source;
+	int state;
+	int xfr_phase;
+	int command_pos;
+	bool irq = false;
+	bool drq = false;
+	uint32_t tcounter;
+	uint8_t sync_period;
+	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
+	emu_timer *tm;
+	int bus_id;
+	std::queue<uint32_t> m_even_fifo;
+	std::queue<uint32_t> m_odd_fifo;
+
+	// I/O ports
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_drq_handler;
 };
 
 DECLARE_DEVICE_TYPE(SPIFI3, spifi3_device)
