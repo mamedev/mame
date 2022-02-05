@@ -178,10 +178,7 @@ void nesapu_device::device_start()
 		{
 			for (int d = 0; d < 128; d++)
 			{
-				stream_buffer::sample_t tri_out = (t == 0) ? 0.0 : (t / 8227.0);
-				stream_buffer::sample_t noise_out = (n == 0) ? 0.0 : (n / 12241.0);
-				stream_buffer::sample_t dmc_out = (d == 0) ? 0.0 : (d / 22638.0);
-				stream_buffer::sample_t tnd_out = tri_out + noise_out + dmc_out;
+				stream_buffer::sample_t tnd_out = (t / 8227.0) + (n / 12241.0) + (d / 22638.0);
 				tnd_out = (tnd_out == 0.0) ? 0.0 : 159.79 / ((1.0 / tnd_out) + 100.0);
 				m_tnd_lut[t][n][d] = tnd_out;
 			}
