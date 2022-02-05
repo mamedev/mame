@@ -9,6 +9,7 @@
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
@@ -105,6 +106,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	static void floppy_formats(format_registration &fr);
+
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
 	uint8_t dart_r(offs_t offset);
@@ -152,6 +155,7 @@ public:
 	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
+	
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected

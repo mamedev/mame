@@ -1020,6 +1020,7 @@ BUSES["ZORRO"] = true
 FORMATS["2D_DSK"] = true
 FORMATS["A26_CAS"] = true
 FORMATS["A5105_DSK"] = true
+FORMATS["ABC1600_DSK"] = true
 FORMATS["ABC800_DSK"] = true
 FORMATS["ABCFD2_DSK"] = true
 FORMATS["ACE_TAP"] = true
