@@ -79,8 +79,13 @@ nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_TQROM, tag, owner, clock)
+nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_tqrom_device(mconfig, NES_TQROM, tag, owner, clock)
 {
 }
 

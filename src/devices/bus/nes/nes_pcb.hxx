@@ -42,6 +42,7 @@ static const nes_pcb pcb_list[] =
 	{ "pal_zz",           PAL_ZZ },
 	{ "nes_qj",           NES_QJ },
 	{ "nes_event",        STD_EVENT },
+	{ "nes_event2",       STD_EVENT2 },
 	{ "discrete_74x139",  DIS_74X139X74 },
 	{ "discrete_74x377",  DIS_74X377 },
 	{ "discrete_74x161",  DIS_74X161X161X32 },
