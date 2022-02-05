@@ -170,7 +170,6 @@ enum
 #define CART_NTRAM 4
 
 
-#define PPU_MIRROR_NONE     0
 #define PPU_MIRROR_VERT     1
 #define PPU_MIRROR_HORZ     2
 #define PPU_MIRROR_HIGH     3
@@ -334,7 +333,6 @@ public:
 
 	// CHR
 	int m_chr_source;   // global source for the 8 VROM banks
-	inline void chr_sanity_check(int source);
 
 	//these were previously called chr_map. they are a quick banking structure,
 	//because some of these change multiple times per scanline!
@@ -346,24 +344,27 @@ public:
 	uint32_t m_vram_chunks;
 
 	// CHR helpers
-	void chr8(int bank, int source);
-	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
-	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
-	void chr2_x(int start, int bank, int source);
-	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
-	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
-	void chr2_4(int bank, int source) { chr2_x(4, bank, source); }
-	void chr2_6(int bank, int source) { chr2_x(6, bank, source); }
-	void chr1_x(int start, int bank, int source);
-	void chr1_0(int bank, int source) { chr1_x(0, bank, source); }
-	void chr1_1(int bank, int source) { chr1_x(1, bank, source); }
-	void chr1_2(int bank, int source) { chr1_x(2, bank, source); }
-	void chr1_3(int bank, int source) { chr1_x(3, bank, source); }
-	void chr1_4(int bank, int source) { chr1_x(4, bank, source); }
-	void chr1_5(int bank, int source) { chr1_x(5, bank, source); }
-	void chr1_6(int bank, int source) { chr1_x(6, bank, source); }
-	void chr1_7(int bank, int source) { chr1_x(7, bank, source); }
+private:
+	void bank_chr(int shift, int start, int bank, int source);
+public:
+	void chr8(int bank, int source) { bank_chr(3, 0, bank, source); }
+	void chr4_x(int start, int bank, int source) { bank_chr(2, start, bank, source); }
+	void chr4_0(int bank, int source) { bank_chr(2, 0, bank, source); }
+	void chr4_4(int bank, int source) { bank_chr(2, 4, bank, source); }
+	void chr2_x(int start, int bank, int source) { bank_chr(1, start, bank, source); }
+	void chr2_0(int bank, int source) { bank_chr(1, 0, bank, source); }
+	void chr2_2(int bank, int source) { bank_chr(1, 2, bank, source); }
+	void chr2_4(int bank, int source) { bank_chr(1, 4, bank, source); }
+	void chr2_6(int bank, int source) { bank_chr(1, 6, bank, source); }
+	void chr1_x(int start, int bank, int source) { bank_chr(0, start, bank, source); }
+	void chr1_0(int bank, int source) { bank_chr(0, 0, bank, source); }
+	void chr1_1(int bank, int source) { bank_chr(0, 1, bank, source); }
+	void chr1_2(int bank, int source) { bank_chr(0, 2, bank, source); }
+	void chr1_3(int bank, int source) { bank_chr(0, 3, bank, source); }
+	void chr1_4(int bank, int source) { bank_chr(0, 4, bank, source); }
+	void chr1_5(int bank, int source) { bank_chr(0, 5, bank, source); }
+	void chr1_6(int bank, int source) { bank_chr(0, 6, bank, source); }
+	void chr1_7(int bank, int source) { bank_chr(0, 7, bank, source); }
 
 
 	// NameTable & Mirroring
