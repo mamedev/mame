@@ -117,6 +117,7 @@ private:
 		DMA_LEN = 0x26,
 		DMA_CTRL = 0x27,
 		DMA_NUM_L = 0x28,
+		FDD_VIRT = 0x29,
 		INT_MASK = 0x2a,
 		CACHE_CONFIG = 0x2b,
 		DMA_NUM_H = 0x2c,

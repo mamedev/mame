@@ -452,7 +452,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	u32 ram_addr = PAGE4K(page) + offset;
 	if (ram_addr >= PAGE4K(m_regs[T_MAP_PAGE]) && ram_addr < (PAGE4K(m_regs[T_MAP_PAGE] + 1)))
 	{
-		//TODO invalidate sprites, not entire map
+		// TODO invalidate sprites, not entire map
 		m_ts_tilemap[offset & 128 ? TM_TILES1 : TM_TILES0]->mark_all_dirty();
 	}
 	else
@@ -516,7 +516,7 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
-	//LOCK? BIT(data, 5);
+	// LOCK? BIT(data, 5);
 	u8 page3 = (m_regs[PAGE3] & ~0x07) | BIT(data, 0, 3); // 128K: 0..2 -> 0..2
 	switch (BIT(m_regs[MEM_CONFIG], 6, 2))
 	{
@@ -524,7 +524,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 		page3 = (page3 & ~0x20) | (data & 0x20); // 1024K: 5 -> 5
 		[[fallthrough]];
 	case 0:
-		page3 = (page3 & ~0x18) | (BIT(data, 6, 2) << 3); //512K: 6..7 -> 3..4
+		page3 = (page3 & ~0x18) | (BIT(data, 6, 2) << 3); // 512K: 6..7 -> 3..4
 		break;
 	default:
 		break;
@@ -567,7 +567,7 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 		break;
 	}
 
-	//LOGWARN("'tsconf': reg read %02X = %02x\n", nreg, data);
+	// LOGWARN("'tsconf': reg read %02X = %02x\n", nreg, data);
 	return data;
 }
 
@@ -596,7 +596,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	bool val_changed = m_regs[nreg] != data;
 
-	// 2. Updates which require any pre-work before change
+	// 2. Updates which require some pre-work before change
 	switch (nreg)
 	{
 	case BORDER:
@@ -620,12 +620,16 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case T_MAP_PAGE:
-		m_ts_tilemap[TM_TILES0]->mark_all_dirty();
-		m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+		if (val_changed)
+		{
+			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
+			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+		}
 		break;
 
 	case T0_G_PAGE:
-		m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(data));
+		if (val_changed)
+			m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(data));
 		break;
 
 	case T0_X_OFFSET_L:
@@ -639,7 +643,8 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case T1_G_PAGE:
-		m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(data));
+		if (val_changed)
+			m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(data));
 		break;
 
 	case T1_X_OFFSET_L:
@@ -653,7 +658,8 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case SG_PAGE:
-		m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data));
+		if (val_changed)
+			m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data));
 		break;
 
 	case MEM_CONFIG:
@@ -730,10 +736,12 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case PAL_SEL:
 	case TS_CONFIG:
 	case INT_MASK:
+	// TODO
+	case FDD_VIRT:
+	case CACHE_CONFIG:
 		break;
 
 	default:
-		logerror("Unsupported reg write: %02X = %02x\n", nreg, data);
 		break;
 	}
 }
@@ -822,9 +830,9 @@ void tsconf_state::tsconf_port_57_zctr_w(offs_t port, u8 data)
 	{
 		for (u8 m = 0x80; m; m >>= 1)
 		{
-			m_sdcard->spi_clock_w(CLEAR_LINE); //0-S R
+			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
 			m_sdcard->spi_mosi_w(data & m ? 1 : 0);
-			m_sdcard->spi_clock_w(ASSERT_LINE); //1-L W
+			m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
 		}
 	}
 }
@@ -902,8 +910,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 		}
 		u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
-		u16 hpos = m_regs[HS_INT];
-		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && hpos == 0)
+		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && m_regs[HS_INT] == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));

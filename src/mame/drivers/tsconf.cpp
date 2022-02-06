@@ -211,27 +211,27 @@ void tsconf_state::machine_reset()
 	m_port_f7_ext = DISABLED;
 
 	m_scanline_delayed_regs_update = {};
-	m_regs[V_CONFIG] = 0x00;
-	m_regs[V_PAGE] = 0x05;
-	m_regs[G_X_OFFS_L] = 0x00;
-	m_regs[G_X_OFFS_H] &= 0xfe; // xxxxxxx0
-	m_regs[G_Y_OFFS_L] = 0x00;
-	m_regs[G_Y_OFFS_H] &= 0xfe; // xxxxxxx0
-	m_regs[TS_CONFIG] &= 0x03;	// 000000xx
-	m_regs[PAL_SEL] = 0x0f;
-	m_regs[PAGE0] = 0x00;
-	m_regs[PAGE1] = 0x05;
-	m_regs[PAGE2] = 0x02;
-	m_regs[PAGE3] = 0x00;
-	m_regs[FMAPS] &= 0xef; // xxx0xxxx
-	m_regs[SYS_CONFIG] = 0x00;
-	m_regs[MEM_CONFIG] = 0x04;
-	m_regs[HS_INT] = 0x01;	 // 00000001
-	m_regs[VS_INT_L] = 0x00; // 00000000
-	m_regs[VS_INT_H] &= 0x0e; // 0000xxx0
-	// FDDVirt      = 0x00; // 0000xxx0
-	m_regs[INT_MASK] = 0x01; // xxxxx001
-	m_regs[CACHE_CONFIG] &= 0xf0; // xxxx0000
+	m_regs[V_CONFIG] = 0x00;		// 00000000
+	m_regs[V_PAGE] = 0x05;			// 00000101
+	m_regs[G_X_OFFS_L] = 0x00;		// 00000000
+	m_regs[G_X_OFFS_H] &= 0xfe;		// xxxxxxx0
+	m_regs[G_Y_OFFS_L] = 0x00;		// 00000000
+	m_regs[G_Y_OFFS_H] &= 0xfe;		// xxxxxxx0
+	m_regs[TS_CONFIG] &= 0x03;		// 000000xx
+	m_regs[PAL_SEL] = 0x0f;			// 00001111
+	m_regs[PAGE0] = 0x00;			// 00000000
+	m_regs[PAGE1] = 0x05;			// 00000101
+	m_regs[PAGE2] = 0x02;			// 00000010
+	m_regs[PAGE3] = 0x00;			// 00000000
+	m_regs[FMAPS] &= 0xef;			// xxx0xxxx
+	m_regs[SYS_CONFIG] = 0x00;		// 00000000
+	m_regs[MEM_CONFIG] = 0x04;		// 00000100
+	m_regs[HS_INT] = 0x01;			// 00000001
+	m_regs[VS_INT_L] = 0x00;		// 00000000
+	m_regs[VS_INT_H] &= 0x0e;		// 0000xxx0
+	m_regs[FDD_VIRT] &= 0xf0;		// xxxx0000
+	m_regs[INT_MASK] = 0x01;		// xxxxx001
+	m_regs[CACHE_CONFIG] &= 0xf0;	// xxxx0000
 
 	if (m_beta->started())
 		m_beta->enable();
