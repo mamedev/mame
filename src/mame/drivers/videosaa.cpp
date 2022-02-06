@@ -502,13 +502,31 @@ ROM_START( winner ) // dump confirmed from 3 different PCBs
 	ROM_LOAD( "palce16v8h-25pc-4.9c", 0x000, 0x117, CRC(ac0347ee) SHA1(26b27d2037400c06e63528e0e59be6d7d1a81cab) )
 ROM_END
 
+ROM_START( unkvsaa ) // all labels unreadable
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD( "68hc705.0d", 0x0000, 0x2000, NO_DUMP ) // no label
+
+	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_LOAD( "5b", 0x0000, 0x2000, CRC(c70132c3) SHA1(dff6b3729527e2fed39f7b11b368ec8fe3f57593) )
+	ROM_LOAD( "7b", 0x2000, 0x2000, CRC(9d03b943) SHA1(7809b67fe540a63f82bd3ad327000b79c1f76c3f) )
+	ROM_LOAD( "8b", 0x4000, 0x2000, CRC(4b269de2) SHA1(03e041ac84978fe43cd74991a5c5b51635c4ab81) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_LOAD( "5a", 0x00000, 0x10000, CRC(f892be86) SHA1(901f288cd99614dbb2f5ea2fb572cdf0d0915127) )
+	ROM_LOAD( "3a", 0x10000, 0x10000, CRC(d6fbc984) SHA1(2538257ac89bfd5b87b4aea5e80ec62720ec79d3) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pld.9c", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR   NAME       PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY       FULLNAME       FLAGS
-GAME( 1995?, jokrlady,  0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Joker Lady",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995?, ladygum,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Lady Gum",    MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-GAME( 1995?, paradar,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Paradar",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995?, winner,    0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Winner",      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR   NAME       PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY       FULLNAME                   FLAGS
+GAME( 1995?, jokrlady,  0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Joker Lady",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995?, ladygum,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Lady Gum",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+GAME( 1995?, paradar,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Paradar",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995?, winner,    0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Winner",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 199?,  unkvsaa,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "unknown Videos A A game", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // has Scratch! GFX, may be title or not
