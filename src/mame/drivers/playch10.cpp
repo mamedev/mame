@@ -73,7 +73,7 @@ Working games:
     - Double Dribble                    (DW) - B board
     - Dr. Mario                         (VU) - F board
     - Duck Hunt                         (DH) - Standard board
-    - Excite Bike                       (EB) - Standard board
+    - Excitebike                        (EB) - Standard board
     - Fester's Quest                    (EQ) - F board
     - Gauntlet                          (GL) - G board
     - Golf                              (GF) - Standard board
@@ -950,7 +950,7 @@ ROM_START( pc_smb )     /* Super Mario Bros. */
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(bd82d775) SHA1(e15c369d638156eeb0cd141aeeec877c62810b64) )
 ROM_END
 
-ROM_START( pc_ebike )   /* Excite Bike */
+ROM_START( pc_ebike )   /* Excitebike */
 	BIOS_CPU
 	ROM_LOAD( "u3eb",    0x0c000, 0x2000, CRC(8ff0e787) SHA1(35a6d7186dee4fd4ba015ec0db5181768411aa3c) ) /* extra bios code for this game */
 	BIOS_GFX
@@ -1884,7 +1884,7 @@ GAME( 1983, pc_tenis, playch10, playch10,   playch10, playch10_state, init_pc_hr
 GAME( 1983, pc_mario, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Mario Bros. (PlayChoice-10)", 0 )
 GAME( 1984, pc_bball, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo of America",                      "Baseball (PlayChoice-10)", 0 )
 GAME( 1984, pc_bfght, playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Balloon Fight (PlayChoice-10)", 0 )
-GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excite Bike (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // scanline in middle of screen scrolls when it should not
+GAME( 1984, pc_ebike, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Excitebike (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // scanline in middle of screen scrolls when it should not
 GAME( 1984, pc_golf,  playch10, playch10,   playch10, playch10_state, init_pc_hrz,   ROT0, "Nintendo",                                 "Golf (PlayChoice-10)", 0 )
 GAME( 1985, pc_kngfu, playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Irem (Nintendo license)",                  "Kung Fu (PlayChoice-10)", 0 )
 GAME( 1985, pc_smb,   playch10, playch10,   playch10, playch10_state, init_playch10, ROT0, "Nintendo",                                 "Super Mario Bros. (PlayChoice-10)", 0 )

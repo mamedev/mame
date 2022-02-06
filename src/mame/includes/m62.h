@@ -67,6 +67,8 @@ protected:
 
 	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 
+	void kungfum_io_map(address_map &map);
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -174,7 +176,6 @@ private:
 	void horizon_map(address_map &map);
 	void kidniki_io_map(address_map &map);
 	void kidniki_map(address_map &map);
-	void kungfum_io_map(address_map &map);
 	void kungfum_map(address_map &map);
 	void ldrun2_io_map(address_map &map);
 	void ldrun2_map(address_map &map);
@@ -189,5 +190,8 @@ private:
 	void youjyudn_io_map(address_map &map);
 	void youjyudn_map(address_map &map);
 };
+
+INPUT_PORTS_EXTERN( m62_common );
+INPUT_PORTS_EXTERN( kungfum );
 
 #endif // MAME_INCLUDES_M62_H

@@ -163,7 +163,7 @@ debugger should take the most likely meaning for a device or address
 space specification.
 
 
-.. _debugger-expressions:
+.. _debugger-express:
 
 Debugger expression syntax
 --------------------------
@@ -218,6 +218,8 @@ Major differences from C expression semantics:
   always evaluated.
 
 
+.. _debugger-express-num:
+
 Numbers
 ~~~~~~~
 
@@ -240,6 +242,8 @@ Examples:
 * ``0b123`` is invalid
 
 
+.. _debugger-express-bool:
+
 Boolean values
 ~~~~~~~~~~~~~~
 
@@ -252,6 +256,8 @@ An empty string may be supplied as an argument for Boolean parameters to
 debugger commands to use the default value, even when subsequent
 parameters are specified.
 
+
+.. _debugger-express-mem:
 
 Memory accesses
 ~~~~~~~~~~~~~~~
@@ -389,6 +395,8 @@ access type) requires a tag to be specified.
 Memory accesses can be used as both lvalues and rvalues, so you can write
 ``b@100 = ff`` to store a byte in memory.
 
+
+.. _debugger-express-func:
 
 Functions
 ~~~~~~~~~

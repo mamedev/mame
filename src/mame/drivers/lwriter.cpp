@@ -97,6 +97,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
+
 #include "screen.h"
 
 #define LOG_GENERAL (1U << 0)
@@ -144,10 +145,14 @@ public:
 	void lwriter2nt(machine_config &config);
 
 protected:
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
+	// A guess based on not very much
+	static constexpr unsigned FB_HEIGHT = 3434;
+	static constexpr unsigned FB_WIDTH = 2520;
+
 	uint16_t bankedarea_r(offs_t offset);
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t eeprom_r(offs_t offset);
@@ -305,8 +310,11 @@ INPUT_PORTS_END
 /* Start it up */
 void lwriter_state::machine_start()
 {
+	m_vram = make_unique_clear<uint8_t []>(FB_WIDTH * FB_HEIGHT / 8);
+
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
-	m_pb6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lwriter_state::pb6_tick),this));
+	m_pb6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lwriter_state::pb6_tick), this));
+
 	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
 	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0
 	m_via->write_ca1(1);
@@ -415,9 +423,6 @@ void lwriter_state::led_out_w(uint8_t data)
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
-// A guess based on not very much
-#define FB_HEIGHT 3434
-#define FB_WIDTH 2520
 /* FIFO to printer, 64 bytes long */
 void lwriter_state::fifo_out_w(uint8_t data)
 {
@@ -619,19 +624,19 @@ void lwriter_state::write_dtr(int state)
 
 uint32_t lwriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto const f = [] (auto x) { return x ? u32(0) : u32(0xffffffff); };
 	for (int y = 0; y < FB_HEIGHT; y++) {
 		for (int x = 0; x < FB_WIDTH; x += 8) {
 			uint32_t *scanline = &bitmap.pix(y, x);
-			uint8_t pixels = m_vram[y * FB_WIDTH/8 + x/8];
-#define f(x) ((x) ? (0) : (0xffffffff))
-			*scanline++ = f(pixels&0x80);
-			*scanline++ = f((pixels<<1)&0x80);
-			*scanline++ = f((pixels<<2)&0x80);
-			*scanline++ = f((pixels<<3)&0x80);
-			*scanline++ = f((pixels<<4)&0x80);
-			*scanline++ = f((pixels<<5)&0x80);
-			*scanline++ = f((pixels<<6)&0x80);
-			*scanline++ = f((pixels<<7)&0x80);
+			uint8_t const pixels = m_vram[y * FB_WIDTH/8 + x/8];
+			*scanline++ = f(BIT(pixels, 7));
+			*scanline++ = f(BIT(pixels, 6));
+			*scanline++ = f(BIT(pixels, 5));
+			*scanline++ = f(BIT(pixels, 4));
+			*scanline++ = f(BIT(pixels, 3));
+			*scanline++ = f(BIT(pixels, 2));
+			*scanline++ = f(BIT(pixels, 1));
+			*scanline++ = f(BIT(pixels, 0));
 		}
 	}
 
@@ -655,7 +660,6 @@ void lwriter_state::lwriter(machine_config &config)
 	m_screen->set_size(FB_WIDTH, FB_HEIGHT);
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
-	m_vram = make_unique_clear<uint8_t[]>(FB_WIDTH*FB_HEIGHT/8);
 
 	SCC8530N(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);

@@ -195,7 +195,7 @@ struct apu_t
 /* vblank length table used for squares, triangle, noise */
 static const apu_t::uint8 vbl_length[32] =
 {
-	5, 127, 10, 1, 19,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
+	5, 127, 10, 1, 20,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
 	6,   8, 12, 9, 24, 10, 48, 11, 96, 12, 36, 13, 8, 14, 16, 15
 };
 
@@ -205,10 +205,12 @@ static const int freq_limit[8] =
 	0x3FF, 0x555, 0x666, 0x71C, 0x787, 0x7C1, 0x7E0, 0x7F0,
 };
 
-/* table of noise frequencies */
-static const int noise_freq[16] =
+// table of noise period
+// each fundamental is determined as: freq = master / period / 93
+static const int noise_freq[2][16] =
 {
-	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
+	{ 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 }, // NTSC
+	{ 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 }  // PAL
 };
 
 // dpcm (cpu) cycle period
@@ -216,7 +218,7 @@ static const int noise_freq[16] =
 static const int dpcm_clocks[2][16] =
 {
 	{ 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54 }, // NTSC
-	{ 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118, 98, 78, 66, 50 } // PAL
+	{ 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98, 78, 66, 50 }  // PAL
 };
 
 /* ratios of pos/neg pulse for square waves */

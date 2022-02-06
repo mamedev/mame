@@ -5,6 +5,13 @@
 PINBALL
 Williams System 11
 
+Differences to system 9:
+- New PIAs at 0x2c00 and 0x3400
+- Computer control of special solenoids restored
+- Alphanumeric display
+- Default sound card merged into the CPU board
+- Optional extra sound cards attached to the widget port
+
 Games:
 - Grand Lizard (#523)
 - High Speed (#541)
@@ -245,14 +252,21 @@ void s11_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s11_state::dig0_w(u8 data)
 {
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_strobe = data & 15;
-	m_diag = BIT(data, 4, 3);
+	u8 diag = BIT(data, 4, 3);
+	if (diag == get_diag())
+	{
+		set_lock1(0);
+		set_lock2(0);
+	}
+	else
+		set_diag(diag);
 	m_digits[60] = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -260,8 +274,15 @@ void s11_state::dig0_w(u8 data)
 
 void s11_state::dig1_w(u8 data)
 {
-	m_segment2 |= data;
-	m_segment2 |= 0x20000;
+	u8 lock = get_lock2() + 1;
+	if (lock == 1)
+	{
+		u16 seg = get_segment2() & 0xff00;
+		seg |= data;
+		set_segment2(seg);
+		m_digits[get_strobe()+16] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+	}
+	set_lock2(lock);
 }
 
 u8 s11_state::pia28_w7_r()
@@ -279,19 +300,26 @@ u8 s11_state::pia28_w7_r()
 
 void s11_state::pia2c_pa_w(u8 data)
 {
-	m_segment1 |= (data<<8);
-	m_segment1 |= 0x10000;
-	if ((m_segment1 & 0x70000) == 0x30000)
+	if (get_lock1() == 1)
 	{
-		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment1 |= 0x40000;
+		u16 seg = get_segment1() & 0xff;
+		seg |= (data<<8);
+		m_digits[get_strobe()] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment1(seg);
 	}
 }
 
 void s11_state::pia2c_pb_w(u8 data)
 {
-	m_segment1 |= data;
-	m_segment1 |= 0x20000;
+	u8 lock = get_lock1() + 1;
+	if (lock == 1)
+	{
+		u16 seg = get_segment1() & 0xff00;
+		seg |= data;
+		m_digits[get_strobe()] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment1(seg);
+	}
+	set_lock1(lock);
 }
 
 u8 s11_state::switch_r()
@@ -313,12 +341,12 @@ void s11_state::switch_w(u8 data)
 
 void s11_state::pia34_pa_w(u8 data)
 {
-	m_segment2 |= (data<<8);
-	m_segment2 |= 0x10000;
-	if ((m_segment2 & 0x70000) == 0x30000)
+	if (get_lock2() == 1)
 	{
-		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		m_segment2 |= 0x40000;
+		u16 seg = get_segment2() & 0xff;
+		seg |= (data<<8);
+		m_digits[get_strobe()+16] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		set_segment2(seg);
 	}
 }
 
@@ -378,7 +406,6 @@ void s11_state::machine_start()
 	save_item(NAME(m_pia_irq_active));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
-	//save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -451,6 +478,8 @@ void s11_state::s11(machine_config &config)
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
+	m_pia2c->ca2_handler().set(FUNC(s11_state::pia2c_ca2_w));
+	m_pia2c->cb2_handler().set(FUNC(s11_state::pia2c_cb2_w));
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
@@ -458,6 +487,7 @@ void s11_state::s11(machine_config &config)
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
+	m_pia30->ca2_handler().set(FUNC(s11_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
 	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
@@ -465,6 +495,7 @@ void s11_state::s11(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
+	m_pia34->ca2_handler().set_nop();
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
