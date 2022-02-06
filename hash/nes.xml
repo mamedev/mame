@@ -49102,14 +49102,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- The dump is from the repro cart. It is unknown if it has been modified. -->
 	<software name="ncc91">
-		<description>Nintendo Campus Challenge 1991 (USA)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
+		<description>Nintendo Campus Challenge 1991 (bootleg)</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
 		<info name="usage" value="To play, press start on controller 2."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nes_event2" />
-			<feature name="pcb_model" value="NES-EVENT2-01" />
-			<feature name="mmc3_type" value="MMC3B" /> <!-- needs to be confirmed -->
 			<dataarea name="prg" size="524288">
 				<rom name="0.prg" size="524288" crc="61a6741d" sha1="ece5c65a80c9594696408528ddbbe53ddeb20b8e" status="baddump" />
 			</dataarea>
