@@ -85,7 +85,7 @@ public:
 	void tmap0_regs_w(offs_t offset, uint16_t data);
 	void tmap1_regs_w(offs_t offset, uint16_t data);
 
-	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
