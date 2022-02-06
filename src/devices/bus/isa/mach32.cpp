@@ -118,7 +118,6 @@ void mach32_device::device_start()
 	vga.svga_intf.vram_size = 0x400000;
 	vga.memory.resize(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
 }
 
 void mach32_device::device_reset()
