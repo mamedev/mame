@@ -39,10 +39,15 @@ public:
 	uint32_t input(void *buffer, uint32_t length);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
+	// device_image_interface implementation
+	virtual software_list_loader const &get_software_list_loader() const override;
+
 private:
+	uint8_t const *m_next;
+	uint8_t const *m_end;
 	char const *m_interface;
 	bool m_is_readonly;
 };

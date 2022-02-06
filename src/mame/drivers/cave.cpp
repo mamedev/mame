@@ -3339,7 +3339,7 @@ ROM_START( donpachikr )
 	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
 
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
-	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
+	ROM_LOAD( "text.u58", 0x000000, 0x040000, CRC(5dba06e7) SHA1(f9dab7f6c732a683fddb4cae090a875b3962332b) )
 
 	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
 	/* Leave the 0x40000 bytes addressable by the chip empty */

@@ -33,13 +33,10 @@
 #include "emu.h"
 
 #include "bus/rs232/rs232.h"
-
 #include "cpu/i8085/i8085.h"
-
+#include "imagedev/bitbngr.h"
 #include "machine/clock.h"
-#include "machine/bankdev.h"
 #include "machine/i8255.h"
-
 #include "video/dl1416.h"
 
 #include "softlist_dev.h"
@@ -59,9 +56,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_buttons(*this, "BUTTONS")
 		, m_maincpu(*this, "maincpu")
-		, m_bank(*this, "bank")
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "p%c%u", unsigned('a'), 0U)
+		, m_bootstrap(*this, "bootstrap")
 		, m_rxd(true)
 	{
 	}
@@ -71,6 +68,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
+	void sitcom_mem(address_map &map);
+	void sitcom_io(address_map &map);
+
 	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
@@ -78,18 +78,19 @@ protected:
 	virtual void update_ppi_pa(uint8_t data);
 	virtual void update_ppi_pb(uint8_t data);
 
-	void sitcom_bank(address_map &map);
-	void sitcom_io(address_map &map);
-	void sitcom_mem(address_map &map);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	static void sitcom_null_modem(device_t *device)
+	{
+		device->subdevice<bitbanger_device>("stream")->set_interface("rs232");
+	}
+
 	required_ioport                          m_buttons;
 	required_device<i8085a_cpu_device>       m_maincpu;
-	required_device<address_map_bank_device> m_bank;
 	output_finder<15>                        m_digits;
 	output_finder<2, 8>                      m_leds;
+	memory_view                              m_bootstrap;
 
 	bool m_rxd;
 };
@@ -109,6 +110,7 @@ public:
 		, m_ppi(*this, "ppi")
 		, m_ds2(*this, "ds2")
 		, m_test_led(*this, "test_led")
+		, m_dac(*this, "dac")
 		, m_shutter_timer(nullptr)
 		, m_shutter(false)
 		, m_dac_cs(true)
@@ -137,6 +139,7 @@ protected:
 	required_device<i8255_device>   m_ppi;
 	required_device<dl1414_device>  m_ds2;
 	output_finder<>                 m_test_led;
+	output_finder<>                 m_dac;
 	emu_timer                       *m_shutter_timer;
 
 	bool                            m_shutter;
@@ -144,18 +147,12 @@ protected:
 };
 
 
-void sitcom_state::sitcom_bank(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x07ff).rom().region("bootstrap", 0);
-	map(0x8000, 0xffff).ram().share("ram");
-}
-
 void sitcom_state::sitcom_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).ram().share("ram");
+	map(0x0000, 0x7fff).mirror(0x8000).ram();
+	map(0x0000, 0x7fff).view(m_bootstrap);
+	m_bootstrap[0](0x0000, 0x7fff).unmapw().rom().region("bootstrap", 0);
 }
 
 void sitcom_state::sitcom_io(address_map &map)
@@ -222,7 +219,7 @@ void sitcom_state::machine_start()
 
 void sitcom_state::machine_reset()
 {
-	m_bank->set_bank(0);
+	m_bootstrap.select(0);
 }
 
 void sitcom_state::update_ppi_pa(uint8_t data)
@@ -245,9 +242,9 @@ INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (boot || reset) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (boot)
-		m_bank->set_bank(0);
+		m_bootstrap.select(0);
 	else if (reset)
-		m_bank->set_bank(1);
+		m_bootstrap.disable();
 }
 
 
@@ -319,6 +316,7 @@ void sitcom_timer_state::machine_start()
 	sitcom_state::machine_start();
 
 	m_test_led.resolve();
+	m_dac.resolve();
 
 	m_shutter_timer = timer_alloc(TIMER_SHUTTER);
 
@@ -339,6 +337,7 @@ void sitcom_timer_state::machine_reset()
 void sitcom_timer_state::update_dac(uint8_t value)
 {
 	// supposed to be a DAC and an analog meter, but that's hard to do with internal layouts
+	m_dac = value;
 	constexpr u8 s_7seg[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
 	m_digits[12] = s_7seg[value % 10];
 	value /= 10;
@@ -357,8 +356,6 @@ void sitcom_state::sitcom(machine_config &config)
 	m_maincpu->in_sid_func().set(FUNC(sitcom_state::sid_line));
 	m_maincpu->out_sod_func().set_output("sod_led");
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&sitcom_state::sitcom_bank).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
-
 	CLOCK(config, "100hz", 100).signal_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
 	i8255_device &ppi(I8255(config, "ppi"));
@@ -373,6 +370,7 @@ void sitcom_state::sitcom(machine_config &config)
 	// host interface
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
 	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
+	rs232.set_option_machine_config("null_modem", sitcom_null_modem);
 
 	SOFTWARE_LIST(config, "bitb_list").set_original("sitcom");
 	config.set_default_layout(layout_sitcom);

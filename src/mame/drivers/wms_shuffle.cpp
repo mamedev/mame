@@ -49,7 +49,6 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/ripple_counter.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 #include "shuffle4.lh"

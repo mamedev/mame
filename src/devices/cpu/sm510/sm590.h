@@ -12,12 +12,6 @@
 #include "sm510base.h"
 
 
-// I/O ports setup
-
-// It does not have K pins, but can wake up after halt on R2.2
-#define SM590_INPUT_LINE_R22 SM510_INPUT_LINE_K3
-
-
 // pinout reference
 
 /*
@@ -115,7 +109,6 @@ protected:
 
 	virtual void reset_vector() override { do_branch(0, 0, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 1, 0); }
-	virtual bool valid_wakeup_line(int line) const override { return (line == SM590_INPUT_LINE_R22); }
 
 	// opcode handlers
 	// 00-3f

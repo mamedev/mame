@@ -8,6 +8,8 @@ Williams System 7
 Differences to system 6/6a:
 - Extra PIA at 0x2100 to handle sound and more solenoids.
 - Diag digit
+- Leading zero suppression
+- Commas
 
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
@@ -98,7 +100,7 @@ public:
 	{ }
 
 	void s7(machine_config &config);
-	void init_1() { m_game = 1; }
+	void init_1() { m_game = 1U; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
@@ -124,24 +126,25 @@ private:
 	void nvram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	void main_map(address_map &map);
 
-	u8 m_strobe = 0;
-	u8 m_row = 0;
+	u8 m_strobe = 0U;
+	u8 m_row = 0U;
+	u8 m_comma = 0U;
 	u8 m_nvram[0x100]{};
 	bool m_data_ok = 0;
-	u8 m_lamp_data = 0;
+	u8 m_lamp_data = 0U;
 	bool m_memprotect = 0;
-	u8 m_game = 0;
+	u8 m_game = 0U;
 	emu_timer* m_irq_timer;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
@@ -154,7 +157,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 	required_ioport_array<2> m_dips;
 	output_finder<61> m_digits;
-	output_finder<88> m_io_outputs; // 24 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s7_state::main_map(address_map &map)
@@ -519,10 +522,8 @@ void s7_state::sol1_w(u8 data)
 
 void s7_state::sol2_w(u8 data)
 {
+	m_comma = data & 0xc0;
 	m_pia21->ca1_w(BIT(data, 5));
-	// PB0-4 solenoids
-	for (u8 i = 0; i < 5; i++)
-		m_io_outputs[16U+i] = BIT(data, i);
 }
 
 void s7_state::sound_w(u8 data)
@@ -530,9 +531,6 @@ void s7_state::sound_w(u8 data)
 	u8 t = m_game ? 0x3f : 0x1f;
 	u8 t3 = (data & t) | ~t;
 	m_s6sound->write(t3);
-
-	// PA7 solenoid
-	m_io_outputs[23] = BIT(data, 7);
 }
 
 void s7_state::lamp0_w(u8 data)
@@ -546,7 +544,7 @@ void s7_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[24U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s7_state::dig0_w(u8 data)
@@ -560,11 +558,11 @@ void s7_state::dig0_w(u8 data)
 
 void s7_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
-		m_digits[m_strobe+16] = patterns[data&15];
-		m_digits[m_strobe] = patterns[data>>4];
+		m_digits[m_strobe+16] = patterns[data & 15] | (BIT(m_comma, 6) ? 0xc000 : 0);
+		m_digits[m_strobe] = patterns[data >> 4] | (BIT(m_comma, 7) ? 0xc000 : 0);
 	}
 	m_data_ok = false;
 }
@@ -654,6 +652,7 @@ void s7_state::machine_start()
 	save_item(NAME(m_memprotect));
 	save_item(NAME(m_nvram));
 	save_item(NAME(m_game));
+	save_item(NAME(m_comma));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
@@ -683,8 +682,8 @@ void s7_state::s7(machine_config &config)
 
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
-	m_pia21->readpa_handler().set_constant(0xff);
-	m_pia21->readpb_handler().set_constant(0x3f);
+	m_pia21->readpa_handler().set_constant(0xff); // PA7 unknown input
+	m_pia21->readpb_handler().set_constant(0x3f); // PB0-4 unknown inputs
 	m_pia21->writepa_handler().set(FUNC(s7_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s7_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s7_state::pia21_ca2_w));

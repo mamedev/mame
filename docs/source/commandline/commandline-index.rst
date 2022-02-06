@@ -11,23 +11,23 @@ Universal Commandline Options
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
 
-Core Commands
-~~~~~~~~~~~~~
+Core Verbs
+~~~~~~~~~~
 
 | :ref:`help <mame-commandline-help>`
 | :ref:`validate <mame-commandline-validate>`
 
 
-Configuration Commands
-~~~~~~~~~~~~~~~~~~~~~~
+Configuration Verbs
+~~~~~~~~~~~~~~~~~~~
 
 | :ref:`createconfig <mame-commandline-createconfig>`
 | :ref:`showconfig <mame-commandline-showconfig>`
 | :ref:`showusage <mame-commandline-showusage>`
 
 
-Frontend Commands
-~~~~~~~~~~~~~~~~~
+Frontend Verbs
+~~~~~~~~~~~~~~
 
 | :ref:`listxml <mame-commandline-listxml>`
 | :ref:`listfull <mame-commandline-listfull>`
@@ -60,8 +60,8 @@ OSD-related Options
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
 
 
-OSD CLI Options
-~~~~~~~~~~~~~~~
+OSD CLI Verbs
+~~~~~~~~~~~~~
 
 | :ref:`listmidi <mame-commandline-listmidi>`
 | :ref:`listnetwork <mame-commandline-listnetwork>`
@@ -117,9 +117,8 @@ Core State/Playback Options
 | :ref:`state <mame-commandline-state>`
 | :ref:`[no]autosave <mame-commandline-noautosave>`
 | :ref:`playback <mame-commandline-playback>`
-| :ref:`exit_after_playback <mame-commandline-exitafterplayback>`
+| :ref:`[no]exit_after_playback <mame-commandline-exitafterplayback>`
 | :ref:`record <mame-commandline-record>`
-| :ref:`record_timecode <mame-commandline-recordtimecode>`
 | :ref:`mngwrite <mame-commandline-mngwrite>`
 | :ref:`aviwrite <mame-commandline-aviwrite>`
 | :ref:`wavwrite <mame-commandline-wavwrite>`
@@ -143,7 +142,7 @@ Core Performance Options
 | :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
 | :ref:`numprocessors <mame-commandline-numprocessors>`
 | :ref:`bench <mame-commandline-bench>`
-| :ref:`lowlatency <mame-commandline-lowlatency>`
+| :ref:`[no]lowlatency <mame-commandline-lowlatency>`
 
 
 Core Rotation Options
@@ -212,6 +211,7 @@ Core Vector Options
 | :ref:`beam_width_min <mame-commandline-beamwidthmin>`
 | :ref:`beam_width_max <mame-commandline-beamwidthmax>`
 | :ref:`beam_intensity_weight <mame-commandline-beamintensityweight>`
+| :ref:`beam_dot_size <mame-commandline-beamdotsize>`
 | :ref:`flicker <mame-commandline-flicker>`
 
 
@@ -227,11 +227,10 @@ Core Video OpenGL Debugging Options
 Core Video OpenGL GLSL Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`gl_glsl <mame-commandline-glglsl>`
+| :ref:`[no]gl_glsl <mame-commandline-glglsl>`
 | :ref:`gl_glsl_filter <mame-commandline-glglslfilter>`
 | :ref:`glsl_shader_mame[0-9] <mame-commandline-glslshadermame>`
 | :ref:`glsl_shader_screen[0-9] <mame-commandline-glslshaderscreen>`
-| :ref:`gl_glsl_vid_attr <mame-commandline-glglslvidattr>`
 
 
 Core Sound Options
@@ -261,8 +260,8 @@ Core Input Options
 | :ref:`joystick_map <mame-commandline-joystickmap>`
 | :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
 | :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
-| :ref:`natural <mame-commandline-natural>`
-| :ref:`joystick_contradictory <mame-commandline-joystickcontradictory>`
+| :ref:`[no]natural <mame-commandline-natural>`
+| :ref:`[no]joystick_contradictory <mame-commandline-joystickcontradictory>`
 | :ref:`coin_impulse <mame-commandline-coinimpulse>`
 
 
@@ -286,9 +285,11 @@ Core Debugging Options
 | :ref:`[no]oslog <mame-commandline-oslog>`
 | :ref:`[no]log <mame-commandline-log>`
 | :ref:`[no]debug <mame-commandline-debug>`
+| :ref:`debugger <mame-commandline-debugger>`
 | :ref:`debugscript <mame-commandline-debugscript>`
 | :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
 | :ref:`watchdog <mame-commandline-watchdog>`
+| :ref:`debugger_port <mame-commandline-debuggerport>`
 | :ref:`debugger_font <mame-commandline-debuggerfont>`
 | :ref:`debugger_font_size <mame-commandline-debuggerfontsize>`
 
@@ -307,23 +308,23 @@ Core Misc Options
 ~~~~~~~~~~~~~~~~~
 
 | :ref:`[no]drc <mame-commandline-drc>`
-| :ref:`drc_use_c <mame-commandline-drcusec>`
-| :ref:`drc_log_uml <mame-commandline-drcloguml>`
-| :ref:`drc_log_native <mame-commandline-drclognative>`
+| :ref:`[no]drc_use_c <mame-commandline-drcusec>`
+| :ref:`[no]drc_log_uml <mame-commandline-drcloguml>`
+| :ref:`[no]drc_log_native <mame-commandline-drclognative>`
 | :ref:`bios <mame-commandline-bios>`
 | :ref:`[no]cheat <mame-commandline-cheat>`
 | :ref:`[no]skip_gameinfo <mame-commandline-skipgameinfo>`
 | :ref:`uifont <mame-commandline-uifont>`
 | :ref:`ui <mame-commandline-ui>`
 | :ref:`ramsize <mame-commandline-ramsize>`
-| :ref:`confirm_quit <mame-commandline-confirmquit>`
-| :ref:`ui_mouse <mame-commandline-uimouse>`
+| :ref:`[no]confirm_quit <mame-commandline-confirmquit>`
+| :ref:`[no]ui_mouse <mame-commandline-uimouse>`
 | :ref:`language <mame-commandline-language>`
 | :ref:`[no]nvram_save <mame-commandline-nvramsave>`
 
 
 Scripting Options
------------------
+~~~~~~~~~~~~~~~~~
 
 | :ref:`autoboot_command <mame-commandline-autobootcommand>`
 | :ref:`autoboot_delay <mame-commandline-autobootdelay>`
@@ -335,11 +336,19 @@ Scripting Options
 
 
 HTTP Server Options
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 | :ref:`http <mame-commandline-http>`
 | :ref:`http_port <mame-commandline-httpport>`
 | :ref:`http_root <mame-commandline-httproot>`
+
+
+PortAudio Options
+~~~~~~~~~~~~~~~~~
+
+| :ref:`pa_api <mame-commandline-paapi>`
+| :ref:`pa_device <mame-commandline-padevice>`
+| :ref:`pa_latency <mame-commandline-palatency>`
 
 
 Windows-Specific Commandline Options
@@ -377,7 +386,7 @@ This section contains configuration options that are specific to any build suppo
 SDL Performance Options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`sdlvideofps <mame-scommandline-sdlvideofps>`
+| :ref:`[no]sdlvideofps <mame-scommandline-sdlvideofps>`
 
 
 SDL Video Options

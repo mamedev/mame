@@ -6,17 +6,22 @@
 
     Driver file for EC-184x series
 
+    To do:
+    - verify ec1840 clocks etc.
+    - did 640KB memory board exist or it's 512+128 boards?
+
 ***************************************************************************/
 
 
 #include "emu.h"
-
 #include "machine/genpc.h"
+
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
+
 #include "softlist_dev.h"
 
 
@@ -32,7 +37,7 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
-#define EC1841_MEMBOARD_SIZE    (512*1024)
+static constexpr int EC1841_MEMBOARD_SIZE = 512 * 1024;
 
 
 class ec184x_state : public driver_device
@@ -154,7 +159,7 @@ void ec184x_state::init_ec1840()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_ram(0, m_ram->size()-1, m_ram->pointer());
+	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 void ec184x_state::init_ec1841()
@@ -164,10 +169,9 @@ void ec184x_state::init_ec1841()
 	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
 	if (m_memory.boards > 4) m_memory.boards = 4;
 
-	program.install_ram(0,  EC1841_MEMBOARD_SIZE-1, m_ram->pointer());
+	program.install_ram(0, EC1841_MEMBOARD_SIZE - 1, m_ram->pointer());
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
-	// XXX verify this was actually the case
 	if (m_ram->size() == 640 * 1024)
 	{
 		program.install_ram(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, m_ram->pointer() + EC1841_MEMBOARD_SIZE);
@@ -208,7 +212,6 @@ void ec184x_state::ec1841_io(address_map &map)
 }
 
 
-// XXX verify everything
 void ec184x_state::ec1840(machine_config &config)
 {
 	I8086(config, m_maincpu, 4096000);
@@ -257,9 +260,9 @@ void ec184x_state::ec1841(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false);   // cga
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false);   // fdc (IRQ6) + mouse port (IRQ2..5)
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false);   // lpt (IRQ7||5) [+ serial (IRQx)]
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false); // cga
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false); // fdc (IRQ6) + mouse port (IRQ2..5)
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false); // lpt (IRQ7||5) [+ serial (IRQx)]
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, "hdc", false);
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);

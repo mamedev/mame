@@ -10700,7 +10700,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="aliengatu">
+	<software name="aliengatu" cloneof="aliengat">
 		<description>Alien Gate (US, set 1)</description>
 		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
@@ -10711,7 +10711,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="aliengatu1">
+	<software name="aliengatu1" cloneof="aliengat">
 		<description>Alien Gate (US, set 2)</description>
 		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
