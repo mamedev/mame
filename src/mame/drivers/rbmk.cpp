@@ -85,6 +85,8 @@ public:
 	void rbmk(machine_config &config);
 	void rbspm(machine_config &config);
 
+	void magslot(machine_config &config);
+
 protected:
 	virtual void video_start() override;
 
@@ -93,7 +95,7 @@ private:
 	required_shared_ptr<uint16_t> m_vidram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<at89c4051_device> m_mcu;
+	optional_device<at89c4051_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -107,6 +109,8 @@ private:
 	void mcu_mem(address_map &map);
 	void rbmk_mem(address_map &map);
 	void rbspm_mem(address_map &map);
+
+	void magslot_mem(address_map &map);
 
 	uint16_t unk_r();
 	uint16_t dip_mux_r();
@@ -203,6 +207,24 @@ void rbmk_state::rbspm_mem(address_map &map)
 	map(0x940000, 0x940fff).ram().share("vidram2"); // if removed fails palette test?
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
 	map(0x9c0000, 0x9c0fff).ram().share("vidram");
+}
+
+void rbmk_state::magslot_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x600000, 0x600001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x610000, 0x610001).portr("IN2");
+	map(0x618080, 0x618081).r(FUNC(rbmk_state::unk_r));
+	map(0x620000, 0x620001).portr("IN3");
+	map(0x628000, 0x628001).w(FUNC(rbmk_state::unk_w));
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x940000, 0x940fff).ram().share("vidram2");
+	map(0x980000, 0x983fff).ram();
+	map(0x9c0000, 0x9c0fff).ram().share("vidram");
+	map(0x9e0000, 0x9e0fff).ram().share("vidram3");
+	//map(0xf00000, 0xf00001).w(FUNC(rbmk_state::eeprom_w)); // wrong?
 }
 
 void rbmk_state::mcu_mem(address_map &map)
@@ -529,6 +551,12 @@ static GFXDECODE_START( gfx_rbmk )
 	GFXDECODE_ENTRY( "gfx2", 0, rbmk8_layout,   0x100, 16  )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_magslot )
+	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,   0x0, 16  ) // wrong
+	GFXDECODE_ENTRY( "gfx2", 0, rbmk8_layout,   0x100, 16  )
+	GFXDECODE_ENTRY( "gfx3", 0, rbmk8_layout,   0x100, 16  ) // wrong colors
+GFXDECODE_END
+
 void rbmk_state::video_start()
 {
 	save_item(NAME(m_tilebank));
@@ -610,6 +638,19 @@ void rbmk_state::rbspm(machine_config &config)
 	// PIC16F84 but no CPU core available
 }
 
+void rbmk_state::magslot(machine_config &config)
+{
+	rbmk(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rbmk_state::magslot_mem);
+
+	config.device_remove("mcu");
+
+	// PIC16F84 but no CPU core available
+
+	m_gfxdecode->set_info(gfx_magslot);
+}
+
+
 // 实战麻将王 (Shízhàn Májiàng Wáng)
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
@@ -668,5 +709,36 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+
+// the PCB is slightly different from the others, both layout-wise and component-wyse, but it's mostly compatible. It seems to use one more GFX layer and not to have the 89C51.
+ROM_START( magslot ) // All labels have SLOT canceled with a black pen. No sum matches the one on label.
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD( "magic 1.0c _ _ _ _.u64", 0x00000, 0x80000, CRC(84544dd7) SHA1(cf10ad3373c2f35f5fa7986be0865f760a454c28) ) // no sum on label, 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x880, "pic", 0 ) // pic is assumed populated under the plastic cover
+	ROM_LOAD( "pic16f84_code.bin", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "pic16f84_data.bin", 0x800, 0x080, NO_DUMP )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "magic s1.0c ba8d.u83", 0x00000, 0x80000, CRC(46df3564) SHA1(6b740ca1fd839f7e7e35f097457e87d1260a6aaf) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "magic a1.0c _ _ _ _.u178", 0x000000, 0x200000,  CRC(11028627) SHA1(80b38acab1cd12462d8fc36a9cdce5e5e76f6403) ) // no sum on label, 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "magic t1.0c ec43.u64", 0x00000, 0x80000, CRC(18df608d) SHA1(753b8090e8fd89e50131a22259ef3280d7e6b282) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "magic u1.0c f7f6.u169", 0x00000, 0x40000, CRC(582631d3) SHA1(92d1b767bc7ef15eed6dad599392c17620210678) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
+ROM_END
+
+
+// mahjong
+GAME( 1998, rbmk,    0, rbmk,    rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
+GAME( 1998, rbspm,   0, rbspm,   rbspm, rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+
+// slot, on slightly different PCB
+GAME( 2003, magslot, 0, magslot, rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Magic Slot (Normal 1.0C)",               MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode, PIC dump and core, inputs
