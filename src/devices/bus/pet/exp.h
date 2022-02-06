@@ -103,8 +103,8 @@ protected:
 
 	// runtime
 	virtual int pet_norom_r(offs_t offset, int sel) { return 1; }
-	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) { return data; };
-	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) { };
+	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) { return data; }
+	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) { }
 	virtual int pet_diag_r() { return 1; }
 	virtual void pet_irq_w(int state) { }
 

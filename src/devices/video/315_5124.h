@@ -76,8 +76,8 @@ public:
 	void hcount_latch();
 	bool hcount_latched() { return m_hcounter_latched; }
 
-	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
-	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
+	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; }
+	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; }
 
 	/* update the screen */
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

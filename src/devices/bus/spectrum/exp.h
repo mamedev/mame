@@ -112,10 +112,10 @@ class device_spectrum_expansion_interface : public device_interface
 {
 public:
 	// reading and writing
-	virtual void pre_opcode_fetch(offs_t offset) { };
-	virtual void post_opcode_fetch(offs_t offset) { };
-	virtual void pre_data_fetch(offs_t offset) { };
-	virtual void post_data_fetch(offs_t offset) { };
+	virtual void pre_opcode_fetch(offs_t offset) { }
+	virtual void post_opcode_fetch(offs_t offset) { }
+	virtual void pre_data_fetch(offs_t offset) { }
+	virtual void post_data_fetch(offs_t offset) { }
 	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
 	virtual void mreq_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t iorq_r(offs_t offset) { return offset & 1 ? m_slot->fb_r() : 0xff; }

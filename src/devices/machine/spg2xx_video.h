@@ -30,9 +30,9 @@ public:
 	uint16_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint16_t data);
 
-	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); };
+	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); }
 
-	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -42,7 +42,7 @@ public:
 	u32 size() const { return m_size; }
 	u32 mask() const { return m_size - 1; }
 	u8 *pointer() { return &m_pointer[0]; }
-	char const *default_size_string() const { return m_default_size; };
+	char const *default_size_string() const { return m_default_size; }
 	u32 default_size() const;
 	extra_option_vector const &extra_options() const;
 

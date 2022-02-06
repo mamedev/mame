@@ -21,7 +21,7 @@ public:
 
 	virtual void map(address_map &map) = 0;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) = 0;
-	virtual void set_swapped(bool swapped) { m_swap = swapped ? 3 : 0; };
+	virtual void set_swapped(bool swapped) { m_swap = swapped ? 3 : 0; }
 
 protected:
 	ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -222,7 +222,7 @@ class g364_device : public g332_device
 public:
 	g364_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual void set_swapped(bool swapped) override { m_swap = swapped ? 7 : 0; };
+	virtual void set_swapped(bool swapped) override { m_swap = swapped ? 7 : 0; }
 };
 
 DECLARE_DEVICE_TYPE(G300, g300_device)

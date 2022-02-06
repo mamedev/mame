@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual void port_w(u8 data);
-	void set_start_delay(uint32_t data) { m_start_delay = data; };
+	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
 protected:
 	virtual void internal_start_w(int state) = 0;
