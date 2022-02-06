@@ -142,6 +142,7 @@ we have no way of knowing which is the later/corrected version.
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
+#include "sound/okim6295.h"
 #include "speaker.h"
 
 
@@ -380,6 +381,42 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x6000);
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
 	map(0x330000, 0x331fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void mystwarr_state::viostormbl_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();     // main program
+	map(0x200000, 0x20ffff).ram().share("gx_workram");
+	map(0x210000, 0x210fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
+	map(0x211000, 0x21ffff).ram();
+	map(0x240000, 0x240007).w(m_k055673, FUNC(k055673_device::k053246_w));
+	map(0x244000, 0x24400f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
+	map(0x244010, 0x24401f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
+	map(0x24c000, 0x24ffff).ram();     // K053250 ram
+	map(0x250000, 0x25000f).ram();     // K053250 reg
+	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
+	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
+	map(0x25c000, 0x25c03f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
+	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x264ffe, 0x264ffe).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x07); }));
+	map(0x268ffe, 0x268ffe).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
+	map(0x274000, 0x274001).portr("P1_P3");
+	map(0x274002, 0x274003).portr("P2_P4");
+	map(0x278000, 0x278001).portr("IN0");
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
+	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x6000);
+	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
+	map(0x330000, 0x331fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void mystwarr_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 // Martial Champion specific interfaces
@@ -881,12 +918,22 @@ MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
+MACHINE_START_MEMBER(mystwarr_state,viostormbl)
+{
+	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
+
+	m_mw_irq_control = 0;
+
+	// konamigx_mixer uses this, so better initialize it
+	m_gx_wrport1_0 = 0;
+
+	save_item(NAME(m_mw_irq_control));
+}
+
 MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 {
-	int i;
-
-	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	if (m_k054539_1.found())
+		for (int i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0); // boost voice(chip 0 channel 4-7)
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
@@ -1014,6 +1061,27 @@ void mystwarr_state::viostorm(machine_config &config)
 
 	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -62, -23);
+}
+
+void mystwarr_state::viostormbl(machine_config &config)
+{
+	viostorm(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::viostormbl_map);
+
+	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,viostormbl)
+
+	// TODO: adjust layer offsets
+
+	config.device_remove("soundcpu");
+	config.device_remove("k054321");
+	config.device_remove("k054539_1");
+	config.device_remove("k054539_2");
+
+	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // frequency and pin 7 unverified
+	oki.set_addrmap(0, &mystwarr_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void mystwarr_state::metamrph(machine_config &config)
@@ -1548,6 +1616,35 @@ ROM_START( viostormab )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "viostormab.nv", 0x0000, 0x080, CRC(38ffce43) SHA1(f0666198562ae7c07c8f805088e882a10c79bcf3) )
+ROM_END
+
+ROM_START( viostormabbl ) // bootleg PCB with no Konami customs and an Oki M6295 for sound
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "c-24", 0x000001, 0x80000, CRC(45fe6ce0) SHA1(96b3c6628a0a1b8db0528843db78704d04270db6) ) /* 1993. 7.26 Asia */
+	ROM_LOAD16_BYTE( "c-28", 0x000000, 0x80000, CRC(937d23d1) SHA1(31a22c2dab63c9d3b541e3f463bf4b61411024c8) )
+
+	/* tiles */
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
+	ROM_LOADTILE_WORD( "rom4", 0x000000, 0x100000, CRC(3d543183) SHA1(a1c5eba8ce6e32ef5f256e2e17b0e7eb79ec32c4) )
+	ROM_LOADTILE_WORD( "rom3", 0x000002, 0x100000, CRC(377e394c) SHA1(f9acc9d033f13a00e5079f292e9ebe92d71866e1) )
+
+	// sprites
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "rom8", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
+	ROM_LOAD64_WORD( "rom6", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
+	ROM_LOAD64_WORD( "rom7", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
+	ROM_LOAD64_WORD( "rom5", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
+
+	// road generator
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c-23", 0x00000, 0x80000, CRC(b8eb1ae0) SHA1(312137ca03e9e6a101a8c1ccda635007819ff542) )
+	ROM_LOAD( "c-21", 0x80000, 0x80000, CRC(7fee16d6) SHA1(7dd2b9cdadc524e3af4adfa1755d1601bbbd340d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "viostormabbl.nv", 0x0000, 0x080, CRC(38ffce43) SHA1(f0666198562ae7c07c8f805088e882a10c79bcf3) )
 ROM_END
 
 
@@ -2228,37 +2325,38 @@ ROM_START( dadandrn )
 	ROM_LOAD( "dadandrn.nv", 0x0000, 0x080, CRC(346ae0cf) SHA1(1f79b2e21766f7a971c7d0f618700deb8a32f78a) )
 ROM_END
 
-//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE
-GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME          PARENT    MACHINE     INPUT     STATE
+GAME( 1993, mystwarr,     0,        mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarraa,   mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulers,     0,        dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dadandrn,     mmaulers, dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, viostorm,   0,        viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormeb, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormu,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormub, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormj,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostorma,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormab, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorm,     0,        viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormeb,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormu,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormub,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormj,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorma,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormab,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormabbl, viostorm, viostormbl, viostorm, mystwarr_state, empty_init, ROT0,  "bootleg", "Violent Storm (ver AAB, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // some glitches, may be bootleg crappyness
 
-GAME( 1993, metamrph,   0,        metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphe,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrph,     0,        metamrph,   metamrph, mystwarr_state, empty_init, ROT0,  "Konami",  "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphe,    metamrph, metamrph,   metamrph, mystwarr_state, empty_init, ROT0,  "Konami",  "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphu,    metamrph, metamrph,   metamrph, mystwarr_state, empty_init, ROT0,  "Konami",  "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphj,    metamrph, metamrph,   metamrph, mystwarr_state, empty_init, ROT0,  "Konami",  "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrpha,    metamrph, metamrph,   metamrph, mystwarr_state, empty_init, ROT0,  "Konami",  "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mtlchamp,   0,        martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchamp1,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu1, mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampj,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampa,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp,     0,        martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp1,    mtlchamp, martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu,    mtlchamp, martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu1,   mtlchamp, martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampj,    mtlchamp, martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampa,    mtlchamp, martchmp,   martchmp, mystwarr_state, empty_init, ROT0,  "Konami",  "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, gaiapols,   0,        gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsu,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsj,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapols,     0,        gaiapols,   dadandrn, mystwarr_state, empty_init, ROT90, "Konami",  "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsu,    gaiapols, gaiapols,   dadandrn, mystwarr_state, empty_init, ROT90, "Konami",  "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsj,    gaiapols, gaiapols,   dadandrn, mystwarr_state, empty_init, ROT90, "Konami",  "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )
