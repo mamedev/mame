@@ -11,7 +11,7 @@
     There are several models and versions. Most of them are based on 8051 compatible MCUs
     and EF9345 semi graphic video chip.
 
-    The current implementation is an Minitel 2 from "La RADIOTECHNIQUE PORTENSEIGNE" / RPIC (Philips)
+    The current implementation is a Minitel 2 from "La RADIOTECHNIQUE PORTENSEIGNE" / RPIC (Philips)
     More Minitel hardware related informations are available on this page :
     http://hxc2001.free.fr/minitel
 
@@ -32,7 +32,7 @@
     - Sound output.
     - Screen should go blank when switched off
 
-    The original firmware and the experimental demo rom are currently both working.
+    The original firmware and the experimental demo ROM are currently both working.
 
     Please note the current special function keys assignation :
 
@@ -49,10 +49,11 @@
 
     With the official ROM you need to press F10 to switch on the CRT.
 
-    Modem and external port can be exported with the "modport0" and "serport0"
+    Modem and external port can be exported to the "modport0" and "serport0"
     interfaces.
-    Example : Options to use to create an TCP socket connected to the modem port :
-              "-modport0 null_modem -bitb socket.127.0.0.1:20000"
+    Example : Command line options to use to create a TCP socket linked to
+    the modem port : "-modport0 null_modem -bitb socket.127.0.0.1:20000"
+    Once mame started you can then send vdt files with netcat to this socket.
 
 ****************************************************************************/
 
