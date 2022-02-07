@@ -459,19 +459,19 @@ private:
 	}
 
 
-	uint8_t adc0_r() { return m_an_in[0]->read(); };
-	uint8_t adc1_r() { return m_an_in[1]->read(); };
-	uint8_t adc2_r() { return m_an_in[2]->read(); };
-	uint8_t adc3_r() { return m_an_in[3]->read(); };
-	uint8_t adc4_r() { return m_an_in[4]->read(); };
-	uint8_t adc5_r() { return m_an_in[5]->read(); };
-	uint8_t adc6_r() { return m_an_in[6]->read(); };
-	uint8_t adc7_r() { return m_an_in[7]->read(); };
+	uint8_t adc0_r() { return m_an_in[0]->read(); }
+	uint8_t adc1_r() { return m_an_in[1]->read(); }
+	uint8_t adc2_r() { return m_an_in[2]->read(); }
+	uint8_t adc3_r() { return m_an_in[3]->read(); }
+	uint8_t adc4_r() { return m_an_in[4]->read(); }
+	uint8_t adc5_r() { return m_an_in[5]->read(); }
+	uint8_t adc6_r() { return m_an_in[6]->read(); }
+	uint8_t adc7_r() { return m_an_in[7]->read(); }
 
-	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
-	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
-	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
-	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; }
+	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; }
+	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; }
+	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; }
 
 	void update_irqs();
 	uint8_t m_irqsource;
