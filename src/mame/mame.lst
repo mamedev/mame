@@ -14714,6 +14714,7 @@ quaak                           // bootleg
 redufo                          // (c) Artic
 redufob                         // bootleg
 redufob2                        // bootleg
+redufob3                        // bootleg
 sbhoei                          // Hoei
 sbhoeia                         // Hoei
 scobra                          // GX316 (c) 1981 Konami
@@ -37325,7 +37326,8 @@ vsaturn                         // JVC V-Saturn
 @source:sauro.cpp
 sauro                           // (c) 1987
 sauroa                          // (c) 1987
-saurob                          // (c) 1987 bootleg
+saurob                          // (c) 1987
+saurobl                         // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987
 seawolft                        // (c) 1987 Tecfri
