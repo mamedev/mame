@@ -133,6 +133,7 @@ public:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
+	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 
@@ -149,7 +150,6 @@ public:
 	int m_dmadis;
 	int m_sysscc;
 	int m_sysfs;
-	uint8_t m_cause;
 	int m_partst;               // parity test
 
 	void abc1600(machine_config &config);
@@ -164,8 +164,8 @@ public:
 	int m_btce;                 // V.24 channel B external clock enable
 	bool m_sccrq_a;
 	bool m_sccrq_b;
-	int m_dart_irq;
 	int m_scc_irq;
+	int m_dart_irq;
 };
 
 
