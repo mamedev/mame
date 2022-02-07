@@ -10,6 +10,7 @@
 #define NW0_MAP (BIT(m_regs[MEM_CONFIG], 2))
 #define W0_WE (BIT(m_regs[MEM_CONFIG], 1))
 #define ROM128 (BIT(m_regs[MEM_CONFIG], 0))
+#define OFFS_512(_rl) (((m_regs[_rl + 1] & 1) << 8) | m_regs[_rl])
 
 #define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
 
@@ -185,13 +186,13 @@ void tsconf_state::tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from
 	while (!((from_x == to_x) && (from_y == to_y)))
 	{
 		if (from_x == screen.left() && (from_y == screen.top()))
-			m_rendering_gfx_y_offset = ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L];
+			m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
 
 		u16 x = from_x - screen.left();
 		u16 *bm = &m_screen->curbitmap().as_ind16().pix(from_y, from_x);
 		s16 width = (screen.width() - x) / 8;
 
-		// TODO u16 x_offset = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
+		// TODO u16 x_offset = OFFS_512(G_X_OFFS_L);
 		u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
 		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (m_rendering_gfx_y_offset / 8 * 256 + x / 8);
 		for (; width > 0; width--)
@@ -228,10 +229,10 @@ void tsconf_state::tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from
 	while (!((from_x == to_x) && (from_y == to_y)))
 	{
 		if (from_x == screen.left() && (from_y == screen.top()))
-			m_rendering_gfx_y_offset = ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L];
+			m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
 
 		u16 x = from_x - screen.left();
-		u16 x_offset = (((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L] + x) & 0x1ff;
+		u16 x_offset = (OFFS_512(G_X_OFFS_L) + x) & 0x1ff;
 		u16 *bm = &m_screen->curbitmap().as_ind16().pix(from_y, from_x);
 		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((m_rendering_gfx_y_offset * 512 + x_offset) >> (2 - VM));
 		s16 width = screen.width() - x;
@@ -634,12 +635,12 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case T0_X_OFFSET_L:
 	case T0_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES0]->set_scrollx((m_regs[T0_X_OFFSET_H] << 8) | m_regs[T0_X_OFFSET_L]);
+		m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
 		break;
 
 	case T0_Y_OFFSET_L:
 	case T0_Y_OFFSET_H:
-		m_ts_tilemap[TM_TILES0]->set_scrolly((m_regs[T0_Y_OFFSET_H] << 8) | m_regs[T0_Y_OFFSET_L]);
+		m_ts_tilemap[TM_TILES0]->set_scrolly(OFFS_512(T0_Y_OFFSET_L));
 		break;
 
 	case T1_G_PAGE:
@@ -649,12 +650,12 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case T1_X_OFFSET_L:
 	case T1_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES1]->set_scrollx((m_regs[T1_X_OFFSET_H] << 8) | m_regs[T1_X_OFFSET_L]);
+		m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
 		break;
 
 	case T1_Y_OFFSET_L:
 	case T1_Y_OFFSET_H:
-		m_ts_tilemap[TM_TILES1]->set_scrolly((m_regs[T1_Y_OFFSET_H] << 8) | m_regs[T1_Y_OFFSET_L]);
+		m_ts_tilemap[TM_TILES1]->set_scrolly(OFFS_512(T1_Y_OFFSET_L));
 		break;
 
 	case SG_PAGE:
@@ -851,7 +852,7 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 
 void tsconf_state::update_frame_timer()
 {
-	u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
+	u16 vpos = OFFS_512(VS_INT_L);
 	u16 hpos = m_regs[HS_INT];
 	if (hpos > 0 && vpos <= 319 && hpos <= 223)
 	{
@@ -868,6 +869,15 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
 	update_frame_timer();
 	m_line_irq_timer->adjust(attotime::zero);
+}
+
+void tsconf_state::dma_ready(int line)
+{
+	if (BIT(m_regs[INT_MASK], 4))
+	{
+		m_maincpu->set_input_line_and_vector(line, ASSERT_LINE, 0xfb);
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	}
 }
 
 void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
@@ -892,7 +902,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			{
 			case G_Y_OFFS_L:
 			case G_Y_OFFS_H:
-				m_rendering_gfx_y_offset = ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L];
+				m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
 				break;
 
 			default:
@@ -909,7 +919,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			// Not quite precise. Scanline can't be skipped.
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 		}
-		u16 vpos = ((m_regs[VS_INT_H] & 0x01) << 8) | m_regs[VS_INT_L];
+		u16 vpos = OFFS_512(VS_INT_L);
 		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && m_regs[HS_INT] == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);

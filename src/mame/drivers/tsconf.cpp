@@ -270,6 +270,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
 	m_dma->out_cram_callback().set(FUNC(tsconf_state::cram_write16));
 	m_dma->out_sfile_callback().set(FUNC(tsconf_state::sfile_write16));
+	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));
 
 	BETA_DISK(config, m_beta, 0);
 	SPI_SDCARD(config, m_sdcard, 0);

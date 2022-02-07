@@ -15,7 +15,8 @@ tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *ta
 	  m_out_mreq_cb(*this),
 	  m_in_mspi_cb(*this),
 	  m_out_cram_cb(*this),
-	  m_out_sfile_cb(*this)
+	  m_out_sfile_cb(*this),
+	  m_on_ready_cb(*this)
 {
 }
 
@@ -26,6 +27,7 @@ void tsconfdma_device::device_start()
 	m_in_mspi_cb.resolve_safe(0);
 	m_out_cram_cb.resolve_safe();
 	m_out_sfile_cb.resolve_safe();
+	m_on_ready_cb.resolve_safe();
 
 	save_item(NAME(m_ready));
 	save_item(NAME(m_address_s));
@@ -204,6 +206,7 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 	}
 
 	m_ready = ASSERT_LINE;
+	m_on_ready_cb(0);
 }
 
 // device type definition
