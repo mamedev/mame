@@ -147,7 +147,7 @@ protected:
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(uint8_t *cart_base) { };
+	virtual void update_cart_base(uint8_t *cart_base) { }
 
 protected:
 	// timer constants

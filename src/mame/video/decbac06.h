@@ -50,7 +50,7 @@ public:
 	  For now we have this get_flip_state function so that drivers can query the bit and set other
 	  flip flags accordingly
 	*/
-	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; };
+	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; }
 
 	void set_flip_screen(bool flip);
 

@@ -67,7 +67,7 @@ protected:
 
 	virtual uint8_t input_r(offs_t offset) = 0;
 	virtual void sound_w(offs_t offset, uint8_t data) = 0;
-	virtual void music_w(offs_t offset, uint8_t data) { };
+	virtual void music_w(offs_t offset, uint8_t data) { }
 
 	void scratch_w(offs_t offset, uint8_t data);
 	uint8_t scratch_r(offs_t offset);
