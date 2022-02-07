@@ -489,6 +489,10 @@ static INPUT_PORTS_START(dx100)
 
 	PORT_START("AN6")
 	PORT_CONFNAME( 0xFF, 0x00, "Battery Power Level" )
+	// Yes, higher values mean lower voltages.
+	// I think this is opposite to how the RAM battery voltmeter works.
+	// The weird granularity here is due to the buggy implementation of the
+	// test in the test mode; all 7V values should LED flash, but some don't.
 	PORT_CONFSETTING( 0x00, "9V (Normal)" ) // for some arbitrary definition of "normal"
 	PORT_CONFSETTING( 0x4B, "9V (Lowest Allowed)" )
 	PORT_CONFSETTING( 0x67, "7V (Highest Allowed Without LED Flash)" )
