@@ -98,7 +98,6 @@ private:
 
 
 #define SUPERDRIVE_ROM_REGION  "superdrive_rom"
-#define SUPERDRIVE_RAM_TAG "superdrive_ram"
 
 
 ROM_START( superdrive )
@@ -114,7 +113,7 @@ const tiny_rom_entry *a2bus_superdrive_device::device_rom_region() const
 
 void a2bus_superdrive_device::m65c02_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().share(SUPERDRIVE_RAM_TAG);
+	map(0x0000, 0x7fff).ram().share(m_ram);
 	map(0x0a00, 0x0aff).rw(FUNC(a2bus_superdrive_device::m65c02_r), FUNC(a2bus_superdrive_device::m65c02_w));
 	map(0x8000, 0xffff).rom().region(SUPERDRIVE_ROM_REGION, 0x0000);
 }
@@ -123,7 +122,7 @@ void a2bus_superdrive_device::m65c02_mem(address_map &map)
 void a2bus_superdrive_device::device_add_mconfig(machine_config &config)
 {
 
-	W65C02S(config, m_65c02,  A2BUS_7M_CLOCK / 3.5);  /* ~ 2.046 MHz */
+	W65C02S(config, m_65c02,  DERIVED_CLOCK(2, 7));  /* ~ 2.046 MHz */
 	m_65c02->set_addrmap(AS_PROGRAM, &a2bus_superdrive_device::m65c02_mem);
 
 	SWIM1(config, m_fdc, C16M);
@@ -144,7 +143,7 @@ a2bus_superdrive_device::a2bus_superdrive_device(const machine_config &mconfig, 
 	device_a2bus_card_interface(mconfig, *this),
 	m_65c02(*this, "superdrive_65c02"),
 	m_rom(*this, SUPERDRIVE_ROM_REGION),
-	m_ram(*this, SUPERDRIVE_RAM_TAG),
+	m_ram(*this, "superdrive_ram"),
 	m_fdc(*this, "fdc"),
 	m_bank_select(0),
 	m_side(0)
@@ -253,11 +252,11 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 			break;
 
 		case 0x80:
-			logerror("LED on");
+			logerror("LED on\n");
 			break;
 
 		case 0x81:
-			logerror("LED off");
+			logerror("LED off\n");
 			break;
 
 		default:
@@ -273,28 +272,28 @@ uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
 	if (offset < 16)
 		return m_fdc->read(offset);
 
+	if (machine().side_effects_disabled()) return 0;
+
 	switch (offset)
 	{
 		case 0x40:
-			if (machine().side_effects_disabled()) break;
 			m_side = 0;
 			floppy = m_fdc->get_floppy();
 			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x41:
-			if (machine().side_effects_disabled()) break;
 			m_side = 1;
 			floppy = m_fdc->get_floppy();
 			if (floppy) floppy->ss_w(m_side);
 			break;
 
 		case 0x80:
-			logerror("LED on");
+			logerror("LED on\n");
 			break;
 
 		case 0x81:
-			logerror("LED off");
+			logerror("LED off\n");
 			break;
 
 		default:
@@ -345,5 +344,5 @@ void a2bus_superdrive_device::hdsel_w(int hdsel)
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_SUPERDRIVE, device_a2bus_card_interface, a2bus_superdrive_device, "superdrive", "Apple II 3.5\" Disk Controller Card")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_SUPERDRIVE, device_a2bus_card_interface, a2bus_superdrive_device, "a2superdrive", "Apple II 3.5\" Disk Controller Card")
 

@@ -33,6 +33,7 @@
 #include "bus/a2bus/a2scsi.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2ssc.h"
+#include "bus/a2bus/a2superdrive.h"
 #include "bus/a2bus/a2swyft.h"
 #include "bus/a2bus/a2themill.h"
 #include "bus/a2bus/a2thunderclock.h"
@@ -68,7 +69,6 @@
 #include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/titan3plus2.h"
 #include "bus/a2bus/softcard3.h"
-#include "bus/a2bus/a2superdrive.h"
 
 
 void apple2_slot0_cards(device_slot_interface &device)
