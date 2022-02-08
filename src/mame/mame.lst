@@ -14896,9 +14896,11 @@ hotpinbl                        // (c) 1995 Comad & New Japan System
 gamate                          // Bit Corp Gamate
 
 @source:gambl186.cpp
-gambl186                        // unknown
-gambl186a                       // unknown
-gambl186b                       // unknown
+gambl186                        // EGD
+gambl186a                       // EGD
+gambl186b                       // EGD
+gambl186c                       // EGD
+gambl186d                       // EGD
 
 @source:gamecom.cpp
 gamecom                         // Tiger Game.com
