@@ -2545,6 +2545,8 @@ files {
 	MAME_DIR .. "src/mame/machine/k573fpga.h",
 	MAME_DIR .. "src/mame/machine/k573kara.cpp",
 	MAME_DIR .. "src/mame/machine/k573kara.h",
+	MAME_DIR .. "src/mame/machine/k573mcal.cpp",
+	MAME_DIR .. "src/mame/machine/k573mcal.h",
 	MAME_DIR .. "src/mame/machine/k573mcr.cpp",
 	MAME_DIR .. "src/mame/machine/k573mcr.h",
 	MAME_DIR .. "src/mame/machine/k573msu.cpp",
