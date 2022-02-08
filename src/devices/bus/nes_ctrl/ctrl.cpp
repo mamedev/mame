@@ -185,6 +185,7 @@ void nes_control_port1_devices(device_slot_interface &device)
 	device.option_add("4score_p1p3", NES_4SCORE_P1P3);
 	device.option_add("miracle_piano", NES_MIRACLE);
 	device.option_add("snes_adapter", NES_SNESADAPTER);
+	device.option_add("vboy", NES_VBOYCTRL);
 }
 
 void nes_control_port2_devices(device_slot_interface &device)
@@ -195,6 +196,7 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("powerpad", NES_POWERPAD);
 	device.option_add("4score_p2p4", NES_4SCORE_P2P4);
 	device.option_add("snes_adapter", NES_SNESADAPTER);
+	device.option_add("vboy", NES_VBOYCTRL);
 }
 
 void fc_control_port1_devices(device_slot_interface &device)

@@ -79368,6 +79368,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="candesto" supported="partial"> <!-- Restore/Options not yet supported -->
+		<description>Candelabra - Estoscerro</description>
+		<year>2020</year> <!-- cartridge release year -->
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="candelabra - estoscerro.prg" size="524288" crc="acc3e3df" sha1="6b929e2aaaf31b6bcddf530f608612aa5826632f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Author self-published through mail order, carts made by RetroZone -->
 	<software name="et">
 		<description>E.T.</description>
