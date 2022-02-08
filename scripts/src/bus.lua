@@ -3735,6 +3735,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/epson_qx/option.h,BUSES["EPSON_QX"] = true
+---------------------------------------------------
+if (BUSES["EPSON_QX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/pce/pce_slot.h,BUSES["PCE"] = true
 ---------------------------------------------------
 if (BUSES["PCE"]~=null) then
