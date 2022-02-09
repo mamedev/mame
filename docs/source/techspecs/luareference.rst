@@ -1363,6 +1363,42 @@ space:read_range(start, end, width, [step])
     Reads a range of addresses as a binary string.  The end address must be
     greater than or equal to the start address.  The width must be 8, 16, 30 or
     64.  If the step is provided, it must be a positive number of elements.
+space:add_change_notifier(callback)
+    Adds a
+    :ref:`handler change subscription <luareference-mem-spacechangenotif>` to
+    the address space.  The callback function is passed a single string as an
+    argument, either ``r`` if read handlers have potentially changed, ``w`` if
+    write handlers have potentially changed, or ``rw`` if both read and write
+    handlers have potentially changed.
+
+    Note that handler change subscriptions must be explicitly removed before the
+    emulation session ends.
+space:install_read_tap(start, end, name, callback)
+    Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
+    receive notifications on reads from the specified range of addresses in the
+    address space.  The start and end addresses are inclusive.  The name must be
+    a string, and the callback must be a function.
+
+    The callback is passed three arguments for the access offset, the data read,
+    and the memory access mask.  To modify the data being read, return the
+    modified value from the callback function as an integer.  If the callback
+    does not return an integer, the data will not be modified.
+
+    Note that pass-through handlers must be explicitly removed before the
+    emulation session ends.
+space:install_write_tap(start, end, name, callback)
+    Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
+    receive notifications on write to the specified range of addresses in the
+    address space.  The start and end addresses are inclusive.  The name must be
+    a string, and the callback must be a function.
+
+    The callback is passed three arguments for the access offset, the data
+    written, and the memory access mask.  To modify the data being written,
+    return the modified value from the callback function as an integer.  If the
+    callback does not return an integer, the data will not be modified.
+
+    Note that pass-through handlers must be explicitly removed before the
+    emulation session ends.
 
 Properties
 ^^^^^^^^^^
@@ -1386,6 +1422,76 @@ space.endianness (read-only)
 space.map (read-only)
     The configured :ref:`address map <luareference-mem-map>` for the space or
     ``nil``.
+
+.. _luareference-mem-spacechangenotif:
+
+Address space change notifier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tracks a subscription to :ref:`address space <luareference-mem-space>` handler
+changes.  Note that you must remove subscriptions before the emulation session
+ends.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].spaces[name]:add_change_notifier(callback)
+    Adds a handler change subscriptions to an
+    :ref:`address space <luareference-mem-space>`.
+
+Methods
+^^^^^^^
+
+notifier:remove()
+    Removes the notification subscription.  The associated callback will not be
+    called on future handler changes for the address space.
+
+.. _luareference-mem-tap:
+
+Pass-through handler
+~~~~~~~~~~~~~~~~~~~~
+
+Tracks a pass-through handler installed in an
+:ref:`address space <luareference-mem-space>`.  A memory pass-through handler
+receives notifications on accesses to a specified range of addresses, and can
+modify the data that is read or written if desired.  Note that you must remove
+pass-through handlers before the emulation session ends.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].spaces[name]:install_read_tap(start, end, name, callback)
+    Installs a pass-through handler that will receive notifications on reads
+    from the specified range of addresses in an
+    :ref:`address space <luareference-mem-space>`.
+manager.machine.devices[tag].spaces[name]:install_write_tap(start, end, name, callback)
+    Installs a pass-through handler that will receive notifications on writes to
+    the specified range of addresses in an
+    :ref:`address space <luareference-mem-space>`.
+
+Methods
+^^^^^^^
+
+passthrough:reinstall()
+    Reinstalls the pass-through handler in the address space.  May be necessary
+    if the handler is removed due to other changes to handlers in the address
+    space.
+passthrough:remove()
+    Removes the pass-through handler from the address space.  The associated
+    callback will not be called in response to future memory accesses.
+
+Properties
+^^^^^^^^^^
+
+passthrough.addrstart (read-only)
+    The inclusive start address of the address range monitored by the
+    pass-through handler (i.e. the lowest address that the handler will be
+    notified for).
+passthrough.addrend (read-only)
+    The inclusive end address of the address range monitored by the pass-through
+    handler (i.e. the highest address that the handler will be notified for).
+passthrough.name (read-only)
+    The display name for the pass-through handler.
 
 .. _luareference-mem-map:
 
@@ -3140,8 +3246,8 @@ Wraps MAME’s ``parsed_expression`` class, which represents a tokenised debugge
 expression.  Note that parsed expressions can be created and used even when the
 debugger is not enabled.
 
-Intantiation
-^^^^^^^^^^^^
+Instantiation
+^^^^^^^^^^^^^
 
 emu.parsed_expression(symbols)
     Creates an empty expression that will use the supplied

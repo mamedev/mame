@@ -22,18 +22,19 @@
 //  debug_breakpoint - constructor
 //-------------------------------------------------
 
-debug_breakpoint::debug_breakpoint(device_debug* debugInterface,
-										symbol_table &symbols,
-										int index,
-										offs_t address,
-										const char *condition,
-										const char *action)
-	: m_debugInterface(debugInterface),
-		m_index(index),
-		m_enabled(true),
-		m_address(address),
-		m_condition(symbols, (condition != nullptr) ? condition : "1"),
-		m_action((action != nullptr) ? action : "")
+debug_breakpoint::debug_breakpoint(
+		device_debug *debugInterface,
+		symbol_table &symbols,
+		int index,
+		offs_t address,
+		const char *condition,
+		const char *action) :
+	m_debugInterface(debugInterface),
+	m_index(index),
+	m_enabled(true),
+	m_address(address),
+	m_condition(symbols, condition ? condition : "1"),
+	m_action(action ? action : "")
 {
 }
 
@@ -59,7 +60,7 @@ bool debug_breakpoint::hit(offs_t pc)
 		{
 			return (m_condition.execute() != 0);
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
 			return false;
 		}
@@ -78,27 +79,28 @@ bool debug_breakpoint::hit(offs_t pc)
 //  debug_watchpoint - constructor
 //-------------------------------------------------
 
-debug_watchpoint::debug_watchpoint(device_debug* debugInterface,
-										symbol_table &symbols,
-										int index,
-										address_space &space,
-										read_or_write type,
-										offs_t address,
-										offs_t length,
-										const char *condition,
-										const char *action)
-	: m_debugInterface(debugInterface),
-	  m_phr(nullptr),
-	  m_phw(nullptr),
-	  m_space(space),
-	  m_index(index),
-	  m_enabled(true),
-	  m_type(type),
-	  m_address(address & space.addrmask()),
-	  m_length(length),
-	  m_condition(symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : ""),
-	  m_installing(false)
+debug_watchpoint::debug_watchpoint(
+		device_debug* debugInterface,
+		symbol_table &symbols,
+		int index,
+		address_space &space,
+		read_or_write type,
+		offs_t address,
+		offs_t length,
+		const char *condition,
+		const char *action) :
+	m_debugInterface(debugInterface),
+	m_phr(nullptr),
+	m_phw(nullptr),
+	m_space(space),
+	m_index(index),
+	m_enabled(true),
+	m_type(type),
+	m_address(address & space.addrmask()),
+	m_length(length),
+	m_condition(symbols, condition ? condition : "1"),
+	m_action(action ? action : ""),
+	m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
@@ -170,12 +172,14 @@ debug_watchpoint::debug_watchpoint(device_debug* debugInterface,
 	}
 
 	install(read_or_write::READWRITE);
-	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
-												 if (m_enabled)
-												 {
-													 install(mode);
-												 }
-											 });
+	m_notifier = m_space.add_change_notifier(
+			[this] (read_or_write mode)
+			{
+				if (m_enabled)
+				{
+					install(mode);
+				}
+			});
 }
 
 debug_watchpoint::~debug_watchpoint()
