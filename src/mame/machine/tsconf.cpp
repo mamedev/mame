@@ -790,7 +790,7 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				{
 					strcpy((char *)m_fx, "M.A.M.E.");
 					PAIR16 m_ver;
-					m_ver.w = ((22 << 9) | (01 << 5) | 19); // y.m.d
+					m_ver.w = ((22 << 9) | (02 << 5) | 8); // y.m.d
 					m_fx[0x0c] = m_ver.b.l;
 					m_fx[0x0d] = m_ver.b.h;
 					break;
