@@ -41,7 +41,7 @@ static constexpr int KSM_DISP_VERT = 250;
 
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

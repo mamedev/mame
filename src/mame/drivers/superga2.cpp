@@ -18,14 +18,16 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "video/apple2.h"
 
 #include "cpu/m6502/m6502.h"
+
 #include "machine/74259.h"
 #include "machine/apple2common.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+
 #include "sound/spkrdev.h"
-#include "video/apple2.h"
 
 #include "screen.h"
 #include "speaker.h"
