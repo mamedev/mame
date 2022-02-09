@@ -7,7 +7,7 @@ Bally MPU A084-91786-AH06 (6803)
 
 First generation 6803 has 4x 7-digit displays, and a 6-digit display for the credits/balls (only
  4 digits are visible).
-Then, the 2nd generation replaced all that with 4x 7-letter alphanumeric displays lined up along
+Then, the 2nd generation replaced all that with 2x 14-letter alphanumeric displays lined up along
  the bottom of the backbox. They show scores, moving messages, and anything else that's needed.
  This also meant a more informative setup mode.
 
@@ -269,9 +269,11 @@ WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
 {
 	if (state)
 	{
-		// comma info is available in m_pia1_a at this time.
-		m_digits[m_digit] = m_segment[0];
-		m_digits[m_digit+16] = m_segment[1];
+		for (u8 i = 0; i < 2; i++)
+		{
+			u16 t = bitswap<10>(u16(m_segment[i]), 0, 0, 7, 7, 6, 5, 4, 3, 2, 1);
+			m_digits[m_digit+i*20] = t;
+		}
 	}
 }
 
@@ -303,12 +305,12 @@ void by6803_state::pia0a_w(u8 data)
 	if ((data & 15)==14)
 	{
 		m_digit = data >> 4;
-		m_segment[0] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
+		m_segment[0] = m_pia1_a ^ 1;
 	}
 	else
 	if ((data & 15)==13)
 	{
-		m_segment[1] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
+		m_segment[1] = m_pia1_a ^ 1;
 	}
 }
 
