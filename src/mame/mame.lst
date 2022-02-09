@@ -41563,6 +41563,7 @@ tmntu                           // GX963 (c) 1989 (US)
 tmntua                          // GX963 (c) 1989 (US)
 tmntub                          // GX963 (c) 1989 (US)
 tmntuc                          // GX963 (c) 1989 (US)
+tmntucbl                        // bootleg
 trigon                          // GX939 (c) 1990 (Japan)
 
 @source:tmspoker.cpp
