@@ -263,6 +263,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_60311c",       BMC_60311C },
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
+	{ "bmc_82ab",         BMC_82AB },
 	{ "bmc_830425c",      BMC_830425C },
 	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
