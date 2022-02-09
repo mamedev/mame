@@ -19,20 +19,23 @@ public:
 		konamigx_state(mconfig, type, tag),
 		m_k054321(*this, "k054321"),
 		m_gx_workram(*this, "gx_workram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void martchmp(machine_config &config);
 	void mystwarr(machine_config &config);
 	void dadandrn(machine_config &config);
 	void viostorm(machine_config &config);
+	void viostormbl(machine_config &config);
 	void gaiapols(machine_config &config);
 	void metamrph(machine_config &config);
 
 private:
-	required_device<k054321_device> m_k054321;
+	optional_device<k054321_device> m_k054321;
 	required_shared_ptr<uint16_t> m_gx_workram;
 	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_memory_bank m_okibank; // for viostormabbl
 	std::unique_ptr<uint8_t[]> m_decoded;
 
 	uint8_t m_mw_irq_control;
@@ -81,6 +84,7 @@ private:
 	DECLARE_VIDEO_START(mystwarr);
 	DECLARE_MACHINE_RESET(viostorm);
 	DECLARE_VIDEO_START(viostorm);
+	DECLARE_MACHINE_START(viostormbl);
 	DECLARE_MACHINE_RESET(metamrph);
 	DECLARE_VIDEO_START(metamrph);
 	DECLARE_MACHINE_RESET(dadandrn);
@@ -113,5 +117,7 @@ private:
 	void metamrph_map(address_map &map);
 	void mystwarr_map(address_map &map);
 	void mystwarr_sound_map(address_map &map);
+	void oki_map(address_map &map); // for viostormabbl
 	void viostorm_map(address_map &map);
+	void viostormbl_map(address_map &map);
 };

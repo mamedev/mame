@@ -33,10 +33,10 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
-	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
+	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; }
 
 	// Sets the default Programming Interface (PIF) register
-	void set_pif(int val) { m_pif = val & 0xff; };
+	void set_pif(int val) { m_pif = val & 0xff; }
 
 protected:
 	virtual void device_start() override;

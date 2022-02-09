@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	spectrum_specmate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_INPUT_CHANGED_MEMBER(freeze_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); };
+	DECLARE_INPUT_CHANGED_MEMBER(freeze_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); }
 
 protected:
 	// device-level overrides
@@ -40,9 +40,9 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 	// passthru
-	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); };
-	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); };
-	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); };
+	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
+	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); }
+	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); }
 	virtual void mreq_w(offs_t offset, uint8_t data) override { if (m_exp->romcs()) m_exp->mreq_w(offset, data); }
 	virtual uint8_t iorq_r(offs_t offset) override { return m_exp->iorq_r(offset); }
 	virtual void iorq_w(offs_t offset, uint8_t data) override { m_exp->iorq_w(offset, data); }

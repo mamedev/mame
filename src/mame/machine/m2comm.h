@@ -42,7 +42,7 @@ public:
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 
-	void set_frameoffset(uint16_t offset) { m_frameoffset = offset; };
+	void set_frameoffset(uint16_t offset) { m_frameoffset = offset; }
 
 protected:
 	// device-level overrides

@@ -478,7 +478,7 @@ void abc1600_state::spec_contr_reg_w(uint8_t data)
 
 void abc1600_state::abc1600_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).m(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::map));
+	map(0x00000, 0xfffff).rw(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
 }
 
 
@@ -785,6 +785,13 @@ static void abc1600_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
+void abc1600_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC1600_FORMAT);
+}
+
+
 
 //-------------------------------------------------
 //  ABC1600BUS_INTERFACE( abcbus_intf )
@@ -796,6 +803,13 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 	{
 		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
 	}
+}
+
+void abc1600_state::buserr_w(offs_t offset, uint8_t data)
+{
+	m_maincpu->set_buserror_details(offset, data, m_maincpu->get_fc());
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 
@@ -823,6 +837,7 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_bus0));
 	save_item(NAME(m_csb));
 	save_item(NAME(m_atce));
+	save_item(NAME(m_btce));
 	save_item(NAME(m_sccrq_a));
 	save_item(NAME(m_sccrq_b));
 	save_item(NAME(m_scc_irq));
@@ -870,7 +885,7 @@ void abc1600_state::abc1600(machine_config &config)
 	ABC1600_MAC(config, m_mac, 0);
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
 	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_base_device::get_fc));
-	m_mac->buserr_cb().set_inputline(m_maincpu, M68K_LINE_BUSERROR);
+	m_mac->buserr_cb().set(FUNC(abc1600_state::buserr_w));
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
@@ -955,9 +970,9 @@ void abc1600_state::abc1600(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", abc1600_state::floppy_formats).enable_sound(true);
 
 	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

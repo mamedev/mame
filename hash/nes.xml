@@ -52139,6 +52139,36 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_4jy16">
+		<description>1995 Super HiK 4 in 1 (JY-016)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="jy830623c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-016).prg" size="524288" crc="843f9a6b" sha1="4b80da18c37e0ff351333f0b660a51e1e5a4c160" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1995 super hik 4-in-1 (jy-016).chr" size="1048576" crc="afa3e3b8" sha1="80d4d42179505448f436558880cb5966d6fe863d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4jy17">
+		<description>1995 Super HiK 4 in 1 (JY-017)</description>
+		<year>1995</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="jy830623c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1995 super hik 4-in-1 (jy-017).prg" size="524288" crc="92b53816" sha1="21e5467a0108bb5f6a2911b17a24875a5cc2c70e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1995 super hik 4-in-1 (jy-017).chr" size="1048576" crc="4c2b11f3" sha1="f24da433a562945d9c4aeb55cc375bdd05284b07" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy18">
 		<description>1996 Super HiK 4 in 1 (JY-018)</description>
 		<year>1996</year>
@@ -66504,8 +66534,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="262144">
 				<rom name="dragon ball z - super butoden 2 (199x)(-)(as)[p][a mapper 91].chr" size="262144" crc="589aa731" sha1="f49e24a9bc277065f6ac2132233bdbcb3df7163e" offset="00000" status="baddump" />
 			</dataarea>
@@ -75660,8 +75689,7 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="131072">
 				<rom name="super mario &amp; sonic 2 (as).chr" size="131072" crc="275e90da" sha1="b54ef68bbd5f7a3ff82cc2891945fc3d5b9984f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -75952,8 +75980,7 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="65536">
 				<rom name="super mario kart raider (top rider hack)[p1].chr" size="65536" crc="efce7a4f" sha1="c96f07160658682ac5663e00fc2489e85cac5b13" offset="00000" status="baddump" />
 			</dataarea>
@@ -75968,8 +75995,7 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="32768">
 				<rom name="mario rider (unl).chr" size="32768" crc="8779113b" sha1="aaddb6a0702213923f89a693739652ee8c9c241d" offset="00000" status="baddump" />
 			</dataarea>
@@ -77615,8 +77641,7 @@ be better to redump them properly. -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Street Fighter III - Mari Turbo"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="524288">
 				<rom name="mari street fighter iii turbo (unl).chr" size="524288" crc="8f32eafb" sha1="cee57b353b6a6fd6d033a86bb83a5744dd0a02b4" offset="00000" status="baddump" />
 			</dataarea>
@@ -77921,8 +77946,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="262144">
 				<rom name="mortal kombat ii (original) [p1].chr" size="262144" crc="79e05969" sha1="dc95afb67aba1ebb6c7b6101d38810aaac383e1d" offset="00000" status="baddump" />
 			</dataarea>
@@ -78245,8 +78269,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="524288">
 				<rom name="street fighter iii (18 fighter) (unl).chr" size="524288" crc="2c40e304" sha1="3b868bd7404b6bb16740c280b4c80363eb66b014" offset="00000" status="baddump" />
 			</dataarea>
@@ -78261,8 +78284,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mk2" />
-			<feature name="pcb" value="UNL-MK2" />
+			<feature name="slot" value="jy830623c" />
 			<dataarea name="chr" size="524288">
 				<rom name="street fighter iii (9 fighter) (unl).chr" size="524288" crc="2c40e304" sha1="3b868bd7404b6bb16740c280b4c80363eb66b014" offset="00000" status="baddump" />
 			</dataarea>
@@ -79341,6 +79363,22 @@ be better to redump them properly. -->
 				<rom name="battle kid 2 - mountain of torment (v1.000).prg" size="524288" crc="74b823a1" sha1="dcd6870e0d5a79899dce11b975c8a16652fc7143" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="candesto" supported="partial"> <!-- Restore/Options not yet supported -->
+		<description>Candelabra - Estoscerro</description>
+		<year>2020</year> <!-- cartridge release year -->
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="candelabra - estoscerro.prg" size="524288" crc="acc3e3df" sha1="6b929e2aaaf31b6bcddf530f608612aa5826632f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>

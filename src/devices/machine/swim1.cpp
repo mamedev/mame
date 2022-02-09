@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "swim1.h"
 
-#include "cpu/m68000/m68000.h"
-
 DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak Integrated Machine) version 1 floppy controller")
 
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -69,8 +69,8 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
-	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

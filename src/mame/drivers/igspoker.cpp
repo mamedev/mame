@@ -2967,9 +2967,9 @@ void igspoker_state::init_pktet346()
 
 ROM_START( kungfu ) // IGS PCB N0- 0139
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "u23",          0x00000, 0x10000, CRC(53396dd3) SHA1(1bab42394f016f800dbd80603c70defc25380fd7) ) // missing label, probably 'kung fu 8'
-	ROM_LOAD( "kungfu-7.u22", 0x10000, 0x08000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, otherwise same as the other set
-	ROM_IGNORE(                        0x08000 )
+	ROM_LOAD( "kung fu v202n.u23", 0x00000, 0x10000, CRC(53396dd3) SHA1(1bab42394f016f800dbd80603c70defc25380fd7) )
+	ROM_LOAD( "kungfu-7.u22",      0x10000, 0x08000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, otherwise same as the other set
+	ROM_IGNORE(                             0x08000 )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "kungfu-4.u4", 0x00000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )

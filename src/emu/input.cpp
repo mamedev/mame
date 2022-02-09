@@ -1150,7 +1150,7 @@ input_seq input_manager::seq_clean(const input_seq &seq) const
 	{
 		// if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs
 		input_code code = seq[codenum];
-		if (!code.internal() && code_name(code).empty())
+		if (!code.internal() && (((code.device_index() > 0) && !m_class[code.device_class()]->multi()) || !item_from_code(code)))
 		{
 			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
 			{

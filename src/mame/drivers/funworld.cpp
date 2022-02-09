@@ -7702,6 +7702,9 @@ ROM_START( royalcrd_nes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "me2.bin", 0x0000, 0x10000, CRC(2144efab) SHA1(47fef8e0d2b05869e667731fdaf535722b9a8f19)) // this is one (or more?) Royal Card programs, with (c)1991 TAB Austria in them
 
+	ROM_REGION( 0x2000, "pic16c57", 0 )
+	ROM_LOAD( "pic.bin", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", 0 ) // these are (encrypted?) GFX ROMS
 	ROM_LOAD( "me3.bin", 0x00000, 0x10000, CRC(398a6f7c) SHA1(126048c75ab5df421f9dd2e39c6b68e15bf54f38) )
 	ROM_LOAD( "me4.bin", 0x10000, 0x10000, CRC(6f84222a) SHA1(eee8e46d464211914cb99d15fd9f7dd4aa009664) )

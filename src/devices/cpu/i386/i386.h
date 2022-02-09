@@ -1530,9 +1530,9 @@ public:
 	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); };
-	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); };
-	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); };
+	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); }
+	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); }
+	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); }
 
 	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
 	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;

@@ -558,7 +558,7 @@ protected:
 
 	virtual void vblank();
 
-	virtual void potgo_w(uint16_t data) {};
+	virtual void potgo_w(uint16_t data) {}
 
 	// joystick/mouse
 	virtual uint16_t joy0dat_r();

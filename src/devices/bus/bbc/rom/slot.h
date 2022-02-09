@@ -131,7 +131,7 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 	// decrypt data lines
-	virtual void decrypt_rom() { };
+	virtual void decrypt_rom() { }
 
 protected:
 	device_bbc_rom_interface(const machine_config &mconfig, device_t &device);

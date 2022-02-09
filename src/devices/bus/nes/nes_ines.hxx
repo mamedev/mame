@@ -123,7 +123,7 @@ static const nes_mmc mmc_list[] =
 	{ 88, NAMCOT_34X3 },
 	{ 89, SUNSOFT_2 },
 	{ 90, JYCOMPANY_A },
-	{ 91, UNL_MK2 },
+	{ 91, UNL_JY830623C },
 	{ 92, JALECO_JF19 },
 	{ 93, SUNSOFT_2 },
 	{ 94, STD_UN1ROM },
