@@ -130,13 +130,13 @@ void to_display(rectangle area, unsigned int &x, unsigned int &y)
 	}
 }
 
-void tsconf_state::spectrum_UpdateZxScreenBitmap(bool eof)
+void tsconf_state::spectrum_UpdateZxScreenBitmap()
 {
 	unsigned int to_x = m_screen->hpos();
 	unsigned int to_y = m_screen->vpos();
 	to_display(m_screen->visible_area(), to_x, to_y);
 
-	if ((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y) && !eof)
+	if ((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y))
 		return;
 
 	bitmap_ind16 *bm = &m_screen->curbitmap().as_ind16();
@@ -299,7 +299,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 	unsigned int from_x = m_previous_screen_x;
 	unsigned int from_y = m_previous_screen_y;
 
-	spectrum_UpdateZxScreenBitmap(false);
+	spectrum_UpdateZxScreenBitmap();
 	if (!BIT(m_regs[V_CONFIG], 5) && VM != VM_ZX)
 	{
 		to_display(screen, from_x, from_y);
@@ -610,59 +610,9 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	}
 
 	m_regs[nreg] = data;
-
-	// 3. Regular updates
+	// 3. Even same value must be processed
 	switch (nreg)
 	{
-	case V_CONFIG:
-	case V_PAGE:
-		if (val_changed)
-			tsconf_update_video_mode();
-		break;
-
-	case T_MAP_PAGE:
-		if (val_changed)
-		{
-			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
-			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
-		}
-		break;
-
-	case T0_G_PAGE:
-		if (val_changed)
-			m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(data));
-		break;
-
-	case T0_X_OFFSET_L:
-	case T0_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
-		break;
-
-	case T0_Y_OFFSET_L:
-	case T0_Y_OFFSET_H:
-		m_ts_tilemap[TM_TILES0]->set_scrolly(OFFS_512(T0_Y_OFFSET_L));
-		break;
-
-	case T1_G_PAGE:
-		if (val_changed)
-			m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(data));
-		break;
-
-	case T1_X_OFFSET_L:
-	case T1_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
-		break;
-
-	case T1_Y_OFFSET_L:
-	case T1_Y_OFFSET_H:
-		m_ts_tilemap[TM_TILES1]->set_scrolly(OFFS_512(T1_Y_OFFSET_L));
-		break;
-
-	case SG_PAGE:
-		if (val_changed)
-			m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data));
-		break;
-
 	case MEM_CONFIG:
 	case PAGE0:
 		tsconf_update_bank0();
@@ -720,6 +670,58 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		m_dma->start_tx(((BIT(data, 7) << 3) | (data & 0x07)), BIT(data, 5), BIT(data, 4), BIT(data, 3));
 		break;
 
+	default:
+		break;
+	}
+
+	// 3. Can skip update if value not changed
+	if (!val_changed)
+		return;
+
+	switch (nreg)
+	{
+	case V_CONFIG:
+	case V_PAGE:
+		tsconf_update_video_mode();
+		break;
+
+	case T_MAP_PAGE:
+		m_ts_tilemap[TM_TILES0]->mark_all_dirty();
+		m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+		break;
+
+	case T0_G_PAGE:
+		m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(data));
+		break;
+
+	case T0_X_OFFSET_L:
+	case T0_X_OFFSET_H:
+		m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
+		break;
+
+	case T0_Y_OFFSET_L:
+	case T0_Y_OFFSET_H:
+		m_ts_tilemap[TM_TILES0]->set_scrolly(OFFS_512(T0_Y_OFFSET_L));
+		break;
+
+	case T1_G_PAGE:
+		m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(data));
+		break;
+
+	case T1_X_OFFSET_L:
+	case T1_X_OFFSET_H:
+		m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
+		break;
+
+	case T1_Y_OFFSET_L:
+	case T1_Y_OFFSET_H:
+		m_ts_tilemap[TM_TILES1]->set_scrolly(OFFS_512(T1_Y_OFFSET_L));
+		break;
+
+	case SG_PAGE:
+		m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data));
+		break;
+
 	case SYS_CONFIG:
 		// 0 - 3.5MHz, 1 - 7MHz, 2 - 14MHz, 3 - reserved
 		m_maincpu->set_clock(3.5_MHz_XTAL * (1 << (data & 0x03)));
@@ -729,8 +731,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case HS_INT:
 	case VS_INT_L:
 	case VS_INT_H:
-		if (val_changed)
-			update_frame_timer();
+		update_frame_timer();
 		break;
 
 	case FMAPS:
@@ -876,7 +877,7 @@ void tsconf_state::dma_ready(int line)
 	if (BIT(m_regs[INT_MASK], 4))
 	{
 		m_maincpu->set_input_line_and_vector(line, ASSERT_LINE, 0xfb);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 	}
 }
 
@@ -889,7 +890,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		if (BIT(m_regs[INT_MASK], 0))
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 		break;
 	}
@@ -917,13 +918,13 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
 			// Not quite precise. Scanline can't be skipped.
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 		u16 vpos = OFFS_512(VS_INT_L);
 		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && m_regs[HS_INT] == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 		spectrum_UpdateScreenBitmap();
 		break;

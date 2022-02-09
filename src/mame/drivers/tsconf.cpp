@@ -59,7 +59,8 @@
   TODO:
   - Ram cache
   - VDos
-  - Many more...
+  - INTs not perfect. Currently all signals are invalidated after 32t(3.5MHz). Must only do so for frame, not scanline/DMA
+  - Palette change in the middle of the frame e.g. zapili-c0
 
  ****************************************************************************/
 

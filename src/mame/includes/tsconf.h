@@ -147,7 +147,7 @@ private:
 	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void spectrum_UpdateScreenBitmap(bool eof = false) override;
 	void spectrum_UpdateBorderBitmap() override;
-	void spectrum_UpdateZxScreenBitmap(bool eof);
+	void spectrum_UpdateZxScreenBitmap();
 	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_palette(palette_device &palette) const;
