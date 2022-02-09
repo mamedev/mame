@@ -119,6 +119,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("pal_zz",           NES_ZZ_PCB);
 	device.option_add_internal("nes_qj",           NES_QJ_PCB);
 	device.option_add_internal("nes_event",        NES_EVENT);
+	device.option_add_internal("nes_event2",       NES_EVENT2);
 // Discrete Components boards
 // IC_74x139x74
 	device.option_add_internal("discrete_74x139",  NES_74X139X74);

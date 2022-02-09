@@ -516,7 +516,7 @@ static const nes_mmc mmc_list[] =
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
-	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
+	{ 555, STD_EVENT2 },
 	// 556 JY-215 multicart
 	{ 557, UNL_LG25 },             // Moero TwinBee FDS conversion
 	// 558 some games on YC-03-09 board (related to mappers 162-164)

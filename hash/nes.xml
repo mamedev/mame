@@ -21110,11 +21110,12 @@ license:CC0
 	</software>
 
 	<software name="kungfuju" cloneof="kungfu">
-		<description>Kung Fu (Jpn, USA)</description><!-- Dump still to be confirmed from a Jpn cart -->
+		<description>Kung Fu (Japan, USA)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="HVC-KF"/>
 		<info name="serial" value="NES-SX-USA"/>
-		<info name="release" value="198510xx"/>
+		<info name="release" value="198510xx (USA)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
@@ -34585,7 +34586,7 @@ license:CC0
 	</software>
 
 	<software name="skykidj" cloneof="skykid">
-		<description>Sky Kid (Jpn)</description>
+		<description>SkyKid (Japan)</description>
 		<year>1986</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-NSK-3900 (18)"/>
@@ -34605,7 +34606,7 @@ license:CC0
 	</software>
 
 	<software name="skykid">
-		<description>Sky Kid (USA)</description>
+		<description>SkyKid (USA)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-SY-USA"/>
@@ -49095,6 +49096,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The dump is from the repro cart. It is unknown if it has been modified. -->
+	<software name="ncc91">
+		<description>Nintendo Campus Challenge 1991 (bootleg)</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
+		<info name="usage" value="To play, press start on controller 2."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nes_event2" />
+			<dataarea name="prg" size="524288">
+				<rom name="0.prg" size="524288" crc="61a6741d" sha1="ece5c65a80c9594696408528ddbbe53ddeb20b8e" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="nwc.chr" size="262144" crc="3722904a" sha1="f88d7886bc0f9a7f93c1760130e311d4ab38ecfb" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 10k WRAM on cartridge (8k + 2k) -->
+			<dataarea name="wram" size="10240">
 			</dataarea>
 		</part>
 	</software>
