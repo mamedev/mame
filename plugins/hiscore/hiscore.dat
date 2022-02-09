@@ -7592,12 +7592,18 @@ gtmr2u:
 ;gtmra:******1000 Miglia: Great 1000 Miles Rally (94/06/13)
 gtmr:
 gtmra:
-@:maincpu,program,102df2,19e,59,80
+@:maincpu,program,102df2,1a0,59,01
+
+
+;******1000 Miglia: Great 1000 Miles Rally (94/05/..)
+gtmrb:
+gtmro:
+@:maincpu,program,102dee,1a0,59,01
 
 
 gtmre:
 gtmrusa:
-@:maincpu,program,1035fa,19e,59,80
+@:maincpu,program,1035fa,1a0,59,01
 
 
 ;@s:kangaroo.cpp
