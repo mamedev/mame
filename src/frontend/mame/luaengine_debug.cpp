@@ -30,6 +30,78 @@ struct wrap_textbuf
 };
 
 
+class symbol_table_wrapper
+{
+public:
+	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
+
+	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+		: m_table(machine, parent ? &parent->table() : nullptr, device)
+		, m_parent(parent)
+	{
+	}
+
+	symbol_table &table() { return m_table; }
+	symbol_table const &table() const { return m_table; }
+	std::shared_ptr<symbol_table_wrapper> const &parent() { return m_parent; }
+
+	symbol_entry &add(char const *name) { return m_table.add(name, symbol_table::READ_WRITE); }
+	symbol_entry &add(char const *name, u64 value) { return m_table.add(name, value); }
+	symbol_entry *find(char const *name) const { return m_table.find(name); }
+	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
+
+	u64 value(const char *symbol) { return m_table.value(symbol); }
+	void set_value(const char *symbol, u64 value) { m_table.set_value(symbol, value); }
+
+private:
+	symbol_table m_table;
+	std::shared_ptr<symbol_table_wrapper> const m_parent;
+};
+
+
+class expression_wrapper
+{
+public:
+	expression_wrapper(expression_wrapper const &) = delete;
+	expression_wrapper &operator=(expression_wrapper const &) = delete;
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable)
+		: m_expression(symtable->table())
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
+		: m_expression(symtable->table(), expression, default_base)
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
+		: m_expression(symtable->table(), expression)
+		, m_symbols(symtable)
+	{
+	}
+
+	void set_default_base(int base) { m_expression.set_default_base(base); }
+	void parse(char const *string) { m_expression.parse(string); }
+	u64 execute() { return m_expression.execute(); }
+	bool is_empty() const { return m_expression.is_empty(); }
+	char const *original_string() const { return m_expression.original_string(); }
+	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
+
+	void set_symbols(std::shared_ptr<symbol_table_wrapper> const &symtable)
+	{
+		m_expression.set_symbols(symtable->table());
+		m_symbols = symtable;
+	}
+
+private:
+	parsed_expression m_expression;
+	std::shared_ptr<symbol_table_wrapper> m_symbols;
+};
+
+
 template <bool Enable>
 sol::object do_breakpoint_enable(device_debug &dev, sol::this_state s, sol::object index)
 {
@@ -106,12 +178,12 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "m", EXPSPACE_REGION }
 	};
 
-	auto const do_add_symbol = [this] (symbol_table &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format)
+	auto const do_add_symbol = [this] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format) -> symbol_entry &
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
 			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
-		st.add(
+		return st.table().add(
 				name,
 				[this, cbfunc = std::move(getter)] () -> u64
 				{
@@ -130,46 +202,50 @@ void lua_engine::initialize_debug(sol::table &emu)
 				(format && *format) ? *format : "");
 	};
 
-	auto symbol_table_type = emu.new_usertype<symbol_table>(
+	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
 			"symbol_table",
 			sol::call_constructor, sol::factories(
-				[] (running_machine &machine, symbol_table *parent, device_t *device) { return std::make_unique<symbol_table>(machine, parent, device); },
-				[] (running_machine &machine, symbol_table *parent) { return std::make_unique<symbol_table>(machine, parent); },
-				[] (running_machine &machine, device_t &device) { return std::make_unique<symbol_table>(machine, nullptr, &device); },
-				[] (running_machine &machine) { return std::make_unique<symbol_table>(machine); }));
+				[] (running_machine &machine)
+				{ return std::make_shared<symbol_table_wrapper>(machine, nullptr, nullptr); },
+				[] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, device); },
+				[] (std::shared_ptr<symbol_table_wrapper> const &parent)
+				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, nullptr); },
+				[] (device_t &device)
+				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
 	symbol_table_type["set_memory_modified_func"] =
-			[this] (symbol_table &st, sol::object cb)
+			[this] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
-					st.set_memory_modified_func(nullptr);
+					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			};
 	symbol_table_type["add"] = sol::overload(
-			[] (symbol_table &st, char const *name) { st.add(name, symbol_table::READ_WRITE); },
-			static_cast<void (symbol_table::*)(char const *, u64)>(&symbol_table::add),
+			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *)>(&symbol_table_wrapper::add),
+			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *, u64)>(&symbol_table_wrapper::add),
 			do_add_symbol,
-			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format)
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format) -> symbol_entry &
 			{
-				do_add_symbol(st, name, getter, std::nullopt, format);
+				return do_add_symbol(st, name, getter, std::nullopt, format);
 			},
-			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter)
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter) -> symbol_entry &
 			{
-				do_add_symbol(st, name, getter, setter, nullptr);
+				return do_add_symbol(st, name, getter, setter, nullptr);
 			},
-			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter, char const *format)
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, char const *format) -> symbol_entry &
 			{
-				do_add_symbol(st, name, getter, std::nullopt, format);
+				return do_add_symbol(st, name, getter, std::nullopt, format);
 			},
-			[do_add_symbol] (symbol_table &st, char const *name, sol::protected_function getter)
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter) -> symbol_entry &
 			{
-				do_add_symbol(st, name, getter, std::nullopt, nullptr);
+				return do_add_symbol(st, name, getter, std::nullopt, nullptr);
 			},
-			[this] (symbol_table &st, char const *name, int minparams, int maxparams, sol::protected_function execute)
+			[this] (symbol_table_wrapper &st, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
 			{
-				st.add(
+				return st.table().add(
 						name,
 						minparams,
 						maxparams,
@@ -185,41 +261,40 @@ void lua_engine::initialize_debug(sol::table &emu)
 							return result ? *result : 0;
 						});
 			});
-	symbol_table_type["find"] = &symbol_table::find;
-	symbol_table_type["find_deep"] = &symbol_table::find_deep;
-	symbol_table_type["value"] = &symbol_table::value;
-	symbol_table_type["set_value"] = &symbol_table::set_value;
+	symbol_table_type["find"] = &symbol_table_wrapper::find;
+	symbol_table_type["find_deep"] = &symbol_table_wrapper::find_deep;
+	symbol_table_type["value"] = &symbol_table_wrapper::value;
+	symbol_table_type["set_value"] = &symbol_table_wrapper::set_value;
 	symbol_table_type["memory_value"] =
-			[] (symbol_table &st, char const *name, char const *space, u32 offset, int size, bool disable_se)
+			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, bool disable_se)
 			{
 				expression_space const es = s_expression_space_parser(space);
-				return st.memory_value(name, es, offset, size, disable_se);
+				return st.table().memory_value(name, es, offset, size, disable_se);
 			};
 	symbol_table_type["set_memory_value"] =
-			[] (symbol_table &st, char const *name, char const *space, u32 offset, int size, u64 value, bool disable_se)
+			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, u64 value, bool disable_se)
 			{
 				expression_space const es = s_expression_space_parser(space);
-				st.set_memory_value(name, es, offset, size, value, disable_se);
+				st.table().set_memory_value(name, es, offset, size, value, disable_se);
 			};
 	//symbol_table_type["read_memory"] = &symbol_table::read_memory; crashes if you try to use it, need to work out why
 	//symbol_table_type["write_memory"] = &symbol_table::write_memory; crashes if you try to use it, need to work out why
-	symbol_table_type["entries"] = sol::property([] (symbol_table const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.entries()); });
-	symbol_table_type["parent"] = sol::property(&symbol_table::parent);
+	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
+	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
 
 
-	auto parsed_expression_type = emu.new_usertype<parsed_expression>(
+	auto parsed_expression_type = emu.new_usertype<expression_wrapper>(
 			"parsed_expression",
-			sol::call_constructor, sol::factories(
-				[] (symbol_table &symtable) { return std::make_unique<parsed_expression>(symtable); },
-				[] (symbol_table &symtable, char const *expression, int default_base) { return std::make_unique<parsed_expression>(symtable, expression, default_base); },
-				[] (symbol_table &symtable, char const *expression) { return std::make_unique<parsed_expression>(symtable, expression); },
-				[] (parsed_expression const &src) { return std::make_unique<parsed_expression>(src); }));
-	parsed_expression_type["set_default_base"] = &parsed_expression::set_default_base;
-	parsed_expression_type["parse"] = [] (parsed_expression &e, char const *string) { e.parse(string); };
-	parsed_expression_type["execute"] = &parsed_expression::execute;
-	parsed_expression_type["is_empty"] = sol::property(&parsed_expression::is_empty);
-	parsed_expression_type["original_string"] = sol::property(&parsed_expression::original_string);
-	parsed_expression_type["symbols"] = sol::property(&parsed_expression::symbols, &parsed_expression::set_symbols);
+			sol::call_constructor, sol::constructors<
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &),
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *, int),
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *)>());
+	parsed_expression_type["set_default_base"] = &expression_wrapper::set_default_base;
+	parsed_expression_type["parse"] = &expression_wrapper::parse;
+	parsed_expression_type["execute"] = &expression_wrapper::execute;
+	parsed_expression_type["is_empty"] = sol::property(&expression_wrapper::is_empty);
+	parsed_expression_type["original_string"] = sol::property(&expression_wrapper::original_string);
+	parsed_expression_type["symbols"] = sol::property(&expression_wrapper::symbols, &expression_wrapper::set_symbols);
 
 
 	auto symbol_entry_type = sol().registry().new_usertype<symbol_entry>("symbol_entry", sol::no_constructor);
