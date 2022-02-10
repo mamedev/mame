@@ -280,37 +280,42 @@ void vsnes_state::gun_in0_w(uint8_t data)
 		int x = ioport("GUNX")->read();
 		int y = ioport("GUNY")->read();
 
-		// effective range picked up by photodiode, i.e. gun position +- radius
-		constexpr int xrad = 0;
-		constexpr int yrad = 0;
+		// radius of circle picked up by the gun's photodiode
+		constexpr int radius = 5;
 		// brightness threshold
-		constexpr int bright = 0x70;
+		constexpr int bright = 0xc0;
 		// # of CRT scanlines that sustain brightness
-		constexpr int sustain = 20;
+		constexpr int sustain = 22;
 
 		int vpos = m_ppu1->screen().vpos();
 		int hpos = m_ppu1->screen().hpos();
 
 		// update the screen if necessary
 		if (!m_ppu1->screen().vblank())
-			if (vpos > y - yrad || (vpos == y - yrad && hpos >= x - xrad))
+			if (vpos > y - radius || (vpos == y - radius && hpos >= x - radius))
 				m_ppu1->screen().update_now();
 
-		// check brightness of pixels nearby the gun position
-		for (int i = x - xrad; i <= x + xrad; i++)
-			for (int j = y - yrad; j <= y + yrad; j++)
-			{
-				rgb_t pix = m_ppu1->screen().pixel(i, j);
+		int sum = 0;
+		int scanned = 0;
 
-				// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
-				// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
-				if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos) && pix.brightness() >= bright)
+		// sum brightness of pixels nearby the gun position
+		for (int i = x - radius; i <= x + radius; i++)
+			for (int j = y - radius; j <= y + radius; j++)
+				// look at pixels within circular sensor
+				if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius)
 				{
-					m_input_latch[0] |= 0x40;
-					i = x + xrad;
-					break;
+					rgb_t pix = m_ppu1->screen().pixel(i, j);
+
+					// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
+					// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
+					if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
+						sum += pix.r() + pix.g() + pix.b();
+					scanned++;
 				}
-			}
+
+		// light detected if average brightness is above threshold
+		if (sum >= bright * scanned)
+			m_input_latch[0] |= 0x40;
 	}
 
 	m_input_strobe[0] = data;
