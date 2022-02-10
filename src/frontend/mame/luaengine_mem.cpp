@@ -205,21 +205,19 @@ public:
 		: m_callback(std::move(callback))
 		, m_engine(engine)
 		, m_space(space)
-		, m_handler(nullptr)
+		, m_handler()
 		, m_name(std::move(name))
 		, m_start(start)
 		, m_end(end)
 		, m_mode(mode)
-		, m_installing(false)
-		, m_installed(false)
+		, m_installing(0U)
 	{
 		reinstall();
 	}
 
 	~tap_helper()
 	{
-		if (m_handler && m_installed)
-			m_handler->remove();
+		remove();
 	}
 
 	offs_t start() const noexcept { return m_start; }
@@ -239,11 +237,9 @@ public:
 
 	void remove()
 	{
-		if (m_handler)
-		{
-			m_handler->remove();
-			m_installed = false;
-		}
+		++m_installing;
+		m_handler.remove();
+		--m_installing;
 	}
 
 private:
@@ -252,9 +248,8 @@ private:
 	{
 		if (m_installing)
 			return;
-		m_installing = true;
-		if (m_handler)
-			m_handler->remove();
+		++m_installing;
+		m_handler.remove();
 
 		switch (m_mode)
 		{
@@ -269,7 +264,7 @@ private:
 						if (result)
 							data = *result;
 					},
-					m_handler);
+					&m_handler);
 			break;
 		case read_or_write::WRITE:
 			m_handler = m_space.install_write_tap(
@@ -282,27 +277,25 @@ private:
 						if (result)
 							data = *result;
 					},
-					m_handler);
+					&m_handler);
 			break;
 		case read_or_write::READWRITE:
 			// won't ever get here, but compilers complain about unhandled enum value
 			break;
 		}
 
-		m_installed = true;
-		m_installing = false;
+		--m_installing;
 	};
 
 	sol::protected_function m_callback;
 	lua_engine &m_engine;
 	address_space &m_space;
-	memory_passthrough_handler *m_handler;
+	memory_passthrough_handler m_handler;
 	std::string m_name;
 	offs_t const m_start;
 	offs_t const m_end;
 	read_or_write const m_mode;
-	bool m_installing;
-	bool m_installed;
+	unsigned m_installing;
 };
 
 

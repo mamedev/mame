@@ -292,9 +292,9 @@ public:
 	using address_space::install_write_tap;
 	using address_space::install_readwrite_tap;
 
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph) override;
 
 	// construction/destruction
 	address_space_specific(memory_manager &manager, device_memory_interface &memory, int spacenum, int address_width)
@@ -1084,73 +1084,78 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	view.make_subdispatch(""); // Must be called after populate
 }
 
-memory_passthrough_handler *address_space::make_mph()
+std::shared_ptr<emu::detail::memory_passthrough_handler_impl> address_space::make_mph(memory_passthrough_handler *mph)
 {
-	m_mphs.emplace_back(std::make_unique<memory_passthrough_handler>(*this));
-	return m_mphs.back().get();
+	if (mph)
+	{
+		auto impl(mph->m_impl.lock());
+		if (impl)
+		{
+			assert(&impl->m_space == this);
+			return impl;
+		}
+	}
+	return m_mphs.emplace_back(std::make_shared<emu::detail::memory_passthrough_handler_impl>(*this));
 }
 
 //-------------------------------------------------
 //  install_read_tap - install a read tap on the bus
 //-------------------------------------------------
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler address_space_specific<Level, Width, AddrShift, Endian>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_read_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = make_mph();
+	auto impl = make_mph(mph);
 
-	auto handler = new handler_entry_read_tap<Width, AddrShift>(this, *mph, name, tap);
+	auto handler = new handler_entry_read_tap<Width, AddrShift>(this, *impl, name, tap);
 	m_root_read->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
 	invalidate_caches(read_or_write::READ);
 
-	return mph;
+	return impl;
 }
 
 //-------------------------------------------------
 //  install_write_tap - install a write tap on the bus
 //-------------------------------------------------
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler address_space_specific<Level, Width, AddrShift, Endian>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_write_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = make_mph();
+	auto impl = make_mph(mph);
 
-	auto handler = new handler_entry_write_tap<Width, AddrShift>(this, *mph, name, tap);
+	auto handler = new handler_entry_write_tap<Width, AddrShift>(this, *impl, name, tap);
 	m_root_write->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
 	invalidate_caches(read_or_write::WRITE);
 
-	return mph;
+	return impl;
 }
 //-------------------------------------------------
 //  install_write_tap - install a read and a write tap on the bus
 //-------------------------------------------------
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler address_space_specific<Level, Width, AddrShift, Endian>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = make_mph();
+	auto impl = make_mph(mph);
 
-	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(this, *mph, name, tapr);
+	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(this, *impl, name, tapr);
 	m_root_read ->populate_passthrough(nstart, nend, nmirror, rhandler);
 	rhandler->unref();
 
-	auto whandler = new handler_entry_write_tap<Width, AddrShift>(this, *mph, name, tapw);
+	auto whandler = new handler_entry_write_tap<Width, AddrShift>(this, *impl, name, tapw);
 	m_root_write->populate_passthrough(nstart, nend, nmirror, whandler);
 	whandler->unref();
 
 	invalidate_caches(read_or_write::READWRITE);
 
-	return mph;
+	return impl;
 }
 
 

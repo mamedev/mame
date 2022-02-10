@@ -56,7 +56,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
-	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {

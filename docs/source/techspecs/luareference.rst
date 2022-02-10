@@ -1383,9 +1383,6 @@ space:install_read_tap(start, end, name, callback)
     and the memory access mask.  To modify the data being read, return the
     modified value from the callback function as an integer.  If the callback
     does not return an integer, the data will not be modified.
-
-    Note that pass-through handlers must be explicitly removed before the
-    emulation session ends.
 space:install_write_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
     receive notifications on write to the specified range of addresses in the
@@ -1396,9 +1393,6 @@ space:install_write_tap(start, end, name, callback)
     written, and the memory access mask.  To modify the data being written,
     return the modified value from the callback function as an integer.  If the
     callback does not return an integer, the data will not be modified.
-
-    Note that pass-through handlers must be explicitly removed before the
-    emulation session ends.
 
 Properties
 ^^^^^^^^^^
@@ -1454,8 +1448,7 @@ Pass-through handler
 Tracks a pass-through handler installed in an
 :ref:`address space <luareference-mem-space>`.  A memory pass-through handler
 receives notifications on accesses to a specified range of addresses, and can
-modify the data that is read or written if desired.  Note that you must remove
-pass-through handlers before the emulation session ends.
+modify the data that is read or written if desired.
 
 Instantiation
 ^^^^^^^^^^^^^
