@@ -22,7 +22,10 @@
 
 #include "emu.h"
 
+#include "bus/ieee488/ieee488.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/bankdev.h"
@@ -32,13 +35,10 @@
 #include "machine/ram.h"
 #include "machine/tms9914.h"
 #include "video/saa5050.h"
-#include "bus/ieee488/ieee488.h"
-#include "bus/rs232/rs232.h"
-#include "imagedev/cassette.h"
-#include "speaker.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 // Debugging
@@ -112,7 +112,7 @@ private:
 	required_shared_ptr<uint8_t> m_lores_ram;
 	required_device<cassette_image_device> m_cassette;
 
-	memory_passthrough_handler *m_mmu_shadow_tap;
+	memory_passthrough_handler m_mmu_shadow_tap;
 
 	uint8_t m_prev_opcode;
 };
@@ -152,30 +152,32 @@ void positron_state::machine_reset()
 	m_mmu.active_key = 0;
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_mmu_shadow_tap = program.install_read_tap(0x0000, 0xffff, "mmu_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			if (m_fuse_timer_running && m_prev_opcode == 0x3b) // RTI
+	m_mmu_shadow_tap.remove();
+	m_mmu_shadow_tap = program.install_read_tap(
+			0x0000, 0xffff,
+			"mmu_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
-				m_mmu.active_key = m_mmu.operate_key;
-				logerror("mmu_shadow_r: switched to task %d\n", m_mmu.active_key);
-				m_mmu.sbit = false;
-				m_fuse_timer_running = false;
-			}
-			else if (m_irq_ack && offset >= 0xfff0 && offset != 0xffff)
-			{
-				m_mmu.active_key = 0;
-				logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
-				m_mmu.sbit = true;
-				m_irq_ack = false;
-				data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-			}
-		}
-
-		// return the original data
-		return data;
-	});
+				if (!machine().side_effects_disabled())
+				{
+					if (m_fuse_timer_running && m_prev_opcode == 0x3b) // RTI
+					{
+						m_mmu.active_key = m_mmu.operate_key;
+						logerror("mmu_shadow_r: switched to task %d\n", m_mmu.active_key);
+						m_mmu.sbit = false;
+						m_fuse_timer_running = false;
+					}
+					else if (m_irq_ack && offset >= 0xfff0 && offset != 0xffff)
+					{
+						m_mmu.active_key = 0;
+						logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
+						m_mmu.sbit = true;
+						m_irq_ack = false;
+						data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+					}
+				}
+			},
+			&m_mmu_shadow_tap);
 }
 
 

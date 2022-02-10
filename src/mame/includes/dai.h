@@ -9,13 +9,15 @@
 #ifndef MAME_INCLUDES_DAI_H
 #define MAME_INCLUDES_DAI_H
 
-#include "cpu/i8085/i8085.h"
 #include "audio/dai_snd.h"
+
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/tms5501.h"
-#include "imagedev/cassette.h"
 #include "machine/timer.h"
+#include "machine/tms5501.h"
+
 #include "emupal.h"
 
 
@@ -65,7 +67,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;

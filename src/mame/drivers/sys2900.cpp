@@ -42,14 +42,18 @@ Status:
 *****************************************************************************************/
 
 #include "emu.h"
+
+//#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-//#include "bus/s100/s100.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class sys2900_state : public driver_device
 {
@@ -70,7 +74,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -105,20 +109,22 @@ void sys2900_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xf7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf000, 0xf7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void sys2900_state::machine_start()
@@ -159,6 +165,8 @@ ROM_START( sys2900 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "104401cpc.bin", 0x0000, 0x0800, CRC(6c8848bc) SHA1(890e0578e5cb0e3433b4b173e5ed71d72a92af26)) // label says BE 5 1/4 107701
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

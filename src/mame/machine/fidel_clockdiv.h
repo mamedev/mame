@@ -36,8 +36,8 @@ protected:
 private:
 	inline void div_set_cpu_freq(offs_t offset);
 
-	memory_passthrough_handler *m_read_tap = nullptr;
-	memory_passthrough_handler *m_write_tap = nullptr;
+	memory_passthrough_handler m_read_tap;
+	memory_passthrough_handler m_write_tap;
 
 	u16 m_div_status;
 	double m_div_scale;
