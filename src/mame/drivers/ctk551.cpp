@@ -6,11 +6,11 @@
     Casio released several keyboard models with the same main board.
     As usual, some of them were also rebranded by Radio Shack.
 
-    - CTK-531, CTK-533
+    - CTK-531, CTK-533 (1999)
       Basic 61-key model
-    - CTK-541, Optimus MD-1150
+    - CTK-541, Optimus MD-1150 (1999)
       Adds velocity-sensitive keys
-    - CTK-551, CTK-558, Radio Shack MD-1160
+    - CTK-551, CTK-558, Radio Shack MD-1160 (2000)
       Adds pitch wheel and different selection of demo songs
 
     Main board (JCM456-MA1M):
@@ -358,7 +358,7 @@ INPUT_PORTS_END
 
 ROM_START(ctk551)
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP("ctk551.lsi2", 0x000000, 0x100000, CRC(66fc34cd) SHA1(47e9559edc106132f8a83462ed17a6c5c3872157))
+	ROM_LOAD16_WORD_SWAP("ctk551.lsi2", 0x000000, 0x100000, CRC(66fc34cd) SHA1(47e9559edc106132f8a83462ed17a6c5c3872157)) // MSM538002E-T6
 
 	ROM_REGION(285279, "screen", 0)
 	ROM_LOAD("ctk551lcd.svg", 0, 285279, CRC(1bb5da03) SHA1(a0cf22c6577c4ff0119ee7bb4ba8b487e23872d4))
@@ -368,4 +368,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME     FLAGS
-SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_SUPPORTS_SAVE )
+SYST( 2000, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_SUPPORTS_SAVE )
