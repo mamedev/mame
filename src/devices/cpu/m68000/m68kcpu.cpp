@@ -957,8 +957,15 @@ void m68000_base_device::execute_run()
 
 					if (!CPU_TYPE_IS_020_PLUS())
 					{
-						/* Note: This is implemented for 68000 only! */
-						m68ki_stack_frame_buserr(sr);
+						if (CPU_TYPE_IS_010())
+						{
+							m68ki_stack_frame_1000(m_ppc, sr, EXCEPTION_BUS_ERROR);
+						}
+						else
+						{
+							/* Note: This is implemented for 68000 only! */
+							m68ki_stack_frame_buserr(sr);
+						}
 					}
 					else if(!CPU_TYPE_IS_040_PLUS()) {
 						if (m_mmu_tmp_buserror_address == m_ppc)
