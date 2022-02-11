@@ -1,10 +1,70 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/*
-    Sega/Stern Whitestar
-*/
+/********************************************************************************************************************
+PINBALL
+Sega/Stern Whitestar
+
+Several PAL devices are not dumped.
+
+Here are the key codes to enable play:
+- "Start ball" code, wait for it to flash DANGER then let go
+- "End ball" code, if it says BALL SAVED you need to play a while longer.
+- May have to hold the key or hit it a few times
+
+Game                                   NUM  Start game         Start ball         End ball
+---------------------------------------------------------------------------------------------
+**** Sega ****
+Viper Night Drivin'                   5035    2                FG                 D
+Mini-Viper (not emulated)
+Godzilla                              5040    2                FG                 D
+Twister                               5041    2                EF                 C
+Goldeneye                             5042    1                DEF                B
+Space Jam                             5043    2                EF                 C
+Apollo 13                             5044    1                DEF                E
+Independence Day                      5045    2                C                  C
+X Files                               5046    2 then Shift     D                  D
+Cut The Cheese Deluxe (Redemption)      --    2 (not working, screen goes black)
+Titanic (Coin dropper)                  --    (stuck in service menu)
+Wack-A-Doodle-Doo (Redemption)          --    2
+Lost World Jurassic Park              5053    2                EF                 D
+Star Wars Trilogy Special Edition     5056    2                EF                 D
+Starship Troopers                     5059    2                EF                 D
+Lost in Space                         5060    2 (stuck in volume control menu)
+Golden Cue                            5064    (stuck in free play, unable to start)
+High Roller Casino                    5065    2                                   Almost any key
+Harley-Davidson                       5067    2                DE                 B
+Irons and Woods (Redemption, not emulated)
+South Park                            5071    2                DE                 E
+**** Stern ****
+Striker Xtreme                        5068    2 (does random things, not really working)
+Sharkey's Shootout                    5072    2 (no inputs)
+NFL                                   5073    2 (not working, screen goes black after starting a game)
+Austin Powers                         5074    2                                   Almost any key
+Monopoly (Coin dropper)               5075    2 (not working, please close the door)
+Playboy                               5076    2 (not working)
+The Simpsons Pinball Party            5077    2 (not working, when it tilts it can't be resumed)
+Rollercoaster Tycoon                  5078    2                                   Almost any key
+Terminator 3: Rise of the Machines    5079    2 (not working, when it tilts it can't be resumed)
+Harley-Davidson 2nd edition             --    2                DE                 B
+The Brain (conversion, not emulated)
+Harley-Davidson 3rd edition           5087    2                DE                 B
 
 
+Status:
+- Some machines are playable
+- Volume is quite low
+
+ToDo:
+- NVRAM
+- ATMEL ARM soundcard
+- Mechanical sounds
+- Outputs
+- Some solenoids should interact with switches
+- Memory protect switch (Monopoly needs it)
+- The navigation buttons in the setup screen usually don't work
+- Various unknown memory reads/writes.
+
+*********************************************************************************************************************/
 #include "emu.h"
 #include "video/mc6845.h"
 #include "audio/decobsmt.h"
@@ -14,22 +74,18 @@ class whitestar_state : public driver_device
 {
 public:
 	whitestar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_decobsmt(*this, "decobsmt"),
-		m_decodmd(*this, "decodmd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_decobsmt(*this, "decobsmt")
+		, m_decodmd(*this, "decodmd")
+		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void whitestar(machine_config &config);
 	void whitestarm(machine_config &config);
+	void goldcue(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
-	//required_device<cpu_device> m_dmdcpu;
-	//required_device<mc6845_device> m_mc6845;
-	optional_device<decobsmt_device> m_decobsmt;
-	required_device<decodmd_type2_device> m_decodmd;
-
 	void bank_w(uint8_t data);
 	void dmddata_w(uint8_t data);
 
@@ -41,6 +97,14 @@ private:
 	void whitestar_base_map(address_map &map);
 	void whitestar_map(address_map &map);
 	void whitestarm_map(address_map &map);
+	void goldcue_map(address_map &map);
+	u8 m_row = 0U;
+	required_device<cpu_device> m_maincpu;
+	//required_device<cpu_device> m_dmdcpu;
+	//required_device<mc6845_device> m_mc6845;
+	optional_device<decobsmt_device> m_decobsmt;
+	required_device<decodmd_type2_device> m_decodmd;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -55,21 +119,102 @@ static INPUT_PORTS_START( whitestar )
 // D6 - DED #7 - Service Credit (Green Button)
 // D7 - DED #8 - Begin Test (Black Button)
 	PORT_START("DEDICATED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Left Flipper EOS")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Right Flipper EOS")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Volume/Red")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service Credit/Green")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test/Black")
 	PORT_START("DSW0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("INP01")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("INP02") // Coin Slot 4
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) // not always
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("INP07") // Coin slot 5
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("INP08")
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP16")
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP40")
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP48")
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP49")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP50")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP51")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP52")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP53")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("INP55") // usually slam tilt
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("INP56") // usually plumb-bob tilt
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP57")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP58")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP59")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("INP60")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("INP61")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP62")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP63")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP64")
 INPUT_PORTS_END
 
 void whitestar_state::whitestar_base_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x200f).nopw();  // lots of unknown writes
 	map(0x3000, 0x3000).portr("DEDICATED");
 	map(0x3100, 0x3100).portr("DSW0");
 	map(0x3200, 0x3200).w(FUNC(whitestar_state::bank_w));
@@ -94,13 +239,25 @@ void whitestar_state::whitestarm_map(address_map &map)
 	// TODO: sound writes
 }
 
+void whitestar_state::goldcue_map(address_map &map)
+{
+	whitestar_base_map(map);
+	map(0x8000, 0x81ff).ram();
+}
+
 uint8_t whitestar_state::switch_r()
 {
-	return 0;
+	u8 data = 0U;
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(m_row, i))
+			data |= m_io_keyboard[i]->read();
+
+	return data;
 }
 
 void whitestar_state::switch_w(uint8_t data)
 {
+	m_row = data;
 }
 
 void whitestar_state::bank_w(uint8_t data)
@@ -147,6 +304,12 @@ void whitestar_state::whitestarm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &whitestar_state::whitestarm_map);
 
 	// TODO: ARM7 sound board
+}
+
+void whitestar_state::goldcue(machine_config &config)
+{
+	whitestar(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &whitestar_state::goldcue_map);
 }
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37
@@ -3473,7 +3636,7 @@ GAME(1998,  godzillp_100, godzillp,   whitestar,  whitestar, whitestar_state, em
 GAME(1998,  godzillp_090, godzillp,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Godzilla (Pinball, 0.90)",                                 MACHINE_IS_PINBALL)
 GAME(1996,  gldneye,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Goldeneye (4.04)",                                         MACHINE_IS_PINBALL)
 GAME(1996,  gldneye_402,  gldneye,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Goldeneye (4.02)",                                         MACHINE_IS_PINBALL)
-GAME(1998,  goldcue,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Golden Cue",                                               MACHINE_IS_PINBALL)
+GAME(1998,  goldcue,      0,          goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Golden Cue",                                               MACHINE_IS_PINBALL)
 GAME(1999,  harl_a13,     0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Harley Davidson (1.03)",                                   MACHINE_IS_PINBALL)
 GAME(1999,  harl_u13,     harl_a13,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Harley Davidson (1.03 UK)",                                MACHINE_IS_PINBALL)
 GAME(1999,  harl_a10,     harl_a13,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Harley Davidson (1.03 Display rev. 1.00)",                 MACHINE_IS_PINBALL)
@@ -3575,14 +3738,14 @@ GAME(2002,  rctycnl_701,  rctycnl,    whitestar,  whitestar, whitestar_state, em
 GAME(2002,  rctycnl_600,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (6.00 Spain)",                       MACHINE_IS_PINBALL)
 GAME(2002,  rctycnl_400,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00 Spain)",                       MACHINE_IS_PINBALL)
 GAME(2000,  shrkysht,     0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11)",                                MACHINE_IS_PINBALL)
-GAME(2000,  shrky_207,    shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07)",                                MACHINE_IS_PINBALL)
+GAME(2000,  shrky_207,    shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07)",                                MACHINE_IS_PINBALL)
 GAME(2001,  shrknew,      shrkysht,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (ARM7 Sound Board)",                    MACHINE_IS_PINBALL)
-GAME(2001,  shrkygr,      shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 Germany)",                        MACHINE_IS_PINBALL)
-GAME(2001,  shrkygr_207,  shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 Germany)",                        MACHINE_IS_PINBALL)
-GAME(2001,  shrkyfr,      shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 France)",                         MACHINE_IS_PINBALL)
-GAME(2001,  shrkyfr_207,  shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 France)",                         MACHINE_IS_PINBALL)
-GAME(2001,  shrkyit,      shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 Italy)",                          MACHINE_IS_PINBALL)
-GAME(2001,  shrkyit_207,  shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 Italy)",                          MACHINE_IS_PINBALL)
+GAME(2001,  shrkygr,      shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 Germany)",                        MACHINE_IS_PINBALL)
+GAME(2001,  shrkygr_207,  shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 Germany)",                        MACHINE_IS_PINBALL)
+GAME(2001,  shrkyfr,      shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 France)",                         MACHINE_IS_PINBALL)
+GAME(2001,  shrkyfr_207,  shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 France)",                         MACHINE_IS_PINBALL)
+GAME(2001,  shrkyit,      shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11 Italy)",                          MACHINE_IS_PINBALL)
+GAME(2001,  shrkyit_207,  shrkysht,   goldcue,    whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07 Italy)",                          MACHINE_IS_PINBALL)
 GAME(1999,  sprk_103,     0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "South Park (1.03)",                                        MACHINE_IS_PINBALL)
 GAME(1999,  sprk_096,     sprk_103,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "South Park (0.96)",                                        MACHINE_IS_PINBALL)
 GAME(1999,  sprk_090,     sprk_103,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "South Park (0.90)",                                        MACHINE_IS_PINBALL)
