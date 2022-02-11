@@ -18,6 +18,9 @@
 #ifndef __EMU_H__
 #define __EMU_H__
 
+// get forward declarations before anything else
+#include "emufwd.h"
+
 #include <list>
 #include <forward_list>
 #include <vector>

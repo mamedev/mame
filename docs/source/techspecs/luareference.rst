@@ -63,6 +63,29 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-notifiersub:
+
+Notifier subscription
+~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``util::notifier_subscription`` class, which manages a subscription
+to a broadcast notification.
+
+Methods
+^^^^^^^
+
+subscription:unsubscribe()
+    Unsubscribes from notifications.  The subscription will become inactive and
+    no future notifications will be received.
+
+Properties
+^^^^^^^^^^
+
+subscription.is_active (read-only)
+    A Boolean indicating whether the subscription is active.  A subscription
+    becomes inactive after explicitly unsubscribing or if the underlying
+    notifier is destroyed.
+
 .. _luareference-core-attotime:
 
 Attotime
@@ -1364,15 +1387,13 @@ space:read_range(start, end, width, [step])
     greater than or equal to the start address.  The width must be 8, 16, 30 or
     64.  If the step is provided, it must be a positive number of elements.
 space:add_change_notifier(callback)
-    Adds a
-    :ref:`handler change subscription <luareference-mem-spacechangenotif>` to
-    the address space.  The callback function is passed a single string as an
-    argument, either ``r`` if read handlers have potentially changed, ``w`` if
-    write handlers have potentially changed, or ``rw`` if both read and write
-    handlers have potentially changed.
+    Add a callback to receive notifications for handler changes in address
+    space.  The callback function is passed a single string as an argument,
+    either ``r`` if read handlers have potentially changed, ``w`` if write
+    handlers have potentially changed, or ``rw`` if both read and write handlers
+    have potentially changed.
 
-    Note that handler change subscriptions must be explicitly removed before the
-    emulation session ends.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
 space:install_read_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
     receive notifications on reads from the specified range of addresses in the
@@ -1383,9 +1404,6 @@ space:install_read_tap(start, end, name, callback)
     and the memory access mask.  To modify the data being read, return the
     modified value from the callback function as an integer.  If the callback
     does not return an integer, the data will not be modified.
-
-    Note that pass-through handlers must be explicitly removed before the
-    emulation session ends.
 space:install_write_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
     receive notifications on write to the specified range of addresses in the
@@ -1396,9 +1414,6 @@ space:install_write_tap(start, end, name, callback)
     written, and the memory access mask.  To modify the data being written,
     return the modified value from the callback function as an integer.  If the
     callback does not return an integer, the data will not be modified.
-
-    Note that pass-through handlers must be explicitly removed before the
-    emulation session ends.
 
 Properties
 ^^^^^^^^^^
@@ -1423,29 +1438,6 @@ space.map (read-only)
     The configured :ref:`address map <luareference-mem-map>` for the space or
     ``nil``.
 
-.. _luareference-mem-spacechangenotif:
-
-Address space change notifier
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Tracks a subscription to :ref:`address space <luareference-mem-space>` handler
-changes.  Note that you must remove subscriptions before the emulation session
-ends.
-
-Instantiation
-^^^^^^^^^^^^^
-
-manager.machine.devices[tag].spaces[name]:add_change_notifier(callback)
-    Adds a handler change subscriptions to an
-    :ref:`address space <luareference-mem-space>`.
-
-Methods
-^^^^^^^
-
-notifier:remove()
-    Removes the notification subscription.  The associated callback will not be
-    called on future handler changes for the address space.
-
 .. _luareference-mem-tap:
 
 Pass-through handler
@@ -1454,8 +1446,7 @@ Pass-through handler
 Tracks a pass-through handler installed in an
 :ref:`address space <luareference-mem-space>`.  A memory pass-through handler
 receives notifications on accesses to a specified range of addresses, and can
-modify the data that is read or written if desired.  Note that you must remove
-pass-through handlers before the emulation session ends.
+modify the data that is read or written if desired.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3155,15 +3146,22 @@ debugger is not enabled.
 Instantiation
 ^^^^^^^^^^^^^
 
-emu.symbol_table(machine, [parent], [device])
+emu.symbol_table(machine)
     Creates a new symbol table in the context of the specified machine,
-    optionally supplying a parent symbol table.  If a parent symbol table is
-    supplied, it must not be destroyed before the new symbol table.  If a device
-    is specified and it implements ``device_memory_interface``, it is used as
-    the base for looking up address spaces and memory regions.  Note that if a
-    device that does not implement ``device_memory_interface`` is supplied, it
-    will not be used (address spaces and memory regions will be looked up
-    relative to the root device).
+emu.symbol_table(parent, [device])
+    Creates a new symbol table with the specified parent symbol table.  If a
+    device is specified and it implements ``device_memory_interface``, it will
+    be used as the base for looking up address spaces and memory regions.  Note
+    that if a device that does not implement ``device_memory_interface`` is
+    supplied, it will not be used (address spaces and memory regions will be
+    looked up relative to the root device).
+emu.symbol_table(device)
+    Creates a new symbol table in the context of the specified device.  If the
+    device implements ``device_memory_interface``, it will be used as the base
+    for looking up address spaces and memory regions.  Note that if a device
+    that does not implement ``device_memory_interface`` is supplied, it will
+    only be used to determine the machine context (address spaces and memory
+    regions will be looked up relative to the root device).
 
 Methods
 ^^^^^^^
@@ -3178,6 +3176,8 @@ symbols:add(name, [value])
     is added with the supplied value.  If no value is supplied, a read/write
     symbol is created with and initial value of zero.  If a symbol entry with
     the specified name already exists in the symbol table, it will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:add(name, getter, [setter], [format])
     Adds a named integer symbol using getter and optional setter callbacks.  The
     name must be a string.  The getter must be a function returning an integer
@@ -3186,10 +3186,14 @@ symbols:add(name, getter, [setter], [format])
     string for displaying the symbol value may optionally be supplied.  If a
     symbol entry with the specified name already exists in the symbol table, it
     will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:add(name, minparams, maxparams, execute)
     Adds a named function symbol.  The name must be a string.  The minimum and
     maximum numbers of parameters must be integers.  If a symbol entry with the
     specified name already exists in the symbol table, it will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:find(name)
     Returns the :ref:`symbol entry <luareference-debug-symentry>` with the
     specified name, or ``nil`` if there is no symbol with the specified name in
@@ -3258,8 +3262,6 @@ emu.parsed_expression(symbols, string, [default_base])
     default base for interpreting integer literals is not supplied, 16 is used
     (hexadecimal).  Raises an error if the string contains syntax errors or uses
     undefined symbols.
-emu.parsed_expression(expression)
-    Creates a copy of an existing parsed expression.
 
 Methods
 ^^^^^^^
@@ -3274,7 +3276,7 @@ expression:parse(string)
     expression is not preserved when attempting to parse an invalid expression
     string.
 expression:execute()
-    Evaluates the expression, returning an unsigned integer result.  Raises an 
+    Evaluates the expression, returning an unsigned integer result.  Raises an
     error if the expression cannot be evaluated (e.g. calling a function with an
     invalid number of arguments).
 
@@ -3295,19 +3297,24 @@ Symbol entry
 ~~~~~~~~~~~~
 
 Wraps MAME’s ``symbol_entry`` class, which represents an entry in a
-:ref:`symbol table <luareference-debug-symtable>`.
+:ref:`symbol table <luareference-debug-symtable>`.  Note that symbol entries
+must not be used after the symbol table they belong to is destroyed.
 
 Instantiation
 ^^^^^^^^^^^^^
 
-symbols:find(name)
-    Obtains the symbol entry with the specified name from a
-    :ref:`symbol table <luareference-debug-symtable>`, but does not search
-    parent symbol tables.
-symbols:deep_find(name)
-    Obtains the symbol entry with the specified name from a
-    :ref:`symbol table <luareference-debug-symtable>`, recursively searching
-    parent symbol tables.
+symbols:add(name, [value])
+    Adds an integer symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
+symbols:add(name, getter, [setter], [format])
+    Adds an integer symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
+symbols:add(name, minparams, maxparams, execute)
+    Adds function symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
 
 Properties
 ^^^^^^^^^^
@@ -3377,7 +3384,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug()
+manager.machine.devices[tag].debug
     Returns the debugger interface for an emulated CPU device, or ``nil`` if the
     device is not a CPU.
 
@@ -3462,7 +3469,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():bplist()[bp]
+manager.machine.devices[tag].debug:bplist()[bp]
     Gets the specified breakpoint for an emulated CPU device, or ``nil`` if no
     breakpoint corresponds to the specified index.
 
@@ -3473,7 +3480,7 @@ breakpoint.index (read-only)
     The breakpoint’s index.  The can be used to enable, disable or clear the
     breakpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-breakpoint.enabled (read-only)
+breakpoint.enabled (read/write)
     A Boolean indicating whether the breakpoint is currently enabled.
 breakpoint.address (read-only)
     The breakpoint’s address.
@@ -3496,7 +3503,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():wplist(space)[wp]
+manager.machine.devices[tag].debug:wplist(space)[wp]
     Gets the specified watchpoint for an address space of an emulated CPU
     device, or ``nil`` if no watchpoint in the address space corresponds to the
     specified index.
@@ -3508,7 +3515,7 @@ watchpoint.index (read-only)
     The watchpoint’s index.  The can be used to enable, disable or clear the
     watchpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-watchpoint.enabled (read-only)
+watchpoint.enabled (read/write)
     A Boolean indicating whether the watchpoint is currently enabled.
 watchpoint.type (read-only)
     Either ``"r"``, ``"w"`` or ``"rw"`` for a read, write or read/write

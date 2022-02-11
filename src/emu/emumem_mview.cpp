@@ -126,9 +126,9 @@ public:
 	using address_space_installer::install_write_tap;
 	using address_space_installer::install_readwrite_tap;
 
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph) override;
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph) override;
 
 	virtual void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, u16 flags, read_or_write readorwrite, bool quiet) override;
 	virtual void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, u16 flags, read_or_write readorwrite, void *baseptr) override;
@@ -898,65 +898,62 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 	view.make_subdispatch(key()); // Must be called after populate
 }
 
-template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler memory_view_entry_specific<Level, Width, AddrShift>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_read_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = m_view.m_space->make_mph();
+	auto impl = m_view.m_space->make_mph(mph);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto handler = new handler_entry_read_tap<Width, AddrShift>(m_view.m_space, *mph, name, tap);
+	auto handler = new handler_entry_read_tap<Width, AddrShift>(m_view.m_space, *impl, name, tap);
 	r()->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
 	invalidate_caches(read_or_write::READ);
 
-	return mph;
+	return impl;
 }
 
-template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler memory_view_entry_specific<Level, Width, AddrShift>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_write_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = m_view.m_space->make_mph();
+	auto impl = m_view.m_space->make_mph(mph);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto handler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *mph, name, tap);
+	auto handler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *impl, name, tap);
 	w()->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
 	invalidate_caches(read_or_write::WRITE);
 
-	return mph;
+	return impl;
 }
 
-template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_readwrite_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
-	if (!mph)
-		mph = m_view.m_space->make_mph();
+	auto impl = m_view.m_space->make_mph(mph);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(m_view.m_space, *mph, name, tapr);
+	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(m_view.m_space, *impl, name, tapr);
 	r() ->populate_passthrough(nstart, nend, nmirror, rhandler);
 	rhandler->unref();
 
-	auto whandler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *mph, name, tapw);
+	auto whandler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *impl, name, tapw);
 	w()->populate_passthrough(nstart, nend, nmirror, whandler);
 	whandler->unref();
 
 	invalidate_caches(read_or_write::READWRITE);
 
-	return mph;
+	return impl;
 }
 
 template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth, u16 flags)
