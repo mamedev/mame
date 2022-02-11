@@ -52,6 +52,8 @@
 // Build Options
 // =============
 
+#define ASMJIT_STATIC
+
 // NOTE: Doxygen cannot document macros that are not defined, that's why we have to define them and then undefine
 // them immediately, so it won't use the macros with its own preprocessor.
 #ifdef _DOXYGEN
