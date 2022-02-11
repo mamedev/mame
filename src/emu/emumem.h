@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_EMUMEM_H
 #define MAME_EMU_EMUMEM_H
 
+#include "notifier.h"
+
 #include <optional>
 #include <set>
 #include <type_traits>
@@ -1946,11 +1948,6 @@ class address_space : public address_space_installer
 	template<int Width, int AddrShift> friend class handler_entry_read_unmapped;
 	template<int Width, int AddrShift> friend class handler_entry_write_unmapped;
 
-	struct notifier_t {
-		std::function<void (read_or_write)> m_notifier;
-		int m_id;
-	};
-
 protected:
 	// construction/destruction
 	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum);
@@ -1990,15 +1987,14 @@ public:
 		v.set(this, get_specific_info());
 	}
 
-	int add_change_notifier(std::function<void (read_or_write)> n);
-	void remove_change_notifier(int id);
+	util::notifier_subscription add_change_notifier(delegate<void (read_or_write)> &&n);
+	template <typename T> util::notifier_subscription add_change_notifier(T &&n) { return add_change_notifier(delegate<void (read_or_write)>(std::forward<T>(n))); }
 
 	void invalidate_caches(read_or_write mode) {
 		if(u32(mode) & ~m_in_notification) {
 			u32 old = m_in_notification;
 			m_in_notification |= u32(mode);
-			for(const auto &n : m_notifiers)
-				n.m_notifier(mode);
+			m_notifiers(mode);
 			m_in_notification = old;
 		}
 	}
@@ -2118,8 +2114,7 @@ protected:
 
 	std::vector<std::shared_ptr<emu::detail::memory_passthrough_handler_impl>> m_mphs;
 
-	std::vector<notifier_t> m_notifiers;        // notifier list for address map change
-	int                     m_notifier_id;      // next notifier id
+	util::notifier<read_or_write> m_notifiers;  // notifier list for address map change
 	u32                     m_in_notification;  // notification(s) currently being done
 };
 

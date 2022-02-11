@@ -112,7 +112,7 @@ private:
 	offs_t               m_length;                   // length of watch area
 	parsed_expression    m_condition;                // condition
 	std::string          m_action;                   // action
-	int                  m_notifier;                 // address map change notifier id
+	util::notifier_subscription m_notifier;          // address map change notifier ID
 
 	offs_t               m_start_address[3];         // the start addresses of the checks to install
 	offs_t               m_end_address[3];           // the end addresses

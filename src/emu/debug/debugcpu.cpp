@@ -462,10 +462,10 @@ device_debug::device_debug(device_t &device)
 		for (int i=0; i != count; i++)
 			if (m_memory->has_space(i)) {
 				address_space &space = m_memory->space(i);
-				m_notifiers.push_back(space.add_change_notifier([this, &space](read_or_write mode) { reinstall(space, mode); }));
+				m_notifiers.emplace_back(space.add_change_notifier([this, &space] (read_or_write mode) { reinstall(space, mode); }));
 			}
 			else
-				m_notifiers.push_back(-1);
+				m_notifiers.emplace_back();
 	}
 
 	// set up state-related stuff

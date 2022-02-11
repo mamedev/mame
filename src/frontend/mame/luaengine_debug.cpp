@@ -341,22 +341,22 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", sol::no_constructor);
 	device_debug_type["step"] =
-		[] (device_debug &dev, sol::object num)
-		{
-			int steps = 1;
-			if (num.is<int>())
-				steps = num.as<int>();
-			dev.single_step(steps);
-		};
+			[] (device_debug &dev, sol::object num)
+			{
+				int steps = 1;
+				if (num.is<int>())
+					steps = num.as<int>();
+				dev.single_step(steps);
+			};
 	device_debug_type["go"] = &device_debug::go;
 	device_debug_type["bpset"] =
-		[] (device_debug &dev, offs_t address, char const *cond, char const *act)
-		{
-			int result(dev.breakpoint_set(address, cond, act));
-			dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
-			dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
-			return result;
-		};
+			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
+			{
+				int result(dev.breakpoint_set(address, cond, act));
+				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
+				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
+				return result;
+			};
 	device_debug_type["bpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -377,21 +377,21 @@ void lua_engine::initialize_debug(sol::table &emu)
 	device_debug_type["bpenable"] = &do_breakpoint_enable<true>;
 	device_debug_type["bpdisable"] = &do_breakpoint_enable<false>;
 	device_debug_type["bplist"] =
-		[this] (device_debug &dev)
-		{
-			sol::table table = sol().create_table();
-			for (auto const &bpp : dev.breakpoint_list())
-				table[bpp.second->index()] = sol::make_reference(sol(), *bpp.second);
-			return table;
-		};
+			[this] (device_debug &dev)
+			{
+				sol::table table = sol().create_table();
+				for (auto const &bpp : dev.breakpoint_list())
+					table[bpp.second->index()] = sol::make_reference(sol(), bpp.second.get());
+				return table;
+			};
 	device_debug_type["wpset"] =
-		[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
-		{
-			read_or_write const wptype = s_read_or_write_parser(type);
-			int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
-			dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
-			return result;
-		};
+			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
+			{
+				read_or_write const wptype = s_read_or_write_parser(type);
+				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
+				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
+				return result;
+			};
 	device_debug_type["wpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -408,18 +408,28 @@ void lua_engine::initialize_debug(sol::table &emu)
 	device_debug_type["wpenable"] = &do_watchpoint_enable<true>;
 	device_debug_type["wpdisable"] = &do_watchpoint_enable<false>;
 	device_debug_type["wplist"] =
-		[this] (device_debug &dev, addr_space &sp)
-		{
-			sol::table table = sol().create_table();
-			for (auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
-				table[wpp->index()] = sol::make_reference(sol(), *wpp);
-			return table;
-		};
+			[this] (device_debug &dev, addr_space &sp)
+			{
+				sol::table table = sol().create_table();
+				for (auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
+					table[wpp->index()] = sol::make_reference(sol(), wpp.get());
+				return table;
+			};
 
 
 	auto breakpoint_type = sol().registry().new_usertype<debug_breakpoint>("breakpoint", sol::no_constructor);
 	breakpoint_type["index"] = sol::property(&debug_breakpoint::index);
-	breakpoint_type["enabled"] = sol::property(&debug_breakpoint::enabled);
+	breakpoint_type["enabled"] = sol::property(
+			&debug_breakpoint::enabled,
+			[] (debug_breakpoint &bp, bool val)
+			{
+				if (bp.enabled() != val)
+				{
+					bp.setEnabled(val);
+					bp.debugInterface()->device().machine().debug_view().update_all(DVT_DISASSEMBLY);
+					bp.debugInterface()->device().machine().debug_view().update_all(DVT_BREAK_POINTS);
+				}
+			});
 	breakpoint_type["address"] = sol::property(&debug_breakpoint::address);
 	breakpoint_type["condition"] = sol::property(&debug_breakpoint::condition);
 	breakpoint_type["action"] = sol::property(&debug_breakpoint::action);
@@ -427,7 +437,16 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto watchpoint_type = sol().registry().new_usertype<debug_watchpoint>("watchpoint", sol::no_constructor);
 	watchpoint_type["index"] = sol::property(&debug_watchpoint::index);
-	watchpoint_type["enabled"] = sol::property(&debug_watchpoint::enabled);
+	watchpoint_type["enabled"] = sol::property(
+			&debug_watchpoint::enabled,
+			[] (debug_watchpoint &wp, bool val)
+			{
+				if (wp.enabled() != val)
+				{
+					wp.setEnabled(val);
+					wp.debugInterface()->device().machine().debug_view().update_all(DVT_WATCH_POINTS);
+				}
+			});
 	watchpoint_type["type"] = sol::property(
 			[] (debug_watchpoint &wp) -> char const *
 			{

@@ -63,6 +63,29 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-notifiersub:
+
+Notifier subscription
+~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``util::notifier_subscription`` class, which manages a subscription
+to a broadcast notification.
+
+Methods
+^^^^^^^
+
+subscription:unsubscribe()
+    Unsubscribes from notifications.  The subscription will become inactive and
+    no future notifications will be received.
+
+Properties
+^^^^^^^^^^
+
+subscription.is_active (read-only)
+    A Boolean indicating whether the subscription is active.  A subscription
+    becomes inactive after explicitly unsubscribing or if the underlying
+    notifier is destroyed.
+
 .. _luareference-core-attotime:
 
 Attotime
@@ -1364,15 +1387,13 @@ space:read_range(start, end, width, [step])
     greater than or equal to the start address.  The width must be 8, 16, 30 or
     64.  If the step is provided, it must be a positive number of elements.
 space:add_change_notifier(callback)
-    Adds a
-    :ref:`handler change subscription <luareference-mem-spacechangenotif>` to
-    the address space.  The callback function is passed a single string as an
-    argument, either ``r`` if read handlers have potentially changed, ``w`` if
-    write handlers have potentially changed, or ``rw`` if both read and write
-    handlers have potentially changed.
+    Add a callback to receive notifications for handler changes in address
+    space.  The callback function is passed a single string as an argument,
+    either ``r`` if read handlers have potentially changed, ``w`` if write
+    handlers have potentially changed, or ``rw`` if both read and write handlers
+    have potentially changed.
 
-    Note that handler change subscriptions must be explicitly removed before the
-    emulation session ends.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
 space:install_read_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
     receive notifications on reads from the specified range of addresses in the
@@ -1416,29 +1437,6 @@ space.endianness (read-only)
 space.map (read-only)
     The configured :ref:`address map <luareference-mem-map>` for the space or
     ``nil``.
-
-.. _luareference-mem-spacechangenotif:
-
-Address space change notifier
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Tracks a subscription to :ref:`address space <luareference-mem-space>` handler
-changes.  Note that you must remove subscriptions before the emulation session
-ends.
-
-Instantiation
-^^^^^^^^^^^^^
-
-manager.machine.devices[tag].spaces[name]:add_change_notifier(callback)
-    Adds a handler change subscriptions to an
-    :ref:`address space <luareference-mem-space>`.
-
-Methods
-^^^^^^^
-
-notifier:remove()
-    Removes the notification subscription.  The associated callback will not be
-    called on future handler changes for the address space.
 
 .. _luareference-mem-tap:
 
@@ -3386,7 +3384,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug()
+manager.machine.devices[tag].debug
     Returns the debugger interface for an emulated CPU device, or ``nil`` if the
     device is not a CPU.
 
@@ -3471,7 +3469,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():bplist()[bp]
+manager.machine.devices[tag].debug:bplist()[bp]
     Gets the specified breakpoint for an emulated CPU device, or ``nil`` if no
     breakpoint corresponds to the specified index.
 
@@ -3482,7 +3480,7 @@ breakpoint.index (read-only)
     The breakpoint’s index.  The can be used to enable, disable or clear the
     breakpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-breakpoint.enabled (read-only)
+breakpoint.enabled (read/write)
     A Boolean indicating whether the breakpoint is currently enabled.
 breakpoint.address (read-only)
     The breakpoint’s address.
@@ -3505,7 +3503,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():wplist(space)[wp]
+manager.machine.devices[tag].debug:wplist(space)[wp]
     Gets the specified watchpoint for an address space of an emulated CPU
     device, or ``nil`` if no watchpoint in the address space corresponds to the
     specified index.
@@ -3517,7 +3515,7 @@ watchpoint.index (read-only)
     The watchpoint’s index.  The can be used to enable, disable or clear the
     watchpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-watchpoint.enabled (read-only)
+watchpoint.enabled (read/write)
     A Boolean indicating whether the watchpoint is currently enabled.
 watchpoint.type (read-only)
     Either ``"r"``, ``"w"`` or ``"rw"`` for a read, write or read/write

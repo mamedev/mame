@@ -300,97 +300,6 @@ private:
 
 
 //-------------------------------------------------
-//  addr_space_change_notif - helper for hanging
-//  on to an address space change notification
-//  subscription
-//-------------------------------------------------
-
-class lua_engine::addr_space_change_notif
-{
-public:
-	addr_space_change_notif(addr_space_change_notif const &) = delete;
-
-	addr_space_change_notif(addr_space_change_notif &&that)
-		: m_callback(std::move(that.m_callback))
-		, m_engine(that.m_engine)
-		, m_space(that.m_space)
-		, m_id(-1)
-	{
-		that.remove();
-		install();
-	}
-
-	addr_space_change_notif &operator=(addr_space_change_notif &&that)
-	{
-		if (&that != this)
-		{
-			remove();
-			m_callback = std::move(that.m_callback);
-			m_engine = that.m_engine;
-			m_space = that.m_space;
-			that.remove();
-			install();
-		}
-		return *this;
-	}
-
-	addr_space_change_notif(lua_engine &engine, address_space &space, sol::protected_function &&callback)
-		: m_callback(std::move(callback))
-		, m_engine(&engine)
-		, m_space(&space)
-		, m_id(-1)
-	{
-		install();
-	}
-
-	~addr_space_change_notif()
-	{
-		if (m_space)
-			m_space->remove_change_notifier(m_id);
-	}
-
-	void remove()
-	{
-		if (m_space)
-		{
-			m_space->remove_change_notifier(m_id);
-			m_space = nullptr;
-			m_id = -1;
-		}
-	}
-
-private:
-	void install()
-	{
-		if (m_space)
-		{
-			m_id = m_space->add_change_notifier(
-					[this] (read_or_write mode)
-					{
-						char const *modestr = "";
-						switch (mode)
-						{
-						case read_or_write::READ:      modestr = "r";  break;
-						case read_or_write::WRITE:     modestr = "w";  break;
-						case read_or_write::READWRITE: modestr = "rw"; break;
-						}
-						m_engine->invoke(m_callback, modestr);
-					});
-		}
-		else
-		{
-			m_id = -1;
-		}
-	}
-
-	sol::protected_function m_callback;
-	lua_engine *m_engine;
-	address_space *m_space;
-	int m_id;
-};
-
-
-//-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_i8(0xC000)
 //-------------------------------------------------
@@ -717,7 +626,18 @@ void lua_engine::initialize_memory(sol::table &emu)
 	addr_space_type["add_change_notifier"] =
 			[this] (addr_space &sp, sol::protected_function &&cb)
 			{
-				return addr_space_change_notif(*this, sp.space, std::move(cb));
+				return sp.space.add_change_notifier(
+						[this, callback = std::move(cb)] (read_or_write mode)
+						{
+							char const *modestr = "";
+							switch (mode)
+							{
+							case read_or_write::READ:      modestr = "r";  break;
+							case read_or_write::WRITE:     modestr = "w";  break;
+							case read_or_write::READWRITE: modestr = "rw"; break;
+							}
+							invoke(callback, modestr);
+						});
 			};
 	addr_space_type["install_read_tap"] =
 			[this] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
@@ -737,9 +657,6 @@ void lua_engine::initialize_memory(sol::table &emu)
 	addr_space_type["endianness"] = sol::property([] (addr_space &sp) { return sp.space.endianness(); });
 	addr_space_type["map"] = sol::property([] (addr_space &sp) { return sp.space.map(); });
 
-
-	auto change_notif_type = sol().registry().new_usertype<addr_space_change_notif>("addr_space_change", sol::no_constructor);
-	change_notif_type["remove"] = &addr_space_change_notif::remove;
 
 	auto tap_type = sol().registry().new_usertype<tap_helper>("mempassthrough", sol::no_constructor);
 	tap_type["reinstall"] = &tap_helper::reinstall;

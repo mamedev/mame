@@ -810,7 +810,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_spacenum(spacenum),
 		m_log_unmap(true),
 		m_name(memory.space_config(spacenum)->name()),
-		m_notifier_id(0),
 		m_in_notification(0)
 {
 }
@@ -1296,19 +1295,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 //  MEMORY MAPPING HELPERS
 //**************************************************************************
 
-int address_space::add_change_notifier(std::function<void (read_or_write)> n)
+util::notifier_subscription address_space::add_change_notifier(delegate<void (read_or_write)> &&n)
 {
-	int id = m_notifier_id++;
-	m_notifiers.emplace_back(notifier_t{ std::move(n), id });
-	return id;
-}
-
-void address_space::remove_change_notifier(int id)
-{
-	for(auto i = m_notifiers.begin(); i != m_notifiers.end(); i++)
-		if (i->m_id == id) {
-			m_notifiers.erase(i);
-			return;
-		}
-	fatalerror("Unknown notifier id %d, double remove?\n", id);
+	return m_notifiers.subscribe(std::move(n));
 }

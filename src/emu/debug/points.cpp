@@ -184,7 +184,7 @@ debug_watchpoint::debug_watchpoint(
 
 debug_watchpoint::~debug_watchpoint()
 {
-	m_space.remove_change_notifier(m_notifier);
+	m_notifier.reset();
 	m_phr.remove();
 	m_phw.remove();
 }
