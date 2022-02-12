@@ -513,7 +513,9 @@ void gambl186_state::gambl186(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	CIRRUS_GD5428(config, "vga", 0).set_screen("screen");
+	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

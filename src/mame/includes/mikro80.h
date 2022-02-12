@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "machine/i8255.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
 #include "sound/dac.h"
 
 class mikro80_state : public driver_device
@@ -59,7 +59,7 @@ private:
 	void mikro80_mem(address_map &map);
 	void radio99_io(address_map &map);
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_shared_ptr<uint8_t> m_aram;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<i8255_device> m_ppi;

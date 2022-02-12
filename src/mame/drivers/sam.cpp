@@ -1,5 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+/********************************************************************************************************************
+PINBALL
+Stern SAM system.
+
+An evolution of the Whitestar system, it has now been superseded by SPIKE.
+
+Status:
+- Skeletons
+
+ToDo:
+- Everything
+
+*********************************************************************************************************************/
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

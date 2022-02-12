@@ -264,6 +264,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface(mconfig, *this)
 {
 	set_screen(*this, "screen");
+	set_vram_size(0x100000);
 }
 
 void vis_vga_device::device_add_mconfig(machine_config &config)

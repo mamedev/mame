@@ -75,10 +75,10 @@ void s3virge_vga_device::device_start()
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x1c;
 	vga.svga_intf.crtc_regcount = 0x19;
-	vga.svga_intf.vram_size = 0x400000;
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(vga.memory,"Video RAM");
+
+	save_pointer(vga.memory, "Video RAM", vga.svga_intf.vram_size);
 	save_item(vga.crtc.data,"CRTC Registers");
 	save_item(vga.sequencer.data,"Sequencer Registers");
 	save_item(vga.attribute.data,"Attribute Registers");

@@ -212,50 +212,60 @@ uint8_t playch10_state::pc10_in0_r()
 
 uint8_t playch10_state::pc10_in1_r()
 {
-	int ret = (m_input_latch[1]) & 1;
+	int ret = m_input_latch[1] & 1;
 
-	/* shift */
+	// shift
 	m_input_latch[1] >>= 1;
 
-	/* do the gun thing */
+	// do the gun thing
 	if (m_pc10_gun_controller)
 	{
 		int trigger = ioport("P1")->read();
 		int x = ioport("GUNX")->read();
 		int y = ioport("GUNY")->read();
 
-		/* no sprite hit (yet) */
-		ret |= 0x08;
+		// effective range picked up by photodiode, i.e. gun position +- radius
+		constexpr int xrad = 0;
+		constexpr int yrad = 0;
+		// brightness threshold
+		constexpr int bright = 0x70;
+		// # of CRT scanlines that sustain brightness
+		constexpr int sustain = 20;
+
+		int vpos = m_ppu->screen().vpos();
+		int hpos = m_ppu->screen().hpos();
 
 		// update the screen if necessary
 		if (!m_ppu->screen().vblank())
-		{
-			int vpos = m_ppu->screen().vpos();
-			int hpos = m_ppu->screen().hpos();
-
-			if (vpos > y || (vpos == y && hpos >= x))
+			if (vpos > y - yrad || (vpos == y - yrad && hpos >= x - xrad))
 				m_ppu->screen().update_now();
-		}
 
-		/* get the pixel at the gun position */
-		rgb_t pix = m_ppu->screen().pixel(x, y);
+		// default to no light detected
+		ret |= 0x08;
 
-		/* look at the screen and see if the cursor is over a bright pixel */
-		// FIXME: still a gross hack
-		if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
-		{
-			ret &= ~0x08; /* sprite hit */
-		}
+		// check brightness of pixels nearby the gun position
+		for (int i = x - xrad; i <= x + xrad; i++)
+			for (int j = y - yrad; j <= y + yrad; j++)
+			{
+				rgb_t pix = m_ppu->screen().pixel(i, j);
 
-		/* now, add the trigger if not masked */
+				// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
+				// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
+				if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos) && pix.brightness() >= bright)
+				{
+					ret &= ~0x08; // light detected
+					i = x + xrad;
+					break;
+				}
+			}
+
+		// now, add the trigger if not masked
 		if (!m_cntrl_mask)
-		{
 			ret |= (trigger & 2) << 3;
-		}
 	}
 
-	/* some games expect bit 6 to be set because the last entry on the data bus shows up */
-	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
+	// some games expect bit 6 to be set because the last entry on the data bus shows up
+	// in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there.
 	ret |= 0x40;
 
 	return ret;
