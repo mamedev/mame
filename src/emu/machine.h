@@ -217,7 +217,7 @@ public:
 	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
 
 	// used by debug_console to take ownership of the debug.log file
-	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
+	std::unique_ptr<emu_file> steal_debuglogfile();
 
 private:
 	class side_effects_disabler {

@@ -974,6 +974,17 @@ void running_machine::logfile_callback(const char *buffer)
 
 
 //-------------------------------------------------
+//  steal_debuglogfile - relinquish ownership of
+//  the debug.log file
+//-------------------------------------------------
+
+std::unique_ptr<emu_file> running_machine::steal_debuglogfile()
+{
+	return std::move(m_debuglogfile);
+}
+
+
+//-------------------------------------------------
 //  start_all_devices - start any unstarted devices
 //-------------------------------------------------
 
