@@ -44365,8 +44365,29 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		</part>
 	</software>
 
-	<software name="pboxbas" supported="no">
-		<description>Playbox Basic V0.0 (Jpn, Proto)</description>
+	<software name="pboxbas1" cloneof="famibs21">
+		<description>Playbox BASIC (Japan, V1.0)</description>
+		<year>198?</year>
+		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="hvc_basic" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="fc_keyboard" />
+			<dataarea name="prg" size="32768">
+				<rom name="playbox basic v1.0.prg" size="32768" crc="da03d908" sha1="474869bb5882928a481e58ced0adcbb1b1ad18f9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="playbox basic v1.0.chr" size="8192" crc="11848b93" sha1="04311090fcb7c46d2df86a06575c81e09a0f77b8" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="2048">
+				<rom value="0x00" size="2048" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pboxbas0" cloneof="famibs21">
+		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
 		<part name="cart" interface="nes_cart">
