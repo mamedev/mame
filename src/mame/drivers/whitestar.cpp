@@ -10,7 +10,7 @@ Here are the key codes to enable play:
 - "End ball" code, if it says BALL SAVED you need to play a while longer.
 - May have to hold the key or hit it a few times
 
-Game                                   NUM  Start game                   End ball
+Game                                   NUM    Start game                 End ball
 ---------------------------------------------------------------------------------------------
 **** Sega ****
 Viper Night Drivin'                   5035    Hold FG, hit 1             DEFG
@@ -32,6 +32,7 @@ Lost in Space                         5060    Hold DE, hit 1             FG
 Golden Cue                            5064    Hold DFG, hit 1 (unable to navigate setup menu)
 High Roller Casino                    5065    Hold FG, hit 1             D
 Harley-Davidson                       5067    Hold DG, hit 1             DEFG
+Harley-Davidson 2nd edition           5067    Hold DG, hit 1             DEFG
 Irons and Woods (Redemption, not emulated)
 South Park                            5071    Hold FG, hit 1             DEFG
 **** Stern ****
@@ -44,7 +45,6 @@ Playboy                               5076    Hold CDEF, hit 1           CDEF
 The Simpsons Pinball Party            5077    Hold BCDEF, hit 1          BCDEF
 Rollercoaster Tycoon                  5078    Hold CDE, hit 1            CDE
 Terminator 3: Rise of the Machines    5079    Hold CDE, hit 1            CDE
-Harley-Davidson 2nd edition             --    Hold DG, hit 1             DEFG
 The Brain (conversion, not emulated)
 Lord of the Rings                     5080    Hold CDEF, hit 1           CDEF
 Ripley's Believe it or not!           5081    Hold CDEF, hit 1           CDEF
@@ -52,9 +52,8 @@ Elvis                                 5084    Hold CDEF, hit 1           CDEF
 The Sopranos                          5085    Hold CDEF, hit 1           CDEF
 NASCAR                                5086    Hold CDEF, hit 1           CDEF (unable to end ball)
 Harley-Davidson 3rd edition           5087    Hold DG, hit 1             DEFG
-Grand Prix                            5091    Hold CDEF, hit 1           CDEF (unable to end ball
-[NDSE] (not emulated)                 5097
- (this game mentioned in Nascar manual, but not explained. Could be a special edition of Nascar.)
+Grand Prix                            5091    Hold CDEF, hit 1           CDEF (unable to end ball)
+Dale Jr NASCAR Special Edition        5097    Hold CDEF, hit 1           CDEF (unable to end ball)
 
 
 Status:
@@ -76,6 +75,8 @@ ToDo:
 //#include "video/mc6845.h"
 #include "audio/decobsmt.h"
 #include "video/decodmd2.h"
+
+namespace {
 
 class whitestar_state : public genpin_class
 {
@@ -6741,6 +6742,7 @@ ROM_START(sopranoi_107)
 	ROM_LOAD("sopsndi.u37", 0x300000, 0x100000, CRC(b34c0a5f) SHA1(b84979d6eef7d23e6dd5410993d83fba2121bc6a))
 ROM_END
 
+} // Anonymous namespace
 
 GAME(1995,  apollo13,     0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Apollo 13 (5.01)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1995,  apollo13_d4,  apollo13,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Sega",     "Apollo 13 (5.01, Display 4.01)",                           MACHINE_IS_SKELETON_MECHANICAL)
