@@ -106,7 +106,7 @@ void tsconf_state::tsconf_update_video_mode()
 	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
 
-	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, HZ_TO_ATTOSECONDS(50));
+	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period().as_attoseconds());
 }
 
 uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
