@@ -1283,10 +1283,10 @@ public:
 
 protected:
 	// construction/destruction
-	nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vram_prot_bit);
 
 private:
-	u8 m_vram_prot_bit;
+	const u8 m_vram_prot_bit;
 };
 
 
