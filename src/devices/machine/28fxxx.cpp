@@ -32,6 +32,8 @@
 #include "emu.h"
 #include "28fxxx.h"
 
+#include "fileio.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 

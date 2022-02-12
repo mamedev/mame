@@ -10,6 +10,8 @@
 #include "machine/dp8573.h"
 #include "machine/timehelp.h"
 
+#include "fileio.h"
+
 #define LOG_GENERAL (1 << 0)
 #define LOG_TICKS   (1 << 1)
 #define LOG_ALL     (LOG_GENERAL | LOG_TICKS)

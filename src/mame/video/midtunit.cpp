@@ -18,6 +18,7 @@
 #include "debugger.h"
 
 #include "emuopts.h" // Used by PNG logging
+#include "fileio.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging

@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "strata.h"
 
+#include "fileio.h"
+
 
 #define FEEPROM_SIZE        0x800000    // 64Mbit
 #define BLOCK_SIZE          0x020000

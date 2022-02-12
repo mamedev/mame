@@ -177,8 +177,8 @@ public:
 	void export_http_api();
 
 	// TODO: Do saves and loads still require scheduling?
-	void immediate_save(const char *filename);
-	void immediate_load(const char *filename);
+	void immediate_save(std::string_view filename);
+	void immediate_load(std::string_view filename);
 
 	// rewind operations
 	bool rewind_capture();

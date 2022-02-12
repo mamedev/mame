@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "machine/x76f041.h"
 
+#include "fileio.h"
+
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) x76f041_device::verboselog( int n_level, const char *s_fmt, ... )

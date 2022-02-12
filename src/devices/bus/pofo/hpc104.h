@@ -13,7 +13,7 @@
 
 #include "exp.h"
 #include "bus/pofo/ccm.h"
-#include "machine/nvram.h"
+#include "fileio.h"
 
 
 
