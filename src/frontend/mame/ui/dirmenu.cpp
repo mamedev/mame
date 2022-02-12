@@ -16,6 +16,7 @@
 #include "ui/optsmenu.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "mame.h"
 
 #include "util/corestr.h"

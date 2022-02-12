@@ -131,9 +131,11 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs51.h"
 #include "mcs51dasm.h"
+
+#include "debugger.h"
+#include "fileio.h"
 
 #define VERBOSE 0
 

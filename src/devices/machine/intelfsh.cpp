@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "intelfsh.h"
 
+#include "fileio.h"
+
 
 //**************************************************************************
 //  CONSTANTS

@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "bq48x2.h"
 
+#include "fileio.h"
+
 #define LOG_WARN         (1U<<1)    // Warnings
 #define LOG_CLOCK        (1U<<2)    // Clock operation
 #define LOG_REGW         (1U<<3)    // Register write

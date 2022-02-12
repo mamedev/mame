@@ -25,6 +25,8 @@ there are two standard values.
 #include "emu.h"
 #include "machine/i2cmem.h"
 
+#include "fileio.h"
+
 constexpr int STATE_IDLE(0);
 constexpr int STATE_DEVSEL(1);
 constexpr int STATE_ADDRESSHIGH(2);

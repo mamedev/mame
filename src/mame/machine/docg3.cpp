@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "machine/docg3.h"
 
+#include "fileio.h"
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ... )

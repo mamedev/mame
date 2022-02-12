@@ -126,6 +126,8 @@
 #include "emu.h"
 #include "horizon.h"
 
+#include "fileio.h"
+
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
 #define LOG_32K         (1U<<3)   // 32K optional RAM r/w

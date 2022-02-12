@@ -12,6 +12,8 @@
 #include "ds1386.h"
 #include "machine/timehelp.h"
 
+#include "fileio.h"
+
 #define DISABLE_OSC     (0x80)
 #define DISABLE_SQW     (0x40)
 

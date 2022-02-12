@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "pcf8583.h"
 
+#include "fileio.h"
+
 #define LOG_DATA (1 << 1)
 #define LOG_LINE (1 << 2)
 

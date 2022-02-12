@@ -14,6 +14,7 @@
 #include "exp.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/gen_latch.h"
+#include "fileio.h"
 
 
 

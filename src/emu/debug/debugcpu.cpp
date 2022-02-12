@@ -19,6 +19,7 @@
 
 #include "debugger.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "screen.h"
 #include "uiinput.h"
 
