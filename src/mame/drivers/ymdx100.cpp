@@ -57,7 +57,7 @@ service manual, but is still readily available.
       of cassette samples get translated to a 1 or a 0.
     - [TODO2] Bit 5 of port 6 is tied to the /G2A and /G2B pins of the two
       TC40H138P chips (~~ 74138?) that sit between the panel switches and the CPU.
-      I don't yet undrstand how these lines are actually used, but I can still use
+      I don't yet understand how these lines are actually used, but I can still use
       the full functions of the keyboard if I just have it return 0 on read, so.
 
 *** CPU ports
@@ -132,52 +132,52 @@ void yamaha_dx100_state::init_dx100()
 	u8 *rom = (u8 *) (memregion("program")->base());
 	auto skip = [rom](u16 whichAddr, u16 jumpTo, u8 extraInst = 0, u16 nop2 = 0) {
 		if (extraInst != 0) {
-			rom[whichAddr & 0x7FFF] = extraInst;
+			rom[whichAddr & 0x7fff] = extraInst;
 			whichAddr++;
 		}
-		rom[whichAddr & 0x7FFF] = 0x7E;
-		rom[(whichAddr + 1) & 0x7FFF] = (u8) ((jumpTo >> 8) & 0xFF);
-		rom[(whichAddr + 2) & 0x7FFF] = (u8) (jumpTo & 0xFF);
+		rom[whichAddr & 0x7fff] = 0x7e;
+		rom[(whichAddr + 1) & 0x7fff] = (u8) ((jumpTo >> 8) & 0xff);
+		rom[(whichAddr + 2) & 0x7fff] = (u8) (jumpTo & 0xff);
 		if (nop2 != 0) {
-			rom[nop2 & 0x7FFF] = 0x01;
-			rom[(nop2 + 1) & 0x7FFF] = 0x01;
+			rom[nop2 & 0x7fff] = 0x01;
+			rom[(nop2 + 1) & 0x7fff] = 0x01;
 		}
 	};
 	// 1. Output level, RAM battery voltage
-	skip(0xC464, 0xC4B3);
+	skip(0xc464, 0xc4b3);
 	// 2. RAM, cassette interface, MIDI in/out, MIDI thru
 	// This is hard to skip as a unit in the code, so you need to skip them individually:
 		// Or to only disable a subset of these tests:
 		// 2a. RAM test
-		rom[0xC55F & 0x7FFF] = 0x39;
+		rom[0xc55f & 0x7fff] = 0x39;
 		// 2b. Cassette interface test (I'm not entirely sure MAME's cassette interface
 		//     supports the direct writing; I *think* this is MSX format?)
-		rom[0xC66E & 0x7FFF] = 0x39;
+		rom[0xc66e & 0x7fff] = 0x39;
 		// 2c. MIDI in/out (I'm not sure why this is failing, but something's not right)
-		rom[0xC631 & 0x7FFF] = 0x39;
+		rom[0xc631 & 0x7fff] = 0x39;
 		// 2d. MIDI thru
-		skip(0xC6B0, 0xC52A, 0, 0xC4DD);
+		skip(0xc6b0, 0xc52a, 0, 0xc4dd);
 	// 3. LCD test
 	// This is actually two tests in the code, so you need to skip them individually:
 		// 2a. LCD solid flashing test
-		skip(0xC6E1, 0xC52A, 0, 0xC4E6);
+		skip(0xc6e1, 0xc52a, 0, 0xc4e6);
 		// 2b. LCD checkerboard test
-		skip(0xC6D1, 0xC52A, 0, 0xC4EF);
+		skip(0xc6d1, 0xc52a, 0, 0xc4ef);
 	// 4. Pitch wheel, mod wheel, data entry slider, breath controller, foot switch
 	// AND (run as part of 4 in the code)
 	// 5. Foot switch detecting circuit
-	skip(0xC70F, 0xC7A9);
+	skip(0xc70f, 0xc7a9);
 		// Or to only disable a subset of these tests:
 		// 4a/5. Foot switch tests
-		skip(0xC7B3, 0xC7A9, 0x38);
+		skip(0xc7b3, 0xc7a9, 0x38);
 	// 6. Keyboard
-	skip(0xC86E, 0xC927);
+	skip(0xc86e, 0xc927);
 	// 7. LCD contrast
 	// AND (run as part of 7 in the code)
 	// 8. Main power, LED flash on low power
-	skip(0xC927, 0xC98F);
+	skip(0xc927, 0xc98f);
 	// 9. Panel switches
-	skip(0xC9D3, 0xCA50);
+	skip(0xc9d3, 0xca50);
 }
 
 *******************************************************************************/
@@ -195,6 +195,8 @@ void yamaha_dx100_state::init_dx100()
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "dx100.lh"
 
 namespace {
 
@@ -459,46 +461,47 @@ static INPUT_PORTS_START(dx100)
 	
 	PORT_START("AN0")
 	// The pitch wheel returns to center once released.
-	PORT_BIT( 0xFF, 0x7F, IPT_PADDLE ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xFF)
+	// PORT_REVERSE makes pressing DOWN with the default controls decrease the pitch instead of increase.
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 
 	PORT_START("AN1")
 	// The mod wheel stays in place to wherever it's set.
-	PORT_BIT( 0xFF, 0, IPT_POSITIONAL ) PORT_NAME("Modulation Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xFF) PORT_CENTERDELTA(0)
+	// PORT_REVERSE is here for the same reason as with the pitch wheel.
+	PORT_BIT( 0xff, 0, IPT_PADDLE_V ) PORT_NAME("Modulation Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("AN2")
-	// TODO I have no idea what kind of input this should actually be...
-	// TODO also this appears to be inverted; if this is set to 255 it behaves as if
+	// TODO this appears to be inverted; if this is set to 255 it behaves as if
 	// there was no breath controller? or at least seems to? on instruments like
 	// 112 Pianobrass if this is set to 0 it acts as if the mod wheel had been turned
 	// all the way up and enables LFO -- and there's probably a better way we could
 	// simulate not having a breath controller attached at all???
-	PORT_BIT( 0xFF, 0, IPT_POSITIONAL ) PORT_NAME("Breath Controller") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xFF) PORT_CENTERDELTA(0) PORT_REVERSE
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_NAME("Breath Controller") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 
 	PORT_START("AN3")
 	// The data entry slider stays in place to wherever it's set.
-	PORT_BIT( 0xFF, 0, IPT_POSITIONAL ) PORT_NAME("Data Entry Slider") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xFF) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0, IPT_POSITIONAL ) PORT_NAME("Data Entry Slider") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CENTERDELTA(0)
 
 	PORT_START("AN5")
-	PORT_CONFNAME( 0xFF, 0x80, "Internal RAM Battery Level" )
-	// "CNG RAM BATTERY!" displayed unless value is between 0x70 and 0xCC
-	PORT_CONFSETTING( 0x6F, "Too Low" )
+	PORT_CONFNAME( 0xff, 0x80, "Internal RAM Battery Level" )
+	// "CNG RAM BATTERY!" displayed unless value is between 0x70 and 0xcc
+	PORT_CONFSETTING( 0x6f, "Too Low" )
 	PORT_CONFSETTING( 0x70, "Lowest Allowed" )
 	PORT_CONFSETTING( 0x80, "Normal" ) // for some arbitrary definition of "normal"
-	PORT_CONFSETTING( 0xCB, "Highest Allowed" )
-	PORT_CONFSETTING( 0xCC, "Too High" )
+	PORT_CONFSETTING( 0xcb, "Highest Allowed" )
+	PORT_CONFSETTING( 0xcc, "Too High" )
 
 	PORT_START("AN6")
-	PORT_CONFNAME( 0xFF, 0x00, "Battery Power Level" )
+	PORT_CONFNAME( 0xff, 0x00, "Battery Power Level" )
 	// Yes, higher values mean lower voltages.
 	// I think this is opposite to how the RAM battery voltmeter works.
 	// The weird granularity here is due to the buggy implementation of the
 	// test in the test mode; all 7V values should LED flash, but some don't.
 	PORT_CONFSETTING( 0x00, "9V (Normal)" ) // for some arbitrary definition of "normal"
-	PORT_CONFSETTING( 0x4B, "9V (Lowest Allowed)" )
+	PORT_CONFSETTING( 0x4b, "9V (Lowest Allowed)" )
 	PORT_CONFSETTING( 0x67, "7V (Highest Allowed Without LED Flash)" )
-	PORT_CONFSETTING( 0x6B, "7V (Lowest Allowed Without LED Flash)" )
-	PORT_CONFSETTING( 0x6C, "7V (Highest Allowed With LED Flash)" )
-	PORT_CONFSETTING( 0x6F, "7V (Lowest Allowed With LED Flash)" )
+	PORT_CONFSETTING( 0x6b, "7V (Lowest Allowed Without LED Flash)" )
+	PORT_CONFSETTING( 0x6c, "7V (Highest Allowed With LED Flash)" )
+	PORT_CONFSETTING( 0x6f, "7V (Lowest Allowed With LED Flash)" )
 	PORT_CONFSETTING( 0x70, "Less Than 7V" )
 INPUT_PORTS_END
 
@@ -512,15 +515,15 @@ void yamaha_dx100_state::dx100(machine_config &config)
 		u8 casplay = m_port6_val & 0x80; // [TODO1]
 		u8 casrec = m_port6_val & 0x40; // [TODO1]
 		u8 adcval = ((u8) (m_adc->eoc_r() << 4)) & 0x10;
-		u8 port5line = (m_port6_val & 0x2F);
+		u8 port5line = (m_port6_val & 0x2f);
 		return casplay | casrec | adcval | port5line;
 	});
 	m_maincpu->out_p6_cb().set([this](u8 val) { m_port6_val = val; });
 	m_maincpu->in_p5_cb().set([this]() -> u8 {
-		u8 line = m_port6_val & 0x2F;
+		u8 line = m_port6_val & 0x2f;
 		if ((line & 0x20) != 0)
 			return 0x00;	// [TODO2]
-		return (u8) (m_keysbuttons[line]->read() & 0xFF);
+		return (u8) (m_keysbuttons[line]->read() & 0xff);
 	});
 	m_maincpu->out_ser_tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 
@@ -561,6 +564,8 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	ym2164_device &ymsnd(YM2164(config, "ymsnd", 7.15909_MHz_XTAL / 2)); // with YM3014 DAC
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
+
+	config.set_default_layout(layout_dx100);
 }
 
 ROM_START(dx100)
