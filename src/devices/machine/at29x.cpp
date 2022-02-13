@@ -40,6 +40,8 @@
 #include "emu.h"
 #include "at29x.h"
 
+#include "fileio.h"
+
 #define LOG_DETAIL      (1U<<1)     // More detail
 #define LOG_WARN        (1U<<2)     // Warning
 #define LOG_PRG         (1U<<3)     // Programming

@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "cr589.h"
 
+#include "fileio.h"
+
 
 static constexpr int identity_offset = 0x3ab;
 static constexpr char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";

@@ -245,8 +245,8 @@ public:
 
 	virtual uint8_t status_r() override;
 
-	uint8_t conf2_r() { return config2; };
-	void conf2_w(uint8_t data) { config2 = data; };
+	uint8_t conf2_r() { return config2; }
+	void conf2_w(uint8_t data) { config2 = data; }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -296,9 +296,9 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	uint8_t conf3_r() { return config3; };
-	void conf3_w(uint8_t data) { config3 = data; };
-	void fifo_align_w(uint8_t data) { fifo_align = data; };
+	uint8_t conf3_r() { return config3; }
+	void conf3_w(uint8_t data) { config3 = data; }
+	void fifo_align_w(uint8_t data) { fifo_align = data; }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

@@ -287,22 +287,22 @@ multiple effects of a write access.  For example:
 
 * Some registers need to be written in sequence to avoid race
   conditions.  The debugger can issue multiple writes at the same point
-  in emulated time, so these race conditions cannot be avoided
-  trivially.  For example writing to the MC68HC05 output compare
-  register high byte (OCRH) inhibits compare until the output compare
-  register low byte (OCRL) is written to prevent race conditions.
-  Since the debugger can write to both locations at the same instant
-  from the emulated machine’s point of view, the race condition is not
-  usually relevant.  It’s more error-prone if you can accidentally set
-  hidden state when all you really want to do is change the value, so
-  writing to OCRH with side effects suppressed does not inhibit compare,
-  it just changes the value in the output compare register.
+  in emulated time, so these race conditions can be avoided trivially.
+  For example writing to the MC68HC05 output compare register high byte
+  (OCRH) inhibits compare until the output compare register low byte
+  (OCRL) is written to prevent race conditions.  Since the debugger can
+  write to both locations at the same instant from the emulated
+  machine’s point of view, the race condition is not usually relevant.
+  It’s more error-prone if you can accidentally set hidden state when
+  all you really want to do is change the value, so writing to OCRH with
+  side effects suppressed does not inhibit compare, it just changes the
+  value in the output compare register.
 * Writing to some registers has multiple effects that may be useful to
   separate for debugging purposes.  Using the MC68HC05 as an example
   again, writing to OCRL changes the value in the output compare
   register, and also clears the output compare flag (OCF) and enables
   compare if it was previously inhibited by writing to OCRH.  Writing to
-  OCRL with side effects disable just changes the value in the register
+  OCRL with side effects disabled just changes the value in the register
   without clearing OCF or enabling compare, since it’s useful for
   debugging purposes.  Writing to OCRL with side effects enabled has the
   additional effects.

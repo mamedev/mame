@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "msx_s1985.h"
 
+#include "fileio.h"
+
 const uint8_t manufacturer_id = 0xfe;
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")

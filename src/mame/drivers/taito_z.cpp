@@ -3219,16 +3219,16 @@ void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vd
 	m_screen->set_raw(XTAL(26'686'000)/4, 424, 0, 320, 262, vdisp_start, vdisp_end);
 }
 
-void contcirc_state::contcirc(machine_config &config)
+void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.000
 {
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &contcirc_state::contcirc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    // Z0840004PSC @ 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contcirc_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &contcirc_state::contcirc_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
@@ -3259,7 +3259,7 @@ void contcirc_state::contcirc(machine_config &config)
 	SPEAKER(config, "rear").rear_center();
 	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "subwoofer", 0.20);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
@@ -3277,17 +3277,17 @@ void contcirc_state::contcirc(machine_config &config)
 	m_tc0140syt->set_slave_tag(m_audiocpu);
 }
 
-void chasehq_state::chasehq(machine_config &config)
+void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.000
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &chasehq_state::chasehq_map);
 	m_maincpu->set_vblank_int("screen", FUNC(chasehq_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    // Z0840004PSC @ 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &chasehq_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &chasehq_state::chasehq_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(chasehq_state::irq4_line_hold));
 
@@ -3318,7 +3318,7 @@ void chasehq_state::chasehq(machine_config &config)
 	SPEAKER(config, "rear").rear_center();
 	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "subwoofer", 0.20);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
@@ -3339,14 +3339,14 @@ void chasehq_state::chasehq(machine_config &config)
 void contcirc_state::enforce(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &contcirc_state::enforce_map);
 	m_maincpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    // Z0840004PSC @ 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contcirc_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &contcirc_state::enforce_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
@@ -3379,7 +3379,7 @@ void contcirc_state::enforce(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -3472,14 +3472,14 @@ void taitoz_state::bsharkjjs(machine_config &config)
 void sci_state::sci(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sci_state::sci_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sci_state::sci_interrupt));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(32'000'000)/8);    // 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sci_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &sci_state::sci_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(sci_state::irq4_line_hold));
 
@@ -3510,7 +3510,7 @@ void sci_state::sci(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -3529,17 +3529,17 @@ void sci_state::sci(machine_config &config)
 	m_tc0140syt->set_slave_tag(m_audiocpu);
 }
 
-void nightstr_state::nightstr(machine_config &config)
+void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.000
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightstr_state::nightstr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nightstr_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    // Z0840004PSC @ 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nightstr_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightstr_state::nightstr_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(nightstr_state::irq4_line_hold));
 
@@ -3579,7 +3579,7 @@ void nightstr_state::nightstr(machine_config &config)
 	SPEAKER(config, "rear").rear_center();
 	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "subwoofer", 0.20);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
@@ -3597,17 +3597,17 @@ void nightstr_state::nightstr(machine_config &config)
 	m_tc0140syt->set_slave_tag(m_audiocpu);
 }
 
-void taitoz_z80_sound_state::aquajack(machine_config &config)
+void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.000, 16.000
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::aquajack_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoz_z80_sound_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    // Z0840004PSC @ 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);   /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::aquajack_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_z80_sound_state::irq4_line_hold));
 
@@ -3639,7 +3639,7 @@ void taitoz_z80_sound_state::aquajack(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -3658,14 +3658,14 @@ void taitoz_z80_sound_state::aquajack(machine_config &config)
 	m_tc0140syt->set_slave_tag(m_audiocpu);
 }
 
-void spacegun_state::spacegun(machine_config &config)
+void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.000
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz ??? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacegun_state::spacegun_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spacegun_state::irq4_line_hold));
 
-	M68000(config, m_subcpu, 16000000);   /* 16 MHz ??? */
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);   // MC68000P12 @ 12 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &spacegun_state::spacegun_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(spacegun_state::irq4_line_hold));
 
@@ -3704,7 +3704,7 @@ void spacegun_state::spacegun(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -3722,14 +3722,14 @@ void spacegun_state::spacegun(machine_config &config)
 void dblaxle_state::dblaxle(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &dblaxle_state::dblaxle_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dblaxle_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/8);
+	Z80(config, m_audiocpu, XTAL(32'000'000)/8);   // 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dblaxle_state::z80_sound_map);
 
-	M68000(config, m_subcpu, XTAL(32'000'000)/2);
+	M68000(config, m_subcpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &dblaxle_state::dblaxle_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(dblaxle_state::irq4_line_hold));
 
@@ -3762,7 +3762,7 @@ void dblaxle_state::dblaxle(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -3784,14 +3784,14 @@ void dblaxle_state::dblaxle(machine_config &config)
 void sci_state::racingb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sci_state::racingb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sci_state::sci_interrupt));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/8);
+	Z80(config, m_audiocpu, XTAL(32'000'000)/8);   // 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sci_state::z80_sound_map);
 
-	M68000(config, m_subcpu, XTAL(32'000'000)/2);
+	M68000(config, m_subcpu, XTAL(32'000'000)/2);   // 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &sci_state::racingb_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(sci_state::irq4_line_hold));
 
@@ -3823,7 +3823,7 @@ void sci_state::racingb(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);

@@ -4292,7 +4292,7 @@ public:
 		set_intf(intf);
 	}
 	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~discrete_sound_device() { };
+	virtual ~discrete_sound_device() { }
 
 	/* --------------------------------- */
 
@@ -4344,7 +4344,7 @@ public:
 	virtual void stop() { }
 	virtual void save_state();
 
-	virtual int max_output() { return 1; };
+	virtual int max_output() { return 1; }
 
 	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != nullptr); }
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != nullptr); }

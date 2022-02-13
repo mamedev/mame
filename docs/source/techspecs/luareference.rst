@@ -63,6 +63,29 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-notifiersub:
+
+Notifier subscription
+~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``util::notifier_subscription`` class, which manages a subscription
+to a broadcast notification.
+
+Methods
+^^^^^^^
+
+subscription:unsubscribe()
+    Unsubscribes from notifications.  The subscription will become inactive and
+    no future notifications will be received.
+
+Properties
+^^^^^^^^^^
+
+subscription.is_active (read-only)
+    A Boolean indicating whether the subscription is active.  A subscription
+    becomes inactive after explicitly unsubscribing or if the underlying
+    notifier is destroyed.
+
 .. _luareference-core-attotime:
 
 Attotime
@@ -1363,6 +1386,34 @@ space:read_range(start, end, width, [step])
     Reads a range of addresses as a binary string.  The end address must be
     greater than or equal to the start address.  The width must be 8, 16, 30 or
     64.  If the step is provided, it must be a positive number of elements.
+space:add_change_notifier(callback)
+    Add a callback to receive notifications for handler changes in address
+    space.  The callback function is passed a single string as an argument,
+    either ``r`` if read handlers have potentially changed, ``w`` if write
+    handlers have potentially changed, or ``rw`` if both read and write handlers
+    have potentially changed.
+
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+space:install_read_tap(start, end, name, callback)
+    Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
+    receive notifications on reads from the specified range of addresses in the
+    address space.  The start and end addresses are inclusive.  The name must be
+    a string, and the callback must be a function.
+
+    The callback is passed three arguments for the access offset, the data read,
+    and the memory access mask.  To modify the data being read, return the
+    modified value from the callback function as an integer.  If the callback
+    does not return an integer, the data will not be modified.
+space:install_write_tap(start, end, name, callback)
+    Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
+    receive notifications on write to the specified range of addresses in the
+    address space.  The start and end addresses are inclusive.  The name must be
+    a string, and the callback must be a function.
+
+    The callback is passed three arguments for the access offset, the data
+    written, and the memory access mask.  To modify the data being written,
+    return the modified value from the callback function as an integer.  If the
+    callback does not return an integer, the data will not be modified.
 
 Properties
 ^^^^^^^^^^
@@ -1386,6 +1437,52 @@ space.endianness (read-only)
 space.map (read-only)
     The configured :ref:`address map <luareference-mem-map>` for the space or
     ``nil``.
+
+.. _luareference-mem-tap:
+
+Pass-through handler
+~~~~~~~~~~~~~~~~~~~~
+
+Tracks a pass-through handler installed in an
+:ref:`address space <luareference-mem-space>`.  A memory pass-through handler
+receives notifications on accesses to a specified range of addresses, and can
+modify the data that is read or written if desired.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].spaces[name]:install_read_tap(start, end, name, callback)
+    Installs a pass-through handler that will receive notifications on reads
+    from the specified range of addresses in an
+    :ref:`address space <luareference-mem-space>`.
+manager.machine.devices[tag].spaces[name]:install_write_tap(start, end, name, callback)
+    Installs a pass-through handler that will receive notifications on writes to
+    the specified range of addresses in an
+    :ref:`address space <luareference-mem-space>`.
+
+Methods
+^^^^^^^
+
+passthrough:reinstall()
+    Reinstalls the pass-through handler in the address space.  May be necessary
+    if the handler is removed due to other changes to handlers in the address
+    space.
+passthrough:remove()
+    Removes the pass-through handler from the address space.  The associated
+    callback will not be called in response to future memory accesses.
+
+Properties
+^^^^^^^^^^
+
+passthrough.addrstart (read-only)
+    The inclusive start address of the address range monitored by the
+    pass-through handler (i.e. the lowest address that the handler will be
+    notified for).
+passthrough.addrend (read-only)
+    The inclusive end address of the address range monitored by the pass-through
+    handler (i.e. the highest address that the handler will be notified for).
+passthrough.name (read-only)
+    The display name for the pass-through handler.
 
 .. _luareference-mem-map:
 
@@ -3049,15 +3146,22 @@ debugger is not enabled.
 Instantiation
 ^^^^^^^^^^^^^
 
-emu.symbol_table(machine, [parent], [device])
+emu.symbol_table(machine)
     Creates a new symbol table in the context of the specified machine,
-    optionally supplying a parent symbol table.  If a parent symbol table is
-    supplied, it must not be destroyed before the new symbol table.  If a device
-    is specified and it implements ``device_memory_interface``, it is used as
-    the base for looking up address spaces and memory regions.  Note that if a
-    device that does not implement ``device_memory_interface`` is supplied, it
-    will not be used (address spaces and memory regions will be looked up
-    relative to the root device).
+emu.symbol_table(parent, [device])
+    Creates a new symbol table with the specified parent symbol table.  If a
+    device is specified and it implements ``device_memory_interface``, it will
+    be used as the base for looking up address spaces and memory regions.  Note
+    that if a device that does not implement ``device_memory_interface`` is
+    supplied, it will not be used (address spaces and memory regions will be
+    looked up relative to the root device).
+emu.symbol_table(device)
+    Creates a new symbol table in the context of the specified device.  If the
+    device implements ``device_memory_interface``, it will be used as the base
+    for looking up address spaces and memory regions.  Note that if a device
+    that does not implement ``device_memory_interface`` is supplied, it will
+    only be used to determine the machine context (address spaces and memory
+    regions will be looked up relative to the root device).
 
 Methods
 ^^^^^^^
@@ -3072,6 +3176,8 @@ symbols:add(name, [value])
     is added with the supplied value.  If no value is supplied, a read/write
     symbol is created with and initial value of zero.  If a symbol entry with
     the specified name already exists in the symbol table, it will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:add(name, getter, [setter], [format])
     Adds a named integer symbol using getter and optional setter callbacks.  The
     name must be a string.  The getter must be a function returning an integer
@@ -3080,10 +3186,14 @@ symbols:add(name, getter, [setter], [format])
     string for displaying the symbol value may optionally be supplied.  If a
     symbol entry with the specified name already exists in the symbol table, it
     will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:add(name, minparams, maxparams, execute)
     Adds a named function symbol.  The name must be a string.  The minimum and
     maximum numbers of parameters must be integers.  If a symbol entry with the
     specified name already exists in the symbol table, it will be replaced.
+
+    Returns the new :ref:`symbol entry <luareference-debug-symentry>`.
 symbols:find(name)
     Returns the :ref:`symbol entry <luareference-debug-symentry>` with the
     specified name, or ``nil`` if there is no symbol with the specified name in
@@ -3140,8 +3250,8 @@ Wraps MAME’s ``parsed_expression`` class, which represents a tokenised debugge
 expression.  Note that parsed expressions can be created and used even when the
 debugger is not enabled.
 
-Intantiation
-^^^^^^^^^^^^
+Instantiation
+^^^^^^^^^^^^^
 
 emu.parsed_expression(symbols)
     Creates an empty expression that will use the supplied
@@ -3152,8 +3262,6 @@ emu.parsed_expression(symbols, string, [default_base])
     default base for interpreting integer literals is not supplied, 16 is used
     (hexadecimal).  Raises an error if the string contains syntax errors or uses
     undefined symbols.
-emu.parsed_expression(expression)
-    Creates a copy of an existing parsed expression.
 
 Methods
 ^^^^^^^
@@ -3168,7 +3276,7 @@ expression:parse(string)
     expression is not preserved when attempting to parse an invalid expression
     string.
 expression:execute()
-    Evaluates the expression, returning an unsigned integer result.  Raises an 
+    Evaluates the expression, returning an unsigned integer result.  Raises an
     error if the expression cannot be evaluated (e.g. calling a function with an
     invalid number of arguments).
 
@@ -3189,19 +3297,24 @@ Symbol entry
 ~~~~~~~~~~~~
 
 Wraps MAME’s ``symbol_entry`` class, which represents an entry in a
-:ref:`symbol table <luareference-debug-symtable>`.
+:ref:`symbol table <luareference-debug-symtable>`.  Note that symbol entries
+must not be used after the symbol table they belong to is destroyed.
 
 Instantiation
 ^^^^^^^^^^^^^
 
-symbols:find(name)
-    Obtains the symbol entry with the specified name from a
-    :ref:`symbol table <luareference-debug-symtable>`, but does not search
-    parent symbol tables.
-symbols:deep_find(name)
-    Obtains the symbol entry with the specified name from a
-    :ref:`symbol table <luareference-debug-symtable>`, recursively searching
-    parent symbol tables.
+symbols:add(name, [value])
+    Adds an integer symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
+symbols:add(name, getter, [setter], [format])
+    Adds an integer symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
+symbols:add(name, minparams, maxparams, execute)
+    Adds function symbol to a
+    :ref:`symbol table <luareference-debug-symtable>`, returning the new symbol
+    entry.
 
 Properties
 ^^^^^^^^^^
@@ -3271,7 +3384,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug()
+manager.machine.devices[tag].debug
     Returns the debugger interface for an emulated CPU device, or ``nil`` if the
     device is not a CPU.
 
@@ -3356,7 +3469,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():bplist()[bp]
+manager.machine.devices[tag].debug:bplist()[bp]
     Gets the specified breakpoint for an emulated CPU device, or ``nil`` if no
     breakpoint corresponds to the specified index.
 
@@ -3367,7 +3480,7 @@ breakpoint.index (read-only)
     The breakpoint’s index.  The can be used to enable, disable or clear the
     breakpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-breakpoint.enabled (read-only)
+breakpoint.enabled (read/write)
     A Boolean indicating whether the breakpoint is currently enabled.
 breakpoint.address (read-only)
     The breakpoint’s address.
@@ -3390,7 +3503,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.devices[tag]:debug():wplist(space)[wp]
+manager.machine.devices[tag].debug:wplist(space)[wp]
     Gets the specified watchpoint for an address space of an emulated CPU
     device, or ``nil`` if no watchpoint in the address space corresponds to the
     specified index.
@@ -3402,7 +3515,7 @@ watchpoint.index (read-only)
     The watchpoint’s index.  The can be used to enable, disable or clear the
     watchpoint via the
     :ref:`CPU debugger interface <luareference-debug-devdebug>`.
-watchpoint.enabled (read-only)
+watchpoint.enabled (read/write)
     A Boolean indicating whether the watchpoint is currently enabled.
 watchpoint.type (read-only)
     Either ``"r"``, ``"w"`` or ``"rw"`` for a read, write or read/write

@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "msm58321.h"
 
+#include "fileio.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

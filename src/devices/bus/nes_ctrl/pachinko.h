@@ -29,12 +29,9 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual void set_latch() override;
 
 private:
-	void set_latch();
-
 	required_ioport m_trigger;
 };
 

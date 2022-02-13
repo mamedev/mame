@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "macrtc.h"
 
+#include "fileio.h"
+
 #ifdef MAME_DEBUG
 #define LOG_RTC         0
 #else

@@ -141,29 +141,29 @@ Notes about 'Space Battle' by Hoei :
 
   The main board is based on Galaxian with the following changes...
     1. Adjustable 555 sound circuit has been removed.
-	2. Two additional noise circuits have been added similar to the 'hit' noise
-	   but using different vertical counts.
-	3. Six paged graphic roms are supported on board.
-	4. Different memory map.
-	5. 2K of ram.
-	6. Sockets for upto 26K of rom.
-	7. Socket for connecting speech synthesis board.
+    2. Two additional noise circuits have been added similar to the 'hit' noise
+       but using different vertical counts.
+    3. Six paged graphic roms are supported on board.
+    4. Different memory map.
+    5. 2K of ram.
+    6. Sockets for upto 26K of rom.
+    7. Socket for connecting speech synthesis board.
 
   Roms from two boards have been dumped. The graphics roms are the same.
   The game roms differ as follows:
     Set 1 Rom A contains a 16bit checksum at address 0x64/0x65.
-	      Rom I contains a 16bit checksum at address 0x7fe/0x7ff
-		  No other roms from this set contain a checksum.
-	Set 2 Rom A does not contain a valid checksum.
-	      Roms B, C, E, F, G, H, and I contain a 16bit checksum at 0x7fe/0x7ff
-		  Rom D contains a 16bit checksum at address 0x5e3/0x534
-		  Rom D contains inline code for one subroutine rather than calling the
-		        routine. It also has a check a for condition which can't happen
-				removed.
-		  Rom G checks the TEST button input on power up and calls 0x5800 if it
-		        is active. We do not have a dump of this (test ?) rom.
-	At no point are the checksums validated.
-	From a game point of view both rom sets function exactly the same.
+          Rom I contains a 16bit checksum at address 0x7fe/0x7ff
+          No other roms from this set contain a checksum.
+    Set 2 Rom A does not contain a valid checksum.
+          Roms B, C, E, F, G, H, and I contain a 16bit checksum at 0x7fe/0x7ff
+          Rom D contains a 16bit checksum at address 0x5e3/0x534
+          Rom D contains inline code for one subroutine rather than calling the
+                routine. It also has a check a for condition which can't happen
+                removed.
+          Rom G checks the TEST button input on power up and calls 0x5800 if it
+                is active. We do not have a dump of this (test ?) rom.
+    At no point are the checksums validated.
+    From a game point of view both rom sets function exactly the same.
 
   Interestingly, the overlapped 4764 ROM is actually from sstrangr2 (aka Super
   Space Stranger, marketed by Hoei), That's on completely different hardware.
@@ -10292,6 +10292,24 @@ ROM_START( redufob2 )
 	ROM_LOAD( "5049.6l",      0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( redufob3 ) // this bootleg has 0x3800 of program ROMs like the original. It seems to be halfway between the original and redufob2
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "1.rom1",      0x0000, 0x0800, CRC(ad9930d3) SHA1(63a892670e40257539a79e12caabe341509dc73e) )
+	ROM_LOAD( "2.rom2",      0x0800, 0x0800, CRC(65d1792d) SHA1(f644c8999584f6368a5fa235a92b89d13e1cd9e2) )
+	ROM_LOAD( "3.rom3",      0x1000, 0x0800, CRC(e1030d1c) SHA1(80640fbbfa7f84c016366b1084e7f8a7acdcd440) )
+	ROM_LOAD( "4.rom4",      0x1800, 0x0800, CRC(d801b80d) SHA1(b76173fcb022b3c443e1731e13d92212ff43408d) )
+	ROM_LOAD( "5.rom5",      0x2000, 0x0800, CRC(f1e46275) SHA1(9e08dbaae4f0f944cc9613090c60000bf2eeb869) )
+	ROM_LOAD( "6.rom6",      0x2800, 0x0800, CRC(98513f8a) SHA1(5a9fdf8e50ce70e25399730aa5f4fe8854a70992) )
+	ROM_LOAD( "7.rom7",      0x3000, 0x0800, CRC(fd07d811) SHA1(6b968a7ce452f76a8d26fe694aa4ea6b16e8b6fa) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gfx.1h",      0x0000, 0x0800, CRC(8a422b0d) SHA1(b886157518f73e7115a225ba230e456179f6e18f) )
+	ROM_LOAD( "gfx.1k",      0x0800, 0x0800, CRC(1eb84cb1) SHA1(08f360802a90039c0499a1417d06b6eb5f89d67e) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6l",   0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( exodus )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "exodus1.bin",  0x0000, 0x0800, CRC(5dfe65e1) SHA1(5f1ce289b3c98a89d61d4dea952b4b8888d92ed7) )
@@ -15561,6 +15579,7 @@ GAME( 1981, spactrai,    warofbug, spactrai,   spactrai,   galaxian_state, init_
 GAME( 1981, redufo,      0,        galaxian,   redufo,     galaxian_state, init_nolock,     ROT270, "Artic",                           "Defend the Terra Attack on the Red UFO",                              MACHINE_SUPPORTS_SAVE ) // is this the original?
 GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 1)",             MACHINE_SUPPORTS_SAVE ) // rev A?
 GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redufob3,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III ('Super Galaxians' hack)",                               MACHINE_SUPPORTS_SAVE )  // Hack of a hack (superg)

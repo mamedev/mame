@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "machine/eeprom.h"
 
+#include "fileio.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "icm7170.h"
+
 #include "coreutil.h"
+#include "fileio.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"

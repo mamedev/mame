@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	spectrum_mface_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(magic_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); };
+	virtual DECLARE_INPUT_CHANGED_MEMBER(magic_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); }
 
 protected:
 	spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -42,13 +42,13 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 	// passthru
-	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); };
-	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); };
-	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); };
+	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
+	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); }
+	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); }
 	virtual uint8_t iorq_r(offs_t offset) override { return m_exp->iorq_r(offset); }
 	virtual void iorq_w(offs_t offset, uint8_t data) override { m_exp->iorq_w(offset, data); }
 
-	void nmi(line_state state) { m_slot->nmi_w(state); m_nmi_pending = state; };
+	void nmi(line_state state) { m_slot->nmi_w(state); m_nmi_pending = state; }
 
 	required_memory_region m_rom;
 	required_device<spectrum_expansion_slot_device> m_exp;
@@ -223,7 +223,7 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; };
+	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
 
 	required_device<centronics_device> m_centronics;
 

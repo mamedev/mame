@@ -5,8 +5,12 @@
 PINBALL
 Williams WPC with DCS and Security PIC.
 
+The security PIC code is generally XYY 123456 12345 123 (where XYY = first,4th,5th digit of
+ the model number), but there are exceptions.
+
 If it says FACTORY SETTINGS, press F3, and wait for the game attract mode to commence.
-The volume may be turned up by pressing NUM+ .
+To increase the volume, open the coin door (NUM2), press NUM+, close coin door (NUM2).
+If coin door not closed, ball can't be ended.
 
 Here are the key codes to enable play:
 
@@ -21,7 +25,7 @@ World Cup Soccer               50031  Hold QWER hit 1         QWER
 The Shadow                     50032  Hold QWERT hit 1        QWERT
 Corvette                       50036  Hold QWER hit 1         QWER
 Theatre of Magic               50039  Hold QWER hit 1         QWER
-Johnny Mnemonic                50042  Hold QWER hit 1         unknown
+Johnny Mnemonic                50042  Hold QWER hit 1         QWER
 Who Dunnit                     50044  Hold QWER hit 1         QWER
 Jack*Bot                       50051  Hold QWER hit 1         QWER
 The Pinball Circus             60020  (not emulated)
