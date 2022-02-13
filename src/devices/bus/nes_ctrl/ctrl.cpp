@@ -234,3 +234,14 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("taptapmat", NES_TAPTAPMAT);
 	device.option_add("turbofile", NES_TURBOFILE);
 }
+
+void famibox_control_port12_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("zapper", NES_ZAPPER);
+}
+
+void famibox_control_port3_devices(device_slot_interface &device)
+{
+	device.option_add("zapper", NES_ZAPPER);
+}
