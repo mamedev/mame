@@ -61,7 +61,6 @@ Status:
 - Volume is quite low. On some machines it can be boosted by hitting NUM2 to get the volume menu, then hold NUM1 to max.
 
 ToDo:
-- NVRAM (it's there but doesn't save anything)
 - ATMEL ARM soundcard
 - Mechanical sounds
 - Outputs
@@ -312,6 +311,8 @@ void whitestar_state::whitestar(machine_config &config)
 	MC6809E(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &whitestar_state::whitestar_map);
 	m_maincpu->set_periodic_int(FUNC(whitestar_state::whitestar_firq_interrupt), attotime::from_hz(976));  // value taken from PinMAME
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	genpin_audio(config);
