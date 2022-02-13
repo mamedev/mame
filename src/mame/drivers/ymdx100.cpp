@@ -196,8 +196,6 @@ void yamaha_dx100_state::init_dx100()
 #include "screen.h"
 #include "speaker.h"
 
-#include "dx100.lh"
-
 namespace {
 
 class yamaha_dx100_state : public driver_device
@@ -564,8 +562,6 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	ym2164_device &ymsnd(YM2164(config, "ymsnd", 7.15909_MHz_XTAL / 2)); // with YM3014 DAC
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
-
-	config.set_default_layout(layout_dx100);
 }
 
 ROM_START(dx100)
