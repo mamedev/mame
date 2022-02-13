@@ -254,8 +254,8 @@ void debug_watchpoint::install(read_or_write mode)
 							[this, mask](offs_t offset, u16 &data, u16 mem_mask) {
 								if (mem_mask & mask)
 									triggered(read_or_write::WRITE, offset, data, mem_mask);
-							 },
-							 &m_phw);
+							},
+							&m_phw);
 			}
 		break;
 
