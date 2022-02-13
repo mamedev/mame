@@ -15,10 +15,10 @@
 #define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
 
 static constexpr rectangle screen_area[4] = {
-	rectangle(TSCONF_SCREEN_HBLANK + 52, TSCONF_SCREEN_HBLANK + 256 + 51, TSCONF_SCREEN_VBLANK + 48, TSCONF_SCREEN_VBLANK + 192 + 47), // 52|256|52 x 48-192-48
-	rectangle(TSCONF_SCREEN_HBLANK + 20, TSCONF_SCREEN_HBLANK + 320 + 19, TSCONF_SCREEN_VBLANK + 44, TSCONF_SCREEN_VBLANK + 200 + 43), // 20|320|20 x 44-200-44
-	rectangle(TSCONF_SCREEN_HBLANK + 20, TSCONF_SCREEN_HBLANK + 320 + 19, TSCONF_SCREEN_VBLANK + 24, TSCONF_SCREEN_VBLANK + 240 + 23), // 20|320|20 x 24-240-24
-	rectangle(TSCONF_SCREEN_HBLANK + 00, TSCONF_SCREEN_HBLANK + 360 - 01, TSCONF_SCREEN_VBLANK + 00, TSCONF_SCREEN_VBLANK + 288 - 01)  // 00|360|00 x 00-288-00
+	rectangle(with_hblank(52), with_hblank(256 + 51), with_vblank(48), with_vblank(192 + 47)), // 52|256|52 x 48-192-48
+	rectangle(with_hblank(20), with_hblank(320 + 19), with_vblank(44), with_vblank(200 + 43)), // 20|320|20 x 44-200-44
+	rectangle(with_hblank(20), with_hblank(320 + 19), with_vblank(24), with_vblank(240 + 23)), // 20|320|20 x 24-240-24
+	rectangle(with_hblank(00), with_hblank(360 - 01), with_vblank(00), with_vblank(288 - 01))  // 00|360|00 x 00-288-00
 };
 
 enum v_mode : u8

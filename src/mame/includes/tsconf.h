@@ -10,16 +10,16 @@
 
 #pragma once
 
+#include "spectrum.h"
 #include "machine/beta.h"
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
-#include "spectrum.h"
 #include "tilemap.h"
 
-#define TSCONF_SCREEN_HBLANK 88
-#define TSCONF_SCREEN_VBLANK 32
+constexpr u16 with_hblank(u16 pixclocks = 0) { return 88 + pixclocks; }
+constexpr u16 with_vblank(u16 pixclocks = 0) { return 32 + pixclocks; }
 
 class tsconf_state : public spectrum_128_state
 {
