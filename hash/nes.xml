@@ -11857,8 +11857,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="famibasa" cloneof="famibas">
-		<description>Family BASIC (Jpn, Rev. A)</description>
+	<software name="famibs20" cloneof="famibs21">
+		<description>Family BASIC (Japan, V2.0A)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-BS"/>
@@ -11866,7 +11866,7 @@ license:CC0
 		<info name="alt_title" value="ファミリーベーシック"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
-			<feature name="pcb" value="HVC-FAMILYBASIC" />
+			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
@@ -11883,8 +11883,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="famibas">
-		<description>Family BASIC (Jpn, Rev. A1)</description>
+	<software name="famibs21">
+		<description>Family BASIC (Japan, V2.1A)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-BS"/>
@@ -11892,7 +11892,7 @@ license:CC0
 		<info name="alt_title" value="ファミリーベーシック"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
-			<feature name="pcb" value="HVC-FAMILYBASIC" />
+			<feature name="pcb_model" value="FB-N-128-02" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
@@ -11910,7 +11910,7 @@ license:CC0
 	</software>
 
 	<software name="famibs30">
-		<description>Family BASIC V3 (Jpn)</description>
+		<description>Family BASIC V3 (Japan)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-VT"/>
@@ -11918,7 +11918,7 @@ license:CC0
 		<info name="alt_title" value="ファミリーベーシックV3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
-			<feature name="pcb" value="HVC-FAMILYBASIC" />
+			<feature name="pcb_model" value="VT-N-256-41" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
@@ -44365,8 +44365,29 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		</part>
 	</software>
 
-	<software name="pboxbas" supported="no">
-		<description>Playbox Basic V0.0 (Jpn, Proto)</description>
+	<software name="pboxbas1" cloneof="famibs21">
+		<description>Playbox BASIC (Japan, V1.0)</description>
+		<year>198?</year>
+		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="hvc_basic" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="fc_keyboard" />
+			<dataarea name="prg" size="32768">
+				<rom name="playbox basic v1.0.prg" size="32768" crc="da03d908" sha1="474869bb5882928a481e58ced0adcbb1b1ad18f9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="playbox basic v1.0.chr" size="8192" crc="11848b93" sha1="04311090fcb7c46d2df86a06575c81e09a0f77b8" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="2048">
+				<rom value="0x00" size="2048" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pboxbas0" cloneof="famibs21">
+		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46643,6 +46664,32 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famibs10" cloneof="famibs21">
+		<description>Family BASIC (Japan, V1.0)</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="HVC-BS"/>
+		<info name="release" value="19840621"/>
+		<info name="alt_title" value="ファミリーベーシック"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="hvc_basic" />
+			<feature name="pcb_model" value="FB-R-128-01" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="fc_keyboard" />
+			<dataarea name="prg" size="32768">
+				<rom name="hvc-fb1-0 a" size="16384" crc="8ece0244" sha1="fa16715f19dc326b855687a701459f3f46353d9f" offset="0x00000" />
+				<rom name="hvc-fb1-0 b" size="16384" crc="e61e0cda" sha1="d415da86ae1d36f9924183dc8c1ab0ce61b5a270" offset="0x04000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="hvc-fb1-0 c" size="8192" crc="11848b93" sha1="04311090fcb7c46d2df86a06575c81e09a0f77b8" offset="00000" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="2048">
+				<rom value="0x00" size="2048" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>

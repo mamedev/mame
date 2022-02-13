@@ -238,7 +238,15 @@ public:
 	void remove()
 	{
 		++m_installing;
-		m_handler.remove();
+		try
+		{
+			m_handler.remove();
+		}
+		catch (...)
+		{
+			--m_installing;
+			throw;
+		}
 		--m_installing;
 	}
 
@@ -249,41 +257,48 @@ private:
 		if (m_installing)
 			return;
 		++m_installing;
-		m_handler.remove();
-
-		switch (m_mode)
+		try
 		{
-		case read_or_write::READ:
-			m_handler = m_space.install_read_tap(
-					m_start,
-					m_end,
-					m_name,
-					[this] (offs_t offset, T &data, T mem_mask)
-					{
-						auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
-						if (result)
-							data = *result;
-					},
-					&m_handler);
-			break;
-		case read_or_write::WRITE:
-			m_handler = m_space.install_write_tap(
-					m_start,
-					m_end,
-					m_name,
-					[this] (offs_t offset, T &data, T mem_mask)
-					{
-						auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
-						if (result)
-							data = *result;
-					},
-					&m_handler);
-			break;
-		case read_or_write::READWRITE:
-			// won't ever get here, but compilers complain about unhandled enum value
-			break;
-		}
+			m_handler.remove();
 
+			switch (m_mode)
+			{
+			case read_or_write::READ:
+				m_handler = m_space.install_read_tap(
+						m_start,
+						m_end,
+						m_name,
+						[this] (offs_t offset, T &data, T mem_mask)
+						{
+							auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							if (result)
+								data = *result;
+						},
+						&m_handler);
+				break;
+			case read_or_write::WRITE:
+				m_handler = m_space.install_write_tap(
+						m_start,
+						m_end,
+						m_name,
+						[this] (offs_t offset, T &data, T mem_mask)
+						{
+							auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							if (result)
+								data = *result;
+						},
+						&m_handler);
+				break;
+			case read_or_write::READWRITE:
+				// won't ever get here, but compilers complain about unhandled enum value
+				break;
+			}
+		}
+		catch (...)
+		{
+			--m_installing;
+			throw;
+		}
 		--m_installing;
 	};
 

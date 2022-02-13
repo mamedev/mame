@@ -431,7 +431,7 @@ protected:
 
 	address_space * m_program;
 	uint32_t        m_data_bits;
-	std::function<u32(offs_t)> m_pr32;
+	delegate<u32 (offs_t)> m_pr32;
 	std::function<const void * (offs_t)> m_prptr;
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;

@@ -91,7 +91,7 @@ public:
 	/// inactive if it is default constructed, reset, transferred away,
 	/// or if the underlying notifier is destructed.
 	/// \return True if the subscription is active, false otherwise.
-	explicit operator bool() const noexcept { return bool(m_token.lock()); }
+	explicit operator bool() const noexcept { return !m_token.expired(); }
 
 	/// \brief Transfer ownership of a subscription
 	///

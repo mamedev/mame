@@ -1573,6 +1573,8 @@ private:
 	handler_entry_read <Width, AddrShift> *m_root_read;  // decode tree roots
 	handler_entry_write<Width, AddrShift> *m_root_write;
 
+	util::notifier_subscription m_subscription;
+
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0));
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0));
 	std::pair<NativeType, u16> read_native_flags(offs_t address, NativeType mask = ~NativeType(0));
@@ -2444,18 +2446,19 @@ set(address_space *space, std::pair<void *, void *> rw)
 	m_space = space;
 	m_addrmask = space->addrmask();
 
-	space->add_change_notifier([this](read_or_write mode) {
-								   if(u32(mode) & u32(read_or_write::READ)) {
-									   m_addrend_r = 0;
-									   m_addrstart_r = 1;
-									   m_cache_r = nullptr;
-								   }
-								   if(u32(mode) & u32(read_or_write::WRITE)) {
-									   m_addrend_w = 0;
-									   m_addrstart_w = 1;
-									   m_cache_w = nullptr;
-								   }
-							   });
+	m_subscription = space->add_change_notifier(
+			[this] (read_or_write mode) {
+			   if(u32(mode) & u32(read_or_write::READ)) {
+				   m_addrend_r = 0;
+				   m_addrstart_r = 1;
+				   m_cache_r = nullptr;
+			   }
+			   if(u32(mode) & u32(read_or_write::WRITE)) {
+				   m_addrend_w = 0;
+				   m_addrstart_w = 1;
+				   m_cache_w = nullptr;
+			   }
+		   });
 	m_root_read  = (handler_entry_read <Width, AddrShift> *)(rw.first);
 	m_root_write = (handler_entry_write<Width, AddrShift> *)(rw.second);
 

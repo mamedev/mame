@@ -499,18 +499,18 @@ nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char
 {
 }
 
-nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_vram_prot_bit(type == NES_BMC_TH22913 ? 10 : 9)
+nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vram_prot_bit)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_vram_prot_bit(vram_prot_bit)
 {
 }
 
 nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_th22913_device(mconfig, NES_BMC_TH22913, tag, owner, clock)
+	: nes_bmc_th22913_device(mconfig, NES_BMC_TH22913, tag, owner, clock, 10)
 {
 }
 
 nes_bmc_82ab_device::nes_bmc_82ab_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_th22913_device(mconfig, NES_BMC_82AB, tag, owner, clock)
+	: nes_bmc_th22913_device(mconfig, NES_BMC_82AB, tag, owner, clock, 9)
 {
 }
 
