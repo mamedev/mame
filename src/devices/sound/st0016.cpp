@@ -33,6 +33,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 	, device_memory_interface(mconfig, *this)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 21) // shares character RAM area?
 	, m_stream(nullptr)
+	, m_voice{ m_cache, m_cache, m_cache, m_cache, m_cache, m_cache, m_cache, m_cache }
 {
 }
 
@@ -48,10 +49,6 @@ void st0016_device::device_start()
 
 	// allocate stream
 	m_stream = stream_alloc(0, 2, clock() / 128);
-
-	// set host device to each voices
-	for (auto & elem : m_voice)
-		elem.m_host = m_cache;
 
 	save_item(STRUCT_MEMBER(m_voice, m_regs));
 	save_item(STRUCT_MEMBER(m_voice, m_start));
