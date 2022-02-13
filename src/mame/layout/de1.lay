@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 license:CC0
-copyright-holders:Barry Rodewald
+copyright-holders:Robbbert, Barry Rodewald
 
-Data East Alphanumeric Display Type 2
+Data East Alphanumeric Display Type 1
 -->
 
 <mamelayout version="2">
@@ -13,6 +13,13 @@ Data East Alphanumeric Display Type 2
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led14segsc>
 	</element>
+	<element name="ldigit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -23,13 +30,13 @@ Data East Alphanumeric Display Type 2
 			<param name="n" start="~s~" increment="1" />
 			<param name="x" start="0" increment="24" />
 			<element name="digit~n~" ref="digit">
-				<bounds x="~x~" y="0" width="24" height="39" />
+				<bounds x="~x~" y="0" width="20" height="39" />
 			</element>
 		</repeat>
 	</group>
 
 	<view name="Default Layout">
-		<bounds left="0" top="20" right="364" bottom="149" />
+		<bounds left="0" top="25" right="364" bottom="249" />
 
 		<!-- LEDs -->
 
@@ -42,7 +49,7 @@ Data East Alphanumeric Display Type 2
 		<!-- Player 2 Score -->
 		<param name="s" value="9" />
 		<group ref="score">
-			<bounds left="202" top="45" right="354" bottom="84" />
+			<bounds left="190" top="45" right="354" bottom="84" />
 		</group>
 
 		<!-- Player 3 Score -->
@@ -54,9 +61,24 @@ Data East Alphanumeric Display Type 2
 		<!-- Player 4 Score -->
 		<param name="s" value="25" />
 		<group ref="score">
-			<bounds left="202" top="100" right="354" bottom="139" />
+			<bounds left="190" top="100" right="354" bottom="139" />
 		</group>
 
+		<!-- Credits and Balls -->
+		<element name="digit16" ref="digit">
+			<bounds left="256" top="200" right="276" bottom="239" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds left="280" top="200" right="300" bottom="239" />
+		</element>
+		<element name="digit0" ref="ldigit">
+			<bounds left="310" top="200" right="330" bottom="239" />
+		</element>
+		<element name="digit8" ref="ldigit">
+			<bounds left="334" top="200" right="354" bottom="239" />
+		</element>
+		<element ref="P0"><bounds left="310" right="354" top="180" bottom="192" /></element>
+		<element ref="P1"><bounds left="256" right="300" top="180" bottom="192" /></element>
 		<element ref="P3"><bounds left="10" right="174" top="30" bottom="42" /></element>
 		<element ref="P4"><bounds left="190" right="354" top="30" bottom="42" /></element>
 		<element ref="P5"><bounds left="10" right="174" top="88" bottom="100" /></element>
