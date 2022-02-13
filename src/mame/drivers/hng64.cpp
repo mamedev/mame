@@ -78,7 +78,7 @@ The games in order of release are....
 002 Samurai Shodown 64 / Samurai Spirits 64
 003 Xtreme Rally / Off Beat Racer!
 004 Beast Busters: Second Nightmare
-005 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+005 Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden
 006 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
 007 Buriki One: World Grapple Tournament '99 in Tokyo
 
@@ -500,7 +500,7 @@ Games that use the LVS-DG1 cart: Road's Edge / Round Trip RV
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
                                  Buriki One: World Grapple Tournament '99 in Tokyo
-                                 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+                                 Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden
 
 There might be a Rev.A program for Buriki One and Round Trip RV, we have Rev. B dumps.
 
@@ -2923,6 +2923,6 @@ GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_road
 GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
 GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
 GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
