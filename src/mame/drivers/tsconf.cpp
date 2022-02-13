@@ -280,7 +280,7 @@ void tsconf_state::tsconf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	AY8912(config.replace(), "ay8912", 14_MHz_XTAL / 8)
+	YM2149(config.replace(), "ay8912", 14_MHz_XTAL / 8)
 		.add_route(0, "lspeaker", 0.50)
 		.add_route(1, "lspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.25)
