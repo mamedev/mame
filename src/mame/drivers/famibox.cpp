@@ -595,7 +595,11 @@ ROM_END
 
 ROM_START(famistat)
 	ROM_REGION(0xa000, "menu", 0)
-	ROM_LOAD("sss-m prg", 0x0000, 0x8000, CRC(efee1d74) SHA1(df5d9b3e61309ba9388c4d32fe0b04e33bbf358c))
+// PRG needs verified. It fails the Self Test. Info from Fiskbit: "Until the code changes at PRG address $4847,
+// the FamicomStation and FamicomBox dumps only differ in 2 bytes at $0000 and $0005, which are both $00 in
+// FamicomStation instead of $C9 and $01 in FamicomBox. The expected FamicomStation checksum is $1088,
+// while the calculated one is $0FBE, which is off by $CA, the sum of the differences of those 2 bytes."
+	ROM_LOAD("sss-m prg", 0x0000, 0x8000, BAD_DUMP CRC(efee1d74) SHA1(df5d9b3e61309ba9388c4d32fe0b04e33bbf358c))
 	ROM_LOAD("sss-m chr", 0x8000, 0x2000, CRC(85561c8a) SHA1(35ab7e72512831a2f4cfaa689551fe7b5fa6d673))
 
 	GAME_LIST
