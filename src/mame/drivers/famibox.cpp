@@ -60,7 +60,7 @@ Notes/ToDo:
 - coin insertion sound is not emulated
 - coin beep (before time out) is not emulated
 - screen modulation (before time out) is not emulated
-- nametable mirroring is incorrectly hardcoded to horizontal (cart NROM PCBs have H/V solder pads like their NES counterparts)
+- nametable mirroring is incorrectly hardcoded (cart PCBs have H/V solder pads like their NES counterparts)
 ***************************************************************************/
 
 #include "emu.h"
@@ -86,6 +86,9 @@ public:
 
 	void famibox(machine_config &config);
 
+	void init_famibox();
+	void init_famistat();
+
 	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -102,6 +105,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
 	uint8_t* m_nt_page[4];
+	uint8_t m_mirroring;
 
 	uint8_t       m_exception_mask;
 	uint8_t       m_exception_cause;
@@ -451,18 +455,18 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Coin timeout period" )
 	PORT_DIPSETTING(    0x00, "10 min" )
-	PORT_DIPSETTING(    0x02, "20 min" )
+	PORT_DIPSETTING(    0x02, "15 min" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Famicombox menu time" )
-	PORT_DIPSETTING(    0x00, "7 sec" )
-	PORT_DIPSETTING(    0x08, "12 sec" )
+	PORT_DIPSETTING(    0x00, "5 sec" )
+	PORT_DIPSETTING(    0x08, "10 sec" )
 	PORT_DIPNAME( 0x30, 0x00, "Attract time" )
-	PORT_DIPSETTING(    0x00, "12 sec" )
-	PORT_DIPSETTING(    0x10, "23 sec" )
-	PORT_DIPSETTING(    0x20, "17 sec" )
-	PORT_DIPSETTING(    0x30, "7 sec" )
+	PORT_DIPSETTING(    0x30, "5 sec" )
+	PORT_DIPSETTING(    0x00, "10 sec" )
+	PORT_DIPSETTING(    0x10, "15 sec" )
+	PORT_DIPSETTING(    0x20, "20 sec" )
 	PORT_DIPNAME( 0xc0, 0x80, "Operational mode" )
 	PORT_DIPSETTING(    0x00, "KEY MODE" )
 	PORT_DIPSETTING(    0x40, "CATV MODE" )
@@ -471,12 +475,12 @@ static INPUT_PORTS_START( famibox )
 
 	PORT_START("KEYSWITCH")
 	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state, famibox_keyswitch_changed, 0)
-	PORT_DIPSETTING(    0x01, "Key position 1" )
-	PORT_DIPSETTING(    0x02, "Key position 2" )
-	PORT_DIPSETTING(    0x04, "Key position 3" )
-	PORT_DIPSETTING(    0x08, "Key position 4" )
-	PORT_DIPSETTING(    0x10, "Key position 5" )
-	PORT_DIPSETTING(    0x20, "Key position 6" )
+	PORT_DIPSETTING(    0x20, "Game Count" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x08, "Self Test" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Unused ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
 
 	PORT_START("COIN")
@@ -497,7 +501,7 @@ void famibox_state::machine_reset()
 void famibox_state::machine_start()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x800);
-	set_mirroring(PPU_MIRROR_HORZ);
+	set_mirroring(m_mirroring);
 
 	famicombox_bankswitch(0);
 
@@ -540,45 +544,66 @@ void famibox_state::famibox(machine_config &config)
 		m_ctrl[i]->set_screen_tag(m_screen);
 }
 
+void famibox_state::init_famibox()
+{
+	m_mirroring = PPU_MIRROR_HORZ;
+}
+
+void famibox_state::init_famistat()
+{
+	m_mirroring = PPU_MIRROR_VERT;
+}
+
+#define GAME_LIST \
+	ROM_REGION(0x6000, "donkeykong", 0) \
+	ROM_LOAD("0.prg", 0x0000, 0x4000, CRC(06d1a012) SHA1(a6f92ae0a991c532e6377db2b3ab7f5c13d27675) ) \
+	ROM_LOAD("0.chr", 0x4000, 0x2000, CRC(a21d7c2e) SHA1(97c16cd6b1f3656428b682a23e6e4248c1ca3607) ) \
+ \
+	ROM_REGION(0x6000, "donkeykongjr", 0) \
+	ROM_LOAD("hvc-jr-1 prg", 0x0000, 0x4000, CRC(cf6c88b6) SHA1(cefc276e7601d14c6a20e545f334281b7a9fe8db) ) \
+	ROM_LOAD("hvc-jr-0 chr", 0x4000, 0x2000, CRC(852778ab) SHA1(307f2245cce164491012f75897eb984af0c3f456) ) \
+ \
+	ROM_REGION(0x6000, "popeye", 0) \
+	ROM_LOAD("hvc-pp-1 prg", 0x0000, 0x4000, CRC(0fa63a45) SHA1(50c594a6d8dcbeee2d83bca8c54c42cf57093aba) ) \
+	ROM_LOAD("hvc-pp-0 chr", 0x4000, 0x2000, CRC(a5fd8d98) SHA1(09d229404babb6c89b417ac541bab80fb06d2ba9) ) \
+ \
+	ROM_REGION(0x6000, "eigoasobi", 0) \
+	ROM_LOAD("hvc-en-0 prg", 0x0000, 0x4000, CRC(2dbfa36a) SHA1(0f4301d78d3dfa163239e7b7b7c4dff8a7e21bac) ) \
+	ROM_LOAD("hvc-en-0 chr", 0x4000, 0x2000, CRC(fccc0f36) SHA1(3566709c3c74960ce2ee1e60a85d026e70d7fd2c) ) \
+ \
+	ROM_REGION(0x6000, "mahjong", 0) \
+	ROM_LOAD("mahjong.prg", 0x0000, 0x4000, CRC(f86d8d8a) SHA1(2904137a030ae2370a8cd3e068078a1d59a4f229) ) \
+	ROM_LOAD("mahjong.chr", 0x4000, 0x2000, CRC(6bb45576) SHA1(5974787496dfa27a4b7fe6023473fae930ea41dc) ) \
+ \
+	ROM_REGION(0x6000, "gomokunarabe", 0) \
+	ROM_LOAD("hvc-go-0 prg", 0x0000, 0x4000, CRC(5603f579) SHA1(f2b007e3b13a777f9f88ff58f87ead6ae8f26327) ) \
+	ROM_LOAD("hvc-go-0 chr", 0x4000, 0x2000, CRC(97ea7144) SHA1(47d354c654285275d0a9420cc6eb3564f0453eb0) ) \
+ \
+	ROM_REGION(0x6000, "baseball", 0) \
+	ROM_LOAD("hvc-ba-0 prg", 0x0000, 0x4000, CRC(d18a3dde) SHA1(91f7d3e4c9d18c1969ca1fffdc811b763508a0a2) ) \
+	ROM_LOAD("hvc-ba-0 chr", 0x4000, 0x2000, CRC(c27eef20) SHA1(d5bd643b3ba98846e520b4d3f38aae45a29cf250) )
 
 ROM_START(famibox)
 	ROM_REGION(0xa000, "menu", 0)
-	ROM_LOAD("sss_menu.prg", 0x0000, 0x8000, CRC(da1eb8d2) SHA1(943e3b0edfbf9bd3ee87dc5f298621b9ddc98db8))
-	ROM_LOAD("sss_menu.chr", 0x8000, 0x2000, CRC(a43d4435) SHA1(ee56b4d2110aff394bf2c8cd3414ca175ace01bd))
+	ROM_LOAD("sss-m prg v-3", 0x0000, 0x8000, CRC(da1eb8d2) SHA1(943e3b0edfbf9bd3ee87dc5f298621b9ddc98db8))
+	ROM_LOAD("sss-m chr v-1", 0x8000, 0x2000, CRC(a43d4435) SHA1(ee56b4d2110aff394bf2c8cd3414ca175ace01bd))
 
-	ROM_REGION(0x6000, "donkeykong", 0)
-	ROM_LOAD("0.prg", 0x0000, 0x4000, CRC(06d1a012) SHA1(a6f92ae0a991c532e6377db2b3ab7f5c13d27675) )
-	ROM_LOAD("0.chr", 0x4000, 0x2000, CRC(a21d7c2e) SHA1(97c16cd6b1f3656428b682a23e6e4248c1ca3607) )
-
-	ROM_REGION(0x6000, "donkeykongjr", 0)
-	ROM_LOAD("hvc-jr-1 prg", 0x0000, 0x4000, CRC(cf6c88b6) SHA1(cefc276e7601d14c6a20e545f334281b7a9fe8db) )
-	ROM_LOAD("hvc-jr-0 chr", 0x4000, 0x2000, CRC(852778ab) SHA1(307f2245cce164491012f75897eb984af0c3f456) )
-
-	ROM_REGION(0x6000, "popeye", 0)
-	ROM_LOAD("hvc-pp-1 prg", 0x0000, 0x4000, CRC(0fa63a45) SHA1(50c594a6d8dcbeee2d83bca8c54c42cf57093aba) )
-	ROM_LOAD("hvc-pp-0 chr", 0x4000, 0x2000, CRC(a5fd8d98) SHA1(09d229404babb6c89b417ac541bab80fb06d2ba9) )
-
-	ROM_REGION(0x6000, "eigoasobi", 0)
-	ROM_LOAD("hvc-en-0 prg", 0x0000, 0x4000, CRC(2dbfa36a) SHA1(0f4301d78d3dfa163239e7b7b7c4dff8a7e21bac) )
-	ROM_LOAD("hvc-en-0 chr", 0x4000, 0x2000, CRC(fccc0f36) SHA1(3566709c3c74960ce2ee1e60a85d026e70d7fd2c) )
-
-	ROM_REGION(0x6000, "mahjong", 0)
-	ROM_LOAD("mahjong.prg", 0x0000, 0x4000, CRC(f86d8d8a) SHA1(2904137a030ae2370a8cd3e068078a1d59a4f229) )
-	ROM_LOAD("mahjong.chr", 0x4000, 0x2000, CRC(6bb45576) SHA1(5974787496dfa27a4b7fe6023473fae930ea41dc) )
-
-	ROM_REGION(0x6000, "gomokunarabe", 0)
-	ROM_LOAD("hvc-go-0 prg", 0x0000, 0x4000, CRC(5603f579) SHA1(f2b007e3b13a777f9f88ff58f87ead6ae8f26327) )
-	ROM_LOAD("hvc-go-0 chr", 0x4000, 0x2000, CRC(97ea7144) SHA1(47d354c654285275d0a9420cc6eb3564f0453eb0) )
-
-	ROM_REGION(0x6000, "baseball", 0)
-	ROM_LOAD("hvc-ba-0 prg", 0x0000, 0x4000, CRC(d18a3dde) SHA1(91f7d3e4c9d18c1969ca1fffdc811b763508a0a2) )
-	ROM_LOAD("hvc-ba-0 chr", 0x4000, 0x2000, CRC(c27eef20) SHA1(d5bd643b3ba98846e520b4d3f38aae45a29cf250) )
+	GAME_LIST
 
 	ROM_REGION(0x6000, "empty", ROMREGION_ERASEFF)
-
 ROM_END
 
+ROM_START(famistat)
+	ROM_REGION(0xa000, "menu", 0)
+	ROM_LOAD("sss-m prg", 0x0000, 0x8000, CRC(efee1d74) SHA1(df5d9b3e61309ba9388c4d32fe0b04e33bbf358c))
+	ROM_LOAD("sss-m chr", 0x8000, 0x2000, CRC(85561c8a) SHA1(35ab7e72512831a2f4cfaa689551fe7b5fa6d673))
+
+	GAME_LIST
+
+	ROM_REGION(0x6000, "empty", ROMREGION_ERASEFF)
+ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, famibox, 0, famibox, famibox, famibox_state, empty_init, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1986, famibox,  0,       famibox, famibox, famibox_state, init_famibox,  ROT0, "Nintendo", "FamicomBox",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1986, famistat, famibox, famibox, famibox, famibox_state, init_famistat, ROT0, "Nintendo", "FamicomStation", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
