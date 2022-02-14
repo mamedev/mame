@@ -77,15 +77,13 @@ void tsconf_state::tsconf_update_bank0()
 
 	if (W0_RAM)
 	{
-		m_banks[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 		m_banks[0]->set_entry(m_ROMSelection);
+		m_bank0_rom.disable();
 	}
 	else
 	{
-		memory_region *rom = memregion("maincpu");
-		u8 rom_banks = (rom->bytes() - 0x10000) / 0x4000;
-		m_banks[0]->configure_entries(0, rom_banks, rom->base() + 0x10000, 0x4000);
-		m_banks[0]->set_entry(m_ROMSelection & 0x1f);
+		m_banks[4]->set_entry(m_ROMSelection & 0x1f);
+		m_bank0_rom.select(0);
 	}
 }
 
@@ -106,8 +104,7 @@ void tsconf_state::tsconf_update_video_mode()
 	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
 
-	// XXX needs one extra line in hight for proper scanline INTS. Tested with FC20YO
-	m_screen->configure(visarea.max_x + 1, visarea.max_y + 2, visarea, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period().as_attoseconds());
 }
 
 uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

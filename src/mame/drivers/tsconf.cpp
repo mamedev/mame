@@ -2,65 +2,65 @@
 // copyright-holders:Andrei I. Holub
 /***************************************************************************
 
-  TS-Configuration (ZX Evolution) machine driver.
-  Implementation: Revision C / 5-bit VDAC
+TS-Configuration (ZX Evolution) machine driver.
+Implementation: Revision C / 5-bit VDAC
 
-  Hobby computer ZX Evolution is Spectrum-compatible with extensions.
+Hobby computer ZX Evolution is Spectrum-compatible with extensions.
 
-  Hardware (ZX Evolution):
-  - Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
-  - 4 Mb RAM, 512Kb ROM;
-  - MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
-  - Based on fpga (Altera EP1K50);
-  - Peripheral MCU ATMEGA128;
-  - PS/2 keyboard and mouse support;
-  - Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
-  - Sound: AY, Beeper, Covox (PWM);
-  - Real-time clock.
+Hardware (ZX Evolution):
+- Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
+- 4 Mb RAM, 512Kb ROM;
+- MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
+- Based on fpga (Altera EP1K50);
+- Peripheral MCU ATMEGA128;
+- PS/2 keyboard and mouse support;
+- Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
+- Sound: AY, Beeper, Covox (PWM);
+- Real-time clock.
 
-  Features (TS-Configuration):
-  - Resolutions: 360x288, 320x240, 320x200, 256x192
-  - Hardware scrolled graphic planes
-  - 256 and 16 indexed colors per pixel
-  - Programmable color RAM with RGB555 color space and 256 cells
-  - Text mode with loadable font and hardware vertical scroll
-  - Up to 256 graphic screens
+Features (TS-Configuration):
+- Resolutions: 360x288, 320x240, 320x200, 256x192
+- Hardware scrolled graphic planes
+- 256 and 16 indexed colors per pixel
+- Programmable color RAM with RGB555 color space and 256 cells
+- Text mode with loadable font and hardware vertical scroll
+- Up to 256 graphic screens
 
-  - Up to 85 sprites per line
-  - Sprites sized from 8x8 to 64x64 pixels
-  - Up to 3 sprite planes
-  - Up to 2 tile planes with 8x8 pixels tiles
-  - Up to 16 palettes for sprites per line
-  - Up to 4 palettes for tiles per line for each tile plane
+- Up to 85 sprites per line
+- Sprites sized from 8x8 to 64x64 pixels
+- Up to 3 sprite planes
+- Up to 2 tile planes with 8x8 pixels tiles
+- Up to 16 palettes for sprites per line
+- Up to 4 palettes for tiles per line for each tile plane
 
-  - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
+- DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
 
-  Refs:
-    ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-           Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-           Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
-   TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
-           https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
-  FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
-      ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
+Refs:
+ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
+		Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+		Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
+TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
+		https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
+FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
+	ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
-  HowTo:
-  # Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
-  # Create SD image "wc.img"
-  # Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
-  # Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
-  $ chdman createhd -i wc.img -o wc.chd -c none
-  $ mame tsconf -hard wc.chd
-  # BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
-  # Change "Reset To: BD boot.$c"
-  # Reset (F3)
-  # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
+HowTo:
+# Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
+# Create SD image "wc.img"
+# Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
+# Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
+$ chdman createhd -i wc.img -o wc.chd -c none
+$ mame tsconf -hard wc.chd
+# BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
+# Change "Reset To: BD boot.$c"
+# Reset (F3)
+# Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
 
-  TODO:
-  - Ram cache
-  - VDos
-  - INTs not perfect. Currently all signals are invalidated after 32t(3.5MHz). Must only do so for frame, not scanline/DMA
-  - Palette change in the middle of the frame e.g. zapili-c0
+TODO:
+- Ram cache
+- VDos
+- INTs not perfect. Currently all signals are invalidated after 32t(3.5MHz). Must only do so for frame, not scanline/DMA
+- Palette change in the middle of the frame e.g. zapili-c0
 
  ****************************************************************************/
 
@@ -96,6 +96,9 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 void tsconf_state::tsconf_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr(m_banks[0]).w(FUNC(tsconf_state::tsconf_bank_w<0>));
+	map(0x0000, 0x3fff).view(m_bank0_rom);
+	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_banks[4]);
+
 	map(0x4000, 0x7fff).bankr(m_banks[1]).w(FUNC(tsconf_state::tsconf_bank_w<1>));
 	map(0x8000, 0xbfff).bankr(m_banks[2]).w(FUNC(tsconf_state::tsconf_bank_w<2>));
 	map(0xc000, 0xffff).bankr(m_banks[3]).w(FUNC(tsconf_state::tsconf_bank_w<3>));
@@ -197,9 +200,12 @@ void tsconf_state::video_start()
 
 void tsconf_state::machine_start()
 {
-	m_banks[1]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
-	m_banks[2]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
-	m_banks[3]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+	for (auto i = 0; i < 4; i++)
+		m_banks[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+
+	memory_region *rom = memregion("maincpu");
+	u8 rom_banks = (rom->bytes()) / 0x4000;
+	m_banks[4]->configure_entries(0, rom_banks, rom->base(), 0x4000);
 
 	save_item(NAME(m_regs));
 	// TODO save'm'all!
@@ -207,6 +213,7 @@ void tsconf_state::machine_start()
 
 void tsconf_state::machine_reset()
 {
+	m_bank0_rom.select(0);
 	m_program = &m_maincpu->space(AS_PROGRAM);
 
 	m_port_f7_ext = DISABLED;
@@ -296,8 +303,8 @@ void tsconf_state::tsconf(machine_config &config)
 }
 
 ROM_START(tsconf)
-	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
-	ROM_LOAD("ts-bios.rom", 0x010000, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
+	ROM_REGION(0x080000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
+	ROM_LOAD("ts-bios.rom", 0, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
