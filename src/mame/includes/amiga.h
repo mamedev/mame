@@ -458,7 +458,7 @@ public:
 	uint16_t custom_chip_r(offs_t offset);
 	void custom_chip_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
+	void paula_int_w(offs_t channel, u8 state);
 
 	uint16_t rom_mirror_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint32_t rom_mirror32_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -545,7 +545,7 @@ protected:
 	virtual void machine_reset() override;
 
 	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void custom_chip_reset();
 
@@ -558,7 +558,7 @@ protected:
 
 	virtual void vblank();
 
-	virtual void potgo_w(uint16_t data) {};
+	virtual void potgo_w(uint16_t data) {}
 
 	// joystick/mouse
 	virtual uint16_t joy0dat_r();

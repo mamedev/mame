@@ -41,8 +41,7 @@ protected:
 
 private:
 	required_device<i8272a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 
@@ -66,8 +65,7 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 	required_device<wd_fdc_device_base> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 private:
 	int m_drive_control;

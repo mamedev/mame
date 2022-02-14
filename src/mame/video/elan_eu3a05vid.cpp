@@ -421,8 +421,8 @@ uint16_t elan_eu3a05vid_device::get_tilemapindex_from_xy(uint16_t x, uint16_t y)
 	// top
 	// bottom
 
-	uint16_t tilemapsizey;
-	uint16_t tilemapsizex;
+	uint16_t tilemapsizey = 0;
+	uint16_t tilemapsizex = 0;
 	uint16_t pagesizey, pagesizex;
 
 	pagesizey = 14; pagesizex = 16;

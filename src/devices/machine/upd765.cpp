@@ -396,8 +396,7 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 uint8_t ps2_fdc_device::sra_r()
 {
 	uint8_t sra = 0;
-	int fid = dor & 3;
-	floppy_info &fi = flopi[fid];
+	floppy_info &fi = flopi[dor & 3];
 	if(fi.dir)
 		sra |= 0x01;
 	if(fi.index)
@@ -408,17 +407,38 @@ uint8_t ps2_fdc_device::sra_r()
 		sra |= 0x10;
 	if(fi.main_state == SEEK_WAIT_STEP_SIGNAL_TIME)
 		sra |= 0x20;
-	sra |= 0x40;
 	if(cur_irq)
 		sra |= 0x80;
 	if(mode == mode_t::M30)
+	{
 		sra ^= 0x1f;
+		if(drq)
+			sra |= 0x40;
+	}
+	else
+	{
+		if(!flopi[1].dev)
+			sra |= 0x40;
+	}
 	return sra;
 }
 
 uint8_t ps2_fdc_device::srb_r()
 {
-	return 0;
+	uint8_t srb = 0;
+	// TODO: rddata, wrdata, write enable bits
+	if(mode == mode_t::M30)
+	{
+		const uint8_t ds[4] = { 0x43, 0x23, 0x62, 0x61 };
+		srb = ds[dor & 3];
+		if(!flopi[1].dev)
+			srb |= 0x80;
+	}
+	else
+	{
+		srb = 0xc0 | ((dor & 1) << 6) | ((dor & 0x30) >> 4);
+	}
+	return srb;
 }
 
 uint8_t upd765_family_device::dor_r()
@@ -1783,7 +1803,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-            if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -1891,7 +1911,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			if(cur_live.crc) {
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE;
-				st2 |= ST2_CM;
+				st2 |= ST2_DD;
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
@@ -1987,6 +2007,14 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		fi.st0 |= ST0_NR | ST0_FAIL;
 		fi.sub_state = COMMAND_DONE;
 		st1 = 0;
+		st2 = 0;
+		write_data_continue(fi);
+		return;
+	}
+	else if(fi.dev && fi.dev->wpt_r()) {
+		fi.st0 |= ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = ST1_NW;
 		st2 = 0;
 		write_data_continue(fi);
 		return;
@@ -2147,7 +2175,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-            if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -2219,7 +2247,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			else
 				st1 &= ~ST1_ND;
 
-			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			sector_size = calc_sector_size(command[5]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
 			LOGSTATE("SEARCH_ADDRESS_MARK_DATA\n");
@@ -2242,7 +2270,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			}
 			if(cur_live.crc) {
 				st1 |= ST1_DE;
-				st2 |= ST2_CM;
+				st2 |= ST2_DD;
 			}
 			bool done = tc_done;
 			sectors_read++;
@@ -2303,9 +2331,18 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 	set_ds(command[1] & 3);
 	fi.ready = get_ready(command[1] & 3);
 
+	st1 = 0;
+	st2 = 0;
 	if(!fi.ready) {
 		fi.st0 = (command[1] & 7) | ST0_NR | ST0_FAIL;
 		fi.sub_state = TRACK_DONE;
+		format_track_continue(fi);
+		return;
+	}
+	else if(fi.dev && fi.dev->wpt_r()) {
+		fi.st0 = (command[1] & 7) | ST0_FAIL;
+		fi.sub_state = TRACK_DONE;
+		st1 = ST1_NW;
 		format_track_continue(fi);
 		return;
 	}
@@ -2348,8 +2385,8 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			LOGSTATE("TRACK_DONE\n");
 			main_phase = PHASE_RESULT;
 			result[0] = fi.st0;
-			result[1] = 0;
-			result[2] = 0;
+			result[1] = st1;
+			result[2] = st2;
 			result[3] = 0;
 			result[4] = 0;
 			result[5] = 0;
@@ -2493,7 +2530,7 @@ std::string upd765_family_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id == TIMER_DRIVE_READY_POLLING) {
 		run_drive_ready_polling();
@@ -3102,6 +3139,14 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 	select_connected = true;
 	select_multiplexed = false;
 	recalibrate_steps = 77; // TODO: 3917 in extended track range mode
+}
+
+void dp8473_device::soft_reset()
+{
+	upd765_family_device::soft_reset();
+
+	// "interrupt is generated when ... Internal Ready signal changes state immediately after a hardware or software reset"
+	other_irq = true;
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)

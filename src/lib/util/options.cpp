@@ -158,6 +158,8 @@ void core_options::entry::set_value(std::string &&newvalue, int priority_value, 
 	// it is invalid to set the value on a header
 	assert(type() != option_type::HEADER);
 
+	validate(newvalue);
+
 	// only set the value if we have priority
 	if (always_override || priority_value >= priority())
 	{
@@ -213,21 +215,23 @@ void core_options::entry::validate(const std::string &data)
 			char const *const strmin(minimum());
 			char const *const strmax(maximum());
 			int imin(0), imax(0);
-			if (strmin)
+			if (strmin && *strmin)
 			{
 				str.str(strmin);
+				str.seekg(0);
 				str >> imin;
 			}
-			if (strmax)
+			if (strmax && *strmax)
 			{
 				str.str(strmax);
+				str.seekg(0);
 				str >> imax;
 			}
-			if ((strmin && (ival < imin)) || (strmax && (ival > imax)))
+			if ((strmin && *strmin && (ival < imin)) || (strmax && *strmax && (ival > imax)))
 			{
-				if (!strmax)
+				if (!strmax || !*strmax)
 					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no less than %d); reverting to %s\n", name(), data, imin, value());
-				else if (!strmin)
+				else if (!strmin || !*strmin)
 					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be no greater than %d); reverting to %s\n", name(), data, imax, value());
 				else
 					throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d, inclusive); reverting to %s\n", name(), data, imin, imax, value());
@@ -245,21 +249,23 @@ void core_options::entry::validate(const std::string &data)
 			char const *const strmin(minimum());
 			char const *const strmax(maximum());
 			float fmin(0), fmax(0);
-			if (strmin)
+			if (strmin && *strmin)
 			{
 				str.str(strmin);
+				str.seekg(0);
 				str >> fmin;
 			}
-			if (strmax)
+			if (strmax && *strmax)
 			{
 				str.str(strmax);
+				str.seekg(0);
 				str >> fmax;
 			}
-			if ((strmin && (fval < fmin)) || (strmax && (fval > fmax)))
+			if ((strmin && *strmin && (fval < fmin)) || (strmax && *strmax && (fval > fmax)))
 			{
-				if (!strmax)
+				if (!strmax || !*strmax)
 					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no less than %f); reverting to %s\n", name(), data, fmin, value());
-				else if (!strmin)
+				else if (!strmin || !*strmin)
 					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be no greater than %f); reverting to %s\n", name(), data, fmax, value());
 				else
 					throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f, inclusive); reverting to %s\n", name(), data, fmin, fmax, value());
@@ -1136,7 +1142,7 @@ bool core_options::header_exists(const char *description) const noexcept
 void core_options::revert(int priority_hi, int priority_lo)
 {
 	for (entry::shared_ptr &curentry : m_entries)
-		if (curentry->type() != option_type::HEADER)
+		if (curentry->type() != option_type::HEADER && curentry->type() != option_type::COMMAND)
 			curentry->revert(priority_hi, priority_lo);
 }
 

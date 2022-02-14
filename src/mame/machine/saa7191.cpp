@@ -71,7 +71,7 @@ void saa7191_device::device_reset()
 	m_input_clock->adjust(attotime::never);
 }
 
-void saa7191_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void saa7191_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 }
 

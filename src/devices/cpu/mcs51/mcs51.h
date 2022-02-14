@@ -168,6 +168,7 @@ protected:
 		uint8_t   mcon;                   /* bootstrap loader MCON register */
 		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
 		uint8_t   crc;                    /* bootstrap loader CRC register */
+		int32_t   rnr_delay;              /* delay before new random number available */
 	} m_ds5002fp;
 
 	// for the debugger
@@ -315,7 +316,6 @@ protected:
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
 	uint8_t ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask);
-
 };
 
 
@@ -348,6 +348,7 @@ DECLARE_DEVICE_TYPE(SAB80C535, sab80c535_device)
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
 DECLARE_DEVICE_TYPE(I8344, i8344_device)
+DECLARE_DEVICE_TYPE(I8744, i8744_device)
 
 DECLARE_DEVICE_TYPE(DS5002FP, ds5002fp_device)
 
@@ -545,6 +546,16 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
+class i8744_device : public mcs51_cpu_device
+{
+public:
+	// construction/destruction
+	i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
 /*
  * The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
  * partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
@@ -593,6 +604,9 @@ protected:
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
+
+	uint8_t handle_rnr();
+	bool is_rnr_ready();
 
 private:
 	optional_memory_region m_region;

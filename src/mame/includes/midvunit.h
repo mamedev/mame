@@ -28,7 +28,7 @@ struct midvunit_object_data
 
 class midvunit_state;
 
-class midvunit_renderer : public poly_manager<float, midvunit_object_data, 2, 4000>
+class midvunit_renderer : public poly_manager<float, midvunit_object_data, 2>
 {
 public:
 	midvunit_renderer(midvunit_state &state);
@@ -198,5 +198,5 @@ private:
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

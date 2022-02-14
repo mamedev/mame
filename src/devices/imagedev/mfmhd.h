@@ -17,7 +17,11 @@
 #pragma once
 
 #include "imagedev/harddriv.h"
+
 #include "formats/mfm_hd.h"
+
+#include <system_error>
+
 
 class mfm_harddisk_device;
 
@@ -94,7 +98,7 @@ public:
 	attotime        track_end_time();
 
 	// Access the tracks on the image. Used as a callback from the cache.
-	chd_error       load_track(uint16_t* data, int cylinder, int head);
+	std::error_condition load_track(uint16_t* data, int cylinder, int head);
 	void            write_track(uint16_t* data, int cylinder, int head);
 
 	// Delivers the number of heads according to the loaded image
@@ -103,10 +107,10 @@ public:
 protected:
 	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void                device_start() override;
-	void                device_stop() override;
-	void                device_reset() override;
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void        device_start() override;
+	virtual void        device_stop() override;
+	virtual void        device_reset() override;
+	virtual void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	std::string         tts(const attotime &t);
 

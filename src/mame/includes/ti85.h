@@ -74,6 +74,7 @@ public:
 	void ti85d(machine_config &config);
 	void ti83pse(machine_config &config);
 	void ti84pse(machine_config &config);
+	void ti84pce(machine_config &config);
 	void ti86(machine_config &config);
 	void ti81(machine_config &config);
 	void ti85(machine_config &config);
@@ -196,7 +197,7 @@ private:
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
 	//crystal timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void ti83pse_count(uint8_t timer, uint8_t data);
 
 	emu_timer *m_crystal_timer1;

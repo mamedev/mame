@@ -37,7 +37,7 @@ Encryption PAL 16R4 on CPU board
 */
 
 
-void stfight_state::init_empcity()
+void stfight_state::init_stfight()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -62,15 +62,9 @@ void stfight_state::init_empcity()
 				( ~( ( src >> 6 ) ^ A ) & 0x01 );
 	}
 
-}
-
-void stfight_state::init_stfight()
-{
-	init_empcity();
-}
-
-void stfight_state::init_cshooter()
-{
+	// Set clock prescaler FM:1/2 PSG:1/1
+	m_ym[0]->write(0, 0x2f);
+	m_ym[1]->write(0, 0x2f);
 }
 
 void stfight_state::machine_start()
@@ -81,7 +75,6 @@ void stfight_state::machine_start()
 	m_int1_timer = timer_alloc(TIMER_STFIGHT_INTERRUPT_1);
 
 	save_item(NAME(m_coin_state));
-
 	save_item(NAME(m_fm_data));
 
 	save_item(NAME(m_cpu_to_mcu_empty));
@@ -116,7 +109,7 @@ void stfight_state::stfight_bank_w(uint8_t data)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

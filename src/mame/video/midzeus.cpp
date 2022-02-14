@@ -200,7 +200,7 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
  *************************************/
 
 midzeus_renderer::midzeus_renderer(midzeus_state &state)
-	: poly_manager<float, mz_poly_extra_data, 4, 10000>(state.machine()),
+	: poly_manager<float, mz_poly_extra_data, 4>(state.machine()),
 		m_state(state)
 {}
 
@@ -274,21 +274,7 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	m_poly->wait("VIDEO_UPDATE");
 
-	/* normal update case */
-	if (!machine().input().code_pressed(KEYCODE_V))
-	{
-		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
-		int xoffs = screen.visible_area().min_x;
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			uint16_t *const dest = &bitmap.pix(y);
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
-		}
-	}
-
-	/* waveram drawing case */
-	else
+	if (DEBUG_KEYS && machine().input().code_pressed(KEYCODE_V)) /* waveram drawing case */
 	{
 		const void *base;
 
@@ -309,8 +295,21 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				dest[x] = (tex << 8) | tex;
 			}
 		}
+
 		popmessage("offs = %06X", m_yoffs << 12);
 	}
+	else /* normal update case */
+	{
+		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
+		int xoffs = screen.visible_area().min_x;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			uint16_t *const dest = &bitmap.pix(y);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
+		}
+	}
+
 
 	return 0;
 }
@@ -580,7 +579,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					// m_zeusbase[0x46] = ??? = 0x00000000
 					// m_zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// m_zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					mz_poly_extra_data& extra = m_poly->object_data_alloc();
+					mz_poly_extra_data& extra = m_poly->object_data().next();
 					poly_vertex vert[4];
 
 					vert[0].x = (int16_t)m_zeusbase[0x08];
@@ -699,7 +698,12 @@ void midzeus_state::zeus_register_update(offs_t offset)
 
 		case 0xcc:
 			m_screen->update_partial(m_screen->vpos());
-			m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+
+			if (DEBUG_KEYS)
+				m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+			else
+				m_log_fifo = 0;
+
 			break;
 
 		case 0xe0:
@@ -1127,7 +1131,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		}
 	}
 
-	numverts = m_state.m_poly->zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
+	numverts = m_state.m_poly->zclip_if_less<4>(4, &vert[0], &clipvert[0], 512.0f);
 	if (numverts < 3)
 		return;
 
@@ -1155,7 +1159,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 			clipvert[i].y += 0.0005f;
 	}
 
-	mz_poly_extra_data& extra = m_state.m_poly->object_data_alloc();
+	mz_poly_extra_data& extra = m_state.m_poly->object_data().next();
 
 	if (ctrl_word & 0x01000000)
 	{
@@ -1193,15 +1197,14 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	// Note: Before being upgraded to the new polygon rasterizing code, this function call was
 	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
 	//       the template argument is 4, but keep an eye out for missing quads.
-	m_state.m_poly->render_polygon<4>(m_state.m_zeus_cliprect,
+	m_state.m_poly->render_polygon<4, 4>(m_state.m_zeus_cliprect,
 							render_delegate(&midzeus_renderer::render_poly, this),
-							4,
 							clipvert);
 }
 
 void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
 {
-	m_state.m_poly->render_polygon<4>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), 0, vert);
+	m_state.m_poly->render_polygon<4, 0>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), vert);
 }
 
 

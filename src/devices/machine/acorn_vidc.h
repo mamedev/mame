@@ -32,9 +32,6 @@ class acorn_vidc10_device : public device_t,
 							public device_video_interface
 {
 public:
-	// construction/destruction
-	acorn_vidc10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// I/O operations
 	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_READ_LINE_MEMBER( flyback_r );
@@ -50,7 +47,7 @@ public:
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
 
 protected:
-	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int dac_type);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -59,7 +56,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock();
@@ -91,6 +88,7 @@ protected:
 	bool     m_sound_mode;
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+	int m_dac_type;
 
 private:
 	required_device<speaker_device> m_lspeaker;
@@ -131,18 +129,23 @@ private:
 	inline void refresh_stereo_image(u8 channel);
 };
 
-class acorn_vidc10_lcd_device : public acorn_vidc10_device
+class acorn_vidc1_device : public acorn_vidc10_device
 {
 public:
 	// construction/destruction
-	acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	acorn_vidc1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class acorn_vidc1a_device : public acorn_vidc10_device
+{
+public:
+	// construction/destruction
+	acorn_vidc1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ACORN_VIDC10, acorn_vidc10_device)
-DECLARE_DEVICE_TYPE(ACORN_VIDC10_LCD, acorn_vidc10_lcd_device)
+DECLARE_DEVICE_TYPE(ACORN_VIDC1, acorn_vidc1_device)
+DECLARE_DEVICE_TYPE(ACORN_VIDC1A, acorn_vidc1a_device)
 
 class arm_vidc20_device : public acorn_vidc10_device
 {
@@ -160,7 +163,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
 
@@ -193,4 +196,4 @@ DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_ACORN_VIDC10_H
+#endif // MAME_MACHINE_ACORN_VIDC_H

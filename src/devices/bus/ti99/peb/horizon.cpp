@@ -126,6 +126,8 @@
 #include "emu.h"
 #include "horizon.h"
 
+#include "fileio.h"
+
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
 #define LOG_32K         (1U<<3)   // 32K optional RAM r/w
@@ -139,7 +141,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000B RAMdisk")
+DEFINE_DEVICE_TYPE(TI99_HORIZON, bus::ti99::peb::horizon_ramdisk_device, "ti99_horizon", "Horizon 4000B RAMdisk")
 
 namespace bus::ti99::peb {
 

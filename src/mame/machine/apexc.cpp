@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    machine/apexc.c : APEXC machine
+    machine/apexc.cpp : APEXC machine
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #include "emu.h"
@@ -66,8 +66,7 @@ void apexc_cylinder_image_device::call_unload()
 
 
 apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_punch_device(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
 {
 }
 
@@ -85,8 +84,7 @@ void apexc_tape_puncher_image_device::write(uint8_t data)
 }
 
 apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_READER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_reader_device(mconfig, APEXC_TAPE_READER, tag, owner, clock)
 {
 }
 

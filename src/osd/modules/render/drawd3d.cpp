@@ -8,10 +8,11 @@
 
 // MAME headers
 #include "emu.h"
-#include "render.h"
-
-#include "rendutil.h"
 #include "emuopts.h"
+#include "render.h"
+#include "rendutil.h"
+#include "screen.h"
+
 #include "aviio.h"
 
 // MAMEOS headers
@@ -1522,15 +1523,10 @@ void renderer_d3d9::batch_vector(const render_primitive &prim)
 	}
 
 	// compute the effective width based on the direction of the line
-	float effwidth = prim.width;
-	if (effwidth < 2.0f)
-	{
-		effwidth = 2.0f;
-	}
+	float effwidth = std::max(prim.width, 2.0f);
 
 	// determine the bounds of a quad to draw this line
-	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, effwidth, &b0, &b1);
+	auto [b0, b1] = render_line_to_quad(prim.bounds, effwidth, effwidth);
 
 	float lx = b1.x1 - b0.x1;
 	float ly = b1.y1 - b0.y1;
@@ -1629,15 +1625,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// compute the effective width based on the direction of the line
-	float effwidth = prim.width;
-	if (effwidth < 1.0f)
-	{
-		effwidth = 1.0f;
-	}
+	float effwidth = std::max(prim.width, 1.0f);
 
 	// determine the bounds of a quad to draw this line
-	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
+	auto [b0, b1] = render_line_to_quad(prim.bounds, effwidth, 0.0f);
 
 	vertex[0].x = b0.x0;
 	vertex[0].y = b0.y0;

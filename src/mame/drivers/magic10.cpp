@@ -123,6 +123,7 @@ Both setups show different variants for components layout, memory size, NVRAM, e
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
@@ -133,75 +134,115 @@ Both setups show different variants for components layout, memory size, NVRAM, e
 #include "musicsrt.lh"
 
 
-#define MAIN_CLOCK    XTAL(20'000'000)
+namespace {
+
 #define AUX_CLOCK     XTAL(30'000'000)
 
-#define CPU_CLOCK    MAIN_CLOCK/2
 
-
-class magic10_state : public driver_device
+class magic10_base_state : public driver_device
 {
 public:
-	magic10_state(const machine_config &mconfig, device_type type, const char *tag) :
+	magic10_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_layer0_videoram(*this, "layer0_videoram"),
-		m_layer1_videoram(*this, "layer1_videoram"),
-		m_layer2_videoram(*this, "layer2_videoram"),
+		m_videoram(*this, "videoram%u", 0U),
 		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_lamps(*this, "lamp%u", 1U)
+		m_palette(*this, "palette")
 	{ }
 
-	void magic102(machine_config &config);
-	void magic10a(machine_config &config);
-	void magic10(machine_config &config);
-	void hotslot(machine_config &config);
-	void sgsafari(machine_config &config);
-
-	void init_sgsafari();
-	void init_suprpool();
-	void init_magic102();
-	void init_magic10();
-	void init_hotslot();
-	void init_altaten();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-private:
-	void layer0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void layer1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void layer2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t magic102_r();
-	uint16_t hotslot_copro_r();
-	void hotslot_copro_w(uint16_t data);
-	void magic10_out_w(uint16_t data);
+	void base(machine_config &config);
+	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
-	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hotslot_map(address_map &map);
-	void magic102_map(address_map &map);
-	void magic10_map(address_map &map);
-	void magic10a_map(address_map &map);
-	void sgsafari_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_layer0_tilemap;
-	tilemap_t *m_layer1_tilemap;
-	tilemap_t *m_layer2_tilemap;
-	required_shared_ptr<uint16_t> m_layer0_videoram;
-	required_shared_ptr<uint16_t> m_layer1_videoram;
-	required_shared_ptr<uint16_t> m_layer2_videoram;
-	int m_layer2_offset[2];
+	tilemap_t *m_tilemap[3];
+	required_shared_ptr_array<uint16_t, 3> m_videoram;
+	int8_t m_layer2_offset[2];
+
 	required_shared_ptr<uint16_t> m_vregs;
-	uint16_t m_magic102_ret;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+};
+
+class magic10_state : public magic10_base_state
+{
+public:
+	magic10_state(const machine_config &mconfig, device_type type, const char *tag) :
+		magic10_base_state(mconfig, type, tag),
+		m_ticket(*this, "ticket"),
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
+
+	void magic10(machine_config &config);
+	void magic10a(machine_config &config);
+	void sgsafari(machine_config &config);
+
+	void init_magic10();
+	void init_sgsafari();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	required_device<ticket_dispenser_device> m_ticket;
+	required_device<ticket_dispenser_device> m_hopper;
+
+private:
 	output_finder<8> m_lamps;
+
+	void out_w(uint16_t data);
+	void magic10_map(address_map &map);
+	void magic10a_map(address_map &map);
+	void sgsafari_map(address_map &map);
+};
+
+class magic102_state : public magic10_base_state
+{
+public:
+	magic102_state(const machine_config &mconfig, device_type type, const char *tag) :
+		magic10_base_state(mconfig, type, tag)
+	{ }
+
+	void magic102(machine_config &config);
+
+	void init_altaten();
+	void init_magic102();
+	void init_suprpool();
+
+protected:
+	virtual void machine_start() override { save_item(NAME(m_ret)); }
+
+private:
+	uint16_t r();
+	uint16_t m_ret;
+
+	void map(address_map &map);
+};
+
+class hotslot_state : public magic10_state
+{
+public:
+	hotslot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		magic10_state(mconfig, type, tag)
+	{ }
+
+	void hotslot(machine_config &config);
+
+	void init_hotslot();
+
+private:
+	uint16_t copro_r();
+	void copro_w(uint16_t data);
+
+	void map(address_map &map);
 };
 
 
@@ -209,74 +250,63 @@ private:
 *      Video Hardware      *
 ***************************/
 
-void magic10_state::layer0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <uint8_t Which>
+void magic10_base_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_layer0_videoram[offset]);
-	m_layer0_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_videoram[Which][offset]);
+	m_tilemap[Which]->mark_tile_dirty(offset >> 1);
 }
 
-void magic10_state::layer1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_layer1_videoram[offset]);
-	m_layer1_tilemap->mark_tile_dirty(offset >> 1);
-}
-
-void magic10_state::layer2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_layer2_videoram[offset]);
-	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
-}
-
-TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
+TILE_GET_INFO_MEMBER(magic10_base_state::get_layer0_tile_info)
 {
 	tileinfo.set(1,
-		m_layer0_videoram[tile_index * 2],
-		m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
+		m_videoram[0][tile_index * 2],
+		m_videoram[0][tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((m_videoram[0][tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
+TILE_GET_INFO_MEMBER(magic10_base_state::get_layer1_tile_info)
 {
 	tileinfo.set(1,
-		m_layer1_videoram[tile_index * 2],
-		m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
+		m_videoram[1][tile_index * 2],
+		m_videoram[1][tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((m_videoram[1][tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
+TILE_GET_INFO_MEMBER(magic10_base_state::get_layer2_tile_info)
 {
 	tileinfo.set(0,
-		m_layer2_videoram[tile_index * 2],
-		m_layer2_videoram[tile_index * 2 + 1] & 0x0f,0);
+		m_videoram[2][tile_index * 2],
+		m_videoram[2][tile_index * 2 + 1] & 0x0f,0);
 }
 
 
-void magic10_state::video_start()
+void magic10_base_state::video_start()
 {
-	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_base_state::get_layer0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_base_state::get_layer1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_base_state::get_layer2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_layer1_tilemap->set_transparent_pen(0);
-	m_layer2_tilemap->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 }
 
-uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magic10_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/*TODO: understand where this comes from. */
-	m_layer2_tilemap->set_scrollx(0, m_layer2_offset[0]);
-	m_layer2_tilemap->set_scrolly(0, m_layer2_offset[1]);
+	// TODO: understand where this comes from.
+	m_tilemap[2]->set_scrollx(0, m_layer2_offset[0]);
+	m_tilemap[2]->set_scrolly(0, m_layer2_offset[1]);
 
 	/*
 	4 and 6 are y/x global register writes.
 	0 and 2 are y/x writes for the scrolling layer.
 	*/
-	m_layer1_tilemap->set_scrolly(0, (m_vregs[0/2] - m_vregs[4/2])+0);
-	m_layer1_tilemap->set_scrollx(0, (m_vregs[2/2] - m_vregs[6/2])+4);
+	m_tilemap[1]->set_scrolly(0, (m_vregs[0 / 2] - m_vregs[4 / 2]) + 0);
+	m_tilemap[1]->set_scrollx(0, (m_vregs[2 / 2] - m_vregs[6 / 2]) + 4);
 
-	m_layer0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_layer1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_layer2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -286,23 +316,23 @@ uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind1
 *       R/W Handlers       *
 ***************************/
 
-uint16_t magic10_state::magic102_r()
+uint16_t magic102_state::r()
 {
-	m_magic102_ret ^= 0x20;
-	return m_magic102_ret;
+	m_ret ^= 0x20;
+	return m_ret;
 }
 
-uint16_t magic10_state::hotslot_copro_r()
+uint16_t hotslot_state::copro_r()
 {
 	return 0x80;
 }
 
-void magic10_state::hotslot_copro_w(uint16_t data)
+void hotslot_state::copro_w(uint16_t data)
 {
 	logerror("Writing to copro: %d \n", data);
 }
 
-void magic10_state::magic10_out_w(uint16_t data)
+void magic10_state::out_w(uint16_t data)
 {
 /*
   ----------------------------------------------
@@ -336,22 +366,25 @@ void magic10_state::magic10_out_w(uint16_t data)
   7654 3210
   =========
   ---- ---x  Payout lamp.
+  ---- --x-  Ticket Motor Out.
   ---- -x--  Coin counter.
-
+  -x-- ----  Hopper Motor Out.
 */
 
 //  popmessage("lamps: %02X", data);
 
-	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
-	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
-	m_lamps[2] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
-	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamps[4] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
-	m_lamps[5] = BIT(data, 5);      /* Lamp 6 - START  */
-	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	m_lamps[7] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
+	m_lamps[0] = BIT(data, 0);      // Lamp 1 - HOLD 1
+	m_lamps[1] = BIT(data, 1);      // Lamp 2 - HOLD 2
+	m_lamps[2] = BIT(data, 2);      // Lamp 3 - HOLD 3
+	m_lamps[3] = BIT(data, 3);      // Lamp 4 - HOLD 4
+	m_lamps[4] = BIT(data, 4);      // Lamp 5 - HOLD 5
+	m_lamps[5] = BIT(data, 5);      // Lamp 6 - START
+	m_lamps[6] = BIT(data, 6);      // Lamp 7 - PLAY (BET/TAKE/CANCEL)
+	m_lamps[7] = BIT(data, 8);      // Lamp 8 - PAYOUT/SUPERGAME
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x400);
+	m_ticket->motor_w(BIT(data, 9) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 10));
+	m_hopper->motor_w(BIT(data, 14) );
 }
 
 /***************************
@@ -361,46 +394,46 @@ void magic10_state::magic10_out_w(uint16_t data)
 void magic10_state::magic10_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x400001).portr("INPUTS");
 	map(0x400002, 0x400003).portr("DSW");
-	map(0x400008, 0x400009).w(FUNC(magic10_state::magic10_out_w));
+	map(0x400008, 0x400009).w(FUNC(magic10_state::out_w));
 	map(0x40000b, 0x40000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x40000e, 0x40000f).nopw();
-	map(0x400080, 0x400087).ram().share("vregs");
+	map(0x400080, 0x400087).ram().share(m_vregs);
 	map(0x600000, 0x603fff).ram();
 }
 
 void magic10_state::magic10a_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500001).portr("INPUTS");
 	map(0x500002, 0x500003).portr("DSW");
-	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).nopw();
-	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
+	map(0x500080, 0x500087).ram().share(m_vregs);   // video registers?
 	map(0x600000, 0x603fff).ram();
 }
 
-void magic10_state::magic102_map(address_map &map)
+void magic102_state::map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic102_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(magic102_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(magic102_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x500001).r(FUNC(magic10_state::magic102_r));
+	map(0x500000, 0x500001).r(FUNC(magic102_state::r));
 	map(0x500004, 0x500005).nopr(); // gives credits
 	map(0x500006, 0x500007).nopr(); // gives credits
 	map(0x50001a, 0x50001b).portr("IN0");
@@ -409,18 +442,18 @@ void magic10_state::magic102_map(address_map &map)
 //  map(0x500002, 0x50001f).nopw();
 	map(0x600000, 0x603fff).ram();
 	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700080, 0x700087).ram().share("vregs");   // video registers?
+	map(0x700080, 0x700087).ram().share(m_vregs);   // video registers?
 }
 
-void magic10_state::hotslot_map(address_map &map)
+void hotslot_state::map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(hotslot_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(hotslot_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(hotslot_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500004, 0x500005).rw(FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
+	map(0x500004, 0x500005).rw(FUNC(hotslot_state::copro_r), FUNC(hotslot_state::copro_w)); // copro comm
 	map(0x500006, 0x500011).ram();
 	map(0x500012, 0x500013).portr("IN0");
 	map(0x500014, 0x500015).portr("IN1");
@@ -429,22 +462,22 @@ void magic10_state::hotslot_map(address_map &map)
 	map(0x50001a, 0x50001d).nopw();
 	map(0x600000, 0x603fff).ram();
 	map(0x70000b, 0x70000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700080, 0x700087).ram().share("vregs");
+	map(0x700080, 0x700087).ram().share(m_vregs);
 }
 
 void magic10_state::sgsafari_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x200000, 0x203fff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500002, 0x500003).portr("DSW1");
-	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).portr("IN0");
-	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
+	map(0x500080, 0x500087).ram().share(m_vregs);   // video registers?
 	map(0x600000, 0x603fff).ram();
 }
 /*
@@ -478,7 +511,7 @@ static INPUT_PORTS_START( magic10 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
@@ -486,19 +519,23 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Logo" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) // empty dispenser
-	PORT_DIPNAME( 0x00ee, 0x00ee, "Disable Free Play" )
-	PORT_DIPSETTING(      0x00ee, DEF_STR( Off ) )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_DIPNAME( 0x0008, 0x0008, "Clear NVRAM" ) // Needs to enabled by other DSW
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ))
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_F) // empty dispenser
+	PORT_DIPNAME( 0x00e4, 0x00e4, "Disable Free Play" )
+	PORT_DIPSETTING(      0x00e4, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Medium ) )    // Clr.NVRAM Enable
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0x0c00, 0x0000, "Notes Settings" )
 	PORT_DIPSETTING(      0x0000, "Note A: 10 - Note B: 20 - Note C: 50 - Note D: 100" )
 	PORT_DIPSETTING(      0x0800, "Note A: 20 - Note B: 40 - Note C: 100 - Note D: 200" )
-	PORT_DIPSETTING(      0x0400, "Note A: 50 - Note B: 100 - Note C: 500 - Note D: 1000" )
+	PORT_DIPSETTING(      0x0400, "Note A: 50 - Note B: 100 - Note C: 500 - Note D: 1000" )    // Clr.NVRAM Enable
 	PORT_DIPSETTING(      0x0c00, "Note A: 100 - Note B: 200 - Note C: 1000 - Note D: 2000" )
 	PORT_DIPNAME( 0x3000, 0x3000, "Lots At" )           PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0000, "50 200 500 1000 2000" )
@@ -506,24 +543,24 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPSETTING(      0x2000, "200 500 2000 3000 5000" )
 	PORT_DIPSETTING(      0x3000, "500 1000 2000 4000 8000" )
 	PORT_DIPNAME( 0x3000, 0x3000, "1 Ticket Won" )      PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
-//  PORT_DIPSETTING(      0x0000, "Every 100 Score" )
-//  PORT_DIPSETTING(      0x1000, "Every 100 Score" )
-//  PORT_DIPSETTING(      0x2000, "Every 100 Score" )
+	PORT_DIPSETTING(      0x0000, "Every 100 Score" )
+	PORT_DIPSETTING(      0x1000, "Every 100 Score" )
+	PORT_DIPSETTING(      0x2000, "Every 100 Score" )
 	PORT_DIPSETTING(      0x3000, "Every 100 Score" )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unused ) )   PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )    // Clr.NVRAM Enable
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )   PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )    // Clr.NVRAM Enable
 	PORT_DIPNAME( 0x3000, 0x3000, "1 Play Won" )        PORT_CONDITION("DSW", 0xc000, EQUALS, 0x0000)
-//  PORT_DIPSETTING(      0x0000, "Every 10 Score" )
-//  PORT_DIPSETTING(      0x1000, "Every 10 Score" )
-//  PORT_DIPSETTING(      0x2000, "Every 10 Score" )
+	PORT_DIPSETTING(      0x0000, "Every 10 Score" )
+	PORT_DIPSETTING(      0x1000, "Every 10 Score" )
+	PORT_DIPSETTING(      0x2000, "Every 10 Score" )
 	PORT_DIPSETTING(      0x3000, "Every 10 Score" )
 	PORT_DIPNAME( 0xc000, 0xc000, "Dispenser Type" )
 	PORT_DIPSETTING(      0x0000, "MKII Hopper - Supergame" )
-	PORT_DIPSETTING(      0x4000, "10 Tokens" )
+	PORT_DIPSETTING(      0x4000, "10 Tokens" )    // Clr.NVRAM Enable
 	PORT_DIPSETTING(      0x8000, "Tickets Dispenser" )
 	PORT_DIPSETTING(      0xc000, "Lots Dispenser" )
 INPUT_PORTS_END
@@ -561,13 +598,13 @@ static INPUT_PORTS_START( musicsrt )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Half Gamble")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet / Take)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )   PORT_NAME("Door") PORT_TOGGLE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Aux A")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Aux B")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Aux C") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("OK")
 
@@ -605,7 +642,7 @@ static INPUT_PORTS_START( hotslot )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("1/2 Win")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -614,7 +651,7 @@ static INPUT_PORTS_START( hotslot )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -663,13 +700,20 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout / Super Game")
 
 	PORT_START("DSW1")
 	// TODO: defaults are hardwired with aforementioned startup code, is it intentional?
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0300,   0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(        0x0300, DEF_STR( Easy ) )
 	PORT_DIPSETTING(        0x0200, DEF_STR( Normal ) )
@@ -698,17 +742,6 @@ INPUT_PORTS_END
 *     Graphics Layouts      *
 ****************************/
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout tiles16x16_layout =
 {
 	16,16,
@@ -728,8 +761,8 @@ static const gfx_layout tiles16x16_layout =
 ****************************/
 
 static GFXDECODE_START( gfx_magic10 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar,  0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -737,12 +770,11 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-void magic10_state::magic10(machine_config &config)
+void magic10_base_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK);  // 10 MHz.
-	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic10_map);
-	m_maincpu->set_vblank_int("screen", FUNC(magic10_state::irq1_line_hold));
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2);  // 10 MHz.
+	m_maincpu->set_vblank_int("screen", FUNC(magic10_base_state::irq1_line_hold));
 
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -752,16 +784,28 @@ void magic10_state::magic10(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 44*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(magic10_state::screen_update_magic10));
+	screen.set_screen_update(FUNC(magic10_base_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magic10);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);   /* clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);   // clock frequency & pin 7 not verified
+}
+
+
+void magic10_state::magic10(machine_config &config)
+{
+	base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic10_map);
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(20), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 }
 
 
@@ -769,28 +813,28 @@ void magic10_state::magic10a(machine_config &config)
 {
 	magic10(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic10a_map);
 }
 
 
-void magic10_state::magic102(machine_config &config)
+void magic102_state::magic102(machine_config &config)
 {
-	magic10(config);
+	base(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic102_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &magic102_state::map);
 
 	subdevice<screen_device>("screen")->set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
 }
 
 
-void magic10_state::hotslot(machine_config &config)
+void hotslot_state::hotslot(machine_config &config)
 {
 	magic10(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::hotslot_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotslot_state::map);
 
 	subdevice<screen_device>("screen")->set_visarea(8*8, 56*8-1, 2*8, 32*8-1);
 }
@@ -800,9 +844,9 @@ void magic10_state::sgsafari(machine_config &config)
 {
 	magic10(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::sgsafari_map);
-	m_maincpu->set_vblank_int("screen", FUNC(magic10_state::irq2_line_hold));    /* L1 interrupts */
+	m_maincpu->set_vblank_int("screen", FUNC(magic10_state::irq2_line_hold));    // L1 interrupts
 
 	subdevice<screen_device>("screen")->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
 }
@@ -851,35 +895,35 @@ void magic10_state::sgsafari(machine_config &config)
 
 */
 ROM_START( magic10 )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2.16.55s.u3", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
 	ROM_LOAD16_BYTE( "3.16.55s.u2", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "16.u25", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
 	ROM_LOAD( "14.u26", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
 	ROM_LOAD( "15.u27", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
 	ROM_LOAD( "17.u28", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16r4.u42", 0x0000, 0x0104, CRC(6d70f3f2) SHA1(44c2be5945c052e057d4e0b03369acb7b9ff5d37) )
 ROM_END
 
 ROM_START( magic10a )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "u3.bin", 0x000000, 0x20000, CRC(3ef8736c) SHA1(0c36c516349cf2c843c4beb64c979b73da56183d) ) // sldh
 	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x20000, CRC(c30507fc) SHA1(ca15e30e9078dae2177df1ec33c94b37317ced61) ) // sldh
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "u25.bin", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
 	ROM_LOAD( "u26.bin", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
 	ROM_LOAD( "u27.bin", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
 	ROM_LOAD( "u28.bin", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 ROM_END
 
@@ -918,17 +962,17 @@ ROM_END
 
 */
 ROM_START( magic10b )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "u3_1645.bin",  0x00000, 0x20000, CRC(7f2549e4) SHA1(6578ad29273c357faae7c6be3fa1b49087e088a2) )
 	ROM_LOAD16_BYTE( "u2_1645.bin",  0x00001, 0x20000, CRC(c075234e) SHA1(d9bc38f0b984082a77088fbb52b02c8f5c49846c) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "u25.bin", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
 	ROM_LOAD( "u26.bin", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
 	ROM_LOAD( "u27.bin", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
 	ROM_LOAD( "u28.bin", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 ROM_END
 
@@ -973,20 +1017,20 @@ ROM_END
 
 */
 ROM_START( magic10c )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(32c12ad6) SHA1(93340df2c0f4c260837bd6649008e26a17a22015) )
 	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(a9945aaa) SHA1(97d4f6441b96618f2e3ce14095ffc5628cb14f0e) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "6.u25", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
 	ROM_LOAD( "4.u26", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
 	ROM_LOAD( "5.u27", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
 	ROM_LOAD( "7.u28", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16v8h.u42", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
@@ -1016,20 +1060,20 @@ ROM_END
 
 */
 ROM_START( magic102 )
-	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2.u3",  0x00000, 0x20000, CRC(6fc55fe4) SHA1(392ad92e55aeac9bf5235cceb6b0b415942105a4) )
 	ROM_LOAD16_BYTE( "1.u2",  0x00001, 0x20000, CRC(501507af) SHA1(ceed50c9380a9838cd3d171d2387334edfeff77f) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "3.u35",        0x00000, 0x20000, CRC(df47bb12) SHA1(b8bcbc9ab764d3159344d93776d13a14c9154086) )
 	ROM_LOAD( "4.u36",        0x20000, 0x20000, CRC(dc242034) SHA1(6a2983c79776df07f29b77f23799fef6f20df24f) )
 	ROM_LOAD( "5.u37",        0x40000, 0x20000, CRC(a048e26e) SHA1(788c28470298896902120e74fd8b9b283b8e9b79) )
 	ROM_LOAD( "6.u38",        0x60000, 0x20000, CRC(469efb34) SHA1(b16646fb0c4757132e272b3877cf546b6f616786) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "7.u32",        0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
@@ -1041,7 +1085,7 @@ ROM_START( magic102a )
 	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu", 0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
+	ROM_REGION( 0x80000, "tiles", 0 )// tiles
 	ROM_LOAD( "7.u35", 0x00000, 0x20000, CRC(82cef471) SHA1(c9649e295336863c713ddf5615f0e8cacdf218e7) )
 	ROM_LOAD( "6.u36", 0x20000, 0x20000, CRC(dc064229) SHA1(511af9036dbd0f3c6f668d46e4971ee0bcaaf816) )
 	ROM_LOAD( "5.u37", 0x40000, 0x20000, CRC(efe2f609) SHA1(e18be34f3b67669a8852b88bda6ba85227470cc1) )
@@ -1103,23 +1147,23 @@ ROM_END
 
 */
 ROM_START( suprpool )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2-1.22a.u3", 0x00000, 0x20000,CRC(5d15037a) SHA1(74cab79a1b08910267262a4c6b501126a4df6cda) )
 	ROM_LOAD16_BYTE( "3-1.22a.u2", 0x00001, 0x20000,CRC(c762cd1c) SHA1(ee05a9e8147d613eb14333e6e7b743fc05982e7c) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "7.u35", 0x00000, 0x20000,  CRC(357d145f) SHA1(9fea0d0c5d6c27bf520c4f81eb0f48a65ff60142) )
 	ROM_LOAD( "6.u36", 0x20000, 0x20000,  CRC(c4448813) SHA1(6e168eb8503b852179f2d743f1cba935592e0a60) )
 	ROM_LOAD( "5.u37", 0x40000, 0x20000,  CRC(6e99af07) SHA1(85e7a76724fd9ce8d07b5088cb6e0d933fd95692) )
 	ROM_LOAD( "4.u38", 0x60000, 0x20000,  CRC(0660a169) SHA1(1cb34b3da4b144028519a3c5b32ef7da44af0624) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1201,23 +1245,23 @@ ROM_END
 
 */
 ROM_START( hotslot )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "hotslot2.u3", 0x00000, 0x20000, CRC(676cbe32) SHA1(78721326f3334fcdfdaffb72dbcacfb8bb591d51) )
 	ROM_LOAD16_BYTE( "hotslot3.u2", 0x00001, 0x20000, CRC(2c362765) SHA1(c41741c97fe8e5b3a66eb08ebf68d24c6c771ba8) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "hotslot7.u35", 0x00000, 0x40000, CRC(715073c2) SHA1(39085871fee182a9b22c3e042211e76da0ee3024) )
 	ROM_LOAD( "hotslot6.u36", 0x40000, 0x40000, CRC(8ef2e25a) SHA1(d4a3288878fabab7ea193d5dadde1fe9fea6bc8a) )
 	ROM_LOAD( "hotslot5.u37", 0x80000, 0x40000, CRC(98375b25) SHA1(2167f3374bdfc5e1fef7b9ec4361bc68223876b8) )
 	ROM_LOAD( "hotslot4.u38", 0xc0000, 0x40000, CRC(cc8a241a) SHA1(8c6ea51d5f7475be79775df0b976ffddc5a960ed) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "hotslot1.u32", 0x00000, 0x40000, CRC(ae880970) SHA1(3c302b3f6f6bbf72a522889592add3b6ef8ce1b0) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "gal6v8d.u54",     0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1274,23 +1318,23 @@ ROM_END
 
 */
 ROM_START( mcolors )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "m.colors1.7a-2.u3", 0x00000, 0x20000, CRC(02ce6aab) SHA1(349cb639024a818cb88e911788a0146f48d25333) )
 	ROM_LOAD16_BYTE( "m.colors1.7a-3.u2", 0x00001, 0x20000, CRC(076b9680) SHA1(856d1cfaca886d78a36e129a7b41455362932e66) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "m.colors1.7-7.u35", 0x00000, 0x20000, CRC(ec44b289) SHA1(269c965112f0ba308bb5f02d965e32df70310b2c) )
 	ROM_LOAD( "m.colors1.7-6.u36", 0x20000, 0x20000, CRC(44e550e2) SHA1(abfc05b386efb0f9ad7479ff53079e6ecbaec137) )
 	ROM_LOAD( "m.colors1.7-5.u37", 0x40000, 0x20000, CRC(ec363d0d) SHA1(283f0bf3e3d76d64389f0abdffbeaa3d538b8991) )
 	ROM_LOAD( "m.colors1.7-4.u38", 0x60000, 0x20000, CRC(7845667d) SHA1(66b1409b8b661b95e2658385da9c2662430d8030) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "m.color1.u32", 0x00000, 0x40000, CRC(db8d6769) SHA1(2ab7730fd8ae9522e5452fe1f535002e11db5e7b) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "gal6v8d.u54",     0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1338,23 +1382,23 @@ ROM_END
 
 */
 ROM_START( mcolorsa )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "m.c.1.6-2.u3", 0x00000, 0x20000, CRC(43062c18) SHA1(5ac23eb392192131cf6745afddba6b5b32d75c9e) )
 	ROM_LOAD16_BYTE( "m.c.1.6-3.u2", 0x00001, 0x20000, CRC(a24daff4) SHA1(a8f30712543c5d3b6024bcdbfa1359585495ba4a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "m.c.1.6-7.u35", 0x00000, 0x20000, CRC(ac0e0520) SHA1(84f0f28260a2234db379c8c745a50d1ea3d0b695) )
 	ROM_LOAD( "m.c.1.6-6.u36", 0x20000, 0x20000, CRC(fab02757) SHA1(cc67325ff512b05b910a648bd4d9143b71081675) )
 	ROM_LOAD( "m.c.1.6-5.u37", 0x40000, 0x20000, CRC(41a2c761) SHA1(27d05a3132c96a9529f34fc1313f4652f7c2ce99) )
 	ROM_LOAD( "m.c.1.6-4.u38", 0x60000, 0x20000, CRC(7fb74c19) SHA1(20e6ecb7f34d9b82d1073c5018a7c1c6cdf3740f) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "m.c.-1.u32", 0x00000, 0x40000, CRC(db8d6769) SHA1(2ab7730fd8ae9522e5452fe1f535002e11db5e7b) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "ampal22v10apc.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u54",    0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1405,17 +1449,17 @@ ROM_END
 
 */
 ROM_START( sgsafari )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2.u7", 0x00000, 0x10000, CRC(797ceeac) SHA1(19055b6700f8523785790992adfeb67faa2358e0) )
 	ROM_LOAD16_BYTE( "1.u2", 0x00001, 0x10000, CRC(549872f5) SHA1(2228c51541e3b059d5b16f50387e4215b82f78f6) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "4.u15", 0x00000, 0x20000, CRC(f9233481) SHA1(1d1aca9a61f0285a6f6f12f6169d9cfc2c5e6991) )
 	ROM_LOAD( "5.u18", 0x20000, 0x20000, CRC(9561aa47) SHA1(140e0d9104c677de911d4d12ff617d84449d907b) )
 	ROM_LOAD( "6.u16", 0x40000, 0x20000, CRC(91c22541) SHA1(e419a2d5e71b6c64992a08fa9bd82718350ca7da) )
 	ROM_LOAD( "7.u19", 0x60000, 0x20000, CRC(3e3a5fbd) SHA1(c3511b488ecb4759a5fdea478007a4a1c2b5f9e0) )
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x040000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "3.u39", 0x00000, 0x40000, CRC(43257bb5) SHA1(993fbeb6ee0a8a4da185303ec24eee8424b90cd0) )
 ROM_END
 
@@ -1456,23 +1500,23 @@ ROM_END
 
 */
 ROM_START( musicsrt )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(6a5cd39f) SHA1(c7ec0d9a640ff876bd9362bfe896ebc09795b418) )
 	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(7af68760) SHA1(08d333037a70cda60df9b0c288e9f6eb6fa7eb84) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "6.u25", 0x00000, 0x20000, CRC(9bcf89a6) SHA1(5b16ef9482249585a714cf2d3efffddd3f0e5834) )
 	ROM_LOAD( "4.u26", 0x20000, 0x20000, CRC(b9397659) SHA1(f809f612fd6a7ecfdb0fa55260ef7a57f00c0733) )
 	ROM_LOAD( "5.u27", 0x40000, 0x20000, CRC(36d7aeb3) SHA1(2c0863f2f366008640e8a19587460a30fda4ad6e) )
 	ROM_LOAD( "7.u28", 0x60000, 0x20000, CRC(a03e750b) SHA1(046e3eb5671bed09d9e5fd3572a8d41ac9e8b69e) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 
-	ROM_REGION( 0x0800, "nvram", 0 ) /* default Non Volatile RAM */
+	ROM_REGION( 0x0800, "nvram", 0 ) // default Non Volatile RAM
 	ROM_LOAD( "musicsrt_nv.u5", 0x0000, 0x0800, CRC(f4e063cf) SHA1(a60bbd960bb7dcf023417e8c7164303b6ce71014) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce6v8h.u42",     0x0000, 0x0117, NO_DUMP )
 ROM_END
 
@@ -1529,23 +1573,23 @@ ROM_END
 
 */
 ROM_START( lunaprk )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2_2.00a.u3", 0x00000, 0x20000, CRC(5ec3d238) SHA1(a9e257275cd81b74309d20bc64b10f788ca1b22a) )
 	ROM_LOAD16_BYTE( "3_2.00a.u2", 0x00001, 0x20000, CRC(6fceb57b) SHA1(f9cf566c60f9c1c604dbfeb9c3ad4831bb3922d4) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "7_l.p..u35", 0x00000, 0x20000, CRC(dfd6795d) SHA1(01929c31b5cc9468674830d9f687b2d3607d8052) )
 	ROM_LOAD( "6_l.p..u36", 0x20000, 0x20000, CRC(fe323a28) SHA1(1cfba6c8359efed48506e8ae231926fb77469aaa) )
 	ROM_LOAD( "5_l.p..u37", 0x40000, 0x20000, CRC(445b6564) SHA1(3568bcbcbdafa8503b50de960c370c85f2fbf62a) )
 	ROM_LOAD( "4_l.p..u38", 0x60000, 0x20000, CRC(81567520) SHA1(4a1990ee19b2346824bb5b9f2880db12a414fdf7) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1606,23 +1650,23 @@ ROM_END
 
 */
 ROM_START( altaten )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "alta_t.2.01a_2.u3", 0x00000, 0x20000, CRC(2ea79d6d) SHA1(2fc5a5c33e3e970b2b631b93238fe2411bdc2be9) )
 	ROM_LOAD16_BYTE( "alta_t.2.01a_3.u2", 0x00001, 0x20000, CRC(62d57606) SHA1(1ad0935f511e22387ce7248f97ce4b89910570d2) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
 	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "alta_tensione_7.u35", 0x00000, 0x20000, CRC(90446541) SHA1(5d0e11221a762c9c11392c27e6bae931c8d2ad86) )
 	ROM_LOAD( "alta_tensione_6.u36", 0x20000, 0x20000, CRC(84070651) SHA1(00d17d74e0923be41978064331940d145dc5f5e3) )
 	ROM_LOAD( "alta_tensione_5.u37", 0x40000, 0x20000, CRC(68b26756) SHA1(7df0db4ec60b5179f27c08a401a9fa9f7dc316e9) )
 	ROM_LOAD( "alta_tensione_4.u38", 0x60000, 0x20000, CRC(7683d3f5) SHA1(fc6ee8e6763eeb9d2bc5bdadf0507c5d606a69e9) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
 	ROM_LOAD( "alta_tensione_1.u32", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 
-	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
@@ -1638,19 +1682,19 @@ void magic10_state::init_magic10()
 	m_layer2_offset[1] = 2;
 }
 
-void magic10_state::init_magic102()
+void magic102_state::init_magic102()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 20;
 }
 
-void magic10_state::init_suprpool()
+void magic102_state::init_suprpool()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 }
 
-void magic10_state::init_hotslot()
+void hotslot_state::init_hotslot()
 {
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
@@ -1665,7 +1709,7 @@ void magic10_state::init_sgsafari()
 	m_layer2_offset[1] = 20;
 }
 
-void magic10_state::init_altaten()
+void magic102_state::init_altaten()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
@@ -1677,23 +1721,25 @@ void magic10_state::init_altaten()
 		rom[0x7669] = 0x4e;
 }
 
+} // Anonymous namespace
+
 
 /******************************
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS                 LAYOUT
-GAMEL( 1995, magic10,   0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10a,  magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10b,  magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,                    layout_sgsafari )
-GAMEL( 1995, magic10c,  magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,                    layout_sgsafari )
-GAME(  1997, magic102,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING )
-GAME(  1997, magic102a, magic102, magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. BETA3)",      MACHINE_NOT_WORKING )
-GAME(  1998, suprpool,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
-GAME(  1996, hotslot,   0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
-GAME(  1999, mcolors,   0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
-GAME(  1999, mcolorsa,  mcolors,  magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
-GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  0,                    layout_sgsafari )
-GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,                            layout_musicsrt )
-GAME(  1998, lunaprk,   0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
-GAME(  1999, altaten,   0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                 FULLNAME                          FLAGS                                         LAYOUT
+GAMEL( 1995, magic10,   0,        magic10,  magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAMEL( 1995, magic10a,  magic10,  magic10,  magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAMEL( 1995, magic10b,  magic10,  magic10a, magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAMEL( 1995, magic10c,  magic10,  magic10a, magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAME(  1997, magic102,  0,        magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, magic102a, magic102, magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. BETA3)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, suprpool,  0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1996, hotslot,   0,        hotslot,  hotslot,  hotslot_state,  init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, mcolors,   0,        magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, mcolorsa,  mcolors,  magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state,  init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state,  init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)",         MACHINE_SUPPORTS_SAVE,                        layout_musicsrt )
+GAME(  1998, lunaprk,   0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, altaten,   0,        magic102, magic102, magic102_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

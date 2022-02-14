@@ -6,6 +6,8 @@ Universal Commandline Options
 This section contains configuration options that are applicable to *all* MAME
 sub-builds (both SDL and Windows native).
 
+.. contents:: :local:
+
 
 Commands and Verbs
 ------------------
@@ -31,7 +33,6 @@ patterns to avoid having your shell try to expand them against filenames (e.g.
 
 
 .. _mame-commandline-paths:
-
 
 File Names and Directory Paths
 ------------------------------
@@ -685,7 +686,7 @@ OSD-related Options
 
 .. _mame-commandline-uifontprovider:
 
-**-uifontprovider**
+**-uifontprovider** *<module>*
 
     Chooses provider for UI font rendering. The default setting is ``auto``.
 
@@ -728,7 +729,7 @@ Example:
 
 .. _mame-commandline-keyboardprovider:
 
-**-keyboardprovider**
+**-keyboardprovider** *<module>*
 
     Chooses how MAME will get keyboard input. The default is ``auto``.
 
@@ -780,7 +781,7 @@ Example:
 
 .. _mame-commandline-mouseprovider:
 
-**\-mouseprovider**
+**-mouseprovider** *<module>*
 
     Chooses how MAME will get mouse input. The default is ``auto``.
 
@@ -828,7 +829,7 @@ Example:
 
 .. _mame-commandline-lightgunprovider:
 
-**\-lightgunprovider**
+**-lightgunprovider** *<module>*
 
     Chooses how MAME will get light gun input. The default is ``auto``.
 
@@ -875,7 +876,7 @@ Example:
 
 .. _mame-commandline-joystickprovider:
 
-**\-joystickprovider**
+**-joystickprovider** *<module>*
 
     Chooses how MAME will get joystick input. The default is ``auto``.
 
@@ -918,14 +919,14 @@ Example:
          supporting both XInput and DirectInput controllers.
 
 
-OSD CLI Options
----------------
+OSD CLI Verbs
+-------------
 
 .. _mame-commandline-listmidi:
 
-**\-listmidi**
+**-listmidi**
 
-    Create a list of available MIDI I/O devices for use with emulation.
+    List available MIDI I/O devices for use with emulation.
 
     Example:
         .. code-block:: bash
@@ -939,9 +940,9 @@ OSD CLI Options
 
 .. _mame-commandline-listnetwork:
 
-**\-listnetwork**
+**-listnetwork**
 
-    Create a list of available Network Adapters for use with emulation.
+    List available network adapters for use with emulation.
 
     Example 1:
         .. code-block:: bash
@@ -1087,7 +1088,7 @@ Core Search Path Options
 
 .. _mame-commandline-artpath:
 
-**-artpath** *<path>* *<path>*
+**-artpath** *<path>*
 
     Specifies one or more paths within which to find external layout and artwork
     files.  Multiple paths can be specified by separating them with semicolons.
@@ -1104,8 +1105,9 @@ Core Search Path Options
 
 **-ctrlrpath** *<path>*
 
-    Specifies one or more paths within which to find default input configuration
+    Specifies one or more paths within which to find controller configuration
     files.  Multiple paths can be specified by separating them with semicolons.
+    Used in conjunction with the ``-ctrlr`` option.
 
     The default is ``ctrlr`` (that is, a directory ``ctrlr`` in the current
     working directory).
@@ -1482,22 +1484,6 @@ Core State/Playback Options
          you should only record and playback with all configuration (.cfg),
          NVRAM (.nv), and memory card files deleted.
 
-.. _mame-commandline-recordtimecode:
-
-**-record_timecode**
-
-    Tells MAME to create a timecode file. It contains a line with elapsed times
-    on each press of timecode shortcut key (default is **F12**).  This option
-    works only when recording mode is enabled (**-record** option).  The
-    timecode file is saved in the ``inp`` folder.
-
-    By default, no timecode file is saved.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -record worldrecord -record_timecode
-
 .. _mame-commandline-mngwrite:
 
 **-mngwrite** *<filename>*
@@ -1544,12 +1530,12 @@ Core State/Playback Options
 
     The default is ``NULL`` (no recording).
 
-.. _mame-commandline-snapname:
-
     Example:
         .. code-block:: bash
 
             mame pacman -wavewrite pacsounds
+
+.. _mame-commandline-snapname:
 
 **-snapname** *<name>*
 
@@ -1764,8 +1750,8 @@ Core Performance Options
     benchmarking and automated testing.  By combining this with a fixed set of
     other command line options, you can set up a consistent environment for
     benchmarking MAME's emulation performance.  In addition, upon exit, the
-    **-str** option will write a screenshot called ``final.png`` to the system's
-    snapshot directory.
+    **-str** option will write a screenshot to the system's snapshot directory
+    with the file name determined by the **-snapname** option.
 
     Example:
         .. code-block:: bash
@@ -1876,7 +1862,7 @@ Core Performance Options
 
 .. _mame-commandline-lowlatency:
 
-**-lowlatency**
+**-[no]lowlatency**
 
     This tells MAME to draw a new frame before throttling to reduce input
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
@@ -2712,11 +2698,11 @@ Core Video OpenGL GLSL Options
 
 .. _mame-commandline-glglsl:
 
-**-gl_glsl**
+**-[no]gl_glsl**
 
     Enable OpenGL GLSL, if available.
 
-    The default is OFF.
+    The default is OFF (**-nogl_glsl**).
 
     Example:
         .. code-block:: bash
@@ -2779,20 +2765,6 @@ Core Video OpenGL GLSL Options
             mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
 
-.. _mame-commandline-glglslvidattr:
-
-**-gl_glsl_vid_attr**
-
-    Enable OpenGL GLSL handling of brightness and contrast.
-    Better RGB system performance.
-
-    Default is ``on``.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -gl_glsl -gl_glsl_vid_attr off
-
 Core Sound Options
 ------------------
 
@@ -2823,6 +2795,20 @@ Core Sound Options
         .. code-block:: bash
 
             mame qbert -nosamples
+
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
 
 .. _mame-commandline-volume:
 
@@ -2904,7 +2890,7 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -2942,11 +2928,13 @@ Core Input Options
 
 **-ctrlr** *<controller>*
 
-    Enables support for special controllers. Configuration files are loaded from
-    the ctrlrpath.  They are in the same format as the .cfg files that are
-    saved, but only control configuration data is read from the file.
+    Specifies a controller configuration file, typically used to set more
+    suitable default input assignments for special controllers. Directories
+    specified using the ``ctrlrpath`` option are searched.  Controller
+    configuration files use a similar format to ``.cfg`` used to save system
+    settings. See :ref:`ctrlrcfg` for more details.
 
-    The default is ``NULL`` (no controller file).
+    The default is ``NULL`` (no controller configuration file).
 
     Example:
         .. code-block:: bash
@@ -3254,7 +3242,7 @@ Core Input Options
 
 .. _mame-commandline-natural:
 
-**\-natural**
+**\-[no]natural**
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
@@ -3288,7 +3276,7 @@ Core Input Options
 
 .. _mame-commandline-joystickcontradictory:
 
-**-joystick_contradictory**
+**-[no]joystick_contradictory**
 
     Enable contradictory direction digital joystick input at the same time such
     as **Left and Right** or **Up and Down** at the same time.
@@ -3429,9 +3417,10 @@ Debugging Options
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, the debugger is entered by
-    pressing the tilde (**~**) key during emulation. It is also entered
-    immediately at startup.
+    Activates the integrated debugger.  By default, pressing the backtick/tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also breaks
+    into the debugger after the initial soft reset on startup if the debugger is
+    active.  See :ref:`debugger` for information on using the debugger.
 
     The default is OFF (**-nodebug**).
 
@@ -3439,6 +3428,40 @@ Debugging Options
         .. code-block:: bash
 
             mame indy_4610 -debug
+
+.. _mame-commandline-debugger:
+
+**-debugger** *<module>*
+
+    Chooses the module to use for debugging the target system when the
+    :ref:`debug <mame-commandline-debug>` option is on.  Available debugger
+    modules depend on the host platform and build options.
+
+    Supported debugger modules:
+
+    windows
+        Win32 GUI debugger (default on Windows).  Only supported on Windows.
+    qt
+        Qt GUI debugger (default on Linux).  Supported on Windows, Linux and
+        macOS, but only included on Linux by default.  Set ``USE_QTDEBUG=1``
+        when compiling MAME to include the Qt debugger on Windows or macOS.
+    osx
+        Cocoa GUI debugger (default on macOS).  Only supported on macOS.
+    imgui
+        ImgUi GUI debugger displayed in first MAME window.  Requires
+        :ref:`video <mame-commandline-video>` option to be set to **bgfx**.
+        Supported on all platforms with BGFX video output support.
+    gdbstub
+        Acts as a remote debugging server for the GNU debugger (GDB).  Only a
+        small subset of the CPUs emulated by MAME are supported.  Use the
+        :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
+        listening port on the loopback interface.  Supported on all platforms
+        with TCP socket support.
+
+    Example:
+        .. code-block:: bash
+
+            mame ambush -debug -debugger qt
 
 .. _mame-commandline-debugscript:
 
@@ -3452,7 +3475,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame galaga -debugscript testscript.txt
+            mame galaga -debug -debugscript testscript.txt
 
 .. _mame-commandline-updateinpause:
 
@@ -3486,6 +3509,21 @@ Debugging Options
         .. code-block:: bash
 
             mame ibm_5150 -watchdog 30
+
+.. _mame-commandline-debuggerport:
+
+**-debugger_port** *<port>*
+
+    Set the TCP port number to listen on for GDB connections when using the GDB
+    stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
+    option).
+
+    The default is ``23946``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_port 2159
 
 .. _mame-commandline-debuggerfont:
 
@@ -3611,7 +3649,7 @@ Core Misc Options
 
 .. _mame-commandline-drcusec:
 
-**\-drc_use_c**
+**\-[no]drc_use_c**
 
     Force DRC to use the C code backend.
 
@@ -3624,7 +3662,7 @@ Core Misc Options
 
 .. _mame-commandline-drcloguml:
 
-**\-drc_log_uml**
+**\-[no]drc_log_uml**
 
     Write DRC UML disassembly log.
 
@@ -3637,7 +3675,7 @@ Core Misc Options
 
 .. _mame-commandline-drclognative:
 
-**\-drc_log_native**
+**\-[no]drc_log_native**
 
     Write DRC native disassembly log.
 
@@ -3736,7 +3774,7 @@ Core Misc Options
 
 .. _mame-commandline-confirmquit:
 
-**\-confirm_quit**
+**\-[no]confirm_quit**
 
     Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
@@ -3750,7 +3788,7 @@ Core Misc Options
 
 .. _mame-commandline-uimouse:
 
-**\-ui_mouse**
+**\-[no]ui_mouse**
 
     Displays a mouse cursor when using the built-in UI for MAME.
 
@@ -3895,7 +3933,7 @@ HTTP Server Options
 
 .. _mame-commandline-httpport:
 
-**-http_port** *[port]*
+**-http_port** *<port>*
 
     Choose HTTP server port.
 
@@ -3908,7 +3946,7 @@ HTTP Server Options
 
 .. _mame-commandline-httproot:
 
-**-http_root** *[rootfolder]*
+**-http_root** *<rootfolder>*
 
     Choose HTTP server document root.
 
@@ -3923,7 +3961,7 @@ HTTP Server Options
 PortAudio Options
 -----------------
 
-.. _mame-commandline-pa-api:
+.. _mame-commandline-paapi:
 
 **-pa_api** *API*
 
@@ -3979,7 +4017,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
 
-.. _mame-commandline-pa-device:
+.. _mame-commandline-padevice:
 
 **-pa_device** *device*
 
@@ -3993,7 +4031,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
 
-.. _mame-commandline-pa-latency:
+.. _mame-commandline-palatency:
 
 **-pa_latency** *latency*
 

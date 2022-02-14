@@ -37,15 +37,15 @@ driver by Chris Moore
  *
  *************************************/
 
-void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_CLEAR_SCREEN_DONE:
-		clear_screen_done_callback(ptr, param);
+		clear_screen_done_callback(param);
 		break;
 	case TIMER_VIA_IRQ_DELAYED:
-		via_irq_delayed(ptr, param);
+		via_irq_delayed(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gameplan_state::device_timer");
@@ -156,7 +156,7 @@ void gameplan_state::leprechn_video_command_w(uint8_t data)
 
 uint8_t gameplan_state::leprechn_videoram_r()
 {
-	return m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
+	return m_video_previous;
 }
 
 
@@ -193,6 +193,7 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 					m_video_y = m_video_y + 1;
 			}
 
+			m_video_previous = m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
 			m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x] = m_video_data & 0x0f;
 
 			break;

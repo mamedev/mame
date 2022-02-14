@@ -1,60 +1,69 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, hap
 /***************************************************************************
 
 2011-JUL-16 SLC1 skeleton driver [Robbbert]
 2011-DEC-29 Working [Robbbert]
+2021-APR-27 And stuff [Stuff doer]
 
-http://www.jens-mueller.org/jkcemu/slc1.html
+Schach- und Lerncomputer SLC 1 by Dr.Ing. Dieter Scheuschner, published in
+Schaltungssammlung für den Amateur, 5. Lieferung 1989 (East Germany).
 
-This computer is both a Z80 trainer, and a chess computer.
-        The keyboard is different between the two, so
-        we redefine it for your convenience.
+Reference:
+    - https://dr-scheuschner.de/start/schachcomputer-slc1/
+    - http://www.jens-mueller.org/jkcemu/slc1.html
 
-        There is no chess board attached. You supply your own
-        and you sync the pieces and the computer instructions.
-        The chess engine was copied from Fidelity's Sensory
-        Chess Challenger 8.
+This computer is both a Z80 trainer, and a chess computer. The keyboard
+    is different between the two. So by default, the chess number buttons
+    are on the main keyboard, and the one for the trainer are on the numpad.
 
-        When started, it is in Chess mode. Press 11111 to switch to
-        Trainer mode.
+    There is no chess board attached. You supply your own and you sync the
+    pieces and the computer instructions. The chess engine was copied from
+    Fidelity's Sensory Chess Challenger 8. Even the TTL I/O is the same.
 
-Hardware
-        4 Kbytes ROM in the address range 0000-0FFF
-        1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
-        6-digit 7-segment display
-        Busy LED
-        Keyboard with 12 keys
+    When started, it is in Chess mode. Press 11111 to switch to Trainer mode.
 
-Keys:
-        0-7 : hexadecimal numbers
-        Shift then 0-7 : Hexadecimal 8-F (decimal points will appear)
-        ADR : enter an address to work with. After the 4 digits are entered,
-              the data at that address shows, and you can modify the data.
-        + (inc) : Enter the data into memory, and increment the address by 1.
+Hardware:
+    4 Kbytes ROM in the address range 0000-0FFF
+    1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
+    6-digit 7-segment display
+    Busy LED
+    Keyboard with 12 keys
 
-Pasting doesn't work, but if it did...
+Trainer Keys:
+    0-7 : hexadecimal numbers
+    Shift then 0-7 : Hexadecimal 8-F (decimal points will appear)
+    ADR : enter an address to work with. After the 4 digits are entered,
+          the data at that address shows, and you can modify the data.
+    + (inc) : Enter the data into memory, and increment the address by 1.
 
-    Pasting:
-        0-7 : as is
-        8-F : H, then 0-7
-        + : ^
-        - : H^
-        ADR : -
+Pasting:
+    0-7 : as is
+    8-F : X, then 0-7
+    + : O
+    - : XO
+    ADR : Z
 
-    Test Paste:
-        [[[[[-510011^22^33^44^55^66^77^H8H8^H9H9^-5100
-        Now press up-arrow to confirm the data has been entered.
+Test Paste:
+    00000Z510011O22O33O44O55O66O77OX8X8OX9X9OZ5100
+    Now press O to confirm the data has been entered.
 
-
+TODO:
+    - Pasting doesn't work, probably too slow.
+    - The handwritten schematics and prototype by Dr.Scheuschner show 4 extra
+      keys (R, MEM, N, Y) and 8 7segs, but they aren't in the final version.
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
+// internal artwork
 #include "slc1.lh"
 
 
@@ -67,147 +76,88 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
-		, m_chess_keyboard(*this, "X%u", 0U)
-		, m_trainer_keyboard(*this, "Y%u", 0U)
-		, m_display(*this, "digit%u", 0U)
-		, m_busyled(*this, "busyled")
+		, m_inputs(*this, "IN.%u", 0U)
+		, m_display(*this, "display")
+		, m_busyled(*this, "busy_led")
 	{ }
 
 	void slc1(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<3> m_inputs;
+	required_device<pwm_display_device> m_display;
+	output_finder<> m_busyled;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	u8 m_digit = 0;
-	bool m_kbd_type = false;
+	u8 input_r();
+	void control_w(offs_t offset, u8 data);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<3> m_chess_keyboard;
-	required_ioport_array<3> m_trainer_keyboard;
-	output_finder<8> m_display;
-	output_finder<> m_busyled;
+	u8 m_select = 0;
+	u8 m_segment = 0;
 };
-
-
-
-
-/***************************************************************************
-
-    Display
-
-***************************************************************************/
-
-void slc1_state::io_w(offs_t offset, u8 data)
-{
-	bool const segonoff = BIT(data, 7);
-	bool const busyled = BIT(data, 4);
-	data &= 15;
-
-	if (data < 8)
-		m_digit = data;
-	else if (data < 12)
-	{
-		m_speaker->level_w(BIT(data, 1));
-		return;
-	}
-	else if (offset == 0x2f07)
-		return;
-
-	u8 segdata = m_display[m_digit];
-	u8 const segnum  = offset & 7;
-	u8 const segmask = 1 << segnum;
-
-	if (segonoff)
-		segdata |= segmask;
-	else
-		segdata &= ~segmask;
-
-	m_display[m_digit] = segdata;
-
-	m_busyled = busyled;
-
-	if (m_digit == 3)
-		m_kbd_type = segdata;
-}
-
-
-/***************************************************************************
-
-    Keyboard
-
-***************************************************************************/
-
-u8 slc1_state::io_r(offs_t offset)
-{
-	u8 data = 0xff, upper = (offset >> 8) & 7;
-
-	if (m_kbd_type)
-	{ // Trainer
-		if (upper == 3)
-			data &= m_trainer_keyboard[0]->read();
-		else
-		if (upper == 4)
-			data &= m_trainer_keyboard[1]->read();
-		else
-		if (upper == 5)
-			data &= m_trainer_keyboard[2]->read();
-	}
-	else
-	{ // Chess
-		if (upper == 3)
-			data &= m_chess_keyboard[0]->read();
-		else
-		if (upper == 4)
-			data &= m_chess_keyboard[1]->read();
-		else
-		if (upper == 5)
-			data &= m_chess_keyboard[2]->read();
-	}
-
-	return data;
-}
-
-
-
-/***************************************************************************
-
-    Machine
-
-***************************************************************************/
 
 void slc1_state::machine_start()
 {
-	m_display.resolve();
 	m_busyled.resolve();
 
-	save_item(NAME(m_digit));
-	save_item(NAME(m_kbd_type));
-}
-
-void slc1_state::machine_reset()
-{
+	save_item(NAME(m_select));
+	save_item(NAME(m_segment));
 }
 
 
 
 /***************************************************************************
+    I/O
+***************************************************************************/
 
-    Address Map
+void slc1_state::control_w(offs_t offset, u8 data)
+{
+	// d0-d3: 7442 or equivalent
+	m_select = data & 0xf;
+	u16 sel = 1 << m_select;
 
+	// 7442 0-1,3-6: digit select
+	// 7442 3-5: keypad select
+	// 7442 9: speaker out
+	m_speaker->level_w(BIT(sel, 9));
+
+	// a0-a2+d7: digit segment data
+	u8 mask = 1 << (offset & 7);
+	m_segment = (m_segment & ~mask) | ((data & 0x80) ? mask : 0);
+	m_display->matrix(sel, m_segment);
+
+	// d4: busy led
+	m_busyled = BIT(data, 4);
+}
+
+u8 slc1_state::input_r()
+{
+	u8 data = 0;
+
+	// read keypad
+	if (m_select >= 3 && m_select <= 5)
+		data |= m_inputs[m_select - 3]->read();
+
+	return data << 4 ^ 0xff;
+}
+
+
+
+/***************************************************************************
+    Address Maps
 ***************************************************************************/
 
 void slc1_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map.global_mask(0x4fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x43ff).ram().mirror(0xc00);
@@ -215,68 +165,48 @@ void slc1_state::mem_map(address_map &map)
 
 void slc1_state::io_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(FUNC(slc1_state::input_r), FUNC(slc1_state::control_w));
 }
 
 
+
 /**************************************************************************
-
-    Keyboard Layout
-
+    Input Ports
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(slc1_state::trigger_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static INPUT_PORTS_START( slc1 )
-// Chess Keyboard
-	PORT_START("X0")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D4 T") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3 L") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2 S") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A1 B") PORT_CODE(KEYCODE_1) PORT_CHAR('[')
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D 4 / T / 3 B") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C 3 / L / 2 A") PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B 2 / S / 1 9") PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A 1 / B / 0 8") PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 
-	PORT_START("X1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5 D") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 K") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G7")   PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H8")   PORT_CODE(KEYCODE_8)
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E 5 / D / 4 C INS") PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F 6 / K / 5 D DEL") PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G 7 / 6 E BL") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H 8 / 7 F GO") PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
 
-	PORT_START("X2")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")    PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")    PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("St")   PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")    PORT_CODE(KEYCODE_Z)
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C / Seq / BG") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A / +/- 1 / SS") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("St / Fu / DP") PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CHAR('S')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z / ADR / BP") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('Z')
 
-// Trainer Keyboard
-	PORT_START("Y0")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 B")  PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 A")  PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 9")  PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 8")  PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-
-	PORT_START("Y1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 C INS") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 D DEL") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 E BL")  PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 F Go")  PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-
-	PORT_START("Y2")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fu DP") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR('H')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+-1 SS") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Seq BG") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADR BP") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, slc1_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 
+
 /***************************************************************************
-
-    Machine driver
-
+    Machine Config
 ***************************************************************************/
 
 void slc1_state::slc1(machine_config &config)
@@ -287,18 +217,19 @@ void slc1_state::slc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
 	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 8);
+	m_display->set_segmask(0x7b, 0xff);
 	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
+
 /***************************************************************************
-
-    Game driver
-
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START(slc1)
@@ -311,6 +242,11 @@ ROM_END
 
 } // anonymous namespace
 
+
+
+/***************************************************************************
+    Drivers
+***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY               FULLNAME */
 COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", MACHINE_SUPPORTS_SAVE )

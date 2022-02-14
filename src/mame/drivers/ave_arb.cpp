@@ -23,7 +23,7 @@ Known chess modules (*denotes not dumped yet):
 - Grand Master Series 4.0
 
 Other games:
-- *Avelan (checkers)
+- Avelan (checkers)
 
 Newer modules included button label stickers for OPTIONS, Verify, Take Back, Clear.
 
@@ -33,23 +33,24 @@ running at 16MHz.
 
 TODO:
 - verify gms40 module memory layout
-- need to add checkers pieces and custom initial position when Avelan gets dumped
+- gms40 and avelan rom labels
 
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "speaker.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 // internal artwork
 #include "ave_arb.lh" // clickable
@@ -99,6 +100,10 @@ private:
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
+	// sensorboard
+	void init_board(int state);
+	bool m_altboard = false;
+
 	// cartridge
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 cartridge_r(offs_t offset);
@@ -143,12 +148,28 @@ void arb_state::update_reset()
     I/O
 ******************************************************************************/
 
+// sensorboard
+
+void arb_state::init_board(int state)
+{
+	// different board setup for checkers
+	if (m_altboard)
+		for (int i = 0; i < 12; i++)
+		{
+			m_board->write_piece((i % 4) * 2 + ((i / 4) & 1), i / 4, 13); // white
+			m_board->write_piece((i % 4) * 2 + (~(i / 4) & 1), i / 4 + 5, 14); // black
+		}
+	else
+		m_board->preset_chess(state);
+}
+
+
 // cartridge
 
 DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
+	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0x7fff;
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -156,6 +177,8 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 	// extra ram (optional)
 	if (image.get_feature("ram"))
 		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
+
+	m_altboard = bool(image.get_feature("altboard"));
 
 	return image_init_result::PASS;
 }
@@ -266,7 +289,7 @@ INPUT_PORTS_END
 void arb_state::v2(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 16_MHz_XTAL); // W65C02S6TPG-14
+	W65C02S(config, m_maincpu, 16_MHz_XTAL); // W65C02S6TPG-14
 	m_maincpu->set_addrmap(AS_PROGRAM, &arb_state::v2_map);
 
 	W65C22S(config, m_via, 16_MHz_XTAL); // W65C22S6TPG-14
@@ -278,7 +301,8 @@ void arb_state::v2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().set(FUNC(arb_state::init_board));
+	m_board->set_spawnpoints(12+2); // +2 checkers pieces
 	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */

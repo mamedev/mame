@@ -16,7 +16,6 @@ public:
 	void set_extclock(attoseconds_t clk) { m_extclock = clk; }
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
-	namco_52xx_device &set_irq_duration(attotime t) { m_irq_duration = t; return *this; }
 
 	DECLARE_WRITE_LINE_MEMBER( reset );
 	WRITE_LINE_MEMBER( chip_select );
@@ -28,7 +27,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
+	TIMER_CALLBACK_MEMBER( write_sync );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
 
 private:
@@ -36,7 +35,6 @@ private:
 	required_device<mb88_cpu_device> m_cpu;
 	required_device<discrete_device> m_discrete;
 
-	attotime m_irq_duration;
 	int m_basenode;
 	attoseconds_t m_extclock;
 	emu_timer *m_extclock_pulse_timer;

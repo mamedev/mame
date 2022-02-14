@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation
@@ -85,11 +85,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+	void start_dma();
+	void stop_dma();
 private:
 	enum
 	{
@@ -98,8 +100,6 @@ private:
 		TIMER_BLANK
 	};
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();
@@ -112,16 +112,21 @@ private:
 	inline void update_blank_timer(int state);
 	inline void recompute_parameters();
 	inline void reset_figs_param();
-	inline void read_vram(uint8_t type, uint8_t mod);
-	inline void write_vram(uint8_t type, uint8_t mod);
+	inline void rdat(uint8_t type, uint8_t mod);
+	inline uint16_t read_vram();
+	inline void wdat(uint8_t type, uint8_t mod);
+	inline void write_vram(uint8_t type, uint8_t mod, uint16_t data, uint16_t mask = 0xffff);
 	inline void get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 
-	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
-	void draw_line(int x, int y);
-	void draw_rectangle(int x, int y);
-	void draw_arc(int x, int y);
-	void draw_char(int x, int y);
+	uint16_t get_pitch();
+	uint16_t get_pattern(uint8_t cycle);
+	void next_pixel(int direction);
+	void draw_pixel();
+	void draw_line();
+	void draw_rectangle();
+	void draw_arc();
+	void draw_char();
 	int translate_command(uint8_t data);
 	void process_fifo();
 	void continue_command();
@@ -139,10 +144,16 @@ private:
 	devcb_write_line   m_write_vsync;
 	devcb_write_line   m_write_blank;
 
+	uint16_t m_pattern;
+
+	uint8_t m_dma_type;               // DMA transfer type
+	uint8_t m_dma_mod;                // DMA transfer mode
+	uint16_t m_dma_data;              // current word transferred via DMA
+	uint32_t m_dma_transfer_length;   // DMA transfer length in bytes
+
 	uint16_t m_mask;                  // mask register
 	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
 	uint32_t m_ead;                   // execute word address
-	uint16_t m_dad;                   // dot address within the word
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM

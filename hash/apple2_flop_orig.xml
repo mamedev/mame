@@ -4,7 +4,7 @@
 license:CC0
 -->
 
-<softwarelist name="apple2_flop_orig" description="Apple II 5.25&quot; original disks">
+<softwarelist name="apple2_flop_orig" description="Apple II original disks">
 
 	<software name="agentusa">
 		<description>Agent USA</description>
@@ -5190,7 +5190,7 @@ license:CC0
 		<info name="release" value="2019-05-23"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
-		<!-- This is the Ultima Trilogy rerelease version. -->
+		<!-- This is the Ultima Trilogy re-release version. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234735">
@@ -5584,17 +5584,19 @@ license:CC0
 		<info name="release" value="2019-06-16"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- Redumped on July 3rd, 2021 to fix side 2, which
+		should not have write protection. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - program disk.woz" size="234759" crc="5b42e1f6" sha1="1f6ce95fccd334e8faaf9217735f14da3c9e8d99" />
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - program disk.woz" size="234834" crc="54e443c6" sha1="7ff4c81a96d18d89609e3e1d2ed7e79c7cc10597" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Player disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - player disk.woz" size="234759" crc="98271568" sha1="a0a2546b2b1e7328000aa51de2024233ad06e410" />
+			<feature name="part_id" value="Side B - Player disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - player disk.woz" size="234834" crc="6c1893b0" sha1="d82a0833180147b967eee6cf954b8a7939ca5a02" />
 			</dataarea>
 		</part>
 	</software>
@@ -8025,12 +8027,12 @@ license:CC0
 	</software>
 
 	<software name="covetmir">
-		<description>The Coveted Mirror (1985 Polarware rerelease)</description>
+		<description>The Coveted Mirror (1985 Polarware Re-release)</description>
 		<year>1985</year>
 		<publisher>Polarware</publisher>
 		<info name="release" value="2019-10-14"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- This rerelease requires a 64K Apple II+ or later;
+		<!-- This re-release requires a 64K Apple II+ or later;
 		the optional double hi-res graphics mode requires a
 		128K Apple //e or later. -->
 
@@ -10320,7 +10322,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2020-01-20"/>
-		<sharedfeat name="compatibility" value=",A2P,A2E,A2EE,A2C,A2GS"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple II+ with 48K. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -10594,7 +10596,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2020-02-06"/>
-		<sharedfeat name="compatibility" value="A2fP,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -12131,10 +12133,18 @@ license:CC0
 		<info name="release" value="2020-04-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
+		<!-- Updated on June 30th, 2021 to fix missing side B -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241429">
-				<rom name="aliens.woz" size="241429" crc="2ccbad87" sha1="d254d20ef3095666ada034ea47327ef08375a672"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241454">
+				<rom name="aliens side a.woz" size="241454" crc="b2c5a729" sha1="61c4390f38e22f10944d08b22b2cfb8b2a15f433" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241512">
+				<rom name="aliens side b.woz" size="241512" crc="679750d7" sha1="6cebf1e969058e9fc0dd45b8641bdf0affb6160c" />
 			</dataarea>
 		</part>
 	</software>
@@ -16624,6 +16634,1956 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234776">
 				<rom name="cause and effect- what makes it happen.woz" size="234776" crc="5b2d7be8" sha1="0348efd142a48068b27b0937dd623ab94145eeb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdwsnkrs">
+		<description>Sidewalk Sneakers</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-23"/>
+		<info name="programmer" value="Bonnie Seiler and Michael Sweet"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Sidewalk Sneakers" is a 1991 educational game developed by Bonnie Seiler and Michael Sweet, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="sidewalk sneakers.woz" size="234815" crc="eca45646" sha1="29f5f8fd6e748f2a31b370bf5fdc24f68ac9c39f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anmrescu">
+		<description>Animal Rescue</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-24"/>
+		<info name="programmer" value="S. Hosler, Mark Wharton, and Philip Wharton"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Animal Rescue" is a 1991 educational game developed by S. Hosler, Mark Wharton, and Philip Wharton, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="animal rescue.woz" size="234821" crc="a9f9ad80" sha1="8ae4d857d2742d087be18ba941e5b13da3509005"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckmgrdr">
+		<description>Mickey's Magic Reader</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-24"/>
+		<info name="programmer" value="Neil Larimer and Mary Anne Hermann"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Mickey's Magic Reader" is a 1989 educational game developed by Neil Larimer and Mary Anne Hermann, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234824">
+				<rom name="mickey's magic reader.woz" size="234824" crc="e8373ccf" sha1="ff7126fe65a08b88f1b4c59db8bcb74e44558c94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdbiogen">
+		<description>Modern Biology: Genetics</description>
+		<year>1989</year>
+		<publisher>Holt, Rinehart and Winston</publisher>
+		<info name="release" value="2021-04-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Modern Biology: Genetics" is a 1989 educational program developed by Prentice Associates and distributed by Holt, Rinehart and Winston. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 1.woz" size="234826" crc="6c624a41" sha1="7d83b4a3fd6b4ad04628e9bf3e51b2f121f74416"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 2.woz" size="234826" crc="67b915cf" sha1="137f8e247de3d5e9052e7301507f82c7a47b95ac"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 3.woz" size="234826" crc="0a18ba83" sha1="cc3dbac28c15ffc2faa20cbfb88bbe673b86e511"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 4.woz" size="234826" crc="9406020a" sha1="817e6ea052ae32a20ca4e231413d1f9076307f61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afctadv">
+		<description>Animals Facts and Adventures</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi (design, graphics, animation, and script), Diane Ashachik (editing), and Gregory Truex (programming)"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Animal Facts and Adventures" is a 1992 educational program developed by Nancy Patrissi (design, graphics, animation, and script), Diane Ashachik (editing), and Gregory Truex (programming), and distributed by Troll Associates. This was distributed as a non-bootable disk; it requires a separate ProDOS boot disk or hard drive. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234891">
+				<rom name="animal facts and adventures.woz" size="234891" crc="f27a7a8b" sha1="1440109b0e7ad34a16016cd698a03ad38c06dfbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinodigd">
+		<description>Dino Dig: Dictionary Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi (design, script, graphics, and animation), Alison Bennett (programming and sound), Diane Ashachik (editing), and Gregory Truex (programming advisor)"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Dino Dig: Dictionary Skills" is a 1992 educational program developed by Nancy Patrissi (design, script, graphics, and animation), Alison Bennett (programming and sound), Diane Ashachik (editing), and Gregory Truex (programming advisor), and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234834">
+				<rom name="dino dig.woz" size="234834" crc="942e36e3" sha1="c7d0c175c4a1e515efa2377f5600a217694a4a2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinosplb">
+		<description>Dino Speller: Beginning Dictionary Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi and Alison Bennett"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Dino Speller: Beginning Dictionary Skills" is a 1992 educational program developed by Nancy Patrissi and Alison Bennett, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234819">
+				<rom name="dino speller.woz" size="234819" crc="91be9f89" sha1="4c34a08c73e0f30dd520053ab17b7e534497ccb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyworksf">
+		<description>Keyworks: First Keyboarding Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Hudson Ansley and Millicent Sabater"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Keyworks: First Keyboarding Skills" is a 1992 educational program developed by Hudson Ansley and Millicent Sabater, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="keyworks.woz" size="234814" crc="22a1847c" sha1="e45ef79a88f1f92b34641f48d66ce299bb5fa450"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="posfwnap">
+		<description>Parts of Speech: Fun with Nouns and Pronouns</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi, Gregory Truex, Thomas Whiting, and Diane Ashachik"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Parts of Speech: Fun with Nouns and Pronouns" is a 1992 educational program developed by Nancy Patrissi, Gregory Truex, Thomas Whiting, and Diane Ashachik, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234851">
+				<rom name="parts of speech- fun with nouns and pronouns.woz" size="234851" crc="b004e1f5" sha1="2aafd05be7c8743d431db41ff4b1a684a53f8c96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomsawyr">
+		<description>Troll Reading Games: The Adventures of Tom Sawyer</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Thomas Whiting, Hudson Ansley, and Diane Ashachik"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Troll Reading Games: The Adventures of Tom Sawyer" is a 1992 educational program developed by Millicent Sabater, Thomas Whiting, Hudson Ansley, and Diane Ashachik, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234859">
+				<rom name="troll reading games- the adventures of tom sawyer.woz" size="234859" crc="fcbae0cb" sha1="1e2370fbda9c6738ff82fb7acac45b3c257f39da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmkr">
+		<description>Graph Maker: Introduction to Graphs and Charts</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Hudson Ansley, Bonnie Seiler, and Nancy Patrissi"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Graph Maker: Introduction to Graphs and Charts" is a 1993 educational program developed by Millicent Sabater, Hudson Ansley, Bonnie Seiler, and Nancy Patrissi, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234855">
+				<rom name="graph maker- introduction to graphs and charts.woz" size="234855" crc="5903ea17" sha1="5c38eb87ebd336dab53ed7e0f7aa305d49508baa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgtmapsk">
+		<description>Let's Go There: Beginning Map and Geography Skills</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi, Alison Bennett, and Bonnie Seiler"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Let's Go There: Beginning Maps and Geography Skills" is a 1993 educational program developed by Nancy Patrissi, Alison Bennett, and Bonnie Seiler, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234842">
+				<rom name="let's go there- beginning map and geography skills.woz" size="234842" crc="4b4956f9" sha1="be9bb6e647067ab1ba880322c7641686022e8983"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llacomp">
+		<description>Let's Learn About Computers</description>
+		<year>1994</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Thomas Whiting, Bonnie Seiler, and Nancy Patrissi"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Let's Learn About Computers" is a 1994 educational program developed by Millicent Sabater, Thomas Whiting, Bonnie Seiler, and Nancy Patrissi, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="let's learn about computers.woz" size="234829" crc="53113bee" sha1="e5f069b6306ad52e7580e1d68e57aa7b4be57613"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdyply89">
+		<description>Teddy's Playground (1989 Rerelease) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Donna Stanger and Lon Koenig"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Teddy's Playground" is a 1985 educational program developed by Donna Stanger and Lon Koenig, and distributed by Sunburst Communications. This is the 1989 re-release. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="teddy's playground 1989.woz" size="234815" crc="3adfcaa3" sha1="852e2457948c44681c5e3b598166ce410e3f7b51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pop35">
+		<description>Prince of Persia (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card -->
+		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297161">
+				<rom name="prince of persia 800k.woz" size="1297161" crc="e166d56a" sha1="d9558d25a3d3d91542f32abba9e6b0e2f2c75b09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwlybdy">
+		<description>Woolly's Birthday (Version 1.0) (800K 3.5")</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Woolly's Birthday" is a 1994 educational game developed by Dee Dee Daus, Ruth Kivisto, Pat Korn, Claudio Valenzuela, and Ju Chang Wang, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296222">
+				<rom name="woolly's birthday 800k.woz" size="1296222" crc="a38217f8" sha1="18fdd8d2e5903d0959545de4c7103d35ec997ef8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trlspmth">
+		<description>Troll Sports Math (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-07-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or
+		Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a
+		Liron or other compatible drive controller card.
+
+		Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or
+		Apple SuperDrive (G7287), will not work due to
+		incompatibilities created by the copy protection. -->
+		<!--"Troll Sports Math" is a 1991 educational program developed by Millicent Sabater, Gregory Truex, Thomas Whiting, and Toby Shack, and distributed by Troll Associates. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a Liron or other compatible drive controller card. Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or Apple SuperDrive (G7287), will not work due to incompatibilities created by the copy protection.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296307">
+				<rom name="troll sports math 800k.woz" size="1296307" crc="66c531ac" sha1="4313b2cecab98701fac6c6724013fd2cc3908a06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmneu35">
+		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-06"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296763">
+				<rom name="where in europe is carmen sandiego 800k.woz" size="1296763" crc="549ffd83" sha1="d6350738f600af581e5dc598aa8a90f8ee47bcf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="playroom">
+		<description>The Playroom (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296725">
+				<rom name="the playroom 800k.woz" size="1296725" crc="10097dce" sha1="3c7b60daa0ae07bee2289cea5f6b4d2ef0c4dcad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprprnt">
+		<description>SuperPrint! (Version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"SuperPrint!" is a 1987 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer, and distributed by Pelican Software. This is version 1.4. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296709">
+				<rom name="superprint 800k.woz" size="1296709" crc="aa173e19" sha1="50666697478bbfb7b80819fbc6b368c1111eb3ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampag35">
+		<description>Rampage (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Rampage" is a 1988 action game ported to the Apple II by Ken Hurley, J. David Koch, Kelly Flock, Steve Imes, and Alex Edelstein, and distributed by Activision. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312568">
+				<rom name="rampage 800k.woz" size="1312568" crc="b4d75ac9" sha1="c492d0e293e493d6daad94517a257f7f1a3cd4f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hegira">
+		<description>Hegira: Tale of a Galactic Exile</description>
+		<year>1983</year>
+		<publisher>Ted Butler</publisher>
+		<info name="release" value="2021-07-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Hegira: Tale of a Galactic Exile" is a 1983 adventure game developed and distributed by Ted Butler. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234844">
+				<rom name="hegira.woz" size="234844" crc="f3085081" sha1="d6b14bd804a675e12d06abb0c6ee1217e7b2b869"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbmath35">
+		<description>Stickybear Math (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Math" is a 1984 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1302813">
+				<rom name="stickybear math 800k.woz" size="1302813" crc="93214eec" sha1="4dac3752e1575658fe0d10910a4a0f3ea8518af9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbmth235">
+		<description>Stickybear Math 2 (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Math 2" is a 1986 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1286445">
+				<rom name="stickybear math 2 800k.woz" size="1286445" crc="5c477869" sha1="fbf6e23ace6d2d039b299403ffd81b59ee74cd45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sboppo35">
+		<description>Stickybear Opposites (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Opposites" is a 1983 educational game developed by Richard Hefter, Janie Worthington, and Steve Worthington, and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1300806">
+				<rom name="stickybear opposites 800k.woz" size="1300806" crc="884c1592" sha1="9ed4190274892efa75e7db4e11ba097913b7b43e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbtown35">
+		<description>Stickybear Town Builder (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Town Builder" is a 1984 educational game developed by Richard Hefter and Dave Lusby, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1286448">
+				<rom name="stickybear town builder 800k.woz" size="1286448" crc="22df05ac" sha1="88e37f808dddcc70908767aee6a9ed3cd419ae82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbtype35">
+		<description>Stickybear Typing (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Typing" is a 1985 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297197">
+				<rom name="stickybear typing 800k.woz" size="1297197" crc="0a465825" sha1="a212e98ef52877c3bd45f239de64373b71f4579e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprule35">
+		<description>Spelling Rules (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Spelling Rules" is a 1986 educational program developed and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297155">
+				<rom name="spelling rules 800k.woz" size="1297155" crc="824e437b" sha1="0cf88bf109922357ed217533d772ce3af30ffff2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sentf35">
+		<description>Sentence Fun (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Sentence Fun" is a 1987 educational program developed by Richard Hefter and Dave Cunningham, and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296707">
+				<rom name="sentence fun 800k.woz" size="1296707" crc="78438b83" sha1="2184bd6fd27eda6ae43926ddf97e2a1539c69cb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpls135">
+		<description>Alge-Blaster Plus! (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Alge-Blaster Plus!" is a 1989 educational program developed by Julie Baumgartner, Anne Hertz, David Ely, and Louis X. Savain, and distributed by Davidson and Associates. This is version 1.0, distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296215">
+				<rom name="alge-blaster plus v1.0 800k.woz" size="1296215" crc="e3cdd077" sha1="c8654d483ac58e75789106da606ed7b7484511e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckcrswd">
+		<description>Mickey's Crossword Puzzle Maker (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Walt Disney Computer Software</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Mickey's Crossword Puzzle Maker" is a 1990 educational game developed by David Mullich, Rick Ferreira, Ariella Lehrer, Stan Wojtysiak, Kathleen Parades, Stan Wojtysiak, John Miller, Pat Campbell, Tine Sloan, Annelise Falk, Michael Mroz, Beverly Ellman, and Fran Peskoff, and distributed by Walt Disney Computer Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312716">
+				<rom name="mickey's crossword puzzle maker 800k.woz" size="1312716" crc="f5fc7370" sha1="471126107352b52ec5643a97f2893b951d40309d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retdino">
+		<description>Return of the Dinosaurs (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-07-20"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Return of the Dinosaurs" is a 1988 educational game developed by Intentional Educations and distributed by American Educational Computer. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328970">
+				<rom name="return of the dinosaurs 800k.woz" size="1328970" crc="43773390" sha1="b6a6257cb9988576f0eb89daa523cc54258c4280"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswrtrpl">
+		<description>Bank Street Writer Plus (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296168">
+				<rom name="bank street writer plus 800k.woz" size="1296168" crc="731364bd" sha1="d7e9d1e9c777b8123c607cee5ec16435d24cec32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsgnrail">
+		<description>Design Your Own Railroad (Version 1.1C) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Abracadata</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with 48K and a compatible drive controller card. -->
+		<!--"Design Your Own Railroad" is a 1990 educational program developed by Don Fudge and distributed by Abracadata. This is version 1.1C. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with 48K and a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296197">
+				<rom name="design your own railroad 800k.woz" size="1296197" crc="b17c981e" sha1="9394d710e3b55e767e2022353ab4ceb7d126887d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="35grmrgm0587">
+		<description>Grammar Gremlins (Version 05.01.87) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
+		<!--"Grammar Gremlins" is a 1987 educational program developed by Santa Barbara Softworks and distributed by Davidson and Associates. This version is dated 05.01.87. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296190">
+				<rom name="grammar gremlins 800k.woz" size="1296190" crc="c7a3fa58" sha1="51c2184e0995f880ed7fa272224deb75959ae570" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bglwrt3235">
+		<description>BeagleWrite (Version 3.2) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Beagle Write" is a 1989 productivity program developed by Kevin Harvey, Alex Perelberg, and Mark Munz, and distributed by Beagle Bros. This is version 3.2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296189">
+				<rom name="beaglewrite 800k.woz" size="1296189" crc="28e4d42c" sha1="dfc62035d947a81e6eb5fe56054781fa20dacb33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dyohint35">
+		<description>Design Your Own Home: Interior Design (Version 2) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Abracadata</publisher>
+		<info name="release" value="2021-07-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
+		<!--"Design Your Own Home: Interior Design" is a 1986 productivity program developed by Don Fudge and distributed by Abracadata. This is version 2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328956">
+				<rom name="design your own home- interior design 800k.woz" size="1328956" crc="ebf6df6d" sha1="a96f934d6f416fb98ed93903b6597c01ec6f5417" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wllybyte">
+		<description>Willy Byte in the Digital Dimension</description>
+		<year>1984</year>
+		<publisher>Data Trek</publisher>
+		<info name="release" value="2021-07-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Willy Byte in the Digital Dimension" is a 1984 arcade game developed by Murray Krehbiel, with graphics by Greg Hammond, and distributed by Data Trek. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228163">
+				<rom name="willy byte in the digital dimension side a.woz" size="228163" crc="2c59a3a6" sha1="ec6cfdf85cb5496020d6b9ee918850b0cdd37c2f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
+			<dataarea name="flop" size="234819">
+				<rom name="willy byte in the digital dimension side b - boot.woz" size="234819" crc="95305acc" sha1="9fb6d5b6f6595a1b7764ca4b2a7ee92d269455ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcaricr35v1">
+		<description>Arithmetic Critters (Version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345310">
+				<rom name="arithmetic critters 800k.woz" size="1345310" crc="74b14b19" sha1="7b7eeb909cbdc1de88a346d2657429c82fda17c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clckwrks">
+		<description>Clock Works (Version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345302">
+				<rom name="clock works 800k.woz" size="1345302" crc="10213777" sha1="9d854320f839c567d42448d8925b648ece7b0e31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bckydbrd35">
+		<description>Backyard Birds (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Backyard Birds" is a 1989 educational program developed by Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345386">
+				<rom name="backyard birds 800k.woz" size="1345386" crc="1929bb55" sha1="12a3cee293e0d96e7bf4d2928ef1dd14e60a8514" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcchembe35">
+		<description>Chemistry: Balancing Equations (Version 1.0) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296232">
+				<rom name="chemistry- balancing equations 800k.woz" size="1296232" crc="741bcaa4" sha1="93f7dc5c6b6b9737628bcbd540918aee4ec7e746"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clnwtdet35">
+		<description>Cleanwater Detectives (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Cleanwater Detectives" is a 1991 educational program developed by Vincent J. Erickson, John Ojanen, and Diane Portner, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345366">
+				<rom name="cleanwater detectives 800k.woz" size="1345366" crc="051bbdd2" sha1="64306906c5ea53e08c80f86d56eb1840e15f0277"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cirmth35">
+		<description>Circus Math (Version 1.0) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Circus Math" is a 1984 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345309">
+				<rom name="circus math 800k.woz" size="1345309" crc="e676033e" sha1="f12e92bd54cbfb5bfb37181b8106031fb1a43feb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vcrc1135">
+		<description>VCR Companion (Version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"VCR Companion" is a 1988 graphics program developed by Louis Ewens and Lauren Elliott, and distributed by Broderbund Software. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296708">
+				<rom name="vcr companion 800k.woz" size="1296708" crc="ec3956f8" sha1="8be36dcbaa81da0ecf10c1234abc9e803d6d2fa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carbld35">
+		<description>Car Builder (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Car Builder" is a 1985 educational program developed by Richard Hefter and David Cunningham, and distributed by Optimum Resource. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297213">
+				<rom name="car builder 800k.woz" size="1297213" crc="8d78c9a0" sha1="05a0f9e0e3d0d7be1c0a978e1314cc604b3d52cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algbl058735">
+		<description>Alge-Blaster! (Version 050187) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-08-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Alge-Blaster!" is a 1985 educational program developed by Jan Davidson, Ph.D., Anders Beitnes, Wendy Barels, Cathy Johnson, and distributed by Davidson and Associates. This version is dated 050187. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328988">
+				<rom name="alge-blaster 800k.woz" size="1328988" crc="62bffa5f" sha1="ccb4c3c43d3b7ad13cd3c7e5f2b59434af0b1e08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmprstmpr">
+		<description>Whomper Stomper</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2021-08-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Whomper Stomper" is a 1984 action game developed by Mike Wall and Marty Inchiosa, ported to the Apple II by Steve Waldo, and distributed by Adventure International. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234853">
+				<rom name="whomper stomper.woz" size="234853" crc="99f67210" sha1="1ae2f9c644191954cbe586beb476b4bc19866d8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdmn1435">
+		<description>Word Munchers (Version 1.4) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Word Munchers" is a 1985 educational program developed and distributed by MECC. This is version 1.4. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345282">
+				<rom name="word munchers 800k.woz" size="1345282" crc="fead6f7a" sha1="056730809f1e90b8159e8582eb2709a20bb46509"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwlybnc35">
+		<description>Woolly Bounce (Version 1.0) (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-21"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Woolly Bounce" is a 1991 educational program developed by Gene Breault, Scott Jensen, Charolyn Kapplinger, and Kim D. Smith, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345371">
+				<rom name="woolly bounce 800k.woz" size="1345371" crc="7d634eb2" sha1="364f06610a0f4353ed0b2af9a948c9bbef1c9706"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhgtgr56">
+		<description>The Hitchhiker's Guide to the Galaxy (Release 56 / 841221)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-23"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"The Hitchhiker's Guide to the Galaxy" is a 1984 adventure game developed by Douglas Adams and Steve Meretzky, and distributed by Infocom. This is release 56 / 841221. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="the hitchhiker's guide to the galaxy r56.woz" size="234852" crc="befe62e7" sha1="c76fdb640ef34a53b42680f20e698b764dac58d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhgtgr58">
+		<description>The Hitchhiker's Guide to the Galaxy (Release 58 / 851002)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-23"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"The Hitchhiker's Guide to the Galaxy" is a 1984 adventure game developed by Douglas Adams and Steve Meretzky, and distributed by Infocom. This is release 58 / 851002. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234835">
+				<rom name="the hitchhiker's guide to the galaxy r58.woz" size="234835" crc="c80599cb" sha1="80bbad206eb1a6eb000105018b5f40da14503ca5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhgtgr31">
+		<description>The Hitchhiker's Guide to the Galaxy (Release 31 / 871119)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-23"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"The Hitchhiker's Guide to the Galaxy" is a 1984 adventure game developed by Douglas Adams and Steve Meretzky, and distributed by Infocom. This is release 31 / 871119. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234837">
+				<rom name="the hitchhiker's guide to the galaxy r31 side a.woz" size="234837" crc="6cc3a93e" sha1="ba5eda42241d96f06d3be06d29bba1ed9cd6ca36"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="228181">
+				<rom name="the hitchhiker's guide to the galaxy r31 side b.woz" size="228181" crc="ba77d270" sha1="74d52854e0d594dbec9eaaa6adc5b7d7d19f04f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzorkr49">
+		<description>Beyond Zork (Release 49 / 870917)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-24"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Beyond Zork" is a 1987 adventure game developed by Brian Moriarty and distributed by Infocom. This is release 49 / 870917. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234797">
+				<rom name="beyond zork r49 side a.woz" size="234797" crc="51ae5344" sha1="b7209c2942827b81ad5e22683200e461ae06b27d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234797">
+				<rom name="beyond zork r49 side b.woz" size="234797" crc="f76b20d0" sha1="9f8019b8d06d9a5fdea83588dd3286ade459c0b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzorkr57">
+		<description>Beyond Zork (Release 57 / 871221)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-24"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Beyond Zork" is a 1987 adventure game developed by Brian Moriarty and distributed by Infocom. This is release 57 / 871221. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241480">
+				<rom name="beyond zork r57 side a.woz" size="241480" crc="b6f594e5" sha1="a6624490c681bd90b8341cd34d91373a66e98406"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234824">
+				<rom name="beyond zork r57 side b.woz" size="234824" crc="3dbad712" sha1="a7e28a5e5030de3c50daeb8d383b342fe88f9812"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdzoner9">
+		<description>Border Zone (Release 9 / 871008)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-24"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Border Zone" is a 1987 adventure game developed by Marc Blank and distributed by Infocom. This is release 9 / 871008. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234787">
+				<rom name="border zone r9 side a.woz" size="234787" crc="41e004d2" sha1="d51299ead918a772c17a0a5de52e2cefe378ad97"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234760">
+				<rom name="border zone r9 side b.woz" size="234760" crc="37ffb287" sha1="6b90d08d5c9acb5ed411ddf3bb5eb3810174cf8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcryr86">
+		<description>Bureaucracy (Release 86 / 870212)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-08-24"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Bureaucracy" is a 1987 adventure game developed by Michael Bywater and Douglas Adams, and distributed by Infocom. This is release 86 / 870212. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234807">
+				<rom name="bureaucracy r86 side a.woz" size="234807" crc="21a0c5d8" sha1="5a305278c0a57485e12fddf32d76219c331d5c59"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234707">
+				<rom name="bureaucracy r86 side b.woz" size="234707" crc="ac7640fa" sha1="6a8e1a9839d0b5a27c71d6e1861b536f10637e13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodosb1a">
+		<description>ProDOS (Version B.1A 09-DEC-82)</description>
+		<year>1982</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-08-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"ProDOS" is a 1983 operating system developed by James R. Huston et. al. and distributed by Apple Computer. This pre-release version is labeled B.1A and dated December 9, 1982. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234858">
+				<rom name="prodos vb1.a 09-dec-82.woz" size="234858" crc="8cf27981" sha1="90e8419acb670c2b0b4213ab96949afaf64a564a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpcmp35">
+		<description>Picture Chompers (Version 1.0) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Picture Chompers" is a 1990 educational program developed by Sheila Dols, Scott Jensen, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, Liz Wendland, John Wlazlo, and Stephen Zehm, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344397">
+				<rom name="picture chompers 800k.woz" size="1344397" crc="091ff1cf" sha1="678756bb9076214eed6ad491e614cf0a135629ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nmunch1335">
+		<description>Number Munchers (Version 1.3) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Number Munchers" is a 1986 educational program developed and distributed by MECC. This is version 1.3. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296147">
+				<rom name="number munchers 800k.woz" size="1296147" crc="9cff06c6" sha1="3102ce194905e29afd6477dad9b7c5eb5efbb21d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmyso1135">
+		<description>Mystery Objects (Version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Mystery Objects" is a 1988 educational program developed by Greg Holey, Luz Husebye, Charolyn Kapplinger, John Krenz, Sherry Leudloff, Kevin Neff, and Diane Portner, and distributed by MECC. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296217">
+				<rom name="mystery objects 800k.woz" size="1296217" crc="189fff3d" sha1="6609c90ff3edb6775d0595e958e8230bb52a874a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcltzoo1035">
+		<description>Littletown Zoo (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Littletown Zoo" is a 1991 educational program developed by Eileen M. Nannen, John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345372">
+				<rom name="littletown zoo 800k.woz" size="1345372" crc="b7939029" sha1="7630944d1c9822ce4d8e49c5c10e51162e7d666a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinvb1135">
+		<description>Invisible Bugs (Version 1.1) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-08-21"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Invisible Bugs" is a 1989 educational program developed by Gene Breault, Scott Jensen, Charolyn Kapplinger, John Persoon, and Jane Peterson, and distributed by MECC. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345371">
+				<rom name="invisible bugs 800k.woz" size="1345371" crc="3b4cda38" sha1="d09e11869b38650d70273e9c675d3b7b01417ccc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magics23">
+		<description>Magic Spells (Version 2.3) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple //e, //c+ or IIgs. -->
+		<!--"Magic Spells" is a 1985 educational game developed by K. Elliott, G. Genoar, S. Gordon, L. Grimm, and K. Klose, and distributed by The Learning Company. This is version 2.3. It requires a 64K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296218">
+				<rom name="magic spells 800k.woz" size="1296218" crc="8fdcca18" sha1="88beae2101715a83a12dce18e0087e8d78f45533"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrb13">
+		<description>Math Rabbit (Version 1.3) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Math Rabbit" is a 1986 educational game developed by Teri Perl, Analee Nunan, and Aaron Weiss, and distributed by The Learning Company. This is version 1.3. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296204">
+				<rom name="math rabbit 800k.woz" size="1296204" crc="92d6a324" sha1="eff164d131db23346afa189c667d215153f9c911"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thquik14">
+		<description>Think Quick! (Version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Think Quick!" is a 1987 educational game developed by Leslie Grimm and Sid Weber, and distributed by The Learning Company. This is version 1.4. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296193">
+				<rom name="think quick 800k.woz" size="1296193" crc="dd552c51" sha1="fd81362e8608fbba19189db5b5976c640c3c1b70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatk8706">
+		<description>Word Attack! (Version 06.01.87) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+, //e, //c+ or IIgs. -->
+		<!--"Word Attack!" is a 1985 educational game developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated 06.01.87. It requires a 64K Apple ][+, //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296214">
+				<rom name="word attack 800k.woz" size="1296214" crc="05d95b9d" sha1="ab2d4881afeb8197dcecf696db6acc061056d45f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wdatkpl12">
+		<description>Word Attack Plus! (Version 1.2) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs -->
+		<!--"Word Attack Plus!" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.2, dated 04.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329012">
+				<rom name="word attack plus 800k.woz" size="1329012" crc="d794d8ad" sha1="261977a948ad76d34dcbdae4ac3314300cc2fea4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatkpfr13">
+		<description>Word Attack Plus! French (Version 1.3) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Word Attack Plus! French" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.3, dated 09.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1330036">
+				<rom name="word attack plus french 800k.woz" size="1330036" crc="4fa72218" sha1="e4704d7382a7f4e2b850928c0597a48fbf06c51a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatkpsp12">
+		<description>Word Attack Plus! Spanish (Version 1.2, 09.01.88) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"Word Attack Plus! Spanish" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. This is version 1.2, dated 09.01.88. It requires a 128K Apple //e, //c+ or IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329013">
+				<rom name="word attack plus spanish 800k.woz" size="1329013" crc="fc7872de" sha1="ee9e91738a9a2ac6790750490c8948c09e8ccb02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprprii">
+		<description>SuperPrint II (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-09-29"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e, //c+ or IIgs. -->
+		<!--"SuperPrint II" is a 1989 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer of Pelican Software, and distributed by Scholastic. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296289">
+				<rom name="superprint ii 800k.woz" size="1296289" crc="6e4761ec" sha1="e5b0e2c187b0d46a0738f5c325951f3a0529892e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trakattk">
+		<description>Track Attack</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-08-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Track Attack" is a 1982 action game developed by Chris Jochumson and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261303">
+				<rom name="track attack.woz" size="261303" crc="e924de56" sha1="f3d636e0eabfbe196da71016e87424cc12ea0157"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printshp">
+		<description>The Print Shop</description>
+		<year>1984</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-09-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"The Print Shop" is a 1984 graphics program developed by David Balsam and Martin Kahn, and distributed by Broderbund Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234809">
+				<rom name="the print shop side a.woz" size="234809" crc="97344ce3" sha1="3bc4427ed991ecc742f252ca0d201783cef5c2c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234784">
+				<rom name="the print shop side b.woz" size="234784" crc="e1d16e70" sha1="66f324eae1053f3a50c54b906aba8be5aadd31d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesis">
+		<description>Genesis</description>
+		<year>1983</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2021-09-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Genesis" is a 1983 action game developed by Kevin Furry, with art design by Whitney Caughlan, and distributed by Datasoft. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88367">
+				<rom name="genesis.woz" size="88367" crc="21107442" sha1="f3061301b932789a3fbba20f9184fa41527694d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kiludead">
+		<description>Killed Until Dead</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-09-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Killed Until Dead" is a 1987 adventure game developed by Michael Bate, Rick Banks, Allan Johanson, and John Boechler, and distributed by Accolade. It requires a 64K Apple ][+ or later. Due to coding bugs in the original game, it does not properly write-enable certain regions of RAM before writing to them, which leads to crashes in some emulators.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228232">
+				<rom name="killed until dead side a.woz" size="228232" crc="747bec69" sha1="897b9fc89b80b5a3fa8d66f6904e494b34b42a17"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234888">
+				<rom name="killed until dead side b.woz" size="234888" crc="da6d7e77" sha1="b8aca63b2269330030e9be2dc589e16e2701c013"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots4035">
+		<description>Rocky's Boots (Version 4.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-10-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"Rocky's Boots" is a 1988 educational game developed by Warren Robinett and Leslie Grimm, and distributed by The Learning Company. It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296202">
+				<rom name="rocky's boots v4.1 800k.woz" size="1296202" crc="9547ceae" sha1="9ed4042968ce40c1d5049befe27ecc74d81e4aea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdstale3">
+		<description>The Bard's Tale III: Thief of Fate (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-10-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"The Bard's Tale III: Thief of Fate" is a 1988 roleplaying game developed by Rebecca Heineman and distributed by Electronic Arts. It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296176">
+				<rom name="the bard's tale iii 800k.woz" size="1296176" crc="d388b56d" sha1="7e45ae4673d40093f535606d13d032cadaa410ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newprntshop">
+		<description>The New Print Shop (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-10-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"The New Print Shop" is a 1990 graphics program developed by Don Lloyd and distributed by Broderbund Software. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296152">
+				<rom name="the new print shop 800k.woz" size="1296152" crc="df2c9138" sha1="d5f690d14861672cbefb9ab9a1ad275a087979e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargle">
+		<description>Wargle!</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2021-10-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Wargle!" is a 1982 action game developed and distributed by Hayden Book Company. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="wargle.woz" size="234778" crc="1206aa31" sha1="c2431e7f2cbda517edb71d4458fa0e85a36338fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scruples">
+		<description>A Question of Scruples</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-10-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"A Question of Scruples" is a 1987 board game developed by Sentient Software and distributed by Leisure Genius. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234838">
+				<rom name="a question of scruples - disk a (program disk).woz" size="234838" crc="8d6b5e39" sha1="fc05cbe47accd7359e439e7bab276e73253ab458"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234840">
+				<rom name="a question of scruples - disk b (questions disk).woz" size="234840" crc="e06d7439" sha1="e79bb730be5b7c5455a34c5e1538fc10e24e37ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jbird">
+		<description>J-Bird</description>
+		<year>1983</year>
+		<publisher>Orion Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"J-Bird" is a 1983 action game developed by Daryl Rotta and distributed by Orion Software. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="j-bird.woz" size="234788" crc="98debcd8" sha1="f22a533197f895a950cdb04965a20a09d073ca54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stardanc">
+		<description>Star Dance</description>
+		<year>1981</year>
+		<publisher>United Software of America</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K. -->
+		<!--"Star Dance" is a 1981 action game developed by Gustavo Fernandez and distributed by United Software of America. It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101683">
+				<rom name="star dance.woz" size="101683" crc="61551723" sha1="fb89e011fff5dccc442362ace2b526d3a9a36816"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskorg26">
+		<description>Disk Organizer (Version 2.6)</description>
+		<year>1982</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E"/>
+		<!-- It requires an Apple ][, ][+, or unenhanced //e with 48K. -->
+		<!--"Disk Organizer" is a 1982 disk utility developed and distributed by Sensible Software. This is version 2.6. It requires an Apple ][, ][+, or unenhanced //e with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="114981">
+				<rom name="disk organizer.woz" size="114981" crc="30895055" sha1="1dadfd95788019e35948f4e0889bfa3f22c58720"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdiskc38">
+		<description>Super Disk Copy (Version 3.8)</description>
+		<year>1981</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Super Disk Copy" is a 1981 disk utility developed and distributed by Sensible Software. This is version 3.8. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55072">
+				<rom name="super disk copy v3.8.woz" size="55072" crc="0981c164" sha1="cd957476e7ac4fe1dfded3dd9c1f9e8d3a75a4b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2c3">
+		<description>Nibbles Away ][ (Version C3)</description>
+		<year>1983</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="release" value="2021-11-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Nibbles Away ][" is a 1983 disk utility developed and distributed by COMPUTER:applications. This is version C3. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146764">
+				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddupl44">
+		<description>Essential Data Duplicator (Version 4.4)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="release" value="2021-11-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Essential Data Duplicator" is a 1986 disk utility developed by Donald A. Schnapp and distributed by Utilico Microware. This is version 4.4. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106863">
+				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbatlm35">
+		<description>Beauty and the Beast and The Little Mermaid (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Beauty and the Beast and The Little Mermaid" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296188">
+				<rom name="beauty and the beast and the little mermaid 800k.woz" size="1296188" crc="4a2ad616" sha1="677828388d399ba055587c6db6a2c2915ff87873" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhapp35">
+		<description>Robin Hood and Peter Pan (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Robin Hood and Peter Pan" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296169">
+				<rom name="robin hood and peter pan 800k.woz" size="1296169" crc="fa681449" sha1="4dfe12a419d305baee700410df442b5a02983fde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmcac35">
+		<description>Big Book Maker: Cute and Cuddly (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Cute and Cuddly" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296174">
+				<rom name="big book maker- cute and cuddly 800k.woz" size="1296174" crc="c2a0e20e" sha1="e41e2142880348ae3520c147d2937f0badcbe1b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmfgy35">
+		<description>Big Book Maker: Feeling Good About Yourself (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Feeling Good About Yourself" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296188">
+				<rom name="big book maker- feeling good about yourself 800k.woz" size="1296188" crc="2f5b800f" sha1="0ed862a3896f34ec5b35cec08cb25eeaf9481588" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmlp35">
+		<description>Big Book Maker: Let's Pretend (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Let's Pretend" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296174">
+				<rom name="big book maker- let's pretend 800k.woz" size="1296174" crc="621eb931" sha1="356d287c3a079d2121c7739e0e6cfe4a1a7a5487" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmlns35">
+		<description>Big Book Maker: Letters, Numbers, Shapes (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Letters, Numbers, Shapes" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296185">
+				<rom name="big book maker- letters, numbers, shapes 800k.woz" size="1296185" crc="48ae97fa" sha1="58ef07f6485d0e05ee4f87477cabc797b520b60a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmmal35">
+		<description>Big Book Maker: Myths and Legends (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Myths and Legends" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296176">
+				<rom name="big book maker- myths and legends 800k.woz" size="1296176" crc="1b4bf1af" sha1="348b412fdffae8d6dea20cffcf2b83c2347f2425" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmque35">
+		<description>Big Book Maker: Quentin (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Quentin" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296168">
+				<rom name="big book maker- quentin 800k.woz" size="1296168" crc="630bc219" sha1="ef27a456a84620bff2c4dee6fc3e70f4e3afe694" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ouatpp35">
+		<description>Once Upon A Time... Puppet Playhouse (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Compu-Teach</publisher>
+		<info name="release" value="2021-12-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Once Upon A Time... Puppet Playhouse" is a 1991 educational program developed and distributed by Compu-Teach. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296154">
+				<rom name="once upon a time... puppet playhouse.woz" size="1296154" crc="4582a913" sha1="774e12114f5573b7a95d56a82c8d67861a9d6f7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spelit35">
+		<description>Spell It! (Version 06.01.87) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Spell It!" is a 1984 educational program developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated 06.01.87. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328979">
+				<rom name="spell it 800k.woz" size="1328979" crc="e4bbc951" sha1="f443cb280b267e0b176faa285fb6167b2e72deda" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathb35">
+		<description>Math Blaster! (Version 06.01.87) (800K 3.5")</description>
+		<year>1983</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Math Blaster!" is a 1983 educational program developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated 06.01.87. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328983">
+				<rom name="math blaster 800k.woz" size="1328983" crc="800e565e" sha1="a490cc0adfeb5206657436ab635edd5846e1e80c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdnrl1135">
+		<description>Read 'N Roll (Version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Read 'N Roll" is a 1988 educational program developed by Jan Davidson, Julie Baumgartner, J. M. Albanese, L. X. Savain, and T. S. DeBry, and distributed by Davidson and Associates. This is version 1.1. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329010">
+				<rom name="read n roll v1.1 800k.woz" size="1329010" crc="e53d2298" sha1="f9ce50d2e01b5b8ca997b358756da5f0bac0d7f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbmtaaft35">
+		<description>Big Book Maker: Tall Tales and American Folk Heroes (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Big Book Maker: Tall Tales and American Folk Heroes" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296194">
+				<rom name="big book maker- tall tales and american folk heroes 800k.woz" size="1296194" crc="165b8b53" sha1="87b099520000e5327b8750ec84167fe1a27ca315" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathme1635">
+		<description>Math and Me (Version 1.6) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Math and Me" is a 1988 educational program developed and distributed by Davidson and Associates. This is version 1.6. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296160">
+				<rom name="math and me v1.6 800k.woz" size="1296160" crc="7b21f4c3" sha1="ffcadcec7f45021c1a694e704ddc167896cbcb7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbmst1335">
+		<description>Math Blaster Mystery (Version 1.3) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Math Blaster Mystery" is a 1989 educational program developed by Julie Baumgartner, Anne Hertz, J. M. Albanese, and Larene Wade Spitler, and distributed by Davidson and Associates. This is version 1.3. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296755">
+				<rom name="math blaster mystery v1.3 800k.woz" size="1296755" crc="f8e33137" sha1="065496edb5d9295aee6648dc61c1673170f0d44e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthblpls3735">
+		<description>Math Blaster Plus! (Version 3.7) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Math Blaster Plus!" is a 1989 educational program developed by Jan Davidson, Cathy Johnson, and Louis X. Savain, and distributed by Davidson and Associates. This is version 3.7. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328988">
+				<rom name="math blaster plus v3.7 800k.woz" size="1328988" crc="fa6eebf3" sha1="985f733c100d6131b2dbe6b9bce00f0e0844280b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spelitps35">
+		<description>Spell It Plus! (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Spell It Plus!" is a 1989 educational program developed by Faye Schwartz, Cathy Johnson, Kevin Burley, and Carol Carpenter, and distributed by Davidson and Associates. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296218">
+				<rom name="spell it plus 800k.woz" size="1296218" crc="12943fe4" sha1="fc672aaaaacb195229719107eaaaf36b6feb127d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinodypl35">
+		<description>Dinosaur Days Plus! (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Dinosaur Days Plus!" is a 1988 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296187">
+				<rom name="dinosaur days plus 800k - disk 1 - program disk.woz" size="1296187" crc="06b40e00" sha1="6d35443ca094501873dc1b327c9f2de93af22c8c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Learning disk"/>
+			<dataarea name="flop" size="1296188">
+				<rom name="dinosaur days plus 800k - disk 2 - learning disk.woz" size="1296188" crc="c5319f5d" sha1="1584a8d69a4c4ffa603a8651c83c2fe9e8913dd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robwrp35">
+		<description>Robot Writer Plus! (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Robot Writer Plus!" is a 1988 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296163">
+				<rom name="robot writer plus 800k.woz" size="1296163" crc="679596fc" sha1="3edc0320e88612c4acc18bb58f5121189326e024" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trntrn35">
+		<description>Transportation Transformation (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Transportation Transformation" is a 1991 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296174">
+				<rom name="transportation transformation 800k.woz" size="1296174" crc="94438087" sha1="3099da49bc32f225b7edc0922593fa4485c523dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animat35">
+		<description>Animals with an Attitude (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Animals with an Attitude" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296169">
+				<rom name="animals with an attitude 800k.woz" size="1296169" crc="4bed154c" sha1="10fccbcc82125350fda57bace75c1ddbe9ed47a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whneigh35">
+		<description>The Whole Neighborhood (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"The Whole Neighborhood" is a 1991 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296167">
+				<rom name="the whole neighborhood 800k.woz" size="1296167" crc="95299735" sha1="92047c0ac6dd89cf32c12f14cfd23bc28fec9e18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliwzo35">
+		<description>Alice in Wonderland and The Wizard of Oz (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2021-12-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
+		<!--"Alice in Wonderland and The Wizard of Oz" is a 1992 graphics program developed by Pelican Software and distributed by Queue. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296185">
+				<rom name="alice in wonderland and the wizard of oz 800k.woz" size="1296185" crc="89419cd5" sha1="ad0600952f5a2f40d2c1ba26f454119f3dd7e100" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickspca">
+		<description>Mickey's Space Adventure</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-12-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Mickey's Space Adventure" is a 1984 adventure game developed by Roberta Williams, Peter Oliphant, Robert Eric Heitman, Mark Crowe, Doug MacNeill, Jennifer Nelsen, Terry Pierce, Al Lowe, and Annette Childs, and distributed by Sierra On-Line. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side a.woz" size="234942" crc="0b4f70db" sha1="9b4f799ad6ab2ffcff9edac36f2c19eddf20b689"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side b.woz" size="234942" crc="4213cb80" sha1="d5e2bd7b3dc7bd9a11b7e22f74da4da5848c4211"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side a.woz" size="234942" crc="c035ffcc" sha1="a46004c7bd16b2a9b012347496efe66f4c56af42"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side b.woz" size="234942" crc="5e4cae02" sha1="4624eda8ef93e71ca8237a5cb44cf874f1f7e55e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="envlifed">
+		<description>The Environment Life Dynamic</description>
+		<year>1980</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2021-12-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Environment Life Dynamic" is a 1980 set of action games (Lightning Bug, Moon-Catcher, Jungle Safari, Turn 'Em Loose) developed and distributed by Avant-Garde Creations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the environment life dynamic.woz" size="234809" crc="2add673d" sha1="93d69773a0d8e84ff0a1dfe5de5f54e19815e8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stelpowr">
+		<description>Stellar Power</description>
+		<year>1984</year>
+		<publisher>STI Software</publisher>
+		<info name="release" value="2022-01-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Stellar Power" is a 1984 strategy game developed by David Strimple and distributed by STI Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="stellar power.woz" size="234829" crc="230af062" sha1="b3bb6cedfcd1063ee7b04d537b33d97723323012"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glutton">
+		<description>Glutton</description>
+		<year>1983</year>
+		<publisher>Superior Software</publisher>
+		<info name="release" value="2022-01-19"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Please refer to the following websites for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/20220121195058/https://twitter.com/KaySavetz/status/1482204397903904768
+		https://archive.org/details/atari-youth-advisory-board-tracey-cullinan
+		-->
+		<!--"Glutton" is a 1983 action game developed by Tracey Cullinan and intended to be distributed by Superior Software. (It was never commercially released.) It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248074">
+				<rom name="glutton.woz" size="248074" crc="55b019a9" sha1="07948a603fac11629b1f135bda1c7ef42b1359df"/>
 			</dataarea>
 		</part>
 	</software>

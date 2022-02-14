@@ -16,7 +16,7 @@
 #include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"
@@ -138,7 +138,7 @@ private:
 	virtual void video_start() override;
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();

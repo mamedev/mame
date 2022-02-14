@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/c3040_dsk.h"
 
 c3040_format::c3040_format() : d64_format(file_formats)

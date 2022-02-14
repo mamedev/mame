@@ -50,8 +50,8 @@ To Do:
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/3812intf.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -416,7 +416,7 @@ GFXDECODE_END
             also used for water effects and titlescreen linescroll on gogomile
 */
 
-void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

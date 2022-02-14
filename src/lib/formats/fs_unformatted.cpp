@@ -3,10 +3,23 @@
 
 // Creation of unformatted floppy images
 
-#include "emu.h"
 #include "fs_unformatted.h"
 
-void fs_unformatted::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+namespace fs {
+
+const unformatted_image UNFORMATTED;
+
+const char *unformatted_image::name() const
+{
+	return "unformatted";
+}
+
+const char *unformatted_image::description() const
+{
+	return "Unformatted floppy image";
+}
+
+void unformatted_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
 {
 	bool all = form_factor == floppy_image::FF_UNKNOWN;
 	u32 best_8 =
@@ -35,43 +48,43 @@ void fs_unformatted::enumerate(floppy_enumerator &fe, uint32_t form_factor, cons
 		: FSI_NONE;
 
 	if(all || best_8 == FSI_8_DSDD)
-		fe.add_raw(this, "u8dsdd", FSI_8_DSDD, "Unformatted 8\" double-sided double-density");
+		fe.add_raw("u8dsdd", FSI_8_DSDD, "Unformatted 8\" double-sided double-density");
 	if(all || best_8 == FSI_8_DSSD)
-		fe.add_raw(this, "u8dssd", FSI_8_DSSD, "Unformatted 8\" double-sided single-density");
+		fe.add_raw("u8dssd", FSI_8_DSSD, "Unformatted 8\" double-sided single-density");
 	if(all || best_8 == FSI_8_SSSD)
-		fe.add_raw(this, "u8sssd", FSI_8_SSSD, "Unformatted 8\" single-sided single-density");
+		fe.add_raw("u8sssd", FSI_8_SSSD, "Unformatted 8\" single-sided single-density");
 
 	if(all || best_525 == FSI_525_DSHD)
-		fe.add_raw(this, "u525dshd", FSI_525_DSHD, "Unformatted 5\"25 double-sided high-density");
+		fe.add_raw("u525dshd", FSI_525_DSHD, "Unformatted 5\"25 double-sided high-density");
 	if(all || best_525 == FSI_525_DSQD)
-		fe.add_raw(this, "u525dsqd", FSI_525_DSQD, "Unformatted 5\"25 double-sided quad-density");
+		fe.add_raw("u525dsqd", FSI_525_DSQD, "Unformatted 5\"25 double-sided quad-density");
 	if(all || best_525 == FSI_525_DSDD)
-		fe.add_raw(this, "u525dsdd", FSI_525_DSDD, "Unformatted 5\"25 double-sided double-density");
+		fe.add_raw("u525dsdd", FSI_525_DSDD, "Unformatted 5\"25 double-sided double-density");
 	if(all)
-		fe.add_raw(this, "u525dssd", FSI_525_DSSD, "Unformatted 5\"25 double-sided single-density");
+		fe.add_raw("u525dssd", FSI_525_DSSD, "Unformatted 5\"25 double-sided single-density");
 	if(all || best_525 == FSI_525_SSQD)
-		fe.add_raw(this, "u525ssqd", FSI_525_SSQD, "Unformatted 5\"25 single-sided quad-density");
+		fe.add_raw("u525ssqd", FSI_525_SSQD, "Unformatted 5\"25 single-sided quad-density");
 	if(all || best_525 == FSI_525_SSDD)
-		fe.add_raw(this, "u525ssdd", FSI_525_SSDD, "Unformatted 5\"25 single-sided double-density");
+		fe.add_raw("u525ssdd", FSI_525_SSDD, "Unformatted 5\"25 single-sided double-density");
 	if(all || best_525 == FSI_525_SSSD)
-		fe.add_raw(this, "u525sssd", FSI_525_SSSD, "Unformatted 5\"25 single-sided single-density");
+		fe.add_raw("u525sssd", FSI_525_SSSD, "Unformatted 5\"25 single-sided single-density");
 
 	if(all || has_variant(variants, floppy_image::DSED))
-		fe.add_raw(this, "u35dsed", FSI_35_DSED, "Unformatted 3\"5 double-sided extra-density");
+		fe.add_raw("u35dsed", FSI_35_DSED, "Unformatted 3\"5 double-sided extra-density");
 	if(all || has_variant(variants, floppy_image::DSHD))
-		fe.add_raw(this, "u35dshd", FSI_35_DSHD, "Unformatted 3\"5 double-sided high-density");
+		fe.add_raw("u35dshd", FSI_35_DSHD, "Unformatted 3\"5 double-sided high-density");
 	if(all || best_35 == FSI_35_DSDD)
-		fe.add_raw(this, "u35dsdd", FSI_35_DSDD, "Unformatted 3\"5 double-sided double-density");
+		fe.add_raw("u35dsdd", FSI_35_DSDD, "Unformatted 3\"5 double-sided double-density");
 	if(all || best_35 == FSI_35_SSDD)
-		fe.add_raw(this, "u35ssdd", FSI_35_SSDD, "Unformatted 3\"5 single-sided double-density");
+		fe.add_raw("u35ssdd", FSI_35_SSDD, "Unformatted 3\"5 single-sided double-density");
 
 	if(all || best_3 == FSI_3_DSDD)
-		fe.add_raw(this, "u3dsdd", FSI_35_DSDD, "Unformatted 3\" double-sided double-density");
+		fe.add_raw("u3dsdd", FSI_35_DSDD, "Unformatted 3\" double-sided double-density");
 	if(all || best_3 == FSI_3_SSDD)
-		fe.add_raw(this, "u3ssdd", FSI_35_SSDD, "Unformatted 3\" single-sided double-density");
+		fe.add_raw("u3ssdd", FSI_35_SSDD, "Unformatted 3\" single-sided double-density");
 }
 
-void fs_unformatted::floppy_instantiate_raw(u32 key, floppy_image *image) const
+void unformatted_image::format(u32 key, floppy_image *image)
 {
 	switch(key) {
 	case FSI_8_DSDD: image->set_form_variant(floppy_image::FF_8, floppy_image::DSDD); break;
@@ -96,4 +109,29 @@ void fs_unformatted::floppy_instantiate_raw(u32 key, floppy_image *image) const
 	}
 }
 
-const filesystem_manager_type FS_UNFORMATTED = &filesystem_manager_creator<fs_unformatted>;
+std::unique_ptr<filesystem_t> unformatted_image::mount(fsblk_t &blockdev) const
+{
+	return nullptr;
+}
+
+bool unformatted_image::can_format() const
+{
+	return false;
+}
+
+bool unformatted_image::can_read() const
+{
+	return false;
+}
+
+bool unformatted_image::can_write() const
+{
+	return false;
+}
+
+bool unformatted_image::has_rsrc() const
+{
+	return false;
+}
+
+} // namespace fs

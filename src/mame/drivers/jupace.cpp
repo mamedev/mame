@@ -57,7 +57,7 @@ Ports:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ace_tap.h"
@@ -170,15 +170,16 @@ private:
 
 SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
+	std::vector<uint8_t> RAM(0x10000);
 	cpu_device *cpu = m_maincpu;
-	uint8_t *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
-	unsigned char ace_repeat, ace_byte, loop;
-	int done=0, ace_index=0x2000;
+	unsigned char ace_repeat, ace_byte;
+	u16 ace_index=0x2000;
+	bool done = false;
 
 	if (m_ram->size() < 16*1024)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
+		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
 		return image_init_result::FAIL;
 	}
@@ -194,7 +195,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 			{
 			case 0x00:
 					logerror("File loaded!\r\n");
-					done = 1;
+					done = true;
 					break;
 			case 0x01:
 					image.fread(&ace_byte, 1);
@@ -202,7 +203,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 					break;
 			default:
 					image.fread(&ace_repeat, 1);
-					for (loop = 0; loop < ace_byte; loop++)
+					for (u8 loop = 0; loop < ace_byte; loop++)
 						RAM[ace_index++] = ace_repeat;
 					break;
 			}
@@ -215,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (!done)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
+		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
 		return image_init_result::FAIL;
 	}
@@ -248,7 +249,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 		cpu->set_state_int(Z80_R, RAM[0x2140]);
 
 		if ((RAM[0x2119] < 0x80) || !ace_index)
-			cpu->set_state_int(STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
+			cpu->set_state_int(Z80_SP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
 	/* Copy data to the address space */

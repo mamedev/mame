@@ -29,7 +29,7 @@ likewise a 2 screen game.
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -890,7 +890,7 @@ Second "version" letter denotes cabinet type:
 A = 2 players, 2 coin slots, can set coin/credit by coin slot, COINs common/independent (when independent, premium start & continue values can be set), FREE PLAY option, requires start buttons
 B = 4 players, 4 coin slots, can set premium start & continue value, with or without start buttons
 C = 6 players, 6 coin slots, can set premium start & continue value, no support for START buttons, 2 monitors
-D = 4 players, 4 coin slots, 4 seperate service coins, can set premium start & continue value, with or without start buttons
+D = 4 players, 4 coin slots, 4 separate service coins, can set premium start & continue value, with or without start buttons
 E = 4 players, 2 coin slots, can set coin/credit by coin slot, FREE PLAY option, requires start buttons
 
 */

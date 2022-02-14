@@ -10,6 +10,7 @@
 #include "machine/mos6530.h"
 #include "machine/6532riot.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "sound/sp0250.h"
 #include "sound/votrax.h"
 
@@ -38,7 +39,7 @@ public:
 	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
-	void write(offs_t offset, uint8_t data);
+	void write(uint8_t data);
 
 	// internal communications
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
@@ -87,6 +88,9 @@ protected:
 	virtual void device_start() override;
 
 	virtual void gottlieb_sound_r1_map(address_map &map);
+
+protected:
+	required_device<dac_8bit_r2r_device> m_dac;
 
 private:
 	// devices
@@ -140,6 +144,7 @@ public:
 	// internal communications
 	uint8_t speech_data_r();
 	uint8_t audio_data_r();
+	uint8_t signal_audio_nmi_r();
 	void signal_audio_nmi_w(uint8_t data);
 	void nmi_rate_w(uint8_t data);
 	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
@@ -154,7 +159,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// internal helpers

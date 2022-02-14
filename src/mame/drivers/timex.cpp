@@ -156,7 +156,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "formats/tzx_cas.h"
 
@@ -530,7 +530,7 @@ void ts2068_state::ts2068_io(address_map &map)
 	map(0xf4, 0xf4).rw(FUNC(ts2068_state::port_f4_r), FUNC(ts2068_state::port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(FUNC(ts2068_state::spectrum_port_fe_r), FUNC(ts2068_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(ts2068_state::spectrum_ula_r), FUNC(ts2068_state::spectrum_ula_w)).select(0xff00);
 	map(0xff, 0xff).rw(FUNC(ts2068_state::port_ff_r), FUNC(ts2068_state::port_ff_w)).mirror(0xff00);
 }
 
@@ -573,7 +573,7 @@ void tc2048_state::port_ff_w(offs_t offset, uint8_t data)
 
 void tc2048_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(tc2048_state::spectrum_port_fe_r), FUNC(tc2048_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x00, 0x00).rw(FUNC(tc2048_state::spectrum_ula_r), FUNC(tc2048_state::spectrum_ula_w)).select(0xfffe);
 	map(0xff, 0xff).rw(FUNC(tc2048_state::port_ff_r), FUNC(tc2048_state::port_ff_w)).mirror(0xff00);
 }
 
@@ -608,12 +608,12 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 		if (size % 0x2000 != 9)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
 			return image_init_result::FAIL;
 		}
 		if (!image.loaded_through_softlist())
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
+			image.seterror(image_error::UNSUPPORTED, "Loading from softlist is not supported yet");
 			return image_init_result::FAIL;
 		}
 
@@ -628,7 +628,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
 			return image_init_result::FAIL;
 		}
 
@@ -652,7 +652,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 				break;
 
 			default:
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
+				image.seterror(image_error::INVALIDIMAGE, "Cart type not supported");
 				return image_init_result::FAIL;
 		}
 

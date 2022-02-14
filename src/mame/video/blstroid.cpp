@@ -68,7 +68,7 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(blstroid_state,blstroid)
+void blstroid_state::video_start()
 {
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);
@@ -86,7 +86,7 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -99,7 +99,7 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 			break;
 		default:
-			atarigen_state::device_timer(timer, id, param, ptr);
+			atarigen_state::device_timer(timer, id, param);
 			break;
 	}
 }

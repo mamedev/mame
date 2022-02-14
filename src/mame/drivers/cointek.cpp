@@ -20,17 +20,22 @@ The daughter card has a big box on it labelled as follows:
   Mask Microcomputer
   CODE NUM
 
-The daughter board is connected to the main board via 40 pin socket
+The daughter board is connected to the main board via 40 pin socket.
+
+TODO:
+- decryption is only preliminary (?). The game puts some strings at 0xc000 and at 0xf810. At 0xf810 it puts 'MICRO' and then it expects to read 'DRAGON', if it doesn't it loops endlessly;
+- after decryption is completed, everything else.
 */
 
 #include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "cpu/z80/z80.h"
-#include "machine/i8255.h"
-#include "sound/ym2413.h"
-
 
 namespace {
 
@@ -64,12 +69,11 @@ void cointek_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom(); // banking?
 	map(0xc000, 0xc7ff).ram();
+	map(0xf800, 0xffff).ram();
 }
 
 void cointek_state::io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 void cointek_state::audio_prg_map(address_map &map)
@@ -79,8 +83,6 @@ void cointek_state::audio_prg_map(address_map &map)
 
 void cointek_state::audio_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 
@@ -119,6 +121,21 @@ static INPUT_PORTS_START( unkct )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWC:8")
 INPUT_PORTS_END
 
+const gfx_layout gfx_8x8x4 = // TODO: not correct but it allows to see something in the GFX viewer for now
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56 },
+	8*8
+};
+
+static GFXDECODE_START( gfx_unkct )
+	GFXDECODE_ENTRY("unsorted_gfx", 0, gfx_8x8x4, 0, 32)
+GFXDECODE_END
+
 
 void cointek_state::cointek(machine_config &config)
 {
@@ -130,6 +147,7 @@ void cointek_state::cointek(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 3)); // divisor guessed
 	audiocpu.set_addrmap(AS_PROGRAM, &cointek_state::audio_prg_map);
 	audiocpu.set_addrmap(AS_IO, &cointek_state::audio_io_map);
+	audiocpu.set_disable(); // TODO: disabled for now to avoid clogging the error log
 
 	I8255(config, "ppi1");
 	I8255(config, "ppi2");
@@ -144,6 +162,7 @@ void cointek_state::cointek(machine_config &config)
 	screen.set_screen_update(FUNC(cointek_state::screen_update));
 	screen.set_palette("palette");
 
+	GFXDECODE(config, "gfxdecode", "palette", gfx_unkct);
 	PALETTE(config, "palette").set_entries(0x100);
 
 	// sound hardware
@@ -205,11 +224,12 @@ void cointek_state::init_unkct()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int i = 0; i < 0x8000; i++) // TODO: Is this all there is to it? Is the second ROM scrambled, too?
-		rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
+	for (int i = 0; i < 0x10000; i++) // TODO: This is only enough to show some strings, but the encryption is conditional, possibly based on addresses. The second ROM is also conditionally scrambled.
+		if (!(i & 0x1000))
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
 }
 
 } // Anonymous namespace
 
 
-GAME( 199?, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON )
+GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON ) // string in ROM at 0x7839: Ver 4.00 1989-08-01

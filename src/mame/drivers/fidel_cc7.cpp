@@ -3,10 +3,10 @@
 // thanks-to:Berger
 /******************************************************************************
 
-Fidelity Chess Challenger 7 (CC7, BCC)
+Fidelity Chess Challenger 7 (BCC)
 ------------------------
-It was Fidelity's most sold chess computer. Model BCC appears to be the first
-version, and the CC7 model was produced starting from 1980.
+It was Fidelity's most sold chess computer. The first version was released in
+1979, and a newer PCB revision was produced in 1980.
 
 Zilog Z80A, 3.579MHz from XTAL
 Z80 IRQ/NMI unused, no timer IC.
@@ -18,7 +18,7 @@ to the display panel instead.
 CC7 (BCC) was also bootlegged around 1981 by Splice Industria Brasileira,
 as "Byte XD-300". Mostek MK3880N-4 @ 4MHz, ROM contents is same as BCC REVB.
 
-RE information from netlist by Berger (a BCC model)
+RE information from netlist by Berger (1st version PCB)
 
 Memory map:
 -----------
@@ -249,12 +249,12 @@ void bcc_state::bcc(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( cc7 ) // model CC7, PCB label 510-380
+ROM_START( cc7 ) // PCB label 510-380
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "101-32016", 0x0000, 0x1000, CRC(b9076c52) SHA1(09b17ac6cd6a1c5c62aea3649f3367bcf4405598) ) // 2332
 ROM_END
 
-ROM_START( cc7a ) // model BCC
+ROM_START( cc7a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
 ROM_END
@@ -274,7 +274,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (model CC7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7a,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7a,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, backgamc, 0,      0, bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

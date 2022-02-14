@@ -51,7 +51,7 @@
  * sequence: 10 -> 70 -> e0 -> 80
  * </PRE>
  */
-uint8_t* m_madr_a32;
+std::unique_ptr<uint8_t[]> m_madr_a32;
 
 //! mouse context
 struct {

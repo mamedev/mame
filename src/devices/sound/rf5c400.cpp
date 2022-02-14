@@ -13,10 +13,12 @@
 namespace {
 
 int volume_table[256];
-double pan_table[0x64];
+double pan_table[256];
 
 void init_static_tables()
 {
+	std::fill(std::begin(pan_table), std::end(pan_table), 0.0);
+
 	// init volume/pan tables
 	double max = 255.0;
 	for (int i = 0; i < 256; i++) {
@@ -25,9 +27,6 @@ void init_static_tables()
 	}
 	for (int i = 0; i < 0x48; i++) {
 		pan_table[i] = sqrt(double(0x47 - i)) / sqrt(double(0x47));
-	}
-	for (int i = 0x48; i < 0x64; i++) {
-		pan_table[i] = 0.0;
 	}
 }
 
@@ -188,7 +187,7 @@ void rf5c400_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, env_step));
 	save_item(STRUCT_MEMBER(m_channels, env_scale));
 
-	m_stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc(0, 4, clock() / 384);
 }
 
 //-------------------------------------------------
@@ -211,18 +210,22 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	int i, ch;
 	uint64_t start, end, loop;
 	uint64_t pos;
-	uint8_t vol, lvol, rvol, type;
+	uint8_t vol, lvol, rvol, effect_lvol, effect_rvol, type;
 	uint8_t env_phase;
 	double env_level, env_step, env_rstep;
 
 	outputs[0].fill(0);
 	outputs[1].fill(0);
+	outputs[2].fill(0);
+	outputs[3].fill(0);
 
 	for (ch=0; ch < 32; ch++)
 	{
 		rf5c400_channel *channel = &m_channels[ch];
 		auto &buf0 = outputs[0];
 		auto &buf1 = outputs[1];
+		auto &buf2 = outputs[2];
+		auto &buf3 = outputs[3];
 
 		start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((uint32_t)(channel->endHloopH & 0xFF) << 16) | channel->endL;
@@ -231,6 +234,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		vol = channel->volume & 0xFF;
 		lvol = channel->pan & 0xFF;
 		rvol = channel->pan >> 8;
+		effect_lvol = channel->effect & 0xFF;
+		effect_rvol = channel->effect >> 8;
 		type = (channel->volume >> 8) & TYPE_MASK;
 
 		env_phase = channel->env_phase;
@@ -316,6 +321,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			sample = (sample >> 9) * env_level;
 			buf0.add_int(i, sample * pan_table[lvol], 32768);
 			buf1.add_int(i, sample * pan_table[rvol], 32768);
+			buf2.add_int(i, sample * pan_table[effect_lvol], 32768);
+			buf3.add_int(i, sample * pan_table[effect_rvol], 32768);
 
 			pos += channel->step;
 			if ((pos>>16) > end)
@@ -578,6 +585,31 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			case 0x07:      // effect depth
 			{
 				// 0xCCRR: CC = chorus send depth, RR = reverb send depth
+
+				// Note: beatmania III uses this register differently?
+				//  When effects are off, it writes 0xe0e0 to this register:
+				//    Changed ch 30 reg 6 to volume 18176 -> l: 71, r: 0
+				//    Changed ch 30 reg 7 to volume 57568 -> 0xe0e0
+				//    Changed ch 31 reg 6 to volume 71    -> l: 0, r: 71
+				//    Changed ch 31 reg 7 to volume 57568 -> 0xe0e0
+				//  When effects are on, it writes reg 6 information here:
+				//    Changed ch 30 reg 6 to volume 57568 -> 0xe0e0
+				//    Changed ch 30 reg 7 to volume 18176 -> l: 71, r: 0
+				//    Changed ch 31 reg 6 to volume 57568 -> 0xe0e0
+				//    Changed ch 31 reg 7 to volume 71    -> l: 0, r: 71
+				//
+				// I've observed values of 0xff instead of 0xe0 in some games like Gradius 4,
+				// so 0xe0 is not some kind of max value.
+				//
+				// When effects are enabled the audio is redirected to an external
+				// PCB board for effect processing before returning to the sound PCB.
+				//
+				// That makes me think that the effects are not internal and that
+				// this register is just used to adjust the volume of the channels
+				// being routed externally.
+				//
+				// Whether the effect is a chorus or reverb or something else would
+				// depend on how the PCB is using these external channels.
 				channel->effect = data;
 				break;
 			}

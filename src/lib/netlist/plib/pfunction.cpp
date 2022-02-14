@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #include "pfunction.h"
@@ -10,7 +10,6 @@
 #include "putil.h"
 
 #include <array>
-#include <map>
 #include <map>
 #include <stack>
 #include <type_traits>

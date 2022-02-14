@@ -249,16 +249,17 @@ Notes:
       IC8   - Instruction ROM
       IC10  - Unknown DIP8 chip
 
-Game Name       IC2            IC2 Type   IC3            IC3 Type    IC8            IC8 Type    Jumpers
+Game Name             IC2            IC2 Type   IC3            IC3 Type    IC8            IC8 Type    Jumpers
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
-Actraiser       NSS-R_IC2_AR   TC574000   NSS-R_IC3_AR   TC574000    NSS-R_IC8_AR   27C256      CL2 CL3 CL4 CL5 CL6 CL12 CL13 CL15 CL17 CL18 CL19 - Short
+Actraiser             NSS-R_IC2_AR   TC574000   NSS-R_IC3_AR   TC574000    NSS-R_IC8_AR   27C256      CL2 CL3 CL4 CL5 CL6 CL12 CL13 CL15 CL17 CL18 CL19 - Short
                                                                                                 SL1 SL7 SL8 SL9 SL10 SL11 SL12 SL14 SL16 SL20 SL21 SL22 - Open
-Addams Family   NSS-R_IC2_AF   TC574000   NSS-R_IC3_AF   TC574000    NSS-R_IC8_AF   27C256      All games use the above jumper configuration.
-Amazing Tennis  NSS-R_IC2_AT   TC574000   NSS-R_IC3_AT   TC574000    NSS-R_IC8_AT   27C256
-Irem Skins Game NSS-R_IC2_MT   TC574000   NSS-R_IC3_MT   TC574000    NSS-R_IC8_MT   27C256
-Lethal Weapon   NSS-R_IC2_L3   TC574000   NSS-R_IC3_L3   TC574000    NSS-R_IC8_L3   27C256
-NCAA Basketball NSS-R_IC2_DU   TC574000   NSS-R_IC3_DU   TC574000    NSS-R_IC8_DU   27C256
-Robocop 3       NSS-R_IC2_R3   TC574000   NSS-R_IC3_R3   TC574000    NSS-R_IC8_R3   27C256
+Addams Family         NSS-R_IC2_AF   TC574000   NSS-R_IC3_AF   TC574000    NSS-R_IC8_AF   27C256      All games use the above jumper configuration.
+Amazing Tennis        NSS-R_IC2_AT   TC574000   NSS-R_IC3_AT   TC574000    NSS-R_IC8_AT   27C256
+Irem Skins Game       NSS-R_IC2_MT   TC574000   NSS-R_IC3_MT   TC574000    NSS-R_IC8_MT   27C256
+Lethal Weapon         NSS-R_IC2_L3   TC574000   NSS-R_IC3_L3   TC574000    NSS-R_IC8_L3   27C256
+NCAA Basketball       NSS-R_IC2_DU   TC574000   NSS-R_IC3_DU   TC574000    NSS-R_IC8_DU   27C256
+Robocop 3             NSS-R_IC2_R3   TC574000   NSS-R_IC3_R3   TC574000    NSS-R_IC8_R3   27C256
+Super Mario All-Stars NSS-R_IC2_4M   HN62318    NSS-R_IC3_4M   HN62318     NSS-R_IC8_4M   27C256
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 NSS-01-ROM-C
@@ -306,6 +307,8 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "speaker.h"
 
 
+namespace {
+
 class nss_state : public snes_state
 {
 public:
@@ -315,7 +318,9 @@ public:
 		, m_m50458(*this, "m50458")
 		, m_s3520cf(*this, "s3520cf")
 		, m_rp5h01(*this, "rp5h01")
-		, m_palette(*this, "palette")
+		, m_eepromout(*this, "EEPROMOUT")
+		, m_serial1_data1(*this, "SERIAL1_DATA1")
+		, m_rtc_osd(*this, "RTC_OSD")
 	{ }
 
 	void nss(machine_config &config);
@@ -324,12 +329,18 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(game_over_flag_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
-	optional_device<palette_device> m_palette;
+	required_ioport m_eepromout;
+	required_ioport m_serial1_data1;
+	required_ioport m_rtc_osd;
 
 	uint8_t m_wram_wp_flag;
 	std::unique_ptr<uint8_t[]> m_wram;
@@ -350,8 +361,6 @@ private:
 	void port_04_w(uint8_t data);
 	void port_07_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
@@ -494,7 +503,7 @@ void nss_state::nss_prot_w(uint8_t data)
 		m_rp5h01->cs_w(~data & 0x01);
 	}
 
-	ioport("EEPROMOUT")->write(data, 0xff);
+	m_eepromout->write(data, 0xff);
 }
 
 
@@ -525,12 +534,12 @@ uint8_t nss_state::port_00_r()
 	res = (m_joy_flag) << 7;
 	// TODO: reads from SNES screen output, correct?
 	res|= (m_screen->vblank() & 1) << 6;
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 15) << 5);
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  7) << 4);
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 10) << 3);
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 11) << 2);
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  9) << 1);
-	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  8) << 0);
+	res|= (BIT(m_serial1_data1->read(), 15) << 5);
+	res|= (BIT(m_serial1_data1->read(),  7) << 4);
+	res|= (BIT(m_serial1_data1->read(), 10) << 3);
+	res|= (BIT(m_serial1_data1->read(), 11) << 2);
+	res|= (BIT(m_serial1_data1->read(),  9) << 1);
+	res|= (BIT(m_serial1_data1->read(),  8) << 0);
 
 	return res;
 }
@@ -589,7 +598,7 @@ void nss_state::port_02_w(uint8_t data)
     ---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
 */
 //  printf("%02x\n",data & 0xf);
-	ioport("RTC_OSD")->write(data, 0xff);
+	m_rtc_osd->write(data, 0xff);
 }
 
 void nss_state::port_03_w(uint8_t data)
@@ -635,6 +644,11 @@ void nss_state::machine_start()
 
 	m_is_nss = 1;
 	m_wram = make_unique_clear<uint8_t[]>(0x1000);
+
+	save_item(NAME(m_wram_wp_flag));
+	save_pointer(NAME(m_wram), 0x1000);
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_cart_sel));
 }
 
 
@@ -1065,6 +1079,20 @@ ROM_START( nss_sten )
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(2fd8475b) SHA1(38af97734649b90e0ea74cb1daeaa431e4295eb9) )
 ROM_END
 
+ROM_START( nss_smas )
+	NSS_BIOS
+	ROM_REGION( 0x200000, "user3", 0 ) // believed bad dumps as they are 0x00 filled in ranges 0x40000-0x7ffff and 0xc0000-0xfffff. Comparison with the SNES ROMs seems to confirm the suspects.
+	ROM_LOAD( "nss-r ic3 4m.ic3", 0x000000, 0x100000, BAD_DUMP CRC(e071405a) SHA1(e2a4b849c225a637d1f7481f24d9162da29c4905) )
+	ROM_LOAD( "nss-r ic3 4m.ic2", 0x100000, 0x100000, BAD_DUMP CRC(a46eed6e) SHA1(b9ac1f1d1f8aa5276238a65003c25a3916a4a0c2) )
+
+	// instruction / data rom for bios
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
+	ROM_LOAD( "nss-r ic3 4m.ic8", 0x0000, 0x8000, CRC(bb46c507) SHA1(e753043b70541a4298d0af21781ecc2640a4d554) )
+
+	ROM_REGION( 0x10, "rp5h01", 0 )
+	ROM_LOAD( "security.prm", 0x00, 0x10, NO_DUMP )
+ROM_END
+
 void nss_state::init_nss()
 {
 	uint8_t *PROM = memregion("rp5h01")->base();
@@ -1074,6 +1102,9 @@ void nss_state::init_nss()
 
 	init_snes();
 }
+
+} // Anonymous namespace
+
 
 GAME( 199?, nss,       0,     nss,      snes, nss_state, init_snes, ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -1088,3 +1119,4 @@ GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Human
 GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, nss_smas,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Mario All-Stars (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // bad dump

@@ -9,12 +9,12 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cheat.h"
-#include "mame.h"
+#include "ui/cheatopt.h"
 
 #include "ui/ui.h"
-#include "ui/menu.h"
-#include "ui/cheatopt.h"
+
+#include "cheat.h"
+#include "mame.h"
 
 
 namespace ui {
@@ -29,78 +29,73 @@ namespace ui {
     menu_cheat - handle the cheat menu
 -------------------------------------------------*/
 
-void menu_cheat::handle()
+void menu_cheat::handle(event const *ev)
 {
-	/* process the menu */
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-
-
-	/* handle events */
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	// handle events
+	if (ev && ev->itemref)
 	{
 		bool changed = false;
 
-		/* clear cheat comment on any movement or keypress */
+		// clear cheat comment on any movement or keypress
 		machine().popmessage();
 
-		/* handle reset all + reset all cheats for reload all option */
-		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
+		if ((ev->itemref == ITEMREF_CHEATS_RESET_ALL || ev->itemref == ITEMREF_CHEATS_RELOAD_ALL) && ev->iptkey == IPT_UI_SELECT)
 		{
+			// handle reset all + reset all cheats for reload all option
 			for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 				if (curcheat->select_default_state())
 					changed = true;
 		}
-
-		/* handle individual cheats */
-		else if (menu_event->itemref >= ITEMREF_CHEATS_FIRST_ITEM)
+		else if (ev->itemref >= ITEMREF_CHEATS_FIRST_ITEM)
 		{
-			cheat_entry *curcheat = reinterpret_cast<cheat_entry *>(menu_event->itemref);
+			// handle individual cheats
+			cheat_entry *curcheat = reinterpret_cast<cheat_entry *>(ev->itemref);
 			const char *string;
-			switch (menu_event->iptkey)
+			switch (ev->iptkey)
 			{
-				/* if selected, activate a oneshot */
+				// if selected, activate a oneshot
 				case IPT_UI_SELECT:
 					changed = curcheat->activate();
 					break;
 
-				/* if cleared, reset to default value */
+				// if cleared, reset to default value
 				case IPT_UI_CLEAR:
 					changed = curcheat->select_default_state();
 					break;
 
-				/* left decrements */
+				// left decrements
 				case IPT_UI_LEFT:
 					changed = curcheat->select_previous_state();
 					break;
 
-				/* right increments */
+				// right increments
 				case IPT_UI_RIGHT:
 					changed = curcheat->select_next_state();
 					break;
 
-				/* bring up display comment if one exists */
+				// bring up display comment if one exists
 				case IPT_UI_DISPLAY_COMMENT:
 				case IPT_UI_UP:
 				case IPT_UI_DOWN:
 					string = curcheat->comment();
-					if (string != nullptr && string[0] != 0)
+					if (string && *string)
 						machine().popmessage(_("Cheat Comment:\n%s"), string);
 					break;
 			}
 		}
 
-		/* handle reload all  */
-		if (menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL && menu_event->iptkey == IPT_UI_SELECT)
+		// handle reload all
+		if (ev->itemref == ITEMREF_CHEATS_RELOAD_ALL && ev->iptkey == IPT_UI_SELECT)
 		{
-			/* re-init cheat engine and thus reload cheats/cheats have already been turned off by here */
+			// re-init cheat engine and thus reload cheats/cheats have already been turned off by here
 			mame_machine_manager::instance()->cheat().reload();
 
-			/* display the reloaded cheats */
+			// display the reloaded cheats
 			reset(reset_options::REMEMBER_REF);
 			machine().popmessage(_("All cheats reloaded"));
 		}
 
-		/* if things changed, update */
+		// if things changed, update
 		if (changed)
 			reset(reset_options::REMEMBER_REF);
 	}
@@ -113,6 +108,7 @@ void menu_cheat::handle()
 
 menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 void menu_cheat::populate(float &customtop, float &custombottom)

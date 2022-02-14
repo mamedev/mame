@@ -23,6 +23,7 @@
 #include "pluginopts.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "validity.h"
@@ -37,7 +38,10 @@
 
 #include <algorithm>
 #include <new>
+#include <set>
+#include <tuple>
 #include <cctype>
+#include <iostream>
 
 
 //**************************************************************************
@@ -79,6 +83,7 @@
 
 
 namespace {
+
 //**************************************************************************
 //  COMMAND-LINE OPTIONS
 //**************************************************************************
@@ -217,7 +222,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	try
 	{
 		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
-		m_osd.set_verbose(m_options.verbose());
+	}
+	catch (options_warning_exception &ex)
+	{
+		osd_printf_error("%s", ex.message());
 	}
 	catch (options_exception &ex)
 	{
@@ -228,6 +236,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 		// otherwise, error on the options
 		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message());
 	}
+	m_osd.set_verbose(m_options.verbose());
 
 	// determine the base name of the EXE
 	std::string_view exename = core_filename_extract_base(args[0], true);
@@ -543,53 +552,82 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 					osd_printf_info("\n");
 
 				// iterate through ROMs
-				bool hasroms = false;
+				std::list<std::tuple<std::string, int64_t, std::string>> entries;
+				std::set<std::string_view> devnames;
 				for (device_t const &device : device_enumerator(root))
 				{
+					bool hasroms = false;
 					for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 					{
 						for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 						{
-							// print a header
 							if (!hasroms)
-								osd_printf_info(
-									"ROMs required for %s \"%s\".\n"
-									"%-32s %10s %s\n",
-									type, root.shortname(), "Name", "Size", "Checksum");
-							hasroms = true;
+							{
+								hasroms = true;
+								if (&device != &root)
+									devnames.insert(device.shortname());
+							}
 
 							// accumulate the total length of all chunks
 							int64_t length = -1;
 							if (ROMREGION_ISROMDATA(region))
 								length = rom_file_size(rom);
 
-							// start with the name
-							osd_printf_info("%-32s ", rom->name());
-
-							// output the length next
-							if (length >= 0)
-								osd_printf_info("%10u", unsigned(uint64_t(length)));
-							else
-								osd_printf_info("%10s", "");
-
-							// output the hash data
-							util::hash_collection hashes(rom->hashdata());
-							if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-							{
-								if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
-									osd_printf_info(" BAD");
-								osd_printf_info(" %s", hashes.macro_string());
-							}
-							else
-								osd_printf_info(" NO GOOD DUMP KNOWN");
-
-							// end with a CR
-							osd_printf_info("\n");
+							entries.emplace_back(rom->name(), length, rom->hashdata());
 						}
 					}
 				}
-				if (!hasroms)
+
+				// print results
+				if (entries.empty())
 					osd_printf_info("No ROMs required for %s \"%s\".\n", type, root.shortname());
+				else
+				{
+					// print a header
+					osd_printf_info("ROMs required for %s \"%s\"", type, root.shortname());
+					if (!devnames.empty())
+					{
+						osd_printf_info(" (including device%s", devnames.size() > 1 ? "s" : "");
+						bool first = true;
+						for (const std::string_view &devname : devnames)
+						{
+							if (first)
+								first = false;
+							else
+								osd_printf_info(",");
+							osd_printf_info(" \"%s\"", devname);
+						}
+						osd_printf_info(")");
+					}
+					osd_printf_info(".\n%-32s %10s %s\n", "Name", "Size", "Checksum");
+
+					for (auto &entry : entries)
+					{
+						// start with the name
+						osd_printf_info("%-32s ", std::get<0>(entry));
+
+						// output the length next
+						int64_t length = std::get<1>(entry);
+						if (length >= 0)
+							osd_printf_info("%10u", unsigned(uint64_t(length)));
+						else
+							osd_printf_info("%10s", "");
+
+						// output the hash data
+						util::hash_collection hashes(std::get<2>(entry));
+						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+						{
+							if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
+								osd_printf_info(" BAD");
+							osd_printf_info(" %s", hashes.macro_string());
+						}
+						else
+							osd_printf_info(" NO GOOD DUMP KNOWN");
+
+						// end with a CR
+						osd_printf_info("\n");
+					}
+				}
 			});
 }
 
@@ -1024,16 +1062,18 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 				"<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
-				"\t<!ELEMENT softwarelist (software+)>\n" \
+				"\t<!ELEMENT softwarelist (notes?, software+)>\n" \
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
 				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
-				"\t\t<!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>\n" \
+				"\t\t<!ELEMENT notes (#PCDATA)>\n" \
+				"\t\t<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>\n" \
 				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
 				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
 				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
 				"\t\t\t<!ELEMENT description (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT year (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT notes (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT info EMPTY>\n" \
 				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n" \
 				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n" \
@@ -1086,17 +1126,20 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t<software name=\"%s\"", util::xml::normalize_string(swinfo.shortname().c_str()));
 		if (!swinfo.parentname().empty())
 			util::stream_format(out, " cloneof=\"%s\"", util::xml::normalize_string(swinfo.parentname().c_str()));
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_PARTIAL)
+		if (swinfo.supported() == software_support::PARTIALLY_SUPPORTED)
 			out << " supported=\"partial\"";
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_NO)
+		else if (swinfo.supported() == software_support::UNSUPPORTED)
 			out << " supported=\"no\"";
 		out << ">\n";
 		util::stream_format(out, "\t\t\t<description>%s</description>\n", util::xml::normalize_string(swinfo.longname().c_str()));
 		util::stream_format(out, "\t\t\t<year>%s</year>\n", util::xml::normalize_string(swinfo.year().c_str()));
 		util::stream_format(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
 
-		for (const feature_list_item &flist : swinfo.other_info())
+		for (const auto &flist : swinfo.info())
 			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
+
+		for (const auto &flist : swinfo.shared_features())
+			util::stream_format(out, "\t\t\t<sharedfeat name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1106,7 +1149,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 
 			out << ">\n";
 
-			for (const feature_list_item &flist : part.featurelist())
+			for (const auto &flist : part.features())
 				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 			// TODO: display ROM region information
@@ -1438,7 +1481,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	// create our own copy of options for the purposes of ROM identification
 	// so we are not "polluted" with driver-specific slot/image options
 	emu_options options;
-	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT);
+	options.set_value(OPTION_HASHPATH, m_options.hash_path(), OPTION_PRIORITY_DEFAULT);
 
 	media_identifier ident(options);
 
@@ -1646,7 +1689,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") != osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
@@ -1654,7 +1697,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_ui.open("ui.ini") != osd_file::error::NONE)
+		if (file_ui.open("ui.ini"))
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
 		// generate the updated INI
@@ -1669,7 +1712,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 			plugin_opts.scan_directory(pluginpath, true);
 		}
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+		if (file_plugin.open("plugin.ini"))
 			throw emu_fatalerror("Unable to create file plugin.ini\n");
 
 		// generate the updated INI

@@ -30,7 +30,7 @@ protected:
 	virtual void execute_one() override;
 
 	// timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void write_v(uint8_t data) override;
 
 	void data_128x4(address_map &map);

@@ -202,6 +202,13 @@ void _1943_state::video_start()
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x0f);
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_bg2_tilemap->set_scrolldx(128, 128);
+	m_bg2_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
+
 	save_item(NAME(m_char_on));
 	save_item(NAME(m_obj_on));
 	save_item(NAME(m_bg1_on));
@@ -284,7 +291,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 
 void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0; offs <= m_spriteram.bytes(); offs += 32)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 32)
 	{
 		const u8 attr = m_spriteram[offs + 1];
 		const u32 code = m_spriteram[offs] + ((attr & 0xe0) << 3);
@@ -298,7 +305,7 @@ void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 240 - sy;
 		}
 
-		_1943_drawgfx(bitmap,cliprect, m_gfxdecode->gfx(3), code, color, flip_screen(), flip_screen(), sx, sy, 0);
+		_1943_drawgfx(bitmap,cliprect, m_gfxdecode->gfx(3), code, color, flip_screen(), flip_screen(), sx+128, sy+6, 0);
 	}
 }
 

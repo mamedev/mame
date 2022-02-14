@@ -810,7 +810,7 @@ void nds_state::dma_exec(int ch)
 #endif
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (uint32_t)m_dma_timer[ch]);
 //  m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	dma_complete(nullptr, ch);
+	dma_complete(ch);
 }
 
 TIMER_CALLBACK_MEMBER(nds_state::handle_irq)

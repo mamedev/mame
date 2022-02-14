@@ -81,8 +81,8 @@ private:
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
 	void datum_mem(address_map &map);
-	uint8_t m_digit;
-	uint8_t m_seg;
+	uint8_t m_digit = 0U;
+	uint8_t m_seg = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<pia6821_device> m_pia1;

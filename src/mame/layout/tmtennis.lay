@@ -4,11 +4,11 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="court">
 		<image><data><![CDATA[
-			<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="700" height="249" viewBox="0 0 700 249" version="1.1" id="svg1">
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="700" height="249" viewBox="0 0 700 249">
 				<g fill="none" stroke="#00ff00" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1">
 					<path d="m 1.5,247.5 h 697 l -95,-208 h -507 z" />
 					<path d="M 88,58.5 H 612" />
@@ -26,14 +26,13 @@ license:CC0
 		]]></data></image>
 	</element>
 
-	<!-- build screen -->
+
+<!-- build screen -->
 
 	<view name="Internal Layout">
-
 		<screen index="0" blend="add"><bounds x="3" y="7.6" width="64" height="13.9" /></screen>
 
 		<!-- draw the tennis court -->
-
 		<element ref="court"><bounds width="70" height="24.9" /><color alpha="0.5" /></element>
 
 	</view>

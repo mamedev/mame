@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "hd64610.h"
+
 #include "coreutil.h"
+#include "fileio.h"
 
 #define VERBOSE 1
 #include "logmacro.h"
@@ -188,7 +190,7 @@ void hd64610_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

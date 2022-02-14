@@ -2,7 +2,7 @@
 // detail/scheduler.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +25,7 @@
 #include "asio/detail/op_queue.hpp"
 #include "asio/detail/reactor_fwd.hpp"
 #include "asio/detail/scheduler_operation.hpp"
+#include "asio/detail/thread.hpp"
 #include "asio/detail/thread_context.hpp"
 
 #include "asio/detail/push_options.hpp"
@@ -44,7 +45,10 @@ public:
   // Constructor. Specifies the number of concurrent threads that are likely to
   // run the scheduler. If set to 1 certain optimisation are performed.
   ASIO_DECL scheduler(asio::execution_context& ctx,
-      int concurrency_hint = 0);
+      int concurrency_hint = 0, bool own_thread = true);
+
+  // Destructor.
+  ASIO_DECL ~scheduler();
 
   // Destroy all user-defined handler objects owned by the service.
   ASIO_DECL void shutdown();
@@ -95,15 +99,20 @@ public:
   }
 
   // Return whether a handler can be dispatched immediately.
-  bool can_dispatch()
-  {
-    return thread_call_stack::contains(this) != 0;
-  }
+  ASIO_DECL bool can_dispatch();
+
+  /// Capture the current exception so it can be rethrown from a run function.
+  ASIO_DECL void capture_current_exception();
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() has not yet been called for the operation.
   ASIO_DECL void post_immediate_completion(
       operation* op, bool is_continuation);
+
+  // Request invocation of the given operations and return immediately. Assumes
+  // that work_started() has not yet been called for the operations.
+  ASIO_DECL void post_immediate_completions(std::size_t n,
+      op_queue<operation>& ops, bool is_continuation);
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() was previously called for the operation.
@@ -156,6 +165,10 @@ private:
   ASIO_DECL void wake_one_thread_and_unlock(
       mutex::scoped_lock& lock);
 
+  // Helper class to run the scheduler in its own thread.
+  class thread_function;
+  friend class thread_function;
+
   // Helper class to perform task-related operations on block exit.
   struct task_cleanup;
   friend struct task_cleanup;
@@ -199,6 +212,9 @@ private:
 
   // The concurrency hint used to initialise the scheduler.
   const int concurrency_hint_;
+
+  // The thread that is running the scheduler.
+  asio::detail::thread* thread_;
 };
 
 } // namespace detail

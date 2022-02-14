@@ -84,7 +84,7 @@ vc4000_cart_slot_device::vc4000_cart_slot_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_vc4000_cart_interface>(mconfig, *this)
 	, m_type(VC4000_STD)
 	, m_cart(nullptr)
@@ -176,7 +176,7 @@ image_init_result vc4000_cart_slot_device::call_load()
 
 		if (size > 0x1800)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for a VC4000 cart");
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for a VC4000 cart");
 			return image_init_result::FAIL;
 		}
 
@@ -226,17 +226,17 @@ std::string vc4000_cart_slot_device::get_default_card_software(get_default_card_
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
+		std::uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error result
 		int type = VC4000_STD;
 
 		// attempt to identify the non-standard types
 		if (size > 0x1000)  // 6k rom + 1k ram - Chess2 only
 			type = VC4000_CHESS2;
-		else if (size > 0x0800) // some 4k roms have 1k of mirrored ram
+		else if (size > 0x0800) // some 4k roms have 1k of mirrored RAM
 			type = VC4000_RAM1K;
 
-		slot_string = vc4000_get_slot(type);
+		char const *const slot_string = vc4000_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

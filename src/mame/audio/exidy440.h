@@ -58,12 +58,11 @@ private:
 	/* sound_cache_entry structure contains info on each decoded sample */
 	struct sound_cache_entry
 	{
-		struct sound_cache_entry *next;
 		int address;
 		int length;
 		int bits;
 		int frequency;
-		int16_t data[1];
+		std::vector<int16_t> data;
 	};
 
 	required_device<cpu_device> m_audiocpu;
@@ -78,9 +77,7 @@ private:
 	uint8_t m_sound_volume[0x10];
 	std::vector<int32_t> m_mixer_buffer_left;
 	std::vector<int32_t> m_mixer_buffer_right;
-	sound_cache_entry *m_sound_cache;
-	sound_cache_entry *m_sound_cache_end;
-	sound_cache_entry *m_sound_cache_max;
+	std::list<sound_cache_entry> m_sound_cache;
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
@@ -103,11 +100,10 @@ private:
 	void play_cvsd(int ch);
 	void stop_cvsd(int ch);
 
-	void reset_sound_cache();
 	int16_t *add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency);
 	int16_t *find_or_add_to_sound_cache(int address, int length, int bits, int frequency);
 
-	void decode_and_filter_cvsd(uint8_t *data, int bytes, int maskbits, int frequency, int16_t *dest);
+	void decode_and_filter_cvsd(uint8_t *data, int bytes, int maskbits, int frequency, std::vector<int16_t> &output);
 	void fir_filter(int32_t *input, int16_t *output, int count);
 
 	void add_and_scale_samples(int ch, int32_t *dest, int samples, int volume);

@@ -35,6 +35,9 @@
 
 */
 
+DECLARE_DEVICE_TYPE(I8244, i8244_device)
+DECLARE_DEVICE_TYPE(I8245, i8245_device)
+
 
 class i8244_device :  public device_t
 					, public device_sound_interface
@@ -108,7 +111,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
@@ -172,19 +175,17 @@ protected:
 };
 
 
-class i8245_device :  public i8244_device
+class i8245_device : public i8244_device
 {
 public:
 	// construction/destruction
 	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static auto parent_rom_device_type() { return &I8244; }
+
 protected:
 	virtual void set_default_params() override;
 };
 
-
-// device type definition
-DECLARE_DEVICE_TYPE(I8244, i8244_device)
-DECLARE_DEVICE_TYPE(I8245, i8245_device)
 
 #endif // MAME_VIDEO_I8244_H

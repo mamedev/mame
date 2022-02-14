@@ -15,9 +15,10 @@
 #include "emu.h"
 #include "kr1601rr1.h"
 
+#include "fileio.h"
+
 #include <algorithm>
 
-#define LOG_GENERAL (1U <<  0)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf

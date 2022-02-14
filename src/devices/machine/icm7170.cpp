@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "icm7170.h"
+
 #include "coreutil.h"
+#include "fileio.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -112,7 +114,7 @@ void icm7170_device::device_reset()
 //  device_timer - handles timer events
 //-------------------------------------------------
 
-void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// advance hundredths
 	m_irq_status |= IRQ_BIT_100TH_SECOND;

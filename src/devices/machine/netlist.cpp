@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /***************************************************************************
 
@@ -289,17 +289,17 @@ void netlist_mame_analog_input_device::write(const double val)
 	m_value_for_device_timer = val * m_mult + m_offset;
 	if (m_value_for_device_timer != (*m_param)())
 	{
-		synchronize(0, 0, &m_value_for_device_timer);
-}
+		synchronize();
+	}
 }
 
-void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
-	nl_owner().log_add(m_param_name, *((double *) ptr), true);
+	nl_owner().log_add(m_param_name, m_value_for_device_timer, true);
 #endif
-	m_param->set(*((double *) ptr));
+	m_param->set(m_value_for_device_timer);
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -322,7 +322,7 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	}
 }
 
-void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -331,7 +331,7 @@ void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_
 	m_param->set(param);
 }
 
-void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -340,7 +340,7 @@ void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_time
 	m_param->set(param);
 }
 
-void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_data = (*m_param)();
 }
@@ -828,7 +828,8 @@ void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &tar
 	int sampindex;
 	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
 		target.put(sampindex, m_buffer[sampindex]);
-	target.fill(m_cur, sampindex);
+	if (sampindex < target.samples())
+		target.fill(m_cur, sampindex);
 }
 
 

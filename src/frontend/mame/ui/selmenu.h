@@ -20,11 +20,13 @@
 
 #include <map>
 #include <memory>
-#include <mutex>
+#include <optional>
 #include <vector>
 
 
+struct ui_system_info;
 struct ui_software_info;
+
 
 namespace ui {
 
@@ -198,12 +200,11 @@ private:
 		void set_snapx_software(ui_software_info const *software) { m_snapx_software = software; }
 
 		bitmap_argb32 &no_avail_bitmap() { return m_no_avail_bitmap; }
-		render_texture *star_texture() { return m_star_texture.get(); }
 
-		bitmap_vector const &toolbar_bitmap() { return m_toolbar_bitmap; }
-		bitmap_vector const &sw_toolbar_bitmap() { return m_sw_toolbar_bitmap; }
-		texture_ptr_vector const &toolbar_texture() { return m_toolbar_texture; }
-		texture_ptr_vector const &sw_toolbar_texture() { return m_sw_toolbar_texture; }
+		bitmap_vector const &toolbar_bitmaps() { return m_toolbar_bitmaps; }
+		texture_ptr_vector const &toolbar_textures() { return m_toolbar_textures; }
+
+		void cache_toolbar(running_machine &machine, float width, float height);
 
 	private:
 		bitmap_ptr              m_snapx_bitmap;
@@ -212,16 +213,20 @@ private:
 		ui_software_info const  *m_snapx_software;
 
 		bitmap_argb32           m_no_avail_bitmap;
-		bitmap_argb32           m_star_bitmap;
-		texture_ptr             m_star_texture;
 
-		bitmap_vector           m_toolbar_bitmap;
-		bitmap_vector           m_sw_toolbar_bitmap;
-		texture_ptr_vector      m_toolbar_texture;
-		texture_ptr_vector      m_sw_toolbar_texture;
+		bitmap_vector           m_toolbar_bitmaps;
+		texture_ptr_vector      m_toolbar_textures;
 	};
-	using cache_ptr = std::shared_ptr<cache>;
-	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
+
+	// this is to satisfy the std::any requirement that objects be copyable
+	class cache_wrapper : public cache
+	{
+	public:
+		cache_wrapper(running_machine &machine) : cache(machine), m_machine(machine) { }
+		cache_wrapper(cache_wrapper const &that) : cache(that.m_machine), m_machine(that.m_machine) { }
+	private:
+		running_machine         &m_machine;
+	};
 
 	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
 
@@ -229,7 +234,7 @@ private:
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
 	void set_pressed();
 
-	bool snapx_valid() const { return m_cache->snapx_bitmap().valid(); }
+	bool snapx_valid() const { return m_cache.snapx_bitmap().valid(); }
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
@@ -237,10 +242,10 @@ private:
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
-	virtual void general_info(const game_driver *driver, std::string &buffer) = 0;
+	void general_info(ui_system_info const *system, game_driver const &driver, std::string &buffer);
 
 	// get selected software and/or driver
-	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const = 0;
 	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
@@ -252,7 +257,7 @@ private:
 		{
 			for (int x = 0; x < item_count(); ++x)
 			{
-				if (item(x).ref == m_prev_selected)
+				if (item(x).ref() == m_prev_selected)
 				{
 					set_selected_index(x);
 					break;
@@ -269,14 +274,9 @@ private:
 
 	void get_title_search(std::string &title, std::string &search);
 
-	// handle keys
+	// event handling
 	virtual void handle_keys(uint32_t flags, int &iptkey) override;
-
-	// handle mouse
 	virtual void handle_events(uint32_t flags, event &ev) override;
-
-	// live search active?
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 	// draw game list
 	virtual void draw(uint32_t flags) override;
@@ -293,8 +293,7 @@ private:
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
-	virtual std::string make_driver_description(game_driver const &driver) const = 0;
-	virtual std::string make_software_description(ui_software_info const &software) const = 0;
+	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const = 0;
 
 	// filter navigation
 	virtual void filter_selected() = 0;
@@ -305,9 +304,6 @@ private:
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);
 	static bool has_multiple_bios(game_driver const &driver, s_bios &biosname);
 
-	// cleanup function
-	static void exit(running_machine &machine);
-
 	bool        m_ui_error;
 	std::string m_error_text;
 
@@ -316,8 +312,9 @@ private:
 	int                         m_info_view;
 	std::vector<std::string>    m_items_list;
 	std::string                 m_info_buffer;
+	std::optional<text_layout>  m_info_layout;
 
-	cache_ptr               m_cache;
+	cache                   &m_cache;
 	bool                    m_is_swlist;
 	focused_menu            m_focus;
 	bool                    m_pressed;              // mouse button held down
@@ -330,9 +327,6 @@ private:
 	bool                    m_default_image;
 	uint8_t                 m_image_view;
 	flags_cache             m_flags;
-
-	static std::mutex       s_cache_guard;
-	static cache_ptr_map    s_caches;
 };
 
 } // namespace ui

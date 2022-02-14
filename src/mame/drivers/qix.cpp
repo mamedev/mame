@@ -1416,30 +1416,30 @@ void qix_state::init_kram3()
 
 	//patch = memregion("user1")->base();
 	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t *decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
+	m_decrypted = std::make_unique<uint8_t[]>(0x6000);
 
-	memcpy(decrypted,&rom[0xa000],0x6000);
+	memcpy(m_decrypted.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
+		m_decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
 	m_bank0->configure_entry(0, memregion("maincpu")->base() + 0xa000);
-	m_bank0->configure_entry(1, decrypted);
+	m_bank0->configure_entry(1, m_decrypted.get());
 	m_bank0->set_entry(0);
 
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
-	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
+	m_decrypted2 = std::make_unique<uint8_t[]>(0x6000);
 
-	memcpy(decrypted,&rom[0xa000],0x6000);
+	memcpy(m_decrypted2.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
+		m_decrypted2[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
 	m_bank1->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	m_bank1->configure_entry(1, decrypted);
+	m_bank1->configure_entry(1, m_decrypted2.get());
 	m_bank1->set_entry(0);
 }
 

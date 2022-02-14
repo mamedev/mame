@@ -30,7 +30,7 @@ TODO:
 #include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -451,9 +451,9 @@ void nightgal_state::sgaltrop_io(address_map &map)
 	common_sexygal_io(map);
 
 	// not actually a YM2203?
-	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::read_port_r));
-	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::write_port_w));
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::control_port_w));
+	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::data_r));
+	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::data_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::address_w));
 }
 
 void nightgal_state::sexygal_nsc_map(address_map &map)
@@ -877,7 +877,7 @@ Night Gal
 OSC:20MHz
 CPU:Z80
 SND:AY-3-8910
-ETC:CUSTOM(The surface of the chip is scrached, so the name of the chip is unknown), MemoryBackup
+ETC:CUSTOM(The surface of the chip is scratched, so the name of the chip is unknown), MemoryBackup
 
 NGAL_01.BIN graphic
 NGAL_02.BIN graphic
@@ -929,7 +929,7 @@ Night Bunny
 CPU: Z80
 Sound: AY-3-8910
 OSC: 20.000MHz
-Other: surface scrached DIP40 (NB1413M3?)
+Other: surface scratched DIP40 (NB1413M3?)
 
 ROMs:
 1.3A

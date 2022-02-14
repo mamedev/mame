@@ -70,13 +70,8 @@ private:
 
 	void fsel_w(offs_t offset, uint8_t data);
 
-	uint8_t sasi_r();
-	void sasi_w(uint8_t data);
-
 	int m_masknmi;
 
-	uint8_t rtc_r();
-	void rtc_w(uint8_t data);
 	void mc146818_set(int as, int ds, int rw);
 	uint8_t m_mc146818_data;
 	int m_mc146818_as;

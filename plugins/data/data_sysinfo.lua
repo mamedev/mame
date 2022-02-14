@@ -12,7 +12,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	return _("Sysinfo")
+	return _p("plugin-data", "Sysinfo")
 end
 
 function dat.get()

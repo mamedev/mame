@@ -9,7 +9,7 @@
 #include "cpu/mcs51/mcs51.h"
 
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 #include "video/bufsprite.h"
 
@@ -36,6 +36,8 @@ public:
 	void toramich(machine_config &config);
 	void tigeroad(machine_config &config);
 	void f1dream_comad(machine_config &config);
+
+	void init_tigeroadb();
 
 protected:
 	required_device<cpu_device> m_maincpu;

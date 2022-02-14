@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "pcf8583.h"
 
+#include "fileio.h"
+
 #define LOG_DATA (1 << 1)
 #define LOG_LINE (1 << 2)
 
@@ -73,7 +75,7 @@ void pcf8583_device::device_start()
 	m_irq_cb.resolve_safe();
 }
 
-void pcf8583_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcf8583_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

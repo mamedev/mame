@@ -513,13 +513,13 @@ ROM_START( msisaac )
 	ROM_LOAD( "a34_01.bin", 0x0000, 0x4000, CRC(545e45e7) SHA1(18ddb1ec8809bb62ae1c1068cd16cd3c933bf6ba) )
 
 	ROM_REGION( 0x0800,  "cpu2", 0 )    /* 2k for the microcontroller */
-	ROM_LOAD( "a34.mcu"       , 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a34_14.mcu", 0x0000, 0x0800, NO_DUMP )
 
 // I tried following MCUs; none of them work with this game:
-//  ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) ) //40love
-//  ROM_LOAD( "a22-19.31",  0x0000, 0x0800, CRC(06a71df0) )     //buggy challenge
-//  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) )     //flstory
-//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(e08b8846) )     //lkage
+//  ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) SHA1(60bc77e03b9be434bb97a374a2fedeb8d049a660) ) //40love
+//  ROM_LOAD( "a22-19.31",  0x0000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) ) //buggy challenge
+//  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) ) //flstory
+//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) //lkage
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a34_02.bin", 0x0000, 0x2000, CRC(50da1a81) SHA1(8aa5a896f3e1173155d4574f5e1c2703e334cf44) )

@@ -18,6 +18,7 @@
 #include "debugger.h"
 
 #include "emuopts.h" // Used by PNG logging
+#include "fileio.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging
@@ -72,22 +73,22 @@ void midtunit_video_device::debug_init()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1));
 	}
 }
 
-void midtunit_video_device::debug_commands(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "pngdma")
-		debug_png_dma_command(ref, params);
+		debug_png_dma_command(params);
 	else
-		debug_help_command(ref, params);
+		debug_help_command(params);
 }
 
-void midtunit_video_device::debug_help_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -96,7 +97,7 @@ void midtunit_video_device::debug_help_command(int ref, const std::vector<std::s
 	con.printf("  midblit help -- this list\n");
 }
 
-void midtunit_video_device::debug_png_dma_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_png_dma_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -440,7 +441,7 @@ void midtunit_video_device::dma_draw()
 	while (iy < height)
 	{
 		int startskip = m_dma_state.startskip << 8;
-		int endskip = m_dma_state.endskip << 8;
+		[[maybe_unused]] int endskip = m_dma_state.endskip << 8;
 		int width = m_dma_state.width << 8;
 		int sx = m_dma_state.xpos;
 		int ix = 0;
@@ -616,7 +617,7 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -902,7 +903,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	char name_buf[256];
 	snprintf(name_buf, 255, "0x%08x.png", raw_offset);
 	auto const filerr = file.open(name_buf);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		return;
 	}
@@ -922,7 +923,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	for (int y = 0; y < m_dma_state.height; y++)
 	{
 		int startskip = m_dma_state.startskip;
-		int endskip = m_dma_state.endskip;
+		[[maybe_unused]] int endskip = m_dma_state.endskip;
 		int width = m_dma_state.width;
 		int ix = 0;
 		int tx;
@@ -1029,7 +1030,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 		snprintf(name_buf, 255, "0x%08x.json", raw_offset);
 		auto const jsonerr = json.open(name_buf);
-		if (jsonerr != osd_file::error::NONE)
+		if (jsonerr)
 		{
 			return;
 		}

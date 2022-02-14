@@ -31,13 +31,7 @@ void arm_disassembler::WriteDataProcessingOperand(std::ostream &stream, uint32_t
 	if (opcode & 0x02000000)
 	{
 		uint32_t imm = ExtractImmediateOperand(opcode);
-		util::stream_format(stream, "#$%x", imm);
-
-		// Calculate result of ADD/SUB Rn, R15, #imm
-		if ((opcode & 0x01ef0000) == 0x008f0000)
-			util::stream_format(stream, " ; =$%x", pc + 8 + imm);
-		else if ((opcode & 0x01ef0000) == 0x004f0000)
-			util::stream_format(stream, " ; =$%x", pc + 8 - imm);
+		util::stream_format(stream, "#&%X", imm);
 	}
 	else
 	{
@@ -58,6 +52,11 @@ void arm_disassembler::WriteDataProcessingOperand(std::ostream &stream, uint32_t
 			{
 				if (shiftop == 0)
 				return;
+				else if (shiftop == 3)
+				{
+					util::stream_format(stream, ", RRX");
+					return;
+				}
 				c = 32;
 			}
 			util::stream_format(stream, ", %s #%d", pRegOp[shiftop], c);
@@ -70,15 +69,19 @@ void arm_disassembler::WriteRegisterOperand1(std::ostream &stream, uint32_t opco
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
 
+	util::stream_format(stream, ", ");
+	if((opcode & 0x00800000) == 0)
+		util::stream_format(stream, "-");
+
 	int shiftop = (opcode >> 5) & 3;
 	util::stream_format(
 		stream,
-		", R%d", /* Operand 1 register, Operand 2 register */
+		"R%d", /* Operand 1 register, Operand 2 register */
 		(opcode >> 0) & 0xf);
 
 	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		util::stream_format(stream, " %s R%d", pRegOp[shiftop], (opcode >> 7) & 0xf);
+		util::stream_format(stream, ", %s R%d", pRegOp[shiftop], (opcode >> 7) & 0xf);
 	}
 	else /* Shift amount immediate 5 bit unsigned integer */
 	{
@@ -87,9 +90,14 @@ void arm_disassembler::WriteRegisterOperand1(std::ostream &stream, uint32_t opco
 		{
 			if (shiftop == 0)
 				return;
+			else if (shiftop == 3)
+			{
+				util::stream_format(stream, ", RRX");
+				return;
+			}
 			c = 32;
 		}
-		util::stream_format(stream, " %s #%d", pRegOp[shiftop], c);
+		util::stream_format(stream, ", %s #%d", pRegOp[shiftop], c);
 	}
 } /* WriteRegisterOperand */
 
@@ -102,7 +110,7 @@ void arm_disassembler::WriteBranchAddress(std::ostream &stream, uint32_t pc, uin
 		opcode |= 0xff000000; /* sign-extend */
 	}
 	pc += 8+4*opcode;
-	util::stream_format( stream, "$%x", pc );
+	util::stream_format( stream, "&%07X", pc & 0x03ffffff );
 } /* WriteBranchAddress */
 
 void arm_disassembler::WritePadding(std::ostream &stream, std::streampos start_position) const
@@ -142,13 +150,13 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		/* xxxx0000 00ASdddd nnnnssss 1001mmmm */
 		if( opcode&0x00200000 )
 		{
-			util::stream_format( stream, "MLA" );
+			stream << "MLA";
 		}
 		else
 		{
-			util::stream_format( stream, "MUL" );
+			stream << "MUL";
 		}
-		util::stream_format( stream, "%s", pConditionCode );
+		stream << pConditionCode;
 		if ((opcode & 0x00100000) != 0)
 			stream << 'S';
 
@@ -173,13 +181,21 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		/* xxxx001a aaaSnnnn ddddrrrr bbbbbbbb */
 		/* xxxx000a aaaSnnnn ddddcccc ctttmmmm */
 
+		// ADR Rn, offset = ADD/SUB Rn, R15, #imm
+		bool adr = (op == 0x02 || op == 0x04) && (opcode & 0x020f0000) == 0x020f0000;
+
 		util::stream_format(stream,
 			"%s%s",
-			pOperation[op],
+			adr ? "ADR" : pOperation[op],
 			pConditionCode);
 
 		if ((opcode & 0x00100000) != 0)
-			stream << 'S';
+		{
+			if ((op & 0x0c) != 0x08)
+				stream << 'S';
+			else if (((opcode >> 12) & 0xf) == 0xf)
+				stream << 'P';
+		}
 
 		WritePadding(stream, start_position);
 
@@ -194,7 +210,13 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		case 0x07:
 		case 0x0c:
 		case 0x0e:
-			WriteDataProcessingOperand(stream, opcode, true, true, pc);
+			if (adr)
+			{
+				uint32_t imm = ExtractImmediateOperand(opcode);
+				util::stream_format(stream, "R%d, &%07X", (opcode >> 12) & 0xf, (op == 0x02) ? pc + 8 - imm : pc + 8 + imm);
+			}
+			else
+				WriteDataProcessingOperand(stream, opcode, true, true, pc);
 			break;
 		case 0x08:
 		case 0x09:
@@ -220,60 +242,83 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		/* xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form */
 		if( opcode&0x00100000 )
 		{
-			util::stream_format( stream, "LDR" );
+			stream << "LDR";
 		}
 		else
 		{
-			util::stream_format( stream, "STR" );
+			stream << "STR";
 		}
-		util::stream_format( stream, "%s", pConditionCode );
+		stream << pConditionCode;
 
 		if( opcode&0x00400000 )
 		{
-			util::stream_format( stream, "B" );
+			stream << 'B';
 		}
 
-		if( opcode&0x00200000 )
+		if(( opcode&0x01200000 ) == 0x00200000 )
 		{
-			/* writeback addr */
-			if( opcode&0x01000000 )
-			{
-				/* pre-indexed addressing */
-				util::stream_format( stream, "!" );
-			}
-			else
-			{
-				/* post-indexed addressing */
-				util::stream_format( stream, "T" );
-			}
+			stream << 'T';
 		}
 
 		int memreg = (opcode >> 16) & 0xf;
 		WritePadding(stream, start_position);
-		util::stream_format(stream, "R%d, [R%d", (opcode >> 12) & 0xf, memreg);
+		util::stream_format(stream, "R%d, ", (opcode >> 12) & 0xf);
 
-		if( opcode&0x02000000 )
+		if ((memreg == 15) && ( opcode&0x03200000 ) == 0x01000000)
 		{
-			/* register form */
-			WriteRegisterOperand1(stream, opcode);
-			util::stream_format(stream, "]");
-		}
-		else
-		{
-			/* immediate form */
-			util::stream_format(stream, "]");
 			uint16_t displacement = opcode & 0xfff;
+
 			if( opcode&0x00800000 )
 			{
-				util::stream_format(stream, ", #$%x", displacement);
-				if (memreg == 15)
-					util::stream_format(stream, " ; [$%x]", pc + 8 + displacement);
+				util::stream_format(stream, "&%07X", pc + 8 + displacement);
 			}
 			else
 			{
-				util::stream_format(stream, ", -#$%x", displacement);
-				if (memreg == 15)
-					util::stream_format(stream, " ; [$%x]", pc + 8 - displacement);
+				util::stream_format(stream, "&%07X", pc + 8 - displacement);
+			}
+		}
+		else
+		{
+			util::stream_format(stream, "[R%d", memreg);
+
+			if(( opcode&0x01000000 ) == 0)
+			{
+				/* post-indexed addressing */
+				stream << ']';
+			}
+
+			if( opcode&0x02000000 )
+			{
+				/* register form */
+				WriteRegisterOperand1(stream, opcode);
+			}
+			else
+			{
+				/* immediate form */
+				uint16_t displacement = opcode & 0xfff;
+				if( displacement != 0 )
+				{
+					if( opcode&0x00800000 )
+					{
+						util::stream_format(stream, ", #&%X", displacement);
+					}
+					else
+					{
+						util::stream_format(stream, ", -#&%X", displacement);
+					}
+				}
+			}
+
+			if( opcode&0x01000000 )
+			{
+				/* pre-indexed addressing */
+				stream << ']';
+
+				/* writeback addr */
+				if( opcode&0x00200000 )
+				{
+					stream << '!';
+				}
 			}
 		}
 	}
@@ -282,59 +327,62 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		/* xxxx100P USWLnnnn llllllll llllllll */
 		/* Block Data Transfer */
 
+		uint8_t d = (opcode >> 16) & 0xf;
 		if( opcode&0x00100000 )
 		{
-			util::stream_format( stream, "LDM" );
+			util::stream_format( stream, "LDM%s", pConditionCode );
+			if (d == 13)
+				util::stream_format( stream, "%c%c", ( opcode&0x01000000 ) ? 'E' : 'F', ( opcode&0x00800000 ) ? 'D' : 'A');
+			else
+				util::stream_format( stream, "%c%c", ( opcode&0x00800000 ) ? 'I' : 'D', ( opcode&0x01000000 ) ? 'B' : 'A');
+
+			if( opcode & 0x00008000 )
+				dasmflags = STEP_OUT;
 		}
 		else
 		{
-			util::stream_format( stream, "STM" );
-		}
-		util::stream_format( stream, "%s", pConditionCode );
-
-		if( opcode&0x01000000 )
-		{
-			util::stream_format( stream, "P" );
-		}
-		if( opcode&0x00800000 )
-		{
-			util::stream_format( stream, "U" );
-		}
-		if( opcode&0x00400000 )
-		{
-			util::stream_format( stream, "^" );
-		}
-		if( opcode&0x00200000 )
-		{
-			util::stream_format( stream, "W" );
+			util::stream_format( stream, "STM%s", pConditionCode );
+			if (d == 13)
+				util::stream_format( stream, "%c%c", ( opcode&0x01000000 ) ? 'F' : 'E', ( opcode&0x00800000 ) ? 'A' : 'D');
+			else
+				util::stream_format( stream, "%c%c", ( opcode&0x00800000 ) ? 'I' : 'D', ( opcode&0x01000000 ) ? 'B' : 'A');
 		}
 
 		WritePadding(stream, start_position);
-		util::stream_format( stream, "[R%d], {",(opcode>>16)&0xf);
+		util::stream_format( stream, "R%d", d );
+		if( opcode&0x00200000 )
+		{
+			stream << '!';
+		}
+		stream << ", {";
 
 		{
-			int j=0,last=0,found=0;
-			for (j=0; j<16; j++) {
+			int last=0,found=0;
+			for (int j=0; j<16; j++) {
 				if (opcode&(1<<j) && found==0) {
+					if ((opcode&((1<<j)-1)) != 0)
+						stream << ", ";
 					found=1;
 					last=j;
 				}
 				else if ((opcode&(1<<j))==0 && found) {
-					if (last==j-1)
-						util::stream_format( stream, " R%d,",last);
-					else
-						util::stream_format( stream, " R%d-R%d,",last,j-1);
+					util::stream_format( stream, "R%d",last);
+					if (last!=j-1)
+						util::stream_format( stream, "-R%d",j-1);
 					found=0;
 				}
 			}
 			if (found && last==15)
-				util::stream_format( stream, " R15,");
+				util::stream_format( stream, "R15");
 			else if (found)
-				util::stream_format( stream, " R%d-R%d,",last,15);
+				util::stream_format( stream, "R%d-R%d",last,15);
 		}
 
-		stream.seekp(-1, std::ios_base::cur);
-		util::stream_format( stream, " }");
+		stream << '}';
+		if( opcode&0x00400000 )
+		{
+			stream << '^';
+		}
 	}
 	else if( (opcode&0x0e000000)==0x0a000000 )
 	{
@@ -342,15 +390,15 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		/* xxxx101L oooooooo oooooooo oooooooo */
 		if( opcode&0x01000000 )
 		{
-			util::stream_format( stream, "BL" );
+			stream << "BL";
 			dasmflags = STEP_OVER;
 		}
 		else
 		{
-			util::stream_format( stream, "B" );
+			stream << "B";
 		}
 
-		util::stream_format( stream, "%s", pConditionCode );
+		stream << pConditionCode;
 
 		WritePadding(stream, start_position);
 
@@ -364,45 +412,44 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		{
 			if( (opcode&0x0f100010)==0x0e100010 )
 			{
-				util::stream_format( stream, "MRC" );
+				stream << "MRC";
 			}
 			else if( (opcode&0x0f100010)==0x0e000010 )
 			{
-				util::stream_format( stream, "MCR" );
+				stream << "MCR";
 			}
 			else
 			{
-				util::stream_format( stream, "???" );
+				stream << "???";
 			}
 
-			util::stream_format( stream, "%s", pConditionCode );
+			stream << pConditionCode;
 			WritePadding(stream, start_position);
 			util::stream_format( stream, "R%d, CR%d {CRM%d, q%d}",(opcode>>12)&0xf, (opcode>>16)&0xf, (opcode>>0)&0xf, (opcode>>5)&0x7);
 			/* Nb:  full form should be o, p, R, CR, CRM, q */
 		}
 		else if( (opcode&0x0f000010)==0x0e000000 )
 		{
-			util::stream_format( stream, "CDP" );
-			util::stream_format( stream, "%s", pConditionCode );
+			util::stream_format( stream, "CDP%s", pConditionCode );
 			WritePadding(stream, start_position);
-			util::stream_format( stream, "%08x", opcode );
+			util::stream_format( stream, "R%d, CR%d {CRM%d, q%d}",(opcode>>12)&0xf, (opcode>>16)&0xf, (opcode>>0)&0xf, (opcode>>5)&0x7);
 		}
 		else
 		{
-			util::stream_format( stream, "???" );
+			stream << "???";
 		}
 	}
 	else if( (opcode&0x0f000000) == 0x0f000000 )
 	{
 		/* Software Interrupt */
-		util::stream_format( stream, "SWI%s $%x",
-			pConditionCode,
-			opcode&0x00ffffff );
+		util::stream_format( stream, "SWI%s", pConditionCode );
+		WritePadding(stream, start_position);
+		util::stream_format( stream, "&%X", opcode&0x00ffffff );
 		dasmflags = STEP_OVER;
 	}
 	else
 	{
-		util::stream_format( stream, "Undefined" );
+		stream << "Undefined";
 	}
 
 	return 4 | dasmflags | SUPPORTED;

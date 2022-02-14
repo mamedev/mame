@@ -104,8 +104,8 @@ void bbc_opus8272_device::device_add_mconfig(machine_config &config)
 	I8272A(config, m_fdc, 20_MHz_XTAL / 5, true);
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
 }
 
 void bbc_opus2791_device::device_add_mconfig(machine_config &config)
@@ -114,8 +114,8 @@ void bbc_opus2791_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_opusfdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
 }
 
 void bbc_opus2793_device::device_add_mconfig(machine_config &config)
@@ -124,8 +124,8 @@ void bbc_opus2793_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_opusfdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
 }
 
 void bbc_opus1770_device::device_add_mconfig(machine_config &config)
@@ -133,8 +133,8 @@ void bbc_opus1770_device::device_add_mconfig(machine_config &config)
 	WD1770(config, m_fdc, DERIVED_CLOCK(1, 1));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
 }
 
 const tiny_rom_entry *bbc_opus8272_device::device_rom_region() const
@@ -170,8 +170,7 @@ bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const ch
 	device_t(mconfig, BBC_OPUS8272, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "i8272"),
-	m_floppy0(*this, "i8272:0"),
-	m_floppy1(*this, "i8272:1")
+	m_floppy(*this, "i8272:%u", 0)
 {
 }
 
@@ -179,8 +178,7 @@ bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
+	m_floppy(*this, "fdc:%u", 0),
 	m_drive_control(0)
 {
 }
@@ -230,16 +228,16 @@ uint8_t bbc_opus8272_device::read(offs_t offset)
 		break;
 
 	case 0x06:
-		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
-		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
+		if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(1);
+		if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(1);
 		[[fallthrough]];
 	case 0x04:
 		data = m_fdc->msr_r();
 		break;
 
 	case 0x05:
-		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
-		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+		if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(0);
+		if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(0);
 		[[fallthrough]];
 	case 0x07:
 		data = m_fdc->fifo_r();
@@ -257,15 +255,15 @@ void bbc_opus8272_device::write(offs_t offset, uint8_t data)
 	case 0x01:
 		switch (data & 0x01)
 		{
-		case 0: floppy = m_floppy1->get_device(); break;
-		case 1: floppy = m_floppy0->get_device(); break;
+		case 0: floppy = m_floppy[1]->get_device(); break;
+		case 1: floppy = m_floppy[0]->get_device(); break;
 		}
 		m_fdc->set_floppy(floppy);
 		break;
 
 	case 0x05:
-		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
-		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+		if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(0);
+		if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(0);
 		[[fallthrough]];
 	case 0x07:
 		m_fdc->fifo_w(data);
@@ -300,8 +298,8 @@ void bbc_opusfdc_device::write(offs_t offset, uint8_t data)
 		// bit 0: drive select
 		switch (BIT(data, 0))
 		{
-		case 0: floppy = m_floppy0->get_device(); break;
-		case 1: floppy = m_floppy1->get_device(); break;
+		case 0: floppy = m_floppy[0]->get_device(); break;
+		case 1: floppy = m_floppy[1]->get_device(); break;
 		}
 		m_fdc->set_floppy(floppy);
 
@@ -320,6 +318,6 @@ void bbc_opusfdc_device::write(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(bbc_opusfdc_device::motor_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 }

@@ -47,27 +47,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
 	// z180_device overrides
-	virtual uint8_t z180_read_memory(offs_t addr) override;
-	virtual void z180_write_memory(offs_t addr, uint8_t data) override;
 	virtual uint8_t z180_internal_port_read(uint8_t port) override;
 	virtual void z180_internal_port_write(uint8_t port, uint8_t data) override;
 
 private:
-	// internal memory maps
-	void prom_map(address_map &map);
-	void ram_map(address_map &map);
+	// internal memory map
+	void internal_map(address_map &map);
 
 	// port callbacks
 	devcb_read8::array<7> m_port_input_cb;
 	devcb_write8::array<6> m_port_output_cb;
 
 	// internal RAM space
-	address_space_config m_data_config;
-	address_space *m_data;
+	memory_view m_ram_view;
 
 	// internal registers
 	PAIR16 m_t2frc;

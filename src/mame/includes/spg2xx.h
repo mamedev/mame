@@ -50,6 +50,7 @@ public:
 
 	void init_crc();
 	void init_tvsprt10();
+	void init_itvphone();
 
 protected:
 	virtual void machine_start() override;

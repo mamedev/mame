@@ -1,5 +1,5 @@
-// copyright-holders:R. Belmont
 // license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     apple2e.cpp - Apple IIe/IIc/IIc Plus and clones
@@ -100,12 +100,11 @@ Normal: Store $08 to $C05A (Zip compatible)
 Lock: Store $A5 to $C05A (Zip compatible).
 Unlock: Store $5A 4 times in a row to $C05A (Zip compatible).
 Read state: Cached by the firmware in MIG RAM (see below).
-Write state: Store speaker/slot byte at $C05C (NOT Zip compatible).  Firmware always enables the paddle
+Write state: Store speaker/slot byte at $C05C (Zip compatible).  Firmware always enables the paddle
 delay at $C05F, regardless of what you pass in.
 
-For the $C05C slot/speaker delay, the Zip has bit 0 = speaker, 7-1 = slots 7-1, and 1=normal, 0=fast.
-The IIc+ instead is as documented in the IIc Technical Reference Manual, Second Edition: bit 7=speaker,
-bits 6-0 = slots 7-1, and 1=fast, 0=normal.
+Previous versions of this driver stated that the IIc+ speaker/slot control byte was not Zip compatible; that
+was a misunderstanding.
 
 Accelerator control firmware saves/restores zero page locations 0-7 in MIG RAM page 2 locations $CE10-$CE17.
 MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accelerator bitfield.
@@ -117,6 +116,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 
 #define IICP_NEW_IWM (0)
 
+#include "machine/apple2common.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs48/mcs48.h"
@@ -124,77 +125,41 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/appldriv.h"
+#include "machine/applefdc.h"
+#include "machine/applefdintf.h"
 #include "machine/bankdev.h"
+#include "machine/ds1315.h"
+#include "machine/iwm.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "machine/sonydriv.h"
 #include "machine/timer.h"
-#include "machine/ds1315.h"
-#include "machine/apple2common.h"
-#include "machine/applefdintf.h"
-#include "machine/iwm.h"
+#include "sound/spkrdev.h"
 
-#include "bus/a2bus/4play.h"
-#include "bus/a2bus/a2alfam2.h"
-#include "bus/a2bus/a2applicard.h"
-#include "bus/a2bus/a2arcadebd.h"
-#include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2cffa.h"
-#include "bus/a2bus/a2corvus.h"
-#include "bus/a2bus/a2diskii.h"
+#include "bus/a2bus/cards.h"
+#include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2diskiing.h"
-#include "bus/a2bus/a2dx1.h"
+#include "bus/a2bus/a2iwm.h"
+#include "bus/a2bus/laser128.h"
+#include "bus/a2bus/ace2x00.h"
 #include "bus/a2bus/a2eauxslot.h"
-#include "bus/a2bus/a2echoii.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
 #include "bus/a2bus/a2estd80col.h"
-#include "bus/a2bus/a2hsscsi.h"
-#include "bus/a2bus/a2iwm.h"
-#include "bus/a2bus/a2mcms.h"
-#include "bus/a2bus/a2memexp.h"
-#include "bus/a2bus/a2midi.h"
-#include "bus/a2bus/a2mockingboard.h"
-#include "bus/a2bus/a2parprn.h"
-#include "bus/a2bus/a2pic.h"
-#include "bus/a2bus/a2sam.h"
-#include "bus/a2bus/a2scsi.h"
-#include "bus/a2bus/a2softcard.h"
-#include "bus/a2bus/a2ssc.h"
-#include "bus/a2bus/a2swyft.h"
-#include "bus/a2bus/a2themill.h"
-#include "bus/a2bus/a2thunderclock.h"
-#include "bus/a2bus/a2ultraterm.h"
-#include "bus/a2bus/a2videoterm.h"
-#include "bus/a2bus/a2vulcan.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/byte8251.h"
-#include "bus/a2bus/cmsscsi.h"
-#include "bus/a2bus/computereyes2.h"
-#include "bus/a2bus/ccs7710.h"
-#include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grapplerplus.h"
-#include "bus/a2bus/laser128.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/pc_xporter.h"
-#include "bus/a2bus/sider.h"
-#include "bus/a2bus/ssbapple.h"
-#include "bus/a2bus/ssprite.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/transwarp.h"
-#include "bus/a2bus/uniprint.h"
-#include "bus/a2bus/uthernet.h"
 #include "bus/a2gameio/gameio.h"
-
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
+
+
+namespace {
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -229,9 +194,9 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #define CNXX_UNCLAIMED  -1
 #define CNXX_INTROM     -2
 
-#define IRQ_SLOT 0
-#define IRQ_VBL  1
-#define IRQ_MOUSEXY 2
+static constexpr int IRQ_SLOT = 0;
+static constexpr int IRQ_VBL = 1;
+static constexpr int IRQ_MOUSEXY = 2;
 
 class apple2e_state : public driver_device
 {
@@ -280,15 +245,20 @@ public:
 #else
 		m_iicpiwm(*this, "fdc"),
 #endif
-		m_ds1315(*this, "nsc")
+		m_ds1315(*this, "nsc"),
+		m_printer_conn(*this, "parallel"),
+		m_printer_out(*this, "laserprnout")
 	{
 		m_accel_laser = false;
+		m_has_laser_mouse = false;
 		m_isiic = false;
 		m_isiicplus = false;
 		m_iscec = false;
 		m_iscecm = false;
 		m_iscec2000 = false;
-		m_spectrum_text = false;
+		m_isace500 = false;
+		m_isace2200 = false;
+		m_ace2200_axxx_bank = false;
 		m_pal = false;
 #if IICP_NEW_IWM
 		m_cur_floppy = nullptr;
@@ -314,18 +284,9 @@ public:
 	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
-	required_device<address_map_bank_device> m_upperbank;
-	required_device<address_map_bank_device> m_0000bank;
-	required_device<address_map_bank_device> m_0200bank;
-	required_device<address_map_bank_device> m_0400bank;
-	required_device<address_map_bank_device> m_0800bank;
-	required_device<address_map_bank_device> m_2000bank;
-	required_device<address_map_bank_device> m_4000bank;
-	required_device<address_map_bank_device> m_c100bank;
-	required_device<address_map_bank_device> m_c300bank;
-	required_device<address_map_bank_device> m_c400bank;
-	required_device<address_map_bank_device> m_c800bank;
-	required_device<address_map_bank_device> m_lcbank;
+	memory_view m_upperbank, m_0000bank, m_0200bank, m_0400bank;
+	memory_view m_0800bank, m_2000bank, m_4000bank, m_c100bank;
+	memory_view m_c300bank, m_c400bank, m_c800bank, m_lcbank;
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
 #if IICP_NEW_IWM
@@ -335,6 +296,8 @@ public:
 	optional_device<legacy_iwm_device> m_iicpiwm;
 #endif
 	required_device<ds1315_device> m_ds1315;
+	optional_device<centronics_device>      m_printer_conn;
+	optional_device<output_latch_device>    m_printer_out;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
@@ -343,7 +306,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	template <bool invert, bool flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
+	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
+	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
+	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
@@ -356,6 +325,7 @@ public:
 	u8 ram2000_r(offs_t offset);
 	void ram2000_w(offs_t offset, u8 data);
 	u8 ram4000_r(offs_t offset);
+	u8 ram4000_ace2200_r(offs_t offset);
 	void ram4000_w(offs_t offset, u8 data);
 	u8 cec4000_r(offs_t offset);
 	u8 cec8000_r(offs_t offset);
@@ -374,7 +344,11 @@ public:
 	void auxram4000_w(offs_t offset, u8 data);
 	u8 c000_r(offs_t offset);
 	void c000_w(offs_t offset, u8 data);
+	u8 c000_laser_r(offs_t offset);
 	void c000_laser_w(offs_t offset, u8 data);
+	u8 laserprn_busy_r();
+	void laserprn_w(u8 data);
+	TIMER_CALLBACK_MEMBER(update_laserprn_strobe);
 	u8 c000_iic_r(offs_t offset);
 	void c000_iic_w(offs_t offset, u8 data);
 	u8 c080_r(offs_t offset);
@@ -410,9 +384,12 @@ public:
 	void lc_w(offs_t offset, u8 data);
 	u8 lc_romswitch_r(offs_t offset);
 	void lc_romswitch_w(offs_t offset, u8 data);
+	u8 laser_mouse_r(offs_t offset);
+	void laser_mouse_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
@@ -420,11 +397,16 @@ public:
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
 	u8 nsc_backing_r(offs_t offset);
+	u8 ace500_c0bx_r(offs_t offset);
+	void ace500_c0bx_w(offs_t offset, u8 data);
 
 	void apple2cp(machine_config &config);
-	void laser128ex2(machine_config &config);
 	void spectred(machine_config &config);
 	void laser128(machine_config &config);
+	void laser128o(machine_config &config);
+	void laser128ex2(machine_config &config);
+	void ace500(machine_config &config);
+	void ace2200(machine_config &config);
 	void apple2c_iwm(machine_config &config);
 	void apple2c_mem(machine_config &config);
 	void cec(machine_config &config);
@@ -438,24 +420,16 @@ public:
 	void apple2eepal(machine_config &config);
 	void apple2c_map(address_map &map);
 	void apple2c_memexp_map(address_map &map);
-	void apple2e_map(address_map &map);
-	void c100bank_map(address_map &map);
-	void c300bank_map(address_map &map);
-	void c400bank_map(address_map &map);
-	void c800bank_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void base_map(address_map &map);
 	void laser128_map(address_map &map);
-	void lcbank_map(address_map &map);
-	void r0000bank_map(address_map &map);
-	void r0200bank_map(address_map &map);
-	void r0400bank_map(address_map &map);
-	void r0800bank_map(address_map &map);
-	void r2000bank_map(address_map &map);
-	void r4000bank_map(address_map &map);
+	void ace500_map(address_map &map);
+	void ace2200_map(address_map &map);
 	void spectred_keyb_map(address_map &map);
+	void init_laser128();
 	void init_128ex();
-	void init_spect();
 	void init_pal();
+	void init_ace500();
+	void init_ace2200();
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -492,18 +466,26 @@ private:
 	bool m_mockingboard4c;
 	bool m_intc8rom;
 
-	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_pal;
+	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_pal;
 	u8 m_migram[0x800];
 	u16 m_migpage;
+
+	bool m_isace500, m_isace2200, m_ace_cnxx_bank, m_ace2200_axxx_bank;
+	u16 m_ace500rombank;
 
 	bool m_accel_unlocked;
 	bool m_accel_fast;
 	bool m_accel_present;
 	bool m_accel_temp_slowdown;
 	bool m_accel_laser;
+	bool m_has_laser_mouse;
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio;
+
+	emu_timer *m_strobe_timer;
+	u8  m_next_strobe;
+	bool m_centronics_busy;
 
 	u8 *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
 	int m_ram_size;
@@ -715,46 +697,39 @@ void apple2e_state::sel35_w(int sel35)
 
 void apple2e_state::recalc_active_device()
 {
-//  printf("recalc_active_device: devsel %d 35sel %d intdrive %d\n", m_devsel, m_35sel, m_intdrive);
 	if (m_devsel == 1)
 	{
 		if (!m_35sel)
 		{
-//          printf("5.25 1\n");
 			m_cur_floppy = m_floppy[0]->get_device();
 		}
 		else
 		{
-//          printf("3.5 1\n");
-			m_cur_floppy = m_floppy[2]->get_device();
+			m_cur_floppy = m_floppy[3]->get_device();
 		}
 	}
 	else if (m_devsel == 2)
 	{
-		if (!m_35sel)
+		// as per http://apple2.guidero.us/doku.php/mg_notes/apple_iic/mig_chip intdrive + devsel = 2 enables
+		// the internal drive, no 35sel is necessary.  If intdrive is clear, 35sel and devsel work as normal.
+		if (m_intdrive)
 		{
-//          printf("5.25 2\n");
+			m_cur_floppy = m_floppy[2]->get_device();
+		}
+		else if (!m_35sel)
+		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
-		else
+		else    // should be external 3.5 #2, for a 3rd drive
 		{
-			// hookup is a little weird here
-			if (m_intdrive)
-			{
-//              printf("3.5 1\n");
-				m_cur_floppy = m_floppy[2]->get_device();
-			}
-			else
-			{
-//              printf("3.5 2\n");
-				m_cur_floppy = m_floppy[3]->get_device();
-			}
+			m_cur_floppy = nullptr;
 		}
 	}
 	else
 	{
 		m_cur_floppy = nullptr;
 	}
+
 	m_iicpiwm->set_floppy(m_cur_floppy);
 
 	if (m_cur_floppy)
@@ -802,7 +777,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1);
+							m_upperbank.select(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -810,7 +785,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0);
+							m_upperbank.select(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -824,10 +799,15 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0);
+			m_upperbank.select(0);
 			m_inh_bank = 0;
 		}
 	}
+}
+
+WRITE_LINE_MEMBER(apple2e_state::busy_w)
+{
+	m_centronics_busy = state;
 }
 
 u8 apple2e_state::memexp_r(offs_t offset)
@@ -929,14 +909,14 @@ void apple2e_state::machine_start()
 	{
 		m_cassette->output(-1.0f);
 	}
-	m_upperbank->set_bank(0);
-	m_lcbank->set_bank(0);
-	m_0000bank->set_bank(0);
-	m_0200bank->set_bank(0);
-	m_0400bank->set_bank(0);
-	m_0800bank->set_bank(0);
-	m_2000bank->set_bank(0);
-	m_4000bank->set_bank(0);
+	m_upperbank.select(0);
+	m_lcbank.select(0);
+	m_0000bank.select(0);
+	m_0200bank.select(0);
+	m_0400bank.select(0);
+	m_0800bank.select(0);
+	m_2000bank.select(0);
+	m_4000bank.select(0);
 	m_inh_bank = 0;
 
 	m_migpage = 0;
@@ -1001,8 +981,19 @@ void apple2e_state::machine_start()
 
 	for (int adr = 0; adr < ram_size; adr += 2)
 	{
-		m_ram_ptr[adr] = 0;
-		m_ram_ptr[adr+1] = 0xff;
+		// invert the fill pattern order on the ACE 500 and 2200, as it interacts with
+		// Franklin's monitor not returning the same values as Apple's plus some
+		// bugs in DOS 3.3.
+		if ((m_isace500) || (m_isace2200))
+		{
+			m_ram_ptr[adr] = 0xff;
+			m_ram_ptr[adr+1] = 0;
+		}
+		else
+		{
+			m_ram_ptr[adr] = 0;
+			m_ram_ptr[adr + 1] = 0xff;
+		}
 
 		if (m_ram_size >= (128*1024))
 		{
@@ -1018,7 +1009,7 @@ void apple2e_state::machine_start()
 	// remap CEC banking
 	if ((m_rom_ptr[0x7bb3] == 0x8d) || (m_rom_ptr[0x7bb3] == 0xea) || (m_rom_ptr[0x7bb3] == 0x06))
 	{
-		m_lcbank->set_bank(3);
+		m_lcbank.select(3);
 		m_cec_ptr = m_cecbanks->base();
 		m_iscec = true;
 		m_iscecm = false;
@@ -1062,6 +1053,13 @@ void apple2e_state::machine_start()
 		m_iscecm = false;
 		m_iscec2000 = false;
 	}
+
+	if ((m_has_laser_mouse) || (m_isace500) || (m_isace2200))
+	{
+		m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2e_state::update_laserprn_strobe), this));
+		m_next_strobe = 1U;
+	}
+
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -1133,6 +1131,11 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_laser));
 	save_item(NAME(m_accel_speed));
+	save_item(NAME(m_next_strobe));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_ace500rombank));
+	save_item(NAME(m_ace_cnxx_bank));
+	save_item(NAME(m_ace2200_axxx_bank));
 }
 
 void apple2e_state::machine_reset()
@@ -1169,6 +1172,7 @@ void apple2e_state::machine_reset()
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
 	m_accel_fast = false;
+	m_centronics_busy = false;
 
 	// is Zip enabled?
 	if (m_sysconfig->read() & 0x10)
@@ -1181,7 +1185,10 @@ void apple2e_state::machine_reset()
 	{
 		m_intcxrom = true;
 		m_slotc3rom = false;
-		m_isiic = true;
+		if (!m_isace500)
+		{
+			m_isiic = true;
+		}
 
 		if (m_rom_ptr[0x3bbf] == 0x05)
 		{
@@ -1213,6 +1220,21 @@ void apple2e_state::machine_reset()
 		m_accel_speed = 1021800;
 	}
 
+	if (m_has_laser_mouse)
+	{
+	   a2bus_laser128_device *printer_slot = static_cast<a2bus_laser128_device *>(m_slotdevice[1]);
+
+	   if (m_sysconfig->read() & 0x08)
+	   {
+		  printer_slot->set_parallel_printer(true);
+	   }
+	   else
+	   {
+		  printer_slot->set_parallel_printer(false);
+	   }
+
+	}
+
 	m_80store = false;
 	m_altzp = false;
 	m_ramrd = false;
@@ -1237,11 +1259,23 @@ void apple2e_state::machine_reset()
 void apple2e_state::init_128ex()
 {
 	m_accel_laser = true;
+	m_has_laser_mouse = true;
 }
 
-void apple2e_state::init_spect()
+void apple2e_state::init_laser128()
 {
-	m_spectrum_text = true;
+	m_has_laser_mouse = true;
+}
+
+void apple2e_state::init_ace500()
+{
+	m_isace500 = true;
+	m_ace_cnxx_bank = false;
+}
+
+void apple2e_state::init_ace2200()
+{
+	m_isace2200 = true;
 }
 
 void apple2e_state::init_pal()
@@ -1258,7 +1292,6 @@ void apple2e_state::raise_irq(int irq)
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 }
-
 
 void apple2e_state::lower_irq(int irq)
 {
@@ -1278,7 +1311,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	if (m_isiic)
+	if ((m_isiic) || (m_has_laser_mouse) || (m_isace500))
 	{
 		update_iic_mouse();
 	}
@@ -1299,10 +1332,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
 			m_maincpu->reset();
+
+			// reset intcxrom to default
+			if ((m_isiic) || (m_isace500))
+			{
+				m_intcxrom = true;
+			}
+			else
+			{
+				m_intcxrom = false;
+			}
+			update_slotrom_banks();
 		}
 	}
 }
 
+template<bool invert, bool flip>
 u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_video->m_page2;
@@ -1330,7 +1375,8 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				{
 					m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
-				m_video->text_update(screen, bitmap, cliprect, 160, 191);
+
+				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1344,7 +1390,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				}
 			}
 		}
-		else    // lo-res
+		else // lo-res
 		{
 			if (m_video->m_mix)
 			{
@@ -1357,7 +1403,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					m_video->lores_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				m_video->text_update(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1374,14 +1420,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 	else
 	{
-		if (m_spectrum_text)
-		{
-			m_video->text_update_spectrum(screen, bitmap, cliprect, 0, 191);
-		}
-		else
-		{
-			m_video->text_update(screen, bitmap, cliprect, 0, 191);
-		}
+		m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	m_video->m_page2 = old_page2;
@@ -1428,54 +1467,54 @@ void apple2e_state::auxbank_update()
 
 	if (!m_iscec)   // real Apple II
 	{
-		m_0000bank->set_bank(m_altzp ? 1 : 0);
-		m_0200bank->set_bank(ramwr);
+		m_0000bank.select(m_altzp ? 1 : 0);
+		m_0200bank.select(ramwr);
 
 		if (m_80store)
 		{
 			if (m_page2)
 			{
-				m_0400bank->set_bank(3);
+				m_0400bank.select(3);
 			}
 			else
 			{
-				m_0400bank->set_bank(0);
+				m_0400bank.select(0);
 			}
 		}
 		else
 		{
-			m_0400bank->set_bank(ramwr);
+			m_0400bank.select(ramwr);
 		}
 
-		m_0800bank->set_bank(ramwr);
+		m_0800bank.select(ramwr);
 
 		if ((m_80store) && (m_video->m_hires))
 		{
 			if (m_page2)
 			{
-				m_2000bank->set_bank(3);
+				m_2000bank.select(3);
 			}
 			else
 			{
-				m_2000bank->set_bank(0);
+				m_2000bank.select(0);
 			}
 		}
 		else
 		{
-			m_2000bank->set_bank(ramwr);
+			m_2000bank.select(ramwr);
 		}
 
-		m_4000bank->set_bank(ramwr);
+		m_4000bank.select(ramwr);
 	}
 	else    // CEC
 	{
 		if (m_ramrd)
 		{
-			m_4000bank->set_bank(4);    // read CEC bank, write normal RAM
+			m_4000bank.select(4);    // read CEC bank, write normal RAM
 		}
 		else
 		{
-			m_4000bank->set_bank(0);    // read/write RAM
+			m_4000bank.select(0);    // read/write RAM
 		}
 	}
 }
@@ -1488,7 +1527,7 @@ void apple2e_state::update_slotrom_banks()
 
 		// IIc and IIc+ have working (readable) INTCXROM/SLOTC3ROM switches, but
 		// internal ROM is always present in the slots.
-		if ((m_intcxrom) || (m_isiic))
+		if ((m_intcxrom) || (m_isiic) || (m_isace500))
 		{
 			if (m_romswitch)
 			{
@@ -1500,64 +1539,64 @@ void apple2e_state::update_slotrom_banks()
 			}
 		}
 
-		m_c100bank->set_bank(cxswitch);
-		m_c400bank->set_bank(cxswitch);
+		m_c100bank.select(cxswitch);
+		m_c400bank.select(cxswitch);
 
 		//printf("intcxrom %d intc8rom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_intc8rom, m_cnxx_slot, m_isiic, m_romswitch);
 		if ((m_intcxrom) || (m_intc8rom) || (m_isiic))
 		{
 			if (m_romswitch)
 			{
-				m_c800bank->set_bank(2);
+				m_c800bank.select(2);
 			}
 			else
 			{
-				m_c800bank->set_bank(1);
+				m_c800bank.select(1);
 			}
 		}
 		else
 		{
-			m_c800bank->set_bank(0);
+			m_c800bank.select(0);
 		}
 
 		if ((m_intcxrom) || (!m_slotc3rom) || (m_isiic))
 		{
 			if (m_romswitch)
 			{
-				m_c300bank->set_bank(2);
+				m_c300bank.select(2);
 			}
 			else
 			{
-				m_c300bank->set_bank(1);
+				m_c300bank.select(1);
 			}
 		}
 		else
 		{
-			m_c300bank->set_bank(0);
+			m_c300bank.select(0);
 		}
 	}
 	else    // CEC has only ROM here
 	{
 		if (!m_intcxrom)
 		{
-			m_c100bank->set_bank(3);
-			m_c400bank->set_bank(3);
-			m_c800bank->set_bank(3);
+			m_c100bank.select(3);
+			m_c400bank.select(3);
+			m_c800bank.select(3);
 		}
 		else
 		{
-			m_c100bank->set_bank(4);
-			m_c400bank->set_bank(4);
-			m_c800bank->set_bank(4);
+			m_c100bank.select(4);
+			m_c400bank.select(4);
+			m_c800bank.select(4);
 		}
 
 		if ((m_intcxrom) || (!m_slotc3rom))
 		{
-			m_c300bank->set_bank(4);
+			m_c300bank.select(4);
 		}
 		else
 		{
-			m_c300bank->set_bank(3);
+			m_c300bank.select(3);
 		}
 	}
 }
@@ -1626,28 +1665,28 @@ void apple2e_state::lc_update(int offset, bool writing)
 		{
 			if (m_lcram)
 			{
-				m_lcbank->set_bank(1);
+				m_lcbank.select(1);
 			}
 			else
 			{
 				if (m_romswitch)
 				{
-					m_lcbank->set_bank(2);
+					m_lcbank.select(2);
 				}
 				else
 				{
-					m_lcbank->set_bank(0);
+					m_lcbank.select(0);
 				}
 			}
 		}
 	}
 
 	#if 0
-	printf("LC: new state %c%c dxxx=%04x altzp=%d\n",
+	printf("LC: new state %c%c dxxx=%04x altzp=%d (PC=%x)\n",
 			m_lcram ? 'R' : 'x',
 			m_lcwriteenable ? 'W' : 'x',
 			m_lcram2 ? 0x1000 : 0x0000,
-			m_altzp);
+			m_altzp, m_maincpu->pc());
 	#endif
 }
 
@@ -1655,17 +1694,17 @@ void apple2e_state::cec_lcrom_update()
 {
 	if (m_altzp)
 	{
-		m_lcbank->set_bank(5);
+		m_lcbank.select(5);
 	}
 	else
 	{
 		if (m_lcram)
 		{
-			m_lcbank->set_bank(1);
+			m_lcbank.select(1);
 		}
 		else
 		{
-			m_lcbank->set_bank(3);
+			m_lcbank.select(3);
 		}
 	}
 }
@@ -1679,7 +1718,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	if ((offset & 0x58) == 0x58)
 	{
 		// IIc-specific switches
-		if (((m_isiic) && (!m_accel_unlocked)) && (!m_ioudis))
+		if (((m_isiic || m_isace500) && (!m_accel_unlocked)) && (!m_ioudis))
 		{
 			switch (offset)
 			{
@@ -1776,11 +1815,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				{
 					if (m_romswitch)
 					{
-						m_lcbank->set_bank(2);
+						m_lcbank.select(2);
 					}
 					else
 					{
-						m_lcbank->set_bank(0);
+						m_lcbank.select(0);
 					}
 				}
 			}
@@ -1883,7 +1922,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 		// trigger joypad read
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			if (is_iic)
+			if ((is_iic) || (m_isace500))
 			{
 				m_vbl = false;
 				lower_irq(IRQ_VBL);
@@ -1897,10 +1936,23 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				accel_normal_speed();
 			}
 
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			// 558 monostable one-shot timers; a running timer cannot be restarted
+			if (machine().time().as_double() >= m_joystick_x1_time)
+			{
+				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y1_time)
+			{
+				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+			}
+			if (machine().time().as_double() >= m_joystick_x2_time)
+			{
+				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+			}
+			if (machine().time().as_double() >= m_joystick_y2_time)
+			{
+				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+			}
 			break;
 
 		default:
@@ -1973,6 +2025,13 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x1f:  // read 80COL
 			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
 
+		case 0x26:  // Ace 2x00 DIP switches
+			if (m_isace2200)
+			{
+				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
+			}
+			break;
+
 		case 0x60: // cassette in
 		case 0x68:
 			if (m_cassette)
@@ -1995,18 +2054,22 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x7e:  // read IOUDIS
@@ -2044,6 +2107,25 @@ u8 apple2e_state::c000_r(offs_t offset)
 	return read_floatingbus();
 }
 
+u8 apple2e_state::c000_laser_r(offs_t offset)
+{
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x63:  // read mouse button
+			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
+
+		case 0x66:  // read mouse xdir
+			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x67:  // read mouse ydir
+			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
+	}
+
+	return c000_r(offset);
+}
+
 void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 {
 	if ((m_accel_laser) && (offset == 0x74))
@@ -2071,7 +2153,46 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 	}
 	else
 	{
+		if ((offset & 0xf0) == 0x70)
+		{
+			lower_irq(IRQ_VBL);
+		}
+
 		c000_w(offset, data);
+	}
+}
+
+u8 apple2e_state::laserprn_busy_r()
+{
+	u8 retval = read_floatingbus() & 0x7f;
+
+	if (m_centronics_busy)
+	{
+		retval |= 0x80;
+	}
+
+	return retval;
+}
+
+void apple2e_state::laserprn_w(u8 data)
+{
+	m_printer_out->write(data);
+
+   // generate strobe pulse after one clock cycle
+	m_next_strobe = 0U;
+	if (!m_strobe_timer->enabled())
+	{
+	   m_strobe_timer->adjust(attotime::from_hz(1021800));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(apple2e_state::update_laserprn_strobe)
+{
+	m_printer_conn->write_strobe(m_next_strobe);
+	if (!m_next_strobe)
+	{
+		m_next_strobe = 1U;
+		m_strobe_timer->adjust(attotime::from_hz(1021800));
 	}
 }
 
@@ -2227,6 +2348,17 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
+			if (m_isace2200)
+			{
+				if (offset == 0x78)
+				{
+					m_ace2200_axxx_bank = false;
+				}
+				else if (offset == 0x79)
+				{
+					m_ace2200_axxx_bank = true;
+				}
+			}
 			if (m_auxslotdevice)
 			{
 				m_auxslotdevice->write_c07x(offset & 0xf, data);
@@ -2370,9 +2502,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			do_io(offset, true);
 			if ((m_accel_unlocked) && (offset == 0x5c))
 			{
-				u8 temp = (m_accel_slotspk ^ 0xff) >> 2;
-				temp |= (m_accel_slotspk & 1) ? 0 : 1;
-				return temp;
+				return m_accel_slotspk;
 			}
 			break;
 	}
@@ -2504,10 +2634,19 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 		case 0x5c:
 			if (m_accel_unlocked)
 			{
-				u8 temp = data ^ 0xff;
-				m_accel_slotspk = (temp << 1) | ((temp & 0x80) ? 1 : 0);
+				m_accel_slotspk = data;
 			}
 			break;
+
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+				if (m_auxslotdevice)
+				{
+					m_auxslotdevice->write_c07x(offset & 0xf, data);
+
+					// card may have banked auxram; get a new bank pointer
+					m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
+				}
+				break;
 
 		case 0x78:  // IIc mirror of SETIOUDIS used by the mouse firmware
 		case 0x7a:
@@ -2636,6 +2775,75 @@ void apple2e_state::update_iic_mouse()
 		}
 
 		m_y0 = !m_y0;
+	}
+}
+
+u8 apple2e_state::laser_mouse_r(offs_t offset)
+{
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x8:  // read X0Edge
+			return (m_x0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x9:  // read Y0Edge
+			return (m_y0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xa:  // read XYMask
+			return (m_xy ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xb:  // read VBL mask
+			return (m_vblmask ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0xc: // mouse X1 IRQ status
+			return (m_xirq ? 0x80 : 0) | uFloatingBus7;
+
+		case 0xd: // mouse Y1 IRQ status
+			return (m_yirq ? 0x80 : 0) | uFloatingBus7;
+
+		case 0xe: // VBL interrupt status
+			return ((m_irqmask & IRQ_VBL) ? 0x80 : 0) | uFloatingBus7;
+	}
+
+	return 0xff;
+}
+
+void apple2e_state::laser_mouse_w(offs_t offset, u8 data)
+{
+	// these are the same as the //c mouse registers, but with bit 4 of the
+	// address inverted, pretty much.
+	switch (offset)
+	{
+		case 0x0:  // RisX0Edge
+			m_x0edge = false; break;
+
+		case 0x1:  // FalX0Edge
+			m_x0edge = true; break;
+
+		case 0x2:  // RisY0Edge
+			m_y0edge = false; break;
+
+		case 0x3:  // FalY0Edge
+			m_y0edge = true; break;
+
+		case 0x4:  // DisXY
+			m_xy = false; break;
+
+		case 0x5:  // EnbXY
+			m_xy = true; break;
+
+		case 0x6:  // DisVBL
+			lower_irq(IRQ_VBL);
+			m_vblmask = false; break;
+
+		case 0x7:  // EnVBL
+			m_vblmask = true; break;
+
+		case 0xf: // clear XY interrupt
+			lower_irq(IRQ_MOUSEXY);
+			m_xirq = m_yirq = false;
+			break;
 	}
 }
 
@@ -2785,7 +2993,20 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 
 u8 apple2e_state::read_int_rom(int slotbias, int offset)
 {
-	//return m_rom_ptr[slotbias + offset];
+	int slot = ((slotbias + offset) >> 8) & 0xf;
+
+	// slot 4 can't remap because the IRQ handler is there
+	if ((m_isace500) && (m_ace_cnxx_bank) && (slot != 4))
+	{
+		slotbias += 0x4000;
+		// even numbered slots come from $6x00 in this mode?
+		if (!(slot & 1))
+		{
+			slotbias += 0x2000;
+		}
+		return m_rom_ptr[slotbias + offset];
+	}
+
 	return m_ds1315->read(slotbias + offset);
 }
 
@@ -2905,6 +3126,61 @@ u8 apple2e_state::c800_r(offs_t offset)
 	return read_floatingbus();
 }
 
+u8 apple2e_state::ace500_c0bx_r(offs_t offset)
+{
+	switch (offset)
+	{
+		// Printer "auto-LF" DIP switch in bit 7
+		case 0x0:
+			return (m_sysconfig->read() & 0x80);
+
+		// Alt key status (0=pressed).  Reads as pressed for function keys.
+		case 0x4:
+			return 0xff;
+
+		// Used by the IRQ handler.  Appears to return altzp status in bit 7, same as $C016.
+		case 0xc:
+			return (m_altzp ? 0x80 : 0x00);
+
+		default:
+			logerror("c0bx_r @ %x (PC=%x)\n", offset, m_maincpu->pc());
+			break;
+	}
+
+	return 0xff;
+}
+
+
+// $C0B8 - $C100-$C7FF alt bank
+// $C0B9 - $C100-$C7FF main bank
+// $C0BA - release $C800 force, use $CFFF mechanism
+// $C0BB - force main rom bank at $C800
+void apple2e_state::ace500_c0bx_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+		case 0x8:
+			m_ace_cnxx_bank = true;
+			break;
+
+		case 0x9:
+			m_ace_cnxx_bank = false;
+			break;
+
+		case 0xa:
+			m_ace500rombank = 0;
+			break;
+
+		case 0xb:
+			m_ace500rombank = 0x7000;
+			break;
+
+		default:
+			logerror("unknown c0bx_w %x (PC=%x)\n", offset, m_maincpu->pc());
+			break;
+	}
+}
+
 u8 apple2e_state::c800_int_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
@@ -2917,6 +3193,11 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 	if (m_iscec)
 	{
 		return m_rom_ptr[0x4800 + offset];
+	}
+
+	if (m_isace500)
+	{
+		return m_rom_ptr[m_ace500rombank + offset];
 	}
 
 	return m_rom_ptr[0x800 + offset];
@@ -2941,6 +3222,27 @@ u8 apple2e_state::c800_b2_int_r(offs_t offset)
 
 void apple2e_state::c800_w(offs_t offset, u8 data)
 {
+	if ((m_isace500) && (offset == 0x7ff))
+	{
+		// TODO: use a version of our conventional CnXX handling for this
+		u8 page = (m_maincpu->pc() >> 8) & 0xf;
+		switch (page)
+		{
+			case 1:
+				m_ace500rombank = 0x4800;
+				break;
+
+			case 3:
+				m_ace500rombank = 0x800;
+				break;
+
+			case 5:
+				m_ace500rombank = 0x5800;
+				break;
+		}
+		return;
+	}
+
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
 		mig_w(offset-0x400, data);
@@ -3202,19 +3504,29 @@ u8 apple2e_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-u8 apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
+u8   apple2e_state::ram0000_r(offs_t offset)          { return m_ram_ptr[offset]; }
 void apple2e_state::ram0000_w(offs_t offset, u8 data) { m_ram_ptr[offset] = data; }
-u8 apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
+u8   apple2e_state::ram0200_r(offs_t offset)          { return m_ram_ptr[offset+0x200]; }
 void apple2e_state::ram0200_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x200] = data; }
-u8 apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
+u8   apple2e_state::ram0400_r(offs_t offset)          { return m_ram_ptr[offset+0x400]; }
 void apple2e_state::ram0400_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x400] = data; }
-u8 apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
+u8   apple2e_state::ram0800_r(offs_t offset)          { return m_ram_ptr[offset+0x800]; }
 void apple2e_state::ram0800_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x800] = data; }
-u8 apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
+u8   apple2e_state::ram2000_r(offs_t offset)          { return m_ram_ptr[offset+0x2000]; }
 void apple2e_state::ram2000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x2000] = data; }
-u8 apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
+u8   apple2e_state::ram4000_r(offs_t offset)          { return m_ram_ptr[offset+0x4000]; }
 void apple2e_state::ram4000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x4000] = data; }
 void apple2e_state::ram8000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x8000] = data; }
+
+u8 apple2e_state::ram4000_ace2200_r(offs_t offset)
+{
+	if ((offset >= 0x6000) && (m_ace2200_axxx_bank))
+	{
+		return m_rom_ptr[0x4000 + (offset - 0x6000)];
+	}
+	return m_ram_ptr[offset+0x4000];
+}
+
 u8 apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
@@ -3234,195 +3546,149 @@ u8 apple2e_state::cec8000_r(offs_t offset)
 	}
 }
 
-u8 apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-u8 apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0200_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0200_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-u8 apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0400_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0400_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-u8 apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram0800_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram0800_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-u8 apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram2000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram2000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-u8 apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
+u8   apple2e_state::auxram4000_r(offs_t offset)          { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
 void apple2e_state::auxram4000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
-void apple2e_state::apple2e_map(address_map &map)
+void apple2e_state::base_map(address_map &map)
 {
-	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
-	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
-	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
-	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
-	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0x01ff).view(m_0000bank);
+	m_0000bank[0](0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
+	m_0000bank[1](0x0000, 0x01ff).rw(FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
+
+	map(0x0200, 0x03ff).view(m_0200bank);
+	m_0200bank[0](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w));         // wr 0 rd 0
+	m_0200bank[1](0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w));      // wr 0 rd 1
+	m_0200bank[2](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w));      // wr 1 rd 0
+	m_0200bank[3](0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
+
+	map(0x0400, 0x07ff).view(m_0400bank);
+	m_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w));         // wr 0 rd 0
+	m_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));      // wr 0 rd 1
+	m_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));      // wr 1 rd 0
+	m_0400bank[3](0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
+
+	map(0x0800, 0x1fff).view(m_0800bank);
+	m_0800bank[0](0x0800, 0x1fff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::ram0800_w));
+	m_0800bank[1](0x0800, 0x1fff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::ram0800_w));
+	m_0800bank[2](0x0800, 0x1fff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::auxram0800_w));
+	m_0800bank[3](0x0800, 0x1fff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::auxram0800_w));
+
+	map(0x2000, 0x3fff).view(m_2000bank);
+	m_2000bank[0](0x2000, 0x3fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::ram2000_w));
+	m_2000bank[1](0x2000, 0x3fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::ram2000_w));
+	m_2000bank[2](0x2000, 0x3fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::auxram2000_w));
+	m_2000bank[3](0x2000, 0x3fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::auxram2000_w));
+
+	map(0x4000, 0xbfff).view(m_4000bank);
+	m_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
+	m_4000bank[1](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
+	m_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
+	m_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
+	m_4000bank[4](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	m_4000bank[5](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
-	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
-	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+
+	map(0xc100, 0xc2ff).view(m_c100bank);
+	m_c100bank[0](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
+	m_c100bank[1](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_int_r), FUNC(apple2e_state::c100_w));
+	m_c100bank[2](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_int_bank_r), FUNC(apple2e_state::c100_w));
+	m_c100bank[3](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
+	m_c100bank[4](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
+
+	map(0xc300, 0xc3ff).view(m_c300bank);
+	m_c300bank[0](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
+	m_c300bank[1](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_w));
+	m_c300bank[2](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_w));
+	m_c300bank[3](0xc300, 0xc3ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
+	m_c300bank[4](0xc300, 0xc3ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
+
+	map(0xc400, 0xc7ff).view(m_c400bank);
+	m_c400bank[0](0xc400, 0xc7ff).rw(FUNC(apple2e_state::c400_r), FUNC(apple2e_state::c400_w));
+	m_c400bank[1](0xc400, 0xc7ff).rw(FUNC(apple2e_state::c400_int_r), FUNC(apple2e_state::c400_w));
+	m_c400bank[2](0xc400, 0xc7ff).rw(FUNC(apple2e_state::c400_int_bank_r), FUNC(apple2e_state::c400_w));
+	m_c400bank[3](0xc400, 0xc7ff).rw(FUNC(apple2e_state::c400_cec_r), FUNC(apple2e_state::c400_cec_w));
+	m_c400bank[4](0xc400, 0xc7ff).r(FUNC(apple2e_state::c400_cec_bank_r)).nopw();
+
+	map(0xc800, 0xcfff).view(m_c800bank);
+	m_c800bank[0](0xc800, 0xcfff).rw(FUNC(apple2e_state::c800_r), FUNC(apple2e_state::c800_w));
+	m_c800bank[1](0xc800, 0xcfff).rw(FUNC(apple2e_state::c800_int_r), FUNC(apple2e_state::c800_w));
+	m_c800bank[2](0xc800, 0xcfff).rw(FUNC(apple2e_state::c800_b2_int_r), FUNC(apple2e_state::c800_w));
+	m_c800bank[3](0xc800, 0xcfff).r(FUNC(apple2e_state::c800_cec_r)).nopw();
+	m_c800bank[4](0xc800, 0xcfff).r(FUNC(apple2e_state::c800_cec_bank_r)).nopw();
+
+	map(0xd000, 0xffff).view(m_upperbank);
+	m_upperbank[0](0xd000, 0xffff).view(m_lcbank);
+	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
+
+	m_lcbank[0](0x0d000, 0x0ffff).rom().region("maincpu", 0x1000).w(FUNC(apple2e_state::lc_w));
+	m_lcbank[1](0x0d000, 0x0ffff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	m_lcbank[2](0x0d000, 0x0ffff).rw(FUNC(apple2e_state::lc_romswitch_r), FUNC(apple2e_state::lc_romswitch_w));
+	m_lcbank[3](0x0d000, 0x0ffff).rom().region("maincpu", 0x5000).w(FUNC(apple2e_state::lc_w));
+	m_lcbank[4](0x0d000, 0x0ffff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	m_lcbank[5](0x0d000, 0x1ffff).rom().region("maincpu", 0xd000).w(FUNC(apple2e_state::lc_w));
 }
 
 void apple2e_state::apple2c_map(address_map &map)
 {
-	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
-	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
-	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
-	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
-	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	base_map(map);
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
-	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
-	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void apple2e_state::apple2c_memexp_map(address_map &map)
 {
-	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
-	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
-	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
-	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
-	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	base_map(map);
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
-	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0c0, 0xc0c3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
-	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
-	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void apple2e_state::laser128_map(address_map &map)
 {
-	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
-	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
-	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
-	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
-	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_laser_w));
-	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	base_map(map);
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_laser_r), FUNC(apple2e_state::c000_laser_w));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0c0, 0xc0cf).rw(FUNC(apple2e_state::laser_mouse_r), FUNC(apple2e_state::laser_mouse_w));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
-	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
-	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
 }
 
-void apple2e_state::r0000bank_map(address_map &map)
+void apple2e_state::ace500_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
-	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
+	base_map(map);
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc0a8, 0xc0ab).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
+	map(0xc0b0, 0xc0bf).rw(FUNC(apple2e_state::ace500_c0bx_r), FUNC(apple2e_state::ace500_c0bx_w));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
 }
 
-void apple2e_state::r0200bank_map(address_map &map)
+void apple2e_state::ace2200_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 0
-	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 1
-	map(0x0400, 0x05ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 0
-	map(0x0600, 0x07ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
-}
+	base_map(map);
 
-void apple2e_state::r0400bank_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w)); // wr 0 rd 0
-	map(0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));  // wr 0 rd 1
-	map(0x0800, 0x0bff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));  // wr 1 rd 0
-	map(0x0c00, 0x0fff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
-}
+	// change the banking here to acommodate the Ace 2x00's ROM banking in at $A000
+	m_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_ace2200_r), FUNC(apple2e_state::ram4000_w));
 
-void apple2e_state::r0800bank_map(address_map &map)
-{
-	map(0x0000, 0x17ff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::ram0800_w));
-	map(0x2000, 0x37ff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::ram0800_w));
-	map(0x4000, 0x57ff).rw(FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::auxram0800_w));
-	map(0x6000, 0x77ff).rw(FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::auxram0800_w));
-}
-
-void apple2e_state::r2000bank_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::ram2000_w));
-	map(0x2000, 0x3fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::ram2000_w));
-	map(0x4000, 0x5fff).rw(FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::auxram2000_w));
-	map(0x6000, 0x7fff).rw(FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::auxram2000_w));
-}
-
-void apple2e_state::r4000bank_map(address_map &map)
-{
-	map(0x00000, 0x07fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x08000, 0x0ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x10000, 0x17fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
-	map(0x18000, 0x1ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
-	map(0x20000, 0x23fff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
-	map(0x24000, 0x27fff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
-}
-
-void apple2e_state::c100bank_map(address_map &map)
-{
-	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	map(0x0200, 0x03ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
-	map(0x0400, 0x05ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
-	map(0x0600, 0x07ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
-	map(0x0800, 0x09ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
-
-}
-
-void apple2e_state::c300bank_map(address_map &map)
-{
-	map(0x0000, 0x00ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2e_state::c300_int_r)).nopw();
-	map(0x0200, 0x02ff).r(FUNC(apple2e_state::c300_int_bank_r)).nopw();
-	map(0x0300, 0x03ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
-	map(0x0400, 0x04ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
-}
-
-void apple2e_state::c400bank_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw(FUNC(apple2e_state::c400_r), FUNC(apple2e_state::c400_w));
-	map(0x0400, 0x07ff).rw(FUNC(apple2e_state::c400_int_r), FUNC(apple2e_state::c400_w));
-	map(0x0800, 0x0bff).rw(FUNC(apple2e_state::c400_int_bank_r), FUNC(apple2e_state::c400_w));
-	map(0x0c00, 0x0fff).rw(FUNC(apple2e_state::c400_cec_r), FUNC(apple2e_state::c400_cec_w));
-	map(0x1000, 0x13ff).r(FUNC(apple2e_state::c400_cec_bank_r)).nopw();
-}
-
-void apple2e_state::c800bank_map(address_map &map)
-{
-	map(0x0000, 0x07ff).rw(FUNC(apple2e_state::c800_r), FUNC(apple2e_state::c800_w));
-	map(0x0800, 0x0fff).rw(FUNC(apple2e_state::c800_int_r), FUNC(apple2e_state::c800_w));
-	map(0x1000, 0x17ff).rw(FUNC(apple2e_state::c800_b2_int_r), FUNC(apple2e_state::c800_w));
-	map(0x1800, 0x1fff).r(FUNC(apple2e_state::c800_cec_r)).nopw();
-	map(0x2000, 0x27ff).r(FUNC(apple2e_state::c800_cec_bank_r)).nopw();
-}
-
-void apple2e_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lcbank, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
-}
-
-void apple2e_state::lcbank_map(address_map &map)
-{
-	map(0x00000, 0x02fff).rom().region("maincpu", 0x1000).w(FUNC(apple2e_state::lc_w));
-	map(0x03000, 0x05fff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
-	map(0x06000, 0x08fff).rw(FUNC(apple2e_state::lc_romswitch_r), FUNC(apple2e_state::lc_romswitch_w));
-	map(0x09000, 0x0bfff).rom().region("maincpu", 0x5000).w(FUNC(apple2e_state::lc_w));
-	map(0x0c000, 0x0efff).rw(FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
-	map(0x0f000, 0x11fff).rom().region("maincpu", 0xd000).w(FUNC(apple2e_state::lc_w));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
 }
 
 void apple2e_state::spectred_keyb_map(address_map &map)
@@ -3558,6 +3824,19 @@ static INPUT_PORTS_START( apple2_sysconfig_no_accel )
 	PORT_CONFSETTING(0x01, "B&W")
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( laser128_sysconfig )
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x01, "B&W")
+	PORT_CONFSETTING(0x02, "Green")
+	PORT_CONFSETTING(0x03, "Amber")
+
+	PORT_CONFNAME(0x08, 0x00, "Printer type")
+	PORT_CONFSETTING(0x00, "Serial")
+	PORT_CONFSETTING(0x08, "Parallel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c_sysconfig )
@@ -3754,7 +4033,9 @@ static INPUT_PORTS_START( apple2e_common )
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( apple2e_special )
 	PORT_START("keyb_special")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
@@ -4106,11 +4387,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2c_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4125,11 +4408,63 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_sysconfig_no_accel )
+	PORT_INCLUDE( laser128_sysconfig )
+
+	PORT_START("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Triangle")   PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Triangle")  PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ace500 )
+	PORT_INCLUDE( apple2e_common )
+
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x01, "B&W")
+	PORT_CONFSETTING(0x02, "Green")
+	PORT_CONFSETTING(0x03, "Amber")
+
+	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
+	PORT_CONFSETTING(0x80, DEF_STR(On))
+	PORT_CONFSETTING(0x00, DEF_STR(Off))
+
+	PORT_START("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open F")       PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid F")      PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2cp_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4626,73 +4961,6 @@ INPUT_PORTS_START( apple2ep )
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
-static void apple2_cards(device_slot_interface &device)
-{
-	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
-	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card, cycle-accurate version */
-	device.option_add("diskiing13", A2BUS_DISKIING13);  /* Disk II Controller Card, cycle-accurate version */
-	device.option_add("diskiiiwm", A2BUS_IWM_CARD);  /* IWM Disk II Controller Card */
-	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
-	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
-	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
-	device.option_add("cffa202", A2BUS_CFFA2_6502);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	device.option_add("memexp", A2BUS_MEMEXP);  /* Apple II Memory Expansion Card */
-	device.option_add("ramfactor", A2BUS_RAMFACTOR);    /* Applied Engineering RamFactor */
-	device.option_add("thclock", A2BUS_THUNDERCLOCK);    /* ThunderWare ThunderClock Plus */
-	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
-	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
-	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
-	device.option_add("ssi", APRICORN_SSI);    /* Apricorn Super Serial Imager */
-	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
-	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
-	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
-	device.option_add("alfam2", A2BUS_ALFAM2);    /* ALF Apple Music II */
-	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
-	device.option_add("ap16", A2BUS_IBSAP16);    /* IBS AP16 (German VideoTerm clone) */
-	device.option_add("ap16alt", A2BUS_IBSAP16ALT);    /* IBS AP16 (German VideoTerm clone), alternate revision */
-	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone */
-	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
-	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
-	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
-	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
-	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
-	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
-	device.option_add("hsscsi", A2BUS_HSSCSI);  /* Apple II High-Speed SCSI Card */
-	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
-	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
-	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
-	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
-	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
-	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
-	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
-	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
-	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
-	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
-	device.option_add("dx1", A2BUS_DX1);    /* Decillonix DX-1 sampler card */
-	device.option_add("tm2ho", A2BUS_TIMEMASTERHO); /* Applied Engineering TimeMaster II H.O. */
-	device.option_add("mouse", A2BUS_MOUSE);    /* Apple II Mouse Card */
-	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
-	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
-	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
-//  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
-	device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
-	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
-	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
-	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
-	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
-	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
-	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
-	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
-	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
-	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
-	device.option_add("uthernet", A2BUS_UTHERNET); /* A2RetroSystems Uthernet card */
-	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
-	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
-	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
-	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
-}
-
 static void apple2eaux_cards(device_slot_interface &device)
 {
 	device.option_add("std80", A2EAUX_STD80COL); // Apple IIe Standard 80 Column Card
@@ -4704,7 +4972,7 @@ void apple2e_state::apple2e(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	TIMER(config, m_scantimer, 0).configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
@@ -4717,7 +4985,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2e_state::screen_update));
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_ff));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -4729,42 +4997,6 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
-
-	/* 0000 banking */
-	ADDRESS_MAP_BANK(config, A2_0000_TAG).set_map(&apple2e_state::r0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
-	/* 0200 banking */
-	ADDRESS_MAP_BANK(config, A2_0200_TAG).set_map(&apple2e_state::r0200bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
-	/* 0400 banking */
-	ADDRESS_MAP_BANK(config, A2_0400_TAG).set_map(&apple2e_state::r0400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
-
-	/* 0800 banking */
-	ADDRESS_MAP_BANK(config, A2_0800_TAG).set_map(&apple2e_state::r0800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
-
-	/* 2000 banking */
-	ADDRESS_MAP_BANK(config, A2_2000_TAG).set_map(&apple2e_state::r2000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
-
-	/* 4000 banking */
-	ADDRESS_MAP_BANK(config, A2_4000_TAG).set_map(&apple2e_state::r4000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
-
-	/* C100 banking */
-	ADDRESS_MAP_BANK(config, A2_C100_TAG).set_map(&apple2e_state::c100bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
-	/* C300 banking */
-	ADDRESS_MAP_BANK(config, A2_C300_TAG).set_map(&apple2e_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
-
-	/* C400 banking */
-	ADDRESS_MAP_BANK(config, A2_C400_TAG).set_map(&apple2e_state::c400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
-
-	/* C800 banking */
-	ADDRESS_MAP_BANK(config, A2_C800_TAG).set_map(&apple2e_state::c800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x800);
-
-	/* built-in language card emulation */
-	ADDRESS_MAP_BANK(config, A2_LCBANK_TAG).set_map(&apple2e_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2e_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller */
 	ay3600_device &kbdc(AY3600(config, "ay3600", 0));
@@ -4793,13 +5025,13 @@ void apple2e_state::apple2e(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2e_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2e_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
 
 	A2EAUXSLOT(config, m_a2eauxslot, 0);
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
@@ -4811,9 +5043,9 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */
-	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
@@ -4823,7 +5055,10 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M6502(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4836,17 +5071,21 @@ void apple2e_state::mprof3(machine_config &config)
 void apple2e_state::apple2ee(machine_config &config)
 {
 	apple2e(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 }
 
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 312, 0, 192);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::spectred(machine_config &config)
@@ -4854,16 +5093,17 @@ void apple2e_state::spectred(machine_config &config)
 	apple2e(config);
 	i8035_device &keyb_mcu(I8035(config, "keyb_mcu", XTAL(4'000'000))); /* guessed frequency */
 	keyb_mcu.set_addrmap(AS_PROGRAM, &apple2e_state::spectred_keyb_map);
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_ft));
 
-		//TODO: implement the actual interfacing to this 8035 MCU and
-		//      and then remove the keyb CPU inherited from apple2e
+	// TODO: implement the actual interfacing to this 8035 MCU and
+	//       and then remove the keyb CPU inherited from apple2e
 }
 
 void apple2e_state::tk3000(machine_config &config)
 {
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 
 //  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
 //  subcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_kbd_map);
@@ -4873,16 +5113,18 @@ void apple2e_state::apple2ep(machine_config &config)
 {
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 }
 
 void apple2e_state::apple2c(machine_config &config)
 {
 	apple2ee(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	// IIc and friends have no cassette port
 	config.device_remove(A2_CASSETTE_TAG);
@@ -5097,6 +5339,9 @@ void apple2e_state::laser128(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
 	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
@@ -5109,11 +5354,49 @@ void apple2e_state::laser128(machine_config &config)
 	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
+}
+
+void apple2e_state::laser128o(machine_config &config)
+{
+	apple2c(config);
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
+
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+
+	config.device_remove("sl4");
+	config.device_remove("sl6");
+
+	A2BUS_LASER128_ORIG(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128_ORIG(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_LASER128_ORIG(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
+	// original Laser 128 doesn't have the Slinky memory expansion
+	m_ram->set_default_size("128K").set_extra_options("128K");
 }
 
 void apple2e_state::laser128ex2(machine_config &config)
@@ -5121,6 +5404,9 @@ void apple2e_state::laser128ex2(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
 	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
@@ -5137,7 +5423,89 @@ void apple2e_state::laser128ex2(machine_config &config)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
+}
+
+void apple2e_state::ace500(machine_config &config)
+{
+	apple2ee(config);
+		subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tt));
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
+	MOS6551(config, m_acia1, 0);
+	m_acia1->set_xtal(1.8432_MHz_XTAL);
+	m_acia1->txd_handler().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
+
+	rs232_port_device &modem(RS232_PORT(config, MODEM_PORT_TAG, default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
+	modem.dcd_handler().set(m_acia1, FUNC(mos6551_device::write_dcd));
+	modem.dsr_handler().set(m_acia1, FUNC(mos6551_device::write_dsr));
+	modem.cts_handler().set(m_acia1, FUNC(mos6551_device::write_cts));
+
+	config.device_remove(A2_CASSETTE_TAG);
+	config.device_remove("sl1");
+	config.device_remove("sl2");
+	config.device_remove("sl3");
+	config.device_remove("sl4");
+	config.device_remove("sl5");
+	config.device_remove("sl6");
+	config.device_remove("sl7");
+	config.device_remove("aux");
+
+	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+
+	A2EAUX_FRANKLIN384(config, "aux", A2BUS_7M_CLOCK).set_onboard(m_a2eauxslot);
+
+	m_ram->set_default_size("128K");
+}
+
+void apple2e_state::ace2200(machine_config &config)
+{
+	apple2e(config);
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace2200_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tt));
+
+	// The Ace 2000 series has 3 physical slots, 2, 4/7, and 5.
+	// 4/7 can be slot 4 or 7 via a jumper; we fix it to slot 7 here
+	// because that's most useful (for e.g. cffa202).
+	config.device_remove("sl1");
+	config.device_remove("sl3");
+	config.device_remove("sl4");
+	config.device_remove("sl5");
+	config.device_remove("sl6");
+
+	A2BUS_ACE2X00_SLOT1(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, "mockingboard");
+	A2BUS_ACE2X00_SLOT6(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+
+	config.device_remove("aux");
+	A2EAUX_FRANKLIN512(config, "aux", A2BUS_7M_CLOCK).set_onboard(m_a2eauxslot);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
+	m_ram->set_default_size("128K");
 }
 
 void apple2e_state::cec(machine_config &config)
@@ -5149,7 +5517,7 @@ void apple2e_state::cec(machine_config &config)
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	SOFTWARE_LIST(config, "flop525_cec").set_original("cecflop");
+	SOFTWARE_LIST(config, "flop_cec").set_original("cecflop");
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	config.device_remove("aux");
@@ -5367,11 +5735,45 @@ ROM_END
 
 ROM_START(laser128)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
+	ROM_CONTINUE(0x0000, 0x0800)    // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000)    // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("laser128.256", 0x0000, 0x8000, CRC(39e59ed3) SHA1(cbd2f45c923725bfd57f8548e65cc80b13bc18da))
+	ROM_SYSTEM_BIOS(0, "871222", "v4.3")
+	ROMX_LOAD( "laser 128 v4.3 871222.bin", 0x000000, 0x008000, CRC(e091af13) SHA1(3232f7036a68b996fd4126d5e19e855c4d5c64df), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "870917", "v4.2")
+	ROMX_LOAD( "laser 128 v4.2 870917.bin", 0x000000, 0x008000, CRC(39e59ed3) SHA1(cbd2f45c923725bfd57f8548e65cc80b13bc18da), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "870724", "v4.1")
+	ROMX_LOAD( "laser 128 v4.1 870724.bin", 0x000000, 0x008000, CRC(ce087911) SHA1(f6dba711f0d727f1d13b0256f10ba62bde6d7f5b), ROM_BIOS(2) )
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+ROM_END
+
+ROM_START(laser128o)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_SYSTEM_BIOS(0, "871212", "v3.3")
+	ROMX_LOAD( "laser 128 v3.3 871212.bin", 0x000000, 0x008000, CRC(3f5deffe) SHA1(4e7195b941c51ba83d5ef16e1f78e3f62bccd8cd), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "870320", "v3.0")
+	ROMX_LOAD( "laser 128 v3.0 870320.bin", 0x000000, 0x008000, CRC(145d39ff) SHA1(087e992548c2e9849d4262a0eb505548f846c7f5), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "870203", "v2.9")
+	ROMX_LOAD( "laser 128 v2.9 870203.bin", 0x000000, 0x008000, CRC(7e12fe93) SHA1(d7be7ba05725111354e4bdbaaef620a2a8ea65f7), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(3, "860915", "860915")
+	ROMX_LOAD( "laser 128 860915.bin", 0x000000, 0x008000, CRC(8d1a181d) SHA1(8fae95776c3d8a581c621cd258e118b8dfdb0cfd), ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS(4, "860801", "860801")
+	ROMX_LOAD( "laser 128 860801.bin", 0x000000, 0x008000, CRC(a88c2fcf) SHA1(ec163bb6e7e07cb256e0ed0f8d148cf85313e9f9), ROM_BIOS(4) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
@@ -5379,8 +5781,9 @@ ROM_END
 
 ROM_START(las128ex)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(b67c8ba1) SHA1(8bd5f82a501b1cf9d988c7207da81e514ca254b0))
@@ -5391,8 +5794,9 @@ ROM_END
 
 ROM_START(las128e2)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
@@ -5506,7 +5910,7 @@ ROM_START(cecm)
 
 	ROM_REGION(0x800,"keyboard",0)
 	ROM_LOAD( "u26.9433c-0201.rcl-zh-16.bin", 0x000000, 0x000800, CRC(f3190603) SHA1(7efdf6f4ee0ed01ff06341c601496a43d06afd6b) )
-	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x001000, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
+	// ROM_LOAD( "u10_2732_0081.bin", 0x000000, 0x00800, CRC(505eed67) SHA1(4acbee7c957528d1f9fbfd54464f85fb493175d7) )
 ROM_END
 
 ROM_START(cec2000)
@@ -5555,6 +5959,37 @@ ROM_START(zijini)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
 
+ROM_START(ace2200)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("franklin_ace2000_videorom.bin", 0x1000, 0x1000, CRC(545bdeea) SHA1(26ebc4b0d3080311f550090bc1b29807cb22d083))
+	ROM_CONTINUE(0x0000, 0x1000)
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("franklin_ace2000_rom_u2_p2_rev6.bin", 0x000000, 0x002000, CRC(1ab6e4d3) SHA1(5bdb10089fbdadaee9772afa1f7439a51289636b))
+	ROM_LOAD("franklin_ace2000_rom_u3_p1_rev6.bin", 0x002000, 0x002000, CRC(197f4936) SHA1(ec9de6da0ca6b6fd97fbef34eec64bf5c3c1b6c5))
+	ROM_LOAD("franklin_ace2000_rom_u1_p3_rev6_franklinrom.bin", 0x004000, 0x002000, CRC(5cc150a7) SHA1(7ac8028bbf8cb7730f432e0bae32e364523555fb))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
+ROM_START(ace500)
+	ROM_REGION(0x2000,"gfx1",0)
+	// not sure if the 500 and 2000 have the same character set.  First 4K is normal charset, second 4K is MouseText
+	ROM_LOAD("franklin_ace2000_videorom.bin", 0x1000, 0x1000, CRC(545bdeea) SHA1(26ebc4b0d3080311f550090bc1b29807cb22d083))
+	ROM_CONTINUE(0x0000, 0x1000)
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("franklin500-rom.bin", 0x004000, 0x004000, CRC(376c9104) SHA1(7f82706adc0bfb5f60c207c81271eb0ba8510a11))
+	ROM_CONTINUE(0x0000, 0x4000)
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
+} // anonymous namespace
+
+
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,  apple2euk, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
@@ -5565,10 +6000,11 @@ COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal, apple2euk, apple2e_state, 
 COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal, apple2efr, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,    apple2ep,  apple2e_state, empty_init, "Apple Computer",   "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c" , MACHINE_SUPPORTS_SAVE )
-COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, init_spect, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, empty_init, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
 COMP( 1986, tk3000,     apple2c, 0,      tk3000,      apple2e,   apple2e_state, empty_init, "Microdigital",     "TK3000//e" , MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8c,     apple2e, 0,      apple2e,     apple2e,   apple2e_state, empty_init, "Pravetz",          "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, empty_init, "Video Technology", "Laser 128 (version 4.2)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128o,  apple2c, 0,      laser128o,   laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128ex,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128e2,   apple2c, 0,      laser128ex2, laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
@@ -5581,3 +6017,5 @@ COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, 
 COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ace2200,    apple2e, 0,      ace2200,     ace500,    apple2e_state, init_ace2200,"Franklin Computer", "Franklin ACE 2200", MACHINE_SUPPORTS_SAVE)
+COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "Franklin ACE 500", MACHINE_SUPPORTS_SAVE)

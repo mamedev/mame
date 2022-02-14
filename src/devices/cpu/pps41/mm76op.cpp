@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// MM76 opcode handlers
+// MM76/shared opcode handlers
 
 #include "emu.h"
 #include "mm76.h"
@@ -9,12 +9,12 @@
 
 // internal helpers
 
-inline u8 mm76_device::ram_r()
+u8 mm76_device::ram_r()
 {
 	return m_data->read_byte(m_ram_addr & m_datamask) & 0xf;
 }
 
-inline void mm76_device::ram_w(u8 data)
+void mm76_device::ram_w(u8 data)
 {
 	m_data->write_byte(m_ram_addr & m_datamask, data & 0xf);
 }
@@ -31,11 +31,6 @@ void mm76_device::push_pc()
 	for (int i = m_stack_levels-1; i >= 1; i--)
 		m_stack[i] = m_stack[i-1];
 	m_stack[0] = m_pc;
-}
-
-void mm76_device::op_tr()
-{
-	// TR x: prefix for extended opcode
 }
 
 void mm76_device::op_illegal()
@@ -101,11 +96,12 @@ void mm76_device::op_sb()
 	// Bu falling or Bu == 3: SOS
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("SOS invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("SOS invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
 		{
-			m_d_output = (m_d_output | (1 << (m_ram_addr & 0xf))) & m_d_mask;
+			m_d_output = (m_d_output | (1 << bl)) & m_d_mask;
 			m_write_d(m_d_output);
 		}
 	}
@@ -129,11 +125,12 @@ void mm76_device::op_rb()
 	// Bu falling or Bu == 3: ROS
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("ROS invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("ROS invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
 		{
-			m_d_output = m_d_output & ~(1 << (m_ram_addr & 0xf));
+			m_d_output = m_d_output & ~(1 << bl);
 			m_write_d(m_d_output);
 		}
 	}
@@ -157,10 +154,11 @@ void mm76_device::op_skbf()
 	// Bu falling or Bu == 3: SKISL
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("SKISL invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("SKISL invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
-			m_skip = !BIT((m_d_output | m_read_d()) & m_d_mask, m_ram_addr & 0xf);
+			m_skip = !BIT((m_d_output | m_read_d()) & m_d_mask, bl);
 	}
 
 	// Bu != 3: SKBF
@@ -177,12 +175,14 @@ void mm76_device::op_xas()
 	u8 a = m_a;
 	m_a = m_s;
 	m_s = a;
+	m_write_sdo(BIT(m_s, 3));
 }
 
 void mm76_device::op_lsa()
 {
 	// LSA: load S from A
 	m_s = m_a;
+	m_write_sdo(BIT(m_s, 3));
 }
 
 
@@ -352,6 +352,11 @@ void mm76_device::op_tml()
 	m_pc = (~m_prev_op & 0xf) << 6 | (~m_op & 0x3f);
 }
 
+void mm76_device::op_tr()
+{
+	// TR x: prefix for extended opcode
+}
+
 void mm76_device::op_nop()
 {
 	// NOP: no operation
@@ -409,8 +414,8 @@ void mm76_device::op_oa()
 
 void mm76_device::op_ios()
 {
-	// IOS: start serial I/O
-	op_todo();
+	// IOS: start serial I/O (2 cycles per shift, 1st shift at IOS+3)
+	m_sclock_count = 9;
 }
 
 void mm76_device::op_i1()
@@ -427,26 +432,28 @@ void mm76_device::op_i2c()
 
 void mm76_device::op_int1h()
 {
-	// INT1H: skip on INT1
-	op_todo();
+	// INT1H: skip on INT1 high
+	m_skip = bool(m_int_line[1]);
 }
 
 void mm76_device::op_din1()
 {
 	// DIN1: test INT1 flip-flop
-	op_todo();
+	m_skip = !m_int_ff[1];
+	m_int_ff[1] = 1;
 }
 
 void mm76_device::op_int0l()
 {
-	// INT1H: skip on INT0
-	op_todo();
+	// INT0L: skip on INT0 low
+	m_skip = !m_int_line[0];
 }
 
 void mm76_device::op_din0()
 {
 	// DIN0: test INT0 flip-flop
-	op_todo();
+	m_skip = !m_int_ff[0];
+	m_int_ff[0] = 1;
 }
 
 void mm76_device::op_seg1()

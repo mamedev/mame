@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Bryan McPhail, Stephane Humbert, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     SNK/Alpha 68000 I board based games
 
@@ -8,10 +8,11 @@
 
     TODO:
     - Both POST screens are X offset by a large margin,
-      i.e. Paddle Mania draws a middle line there, which isn't shown on real HW.
-    - Paddle Mania: ranking screen is unreadable, maybe
+      i.e. paddlema draws a middle line there, which isn't shown on real HW reference instead.
+    - paddlema: ranking screen is unreadable on 9th/10th positions during attract,
+      maybe the underlying background is supposed to be disabled somehow?
 
-***************************************************************************
+===================================================================================================
 
 The Next Space:
  Mainboard A8004-1
@@ -25,7 +26,7 @@ The Next Space:
  Many PCBs feature a A8004-2 daughtercard with 4 smaller mask ROMs, labeled
   NS 5, NS 6, NS 7 & NS 8 instead of the single larger mask ROM
 
-***************************************************************************
+===================================================================================================
 
 Paddle Mania
  Mainboard 68K-96-I
@@ -35,7 +36,7 @@ Paddle Mania
   24MHz OSC
   8 switch Dipswitch x 2
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/alpha68k.h"
@@ -152,8 +153,8 @@ void paddlemania_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xe000, 0xe000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
-	map(0xe800, 0xe800).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0xe800, 0xe800).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xfc00, 0xfc00).ram(); // unknown port
 }
@@ -168,8 +169,8 @@ void thenextspace_state::sound_map(address_map &map)
 void thenextspace_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x3b, 0x3b).nopr(); // unknown read port
 	map(0x3d, 0x3d).nopr(); // unknown read port
 	map(0x7b, 0x7b).nopr(); // unknown read port

@@ -23,6 +23,8 @@
 #include <cctype>
 
 #include "imgtool.h"
+#include "filter.h"
+
 #include "formats/imageutl.h"
 
 

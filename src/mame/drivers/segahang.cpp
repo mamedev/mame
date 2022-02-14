@@ -22,9 +22,14 @@
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+
 #include "speaker.h"
+
+#define LOG_MCU (1 << 1)
+//#define VERBOSE (LOG_MCU)
+#include "logmacro.h"
 
 
 
@@ -241,19 +246,50 @@ uint8_t segahang_state::sound_data_r()
 
 
 //**************************************************************************
-//  I8751-RELATED VBLANK INTERRUPT HANDLERS
+//  I8751 PROTECTION MCU
 //**************************************************************************
 
-//-------------------------------------------------
-//  i8751_main_cpu_vblank - if we have a fake
-//  handler, we hook this to execute it
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
+uint8_t segahang_state::i8751_r(offs_t offset)
 {
-	// if we have a fake 8751 handler, call it on VBLANK
-	if (!m_i8751_vblank_hook.isnull())
-		m_i8751_vblank_hook();
+	offs_t addr = (m_i8751_addr << 16) | (offset ^ 1);
+	uint8 data = m_maincpu->space(AS_PROGRAM).read_byte(addr);
+
+	LOGMASKED(LOG_MCU, "i8751_r: %06x = %02x\n", addr, data);
+
+	return data;
+}
+
+void segahang_state::i8751_w(offs_t offset, uint8_t data)
+{
+	offs_t addr = (m_i8751_addr << 16) | (offset ^ 1);
+
+	// hack, either the cpu is too fast or the mcu too slow or there
+	// is some kind of synchronization missing. either way, the mcu
+	// clears this value after the cpu sets it.
+	if (addr == 0x40385)
+		return;
+
+	m_maincpu->space(AS_PROGRAM).write_byte(addr, data);
+
+	LOGMASKED(LOG_MCU, "i8751_w: %06x = %02x\n", addr, data);
+}
+
+void segahang_state::i8751_p1_w(uint8_t data)
+{
+	// 7-------  halt? (not used by the mcu code)
+	// -6------  a20
+	// --5-----  a18
+	// ---4----  a17
+	// ----3---  a16
+	// -----210  68k ipl
+
+	m_i8751_addr = (BIT(data, 6) << 4) | ((data & 0x38) >> 3);
+	int irq = ~data & 0x07;
+
+	LOGMASKED(LOG_MCU, "i8751_p1_w: %d  %02x  %d\n", BIT(data, 7), m_i8751_addr, irq);
+
+	if (irq)
+		m_maincpu->set_input_line(irq, HOLD_LINE);
 }
 
 
@@ -271,7 +307,7 @@ void segahang_state::machine_reset()
 	// reset misc components
 	m_segaic16vid->tilemap_reset(*m_screen);
 
-	// queue up a timer to either boost interleave or disable the MCU
+	// queue up a timer to boost interleave
 	synchronize(TID_INIT_I8751);
 
 	// reset global state
@@ -283,15 +319,13 @@ void segahang_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
-		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
+		// crank the interleave
 		case TID_INIT_I8751:
-			if (!m_i8751_vblank_hook.isnull())
-				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != nullptr)
+			if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 
@@ -300,29 +334,6 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_i8255_1->write(param >> 8, param & 0xff);
 			break;
 	}
-}
-
-
-
-//**************************************************************************
-//  I8751 SIMULATIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sharrier_i8751_sim - simulate the I8751
-//  from Space Harrier
-//-------------------------------------------------
-
-void segahang_state::sharrier_i8751_sim()
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// disable timer-based protection
-	m_workram[0x090/2] = 1;
-
-	// read I/O ports
-	m_workram[0x492/2] = (m_adc_ports[0]->read() << 8) | m_adc_ports[1]->read();
 }
 
 
@@ -369,6 +380,8 @@ void segahang_state::sharrier_map(address_map &map)
 	map(0x140010, 0x140017).mirror(0xffc8).r(FUNC(segahang_state::sharrier_inputs_r)).umask16(0x00ff);
 	map(0x140020, 0x140027).mirror(0xffc8).rw(m_i8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x140031, 0x140031).mirror(0xffce).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
+	map(0x150000, 0x150001).mirror(0xfffe).nopw(); // mcu writes 0x1c here in its vblank irq
+	map(0x170000, 0x170001).mirror(0xfffe).nopr(); // mcu reads here (by accident?)
 	map(0xc68000, 0xc68fff).ram().share("segaic16road:roadram");
 }
 
@@ -378,7 +391,7 @@ void segahang_state::sharrier_map(address_map &map)
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-	// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
+// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
 void segahang_state::sub_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -446,6 +459,7 @@ void segahang_state::sound_portmap_2203x2(address_map &map)
 
 void segahang_state::mcu_io_map(address_map &map)
 {
+	map(0x0000, 0xffff).rw(FUNC(segahang_state::i8751_r), FUNC(segahang_state::i8751_w));
 }
 
 
@@ -466,7 +480,7 @@ static INPUT_PORTS_START( hangon_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINAGE")
-	SEGA_COINAGE_LOC(SWA)
+	SEGA_COINAGE_NO_FREE_LOC(SWA)
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
@@ -498,7 +512,7 @@ static INPUT_PORTS_START( sharrier_generic )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINAGE")
-	SEGA_COINAGE_LOC(SWA)
+	SEGA_COINAGE_NO_FREE_LOC(SWA)
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
@@ -564,6 +578,9 @@ static INPUT_PORTS_START( shangupb )
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Supercharger") PORT_CODE(KEYCODE_LSHIFT)
+
+	PORT_MODIFY("COINAGE")
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
@@ -646,6 +663,9 @@ static INPUT_PORTS_START( enduror )
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("COINAGE")
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
@@ -901,10 +921,11 @@ void segahang_state::sharrier(machine_config &config)
 	sharrier_base(config);
 	sound_board_2203(config);
 
-	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::i8751_main_cpu_vblank));
+	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, 8000000);
 	m_mcu->set_addrmap(AS_IO, &segahang_state::mcu_io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(segahang_state::i8751_p1_w));
 
 	m_screen->screen_vblank().set_inputline("mcu", INPUT_LINE_IRQ0);
 }
@@ -1387,6 +1408,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hang On Beta bootleg
 //  Has Beta 1987 copyright but is otherwise identical to the bootleg above
+//  Has a custom Philko chip marked "Philko PK8706"
 //
 ROM_START( shangonrb2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1513,7 +1535,7 @@ ROM_START( sharrier )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
-	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, CRC(203dffeb) SHA1(73801db79756b0ffdd54b298814e3eeb088fe8c2) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1593,8 +1615,8 @@ ROM_START( sharrier1 )
 	ROM_LOAD( "epr-7231.ic5", 0x00000, 0x8000, CRC(871c6b14) SHA1(6d04ddc32fdf1db409cb519890821bd10fc9e58b) )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
-	ROM_LOAD( "315-5163.ic32", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x10000, "mcu", 0 ) // handcrafted from decapped rev a mcu
+	ROM_LOAD( "315-5163.ic32", 0x00000, 0x1000, BAD_DUMP CRC(52b0c81a) SHA1(11a910949e61bb1376d15f538557b9ff210c8dc7) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -2216,6 +2238,7 @@ void segahang_state::init_generic()
 	// save states
 	save_item(NAME(m_adc_select));
 	save_item(NAME(m_shadow));
+	save_item(NAME(m_i8751_addr));
 }
 
 
@@ -2227,18 +2250,12 @@ void segahang_state::init_sharrier()
 {
 	init_generic();
 	m_sharrier_video = true;
-	m_i8751_vblank_hook = i8751_sim_delegate(&segahang_state::sharrier_i8751_sim, this);
-}
-
-void segahang_state::init_enduror()
-{
-	init_generic();
-	m_sharrier_video = true;
 }
 
 void segahang_state::init_endurobl()
 {
-	init_enduror();
+	init_sharrier();
+
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
 	memcpy(&m_decrypted_opcodes[0x00000/2], rom + 0x30000/2, 0x10000);
@@ -2247,7 +2264,7 @@ void segahang_state::init_endurobl()
 
 void segahang_state::init_endurob2()
 {
-	init_enduror();
+	init_sharrier();
 
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
@@ -2274,13 +2291,12 @@ GAME( 1987, shangonrb2, shangon,  shangupb, shangupb,  segahang_state, init_gene
 GAME( 1985, sharrier,   0,        sharrier, sharrier,  segahang_state, init_sharrier, ROT0,  "Sega",           "Space Harrier (Rev A, 8751 315-5163A)",                               0 )
 GAME( 1985, sharrier1,  sharrier, sharrier, sharrier,  segahang_state, init_sharrier, ROT0,  "Sega",           "Space Harrier (8751 315-5163)",                                       0 )
 
-GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, FD1089B 317-0013A)",                     0 )
-GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, mask ROM sprites, FD1089B 317-0013A)",   0 )
-GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2151, FD1089B 317-0013A)",                            0 )
-GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2203, FD1089B 317-0013A)",                            0 )
+GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state, init_sharrier, ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, FD1089B 317-0013A)",                     0 )
+GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state, init_sharrier, ROT0,  "Sega",           "Enduro Racer (Rev A, YM2151, mask ROM sprites, FD1089B 317-0013A)",   0 )
+GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_sharrier, ROT0,  "Sega",           "Enduro Racer (YM2151, FD1089B 317-0013A)",                            0 )
+GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_sharrier, ROT0,  "Sega",           "Enduro Racer (YM2203, FD1089B 317-0013A)",                            0 )
 GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0,  "bootleg",        "Enduro Racer (bootleg set 1)",                                        0 )
 GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0,  "bootleg",        "Enduro Racer (bootleg set 2)",                                        MACHINE_NOT_WORKING )
 
-
-GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)",      0 )
-GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)",             0 )
+GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_sharrier, ROT0,  "bootleg",        "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)",      0 )
+GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_sharrier, ROT0,  "bootleg",        "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)",             0 )

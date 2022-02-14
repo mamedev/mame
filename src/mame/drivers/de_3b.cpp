@@ -1,10 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/*
-    DataEast/Sega Version 3b
-*/
+/********************************************************************************************************************
+PINBALL
+Data East System 3b
 
+Here are the key codes to enable play:
 
+Game                                   NUM    Start game                 End ball
+---------------------------------------------------------------------------------------------
+Maverick the Movie                    5031
+Baywatch                              5033
+Mary Shelley's Frankenstein           5036
+Batman Forever                        5038
+Derby Daze (not emulated)             5039
+Cut the Cheese (redemption)           5048
+Roach Racers (not emulated)           5054
+
+Status:
+
+ToDo:
+
+*********************************************************************************************************************/
 #include "emu.h"
 #include "machine/decopincpu.h"
 #include "video/decodmd3.h"
@@ -16,16 +32,14 @@ extern const char layout_pinball[];
 class de_3b_state : public genpin_class
 {
 public:
-	de_3b_state(const machine_config &mconfig, device_type type, const char *tag) :
-		genpin_class(mconfig, type, tag),
-		m_decobsmt(*this, "decobsmt"),
-		m_dmdtype3(*this, "decodmd")
+	de_3b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: genpin_class(mconfig, type, tag)
+		, m_decobsmt(*this, "decobsmt")
+		, m_dmdtype3(*this, "decodmd")
 	{ }
 
 	void detest(machine_config &config);
 	void de_3b(machine_config &config);
-
-	void init_de_3b();
 
 private:
 	// devices
@@ -50,8 +64,8 @@ private:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
-	uint8_t m_kbdrow;
-	uint8_t m_sound_data;
+	uint8_t m_row = 0U;
+	uint8_t m_sound_data = 0U;
 };
 
 
@@ -61,66 +75,66 @@ static INPUT_PORTS_START( de_3b )
 
 	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD )
 
 	PORT_START("INP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K)
 
 	PORT_START("INP4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA)
 
 	PORT_START("INP8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("INP10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN)
 
 	PORT_START("INP20")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("INP40")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INP80")
@@ -130,7 +144,7 @@ INPUT_PORTS_END
 uint8_t de_3b_state::switch_r()
 {
 	char kbdrow[8];
-	sprintf(kbdrow,"INP%X",m_kbdrow);
+	sprintf(kbdrow,"INP%X",m_row);
 	return ~ioport(kbdrow)->read();
 }
 
@@ -143,7 +157,7 @@ void de_3b_state::switch_w(uint8_t data)
 		if(data & (1<<x))
 			break;
 	}
-	m_kbdrow = data & (1<<x);
+	m_row = data & (1<<x);
 }
 
 void de_3b_state::sound_w(uint8_t data)
@@ -229,10 +243,6 @@ void de_3b_state::lamps_w(offs_t offset, uint8_t data)
 }
 
 void de_3b_state::machine_reset()
-{
-}
-
-void de_3b_state::init_de_3b()
 {
 }
 
@@ -674,7 +684,7 @@ ROM_START(ctcheese)
 ROM_END
 
 /*-------------------------------------------------------------
-/ Roach Racers
+/ Roach Racers / Derby Daze
 /------------------------------------------------------------*/
 
 
@@ -691,34 +701,34 @@ ROM_START(detest)
 ROM_END
 
 
-GAME(1995,  batmanf,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf3, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf2, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf1, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_uk,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_cn,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_no,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sv,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_at,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_ch,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_de,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_be,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_fr,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_nl,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_it,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sp,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_jp,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_time, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  baywatch, 0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d300, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_e400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_f201, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (2.01 French)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  frankst,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  frankstg, frankst, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_402,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_401,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_400,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_100,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  detest,   0,       detest, de_3b, de_3b_state, init_de_3b, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  ctcheese, 0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf,  0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf3, batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf2, batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf1, batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_uk,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_cn,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_no,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_sv,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_at,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_ch,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_de,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_be,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_fr,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_nl,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_it,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_sp,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_jp,   batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_time, batmanf, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  baywatch, 0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_d300, baywatch,de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_d400, baywatch,de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_e400, baywatch,de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_f201, baywatch,de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Baywatch (2.01 French)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  frankst,  0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  frankstg, frankst, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_402,  0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_401,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_400,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_100,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998,  detest,   0,       detest, de_3b, de_3b_state, empty_init, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  ctcheese, 0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)

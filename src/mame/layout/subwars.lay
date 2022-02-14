@@ -88,8 +88,8 @@ license:CC0
 		</repeat>
 		<repeat count="3">
 			<param name="y" start="44" increment="12" />
-			<param name="t" start="0" increment="1" />
-			<element ref="text_w~t~"><bounds x="75.7" y="~y~" width="12" height="3.4" /></element>
+			<param name="i" start="0" increment="1" />
+			<element ref="text_w~i~"><bounds x="75.7" y="~y~" width="12" height="3.4" /></element>
 		</repeat>
 
 		<element ref="gray"><bounds x="23.4" y="120" width="116.6" height="13.4" /></element>

@@ -25,7 +25,7 @@
 #include "bus/rs232/terminal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -99,7 +99,7 @@ private:
 	int m_signal_count;
 	uint8_t m_nmi_enabled;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -153,7 +153,7 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -467,7 +467,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
 				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)
@@ -597,7 +597,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 void pcjr_state::ibmpcjr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4900000);
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));

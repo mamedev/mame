@@ -9,6 +9,7 @@
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
@@ -105,7 +106,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t fc_r();
+	static void floppy_formats(format_registration &fr);
+
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
 	uint8_t dart_r(offs_t offset);
@@ -131,6 +133,7 @@ public:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
+	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 
@@ -147,12 +150,12 @@ public:
 	int m_dmadis;
 	int m_sysscc;
 	int m_sysfs;
-	uint8_t m_cause;
 	int m_partst;               // parity test
 
 	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
+	
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected
@@ -161,8 +164,8 @@ public:
 	int m_btce;                 // V.24 channel B external clock enable
 	bool m_sccrq_a;
 	bool m_sccrq_b;
-	int m_dart_irq;
 	int m_scc_irq;
+	int m_dart_irq;
 };
 
 

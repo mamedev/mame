@@ -133,11 +133,27 @@ public:
 	tx0_8kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
+	tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void execute_instruction_8kw();
+	virtual void execute_instruction_8kw();
+};
+
+
+class tx0_8kwo_device : public tx0_8kw_device
+{
+public:
+	// construction/destruction
+	tx0_8kwo_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	virtual void execute_instruction_8kw() override;
 };
 
 
@@ -156,7 +172,8 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device)
-DECLARE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device)
+DECLARE_DEVICE_TYPE(TX0_64KW,    tx0_64kw_device)
+DECLARE_DEVICE_TYPE(TX0_8KW_OLD, tx0_8kwo_device)
+DECLARE_DEVICE_TYPE(TX0_8KW,     tx0_8kw_device)
 
 #endif // MAME_CPU_TX0_TX0_H

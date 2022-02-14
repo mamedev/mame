@@ -61,10 +61,10 @@ private:
 	void babbage_io(address_map &map);
 	void babbage_map(address_map &map);
 
-	uint8_t m_seg;
-	uint8_t m_key;
-	uint8_t m_prev_key;
-	bool m_step;
+	uint8_t m_seg = 0U;
+	uint8_t m_key = 0U;
+	uint8_t m_prev_key = 0U;
+	bool m_step = 0;
 
 	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 2> m_pio;

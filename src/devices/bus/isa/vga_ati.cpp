@@ -82,7 +82,9 @@ void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(ati_vga_device::screen_update));
 
-	ATI_VGA(config, m_vga, 0).set_screen("screen");
+	ATI_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x100000);
 }
 
 void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
@@ -91,7 +93,9 @@ void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach32_device::screen_update));
 
-	ATIMACH32(config, m_vga, 0).set_screen("screen");
+	ATIMACH32(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x400000);
 }
 
 void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
@@ -100,7 +104,9 @@ void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach64_device::screen_update));
 
-	ATIMACH64(config, m_vga, 0).set_screen("screen");
+	ATIMACH64(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x400000);
 }
 
 

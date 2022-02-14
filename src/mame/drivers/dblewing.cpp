@@ -76,7 +76,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "emupal.h"

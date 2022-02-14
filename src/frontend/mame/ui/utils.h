@@ -12,14 +12,16 @@
 
 #pragma once
 
+#include "softlist.h"
+#include "unicode.h"
+
 #include <algorithm>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "unicode.h"
 
 
 class mame_ui_manager;
@@ -30,16 +32,32 @@ class render_container;
 
 struct ui_system_info
 {
+	ui_system_info(ui_system_info const &) = default;
+	ui_system_info(ui_system_info &&) = default;
+	ui_system_info &operator=(ui_system_info const &) = default;
+	ui_system_info &operator=(ui_system_info &&) = default;
+
 	ui_system_info() { }
 	ui_system_info(game_driver const &d, int i, bool a) : driver(&d), index(i), available(a) { }
 
 	game_driver const *driver = nullptr;
 	int index;
+	bool is_clone = false;
 	bool available = false;
+
+	std::string description;
+	std::string parent;
+
+	std::wstring reading_description;
+	std::wstring reading_parent;
 
 	std::u32string ucs_shortname;
 	std::u32string ucs_description;
+	std::u32string ucs_reading_description;
 	std::u32string ucs_manufacturer_description;
+	std::u32string ucs_manufacturer_reading_description;
+	std::u32string ucs_default_description;
+	std::u32string ucs_manufacturer_default_description;
 };
 
 struct ui_software_info
@@ -48,7 +66,7 @@ struct ui_software_info
 
 	// info for software list item
 	ui_software_info(
-			software_info const &info,
+			software_info const &sw,
 			software_part const &p,
 			game_driver const &d,
 			std::string const &li,
@@ -59,19 +77,19 @@ struct ui_software_info
 	ui_software_info(game_driver const &d);
 
 	// copyable/movable
-	ui_software_info(ui_software_info const &) = default;
-	ui_software_info(ui_software_info &&) = default;
-	ui_software_info &operator=(ui_software_info const &) = default;
+	ui_software_info(ui_software_info const &that);
+	ui_software_info(ui_software_info &&that) = default;
+	ui_software_info &operator=(ui_software_info const &that);
 	ui_software_info &operator=(ui_software_info &&) = default;
 
 	bool operator==(ui_software_info const &r) const
 	{
-		// compares all fields except available
-		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
-			   && year == r.year && publisher == r.publisher && supported == r.supported
-			   && part == r.part && driver == r.driver && listname == r.listname
-			   && interface == r.interface && instance == r.instance && startempty == r.startempty
-			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
+		// compares all fields except info (fragile), alttitles (included in info) and available (environmental)
+		return (shortname == r.shortname) && (longname == r.longname) && (parentname == r.parentname)
+			   && (year == r.year) && (publisher == r.publisher) && (supported == r.supported)
+			   && (part == r.part) && (driver == r.driver) && (listname == r.listname)
+			   && (interface == r.interface) && (instance == r.instance) && (startempty == r.startempty)
+			   && (parentlongname == r.parentlongname) && (devicetype == r.devicetype);
 	}
 
 	std::string shortname;
@@ -79,7 +97,7 @@ struct ui_software_info
 	std::string parentname;
 	std::string year;
 	std::string publisher;
-	uint8_t supported = 0;
+	software_support supported = software_support::SUPPORTED;
 	std::string part;
 	game_driver const *driver = nullptr;
 	std::string listname;
@@ -87,10 +105,15 @@ struct ui_software_info
 	std::string instance;
 	uint8_t startempty = 0;
 	std::string parentlongname;
-	std::string usage;
+	std::string infotext;
 	std::string devicetype;
+	std::vector<software_info_item> info;
+	std::vector<std::reference_wrapper<std::string const> > alttitles;
 	bool available = false;
 };
+
+
+void swap(ui_system_info &a, ui_system_info &b) noexcept;
 
 
 namespace ui {
@@ -121,7 +144,7 @@ public:
 	virtual bool adjust_left() = 0;
 	virtual bool adjust_right() = 0;
 
-	virtual void save_ini(emu_file &file, unsigned indent) const = 0;
+	virtual void save_ini(util::core_file &file, unsigned indent) const = 0;
 
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
@@ -175,7 +198,7 @@ public:
 	virtual std::string adorned_display_name(type n) const = 0;
 
 	static ptr create(type n, machine_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file, machine_filter_data const &data) { return create(file, data, 0); }
+	static ptr create(util::core_file &file, machine_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -185,8 +208,8 @@ public:
 protected:
 	machine_filter();
 
-	static ptr create(type n, machine_filter_data const &data, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, machine_filter_data const &data, unsigned indent);
+	static ptr create(type n, machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent);
+	static ptr create(util::core_file &file, machine_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
@@ -205,6 +228,10 @@ public:
 		CLONES,
 		YEAR,
 		PUBLISHERS,
+		DEVELOPERS,
+		DISTRIBUTORS,
+		AUTHORS,
+		PROGRAMMERS,
 		SUPPORTED,
 		PARTIAL_SUPPORTED,
 		UNSUPPORTED,
@@ -222,7 +249,7 @@ public:
 	virtual std::string adorned_display_name(type n) const = 0;
 
 	static ptr create(type n, software_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file, software_filter_data const &data) { return create(file, data, 0); }
+	static ptr create(util::core_file &file, software_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -232,8 +259,8 @@ public:
 protected:
 	software_filter();
 
-	static ptr create(type n, software_filter_data const &data, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, software_filter_data const &data, unsigned indent);
+	static ptr create(type n, software_filter_data const &data, char const *value, util::core_file *file, unsigned indent);
+	static ptr create(util::core_file &file, software_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
@@ -267,7 +294,7 @@ public:
 		return (m_filters.end() != it) ? it->second.get() : nullptr;
 	}
 	std::string get_config_string() const;
-	bool load_ini(emu_file &file);
+	bool load_ini(util::core_file &file);
 
 private:
 	using filter_map = std::map<machine_filter::type, machine_filter::ptr>;
@@ -286,6 +313,10 @@ public:
 	std::vector<std::string> const &regions()           const { return m_regions; }
 	std::vector<std::string> const &publishers()        const { return m_publishers; }
 	std::vector<std::string> const &years()             const { return m_years; }
+	std::vector<std::string> const &developers()        const { return m_developers; }
+	std::vector<std::string> const &distributors()      const { return m_distributors; }
+	std::vector<std::string> const &authors()           const { return m_authors; }
+	std::vector<std::string> const &programmers()       const { return m_programmers; }
 	std::vector<std::string> const &device_types()      const { return m_device_types; }
 	std::vector<std::string> const &list_names()        const { return m_list_names; }
 	std::vector<std::string> const &list_descriptions() const { return m_list_descriptions; }
@@ -294,6 +325,7 @@ public:
 	void add_region(std::string const &longname);
 	void add_publisher(std::string const &publisher);
 	void add_year(std::string const &year);
+	void add_info(software_info_item const &info);
 	void add_device_type(std::string const &device_type);
 	void add_list(std::string const &name, std::string const &description);
 	void finalise();
@@ -306,6 +338,10 @@ private:
 	std::vector<std::string>    m_regions;
 	std::vector<std::string>    m_publishers;
 	std::vector<std::string>    m_years;
+	std::vector<std::string>    m_developers;
+	std::vector<std::string>    m_distributors;
+	std::vector<std::string>    m_authors;
+	std::vector<std::string>    m_programmers;
 	std::vector<std::string>    m_device_types;
 	std::vector<std::string>    m_list_names, m_list_descriptions;
 };
@@ -340,7 +376,9 @@ enum
 	HOVER_ARROW_DOWN,
 	HOVER_B_FAV,
 	HOVER_B_EXPORT,
+	HOVER_B_AUDIT,
 	HOVER_B_DATS,
+	HOVER_BACKTRACK,
 	HOVER_RPANEL_ARROW,
 	HOVER_LPANEL_ARROW,
 	HOVER_FILTER_FIRST,

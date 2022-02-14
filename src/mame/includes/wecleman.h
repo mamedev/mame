@@ -8,6 +8,7 @@
 #include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
+#include "machine/k007452.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -31,6 +32,7 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_k051316(*this, "k051316_%u", 1)
 		, m_k007232(*this, "k007232_%u", 1)
+		, m_k007452(*this, "k007452")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
@@ -65,7 +67,6 @@ protected:
 
 	required_region_ptr<uint8_t> m_sprite_region;
 
-	int m_multiply_reg[2];
 	int m_spr_color_offs;
 	int m_prot_state;
 	int m_selected_ip;
@@ -76,14 +77,10 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_txt_tilemap;
-	int *m_spr_idx_list;
-	int *m_spr_pri_list;
-	int *m_t32x32pm;
 	int m_gameid;
 	int m_spr_offsx;
 	int m_spr_offsy;
 	int m_spr_count;
-	uint16_t *m_rgb_half;
 	int m_cloud_blend;
 	int m_cloud_ds;
 	int m_cloud_visible;
@@ -97,8 +94,6 @@ protected:
 	void selected_ip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t selected_ip_r();
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t multiply_r();
-	void multiply_w(offs_t offset, uint8_t data);
 
 	void wecleman_txtram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wecleman_pageram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -125,6 +120,7 @@ protected:
 	required_device<cpu_device> m_subcpu;
 	optional_device_array<k051316_device, 2> m_k051316;
 	optional_device_array<k007232_device, 3> m_k007232;
+	optional_device<k007452_device> m_k007452;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -135,6 +131,7 @@ protected:
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
 
+	static constexpr int NUM_SPRITES = 256;
 	struct sprite_t
 	{
 		sprite_t() { }
@@ -155,8 +152,10 @@ protected:
 	template<class BitmapClass> void do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
 	template<class BitmapClass> void sprite_draw(BitmapClass &bitmap, const rectangle &cliprect);
 
-	std::unique_ptr<sprite_t []> m_sprite_list;
-	sprite_t **m_spr_ptr_list;
+	sprite_t *m_spr_ptr_list[NUM_SPRITES];
+	int m_spr_idx_list[NUM_SPRITES];
+	int m_spr_pri_list[NUM_SPRITES];
+	sprite_t m_sprite_list[NUM_SPRITES];
 };
 
 class hotchase_state : public wecleman_state

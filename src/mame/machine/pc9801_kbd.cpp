@@ -265,7 +265,7 @@ void pc9801_kbd_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id == RX_TIMER)
 	{

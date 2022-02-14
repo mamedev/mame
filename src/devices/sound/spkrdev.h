@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nathan Woods, Anders Hallström
 /**********************************************************************
 
-    speaker.h
     Sound driver to emulate a simple speaker,
     driven by one or more output bits
 
 **********************************************************************/
+
 #ifndef MAME_SOUND_SPKRDEV_H
 #define MAME_SOUND_SPKRDEV_H
 
@@ -44,7 +44,7 @@ private:
 	// internal state
 
 	// Updates the composed volume array according to time
-	void update_interm_samples(const attotime &time, int volume);
+	void update_interm_samples(const attotime &time, double volume);
 
 	// Updates the composed volume array and returns final filtered volume of next stream sample
 	double update_interm_samples_get_filtered_volume(double volume);

@@ -37,6 +37,7 @@ GD build date
 | | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)         | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
 |*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)         | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
 | | 2004     | Sega Golf Club Network Pro Tour 2005                 | Sega                     | GDROM  | GDX-0010   | ???          |
+|*| 2004     | Sega Golf Club Network Pro Tour 2005 (Rev B)         | Sega                     | GDROM  | GDX-0010B  | ???          |
 |*| 2004     | Sega Golf Club Network Pro Tour 2005 (Rev C)         | Sega                     | GDROM  | GDX-0010C  | ???          |
 |*| 20040909 | OutRun 2 Special Tours (Japan)                       | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
 |*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)                | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
@@ -660,9 +661,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
-	void chihiro_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string> &params);
+	void chihiro_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -777,7 +778,7 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
@@ -791,7 +792,7 @@ void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::stri
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -800,14 +801,14 @@ void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string>
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(int ref, const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 	if (params[0] == "jamdis")
-		jamtable_disasm_command(ref, params);
+		jamtable_disasm_command(params);
 	else
-		chihiro_help_command(ref, params);
+		chihiro_help_command(params);
 }
 
 void chihiro_state::hack_eeprom()
@@ -1838,7 +1839,7 @@ void chihiro_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1));
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
@@ -1911,12 +1912,12 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>("pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
@@ -2163,6 +2164,16 @@ ROM_START( wangmid )
 	// 01/10/12        NA
 	// ?? : ME163-5258Z01
 	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
+ROM_END
+
+ROM_START( scg05ntb )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0010b", 0, SHA1(8da05ff36679f45b2b43d9c5ca3177b8a9e76af5) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-unknown.pic", 0x000000, 0x004000, CRC(36858860) SHA1(b36a0c10b614fdeb7dcd94f4898efc24e5db896a) )
 ROM_END
 
 ROM_START( scg05nt )
@@ -2591,6 +2602,7 @@ ROM_END
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev A) (GDX-0009A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev B) (GDX-0009B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0010  Sega Golf Club Network Pro Tour 2005
+/* 0010B */ GAME( 2004, scg05ntb, scg05nt,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour 2005 (Rev B) (GDX-0010B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0010C */ GAME( 2004, scg05nt,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour 2005 (Rev C) (GDX-0010C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0011  */ GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0011A */ GAME( 2004, outr2stj, outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan, Rev A) (GDX-0011A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

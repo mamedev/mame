@@ -67,8 +67,7 @@ puzznici note
 #include "machine/mb8421.h"
 
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -1026,10 +1025,10 @@ static INPUT_PORTS_START( horshoes )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("AN0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plgirls )

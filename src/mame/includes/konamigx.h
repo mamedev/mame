@@ -78,6 +78,8 @@ public:
 	void K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void type3_bank_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -119,6 +121,8 @@ public:
 	K055673_CB_MEMBER(salmndr2_sprite_callback);
 	K055673_CB_MEMBER(le2_sprite_callback);
 
+	struct GX_OBJ { int order, offs, code, color; };
+
 	void common_init();
 	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
@@ -126,7 +130,7 @@ public:
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						struct GX_OBJ *objpool,
+						GX_OBJ *objpool,
 						int *objbuf,
 						int nobj
 						);
@@ -164,6 +168,7 @@ public:
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
 	int K055555GX_decode_vmixcolor(int layer, int *color);
+	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int *color);
 
 	void init_posthack();
 	void konamigx_6bpp(machine_config &config);
@@ -240,6 +245,7 @@ protected:
 	uint16_t m_prot_data[0x20];
 
 	uint16_t *m_gx_spriteram;
+	std::unique_ptr<uint16_t[]> m_gx_spriteram_alloc;
 
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB;
@@ -290,6 +296,8 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
+
+	std::unique_ptr<GX_OBJ[]> m_gx_objpool;
 
 	u8 m_type3_psac2_bank;
 	u8 m_type3_spriteram_bank;

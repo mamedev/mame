@@ -95,6 +95,7 @@ protected:
 	uint16_t dsp_dr_r();
 	void dsp_dr_w(uint16_t data);
 	uint16_t dsp_r(offs_t offset);
+	[[maybe_unused]] uint16_t fake_r(offs_t offset);
 	void dsp_w(offs_t offset, uint16_t data);
 	uint16_t drifto94_unknown_r();
 	uint16_t hypreact_input_r();

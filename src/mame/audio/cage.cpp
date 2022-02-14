@@ -200,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 	m_tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	m_cpu->set_input_line(TMS3203X_DINT, ASSERT_LINE);
+	m_cpu->set_input_line(TMS3203X_DINT0, ASSERT_LINE);
 	m_dma_enabled = 0;
 }
 

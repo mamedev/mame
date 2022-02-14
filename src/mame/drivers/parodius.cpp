@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/k053260.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -66,7 +66,7 @@ void parodius_state::sound_nmi_callback( int param )
 }
 #endif
 
-void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

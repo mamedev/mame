@@ -729,7 +729,7 @@ u16 taito_f3_state::lineram_r(offs_t offset)
 
 void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	#ifdef UNUSED_FUNCTION
+#if 0
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
 	values.  I'm not sure what the real machine would do with these values, and this
@@ -750,7 +750,7 @@ void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 			return;
 		}
 	}
-	#endif
+#endif
 
 	COMBINE_DATA(&m_line_ram[offset]);
 }
@@ -1685,9 +1685,9 @@ void taito_f3_state::get_spritealphaclip_info()
 		line_t->spri[y] = spri;
 		line_t->sprite_alpha[y] = sprite_alpha;
 		line_t->clip0_l[y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
-		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 47;
+		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
 		line_t->clip1_l[y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
-		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 47;
+		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
 		if (line_t->clip0_l[y] < 0) line_t->clip0_l[y] = 0;
 		if (line_t->clip0_r[y] < 0) line_t->clip0_r[y] = 0;
 		if (line_t->clip1_l[y] < 0) line_t->clip1_l[y] = 0;

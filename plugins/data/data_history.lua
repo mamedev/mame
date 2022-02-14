@@ -80,6 +80,8 @@ local function init()
 	if dbver then
 		db.exec("DELETE FROM \"" .. file .. "\"")
 		db.check("deleting history")
+		db.exec("DELETE FROM \"" .. file .. "_idx\"")
+		db.check("deleting index")
 		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
 		db.check("updating history version")
 	else
@@ -117,6 +119,7 @@ local function init()
 		end,
 		text = function(text, cdata)
 			if lasttag == "text" then
+				text = text:gsub("\r", "") -- strip crs
 				stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
 				db.check("inserting values")
 				stmt:bind_values(text)
@@ -166,7 +169,7 @@ function dat.check(set, softlist)
 		info = stmt:get_value(0)
 	end
 	stmt:finalize()
-	return info and _("History") or nil
+	return info and _p("plugin-data", "History") or nil
 end
 
 function dat.get()

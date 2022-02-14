@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    drivers/apexc.c : APEXC driver
+    drivers/apexc.cpp : APEXC driver
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #include "emu.h"
@@ -139,7 +139,7 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #32")             PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
-void apexc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void apexc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_POLL_INPUTS)
 	{
@@ -384,6 +384,8 @@ void apexc_state::apexc(machine_config &config)
 	APEXC_CYLINDER(config, m_cylinder);
 	APEXC_TAPE_PUNCHER(config, m_tape_puncher);
 	APEXC_TAPE_READER(config, m_tape_reader);
+
+	SOFTWARE_LIST(config, "cyl_list").set_original("apexc_cyl");
 }
 
 ROM_START(apexc)

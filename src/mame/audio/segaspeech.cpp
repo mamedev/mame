@@ -12,8 +12,7 @@
 #include "segaspeech.h"
 
 #include "sound/sp0250.h"
-#include "includes/segag80r.h"
-#include "includes/segag80v.h"
+
 #include "audio/nl_segaspeech.h"
 
 #define VERBOSE 0

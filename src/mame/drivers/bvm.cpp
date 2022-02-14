@@ -51,7 +51,6 @@ private:
 
 void bvm_state::mem_map(address_map &map)
 {
-	// internal ROM not used here?
 	map(0x00000, 0x0f67f).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x10000, 0x17fff).ram().share("nvram");
 	map(0x18000, 0x18007).rw("cxdio0", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
@@ -66,6 +65,7 @@ INPUT_PORTS_END
 void bvm_state::bvm(machine_config &config)
 {
 	HD6435368(config, m_maincpu, 20_MHz_XTAL);
+	m_maincpu->set_mode(3); // internal ROM not used here?
 	m_maincpu->set_addrmap(AS_PROGRAM, &bvm_state::mem_map);
 
 	CAT28F020(config, "flash");

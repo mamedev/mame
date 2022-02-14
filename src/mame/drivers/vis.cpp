@@ -2,13 +2,17 @@
 // copyright-holders:Carl
 
 #include "emu.h"
+#include "machine/at.h"
+
 #include "bus/isa/isa_cards.h"
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
-#include "machine/at.h"
-#include "sound/262intf.h"
+#include "machine/ds6417.h"
 #include "sound/dac.h"
+#include "sound/ymopl.h"
 #include "video/pc_vga.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -23,7 +27,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void dack16_w(int line, uint16_t data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
@@ -75,13 +79,13 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 {
 	m_sample[m_samples++] = data;
 	m_curcount++;
-	if(m_samples >= 2)
+	if((m_samples >= 2) || !(m_mode & 0x8))
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
-void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
-	if(m_samples < 2)
+	if(((m_samples < 2) && (m_mode & 8)) || !m_samples)
 		return;
 	switch(m_mode & 0x88)
 	{
@@ -110,7 +114,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 	}
 
-	if(m_sample_byte >= 4)
+	if(m_sample_byte >= (m_mode & 8 ? 4 : 2))
 	{
 		m_sample_byte = 0;
 		m_samples = 0;
@@ -200,9 +204,11 @@ void vis_audio_device::pcm_w(offs_t offset, uint8_t data)
 			return;
 		case 0x0c:
 			m_count = (m_count & 0xff00) | data;
+			m_curcount = 0;
 			break;
 		case 0x0e:
 			m_count = (m_count & 0xff) | (data << 8);
+			m_curcount = 0;
 			break;
 		case 0x0f:
 			//cdrom related?
@@ -239,6 +245,7 @@ protected:
 	virtual void recompute_params() override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -257,6 +264,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface(mconfig, *this)
 {
 	set_screen(*this, "screen");
+	set_vram_size(0x100000);
 }
 
 void vis_vga_device::device_add_mconfig(machine_config &config)
@@ -375,6 +383,54 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 }
 
+void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const uint32_t IV = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int curr_addr = 0;
+
+	for (int addr = vga.crtc.start_addr, line=0; line<(vga.crtc.vert_disp_end+1); line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		for(int yi = 0;yi < height; yi++)
+		{
+			uint8_t ua = 0, va = 0;
+			if((line + yi) < (vga.crtc.line_compare & 0x3ff))
+				curr_addr = addr;
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				curr_addr = 0;
+			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8,  pos+=8)
+			{
+				if(pos + 0x08 > 0x80000)
+					return;
+				for(int xi=0;xi<8;xi+=4)
+				{
+					if(!screen().visible_area().contains(col+xi, line + yi))
+						continue;
+					uint8_t y0 = vga.memory[pos + xi + 0], ub = vga.memory[pos + xi + 1];
+					uint8_t y1 = vga.memory[pos + xi + 2], vb = vga.memory[pos + xi + 3];
+					uint16_t u, v;
+					if(col)
+					{
+						u = (ua + ub) >> 1;
+						v = (va + vb) >> 1;
+					}
+					else
+					{
+						u = ub;
+						v = vb;
+					}
+					ua = ub; va = vb;
+					// this reads one byte per clock so it'll be one pixel for every 2 clocks
+					bitmap.pix(line + yi, col + xi + 0) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 1) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 2) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+					bitmap.pix(line + yi, col + xi + 3) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+				}
+			}
+		}
+	}
+}
+
 void vis_vga_device::device_start()
 {
 	set_isa_device();
@@ -418,7 +474,7 @@ uint32_t vis_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			popmessage("Border encoded 8-bit mode");
 			break;
 		case 0xc3:
-			popmessage("YUV 422 mode");
+			vga_vh_yuv422(bitmap, cliprect);
 			break;
 		case 0xc4:
 			vga_vh_yuv8(bitmap, cliprect);
@@ -551,7 +607,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 				case 0x01:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_disp_end = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
+					vga.crtc.horz_disp_end = (data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1)) | 1;
 					recompute_params();
 					return;
 				case 0x02:
@@ -651,7 +707,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total /= 2;
-							vga.crtc.horz_disp_end /= 2;
+							vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end / 2) | 1;
 							vga.crtc.horz_blank_end /= 2;
 							vga.crtc.horz_retrace_start /= 2;
 							vga.crtc.horz_retrace_end /= 2;
@@ -668,7 +724,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total *= 2;
-							vga.crtc.horz_disp_end *= 2;
+							vga.crtc.horz_disp_end  = (vga.crtc.horz_disp_end * 2) | 1;
 							vga.crtc.horz_blank_end *= 2;
 							vga.crtc.horz_retrace_start *= 2;
 							vga.crtc.horz_retrace_end *= 2;
@@ -701,6 +757,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pic1(*this, "mb:pic8259_master"),
 		m_pic2(*this, "mb:pic8259_slave"),
+		m_card(*this, "card"),
 		m_pad(*this, "PAD")
 		{ }
 
@@ -712,6 +769,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<ds6417_device> m_card;
 	required_ioport m_pad;
 
 	uint8_t sysctl_r();
@@ -719,7 +777,8 @@ private:
 	uint8_t unk_r(offs_t offset);
 	void unk_w(offs_t offset, uint8_t data);
 	uint8_t unk2_r();
-	uint8_t unk3_r();
+	uint8_t memcard_r(offs_t offset);
+	void memcard_w(offs_t offset, uint8_t data);
 	uint16_t pad_r(offs_t offset);
 	void pad_w(offs_t offset, uint16_t data);
 	uint8_t unk1_r(offs_t offset);
@@ -733,19 +792,23 @@ private:
 	uint8_t m_unkidx;
 	uint8_t m_unk[16];
 	uint8_t m_unk1[4];
+	uint8_t m_cardreg, m_cardval, m_cardcnt;
 	uint16_t m_padctl, m_padstat;
+	bool m_padsel;
 };
 
 void vis_state::machine_reset()
 {
 	m_sysctl = 0;
 	m_padctl = 0;
+	m_padsel = false;
 }
 
 INPUT_CHANGED_MEMBER(vis_state::update)
 {
 	m_pic1->ir3_w(ASSERT_LINE);
 	m_padstat = 0x80;
+	m_padsel = false;
 }
 
 //chipset registers?
@@ -769,10 +832,57 @@ uint8_t vis_state::unk2_r()
 	return 0x40;
 }
 
-//memory card reader?
-uint8_t vis_state::unk3_r()
+uint8_t vis_state::memcard_r(offs_t offset)
 {
-	return 0x00;
+	if(offset)
+	{
+		if(m_cardreg & 0x10)
+		{
+			if(m_cardcnt == 8)
+				return 0;
+			if(m_cardreg & 8)
+			{
+				m_card->clock_w(1);
+				m_card->clock_w(0);
+				m_cardval = (m_cardval >> 1) | (m_card->data_r() ? 0x80 : 0);
+			}
+			else
+			{
+				m_card->clock_w(0);
+				m_card->data_w(BIT(m_cardval, 0));
+				m_card->clock_w(1);
+				m_cardval >>= 1;
+			}
+			m_cardcnt++;
+			return 0x80;
+		}
+	}
+	else
+	{
+		m_cardcnt = 0;
+		return m_cardval;
+	}
+	return 0;
+}
+
+void vis_state::memcard_w(offs_t offset, uint8_t data)
+{
+	if(offset)
+	{
+		if(!(data & 0x10) && !(m_cardreg & 0x10))
+		{
+			m_card->data_w(BIT(data, 1));
+			m_card->clock_w(BIT(data, 0));
+			m_card->reset_w(!BIT(data, 2));
+		}
+		m_cardreg = data;
+		m_cardcnt = data & 8 ? 0 : 8;
+	}
+	else
+	{
+		m_cardcnt = 0;
+		m_cardval = data;
+	}
 }
 
 uint16_t vis_state::pad_r(offs_t offset)
@@ -781,12 +891,17 @@ uint16_t vis_state::pad_r(offs_t offset)
 	switch(offset)
 	{
 		case 0:
-			ret = m_pad->read();
-			if(m_padctl != 0x18)
-				ret |= 0x400;
+			if(!m_padsel)
+			{
+				ret = m_pad->read();
+				m_padstat = 0;
+				m_padsel = true;
+			}
 			else
-				m_padctl = 0;
-			m_padstat = 0;
+			{
+				ret = 0x400; // this is probably for the second controller
+				m_padsel = false;
+			}
 			m_pic1->ir3_w(CLEAR_LINE);
 			break;
 		case 1:
@@ -856,6 +971,7 @@ void vis_state::io_map(address_map &map)
 	map(0x0026, 0x0027).rw(FUNC(vis_state::unk_r), FUNC(vis_state::unk_w));
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0065).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x006a, 0x006a).r(FUNC(vis_state::unk2_r));
 	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
 	map(0x0092, 0x0092).rw(FUNC(vis_state::sysctl_r), FUNC(vis_state::sysctl_w));
@@ -864,7 +980,7 @@ void vis_state::io_map(address_map &map)
 	map(0x00e0, 0x00e1).noprw();
 	map(0x023c, 0x023f).rw(FUNC(vis_state::unk1_r), FUNC(vis_state::unk1_w));
 	map(0x0268, 0x026f).rw(FUNC(vis_state::pad_r), FUNC(vis_state::pad_w));
-	map(0x031a, 0x031a).r(FUNC(vis_state::unk3_r));
+	map(0x0318, 0x031a).rw(FUNC(vis_state::memcard_r), FUNC(vis_state::memcard_w)).umask16(0x00ff);
 }
 
 static void vis_cards(device_slot_interface &device)
@@ -880,18 +996,12 @@ static INPUT_PORTS_START(vis)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 INPUT_PORTS_END
 
 void vis_state::vis(machine_config &config)
@@ -917,6 +1027,10 @@ void vis_state::vis(machine_config &config)
 	ISA16_SLOT(config, "mcd",      0, "mb:isabus", pc_isa16_cards, "mcd",      true);
 	ISA16_SLOT(config, "visaudio", 0, "mb:isabus", vis_cards,      "visaudio", true);
 	ISA16_SLOT(config, "visvga",   0, "mb:isabus", vis_cards,      "visvga",   true);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("vis");
+
+	DS6417(config, m_card, 0);
 }
 
 ROM_START(vis)

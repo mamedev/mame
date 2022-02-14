@@ -19,7 +19,7 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"

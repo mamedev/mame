@@ -639,7 +639,7 @@ void ymz280b_device::device_reset()
 }
 
 
-void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id < 8)
 		update_irq_state_timer_common( id );

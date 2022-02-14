@@ -1,8 +1,8 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 ///
-/// \file pfunction_test.cpp
+/// \file test_pfunction.cpp
 ///
 /// tests for pfunction
 ///

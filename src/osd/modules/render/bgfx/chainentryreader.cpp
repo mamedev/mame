@@ -9,6 +9,7 @@
 #include <string>
 
 #include "emu.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include <modules/render/copyutil.h>
 

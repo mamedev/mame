@@ -8,9 +8,9 @@
 #include "isa.h"
 #include "bus/midi/midi.h"
 #include "bus/pc_joy/pc_joy.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/saa1099.h"
+#include "sound/ymopl.h"
 #include "diserial.h"
 
 //**************************************************************************
@@ -112,7 +112,7 @@ protected:
 	virtual void device_reset() override;
 	uint8_t dack_r(int line);
 	void dack_w(int line, uint8_t data);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void drq16_w(int state) { }
 	virtual void drq_w(int state) { }
 	virtual void irq_w(int state, int source) { }

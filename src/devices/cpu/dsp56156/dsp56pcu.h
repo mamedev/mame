@@ -121,8 +121,8 @@ void MA_bit_set(dsp56156_core* cpustate, uint8_t value);
 uint8_t UF_bit(const dsp56156_core* cpustate);
 uint8_t SE_bit(const dsp56156_core* cpustate);
 
-//void UF_bit_set(dsp56156_core* cpustate, uint8_t value) {};
-//void SE_bit_set(dsp56156_core* cpustate, uint8_t value) {};
+//void UF_bit_set(dsp56156_core* cpustate, uint8_t value) {}
+//void SE_bit_set(dsp56156_core* cpustate, uint8_t value) {}
 
 
 // HACK - Bootstrap modes

@@ -55,7 +55,7 @@ private:
 	bool m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	void blitter_timer_callback(void *ptr, s32 param);
+	void blitter_timer_callback(s32 param);
 
 	void vramflip();
 	void gfxdraw();

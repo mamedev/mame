@@ -11,6 +11,7 @@
 #pragma once
 
 #include "video/k007121.h"
+#include "machine/k007452.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -31,6 +32,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
+		m_k007452(*this, "k007452"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -61,6 +63,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121_1;
 	required_device<k007121_device> m_k007121_2;
+	required_device<k007452_device> m_k007452;
 	void contra_bankswitch_w(uint8_t data);
 	void contra_sh_irqtrigger_w(uint8_t data);
 	void sirq_clear_w(uint8_t data);

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!--
+
+Lexicon / Nixdorf LK-3000 cartridges
+
+serial index:
+
+LK-3000: main unit
+LK-3800: adaptor
+
+LK-0280: Winter Olympics
+LK-0680: Summer Olympics
+LK-3050: English-Spanish
+LK-3060: English-French
+LK-3070: English-Italian
+LK-3080: English-German
+LK-3090: English-Swedish
+LK-3100: English-Polish
+LK-3110: English-Portuguese
+LK-3120: English-Russian
+LK-3130: English-Greek
+LK-3200: English-Spanish-French-German-Italian-Greek
+LK-3500: Electronic Notebook
+LK-3900: Calculator
+
+unreleased?:
+
+LK-3140: English-Arabic
+LK-3150: English-Hebrew
+LK-3160: English-Japanese
+LK-3170: English-Chinese
+
+-->
+
+<softwarelist name="lk3000" description="LK-3000 Cartridges">
+
+	<software name="calc">
+		<description>Calculator</description>
+		<year>1979</year>
+		<publisher>Lexicon</publisher>
+		<info name="serial" value="LK-3900" />
+		<part name="cart" interface="lk3000">
+			<dataarea name="rom" size="0x2800">
+				<rom name="sc80249p_lk3900m" offset="0x0000" size="0x0800" crc="192edfcf" sha1="527216b6e15b9ab5f83742f437a5a8d8eef14ce2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="german" supported="no">
+		<description>English-German</description>
+		<year>1979</year>
+		<publisher>Lexicon</publisher>
+		<info name="serial" value="LK-3080" />
+		<part name="cart" interface="lk3000">
+			<dataarea name="rom" size="0x2800">
+				<rom name="sc80236p_lk3080m" offset="0x0000" size="0x0800" crc="69019491" sha1="d452d1c7b70310c1da9cea2e8b2b1369e1e4cc92" />
+				<rom name="lk_3080_r1" offset="0x0800" size="0x1000" crc="1712568d" sha1="24db112e0845fcf8451721a1f9a043aed4995d98" /> <!-- EA 8332 -->
+				<rom name="lk_3080_r2" offset="0x1800" size="0x1000" crc="669479d1" sha1="3bae1d6fc80781053c127908b8154e16bee933b9" /> <!-- EA 8332 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notebook">
+		<description>Electronic Notebook</description>
+		<year>1980</year>
+		<publisher>Lexicon</publisher>
+		<info name="serial" value="LK-3500" />
+		<part name="cart" interface="lk3000">
+			<feature name="ram" value="1" />
+			<dataarea name="rom" size="0x2800">
+				<rom name="sc80293p_lk3500m" offset="0x0000" size="0x0800" crc="ec8e7d7c" sha1="13e0b174647ecea8f0db5511b7b93df504e91aa9" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -17,7 +17,7 @@ static char const* const JJD[] =
 
 static char const* const JJJD[] =
 {
-	"b,a", "a,b", nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	"b,a", "a,b", "?", "?", "?", "?", "?", "?",
 	"x0,a", "x0,b", "y0,a", "y0,b", "x1,a", "x1,b", "y1,a", "y1,b",
 };
 
@@ -35,7 +35,7 @@ static char const* const LLL[] = { "a10", "b10", "x", "y", "a", "b", "ab", "ba" 
 static char const* const FFF[] = { "m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7" };
 static char const* const NNN[] = { "n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7" };
 static char const* const TTT[] = { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7" };
-static char const* const GGG[] = { nullptr, "sr", "omr", "sp", "ssh", "ssl", "la", "lc" };
+static char const* const GGG[] = { "?", "sr", "omr", "sp", "ssh", "ssl", "la", "lc" };
 
 static char const* const QQQ[] = { "x0,x0", "y0,y0", "x1,x0", "y1,y0", "x0,y1", "y0,x0", "x1,y0", "y1,x1" };
 

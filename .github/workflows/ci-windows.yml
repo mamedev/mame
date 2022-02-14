@@ -1,6 +1,22 @@
 name: CI (Windows)
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+    - '.github/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+  pull_request:
+    paths:
+    - '.github/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
 
 jobs:
 
@@ -18,6 +34,7 @@ jobs:
       env:
         MINGW64: "/mingw64"
         ARCHOPTS: "-fuse-ld=lld"
+        OVERRIDE_AR: "llvm-ar"
         TOOLS: 1
       run: make -j2
     - name: Validate

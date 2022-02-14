@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "82900.h"
-#include "coreutil.h"
 
 // Debugging
 #define VERBOSE 0

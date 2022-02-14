@@ -102,7 +102,7 @@ void hlcd0515_device::device_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (m_rowout > m_rowmax)
 		m_rowout = 0;

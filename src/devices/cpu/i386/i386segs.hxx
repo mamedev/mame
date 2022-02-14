@@ -2482,7 +2482,7 @@ inline void i386_device::dri_changed()
 	if(!(m_dr[7] & 0xff)) return;
 	for(dr = 0; dr < 4; dr++)
 	{
-		if(m_dr_breakpoints[dr]) m_dr_breakpoints[dr]->remove();
+		m_dr_breakpoints[dr].remove();
 		int dr_enabled = (m_dr[7] & (1 << (dr << 1))) || (m_dr[7] & (1 << ((dr << 1) + 1))); // Check both local enable AND global enable bits for this breakpoint.
 		if(dr_enabled)
 		{
@@ -2512,9 +2512,9 @@ inline void i386_device::dri_changed()
 					m_dr[6] |= 1 << dr;
 					i386_trap(1,0,0);
 				}
-			}, m_dr_breakpoints[dr]);
+			}, &m_dr_breakpoints[dr]);
 			else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + 3, "i386_debug_readwrite_breakpoint",
-			[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+			[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
 			{
 				if(true_mask & mem_mask)
 				{
@@ -2522,14 +2522,14 @@ inline void i386_device::dri_changed()
 					i386_trap(1,0,0);
 				}
 			},
-			[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+			[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
 			{
 				if(true_mask & mem_mask)
 				{
 					m_dr[6] |= 1 << dr;
 					i386_trap(1,0,0);
 				}
-			}, m_dr_breakpoints[dr]);
+			}, &m_dr_breakpoints[dr]);
 		}
 	}
 }

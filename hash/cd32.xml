@@ -1751,20 +1751,19 @@ license:CC0
 	</software>
 
 	<!-- http://redump.org/disc/3366/ -->
-	<!--
-	<software name="suprfrog" supported="no">
-	    <description>Superfrog (Rev 1)</description>
-	    <year>1999</year>
-	    <publisher>Islona</publisher>
-	    <info name="barcode" value="5 022358 170384" />
-	    <info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
-	    <part name="cdrom" interface="cd32_cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="superfrog (europe) (rev 1)" sha1=""/>
-	        </diskarea>
-	    </part>
+	<!-- Listed as possible bad dump on redump.org -->
+	<software name="suprfrog1" supported="no">
+		<description>Superfrog (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Islona</publisher>
+		<info name="barcode" value="5 022358 170384" />
+		<info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="superfrog (europe) (rev 1)" sha1="4295e7e97d90f3709cad9361841942a3f09866c8" status="baddump"/>
+			</diskarea>
+		</part>
 	</software>
-	-->
 
 	<!-- http://redump.org/disc/3434/ -->
 	<software name="surfninj" supported="no">

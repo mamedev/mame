@@ -17,6 +17,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
+#include "machine/f4702.h"
 
 class hp98046_io_card_device : public device_t, public device_hp9845_io_interface
 {
@@ -37,12 +38,13 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<i8048_device> m_cpu;
 	required_device<z80sio_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
+	required_device<f4702_device> m_tx_brg;
+	required_device<f4702_device> m_rx_brg;
 	required_ioport m_loopback_en;
 
 	std::unique_ptr<uint8_t[]> m_ram;
@@ -64,13 +66,11 @@ private:
 	bool m_sio_int;
 	uint8_t m_port_2;
 	bool m_loopback;
+	bool m_last_rxc;
+	bool m_last_txc;
 
-	emu_timer *m_rxc_timer;
-	emu_timer *m_txc_timer;
 	uint8_t m_rxc_sel;
 	uint8_t m_txc_sel;
-	bool m_rxc;
-	bool m_txc;
 
 	void cpu_program_map(address_map &map);
 	void cpu_io_map(address_map &map);
@@ -85,6 +85,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_rxc_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_txc_w);
 	bool rx_fifo_flag() const;
 	bool tx_fifo_flag() const;
 	void update_flg();
@@ -94,7 +96,10 @@ private:
 	void load_tx_fifo();
 	void set_r6_r7_pending(bool state);
 	uint8_t get_hs_input() const;
-	void set_brgs(uint8_t sel);
+	DECLARE_WRITE_LINE_MEMBER(rxc_w);
+	DECLARE_WRITE_LINE_MEMBER(txc_w);
+	TIMER_CALLBACK_MEMBER(sync_rx_im_w);
+	TIMER_CALLBACK_MEMBER(sync_tx_im_w);
 };
 
 // device type definitions

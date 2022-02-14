@@ -5,7 +5,7 @@
 
 /*
     A note regarding other bootlegs:
-    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into separate
     derived classes and source files.
 
     Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
@@ -103,8 +103,8 @@ brightness circuity present on pcb?
 #include "cpu/m68000/m68000.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "machine/eepromser.h"
 #include "speaker.h"
 

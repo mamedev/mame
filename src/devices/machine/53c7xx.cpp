@@ -760,7 +760,7 @@ void ncr53c7xx_device::recv_byte()
 //  state machine
 //-------------------------------------------------
 
-void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	step(true);
 }

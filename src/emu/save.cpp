@@ -24,7 +24,10 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "coreutil.h"
+
+#include "util/coreutil.h"
+#include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
 
 
 //**************************************************************************
@@ -205,17 +208,17 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 //  state
 //-------------------------------------------------
 
-save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+save_error save_manager::check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
 	u32 sig;
 	sig = machine.save().signature();
 
 	// seek to the beginning and read the header
-	file.compress(FCOMPRESS_NONE);
 	file.seek(0, SEEK_SET);
 	u8 header[HEADER_SIZE];
-	if (file.read(header, sizeof(header)) != sizeof(header))
+	size_t actual(0);
+	if (file.read(header, sizeof(header), actual) || actual != sizeof(header))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("Could not read %s save file header",emulator_info::get_appname());
@@ -255,22 +258,32 @@ void save_manager::dispatch_presave()
 //  write_file - writes the data to a file
 //-------------------------------------------------
 
-save_error save_manager::write_file(emu_file &file)
+save_error save_manager::write_file(util::core_file &file)
 {
-	return do_write(
+	util::write_stream::ptr writer;
+	save_error err = do_write(
 			[] (size_t total_size) { return true; },
-			[&file] (const void *data, size_t size) { return file.write(data, size) == size; },
-			[&file] ()
+			[&writer] (const void *data, size_t size)
 			{
-				file.compress(FCOMPRESS_NONE);
-				file.seek(0, SEEK_SET);
-				return true;
+				size_t written;
+				std::error_condition filerr = writer->write(data, size, written);
+				return !filerr && (size == written);
 			},
-			[&file] ()
+			[&file, &writer] ()
 			{
-				file.compress(FCOMPRESS_MEDIUM);
-				return true;
+				if (file.seek(0, SEEK_SET))
+					return false;
+				util::core_file::ptr proxy;
+				std::error_condition filerr = util::core_file::open_proxy(file, proxy);
+				writer = std::move(proxy);
+				return !filerr && writer;
+			},
+			[&file, &writer] ()
+			{
+				writer = util::zlib_write(file, 6, 16384);
+				return bool(writer);
 			});
+	return (STATERR_NONE != err) ? err : writer->finalize() ? STATERR_WRITE_ERROR : STATERR_NONE;
 }
 
 
@@ -278,21 +291,30 @@ save_error save_manager::write_file(emu_file &file)
 //  read_file - read the data from a file
 //-------------------------------------------------
 
-save_error save_manager::read_file(emu_file &file)
+save_error save_manager::read_file(util::core_file &file)
 {
+	util::read_stream::ptr reader;
 	return do_read(
 			[] (size_t total_size) { return true; },
-			[&file] (void *data, size_t size) { return file.read(data, size) == size; },
-			[&file] ()
+			[&reader] (void *data, size_t size)
 			{
-				file.compress(FCOMPRESS_NONE);
-				file.seek(0, SEEK_SET);
-				return true;
+				std::size_t read;
+				std::error_condition filerr = reader->read(data, size, read);
+				return !filerr && (read == size);
 			},
-			[&file] ()
+			[&file, &reader] ()
 			{
-				file.compress(FCOMPRESS_MEDIUM);
-				return true;
+				if (file.seek(0, SEEK_SET))
+					return false;
+				util::core_file::ptr proxy;
+				std::error_condition filerr = util::core_file::open_proxy(file, proxy);
+				reader = std::move(proxy);
+				return !filerr && reader;
+			},
+			[&file, &reader] ()
+			{
+				reader = util::zlib_read(file, 16384);
+				return bool(reader);
 			});
 }
 

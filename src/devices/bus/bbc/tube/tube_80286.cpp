@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_80286, bbc_tube_80286_device, "bbc_tube_80286", "Aco
 void bbc_tube_80286_device::tube_80286_mem(address_map &map)
 {
 	map.global_mask(0xfffff);
-	map(0x00000, 0xbffff).ram().share("ram");
+	map(0x00000, 0xfffff).ram().share("ram");
 	map(0xc0000, 0xc3fff).rom().region("bootstrap", 0).mirror(0x3c000);
 }
 

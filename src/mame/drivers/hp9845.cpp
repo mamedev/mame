@@ -43,7 +43,7 @@
 #include "machine/timer.h"
 
 #include "render.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "hp9845b.lh"
@@ -550,7 +550,7 @@ attotime hp9845_base_state::time_to_gv_mem_availability() const
 void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros(pressed);
+		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
 		ioport_value mask = BIT_MASK(bit_no);
 		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {
@@ -3641,11 +3641,14 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 void hp9845_base_state::hp9845_base(machine_config &config)
 {
 	HP_5061_3001(config , m_lpu , 5700000);
+	// Clock scaling takes into account the slowdown caused by DRAM refresh
+	m_lpu->set_clock_scale(0.93);
 	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_lpu->set_9845_boot_mode(true);
 	m_lpu->set_rw_cycles(6 , 6);
 	m_lpu->set_relative_mode(true);
 	HP_5061_3001(config , m_ppu , 5700000);
+	m_ppu->set_clock_scale(0.93);
 	m_ppu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_ppu->set_addrmap(AS_IO , &hp9845_base_state::ppu_io_map);
 	m_ppu->set_9845_boot_mode(true);

@@ -11,7 +11,7 @@
 #ifndef MAME_INCLUDES_PC88VA_H
 #define MAME_INCLUDES_PC88VA_H
 
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
@@ -21,7 +21,7 @@
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -87,7 +87,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ private:
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
-	uint8_t *m_kanjiram;
+	std::unique_ptr<uint8_t[]> m_kanjiram;
 	uint16_t m_bank_reg;
 	uint16_t m_screen_ctrl_reg;
 	uint8_t m_timer3_io_reg;

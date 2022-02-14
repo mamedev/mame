@@ -3,11 +3,84 @@
 #include "emu.h"
 #include "a2pic.h"
 
+#include "bus/centronics/ctronics.h"
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 namespace {
+
+class a2bus_pic_device : public device_t, public device_a2bus_card_interface
+{
+public:
+	a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// DIP switch/jumper handlers
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_strobe);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_ack);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_firmware);
+	DECLARE_INPUT_CHANGED_MEMBER(sw1_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(x_data_out);
+	DECLARE_INPUT_CHANGED_MEMBER(x_char_width);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	DECLARE_WRITE_LINE_MEMBER(perror_w);
+	DECLARE_WRITE_LINE_MEMBER(select_w);
+	DECLARE_WRITE_LINE_MEMBER(fault_w);
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(release_strobe);
+
+	// synchronised inputs
+	void set_ack_in(s32 param);
+	void set_perror_in(s32 param);
+	void set_select_in(s32 param);
+	void set_fault_in(s32 param);
+	void data_write(s32 param);
+
+	// helpers
+	void reset_mode();
+	void set_ack_latch();
+	void clear_ack_latch();
+	void enable_irq();
+	void disable_irq();
+
+	required_device<centronics_device>      m_printer_conn;
+	required_device<output_latch_device>    m_printer_out;
+	required_ioport                         m_input_sw1;
+	required_ioport                         m_input_x;
+	required_region_ptr<u8>                 m_prom;
+	emu_timer *                             m_strobe_timer;
+
+	u16 m_firmware_base;        // controlled by SW6
+	u8  m_data_latch;           // 9B
+	u8  m_autostrobe_disable;   // 2A pin 8
+	u8  m_ack_latch;            // 2A pin 6
+	u8  m_irq_enable;           // 2B pin 9
+	u8  m_ack_in;
+	u8  m_perror_in;            // DI5
+	u8  m_select_in;            // DI6
+	u8  m_fault_in;             // DI3
+};
+
+
 
 ROM_START(pic)
 	ROM_REGION(0x0200, "prom", 0)
@@ -50,12 +123,6 @@ INPUT_PORTS_START(pic)
 	PORT_CONFSETTING(   0x00, "7-bit (X5)")
 	PORT_CONFSETTING(   0x04, "8-bit (X6)")
 INPUT_PORTS_END
-
-} // anonymous namespace
-
-
-
-DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple II Parallel Interface Card")
 
 
 
@@ -177,29 +244,25 @@ void a2bus_pic_device::write_c0nx(u8 offset, u8 data)
 	switch (offset & 0x07U)
 	{
 	case 0U:
+		if (BIT(m_input_x->read(), 1))
 		{
-			ioport_value const x(m_input_x->read());
-
-			// latch output data - remember MSB can be forced low by jumper
-			if (BIT(x, 1))
-			{
-				LOG("Latch data %02X\n", data);
-				m_data_latch = data;
-				m_printer_out->write(data & (BIT(x, 2) ? 0xffU : 0x7fU));
-			}
-			else
-			{
-				LOG("Output disabled, not latching data\n");
-			}
-
-			// start strobe if autostrobe is enabled
+			// latch output data and start strobe if autostrobe is enabled
+			LOG("Latch data %02X\n", data);
+			machine().scheduler().synchronize(
+					timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this),
+					unsigned(data) | (1 << 8) | ((m_autostrobe_disable ? 0 : 1) << 9));
+		}
+		else
+		{
+			// just start strobe if autostrobe is enabled
+			LOG("Output disabled, not latching data\n");
 			if (!m_autostrobe_disable)
-				start_strobe();
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
 		}
 		break;
 
 	case 2U:
-		start_strobe();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
 		break;
 
 	case 5U:
@@ -323,46 +386,25 @@ void a2bus_pic_device::device_reset()
 
 WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
 {
-	if (bool(state) != bool(m_ack_in))
-	{
-		m_ack_in = state ? 1U : 0U;
-		LOG("/ACK=%u\n", m_ack_in);
-		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
-		{
-			LOG("Active /ACK edge\n");
-			set_ack_latch();
-		}
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_ack_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
 {
-	if (bool(state) != bool(m_perror_in))
-	{
-		m_perror_in = state ? 1U : 0U;
-		LOG("PAPER EMPTY=%u\n", m_perror_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_perror_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
 {
-	if (bool(state) != bool(m_select_in))
-	{
-		m_select_in = state ? 1U : 0U;
-		LOG("SELECT=%u\n", m_select_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_select_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
 {
-	if (bool(state) != bool(m_fault_in))
-	{
-		m_fault_in = state ? 1U : 0U;
-		LOG("/FAULT=%u\n", m_fault_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_fault_in), this), state ? 1 : 0);
 }
 
 
@@ -381,6 +423,86 @@ TIMER_CALLBACK_MEMBER(a2bus_pic_device::release_strobe)
 
 
 //----------------------------------------------
+//  synchronised inputs
+//----------------------------------------------
+
+void a2bus_pic_device::set_ack_in(s32 param)
+{
+	if (u32(param) != m_ack_in)
+	{
+		m_ack_in = u8(u32(param));
+		LOG("/ACK=%u\n", m_ack_in);
+		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
+		{
+			LOG("Active /ACK edge\n");
+			set_ack_latch();
+		}
+	}
+}
+
+
+void a2bus_pic_device::set_perror_in(s32 param)
+{
+	if (u32(param) != m_perror_in)
+	{
+		m_perror_in = u8(u32(param));
+		LOG("PAPER EMPTY=%u\n", m_perror_in);
+	}
+}
+
+
+void a2bus_pic_device::set_select_in(s32 param)
+{
+	if (u32(param) != m_select_in)
+	{
+		m_select_in = u8(u32(param));
+		LOG("SELECT=%u\n", m_select_in);
+	}
+}
+
+
+void a2bus_pic_device::set_fault_in(s32 param)
+{
+	if (u32(param) != m_fault_in)
+	{
+		m_fault_in = u8(u32(param));
+		LOG("/FAULT=%u\n", m_fault_in);
+	}
+}
+
+
+void a2bus_pic_device::data_write(s32 param)
+{
+	// latch output data - remember MSB can be forced low by jumper
+	if (BIT(param, 8))
+	{
+		m_data_latch = u8(u32(param));
+		m_printer_out->write(m_data_latch & (BIT(m_input_x->read(), 2) ? 0xffU : 0x7fU));
+	}
+
+	// start/extend strobe output
+	if (BIT(param, 9))
+	{
+		ioport_value const sw1(m_input_sw1->read());
+		unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
+		int const state(BIT(sw1, 3));
+		if (!m_strobe_timer->enabled())
+		{
+			LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
+			clear_ack_latch();
+			m_printer_conn->write_strobe(state);
+		}
+		else
+		{
+			LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
+		}
+		m_strobe_timer->adjust(attotime::from_ticks(cycles * 7, clock()));
+	}
+}
+
+
+
+//----------------------------------------------
 //  helpers
 //----------------------------------------------
 
@@ -393,25 +515,6 @@ void a2bus_pic_device::reset_mode()
 	m_autostrobe_disable = 1U;
 	disable_irq();
 	set_ack_latch();
-}
-
-
-void a2bus_pic_device::start_strobe()
-{
-	ioport_value const sw1(m_input_sw1->read());
-	unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
-	int const state(BIT(sw1, 3));
-	if (!m_strobe_timer->enabled())
-	{
-		LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
-		clear_ack_latch();
-		m_printer_conn->write_strobe(state);
-	}
-	else
-	{
-		LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
-	}
-	m_strobe_timer->adjust(attotime::from_ticks(cycles, clock()));
 }
 
 
@@ -493,3 +596,9 @@ void a2bus_pic_device::disable_irq()
 		LOG("IRQ already disabled\n");
 	}
 }
+
+} // anonymous namespace
+
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_PIC, device_a2bus_card_interface, a2bus_pic_device, "a2pic", "Apple II Parallel Interface Card")

@@ -11,7 +11,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
@@ -178,6 +178,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	u16 tileram_r(offs_t offset);
+	void pri_cb(u8 priority, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 

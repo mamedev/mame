@@ -57,7 +57,7 @@
 #include "machine/z80ctc.h"
 #include "machine/taitoio_yoke.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -103,7 +103,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -424,7 +424,7 @@ u32 mlanding_state::exec_dma()
 }
 
 
-void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

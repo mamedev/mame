@@ -56,7 +56,7 @@ void device_gamate_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 gamate_cart_slot_device::gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GAMATE_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface(mconfig, *this),
 	m_type(GAMATE_PLAIN),
 	m_cart(nullptr)
@@ -134,7 +134,7 @@ image_init_result gamate_cart_slot_device::call_load()
 
 		if (len > 0x80000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 			return image_init_result::FAIL;
 		}
 
@@ -203,15 +203,15 @@ std::string gamate_cart_slot_device::get_default_card_software(get_default_card_
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = gamate_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = gamate_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

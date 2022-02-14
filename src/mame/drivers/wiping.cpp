@@ -9,6 +9,10 @@
             Allard van der Bas (allard@mindless.com)
 
 1 x Z80 CPU main game, 1 x Z80 with ???? sound hardware.
+
+Given the similarities with clshroad.cpp this was probably developed by
+Masao Suzuki, who later left Nichibutsu to form Woodplace Inc.
+
 ----------------------------------------------------------------------------
 Main processor :
 
@@ -45,6 +49,7 @@ dip: 6.7 7.7
 #include "screen.h"
 #include "speaker.h"
 
+#define MASTER_CLOCK XTAL(18'432'000)
 
 void wiping_state::machine_start()
 {
@@ -287,13 +292,15 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 void wiping_state::wiping(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz */
+	Z80(config, m_maincpu, MASTER_CLOCK / 6); /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wiping_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wiping_state::vblank_irq));
 
-	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6);    /* 3.072 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wiping_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(wiping_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
+
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 6 / 512)); // 6000 Hz
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
 	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
@@ -305,10 +312,7 @@ void wiping_state::wiping(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(36*8, 28*8);
-	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 0, 224); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	screen.set_screen_update(FUNC(wiping_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -318,7 +322,7 @@ void wiping_state::wiping(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WIPING_CUSTOM(config, "wiping", 96000 / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // 48000 Hz?
 }
 
 
@@ -349,11 +353,11 @@ ROM_START( wiping )
 	ROM_LOAD( "wip-f4.bin",   0x0020, 0x0100, CRC(3f56c8d5) SHA1(7d279b2f29911c44b4136068770accf7196057d7) )    /* char lookup table */
 	ROM_LOAD( "wip-e11.bin",  0x0120, 0x0100, CRC(e7400715) SHA1(c67193e5f0a43942ddf03058a0bb8b3275308459) )    /* sprite lookup table */
 
-	ROM_REGION( 0x4000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x4000, "wiping:samples", 0 )
 	ROM_LOAD( "rugr5c8",      0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",      0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, "soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, "wiping:soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )    /* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )    /* high 4 bits */
 ROM_END
@@ -378,11 +382,11 @@ ROM_START( rugrats )
 	ROM_LOAD( "eiif4.4f",  0x0020, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )    /* char lookup table */
 	ROM_LOAD( "eiif4.11e", 0x0120, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )    /* sprite lookup table */
 
-	ROM_REGION( 0x4000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x4000, "wiping:samples", 0 )
 	ROM_LOAD( "5.8c",      0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "6.9c",      0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, "soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, "wiping:soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "e8.8e",     0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )    /* low 4 bits */
 	ROM_LOAD( "e9.9e",     0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )    /* high 4 bits */
 ROM_END

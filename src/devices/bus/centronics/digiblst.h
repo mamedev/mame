@@ -20,7 +20,7 @@
 #include "ctronics.h"
 #include "sound/dac.h"
 
-// ======================> centronics_covox_device
+// ======================> centronics_digiblaster_device
 
 class centronics_digiblaster_device : public device_t,
 	public device_centronics_peripheral_interface

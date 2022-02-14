@@ -39,7 +39,7 @@ protected:
 //  virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -47,7 +47,8 @@ private:
 	uint16_t m_rom_address;
 	uint16_t m_adj_address;
 	uint16_t m_dac_start_address, m_dac_current_address;
-	int m_dac_frequency;
+	double m_dac_frequency;
+	uint8_t m_timer_rate;
 	uint8_t m_rom_op;
 	uint8_t m_const90;
 	bool m_timer_reg;
@@ -72,6 +73,7 @@ private:
 	uint8_t const90_r();
 	void const90_w(uint8_t data);
 	void dac_address_w(offs_t offset, uint8_t data);
+	void dac_control_w(uint8_t data);
 	void dac_timer_w(uint8_t data);
 };
 

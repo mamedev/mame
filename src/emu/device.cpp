@@ -136,6 +136,8 @@ std::vector<std::string> device_t::searchpath() const
 		system = system->owner();
 	if (system)
 		result = system->searchpath();
+	if (type().parent_rom_device_type())
+		result.emplace(result.begin(), type().parent_rom_device_type()->shortname());
 	result.emplace(result.begin(), shortname());
 	return result;
 }
@@ -462,9 +464,9 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 //  callback
 //-------------------------------------------------
 
-emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
+emu_timer *device_t::timer_alloc(device_timer_id id)
 {
-	return machine().scheduler().timer_alloc(*this, id, ptr);
+	return machine().scheduler().timer_alloc(*this, id);
 }
 
 
@@ -473,9 +475,9 @@ emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 //  call our device callback
 //-------------------------------------------------
 
-void device_t::timer_set(const attotime &duration, device_timer_id id, int param, void *ptr)
+void device_t::timer_set(const attotime &duration, device_timer_id id, int param)
 {
-	machine().scheduler().timer_set(duration, *this, id, param, ptr);
+	machine().scheduler().timer_set(duration, *this, id, param);
 }
 
 
@@ -607,7 +609,6 @@ void device_t::start()
 	}
 
 	// register our save states
-	save_item(NAME(m_clock));
 	save_item(NAME(m_unscaled_clock));
 	save_item(NAME(m_clock_scale));
 
@@ -686,6 +687,21 @@ void device_t::pre_save()
 
 void device_t::post_load()
 {
+	// recompute clock-related parameters if something changed
+	u32 const scaled_clock = m_unscaled_clock * m_clock_scale;
+	if (m_clock != scaled_clock)
+	{
+		m_clock = scaled_clock;
+		m_attoseconds_per_clock = (scaled_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(scaled_clock);
+
+		// recalculate all derived clocks
+		for (device_t &child : subdevices())
+			child.calculate_derived_clock();
+
+		// make sure the device knows about the new clock
+		notify_clock_changed();
+	}
+
 	// notify the interface
 	for (device_interface &intf : interfaces())
 		intf.interface_post_load();
@@ -870,7 +886,7 @@ void device_t::device_debug_setup()
 //  fires
 //-------------------------------------------------
 
-void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void device_t::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// do nothing by default
 }
@@ -921,7 +937,7 @@ device_t *device_t::subdevice_slow(std::string_view tag) const
 std::string device_t::subtag(std::string_view tag) const
 {
 	std::string result;
-	if (!tag.empty() && tag[0] == ':')
+	if (!tag.empty() && (tag[0] == ':'))
 	{
 		// if the tag begins with a colon, ignore our path and start from the root
 		tag.remove_prefix(1);
@@ -932,28 +948,41 @@ std::string device_t::subtag(std::string_view tag) const
 		// otherwise, start with our path
 		result.assign(m_tag);
 		if (result != ":")
-			result.append(":");
+			result.append(1, ':');
 	}
 
 	// iterate over the tag, look for special path characters to resolve
-	std::string_view::size_type caret;
-	while ((caret = tag.find('^')) != std::string_view::npos)
+	std::string_view::size_type delimiter;
+	while ((delimiter = tag.find_first_of("^:")) != std::string_view::npos)
 	{
 		// copy everything up to there
-		result.append(tag, 0, caret);
-		tag.remove_prefix(caret + 1);
+		bool const parent = tag[delimiter] == '^';
+		result.append(tag, 0, delimiter);
+		tag.remove_prefix(delimiter + 1);
 
-		// strip trailing colons
-		int len = result.length();
-		while (result[--len] == ':')
-			result = result.substr(0, len);
-
-		// remove the last path part, leaving the last colon
-		if (result != ":")
+		if (parent)
 		{
-			int lastcolon = result.find_last_of(':');
-			if (lastcolon != -1)
-				result = result.substr(0, lastcolon + 1);
+			// strip trailing colons
+			std::string::size_type len = result.length();
+			while ((len > 1) && (result[--len] == ':'))
+				result.resize(len);
+
+			// remove the last path part, leaving the last colon
+			if (result != ":")
+			{
+				std::string::size_type lastcolon = result.find_last_of(':');
+				if (lastcolon != std::string::npos)
+					result.resize(lastcolon + 1);
+			}
+		}
+		else
+		{
+			// collapse successive colons
+			if (result.back() != ':')
+				result.append(1, ':');
+			delimiter = tag.find_first_not_of(':');
+			if (delimiter != std::string_view::npos)
+				tag.remove_prefix(delimiter);
 		}
 	}
 
@@ -961,9 +990,9 @@ std::string device_t::subtag(std::string_view tag) const
 	result.append(tag);
 
 	// strip trailing colons up to the root
-	int len = result.length();
-	while (len > 1 && result[--len] == ':')
-		result = result.substr(0, len);
+	std::string::size_type len = result.length();
+	while ((len > 1) && (result[--len] == ':'))
+		result.resize(len);
 	return result;
 }
 

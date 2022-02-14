@@ -132,7 +132,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -147,7 +147,7 @@ protected:
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(uint8_t *cart_base) { };
+	virtual void update_cart_base(uint8_t *cart_base) { }
 
 protected:
 	// timer constants
@@ -197,7 +197,8 @@ protected:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	void poll_joystick(bool *joyin, uint8_t *buttons);
+	bool poll_joystick(void);
+	uint8_t poll_joystick_buttons(void);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
@@ -259,8 +260,8 @@ protected:
 	bool m_dclg_previous_bit;
 	uint8_t m_dclg_output_h;
 	uint8_t m_dclg_output_v;
-	uint8_t m_dclg_state;
-	uint16_t m_dclg_timer;
+	uint32_t m_dclg_state;
+	uint32_t m_dclg_timer;
 
 	// VHD selection
 	uint8_t m_vhd_select;

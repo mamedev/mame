@@ -40,6 +40,8 @@
 
 #include "emu.h"
 #include "evpc.h"
+
+#include "fileio.h"
 #include "speaker.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -52,7 +54,7 @@
 #include "logmacro.h"
 #define EVPC_SCREEN_TAG      "screen"
 
-DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
+DEFINE_DEVICE_TYPE(TI99_EVPC, bus::ti99::peb::snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
 namespace bus::ti99::peb {
 

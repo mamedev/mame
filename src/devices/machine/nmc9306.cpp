@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "nmc9306.h"
 
+#include "fileio.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

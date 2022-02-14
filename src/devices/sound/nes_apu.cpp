@@ -49,36 +49,23 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-/* INTERNAL FUNCTIONS */
+// INTERNAL FUNCTIONS
 
-/* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
-static void create_vbltimes(u32 * table,const u8 *vbl,unsigned int rate)
+// INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE
+static void create_vbltimes(u32 *table, const u8 *vbl, unsigned int rate)
 {
-	int i;
-
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 		table[i] = vbl[i] * rate;
 }
 
-/* INITIALIZE SAMPLE TIMES IN TERMS OF VSYNCS */
+// INITIALIZE SAMPLE TIMES IN TERMS OF VSYNCS
 void nesapu_device::create_syncs(unsigned long sps)
 {
-	int i;
-	unsigned long val = sps;
+	for (int i = 0; i < SYNCS_MAX1; i++)
+		m_sync_times1[i] = sps * (i + 1);
 
-	for (i = 0; i < SYNCS_MAX1; i++)
-	{
-		m_sync_times1[i] = val;
-		val += sps;
-	}
-
-	val = 0;
-	for (i = 0; i < SYNCS_MAX2; i++)
-	{
-		m_sync_times2[i] = val;
-		m_sync_times2[i] >>= 2;
-		val += sps;
-	}
+	for (int i = 0; i < SYNCS_MAX2; i++)
+		m_sync_times2[i] = (sps * i) >> 2;
 }
 
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
@@ -86,6 +73,7 @@ DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_is_pal(0)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
 	, m_stream(nullptr)
@@ -121,6 +109,7 @@ void nesapu_device::device_reset()
 void nesapu_device::device_clock_changed()
 {
 	calculate_rates();
+	m_is_pal = m_clock == PAL_APU_CLOCK;
 }
 
 void nesapu_device::calculate_rates()
@@ -207,8 +196,8 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tail));
 	#else
 	save_item(NAME(m_APU.buf_pos));
-	save_item(NAME(m_APU.step_mode));
 	#endif
+	save_item(NAME(m_APU.step_mode));
 }
 
 /* TODO: sound channels should *ALL* have DC volume decay */
@@ -385,7 +374,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 	if (0 == chan->vbl_length)
 		return 0;
 
-	freq = noise_freq[chan->regs[2] & 0x0F];
+	freq = noise_freq[m_is_pal][chan->regs[2] & 0x0F];
 	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
@@ -433,7 +422,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 
 	if (chan->enabled)
 	{
-		freq = dpcm_clocks[chan->regs[0] & 0x0F];
+		freq = dpcm_clocks[m_is_pal][chan->regs[0] & 0x0F];
 		chan->phaseacc -= 4;
 
 		while (chan->phaseacc < 0)

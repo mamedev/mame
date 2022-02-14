@@ -42,7 +42,7 @@ void astrocade_lightpen_device::device_reset()
 	m_retrigger = false;
 }
 
-void astrocade_lightpen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void astrocade_lightpen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_TRIGGER)
 	{

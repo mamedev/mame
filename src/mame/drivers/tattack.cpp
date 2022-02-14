@@ -9,18 +9,26 @@
     Z80A,
     xtal 8MHz,
     dipsw 8-position x2,
-    volume pots x6,
+    volume pots x6: (descriptions from DIP switch sheet)
+                   VR1: Adjust Bat Position
+                   VR2: Sound Volume
+                   VR3: Screen Flip (?)
+                   VR4: Anti Short-Circuit Crimes (?)
+                   VR5: Screen Vertical Position
+                   VR6: Ball Shape
     2114 ram x5,
-    7910CQ + NE555P sound section,
+    7910CQ (EPSON melody IC) + NE555P sound section,
     SN74198N shifter
     no proms
 
     TODO:
-    - non-tilemap video offsets/sizes are guessworked;
-    - random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
+    - non-tilemap video offsets/sizes are guessed;
+    - random brick flickering effect is guessed too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
     - outputs (coin counter port same as sound writes?);
-    - some dipswitches;
-    - sound (requires Epson 7910 Multi-Melody emulation?)
+    - hook up pots, some are useful for in-game adjustments such as paddle adjust and ball shape (ball is currently a rectangle).
+    - hook up background color jumper (can be changed to black or blue)
+    - player bat moves in steps. Is this correct compared to real PCB?
+    - sound (Music requires Epson 7910CQ Multi-Melody ROM & emulation)
     \- victory BGM cuts off too late?
 
     Connector pinout from manual
@@ -50,12 +58,14 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
-#include "sound/samples.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class tattack_state : public driver_device
 {
@@ -67,7 +77,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_samples(*this,"samples")
+		m_samples(*this, "samples")
 	{ }
 
 	void tattack(machine_config &config);
@@ -84,10 +94,10 @@ private:
 	void sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void tattack_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 
-	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tattack_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -98,7 +108,7 @@ private:
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
 	uint8_t m_paddle_reg;
-	int m_paddle_ysize;
+	uint8_t m_paddle_ysize;
 	bool m_bottom_edge_enable;
 	bool m_bricks_color_bank;
 
@@ -212,7 +222,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 		}
 }
 
-uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tattack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
@@ -229,6 +239,12 @@ uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind1
 void tattack_state::video_start()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tattack_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	save_item(NAME(m_ball_regs));
+	save_item(NAME(m_paddle_reg));
+	save_item(NAME(m_paddle_ysize));
+	save_item(NAME(m_bottom_edge_enable));
+	save_item(NAME(m_bricks_color_bank));
 }
 
 void tattack_state::paddle_w(uint8_t data)
@@ -269,31 +285,31 @@ void tattack_state::sound_w(uint8_t data)
 	}
 }
 
-void tattack_state::tattack_map(address_map &map)
+void tattack_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x4000).portr("AN_PADDLE"); // $315, checks again with same memory, loops if different (?)
-	map(0x5000, 0x53ff).ram().share("videoram");
-	map(0x6000, 0x6000).portr("DSW2");
-	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
-	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
-	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0x5000, 0x53ff).ram().share(m_videoram);
+	map(0x6000, 0x6000).portr("DSW1");
+	map(0x7000, 0x73ff).ram().share(m_colorram);    // color map ? something else .. only bits 1-3 are used
+	map(0xa000, 0xa000).portr("DSW2");
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w));
 	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
 	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
 	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
-	map(0xe000, 0xe3ff).ram().share("ram");
+	map(0xe000, 0xe3ff).ram().share(m_ram);
 }
 
 static INPUT_PORTS_START( tattack )
 	PORT_START("INPUTS")
-	PORT_DIPNAME( 0x01, 0x00, "1-01" ) // reset switch?
+	PORT_DIPNAME( 0x01, 0x00, "1-01" ) // freezes when off IF 1-02 is also off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "1-02" )
+	PORT_DIPNAME( 0x02, 0x02, "1-02" ) // moves the bat (check PCB pinout above, maybe VR Center button 2?)
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "1-03" )
+	PORT_DIPNAME( 0x04, 0x04, "1-03" ) // flips screen and freezes IF 1-02 is on
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "1-04" )
@@ -305,78 +321,69 @@ static INPUT_PORTS_START( tattack )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Enable green square blocks" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Number of bricks to destroy" )
-	PORT_DIPSETTING(    0x04, "112" )
-	PORT_DIPSETTING(    0x00, "5" ) // testing option?
-	PORT_DIPNAME( 0x08, 0x00, "DSW1 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, "Paddle in middle of screen" )
-	PORT_DIPSETTING(    0x00, "Never on screen" )
-	PORT_DIPSETTING(    0x10, "Mode 1" ) // - appears after a set number of bricks destroyed, might be same setting
-	PORT_DIPSETTING(    0x20, "Mode 2" ) // /
-	PORT_DIPSETTING(    0x30, "Always on screen" )
-	PORT_DIPNAME( 0x40, 0x00, "DSW1 7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW1 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2 1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW2 2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW2 3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW2 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW2 5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Game Time" )                PORT_DIPLOCATION( "SW1:1,2,3,4" )
+	PORT_DIPSETTING(    0x00, "2:00" )
+	PORT_DIPSETTING(    0x01, "2:05" )
+	PORT_DIPSETTING(    0x02, "2:10" )
+	PORT_DIPSETTING(    0x03, "2:15" )
+	PORT_DIPSETTING(    0x04, "2:20" )
+	PORT_DIPSETTING(    0x05, "2:25" )
+	PORT_DIPSETTING(    0x06, "2:30" )
+	PORT_DIPSETTING(    0x07, "2:35" )
+	PORT_DIPSETTING(    0x08, "2:40" )
+	PORT_DIPSETTING(    0x09, "2:45" )
+	PORT_DIPSETTING(    0x0a, "2:50" )
+	PORT_DIPSETTING(    0x0b, "2:55" )
+	PORT_DIPSETTING(    0x0c, "3:00" )
+	PORT_DIPSETTING(    0x0d, "3:05" )
+	PORT_DIPSETTING(    0x0e, "3:10" )
+	PORT_DIPSETTING(    0x0f, "3:15" )
+	PORT_DIPNAME( 0x10, 0x10, "Blinking Brick Awards 30 Seconds" )   PORT_DIPLOCATION( "SW1:5" )
+	PORT_DIPSETTING(    0x00, "Once Only" ) // extra 30 seconds of time awarded if the blinking brick is hit
+	PORT_DIPSETTING(    0x10, "No Limit" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )         PORT_DIPLOCATION( "SW1:6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )           PORT_DIPLOCATION( "SW1:7,8" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x80, "7" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Infinite ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Oil Zones" )                PORT_DIPLOCATION( "SW2:1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_A ) )          PORT_DIPLOCATION( "SW2:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )                PORT_DIPLOCATION( "SW2:3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) ) // 112 bricks
+	PORT_DIPSETTING(    0x00, "Hit 5 Bricks Then Game Over" ) // for testing
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" ) // DIP switch sheet says 'no use'
+	PORT_DIPNAME( 0x30, 0x30, "Enemies" )                  PORT_DIPLOCATION( "SW2:5,6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, "Show When 40 Bricks Remaining" )
+	PORT_DIPSETTING(    0x20, "Show When 20 Bricks Remaining" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Enemy Delay" )              PORT_DIPLOCATION( "SW2:7" ) // works when enemies not equal to 0x30
+	PORT_DIPSETTING(    0x40, "Appear In Last 30 Seconds" ) // enemy blocks appear when 30 seconds game time remaining
+	PORT_DIPSETTING(    0x00, "Disable" )
+	PORT_DIPNAME( 0x80, 0x80, "Oil Zone Delay" )                PORT_DIPLOCATION( "SW2:8" ) // works when oil zones set to no
+	PORT_DIPSETTING(    0x80, "Appear In Last 30 Seconds" ) // oil zones appear when 30 seconds game time remaining
+	PORT_DIPSETTING(    0x00, "Disable" )
 
 	PORT_START("AN_PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 
 static GFXDECODE_START( gfx_tattack )
-	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 8 )
 GFXDECODE_END
 
-void tattack_state::tattack_palette(palette_device &palette) const
+void tattack_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -409,7 +416,7 @@ void tattack_state::tattack(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8000000 / 2);   /* 4 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::tattack_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tattack_state::irq0_line_hold));
 
 	/* video hardware */
@@ -418,11 +425,11 @@ void tattack_state::tattack(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(24, 256-32-1, 13, 256-11-1);
-	screen.set_screen_update(FUNC(tattack_state::screen_update_tattack));
+	screen.set_screen_update(FUNC(tattack_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
-	PALETTE(config, "palette", FUNC(tattack_state::tattack_palette), 16);
+	PALETTE(config, "palette", FUNC(tattack_state::palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -446,6 +453,9 @@ void tattack_state::tattack(machine_config &config)
 ROM_START( tattack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.9a",     0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
+
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910CQ Multi-Melody IC
+	ROM_LOAD( "7910cq", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
@@ -488,5 +498,7 @@ void tattack_state::init_tattack()
 
 }
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+} // Anonymous namespace
+
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // there is another undumped version with katakana Shonan logo and black background

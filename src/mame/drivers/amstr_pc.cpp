@@ -200,6 +200,8 @@ Notes:
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -720,6 +722,9 @@ void amstrad_pc_state::pc200(machine_config &config)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("pc200");
 }
 
 void amstrad_pc_state::pc2086(machine_config &config)
@@ -845,6 +850,17 @@ ROM_START( pc3086 )
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
 ROM_END
 
+
+ROM_START( pc5086 ) // dies with error message 010
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_LOAD( "c000.bin", 0x00000, 0x08000, CRC(5a8c640d) SHA1(7e5731f0febbad8228f758c6deceb550356c3b13) )
+	ROM_LOAD( "c800.bin", 0x08000, 0x02000, CRC(217ac584) SHA1(088aeb4bb389086c127274ddd3cde3048173cc8a) )
+	ROM_LOAD( "sys_rom.bin", 0x10000, 0x10000, CRC(d69b0d48) SHA1(3184d2a8107927631414bdcc4863e22b5a282def) )
+
+	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
+	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -861,3 +877,4 @@ COMP( 1988, pc20,   ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_ini
 COMP( 1988, pc200,  ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
 COMP( 1988, pc2086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
 COMP( 1990, pc3086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+COMP( 199?, pc5086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC5086", MACHINE_NOT_WORKING )

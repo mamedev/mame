@@ -593,7 +593,7 @@ void upd775x_device::advance_state()
 
 *************************************************************/
 
-void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint8_t olddrq = m_drq;
 

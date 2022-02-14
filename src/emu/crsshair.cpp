@@ -13,6 +13,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "render.h"
 #include "rendutil.h"
 #include "screen.h"
@@ -189,7 +190,7 @@ void render_crosshair::create_bitmap()
 	if (!m_name.empty())
 	{
 		// look for user specified file
-		if (crossfile.open(m_name + ".png") == osd_file::error::NONE)
+		if (!crossfile.open(m_name + ".png"))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();
@@ -199,14 +200,14 @@ void render_crosshair::create_bitmap()
 	{
 		// look for default cross?.png in crsshair/game dir
 		std::string const filename = string_format("cross%d.png", m_player + 1);
-		if (crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)) == osd_file::error::NONE)
+		if (!crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();
 		}
 
 		// look for default cross?.png in crsshair dir
-		if (!m_bitmap->valid() && (crossfile.open(filename) == osd_file::error::NONE))
+		if (!m_bitmap->valid() && !crossfile.open(filename))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();
@@ -248,8 +249,8 @@ void render_crosshair::update_position()
 {
 	// read all the lightgun values
 	bool gotx = false, goty = false;
-	for (auto &port : m_machine.ioport().ports())
-		for (ioport_field &field : port.second->fields())
+	for (auto const &port : m_machine.ioport().ports())
+		for (ioport_field const &field : port.second->fields())
 			if (field.player() == m_player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
 			{
 				// handle X axis
@@ -357,7 +358,7 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* determine who needs crosshairs */
 	for (auto &port : machine.ioport().ports())
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE)
 			{
 				int player = field.player();
@@ -374,7 +375,11 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (m_usage)
-		machine.configuration().config_register("crosshairs", config_load_delegate(&crosshair_manager::config_load, this), config_save_delegate(&crosshair_manager::config_save, this));
+	{
+		machine.configuration().config_register("crosshairs",
+				configuration_manager::load_delegate(&crosshair_manager::config_load, this),
+				configuration_manager::save_delegate(&crosshair_manager::config_save, this));
+	}
 
 	/* register the animation callback */
 	screen_device *first_screen = screen_device_enumerator(machine.root_device()).first();
@@ -445,19 +450,15 @@ void crosshair_manager::render(screen_device &screen)
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void crosshair_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	/* Note: crosshair_load() is only registered if croshairs are used */
+	// Note: crosshair_load() is only registered if croshairs are used
 
-	/* we only care about game files */
-	if (cfg_type != config_type::GAME)
+	// we only care about system-specific configuration
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
-	/* might not have any data */
-	if (parentnode == nullptr)
-		return;
-
-	/* loop and get player crosshair info */
+	// loop and get player crosshair info
 	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
 	{
 		int const player = crosshairnode->get_attribute_int("player", -1);
@@ -474,8 +475,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode(u8(mode));
-					/* set visibility as specified by mode */
-					/* auto mode starts with visibility off */
+					// set visibility as specified by mode - auto mode starts with visibility off
 					crosshair.set_visible(mode == CROSSHAIR_VISIBILITY_ON);
 				}
 
@@ -485,7 +485,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 		}
 	}
 
-	/* get, check, and store auto visibility time */
+	// get, check, and store auto visibility time
 	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime");
 	if (crosshairnode)
 	{
@@ -503,10 +503,10 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 
 void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	/* Note: crosshair_save() is only registered if crosshairs are used */
+	// Note: crosshair_save() is only registered if crosshairs are used
 
-	/* we only care about game files */
-	if (cfg_type != config_type::GAME)
+	// we only create system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	for (int player = 0; player < MAX_PLAYERS; player++)
@@ -515,7 +515,7 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 
 		if (crosshair.is_used())
 		{
-			/* create a node */
+			// create a node
 			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair", nullptr);
 
 			if (crosshairnode != nullptr)
@@ -537,20 +537,19 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 					changed = true;
 				}
 
-				/* if nothing changed, kill the node */
+				// if nothing changed, kill the node
 				if (!changed)
 					crosshairnode->delete_node();
 			}
 		}
 	}
 
-	/* always store autotime so that it stays at the user value if it is needed */
+	// always store autotime so that it stays at the user value if it is needed
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
-		/* create a node */
+		// create a node
 		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime", nullptr);
-
-		if (crosshairnode != nullptr)
+		if (crosshairnode)
 			crosshairnode->set_attribute_int("val", m_auto_time);
 	}
 

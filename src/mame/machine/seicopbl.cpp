@@ -269,7 +269,7 @@ void seibu_cop_bootleg_device::cmd_trigger_w(offs_t offset, uint16_t data)
 		*/
 		case 0x8100:
 		{
-			uint16_t sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
+			[[maybe_unused]] uint16_t sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
 			sin_offs = m_host_space->read_byte(m_reg[0]+(0x35));
 			sin_offs |= m_host_space->read_byte(m_reg[0]+(0x37)) << 8;
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);

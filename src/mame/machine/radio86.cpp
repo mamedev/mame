@@ -10,9 +10,9 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/radio86.h"
 
+#include "cpu/i8085/i8085.h"
 
 
 void radio86_state::radio86_init_keyboard()
@@ -142,20 +142,22 @@ void radio86_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf000, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void radio86_state::machine_start()
@@ -186,8 +188,7 @@ u8 radio86_state::radio86ram_romdisk_porta_r()
 	u8 *romdisk = m_rom + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0)
 		return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
-	else
-	if (m_disk_sel==0xdf)
+	else if (m_disk_sel==0xdf)
 		return m_radio_ram_disk[m_romdisk_msb*256+m_romdisk_lsb + 0x10000];
 	else
 		return m_radio_ram_disk[m_romdisk_msb*256+m_romdisk_lsb];

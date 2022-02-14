@@ -33,7 +33,7 @@ Looking at the code of the cartridges it seems there is:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class sv8000_state : public driver_device
@@ -84,17 +84,17 @@ private:
 	required_ioport m_io_row2;
 	required_ioport m_io_joy;
 
-	uint8_t m_column;
+	uint8_t m_column = 0U;
 
 	// graphics signals
-	uint8_t m_ag;
-	uint8_t m_gm2;
-	uint8_t m_gm1;
-	uint8_t m_gm0;
-	uint8_t m_as;
-	uint8_t m_css;
-	uint8_t m_intext;
-	uint8_t m_inv;
+	uint8_t m_ag = 0U;
+	uint8_t m_gm2 = 0U;
+	uint8_t m_gm1 = 0U;
+	uint8_t m_gm0 = 0U;
+	uint8_t m_as = 0U;
+	uint8_t m_css = 0U;
+	uint8_t m_intext = 0U;
+	uint8_t m_inv = 0U;
 };
 
 
@@ -207,7 +207,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 
 	if (size != 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Incorrect or not support cartridge size");
 		return image_init_result::FAIL;
 	}
 

@@ -6,7 +6,6 @@
 #pragma once
 
 #include "cpu/m6809/konami.h" // for the callback and the firq irq definition
-#include "machine/bankdev.h"
 #include "video/k052109.h"
 #include "video/k053251.h"
 #include "video/k053246_k053247_k055673.h"
@@ -82,7 +81,7 @@ private:
 	void main_map(address_map &map);
 	void z80_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_SIMPSONS_H

@@ -14,6 +14,7 @@
 
 // standard SDL headers
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
 
 // standard C headers
 #include <cmath>
@@ -28,6 +29,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "render.h"
+#include "screen.h"
 #include "ui/uimain.h"
 
 // OSD headers
@@ -193,7 +195,7 @@ void sdl_osd_interface::window_exit()
 		window->destroy();
 	}
 
-	switch(video_config.mode)
+	switch (video_config.mode)
 	{
 		case VIDEO_MODE_SDL2ACCEL:
 			renderer_sdl1::exit();
@@ -528,11 +530,7 @@ osd_dim sdl_window_info::pick_best_mode()
 
 void sdl_window_info::update()
 {
-	osd_ticks_t     event_wait_ticks;
-
 	// adjust the cursor state
-	//sdlwindow_update_cursor_state(machine, window);
-
 	update_cursor_state();
 
 	// if we're visible and running and not in the middle of a resize, draw
@@ -558,6 +556,7 @@ void sdl_window_info::update()
 			}
 		}
 
+		osd_ticks_t event_wait_ticks;
 		if (video_config.waitvsync && video_config.syncrefresh)
 			event_wait_ticks = osd_ticks_per_second(); // block at most a second
 		else
@@ -585,20 +584,20 @@ void sdl_window_info::update()
 
 			m_primlist = &primlist;
 
-			// if no bitmap, just fill
 			if (m_primlist == nullptr)
 			{
+				// if no bitmap, just fill
 			}
-			// otherwise, render with our drawing system
 			else
 			{
-				if( video_config.perftest )
+				// otherwise, render with our drawing system
+				if (video_config.perftest)
 					measure_fps(update);
 				else
 					renderer().draw(update);
 			}
 
-			/* all done, ready for next */
+			// all done, ready for next
 			m_rendered_event.set();
 		}
 	}
@@ -684,11 +683,68 @@ int sdl_window_info::complete_create()
 	// get monitor work area for centering
 	osd_rect work = monitor()->usuable_position_size();
 
-	// create the SDL window
-	auto sdlwindow = SDL_CreateWindow(title().c_str(),
+	// create or attach to an existing window
+	SDL_Window *sdlwindow;
+#ifdef SDLMAME_X11
+	const char *attach_window = downcast<sdl_options &>(machine().options()).attach_window();
+#else
+	const char *attach_window = nullptr;
+#endif
+	if (attach_window && *attach_window)
+	{
+		// we're attaching to an existing window; parse the argument
+		unsigned long long attach_window_value;
+		try
+		{
+			attach_window_value = std::stoull(attach_window, nullptr, 0);
+		}
+		catch (std::invalid_argument &)
+		{
+			osd_printf_error("Invalid -attach_window value: %s\n", attach_window);
+			return 1;
+		}
+
+		// and attach to it
+		sdlwindow = SDL_CreateWindowFrom((void *)attach_window_value);
+		if (!sdlwindow)
+		{
+			osd_printf_error("Failed to attach to window \"%s\": %s\n", attach_window, SDL_GetError());
+			return 1;
+		}
+
+		// perform SDL subsystem-specific tasks
+		SDL_SysWMinfo swmi;
+		SDL_VERSION(&swmi.version);
+		if (SDL_GetWindowWMInfo(sdlwindow, &swmi))
+		{
+			switch (swmi.subsystem)
+			{
+#ifdef SDLMAME_X11
+			case SDL_SYSWM_X11:
+				// by default, SDL_CreateWindowFrom() doesn't ensure that we're getting the events that we
+				// expect
+				XSelectInput(swmi.info.x11.display, swmi.info.x11.window,
+					FocusChangeMask | EnterWindowMask | LeaveWindowMask |
+					PointerMotionMask | KeyPressMask | KeyReleaseMask |
+					PropertyChangeMask | StructureNotifyMask |
+					ExposureMask | KeymapStateMask);
+				break;
+#endif // SDLMAME_X11
+
+			default:
+				break;
+			}
+		}
+	}
+	else
+	{
+		// create the SDL window
+		sdlwindow = SDL_CreateWindow(title().c_str(),
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), m_extra_flags);
+	}
+
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
@@ -768,8 +824,8 @@ int sdl_window_info::complete_create()
 		return 1;
 
 	// Make sure we have a consistent state
-	SDL_ShowCursor(0);
-	SDL_ShowCursor(1);
+	SDL_ShowCursor(SDL_DISABLE);
+	SDL_ShowCursor(SDL_ENABLE);
 
 	return 0;
 }
@@ -849,10 +905,6 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	int32_t adjwidth, adjheight;
 	float pixel_aspect;
 
-	// do not constrain aspect ratio for integer scaled views
-	if (target()->scale_mode() != SCALE_FRACTIONAL)
-		return rect;
-
 	// get the pixel aspect ratio for the target monitor
 	pixel_aspect = monitor()->pixel_aspect();
 
@@ -915,6 +967,10 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// compute the visible area based on the proposed rectangle
 	target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), viswidth, visheight);
 
+	// clamp visable area to the proposed rectangle
+	viswidth = std::min(viswidth, propwidth);
+	visheight = std::min(visheight, propheight);
+
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect.width();
 	adjheight = (visheight + extraheight) - rect.height();
@@ -963,6 +1019,12 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 	// get the minimum target size
 	target()->compute_minimum_size(minwidth, minheight);
 
+	// check if visible area is bigger
+	int32_t viswidth, visheight;
+	target()->compute_visible_area(minwidth, minheight, monitor()->aspect(), target()->orientation(), viswidth, visheight);
+	minwidth = std::max(viswidth, minwidth);
+	minheight = std::max(visheight, minheight);
+
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)
 		minwidth = MIN_WINDOW_DIM;
@@ -974,7 +1036,7 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -1048,7 +1110,7 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	// remove extra window stuff

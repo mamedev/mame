@@ -58,7 +58,7 @@ static INPUT_PORTS_START( decocpu1 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

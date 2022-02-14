@@ -129,13 +129,13 @@
    [2] VDC Controller CF40052
 */
 
-DEFINE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device, "video992_24", "TI-99/2 CRT Controller 24K version")
-DEFINE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device, "video992_32", "TI-99/2 CRT Controller 32K version")
-DEFINE_DEVICE_TYPE_NS(IO99224, bus::ti99::internal, io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
-DEFINE_DEVICE_TYPE_NS(IO99232, bus::ti99::internal, io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
+DEFINE_DEVICE_TYPE(VIDEO99224, bus::ti99::internal::video992_24_device, "video992_24", "TI-99/2 CRT Controller 24K version")
+DEFINE_DEVICE_TYPE(VIDEO99232, bus::ti99::internal::video992_32_device, "video992_32", "TI-99/2 CRT Controller 32K version")
+DEFINE_DEVICE_TYPE(IO99224, bus::ti99::internal::io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
+DEFINE_DEVICE_TYPE(IO99232, bus::ti99::internal::io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
 
-DEFINE_DEVICE_TYPE_NS(TI992_EXPPORT, bus::ti99::internal, ti992_expport_device, "ti992_expport", "TI-99/2 Expansion Port")
-DEFINE_DEVICE_TYPE_NS(TI992_RAM32K, bus::ti99::internal, ti992_expram_device, "ti992_ram32k", "TI-99/2 RAM Expansion 32K")
+DEFINE_DEVICE_TYPE(TI992_EXPPORT, bus::ti99::internal::ti992_expport_device, "ti992_expport", "TI-99/2 Expansion Port")
+DEFINE_DEVICE_TYPE(TI992_RAM32K, bus::ti99::internal::ti992_expram_device, "ti992_ram32k", "TI-99/2 RAM Expansion 32K")
 
 namespace bus::ti99::internal {
 
@@ -175,7 +175,7 @@ std::string video992_device::tts(attotime t)
 }
 
 
-void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int raw_vpos = screen().vpos();
 

@@ -35,13 +35,13 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
+	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void find_matches(const char *str);
 

@@ -2,16 +2,19 @@
 // copyright-holders:Ernesto Corvi
 /*************************************************************************
 
-    Knuckle Joe
+  Knuckle Joe
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BLOODBRO_H
-#define MAME_INCLUDES_BLOODBRO_H
+
+#ifndef MAME_INCLUDES_KNCLJOE_H
+#define MAME_INCLUDES_KNCLJOE_H
 
 #pragma once
 
+#include "cpu/m6800/m6801.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -53,7 +56,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<m6803_cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -82,4 +85,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BLOODBRO_H
+#endif // MAME_INCLUDES_KNCLJOE_H

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nathan Woods, Vas Crabb
 /***************************************************************************
 
     text.h
@@ -12,10 +12,14 @@
 
 #pragma once
 
+#include <memory>
 #include <string_view>
+#include <vector>
+
 
 class render_font;
 class render_container;
+
 
 namespace ui {
 
@@ -27,7 +31,7 @@ class text_layout
 {
 public:
 	// justification options for text
-	enum text_justify
+	enum class text_justify
 	{
 		LEFT = 0,
 		CENTER,
@@ -35,7 +39,7 @@ public:
 	};
 
 	// word wrapping options
-	enum word_wrapping
+	enum class word_wrapping
 	{
 		NEVER,
 		TRUNCATE,
@@ -56,24 +60,22 @@ public:
 	word_wrapping wrap() const { return m_wrap; }
 
 	// methods
-	float actual_left() const;
-	float actual_width() const;
-	float actual_height() const;
-	bool empty() const { return m_lines.size() == 0; }
-	bool hit_test(float x, float y, size_t &start, size_t &span) const;
+	float actual_left();
+	float actual_width();
+	float actual_height();
+	bool empty() const { return m_lines.empty(); }
+	size_t lines() const { return m_lines.size(); }
+	bool hit_test(float x, float y, size_t &start, size_t &span);
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
-	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
 	void emit(render_container &container, float x, float y);
+	void emit(render_container &container, size_t start, size_t lines, float x, float y);
 	void add_text(std::string_view text, rgb_t fgcolor = rgb_t::white(), rgb_t bgcolor = rgb_t::transparent(), float size = 1.0)
 	{
-		// create the style
-		char_style style = { 0, };
-		style.fgcolor = fgcolor;
-		style.bgcolor = bgcolor;
-		style.size = size;
-
-		// and add the text
-		add_text(text, style);
+		add_text(text, justify(), char_style{ fgcolor, bgcolor, size });
+	}
+	void add_text(std::string_view text, text_justify line_justify, rgb_t fgcolor = rgb_t::white(), rgb_t bgcolor = rgb_t::transparent(), float size = 1.0)
+	{
+		add_text(text, line_justify, char_style{ fgcolor, bgcolor, size });
 	}
 
 private:
@@ -85,53 +87,10 @@ private:
 		float size;
 	};
 
-	// information about the "source" of a character - also in a struct
-	// to facilitate copying
-	struct source_info
-	{
-		size_t start;
-		size_t span;
-	};
-
-	// this should really be "positioned glyph" as glyphs != characters, but
-	// we'll get there eventually
-	struct positioned_char
-	{
-		char32_t character;
-		char_style style;
-		source_info source;
-		float xoffset;
-		float xwidth;
-	};
-
 	// class to represent a line
-	class line
-	{
-	public:
-		line(text_layout &layout, text_justify justify, float yoffset, float height);
-
-		// methods
-		void add_character(char32_t ch, const char_style &style, const source_info &source);
-		void truncate(size_t position);
-
-		// accessors
-		float xoffset() const;
-		float yoffset() const { return m_yoffset; }
-		float width() const { return m_width; }
-		float height() const { return m_height; }
-		text_justify justify() const { return m_justify; }
-		size_t character_count() const { return m_characters.size(); }
-		const positioned_char &character(size_t index) const { return m_characters[index]; }
-		positioned_char &character(size_t index) { return m_characters[index]; }
-
-	private:
-		std::vector<positioned_char> m_characters;
-		text_layout &m_layout;
-		text_justify m_justify;
-		float m_yoffset;
-		float m_width;
-		float m_height;
-	};
+	struct source_info;
+	struct positioned_char;
+	class line;
 
 	// instance variables
 	render_font &m_font;
@@ -141,15 +100,15 @@ private:
 	mutable float m_calculated_actual_width;
 	text_justify m_justify;
 	word_wrapping m_wrap;
-	std::vector<std::unique_ptr<line>> m_lines;
+	std::vector<std::unique_ptr<line> > m_lines;
 	line *m_current_line;
 	size_t m_last_break;
 	size_t m_text_position;
 	bool m_truncating;
 
 	// methods
-	void add_text(std::string_view text, const char_style &style);
-	void start_new_line(text_justify justify, float height);
+	void add_text(std::string_view text, text_justify line_justify, char_style const &style);
+	void start_new_line(float height);
 	float get_char_width(char32_t ch, float size);
 	void truncate_wrap();
 	void word_wrap();
@@ -158,4 +117,4 @@ private:
 
 } // namespace ui
 
-#endif  // MAME_FRONTEND_UI_TEXT_H
+#endif // MAME_FRONTEND_UI_TEXT_H

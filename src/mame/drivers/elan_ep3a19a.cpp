@@ -159,7 +159,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tvbg_2button )
 	PORT_INCLUDE( tvbg_1button )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END

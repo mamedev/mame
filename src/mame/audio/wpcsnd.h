@@ -13,7 +13,7 @@
 
 #include "cpu/m6809/m6809.h"
 #include "sound/hc55516.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class wpcsnd_device : public device_t, public device_mixer_interface

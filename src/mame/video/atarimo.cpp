@@ -150,6 +150,7 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 	, m_activelast(nullptr)
 	, m_last_xpos(0)
 	, m_next_xpos(0)
+	, m_xoffset(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -355,7 +356,7 @@ void atari_motion_objects_device::device_reset()
 //  calbacks
 //-------------------------------------------------
 
-void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -438,7 +439,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 	// extract data from the various words
 	int code = m_codelookup[rawcode];
 	int color = m_colorlookup[m_colormask.extract(entry)];
-	int xpos = m_xposmask.extract(entry);
+	int xpos = m_xposmask.extract(entry) + m_xoffset;
 	int ypos = -m_yposmask.extract(entry);
 	int hflip = m_hflipmask.extract(entry);
 	int vflip = m_vflipmask.extract(entry);

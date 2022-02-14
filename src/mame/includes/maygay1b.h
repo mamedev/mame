@@ -16,7 +16,7 @@
 #include "machine/steppers.h"   // stepper motor
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"

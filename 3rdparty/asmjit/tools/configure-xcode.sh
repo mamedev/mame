@@ -1,9 +1,8 @@
 #!/bin/sh
 
-BUILD_DIR="build_xcode"
-CURRENT_DIR=`pwd`
+CURRENT_DIR="`pwd`"
+BUILD_DIR="${CURRENT_DIR}/../build"
+BUILD_OPTIONS="-G Xcode -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DASMJIT_TEST=1"
 
-mkdir -p ../${BUILD_DIR}
-cd ../${BUILD_DIR}
-cmake .. -G"Xcode" -DASMJIT_TEST=1
-cd ${CURRENT_DIR}
+mkdir -p "${BUILD_DIR}"
+eval cmake "${CURRENT_DIR}/.." -B "${BUILD_DIR}" ${BUILD_OPTIONS}

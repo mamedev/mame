@@ -296,7 +296,6 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	uint8_t duart_input();
 	void duart_output(uint8_t data);
@@ -327,16 +326,11 @@ private:
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_6, state);
-}
-
 uint8_t dectalk_state::duart_input()
 {
 	uint8_t data = 0;
@@ -845,12 +839,12 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(ptr, param);
+		outfifo_read_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
@@ -880,7 +874,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
-	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
 	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));

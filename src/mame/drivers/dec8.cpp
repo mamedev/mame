@@ -48,10 +48,9 @@ To do:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/deco222.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 
@@ -133,7 +132,7 @@ uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 *
 ***************************************************/
 
-void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -11,16 +11,8 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ADAM_LEFT_EXPANSION_SLOT_TAG        "slot1"
-#define ADAM_CENTER_EXPANSION_SLOT_TAG      "slot2"
-#define ADAM_RIGHT_EXPANSION_SLOT_TAG       "slot3"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,7 +24,7 @@ class device_adam_expansion_slot_card_interface;
 
 class adam_expansion_slot_device : public device_t,
 									public device_single_card_slot_interface<device_adam_expansion_slot_card_interface>,
-									public device_image_interface
+									public device_cartrom_image_interface
 {
 public:
 	// construction/destruction
@@ -63,14 +55,7 @@ protected:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "adam_rom"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }

@@ -273,7 +273,7 @@ ROMs:
 #include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -597,7 +597,7 @@ void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

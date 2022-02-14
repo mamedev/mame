@@ -477,6 +477,43 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
+	PORT_START("P1") // note, the physical inputs are in 'phone' order, so 1 is top left, not bottom left like a PC Keypad
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 8") PORT_CODE(KEYCODE_8_PAD) // needed for DIAGNOSTICS mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 0") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad +") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad *") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_CONFNAME( 0x7000, 0x0000, "Non-TV Mode Game" )
+	PORT_CONFSETTING(      0x1000, "Learning Game" )
+	PORT_CONFSETTING(      0x2000, "Finding Game" )
+	PORT_CONFSETTING(      0x4000, "Memory Game" )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter") // needed for DIAGNOSTICS mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bell")
+	PORT_CONFNAME( 0x0040, 0x0000, "TV / Non-TV mode" ) // this is shown as a button in DIAGNOSTICS mode
+	PORT_CONFSETTING(      0x0000, "TV" )
+	PORT_CONFSETTING(      0x0040, "Non-TV" )
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset") // reset? back?
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rad_skat )
@@ -1004,6 +1041,28 @@ static INPUT_PORTS_START( dreamlss )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( knd )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tmntbftc )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -1166,7 +1225,7 @@ static INPUT_PORTS_START( doraglobe )
 
 	PORT_START("P1_ROW4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("Continent Button: Australia")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device 
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_PLAYER(1) PORT_NAME("Reset")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Mode Button: Explore and Find")
 
@@ -1833,14 +1892,14 @@ void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
 
 uint16_t spg2xx_game_doraphone_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
-    uint16_t matrix = 0x000f;
-    for (int b = 1; 6 >= b; ++b)
-    {
-        if (!BIT(m_portb_data, b))
-            matrix &= m_io_p1_rows[b - 1]->read();
-    }
+	uint16_t matrix = 0x000f;
+	for (int b = 1; 6 >= b; ++b)
+	{
+		if (!BIT(m_portb_data, b))
+			matrix &= m_io_p1_rows[b - 1]->read();
+	}
 
-    return matrix | (m_io_p1->read() & 0xfff0);
+	return matrix | (m_io_p1->read() & 0xfff0);
 }
 
 void spg2xx_game_doraphone_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1956,6 +2015,10 @@ ROM_START( tmntbftc )
 	ROM_LOAD16_WORD_SWAP( "tmntbftc.bin", 0x000000, 0x400000, CRC(f923da5b) SHA1(79b290b75d06dabd0f579800edc4453b044c8fd4) )
 ROM_END
 
+ROM_START( knd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "knd_sst39vf3201_00bf235b.bin", 0x000000, 0x400000, CRC(3b82479d) SHA1(2a4ddd5c6af2376e4725aeb44e79b0f9c45ca8c1) )
+ROM_END
 
 ROM_START( gssytts )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -2012,6 +2075,11 @@ ROM_START( vtechtvsgr )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
 ROM_END
 
+ROM_START( itvphone )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "inttvphone.bin", 0x000000, 0x200000, CRC(2ecbb0ad) SHA1(2b6babaaf1582e6b1de944258eba87ddf30406c5) )
+ROM_END
+
 ROM_START( jouet )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jouet.bin", 0x000000, 0x400000, CRC(da46097e) SHA1(f760f4d126a8291b7dacdea7a70691b25ad8b989) )
@@ -2027,6 +2095,10 @@ ROM_START( doraglob )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
 ROM_END
 
+ROM_START( doraglobg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraglobegerman.bin", 0x000000, 0x800000, CRC(538aa197) SHA1(e97e0641df04074a0e45d02cecb43fbec91a4ce6) )
+ROM_END
 
 ROM_START( senspeed )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2110,6 +2182,12 @@ void spg2xx_game_ordentv_state::init_ordentv()
 	rom[0x4fef8] = 0xee07;
 }
 
+void spg2xx_game_state::init_itvphone()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0xf152] = 0xee08;
+}
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
@@ -2155,12 +2233,16 @@ CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_s
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
+CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
 CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
-// A Dutch localized version also exists, which again must be different code
+// Dutch and French localized versions also exists, which again must be different code
 CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe",                           MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
+
 
 // ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
 CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )
@@ -2170,6 +2252,10 @@ CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_
 CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntbftc,   0,        0, spg2xx,    tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// The black flashing square on startup is part of the tilemap layer, it doesn't appear to happen on hardware
+// P.L.U.G.G.U.H.S. = Play Lots of Unbelievable Games, Getting Ultra High Scores
+CONS( 2005, knd,        0,        0, spg2xx,    knd,       spg2xx_game_state,          init_crc,      "Tech2Go / One Man Band",                                 "Codename: Kids Next Door - Operation: P.L.U.G.G.U.H.S.",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

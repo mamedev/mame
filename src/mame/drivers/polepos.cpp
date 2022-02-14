@@ -694,7 +694,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")  /* docs say "freeze", but it doesn't seem to work */
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" )                PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -780,7 +780,7 @@ static INPUT_PORTS_START( polepos2bi )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(    0x00, "90 secs." )
 	PORT_DIPSETTING(    0x40, "120 secs." )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Pause ) )         PORT_DIPLOCATION("SWB:8")
+	PORT_DIPNAME( 0x80, 0x00, "Freeze" )                PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END

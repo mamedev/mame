@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "msx_matsushita.h"
 
+#include "fileio.h"
+
 const uint8_t manufacturer_id = 0x08;
 
 DEFINE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device, "msx_matsushita", "Matsushita switched device")

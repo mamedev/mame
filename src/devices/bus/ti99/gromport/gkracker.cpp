@@ -97,6 +97,8 @@
 #include "emu.h"
 #include "gkracker.h"
 
+#include "fileio.h"
+
 #define LOG_WARN         (1U<<1)   // Warnings
 #define LOG_CHANGE       (1U<<2)   // Cartridge change
 #define LOG_GKRACKER     (1U<<3)   // Gram Kracker operation
@@ -104,7 +106,7 @@
 #define VERBOSE ( LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_GK, bus::ti99::gromport::ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
 
 namespace bus::ti99::gromport {
 

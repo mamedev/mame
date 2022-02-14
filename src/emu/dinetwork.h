@@ -23,7 +23,7 @@ public:
 	bool get_promisc() const { return m_promisc; }
 	int get_interface() const { return m_intf; }
 
-	int send(u8 *buf, int len);
+	int send(u8 *buf, int len, int fcs = 0);
 
 	// TODO: de-virtualise this when existing devices implement delayed receive
 	virtual void recv_cb(u8 *buf, int len);

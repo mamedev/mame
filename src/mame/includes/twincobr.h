@@ -121,12 +121,12 @@ protected:
 	void wardner_videoram_w(offs_t offset, u8 data);
 	u8 wardner_sprite_r(offs_t offset);
 	void wardner_sprite_w(offs_t offset, u8 data);
+	void pri_cb(u8 priority, u32 &pri_mask);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
 	void twincobr_create_tilemaps();
 	DECLARE_WRITE_LINE_MEMBER(display_on_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

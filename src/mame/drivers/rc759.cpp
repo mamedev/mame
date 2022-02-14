@@ -6,8 +6,11 @@
 
     TODO:
     - Needs better I82730 emulation
-    - Sound
+    - Floppy I/O errors
     - Many more things
+
+    Notes:
+    - Press SPACE during self-test for an extended menu
 
 ***************************************************************************/
 
@@ -28,6 +31,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "formats/rc759_dsk.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,6 +53,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_ppi(*this, "ppi"),
 		m_txt(*this, "txt"),
+		m_palette(*this, "palette"),
 		m_cas(*this, "cas"),
 		m_isbx(*this, "isbx"),
 		m_speaker(*this, "speaker"),
@@ -81,6 +86,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<i8255_device> m_ppi;
 	required_device<i82730_device> m_txt;
+	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cas;
 	required_device<isbx_slot_device> m_isbx;
 	required_device<speaker_sound_device> m_speaker;
@@ -181,7 +187,8 @@ void rc759_state::rc759_io(address_map &map)
 	map.unmap_value_high();
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x020, 0x020).r(m_kbd, FUNC(rc759_kbd_hle_device::read));
-//	map(0x056, 0x056)
+	map(0x056, 0x056).w(m_snd, FUNC(sn76494_device::write));
+	map(0x056, 0x057).nopr();
 	map(0x05a, 0x05a).w(FUNC(rc759_state::rtc_data_w));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_data_r), FUNC(rc759_state::rtc_addr_w));
 //  map(0x060, 0x06f).w(FUNC(rc759_state::crt_control_w)).umask16(0x00ff);
@@ -264,6 +271,7 @@ void rc759_state::txt_irst_w(uint16_t data)
 
 uint8_t rc759_state::palette_r(offs_t offset)
 {
+	// not sure if it's possible to read back
 	logerror("palette_r(%02x)\n", offset);
 	return 0xff;
 }
@@ -271,6 +279,22 @@ uint8_t rc759_state::palette_r(offs_t offset)
 void rc759_state::palette_w(offs_t offset, uint8_t data)
 {
 	logerror("palette_w(%02x): %02x\n", offset, data);
+
+	// two colors/byte. format: IRGBIRGB
+	static constexpr uint8_t val[4] = { 0x00, 0x55, 0xaa, 0xff };
+	int r, g, b;
+
+	r = (BIT(data, 2) << 1) | BIT(data, 3);
+	g = (BIT(data, 1) << 1) | BIT(data, 3);
+	b = (BIT(data, 0) << 1) | BIT(data, 3);
+
+	m_palette->set_pen_color(offset * 2 + 0, rgb_t(val[r], val[g], val[b]));
+
+	r = (BIT(data, 6) << 1) | BIT(data, 7);
+	g = (BIT(data, 5) << 1) | BIT(data, 7);
+	b = (BIT(data, 4) << 1) | BIT(data, 7);
+
+	m_palette->set_pen_color(offset * 2 + 1, rgb_t(val[r], val[g], val[b]));
 }
 
 
@@ -569,7 +593,7 @@ void rc759_state::rc759(machine_config &config)
 	m_maincpu->tmrout0_handler().set(FUNC(rc759_state::i186_timer0_w));
 	m_maincpu->tmrout1_handler().set(FUNC(rc759_state::i186_timer1_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
@@ -592,11 +616,14 @@ void rc759_state::rc759(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(1250000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
 	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
+	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this
 
 	I82730(config, m_txt, 1250000, m_maincpu);
 	m_txt->set_screen("screen");
 	m_txt->set_update_row_callback(FUNC(rc759_state::txt_update_row));
 	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
+
+	PALETTE(config, m_palette).set_entries(64);
 
 	// sound
 	SPEAKER(config, "mono").front_center();

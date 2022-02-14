@@ -690,7 +690,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -755,7 +755,7 @@ void funcube_touchscreen_device::device_reset()
 	m_tx_cb(1);
 }
 
-void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!id) {
 		uint8_t button_state = m_btn->read();
@@ -2508,7 +2508,7 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
 	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
 
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 

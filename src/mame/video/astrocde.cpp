@@ -113,9 +113,9 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 			int b = (by + y) * 255;
 
 			// clamp and store
-			r = (std::min)((std::max)(r, 0), 255);
-			g = (std::min)((std::max)(g, 0), 255);
-			b = (std::min)((std::max)(b, 0), 255);
+			r = std::clamp(r, 0, 255);
+			g = std::clamp(g, 0, 255);
+			b = std::clamp(b, 0, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
@@ -379,7 +379,7 @@ uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -387,7 +387,7 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		scanline_callback(ptr, param);
+		scanline_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in astrocde_state::device_timer");

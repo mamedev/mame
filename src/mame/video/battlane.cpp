@@ -9,35 +9,25 @@
 #include "emu.h"
 #include "includes/battlane.h"
 
-/*
-    Video control register
-
-        0x80    = low bit of blue component (taken when writing to palette)
-        0x0e    = Bitmap plane (bank?) select  (0-7)
-        0x01    = Scroll MSB
-*/
 
 void battlane_state::battlane_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 	int bit0, bit1, bit2;
 
-	/* red component */
-
+	// red component
 	bit0 = (~data >> 0) & 0x01;
 	bit1 = (~data >> 1) & 0x01;
 	bit2 = (~data >> 2) & 0x01;
 	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	/* green component */
-
+	// green component
 	bit0 = (~data >> 3) & 0x01;
 	bit1 = (~data >> 4) & 0x01;
 	bit2 = (~data >> 5) & 0x01;
 	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	/* blue component */
-
+	// blue component
 	bit0 = (~m_video_ctrl >> 7) & 0x01;
 	bit1 = (~data >> 6) & 0x01;
 	bit2 = (~data >> 7) & 0x01;
@@ -59,7 +49,7 @@ void battlane_state::battlane_scrolly_w(uint8_t data)
 void battlane_state::battlane_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
-	//m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 void battlane_state::battlane_spriteram_w(offs_t offset, uint8_t data)
@@ -77,17 +67,25 @@ void battlane_state::battlane_bitmap_w(offs_t offset, uint8_t data)
 	{
 		if (data & 1 << i)
 		{
-			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			m_screen_bitmap.pix(offset & 0xff, (offset >> 8 ) * 8 + i) |= orval;
 		}
 		else
 		{
-			m_screen_bitmap.pix(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			m_screen_bitmap.pix(offset & 0xff, (offset >> 8) * 8 + i) &= ~orval;
 		}
 	}
 }
 
 void battlane_state::battlane_video_ctrl_w(uint8_t data)
 {
+	/*
+	    Video control register
+
+	        0x80    = low bit of blue component (taken when writing to palette)
+	        0x0e    = Bitmap plane (bank?) select  (0-7)
+	        0x01    = Scroll MSB
+	*/
+
 	m_video_ctrl = data;
 }
 
@@ -126,6 +124,7 @@ TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
 	return (row & 0xf) * 16 + (col & 0xf) + (row & 0x10) * 32 + (col & 0x10) * 16;
 }
 
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -139,9 +138,9 @@ void battlane_state::video_start()
 	save_item(NAME(m_screen_bitmap));
 }
 
-void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void battlane_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
+	int offs, attr, code, color, sx, sy, flipx, flipy;
 
 	for (offs = 0; offs < 0x100; offs += 4)
 	{
@@ -164,13 +163,13 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (attr & 0x01)
 		{
-			color = (attr >> 3) & 0x01;
+			color = BIT(attr, 3);
 
 			sx = m_spriteram[offs + 2];
 			sy = m_spriteram[offs];
 
-			flipx = attr & 0x04;
-			flipy = attr & 0x02;
+			flipx = BIT(attr, 2);
+			flipy = BIT(attr, 1);
 
 			if (!flip_screen())
 			{
@@ -180,29 +179,28 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				flipy = !flipy;
 			}
 
-
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-				code,
-				color,
-				flipx, flipy,
-				sx, sy, 0);
-
-			if (attr & 0x10)  /* Double Y direction */
+			if (attr & 0x10) // Y Double
 			{
-				dy = flipy ? 16 : -16;
-
-
+				for (int i = 0; i < 2; i++)
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-					code + 1,
+						code + i,
+						color,
+						flipx, flipy,
+						sx, sy - (16 * (i ^ flipy)), 0);
+			}
+			else
+			{
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					code,
 					color,
 					flipx, flipy,
-					sx, sy + dy, 0);
+					sx, sy, 0);
 			}
 		}
 	}
 }
 
-void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
+void battlane_state::draw_fg_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 32 * 8; y++)
 	{
@@ -212,9 +210,14 @@ void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 
 			if (data)
 			{
+				int px = x, py = y;
 				if (flip_screen())
-					bitmap.pix(255 - y, 255 - x) = data;
-				else
+				{
+					px = 255 - px;
+					py = 255 - py;
+				}
+
+				if (cliprect.contains(px, py))
 					bitmap.pix(y, x) = data;
 			}
 		}
@@ -223,10 +226,8 @@ void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 
 uint32_t battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->mark_all_dirty(); // HACK
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
-	draw_fg_bitmap(bitmap);
+	draw_fg_bitmap(bitmap, cliprect);
 	return 0;
 }

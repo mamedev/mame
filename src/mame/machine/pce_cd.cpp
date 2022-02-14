@@ -503,7 +503,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) + 1 ].logframeofs; //get the end of THIS track
+			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframeofs + m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframes; //get the end of THIS track
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 0;
 			m_cdda_play_mode = 3;
@@ -700,11 +700,6 @@ void pce_cd_device::nec_get_dir_info()
 			{
 				track = std::max(bcd_2_dec(m_command_buffer[2]), 1U);
 				frame = toc->tracks[track-1].logframeofs;
-				// PCE wants the start sector for data tracks to *not* include the pregap
-				if (toc->tracks[track-1].trktype != CD_TRACK_AUDIO)
-				{
-					frame += toc->tracks[track-1].pregap;
-				}
 				m_data_buffer[3] = (toc->tracks[track-1].trktype == CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
 			logerror("track = %d, frame = %d\n", track, frame);

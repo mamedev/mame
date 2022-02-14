@@ -284,7 +284,7 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 	}
 }
 
-void dp83932c_device::command(void *ptr, s32 param)
+void dp83932c_device::command(s32 param)
 {
 	if (param & CR_HTX)
 	{
@@ -393,7 +393,7 @@ void dp83932c_device::transmit()
 
 	// transmit data
 	dump_bytes(buf, length);
-	send(buf, length);
+	send(buf, length, 4);
 }
 
 void dp83932c_device::send_complete_cb(int result)

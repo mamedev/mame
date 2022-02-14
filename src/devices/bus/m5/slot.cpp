@@ -73,7 +73,7 @@ void device_m5_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 m5_cart_slot_device::m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M5_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface(mconfig, *this),
 	m_type(M5_STD),
 	m_cart(nullptr)
@@ -166,7 +166,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an M5 cart");
+				seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an M5 cart");
 				return image_init_result::FAIL;
 			}
 

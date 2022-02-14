@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license: CC0
+
+Critter Crusher (STV)
+-->
+
+<mamelayout version="2">
+
+	<element name="cc_digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<view name="Billboard">
+		<element name="cc_digit0" ref="cc_digit">
+			<bounds x="370" y="30" width="15" height="30" />
+		</element>
+
+		<element name="cc_digit1" ref="cc_digit">
+			<bounds x="400" y="30" width="15" height="30" />
+		</element>
+
+		<screen tag="screen">
+			<bounds left="0" top="100" right="800" bottom="700" />
+		</screen>
+	</view>
+
+</mamelayout>

@@ -74,6 +74,8 @@ public:
 
 	void impact_nonvideo(machine_config &config);
 	void impact_nonvideo_altreels(machine_config &config);
+	void impact_nonvideo_disc(machine_config &config);
+
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	template <unsigned N> DECLARE_READ_LINE_MEMBER( coinsense_r ) { return (m_coinstate >> N) & 1; }
@@ -117,6 +119,7 @@ protected:
 
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_inv_cb) { if (!state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	template <unsigned N> TIMER_DEVICE_CALLBACK_MEMBER(coinoff) { m_coinstate |= (1 << N); logerror("coin state lowered %d\n", N+1); }
 
 

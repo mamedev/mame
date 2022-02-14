@@ -30,15 +30,15 @@
 
 void jedi_state::video_start()
 {
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 	/* the sprite pixel determines pen address bits A4-A7 */
 	gfx_element *gx0 = m_gfxdecode->gfx(2);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_gfxdata = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_gfxdata.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -57,7 +57,7 @@ void jedi_state::video_start()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_gfxdata.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(1);
 #endif
 
@@ -350,7 +350,7 @@ u32 jedi_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
  *
  *************************************/
 
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 static const gfx_layout text_layout =
 {
 	8, 8,
@@ -393,7 +393,7 @@ GFXDECODE_END
 
 void jedi_state::jedi_video(machine_config &config)
 {
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jedi);
 #endif
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -48,7 +48,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual bool is_6809() override { return false; };
+	virtual bool is_6809() override { return false; }
 
 private:
 	typedef m6809_base_device super;

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/ep64_dsk.h"
 
 ep64_format::ep64_format() : wd177x_format(formats)

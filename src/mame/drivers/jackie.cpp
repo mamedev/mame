@@ -3,6 +3,7 @@
 /*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.
+IGS PCB N0-T0039-4
 
 Driver by David Haywood and Mirko Buffoni
 */
@@ -49,7 +50,7 @@ Note
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

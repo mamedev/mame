@@ -403,7 +403,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -435,7 +435,7 @@ void wgp_state::cpua_ctrl_w(u16 data)/* assumes Z80 sandwiched between 68Ks */
                         INTERRUPTS
 ***********************************************************/
 
-void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

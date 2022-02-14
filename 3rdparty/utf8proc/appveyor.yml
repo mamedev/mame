@@ -16,23 +16,27 @@ build_script:
       throw "There are newer queued builds for this pull request, failing early." }
   - mkdir msvc_static
   - cd msvc_static
-  - cmake ..
+  - cmake .. -DUTF8PROC_ENABLE_TESTING=On
   - cmake --build .
+  - ctest
   - mkdir ..\msvc_shared
   - cd ..\msvc_shared
-  - cmake .. -DBUILD_SHARED_LIBS=ON
+  - cmake .. -DBUILD_SHARED_LIBS=ON -DUTF8PROC_ENABLE_TESTING=On
   - cmake --build .
+  - ctest
   - set PATH=C:\MinGW\bin;%PATH%
   - C:\MinGW\msys\1.0\bin\sh --login -c "
       cd /c/projects/utf8proc &&
       mkdir mingw_static &&
       cd mingw_static &&
-      cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -G'MSYS Makefiles' &&
+      cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DUTF8PROC_ENABLE_TESTING=On -G'MSYS Makefiles' &&
       make &&
+      ctest &&
       mkdir ../mingw_shared &&
       cd ../mingw_shared &&
-      cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_SHARED_LIBS=ON -G'MSYS Makefiles' &&
-      make
+      cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_SHARED_LIBS=ON -DUTF8PROC_ENABLE_TESTING=On -G'MSYS Makefiles' &&
+      make &&
+      ctest
       "
 
 on_finish:

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "cpu/z80/z80.h"
 
 class t5182_device : public device_t
@@ -42,7 +42,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;

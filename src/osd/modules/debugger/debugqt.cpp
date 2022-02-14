@@ -33,7 +33,7 @@
 #include "qt/deviceinformationwindow.h"
 
 class debug_qt : public osd_module, public debug_module
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 , public QAbstractNativeEventFilter
 #endif
 {
@@ -50,7 +50,7 @@ public:
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
 #endif
 private:
@@ -79,21 +79,17 @@ MainWindow *mainQtWindow = nullptr;
 std::vector<std::unique_ptr<WindowQtConfig> > xmlConfigurations;
 
 
-void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
+void xml_configuration_load(running_machine &machine, config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// We only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// Might not have any data
-	if (!parentnode)
+	// We only care about system configuration files
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	xmlConfigurations.clear();
 
 	// Configuration load
 	util::xml::data_node const *wnode = nullptr;
-	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
+	for (wnode = parentnode->get_child("window"); wnode; wnode = wnode->get_next_sibling("window"))
 	{
 		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
@@ -114,8 +110,8 @@ void xml_configuration_load(running_machine &machine, config_type cfg_type, util
 
 void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// We only write to game configurations
-	if (cfg_type != config_type::GAME)
+	// We only save system configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -234,7 +230,7 @@ void bring_main_window_to_front()
 //  Core functionality
 //============================================================
 
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 bool winwindow_qt_filter(void *message);
 
 bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, long *)
@@ -250,7 +246,7 @@ void debug_qt::init_debugger(running_machine &machine)
 	{
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 		QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 #endif
 	}
@@ -269,8 +265,8 @@ void debug_qt::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
-			config_load_delegate(&xml_configuration_load, &machine),
-			config_save_delegate(&xml_configuration_save, &machine));
+			configuration_manager::load_delegate(&xml_configuration_load, &machine),
+			configuration_manager::save_delegate(&xml_configuration_save, &machine));
 }
 
 
@@ -280,7 +276,7 @@ void debug_qt::init_debugger(running_machine &machine)
 
 #if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 extern int sdl_entered_debugger;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 void winwindow_update_cursor_state(running_machine &machine);
 #endif
 
@@ -347,7 +343,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 		// all the QT windows are already gone.
 		gather_save_configurations();
 	}
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
+#if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
 }

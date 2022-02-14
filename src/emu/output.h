@@ -109,6 +109,7 @@ public:
 		auto &operator[](unsigned n) { return m_proxies[n]; }
 		auto &operator[](unsigned n) const { return m_proxies[n]; }
 
+		auto size() const { return std::size(m_proxies); }
 		auto begin() { return std::begin(m_proxies); }
 		auto end() { return std::end(m_proxies); }
 		auto begin() const { return std::begin(m_proxies); }

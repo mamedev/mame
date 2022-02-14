@@ -71,6 +71,7 @@ X - change banks
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
@@ -83,10 +84,13 @@ X - change banks
 #include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class bigbord2_state : public driver_device
 {
@@ -140,10 +144,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
-	u8 m_term_data;
-	u8 m_term_status;
-	uint16_t m_cnt;
-	bool m_cc[8];
+	u8 m_term_data = 0U;
+	u8 m_term_status = 0U;
+	uint16_t m_cnt = 0U;
+	bool m_cc[8]{};
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -334,11 +338,11 @@ void bigbord2_state::syslatch2_w(u8 data)
 void bigbord2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x5fff).bankr("bankr").bankw("bankw");
-	map(0x6000, 0x67ff).bankrw("bankv");
-	map(0x6800, 0x6fff).bankrw("bankv1");
-	map(0x7000, 0x77ff).bankrw("banka");
-	map(0x7800, 0x7fff).bankrw("banka1");
+	map(0x0000, 0x5fff).bankr(m_bankr).bankw(m_bankw);
+	map(0x6000, 0x67ff).bankrw(m_bankv);
+	map(0x6800, 0x6fff).bankrw(m_bankv1);
+	map(0x7000, 0x77ff).bankrw(m_banka);
+	map(0x7800, 0x7fff).bankrw(m_banka1);
 	map(0x8000, 0xffff).ram();
 }
 
@@ -627,6 +631,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // U10 : 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
+	m_fdc->drq_wr_callback().set(FUNC(bigbord2_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
@@ -670,7 +675,6 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 /* ROMs */
 
-
 ROM_START( bigbord2 )
 	// for optional roms and eproms
 	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
@@ -683,6 +687,10 @@ ROM_START( bigbord2 )
 	ROM_LOAD( "pal16l8.u23", 0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "pal10l8.u34", 0x0400, 0x0400, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
+
 /* System Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                       FULLNAME        FLAGS

@@ -7,7 +7,7 @@
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "tilemap.h"
 #include "video/bufsprite.h"

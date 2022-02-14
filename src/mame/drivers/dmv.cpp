@@ -309,9 +309,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 	if (m_color_mode)
 	{
 		// 96KB videoram (32KB green + 32KB red + 32KB blue)
-		uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-		uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-		uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+		uint16_t green = m_video_ram[(0x00000 + (address & 0x3fff))];
+		uint16_t red   = m_video_ram[(0x04000 + (address & 0x3fff))];
+		uint16_t blue  = m_video_ram[(0x08000 + (address & 0x3fff))];
 
 		for(int xi=0; xi<16; xi++)
 		{
@@ -328,7 +328,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		uint16_t gfx = m_video_ram[(address & 0xffff) >> 1];
+		uint16_t gfx = m_video_ram[(address & 0x3fff)];
 
 		for(int xi=0;xi<16;xi++)
 		{
@@ -361,6 +361,9 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 		for( int yi = 0; yi < lr; yi++)
 		{
 			uint8_t tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
+
+			if((attr & 2) && (m_screen->frame_number() & 0x10)) // FIXME: blink freq
+				tile_data = 0;
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -612,8 +615,8 @@ void dmv_state::kb_mcu_port2_w(uint8_t data)
 
 void dmv_state::upd7220_map(address_map &map)
 {
-	map.global_mask(0x1ffff);
-	map(0x00000, 0x1ffff).ram().share("video_ram");
+	map.global_mask(0xffff);
+	map(0x0000, 0xffff).ram().share("video_ram");
 }
 
 /* Input ports */

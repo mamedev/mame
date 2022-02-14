@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="whited"><disk><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+	<element name="dark"><rect><color red="0.10" green="0.11" blue="0.10" /></rect></element>
+	<element name="darkd"><disk><color red="0.10" green="0.11" blue="0.10" /></disk></element>
+	<element name="green"><rect><color red="0.2" green="0.55" blue="0.1" /></rect></element>
+
+	<element name="text_l1">
+		<rect><color red="0" green="0" blue="0" /></rect>
+		<text string="VISITOR"><color red="0.8" green="0.8" blue="0.8" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0" green="0" blue="0" /></rect>
+		<text string="HOME"><color red="0.8" green="0.8" blue="0.8" /></text>
+	</element>
+
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
+		<rect state="1"><color red="0.5" green="0.05" blue="0.075" /></rect>
+		<rect state="2"><color red="1.0" green="0.1" blue="0.15" /></rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="10" right="130" top="0" bottom="105" />
+
+		<!-- bezel -->
+		<element ref="darkd"><bounds x="34" y="48" width="19" height="19" /></element>
+		<element ref="blackd"><bounds x="35" y="49" width="17" height="17" /></element>
+		<element ref="darkd"><bounds x="60.5" y="48" width="19" height="19" /></element>
+		<element ref="blackd"><bounds x="61.5" y="49" width="17" height="17" /></element>
+		<element ref="darkd"><bounds x="87" y="48" width="19" height="19" /></element>
+		<element ref="blackd"><bounds x="88" y="49" width="17" height="17" /></element>
+
+		<element ref="dark"><bounds x="19" y="31" width="27" height="53" /></element>
+		<element ref="black"><bounds x="19" y="32" width="26" height="51" /></element>
+		<element ref="dark"><bounds x="94" y="31" width="27" height="53" /></element>
+		<element ref="black"><bounds x="95" y="32" width="26" height="51" /></element>
+
+		<element ref="dark"><bounds x="19" y="45.5" width="12" height="24" /></element>
+		<element ref="black"><bounds x="19" y="46.5" width="11" height="22" /></element>
+		<element ref="dark"><bounds x="109" y="45.5" width="12" height="24" /></element>
+		<element ref="black"><bounds x="110" y="46.5" width="11" height="22" /></element>
+
+		<element ref="whited"><bounds x="14.5" y="14.5" width="10" height="10" /></element>
+		<element ref="blackd"><bounds x="15.5" y="15.5" width="8" height="8" /></element>
+		<element ref="whited"><bounds x="115.5" y="14.5" width="10" height="10" /></element>
+		<element ref="blackd"><bounds x="116.5" y="15.5" width="8" height="8" /></element>
+		<element ref="whited"><bounds x="14.5" y="90.5" width="10" height="10" /></element>
+		<element ref="blackd"><bounds x="15.5" y="91.5" width="8" height="8" /></element>
+		<element ref="whited"><bounds x="115.5" y="90.5" width="10" height="10" /></element>
+		<element ref="blackd"><bounds x="116.5" y="91.5" width="8" height="8" /></element>
+
+		<element ref="white"><bounds x="18" y="18" width="104" height="2" /></element>
+		<element ref="white"><bounds x="18" y="18" width="2" height="79" /></element>
+		<element ref="white"><bounds x="120" y="18" width="2" height="79" /></element>
+		<element ref="white"><bounds x="18" y="95" width="104" height="2" /></element>
+
+		<element ref="green"><bounds x="1" y="1" width="138" height="18" /></element>
+		<element ref="green"><bounds x="1" y="1" width="18" height="115" /></element>
+		<element ref="green"><bounds x="1" y="96" width="138" height="18" /></element>
+		<element ref="green"><bounds x="121" y="1" width="18" height="115" /></element>
+
+		<element ref="text_l1"><bounds x="25" y="98.5" width="20" height="4" /></element>
+		<element ref="text_l2"><bounds x="95" y="98.5" width="20" height="4" /></element>
+
+		<element ref="white"><bounds x="13" y="48.5" width="6.5" height="18" /></element>
+		<element ref="green"><bounds x="14" y="49.5" width="5" height="16" /></element>
+		<element ref="white"><bounds x="120.5" y="48.5" width="6.5" height="18" /></element>
+		<element ref="green"><bounds x="121" y="49.5" width="5" height="16" /></element>
+
+		<element ref="black"><bounds x="0" y="0" width="140" height="10" /></element>
+		<element ref="black"><bounds x="0" y="0" width="10" height="120" /></element>
+		<element ref="black"><bounds x="0" y="105" width="140" height="20" /></element>
+		<element ref="black"><bounds x="130" y="0" width="10" height="120" /></element>
+
+		<element ref="white"><bounds x="54" y="-9.5" width="32" height="29" /></element>
+		<element ref="black"><bounds x="55" y="13" width="30" height="6" /></element>
+		<element ref="black"><bounds x="55" y="-10" width="30" height="22" /></element>
+		<element ref="black"><bounds x="0" y="-10" width="140" height="10" /></element>
+
+		<!-- leds -->
+		<element name="digit6" ref="digit"><bounds x="63.25" y="2" width="6" height="8" /></element>
+		<element name="digit7" ref="digit"><bounds x="70.75" y="2" width="6" height="8" /></element>
+
+		<element name="5.3" ref="led"><bounds x="69" y="15.625" width="2" height="0.75" /></element>
+
+		<repeat count="5">
+			<param name="y" start="25" increment="16.0625" />
+			<param name="i1" start="4" increment="-1" />
+
+			<repeat count="7">
+				<param name="x" start="25" increment="14.6666" />
+				<param name="i2" start="0" increment="1" />
+				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="2" height="0.75" /></element>
+			</repeat>
+		</repeat>
+
+	</view>
+</mamelayout>

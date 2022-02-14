@@ -63,7 +63,7 @@ protected:
 	void key_changed(int x, int y, bool down);
 	void scan_keys();
 	void update_modifiers(int y, bool down);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	output_delegate             m_keyboard_cb;
 	required_ioport_array<12>   m_io_kbd_t;

@@ -13,7 +13,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"

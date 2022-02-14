@@ -174,6 +174,8 @@ private:
 	emu_timer *m_1st_timer;
 	emu_timer *m_2nd_timer;
 	emu_timer *m_kbd_timer;
+	std::unique_ptr<uint8_t[]> m_allocated_ram;
+	std::unique_ptr<uint8_t[]> m_allocated_rom;
 };
 
 

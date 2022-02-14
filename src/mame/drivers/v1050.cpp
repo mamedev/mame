@@ -105,8 +105,8 @@ Notes:
 
     Start the Visual 1050 emulator with the floppy and hard disk images mounted:
 
-    $ mess v1050 -flop1 cpm3:flop2 -hard tm501.chd
-    $ mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
+    $ mame v1050 -flop1 cpm3:flop2 -hard tm501.chd
+    $ mame v1050 -flop1 cpm3:flop2 -hard cm5412.chd
 
     Start the Winchester Format Program from the CP/M prompt:
 
@@ -128,13 +128,13 @@ Notes:
 
     You can now boot from the hard disk with:
 
-    $ mess v1050 -hard tm501.chd
-    $ mess v1050 -hard cm5412.chd
+    $ mame v1050 -hard tm501.chd
+    $ mame v1050 -hard cm5412.chd
 
     Or skip all of the above and use the preformatted images in the software list:
 
-    $ mess v1050 -hard cpm3hd5
-    $ mess v1050 -hard cpm3hd10
+    $ mame v1050 -hard cpm3hd5
+    $ mame v1050 -hard cpm3hd10
 
 */
 

@@ -15,6 +15,8 @@
 #include "emu.h"
 #include "machine/ds1994.h"
 
+#include "fileio.h"
+
 #include <ctime>
 
 #define VERBOSE_LEVEL 0
@@ -353,7 +355,7 @@ void ds1994_device::ds1994_writemem(uint8_t value)
 /*                                               */
 /*************************************************/
 
-void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

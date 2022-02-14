@@ -480,7 +480,7 @@ void via6522_device::shift_in()
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
-void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -776,7 +776,7 @@ u8 via6522_device::read(offs_t offset)
 			LOGSHIFT(" - ACR: %02x ", m_acr);
 			if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a read
+				m_shift_timer->adjust(clocks_to_attotime(7) / 2); // 7 edges to cb1 change from start of read
 				LOGSHIFT(" - read SR starts O2 timer ");
 			}
 			else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
@@ -972,7 +972,7 @@ void via6522_device::write(offs_t offset, u8 data)
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a write
+			m_shift_timer->adjust(clocks_to_attotime(6) / 2); // 6 edges to cb2 change from start of write
 			LOGSHIFT(" - write SR starts O2 timer");
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))

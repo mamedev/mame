@@ -13,7 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class pinsnd88_device : public device_t, public device_mixer_interface
@@ -55,7 +55,7 @@ protected:
 	static const device_timer_id TIMER_SYNC = 0;
 private:
 	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// members
 	devcb_write_line m_syncq_cb;

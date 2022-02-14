@@ -4,6 +4,8 @@
 
     ITT 3030
 
+    When the machine is started you get a black screen.
+    Hold down B until the cursor appears. It will then boot from the floppy.
 
     ToDo:
     - Check Beeper
@@ -200,6 +202,7 @@ Beeper Circuit, all ICs shown:
 #include "video/tms9927.h"          //Display hardware
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
 #include "debugger.h"

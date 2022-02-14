@@ -387,11 +387,23 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	<software name="sprdose6">
 		<description>SuperDOS E6</description>
 		<year>1986</year>
-		<publisher>PNP</publisher>
+		<publisher>PNP Communications</publisher>
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
 				<rom name="superdos e6 (198x)(pnp).rom" size="8192" crc="8c1d6c45" sha1="ef157016386ed463374de6bac84d1f8ce654ed80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terminal" supported="no">
+		<description>Terminal Simulator</description>
+		<year>1984</year>
+		<publisher>Telepost Systems</publisher>
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="terminal simulator 1 24-5-84.rom" size="8192" crc="6a7e8b36" sha1="dbd1871c5ecb338defd3209b387d83d5222ed4a6" offset="0x0000" />
+				<rom name="terminal simulator 2 24-5-84.rom" size="8192" crc="ea472a6a" sha1="d6fab40b421a3054bbd32e9d2641ec17fc614cd6" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -431,6 +443,30 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			<!-- <feature name="slot" value="epromprg" /> -->
 			<dataarea name="rom" size="4096">
 				<rom name="eprom_mkII_v21.rom" size="4096" crc="310bc0a0" sha1="4aba041033410ab912753407ae29e5fe89925440"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epromps" supported="no">
+		<description>Dragon EPROM Programmer</description>
+		<year>1984</year>
+		<publisher>Steve's Electronics</publisher>
+		<part name="cart" interface="coco_cart">
+			<!-- <feature name="slot" value="epromprg" /> -->
+			<dataarea name="rom" size="4096">
+				<rom name="ecm_ep_kit.rom" size="4096" crc="f5e1d7f0" sha1="cce757b0662abb8c110e1a072cbf9f54d097d010"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prestel" supported="no">
+		<description>Prestel</description>
+		<year>1987</year>
+		<publisher>Peaksoft</publisher>
+		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="serial" />
+			<dataarea name="rom" size="8192">
+				<rom name="comron_peaksoft.rom" size="8192" crc="9d18cf46" sha1="14124dfb4bd78d1907e80d779cd7f3bae30564c9"/>
 			</dataarea>
 		</part>
 	</software>

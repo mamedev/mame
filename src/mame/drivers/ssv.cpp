@@ -398,9 +398,7 @@ void ssv_state::dsp_w(offs_t offset, uint16_t data)
 
 ***************************************************************************/
 
-#ifdef UNUSED_FUNCTION
-uint16_t ssv_state::fake_r(offs_t offset){   return ssv_scroll[offset];  }
-#endif
+uint16_t ssv_state::fake_r(offs_t offset) { return m_scroll[offset]; }
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
 {
@@ -553,7 +551,7 @@ void ssv_state::hypreac2_map(address_map &map)
 
 
 /***************************************************************************
-                                Jan Jan Simasyo
+                                Jan Jan Shimasho
 ***************************************************************************/
 
 
@@ -1343,10 +1341,10 @@ static INPUT_PORTS_START( eaglshot )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSW2:8" )
 
 	PORT_START("TRACKX")    // IN5 - trackball x ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("TRACKY")    // IN6 - trackball y ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -4829,18 +4827,17 @@ ROM_START( gdfs )
 	ROM_REGION( 0x80000, "gfx3", 0 )    // Tilemap
 	ROM_LOAD( "ssvv7.u16",    0x0000000, 0x080000, CRC(f1c3ab6f) SHA1(b7f54f7ae60650fee7570aa4dd4266c629149673) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
-	ROM_LOAD16_BYTE( "vg004-12.u4", 0x000000, 0x200000, CRC(eb41a4ef) SHA1(f4d0844a3c00cf90faa59ae982744b7f0bcbe218) )
-	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000001, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) )
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD16_BYTE( "vg004-12.u4", 0x000000, 0x200000, CRC(eb41a4ef) SHA1(f4d0844a3c00cf90faa59ae982744b7f0bcbe218) ) // music
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000000, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) ) // credit sound, gunshots etc.
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Samples */
+	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 ) // nothing played from here?
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 ) /* Samples */
+	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 ) // nothing played from here?
 ROM_END
 
 /***************************************************************************

@@ -155,5 +155,5 @@ private:
 	void taiwanmb_io_map(address_map &map);
 	void taiwanmb_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -12,11 +12,10 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wtype-limits")
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wunused-parameter")
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wunused-value")
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wdeprecated-declarations")
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4018) // warning C4018:  '<': signed/unsigned mismatch
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: '' : unreferenced formal parameter
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4389) // warning C4389 : '==' : signed / unsigned mismatch
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4505) // warning C4505: 'tinyexr::miniz::def_realloc_func': unreferenced local function has been removed
-#if BX_PLATFORM_EMSCRIPTEN
-#	include <compat/ctype.h>
-#endif // BX_PLATFORM_EMSCRIPTEN
 #define MINIZ_NO_ARCHIVE_APIS
 #define MINIZ_NO_STDIO
 #define TINYEXR_IMPLEMENTATION
@@ -25,6 +24,8 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4127) // warning C4127: conditional expression is constant
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4267) // warning C4267: '=' : conversion from 'size_t' to 'unsigned short', possible loss of data
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4334) // warning C4334: '<<' : result of 32 - bit shift implicitly converted to 64 bits(was 64 - bit shift intended ? )
 #define LODEPNG_NO_COMPILE_ENCODER
 #define LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
@@ -49,9 +50,11 @@ void lodepng_free(void* _ptr)
 }
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wint-to-pointer-cast")
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow");
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wint-to-pointer-cast")
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wsign-compare");
+BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wunused-but-set-variable");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Warray-bounds");
 #if BX_COMPILER_GCC >= 60000
 BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wmisleading-indentation");
@@ -107,8 +110,8 @@ namespace bimg
 				case 1:
 				case 2:
 				case 4:
-					format    = bimg::TextureFormat::R8;
-					palette   = false;
+					palette   = LCT_PALETTE == state.info_raw.colortype;
+					format    = palette ? bimg::TextureFormat::RGBA8 : bimg::TextureFormat::R8;
 					supported = true;
 					break;
 
@@ -139,6 +142,9 @@ namespace bimg
 							format  = bimg::TextureFormat::RGBA8;
 							palette = true;
 							supported = true;
+							break;
+
+						case LCT_MAX_OCTET_VALUE:
 							break;
 					}
 					break;
@@ -194,6 +200,9 @@ namespace bimg
 
 						case LCT_PALETTE:
 							break;
+
+						case LCT_MAX_OCTET_VALUE:
+							break;
 					}
 					break;
 
@@ -206,7 +215,10 @@ namespace bimg
 				const uint8_t* copyData = data;
 
 				TextureFormat::Enum dstFormat = format;
-				if (1 == state.info_raw.bitdepth
+				if (palette) {
+					copyData = NULL;
+				}
+				else if (1 == state.info_raw.bitdepth
 				||  2 == state.info_raw.bitdepth
 				||  4 == state.info_raw.bitdepth)
 				{
@@ -217,10 +229,6 @@ namespace bimg
 				{
 					dstFormat = bimg::TextureFormat::RGBA16;
 					copyData  = NULL;
-				}
-				else if (palette)
-				{
-					copyData = NULL;
 				}
 
 				output = imageAlloc(_allocator
@@ -234,7 +242,48 @@ namespace bimg
 					, copyData
 					);
 
-				if (1 == state.info_raw.bitdepth)
+				if (palette)
+				{
+					if (1 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*32;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>7)&0x1)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + ( (data[ii]>>6)&0x1)*4, 4);
+							bx::memCopy(dst +  8, state.info_raw.palette + ( (data[ii]>>5)&0x1)*4, 4);
+							bx::memCopy(dst + 12, state.info_raw.palette + ( (data[ii]>>4)&0x1)*4, 4);
+							bx::memCopy(dst + 16, state.info_raw.palette + ( (data[ii]>>3)&0x1)*4, 4);
+							bx::memCopy(dst + 20, state.info_raw.palette + ( (data[ii]>>2)&0x1)*4, 4);
+							bx::memCopy(dst + 24, state.info_raw.palette + ( (data[ii]>>1)&0x1)*4, 4);
+							bx::memCopy(dst + 28, state.info_raw.palette + (  data[ii]    &0x1)*4, 4);
+						}
+					}
+					else if (2 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/4; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*16;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>6)&0x3)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + ( (data[ii]>>4)&0x3)*4, 4);
+							bx::memCopy(dst +  8, state.info_raw.palette + ( (data[ii]>>2)&0x3)*4, 4);
+							bx::memCopy(dst + 12, state.info_raw.palette + (  data[ii]    &0x3)*4, 4);
+						}
+					}
+					else if (4 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/2; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*8;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>4)&0xf)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + (  data[ii]    &0xf)*4, 4);
+						}
+					}
+					else {
+						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
+						{
+							bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
+						}
+					}
+				}
+				else if (1 == state.info_raw.bitdepth)
 				{
 					for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
 					{
@@ -296,12 +345,77 @@ namespace bimg
 						dst[3] = UINT16_MAX;
 					}
 				}
-				else if (palette)
+
+				switch (state.info_raw.colortype) //Check for alpha values
 				{
-					for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
-					{
-						bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
-					}
+					case LCT_GREY:
+					case LCT_RGB:
+						break;
+
+					case LCT_GREY_ALPHA:
+						if (8 == state.info_raw.bitdepth)
+						{
+							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
+							{
+								const uint8_t* rgba = (uint8_t*)data + ii * 2;
+								bool has_alpha = rgba[1] < UINT8_MAX;
+								if (has_alpha)
+								{
+									output->m_hasAlpha = has_alpha;
+									break;
+								}
+							}
+						}
+						else if(16 == state.info_raw.bitdepth)
+						{
+							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
+							{
+								const uint16_t* rgba = (uint16_t*)data + ii * 2;
+								bool has_alpha = rgba[1] < UINT16_MAX;
+								if (has_alpha)
+								{
+									output->m_hasAlpha = has_alpha;
+									break;
+								}
+							}
+						}
+						break;
+
+					case LCT_RGBA:
+						if (8 == state.info_raw.bitdepth)
+						{
+							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
+							{
+								const uint8_t* dst = (uint8_t*)output->m_data + ii * 4;
+								bool has_alpha = dst[3] < UINT8_MAX;
+								if (has_alpha)
+								{
+									output->m_hasAlpha = has_alpha;
+									break;
+								}
+							}
+						}
+						else if (16 == state.info_raw.bitdepth)
+						{
+							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
+							{
+								const uint16_t* dst = (uint16_t*)output->m_data + ii * 4;
+								bool has_alpha = dst[3] < UINT16_MAX;
+								if (has_alpha)
+								{
+									output->m_hasAlpha = has_alpha;
+									break;
+								}
+							}
+						}
+						break;
+
+					case LCT_PALETTE:
+						output->m_hasAlpha = lodepng_has_palette_alpha(&state.info_raw);
+						break;
+
+					case LCT_MAX_OCTET_VALUE:
+						break;
 				}
 			}
 			else
@@ -330,6 +444,8 @@ namespace bimg
 		bimg::TextureFormat::Enum format = bimg::TextureFormat::RGBA8;
 		uint32_t width  = 0;
 		uint32_t height = 0;
+
+		bool hasAlpha = false;
 
 		uint8_t* data = NULL;
 		const char* err = NULL;
@@ -431,6 +547,8 @@ namespace bimg
 							};
 							bx::memCopy(&data[ii * bytesPerPixel], rgba, bytesPerPixel);
 
+							hasAlpha |= (hasAlpha || rgba[3] < 1.0f);
+
 							srcR += stepR;
 							srcG += stepG;
 							srcB += stepB;
@@ -456,6 +574,8 @@ namespace bimg
 								*srcA,
 							};
 							bx::memCopy(&data[ii * bytesPerPixel], rgba, bytesPerPixel);
+
+							hasAlpha |= (hasAlpha || rgba[3] < UINT16_MAX);
 
 							srcR += stepR;
 							srcG += stepG;
@@ -512,7 +632,9 @@ namespace bimg
 				, data
 				);
 			BX_FREE(_allocator, data);
+			output->m_hasAlpha = hasAlpha;
 		}
+
 
 		return output;
 	}

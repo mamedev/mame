@@ -14,7 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/pit8253.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class leland_80186_sound_device : public device_t
@@ -71,7 +71,7 @@ protected:
 	void leland_80186_map_program(address_map &map);
 
 private:
-	void delayed_response_r(void *ptr, int param);
+	void delayed_response_r(int param);
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state

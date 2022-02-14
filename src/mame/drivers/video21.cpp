@@ -55,8 +55,8 @@ private:
 	void lamp1_w(uint8_t data);
 	void lamp2_w(uint8_t data);
 
-	int m_hopper_motor;
-	int m_hopper_coin;
+	int m_hopper_motor = 0;
+	int m_hopper_coin = 0;
 	emu_timer *m_hopper_timer;
 	TIMER_CALLBACK_MEMBER(hopper_coinout);
 

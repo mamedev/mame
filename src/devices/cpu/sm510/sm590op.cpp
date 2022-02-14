@@ -15,6 +15,7 @@ void sm590_device::do_branch(u8 pu, u8 pm, u8 pl)
 	m_pc = (((u16)pu << 9 & 0x200) | ((u16)pm << 7 & 0x180) | (pl & 0x07f)) & m_prgmask;
 }
 
+
 // instruction set
 
 void sm590_device::op_adx()
