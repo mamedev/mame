@@ -9610,10 +9610,11 @@ braiplus                        //
 
 @source:brkthru.cpp
 brkthru                         // (c) 1986 Data East USA (US)
+brkthrubl                       // bootleg
 brkthruj                        // (c) 1986 Data East Corporation (Japan)
 brkthrut                        // (c) 1986 Data East Corporation (Tecfri license)
 darwin                          // (c) 1986 Data East Corporation (Japan)
-forcebrk                        // (c) 1986 Data East Corporation (Japan)
+forcebrk                        // bootleg
 
 @source:bsktball.cpp
 bsktball                        // 034756-034766    1979/05 [6502]
@@ -16811,6 +16812,7 @@ girotutt                        // (c) 2000 High Video
 grancapi                        // (c) 2000 High Video
 magicbom                        // (c) 2000 High Video
 newmcard                        // (c) 19?? unknown
+newtiger                        // (c) 200? unknown
 nyjoker                         //
 record                          // (c) 2000 High Video
 tour4000                        // (c) 2000 High Video
@@ -17151,6 +17153,7 @@ amazoni2                        // (c) 2002
 amazonia                        // (c) 1999
 amazonkp                        // (c) 1999
 chessc2                         // (c) 200?
+extradrw                        // (c) 200?
 fruitpar                        // (c) 200?
 gonefsh2                        // (c) 200?
 haunthig                        // (c) 200?
@@ -42512,7 +42515,8 @@ videopkr                        // (c) 1984 InterFlip
 jokrlady                        //
 ladygum                         //
 paradar                         //
-unkvsaa                         //
+scratch                         //
+toureiff                        //
 winner                          //
 
 @source:vigilant.cpp
