@@ -204,8 +204,7 @@ void tsconf_state::machine_start()
 		m_banks[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	memory_region *rom = memregion("maincpu");
-	u8 rom_banks = (rom->bytes()) / 0x4000;
-	m_banks[4]->configure_entries(0, rom_banks, rom->base(), 0x4000);
+	m_banks[4]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 
 	save_item(NAME(m_regs));
 	// TODO save'm'all!

@@ -918,8 +918,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			// Not quite precise. Scanline can't be skipped.
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
-		u16 vpos = OFFS_512(VS_INT_L);
-		if (BIT(m_regs[INT_MASK], 0) && vpos == screen_vpos && m_regs[HS_INT] == 0)
+		if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
 			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
