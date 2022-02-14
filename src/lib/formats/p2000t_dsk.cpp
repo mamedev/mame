@@ -50,10 +50,10 @@ const p2000t_format::format p2000t_format::formats[] = {
 
                                 RPM    cell_size
         5.25" SD         4       300    4000
-	    5.25" DD         2       300    2000
-	    5.25" HD         1       360    1200
-	    3.5" DD          2       300    2000
-	    
+        5.25" DD         2       300    2000
+        5.25" HD         1       360    1200
+        3.5" DD          2       300    2000
+
     */
     {   /*  3 1/2 inch single sided double density */
         floppy_image::FF_35,  floppy_image::SSDD, floppy_image::MFM,
@@ -65,11 +65,11 @@ const p2000t_format::format p2000t_format::formats[] = {
     },
     {   /*  5 1/4 inch single sided single density 35 ttrk */
         floppy_image::FF_525,  floppy_image::SSSD, floppy_image::MFM,
-        4000,  16, 35, 1, 256, {}, 1, {}, 80, 50, 22, 50
+        2000,  16, 35, 1, 256, {}, 1, {}, 80, 50, 22, 50
     },
     {   /*  5 1/4 inch single density 35 trk */
         floppy_image::FF_525,  floppy_image::DSSD, floppy_image::MFM,
-        4000,  16, 35, 2, 256, {}, 1, {}, 80, 50, 22, 50
+        2000,  16, 35, 2, 256, {}, 1, {}, 80, 50, 22, 50
     },
     {   /*  5 1/4 inch single sided double density 40 trk */
         floppy_image::FF_525,  floppy_image::SSDD, floppy_image::MFM,
@@ -77,7 +77,7 @@ const p2000t_format::format p2000t_format::formats[] = {
     },
     {   /*  5 1/4 inch double density  40 trk */
         floppy_image::FF_525,  floppy_image::DSDD, floppy_image::MFM,
-        2000,  16, 40, 2, 256, {}, 1, {}, 80, 50, 22, 50  // 2000,  16, 40, 2, 256, {}, 1, {}, 26, 24, 28, 50
+        2000,  16, 40, 2, 256, {}, 1, {}, 80, 50, 22, 50
     },
     {   /*  5 1/4 inch quad density  80 trk */
         floppy_image::FF_525,  floppy_image::DSDD, floppy_image::MFM,

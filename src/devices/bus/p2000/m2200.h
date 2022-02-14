@@ -3,14 +3,14 @@
 /**********************************************************************
 Implementation of the P2000T Miniware Muliti purpose extention board
   This emulation was based on documentation from the P2000T presevation page
-  https://github.com/p2000t/documentation/tree/master/hardware 
+  https://github.com/p2000t/documentation/tree/master/hardware
    [M2200.pdf and FieldSupportManual.pdf]
-  
+
     P2000 M2200 Multi Purpose Floppy Dics Controller Card
 
     Ports:
         80-83       CTCBSEL - Z80-CTCB (SIO baud control) (channel 0-3)
-        84-87       SIO 
+        84-87       SIO
                         84: data reg. RS232
                         85: cmd/status RS232
                         86: data RS422
@@ -19,12 +19,12 @@ Implementation of the P2000T Miniware Muliti purpose extention board
         8c-8f       FDCSEL - Floppy ctrl (fdc) uPD765
         90          IOSEL - Floppy/DC control port
         94          SWSEL - RAM Bank select
-        
-        95-97       RAM disk 
+
+        95-97       RAM disk
                         95: set track
                         96: set sector (+ reset data cnt)
                         97: data (in/out)
-        98-9b       Centronics 
+        98-9b       Centronics
                         98: data reg. [out]
                         99: status reg. [in]
                         9a: strobe on
@@ -59,33 +59,33 @@ Implementation of the P2000T Miniware Muliti purpose extention board
 
 // ======= p2000_fdc_device ================
 
-class p2000_fdc_device :  
+class p2000_fdc_device :
     public device_t,
-	public device_p2000_expansion_slot_card_interface
+    public device_p2000_expansion_slot_card_interface
 {
 
 public:
-	// construction/destruction
-	p2000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    // construction/destruction
+    p2000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
     p2000_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-    
-	// device-level overrides
-	virtual void device_start() override;
+
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
 
     // optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
 
     DECLARE_WRITE_LINE_MEMBER(fdc_interrupt);
     uint8_t dew_r() override;
-    
+
     /* FDC control lines */
     DECLARE_WRITE_LINE_MEMBER(fdc_irq_trigger);
     DECLARE_WRITE_LINE_MEMBER(fdc_index_trigger);
     DECLARE_WRITE_LINE_MEMBER(fdc_hdl_wr_trigger);
-    
+
     /* FDC control ports */
     void fdc_control(uint8_t data);
     uint8_t fdc_fcdr();
@@ -96,8 +96,8 @@ protected:
     // marker is found there is no disc present.
     const static unsigned int m_ready_control_delay = 400;
     TIMER_CALLBACK_MEMBER(ready_timer_cb);
-    
-    required_device<z80ctc_device> m_ctc; 
+
+    required_device<z80ctc_device> m_ctc;
     required_device<upd765a_device> m_fdc;
 
     const static unsigned int m_num_of_drives = 4;
@@ -136,18 +136,18 @@ class p2000_m2200_multipurpose_device :  public p2000_fdc_device
 {
 
 public:
-	// construction/destruction
-	p2000_m2200_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    // construction/destruction
+    p2000_m2200_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
     p2000_m2200_multipurpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
-    
+
     // optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
 
     /* RAM Drive control ports */
     void port_95_w(uint8_t data);
@@ -156,7 +156,7 @@ protected:
     uint8_t port_96_r();
     void port_97_w(uint8_t data);
     uint8_t port_97_r() ;
-    
+
     /* Centonics control ports */
     void port_98_w(uint8_t data);
     uint8_t port_99_r();
@@ -164,11 +164,11 @@ protected:
     uint8_t port_9a_r();
     void port_9b_w(uint8_t data);
     uint8_t port_9b_r();
-    
+
     required_device<mc146818_device> m_rtc;
-    required_device<z80ctc_device> m_ctc2; 
-    required_device<z80sio_device> m_sio; 
-    required_device<centronics_device> m_centronics; 
+    required_device<z80ctc_device> m_ctc2;
+    required_device<z80sio_device> m_sio;
+    required_device<centronics_device> m_centronics;
 
     DECLARE_WRITE_LINE_MEMBER(centronics_ack_w);
     DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
@@ -202,10 +202,10 @@ private:
 
 class p2000_m2200d_multipurpose_device :  public p2000_m2200_multipurpose_device
 {
-   
+
 public:
-	// construction/destruction
-	p2000_m2200d_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    // construction/destruction
+    p2000_m2200d_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
     uint32_t get_ramdrive_max_tracks_mask() override { return (0x10000 / 4096) - 1;  }
@@ -220,7 +220,7 @@ protected:
         };
         return m2200_daisy_chain;
     }
-    
+
 };
 
 // device type definition

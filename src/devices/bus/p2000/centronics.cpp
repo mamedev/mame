@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(P2000_P2GGCENT,   p2000_p2gg_centronics_device,  "p2kggcent",
 //  p2000_mw102_centronics_device - constructor
 //-------------------------------------------------
 p2000_mw102_centronics_device::p2000_mw102_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P2000_CENTRONICS, tag, owner, clock)
+    : device_t(mconfig, P2000_CENTRONICS, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
     , m_centronics(*this, "centronics")
 {
@@ -36,7 +36,7 @@ p2000_mw102_centronics_device::p2000_mw102_centronics_device(const machine_confi
 void p2000_mw102_centronics_device::device_add_mconfig(machine_config &config)
 {
     CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(p2000_mw102_centronics_device::centronics_busy_w));
+    m_centronics->busy_handler().set(FUNC(p2000_mw102_centronics_device::centronics_busy_w));
     m_centronics->perror_handler().set(FUNC(p2000_mw102_centronics_device::centronics_paper_empty_w));
 }
 
@@ -66,13 +66,13 @@ void p2000_mw102_centronics_device::device_reset()
 void p2000_mw102_centronics_device::port_4e_w(uint8_t data)
 {
     m_centronics->write_data0(BIT(data, 0));
-	m_centronics->write_data1(BIT(data, 1));
-	m_centronics->write_data2(BIT(data, 2));
-	m_centronics->write_data3(BIT(data, 3));
-	m_centronics->write_data4(BIT(data, 4));
-	m_centronics->write_data5(BIT(data, 5));
-	m_centronics->write_data6(BIT(data, 6));
-	m_centronics->write_data7(BIT(data, 7));
+    m_centronics->write_data1(BIT(data, 1));
+    m_centronics->write_data2(BIT(data, 2));
+    m_centronics->write_data3(BIT(data, 3));
+    m_centronics->write_data4(BIT(data, 4));
+    m_centronics->write_data5(BIT(data, 5));
+    m_centronics->write_data6(BIT(data, 6));
+    m_centronics->write_data7(BIT(data, 7));
 }
 
 /* -------------------------------------------------
@@ -122,7 +122,7 @@ uint8_t p2000_mw102_centronics_device::port_4f_r()
 //-------------------------------------------------
 
 p2000_p2gg_centronics_device::p2000_p2gg_centronics_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+    : device_t(mconfig, type, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
     , m_centronics(*this, "centronics")
 {
@@ -140,7 +140,7 @@ void p2000_p2gg_centronics_device::device_add_mconfig(machine_config &config)
 {
     CENTRONICS(config, m_centronics, centronics_devices, "printer");
     m_centronics->ack_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_ack_w));
-	m_centronics->busy_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_busy_w));
+    m_centronics->busy_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_busy_w));
     m_centronics->perror_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_paper_empty_w));
     m_centronics->select_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_select_w));
     m_centronics->fault_handler().set(FUNC(p2000_p2gg_centronics_device::centronics_error_w));
@@ -172,13 +172,13 @@ void p2000_p2gg_centronics_device::device_reset()
 void p2000_p2gg_centronics_device::port_46_w(uint8_t data)
 {
     m_centronics->write_data0(BIT(data, 0));
-	m_centronics->write_data1(BIT(data, 1));
-	m_centronics->write_data2(BIT(data, 2));
-	m_centronics->write_data3(BIT(data, 3));
-	m_centronics->write_data4(BIT(data, 4));
-	m_centronics->write_data5(BIT(data, 5));
-	m_centronics->write_data6(BIT(data, 6));
-	m_centronics->write_data7(BIT(data, 7));
+    m_centronics->write_data1(BIT(data, 1));
+    m_centronics->write_data2(BIT(data, 2));
+    m_centronics->write_data3(BIT(data, 3));
+    m_centronics->write_data4(BIT(data, 4));
+    m_centronics->write_data5(BIT(data, 5));
+    m_centronics->write_data6(BIT(data, 6));
+    m_centronics->write_data7(BIT(data, 7));
 
     m_centronics->write_strobe(1);
     m_centronics->write_strobe(0);
@@ -191,7 +191,7 @@ void p2000_p2gg_centronics_device::port_46_w(uint8_t data)
         0    ack
         1    busy
         2    paper empty
-`       3    select
+        3    select
         4    error
         5    Cartridge present (allways 1)
 ------------------------------------------------- */
@@ -247,7 +247,7 @@ uint8_t p2000_p2gg_centronics_device::port_47_r()
 //  p2000_p2gg_centronics_device - constructor
 //-------------------------------------------------
 p2000_m2003_centronics_device::p2000_m2003_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: p2000_p2gg_centronics_device(mconfig, P2000_M2003, tag, owner, clock)
+    : p2000_p2gg_centronics_device(mconfig, P2000_M2003, tag, owner, clock)
 {
 }
 
@@ -269,13 +269,13 @@ void p2000_m2003_centronics_device::device_start()
 void p2000_m2003_centronics_device::port_46_w(uint8_t data)
 {
     m_centronics->write_data0(BIT(data, 0));
-	m_centronics->write_data1(BIT(data, 1));
-	m_centronics->write_data2(BIT(data, 2));
-	m_centronics->write_data3(BIT(data, 3));
-	m_centronics->write_data4(BIT(data, 4));
-	m_centronics->write_data5(BIT(data, 5));
-	m_centronics->write_data6(BIT(data, 6));
-	m_centronics->write_data7(BIT(data, 7));
+    m_centronics->write_data1(BIT(data, 1));
+    m_centronics->write_data2(BIT(data, 2));
+    m_centronics->write_data3(BIT(data, 3));
+    m_centronics->write_data4(BIT(data, 4));
+    m_centronics->write_data5(BIT(data, 5));
+    m_centronics->write_data6(BIT(data, 6));
+    m_centronics->write_data7(BIT(data, 7));
 }
 
 

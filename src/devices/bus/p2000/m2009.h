@@ -3,14 +3,14 @@
 /**********************************************************************
 
     P2000 Miniware M2009 Auto Dial/Answer modem Cartridge
-        Port    
+        Port
            40   freq. divider 0   global div.
            41   freq. divider 1   (2.5 MHz / div 0 / div 1 - RX clock)
            42   freq. divider 2   (2.5 MHz / div 0 / div 2 - TX clock)
            43   program divider 2
-           44   USART 8251 DATA port 
+           44   USART 8251 DATA port
            45   USART 8251 command port
-        
+
 **********************************************************************/
 
 #ifndef MAME_BUS_P2000_M2009_H
@@ -38,30 +38,30 @@
                         43: data in/out channlel B
         44-47       Phone Line control
                       bit 5:  Phone off hook (Line open)
-                      bit 6:  Dial active (line short with resistor)  
+                      bit 6:  Dial active (line short with resistor)
                       bit 7:  Dial pulse  (line short)
-        
+
     TODO: inplement AM7910(m_modem)
 **********************************************************************/
 class p2000_m2009_modem_device :
-	public device_t,
-	public device_p2000_expansion_slot_card_interface
+    public device_t,
+    public device_p2000_expansion_slot_card_interface
 {
 
 public:
-	// construction/destruction
-	p2000_m2009_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    
+    // construction/destruction
+    p2000_m2009_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
 
     TIMER_CALLBACK_MEMBER(dial_pulse_timer_cb);
-    
+
     required_device<scc8530_device> m_scc;
-    
+
     void port_40_w(uint8_t data);
     uint8_t port_40_r();
     void port_41_w(uint8_t data);
@@ -81,7 +81,7 @@ private:
     bool m_sync_toggle = true;
     uint8_t m_port_44 = 0;
     uint8_t m_cha_reg = 0;
-    
+
     const static unsigned int m_dialing_ready_delay = 2000;
     const static unsigned int m_number_size = 20;
     bool m_dial_in_progress = false;

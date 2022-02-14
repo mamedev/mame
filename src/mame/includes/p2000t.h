@@ -48,7 +48,7 @@ public:
     }
 
     void p2000t(machine_config &config);
-    
+
 protected:
     uint8_t p2000t_port_000f_r(offs_t offset);
     uint8_t p2000t_port_202f_r();
@@ -67,7 +67,7 @@ protected:
 
     uint8_t videoram_r(offs_t offset);
     virtual void machine_start() override;
-    
+
     INTERRUPT_GEN_MEMBER(p2000_interrupt);
     DECLARE_WRITE_LINE_MEMBER(p2000_slot_interrupt);
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
@@ -75,30 +75,30 @@ protected:
     void p2000t_mem(address_map &map);
     void p2000t_io(address_map &map);
     int in_80char_mode() { return BIT(m_port_707f, 0) ? 1 : 0; }
-    
+
     uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
     optional_device<saa5050_device> m_saa5050; // Only available on P2000T not on M-model
     required_device<screen_device> m_screen;
     required_shared_ptr<uint8_t> m_videoram;
-    
+
     required_device<z80_device> m_maincpu;
     required_device<speaker_sound_device> m_speaker;
     required_device<mdcr_device> m_mdcr;
     required_device<rs232_port_device> m_printer;
-    
+
     required_device<generic_slot_device> m_slot1;
-	required_device<p2000_expansion_slot_device> m_slot2;
-	required_device<p2000_expansion_slot_device> m_ext1;
+    required_device<p2000_expansion_slot_device> m_slot2;
+    required_device<p2000_expansion_slot_device> m_ext1;
     required_device<p2000_expansion_slot_device> m_ext2;
 
     required_device<ram_device> m_ram;
-    
+
     required_memory_bank m_bank;
 
 private:
     required_ioport_array<10> m_keyboard;
     required_ioport m_jumper;
-    
+
     uint8_t m_port_101f = 0;
     uint8_t m_port_303f = 0;
     uint8_t m_port_707f = 0;
@@ -121,7 +121,7 @@ protected:
     virtual void video_start() override;
     void p2000m_palette(palette_device &palette) const;
     uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-    
+
     void p2000m_mem(address_map &map);
 
 private:

@@ -28,11 +28,11 @@ DEFINE_DEVICE_TYPE(P2000_M2009, p2000_m2009_modem_device, "p2km2009", "P2000 Min
 
 // Viewdata settings as default
 static DEVICE_INPUT_DEFAULTS_START( modem  )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_75 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+    DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_75 )
+    DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+    DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+    DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+    DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
 #define M2009_PHONE_HOOK   5
@@ -43,7 +43,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  p2000_m2009_modem_device - constructor
 //-------------------------------------------------
 p2000_m2009_modem_device::p2000_m2009_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P2000_M2009, tag, owner, clock)
+    : device_t(mconfig, P2000_M2009, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
     , m_scc(*this, "scc")
 {
@@ -54,17 +54,17 @@ p2000_m2009_modem_device::p2000_m2009_modem_device(const machine_config &mconfig
 //-------------------------------------------------
 void p2000_m2009_modem_device::device_add_mconfig(machine_config &config)
 {
-    SCC8530N(config, m_scc, 2.4576_MHz_XTAL); 
+    SCC8530N(config, m_scc, 2.4576_MHz_XTAL);
     // TXD over channel B (75 baud)  - port 0x40 - 0x41
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
-	m_scc->out_dtrb_callback().set("modem", FUNC(rs232_port_device::write_dtr));
-	m_scc->out_rtsb_callback().set("modem", FUNC(rs232_port_device::write_rts));
-    
+    m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+    m_scc->out_dtrb_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+    m_scc->out_rtsb_callback().set("modem", FUNC(rs232_port_device::write_rts));
+
     // RXD over channel A (1200 baud) - port 0x42 - 0x43
-	rs232_port_device &rs232(RS232_PORT(config, "modem", default_rs232_devices, "null_modem"));
+    rs232_port_device &rs232(RS232_PORT(config, "modem", default_rs232_devices, "null_modem"));
     rs232.rxd_handler().set(m_scc, FUNC(scc8530_device::rxa_w));
-	rs232.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
-    
+    rs232.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
+
     rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(modem));
     rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(modem));
 }
@@ -78,10 +78,10 @@ void p2000_m2009_modem_device::device_start()
     m_slot->io_space().install_readwrite_handler(0x41, 0x41, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_41_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_41_w)));
     m_slot->io_space().install_readwrite_handler(0x42, 0x42, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_42_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_42_w)));
     m_slot->io_space().install_readwrite_handler(0x43, 0x43, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_43_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_43_w)));
-    
+
     m_slot->io_space().install_read_handler(0x44, 0x47, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_44_r)));
     m_slot->io_space().install_write_handler(0x44, 0x47, write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_44_w)));
- 
+
     m_dial_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(p2000_m2009_modem_device::dial_pulse_timer_cb), this));
 }
 
@@ -119,7 +119,7 @@ uint8_t p2000_m2009_modem_device::port_40_r()
             m_scc->syncb_w(0);
         }
     }
-    
+
     LOGTXDRXD("Port read 40: %02x\n", data);
     return data;
 }
@@ -202,7 +202,7 @@ void p2000_m2009_modem_device::port_44_w(uint8_t data)
                 m_phone_number[m_number_cnt % m_number_size] = '0';
                 m_phone_number[(m_number_cnt % m_number_size) + 1] = 0;
             }
-            
+
             // Rising edge of dial pulse
             if (BIT(data, M2009_DIAL_PULSE) && !BIT(m_port_44, M2009_DIAL_PULSE))
             {
@@ -221,7 +221,7 @@ void p2000_m2009_modem_device::port_44_w(uint8_t data)
             {
                 LOGDIAL("Number dialed so far %s\n", m_phone_number);
             }
-            
+
         }
         m_dial_pulse_timer->adjust(attotime::from_msec(m_dialing_ready_delay));
     }
@@ -233,7 +233,7 @@ void p2000_m2009_modem_device::port_44_w(uint8_t data)
             phone_on_hook();
         }
     }
-    
+
     m_port_44 = data;
 }
 
@@ -255,12 +255,12 @@ void p2000_m2009_modem_device::phone_on_hook()
 {
     // reset all dial/connections activities
     LOG("-- On hook --\n");
-            
+
     // Stop dial process
     m_dial_pulse_timer->reset();
     m_number_cnt = 0;
     m_dial_in_progress = false;
-          
+
     m_scc->dcda_w(1);  // Data carier detect
     m_scc->dcdb_w(1);  // Data carier detect
     // TODO: stop dial/connection tone sound

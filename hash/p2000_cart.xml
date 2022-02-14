@@ -44,7 +44,7 @@ license:CC0
 		<publisher>F.Jalvingh &amp; L.Hilgersom</publisher>
 		<part name="slot1" interface="p2000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="Zemon 1.4.bin" size="16384" crc="912c7455" sha1="53bf77ff64a113c289fcba0529195e1cfc3e383e"/>
+				<rom name="Zemon 1.4.bin" size="16384" crc="f0a42acd" sha1="0300b3c3fcaa57aa80c3809f69e4251d57be9cfd"/>
 			</dataarea>
 		</part>
 	</software>

@@ -26,9 +26,9 @@ DEFINE_DEVICE_TYPE(P2000_EXPANSION_SLOT, p2000_expansion_slot_device, "p2kexpslo
 //-------------------------------------------------
 
 device_p2000_expansion_slot_card_interface::device_p2000_expansion_slot_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "p2000exp")
+    device_interface(device, "p2000exp")
 {
-	m_slot = dynamic_cast<p2000_expansion_slot_device *>(device.owner());
+    m_slot = dynamic_cast<p2000_expansion_slot_device *>(device.owner());
 }
 
 
@@ -41,11 +41,11 @@ device_p2000_expansion_slot_card_interface::device_p2000_expansion_slot_card_int
 //-------------------------------------------------
 
 p2000_expansion_slot_device::p2000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, P2000_EXPANSION_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<device_p2000_expansion_slot_card_interface>(mconfig, *this),
-	m_io_space(*this, finder_base::DUMMY_TAG, -1),
-	m_write_irq(*this), 
-    m_in_mode80(*this), 
+    device_t(mconfig, P2000_EXPANSION_SLOT, tag, owner, clock),
+    device_single_card_slot_interface<device_p2000_expansion_slot_card_interface>(mconfig, *this),
+    m_io_space(*this, finder_base::DUMMY_TAG, -1),
+    m_write_irq(*this),
+    m_in_mode80(*this),
     m_card(nullptr)
 {
 
@@ -58,10 +58,10 @@ p2000_expansion_slot_device::p2000_expansion_slot_device(const machine_config &m
 
 void p2000_expansion_slot_device::device_start()
 {
-	m_card = get_card_device();
+    m_card = get_card_device();
 
-	// resolve callbacks
-	m_write_irq.resolve_safe();
+    // resolve callbacks
+    m_write_irq.resolve_safe();
     m_in_mode80.resolve_safe(0);
 }
 
@@ -73,7 +73,7 @@ uint8_t p2000_expansion_slot_device::dew_r()
 {
     uint8_t data = 0;
     if (m_card != nullptr)
-	{
+    {
         data = m_card->dew_r();
     }
     return data;
@@ -83,7 +83,7 @@ uint8_t p2000_expansion_slot_device::vidon_r()
 {
     uint8_t data = 1;
     if (m_card != nullptr)
-	{
+    {
         data = m_card->vidon_r();
     }
     return data;
@@ -93,7 +93,7 @@ uint32_t p2000_expansion_slot_device::screen_update(screen_device &screen, bitma
 {
     uint8_t data = 0;
     if (m_card != nullptr)
-	{
+    {
         data = m_card->screen_update(screen, bitmap, cliprect);
     }
     return data;
@@ -147,7 +147,7 @@ void p2000_ext1_devices(device_slot_interface &device)
 
 void p2000_ext2_devices(device_slot_interface &device)
 {
-	device.option_add("hires", P2000_HIRES);
+    device.option_add("hires", P2000_HIRES);
 //  device.option_add("cpm",       P2000_CPM);         /* CPM interface -- specs/design needed */
 }
 

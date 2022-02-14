@@ -4,14 +4,14 @@
 
     P2000 PTCC Universal I/O Cartridge (UNIFACE)
 
-            Port    
+            Port
               60   Databus I/O
               61   Address / status bus
                     Status bits
-                    0  0 = analog input print selected 
-                       1 = digital I/Ointerface print present 
-                    1  0 = digital OR analog input print selected 
-                       1 = digital output print selected 
+                    0  0 = analog input print selected
+                       1 = digital I/Ointerface print present
+                    1  0 = digital OR analog input print selected
+                       1 = digital output print selected
                     6  0 = interface print present
                     7  0 = interface print present
 
@@ -34,24 +34,24 @@
 //**************************************************************************
 
 class p2000_uniface_device :
-	public device_t,
-	public device_p2000_expansion_slot_card_interface
+    public device_t,
+    public device_p2000_expansion_slot_card_interface
 {
 
 public:
-	// construction/destruction
-	p2000_uniface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    
+    // construction/destruction
+    p2000_uniface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
     virtual ioport_constructor device_input_ports() const override;
 
     void port_60_w(uint8_t data);
     uint8_t port_60_r();
-    
+
     void port_61_w(uint8_t data);
     uint8_t port_61_r();
 

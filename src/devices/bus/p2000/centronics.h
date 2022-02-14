@@ -3,8 +3,8 @@
 /**********************************************************************
 
     P2000 MW102 Centronics Interface Cartridge
-        Port    
-           4e   Centronics DATA port 
+        Port
+           4e   Centronics DATA port
            4f   Centronics status port
 
 **********************************************************************/
@@ -22,25 +22,25 @@
 //**************************************************************************
 
 class p2000_mw102_centronics_device :
-	public device_t,
-	public device_p2000_expansion_slot_card_interface
+    public device_t,
+    public device_p2000_expansion_slot_card_interface
 {
 
 public:
-	// construction/destruction
-	p2000_mw102_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    
+    // construction/destruction
+    p2000_mw102_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
 
     void port_4e_w(uint8_t data);
     uint8_t port_4f_r();
     void port_4f_w(uint8_t data);
 
-    required_device<centronics_device> m_centronics; 
+    required_device<centronics_device> m_centronics;
     DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
     DECLARE_WRITE_LINE_MEMBER(centronics_paper_empty_w);
 
@@ -55,26 +55,26 @@ private:
 //**************************************************************************
 
 class p2000_p2gg_centronics_device :
-	public device_t,
-	public device_p2000_expansion_slot_card_interface
+    public device_t,
+    public device_p2000_expansion_slot_card_interface
 {
 
 public:
-	// construction/destruction
-	p2000_p2gg_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    
+    // construction/destruction
+    p2000_p2gg_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
     p2000_p2gg_centronics_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
+    // device-level overrides
+    virtual void device_start() override;
     virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_add_mconfig(machine_config &config) override;
 
     void port_46_w(uint8_t data);
     uint8_t port_47_r();
-    
-    required_device<centronics_device> m_centronics; 
+
+    required_device<centronics_device> m_centronics;
     DECLARE_WRITE_LINE_MEMBER(centronics_error_w);
     DECLARE_WRITE_LINE_MEMBER(centronics_select_w);
     DECLARE_WRITE_LINE_MEMBER(centronics_paper_empty_w);
@@ -94,12 +94,12 @@ class p2000_m2003_centronics_device : public p2000_p2gg_centronics_device
 {
 
 public:
-	// construction/destruction
-	p2000_m2003_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    // construction/destruction
+    p2000_m2003_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-protected:  
-	// device-level overrides
-	virtual void device_start() override;
+protected:
+    // device-level overrides
+    virtual void device_start() override;
 
     void port_46_w(uint8_t data);
     void port_48_w(uint8_t data);

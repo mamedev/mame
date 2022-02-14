@@ -15,7 +15,7 @@ Philips P2000T Memory map
 
     Ports:
         00-09       Keyboard input
-        10-1f       Output ports   
+        10-1f       Output ports
                         bit
                          0  - data to cassette
                          1  - write command cassette
@@ -25,8 +25,8 @@ Philips P2000T Memory map
                          5  - reserved
                          6  - keyboard enable (0=disabled)
                          7  - printer data out (pen 3 serial port)
-                         
-        20-2f       Input ports  
+
+        20-2f       Input ports
                        bit
                          0  - data from printer port (pen 2 serial port)
                          1  - printer ready (pen 20 serial port)
@@ -43,15 +43,15 @@ Philips P2000T Memory map
         50-5f       Beeper (bit 0)
         60-67       Free I/O ports  (Uniface/V.24 etc.)
         68-6b       Hires communication ports
-                        68: PIO A DATA status channel 
-                        6a: PIO A ctrl status channel 
-                        69: PIO B DATA status channel 
-                        6b: PIO B ctrl status channel 
+                        68: PIO A DATA status channel
+                        6a: PIO A ctrl status channel
+                        69: PIO B DATA status channel
+                        6b: PIO B ctrl status channel
 
         70-7f       DISAS (M ver)
-        
+
         80-83       CTCBSEL - Z80-CTCB (SIO baud control) (channel 0-3)
-        84-87       SIO 
+        84-87       SIO
                         84: data reg. RS232
                         85: cmd/status RS232
                         86: data RS422
@@ -60,11 +60,11 @@ Philips P2000T Memory map
         8c-8f       FDCSEL - Floppy ctrl (fdc) uPD765
         90-93       IOSEL - Floppy/DC control port
         94          SWSEL - RAM Bank select
-        95-97       RAM disk 
+        95-97       RAM disk
                         95: set track
                         96: set sector (+ reset data cnt)
                         97: data (in/out)
-        98-9b       Centronics 
+        98-9b       Centronics
                         98: data reg. [out]
                         99: status reg. [in]
                         9a: strobe on
@@ -91,14 +91,14 @@ void p2000t_state::p2000t_io(address_map &map)
 {
     map.global_mask(0xff);
     map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
-    map(0x00, 0x00).w(FUNC(p2000t_state::p2000t_port_00_w));    
+    map(0x00, 0x00).w(FUNC(p2000t_state::p2000t_port_00_w));
     map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
     map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
-    map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));  
+    map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
     map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
     map(0x70, 0x7f).rw(FUNC(p2000t_state::p2000t_port_707f_r), FUNC(p2000t_state::p2000t_port_707f_w));
-   
-    map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));  
+
+    map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));
 }
 
 /* Memory w/r functions */
@@ -123,12 +123,12 @@ void p2000m_state::p2000m_mem(address_map &map)
 
 DEVICE_IMAGE_LOAD_MEMBER(p2000t_state::card_load)
 {
-	uint32_t size = m_slot1->common_get_size("rom");
+    uint32_t size = m_slot1->common_get_size("rom");
 
-	m_slot1->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
-	m_slot1->common_load_rom(m_slot1->get_rom_base(), size, "rom");
+    m_slot1->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+    m_slot1->common_load_rom(m_slot1->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+    return image_init_result::PASS;
 }
 
 /* graphics output */
@@ -158,7 +158,7 @@ GFXDECODE_END
 
 /* Keyboard input */
 
-/* 
+/*
 Notice that pictures of p2000 units shows slightly different key mappings, suggesting
 many different .chr roms could exist
 
@@ -217,7 +217,7 @@ static INPUT_PORTS_START (p2000t)
     PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
     PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U')
     PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R')
- 
+
     PORT_START("KEY.5")
     PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clrln")             PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(15) PORT_CHAR(12)
     PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR(')')
@@ -269,20 +269,20 @@ static INPUT_PORTS_START (p2000t)
     PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT)
 
     PORT_START("jumper")
-	PORT_DIPNAME(   0x04, 0x00, "Printer Type")
-	PORT_DIPSETTING(0x04, "Daisywheel")
-	PORT_DIPSETTING(0x00, "Matrix")
+    PORT_DIPNAME(   0x04, 0x00, "Printer Type")
+    PORT_DIPSETTING(0x04, "Daisywheel")
+    PORT_DIPSETTING(0x00, "Matrix")
     PORT_DIPNAME(   0x01, 0x00, "Printer PEN 2 and 6")
-	PORT_DIPSETTING(0x01, "Open")
-	PORT_DIPSETTING(0x00, "Closed")
+    PORT_DIPSETTING(0x01, "Open")
+    PORT_DIPSETTING(0x00, "Closed")
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( printer )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+    DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+    DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+    DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+    DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+    DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
 INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
@@ -290,7 +290,7 @@ INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
     if (BIT(m_port_101f, 6))
     {
         // Keyboard int - with FDC/M2200 board available use CTC trg3 (conform orginal design)
-        if (!m_ext1->dew_r()) 
+        if (!m_ext1->dew_r())
         {
             m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
         }
@@ -305,16 +305,16 @@ WRITE_LINE_MEMBER(p2000t_state::p2000_slot_interrupt)
 uint8_t p2000t_state::videoram_r(offs_t offset)
 {
     /* The scroll register in only supported 40 char/line mode */
-    if (!in_80char_mode()) 
+    if (!in_80char_mode())
     {
-        if (BIT(m_port_303f, 7)) 
+        if (BIT(m_port_303f, 7))
         {   // Bit 7 1 = screen disabled (blank) 0 = screen enabled
             return 0;
         }
         /* The scroll register adds an offset in video ram so the text colums have an offset */
         return m_videoram[(offset + m_port_303f) & 0x0fff];
     }
-    return m_videoram[offset];    
+    return m_videoram[offset];
 }
 
 uint32_t p2000t_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -334,15 +334,15 @@ void p2000t_state::p2000t(machine_config &config)
     m_maincpu->set_addrmap(AS_PROGRAM, &p2000t_state::p2000t_mem);
     m_maincpu->set_addrmap(AS_IO, &p2000t_state::p2000t_io);
     m_maincpu->set_vblank_int("screen", FUNC(p2000t_state::p2000_interrupt));
-    
-	/* video hardware */
+
+    /* video hardware */
     SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
     m_screen->set_refresh_hz(50);
     m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
     m_screen->set_size(80 * 12, 24 * 20);
     m_screen->set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
     m_screen->set_screen_update(FUNC(p2000t_state::screen_update));
-    
+
     SAA5050(config, m_saa5050, 6_MHz_XTAL);
     m_saa5050->d_cb().set(FUNC(p2000t_state::videoram_r));
     m_saa5050->set_screen_size(80, 24, 80);
@@ -358,12 +358,12 @@ void p2000t_state::p2000t(machine_config &config)
     RS232_PORT(config, m_printer, default_rs232_devices, "printer");
     m_printer->set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
     m_printer->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(printer));
-	m_printer->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(printer));
+    m_printer->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
     /* Extention Slots 1 + 2, ext 1 + 2 */
     GENERIC_CARTSLOT(config, m_slot1, generic_plain_slot, "p2000_cart", "bin,rom");
     m_slot1->set_device_load(FUNC(p2000t_state::card_load));
-    
+
     P2000_EXPANSION_SLOT(config, m_slot2, 0, p2000_slot2_devices, nullptr);
     m_slot2->set_io_space(m_maincpu, AS_IO);
     m_slot2->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
@@ -371,7 +371,7 @@ void p2000t_state::p2000t(machine_config &config)
     P2000_EXPANSION_SLOT(config, m_ext1, 0, p2000_ext1_devices, nullptr);
     m_ext1->set_io_space(m_maincpu, AS_IO);
     m_ext1->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
-    
+
     P2000_EXPANSION_SLOT(config, m_ext2, 0, p2000_ext2_devices, nullptr);
     m_ext2->set_io_space(m_maincpu, AS_IO);
     m_ext2->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
@@ -380,8 +380,8 @@ void p2000t_state::p2000t(machine_config &config)
     /* internal ram */
     RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,104K");
 
-    /* software lists */ 
-	SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
+    /* software lists */
+    SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
 }
 
 /* Machine definition */
@@ -402,7 +402,7 @@ void p2000m_state::p2000m(machine_config &config)
     screen.set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
     screen.set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
     screen.set_palette(m_palette);
-    
+
     GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
     PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
 
@@ -418,7 +418,7 @@ void p2000m_state::p2000m(machine_config &config)
     m_printer->set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
     m_printer->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(printer));
 	m_printer->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(printer));
-	
+
     /* Extention Slots 1 + 2, ext 1 + 2 */
     GENERIC_CARTSLOT(config, m_slot1, generic_plain_slot, "p2000_cart", "bin,rom");
     m_slot1->set_device_load(FUNC(p2000m_state::card_load));
@@ -431,7 +431,7 @@ void p2000m_state::p2000m(machine_config &config)
     m_ext1->set_io_space(m_maincpu, AS_IO);
     m_slot2->irq().set(FUNC(p2000m_state::p2000_slot_interrupt));
 
-	P2000_EXPANSION_SLOT(config, m_ext2, 0, p2000_ext2_devices, nullptr);
+    P2000_EXPANSION_SLOT(config, m_ext2, 0, p2000_ext2_devices, nullptr);
     m_ext2->set_io_space(m_maincpu, AS_IO);
     m_slot2->irq().set(FUNC(p2000m_state::p2000_slot_interrupt));
 
@@ -439,7 +439,7 @@ void p2000m_state::p2000m(machine_config &config)
     RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,96K,102K");
 
     /* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
+    SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
 }
 
 ROM_START(p2000t)
