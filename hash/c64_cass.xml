@@ -11158,6 +11158,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="quartet">
+		<description>Quartet</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="594655">
+				<rom name="Quartet.tap" size="594655" crc="842f592c" sha1="19e138ba77a8358289327e7dc3f7868420aba818"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qadvent">
 		<description>QUATTRO Adventure</description>
 		<year>1990</year>
@@ -11194,6 +11206,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2: Frankenstein Jnr / Ollie and Lisa 3"/>
 			<dataarea name="cass" size="1463116">
 				<rom name="QUATTRO_Cartoon_Side_2.tap" size="1463116" crc="ba22541c" sha1="32bca84d0a0797731d365b2e69dd8ec79e95819e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qcoinops">
+		<description>QUATTRO Coin-Ops</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Advanced Pinball Simulator / Pub Trivia"/>
+			<dataarea name="cass" size="2384085">
+				<rom name="QUATTRO_Coin-Ops_Side_1.tap" size="2384085" crc="96a7a8a7" sha1="4fdc364199c8a3eeb2aab9a1470d7209b79dcb18"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Fruit Machine Simulator / Fast Food"/>
+			<dataarea name="cass" size="1668738">
+				<rom name="QUATTRO_Coin-Ops_Side_2.tap" size="1668738" crc="45966241" sha1="7b70322d0393a123ff0c87410b02c853664c87be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11274,6 +11306,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2: Super Tank / Super Heroes"/>
 			<dataarea name="cass" size="1633981">
 				<rom name="QUATTRO_Super_Hits_Side_2.tap" size="1633981" crc="498f1b4e" sha1="6072f71fab8a8f402651d45c4e7936a0d0858f3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quedex">
+		<description>Quedex</description>
+		<year>1987</year>
+		<publisher>Thalamus</publisher>
+		<info name="alt_title" value="Mindroll"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="947549">
+				<rom name="Que-Dex.tap" size="947549" crc="1466de42" sha1="dc77e8ef796b8a31e21c4cf52c033dc4eb995d29"/>
 			</dataarea>
 		</part>
 	</software>
