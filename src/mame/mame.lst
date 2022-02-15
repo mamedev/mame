@@ -13824,6 +13824,7 @@ cbully                          // (c) 1991 Falgas
 
 @source:famibox.cpp
 famibox                         // 1986
+famistat                        // 1986
 
 @source:fantland.cpp
 borntofi                        // (c) International Games?
@@ -43714,6 +43715,7 @@ wy100                           // WY-100
 wy120                           // WY-120
 wy150                           // WY-150
 wy160                           // WY-160
+wy325                           // WY-325
 
 @source:wy30p.cpp
 wy30p                           // WY-30+

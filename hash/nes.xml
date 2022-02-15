@@ -27705,7 +27705,6 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Playable with joypad but zapper does not work -->
 	<software name="opwolfj" cloneof="opwolf" supported="partial">
 		<description>Operation Wolf (Jpn)</description>
 		<year>1989</year>
@@ -27727,7 +27726,6 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Playable with joypad but zapper does not work -->
 	<software name="opwolfu" cloneof="opwolf" supported="partial">
 		<description>Operation Wolf - Take no Prisoners (USA, Rev. 0A)</description>
 		<year>1989</year>
@@ -27748,7 +27746,6 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Playable with joypad but zapper does not work -->
 	<software name="opwolf" supported="partial">
 		<description>Operation Wolf - Take no Prisoners (Euro)</description>
 		<year>1992</year>
@@ -45595,6 +45592,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="discrete_74x377" />
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="chiller (australia) (unl).chr" size="32768" crc="a3dd719f" sha1="3d077a2c78148709c91bb75c099cd3ea04df7f56" offset="00000" status="baddump" />
 			</dataarea>
@@ -48167,6 +48165,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="vrc2-pin26" value="CHR A12" />
 			<feature name="vrc2-pin27" value="CHR A15" />
 			<feature name="vrc2-pin28" value="NC" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="131072">
 				<rom name="mad city (japan) (beta).chr" size="131072" crc="028dc0ef" sha1="1212b249bfc2c13e76a337d4ceedc5f78d1d5be6" offset="00000" status="baddump" />
 			</dataarea>
@@ -54690,6 +54689,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="131072">
 				<rom name="hit marmot (asia) (unl).prg" size="131072" crc="e85b4d3d" sha1="11876755b50d6c48adcbea2b44bd3c77979e5d56" offset="00000" status="baddump" />
 			</dataarea>
@@ -55269,7 +55269,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Operation Wolf currently only works with joypad but not zapper -->
 	<software name="2uzilght" supported="partial">
 		<description>2 in 1 Uzi Lightgun</description>
 		<year>199?</year>
@@ -55452,7 +55451,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="3suprgun">
+	<software name="3suprgun" supported="partial">
 		<description>3 in 1 Supergun (Tw)</description>
 		<year>1993</year>
 		<publisher>Micro Genius</publisher>
@@ -55460,6 +55459,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="3 in 1 supergun (asia) (unl).chr" size="32768" crc="cc4700b4" sha1="cca724a37896a84c35834f655582e3685c6270ec" offset="00000" status="baddump" />
 			</dataarea>
@@ -70041,6 +70041,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="duck hunt (1987)(fmg)(jp)[p].prg" size="16384" crc="9e44c002" sha1="10075f771add649ddc1df07bf481e30e0c2dd37a" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -70407,6 +70408,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hogan's alley (1987)(fmg)(jp)[p].prg" size="16384" crc="27c51ce8" sha1="13743a35b1617c6a191fc3939e81be0388d36cdb" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />

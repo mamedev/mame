@@ -53,7 +53,7 @@
 #define LOG_SYSREG  (1U <<  2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BANK | LOG_SYSREG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
