@@ -60,12 +60,12 @@ void km035_device::device_add_mconfig(machine_config &config)
 	I8035(config, m_maincpu, XTAL(4'608'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &km035_device::km035_map);
 	m_maincpu->bus_out_cb().set(FUNC(km035_device::bus_w));
-	m_maincpu->p1_in_cb().set(FUNC(km035_device::p1_r));
+	m_maincpu->p1_in_cb().set([this] () { return m_p1; });
 	m_maincpu->p1_out_cb().set(FUNC(km035_device::p1_w));
-	m_maincpu->p2_in_cb().set(FUNC(km035_device::p2_r));
+	m_maincpu->p2_in_cb().set([this] () { return m_p2; });
 	m_maincpu->p2_out_cb().set(FUNC(km035_device::p2_w));
-	m_maincpu->t0_in_cb().set(FUNC(km035_device::t0_r));
-	m_maincpu->t1_in_cb().set(FUNC(km035_device::t1_r));
+	m_maincpu->t0_in_cb().set([this] () { return m_keylatch; });
+	m_maincpu->t1_in_cb().set([this] () { return m_rx; });
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -248,7 +248,7 @@ INPUT_PORTS_END
 
 ioport_constructor km035_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( km035 );
+	return INPUT_PORTS_NAME(km035);
 }
 
 //**************************************************************************
@@ -260,12 +260,12 @@ ioport_constructor km035_device::device_input_ports() const
 //-------------------------------------------------
 
 km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KM035, tag, owner, clock),
-	m_maincpu(*this, KM035_CPU_TAG),
-	m_speaker(*this, KM035_SPK_TAG),
-	m_kbd(*this, "KBD%u", 0),
-	m_tx_handler(*this),
-	m_rts_handler(*this)
+	: device_t(mconfig, KM035, tag, owner, clock)
+	, m_maincpu(*this, KM035_CPU_TAG)
+	, m_speaker(*this, KM035_SPK_TAG)
+	, m_kbd(*this, "KBD%u", 0)
+	, m_tx_handler(*this)
+	, m_rts_handler(*this)
 {
 }
 
@@ -290,7 +290,7 @@ void km035_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( km035_device::write_rxd )
+WRITE_LINE_MEMBER(km035_device::write_rxd)
 {
 	LOG("write_rxd %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
@@ -320,7 +320,7 @@ void km035_device::p1_w(uint8_t data)
 	LOGDBG("p1_w %02x = row %d col %d tx %d\n", data, (data>>4)&15, data&7, !BIT(data, 3));
 	m_p1 = data;
 
-	sense = m_kbd[(data>>4) & 15]->read();
+	sense = m_kbd[(data >> 4) & 15]->read();
 	m_keylatch = BIT(sense, (data & 7));
 	if (m_keylatch)
 		LOG("keypress at row %d col %d\n", (data>>4)&15, data&7);
@@ -335,16 +335,6 @@ void km035_device::p2_w(uint8_t data)
 	m_p2 = data;
 }
 
-uint8_t km035_device::p1_r()
-{
-	return m_p1;
-}
-
-uint8_t km035_device::p2_r()
-{
-	return m_p2;
-}
-
 //-------------------------------------------------
 //  bus_w -
 //-------------------------------------------------
@@ -352,22 +342,4 @@ uint8_t km035_device::p2_r()
 void km035_device::bus_w(uint8_t data)
 {
 	LOGDBG("bus_w %02x\n", data);
-}
-
-//-------------------------------------------------
-//  t0_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( km035_device::t0_r )
-{
-	return m_keylatch;
-}
-
-//-------------------------------------------------
-//  t1_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( km035_device::t1_r )
-{
-	return m_rx;
 }
