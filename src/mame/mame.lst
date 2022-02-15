@@ -13824,6 +13824,7 @@ cbully                          // (c) 1991 Falgas
 
 @source:famibox.cpp
 famibox                         // 1986
+famistat                        // 1986
 
 @source:fantland.cpp
 borntofi                        // (c) International Games?
