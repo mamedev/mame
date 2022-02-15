@@ -2367,6 +2367,7 @@ files {
 	MAME_DIR .. "src/mame/machine/ms7004.h",
 	MAME_DIR .. "src/mame/drivers/mk85.cpp",
 	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/mk98.cpp",
 	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.h",
