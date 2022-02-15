@@ -79,6 +79,7 @@ Philips P2000T Memory map
 #include "emu.h"
 #include "includes/p2000t.h"
 #include "formats/dsk_dsk.h"
+#include "softlist_dev.h"
 
 #include "screen.h"
 #include "speaker.h"
