@@ -22,8 +22,6 @@ Status:
 ToDo:
 - Cut the Cheese: screen goes blank after a short while
 - Test fixture: nothing to see
-- Outputs
-- Mechanical sounds
 
 *********************************************************************************************************************/
 #include "emu.h"
@@ -67,12 +65,14 @@ private:
 	uint8_t display_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
 	void lamps_w(offs_t offset, uint8_t data);
+	void sol_w(offs_t, uint8_t);
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint8_t m_row = 0U;
+	u16 m_sol = 0U;
 };
 
 
@@ -180,6 +180,25 @@ void de_3b_state::sound_w(uint8_t data)
 		m_decobsmt->bsmt_comms_w(data);
 }
 
+void de_3b_state::sol_w(offs_t offset, u8 data)
+{
+	if (!offset)
+		m_sol = (m_sol & 0xff00) | data;
+	else
+		m_sol = (m_sol & 0xff) | (BIT(data, 1) ? 0x100 : 0);
+
+	// these vary per game, this is an example
+	switch (m_sol)
+	{
+		case 0x0002:
+			m_samples->start(5, 5); // outhole
+			break;
+		case 0x0080:
+			m_samples->start(0, 6); // knocker
+			break;
+	}
+}
+
 uint8_t de_3b_state::dmd_status_r()
 {
 	return m_dmdtype3->status_r();
@@ -256,6 +275,7 @@ void de_3b_state::machine_start()
 	genpin_class::machine_start();
 
 	save_item(NAME(m_row));
+	save_item(NAME(m_sol));
 }
 
 void de_3b_state::machine_reset()
@@ -274,6 +294,7 @@ void de_3b_state::de_3b(machine_config &config)
 	decocpu.switch_read_callback().set(FUNC(de_3b_state::switch_r));
 	decocpu.switch_write_callback().set(FUNC(de_3b_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_3b_state::lamps_w));
+	decocpu.solenoid_write_callback().set(FUNC(de_3b_state::sol_w));
 	decocpu.dmdstatus_read_callback().set(FUNC(de_3b_state::dmd_status_r));
 
 	genpin_audio(config);
@@ -748,6 +769,6 @@ GAME(1995,  frankstg, frankst, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Se
 GAME(1994,  mav_402,  0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_401,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_400,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_100,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_100,  mav_402, de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Data East", "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1998,  detest,   0,       detest, de_3b, de_3b_state, empty_init, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  ctcheese, 0,       de_3b,  de_3b, de_3b_state, empty_init, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)

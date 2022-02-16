@@ -43,7 +43,6 @@ ToDo:
 - Checkpoint: no sound
 - TMNT: no sound
 - Batman: music missing
-- Outputs
 - Mechanical sounds
 
 *********************************************************************************************************************/
@@ -92,6 +91,7 @@ private:
 	uint8_t display_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
 	void lamps_w(offs_t offset, uint8_t data);
+	void sol_w(offs_t, uint8_t);
 
 	void de_3(machine_config &config);
 
@@ -102,6 +102,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 
 	uint8_t m_row = 0U;
+	u16 m_sol = 0U;
 };
 
 
@@ -262,6 +263,25 @@ void de_3_state::switch_w(uint8_t data)
 	m_row = data;
 }
 
+void de_3_state::sol_w(offs_t offset, u8 data)
+{
+	if (!offset)
+		m_sol = (m_sol & 0xff00) | data;
+	else
+		m_sol = (m_sol & 0xff) | (BIT(data, 1) ? 0x100 : 0);
+
+	// these vary per game, this is an example
+	switch (m_sol)
+	{
+		case 0x0002:
+			m_samples->start(5, 5); // outhole
+			break;
+		case 0x0080:
+			m_samples->start(0, 6); // knocker
+			break;
+	}
+}
+
 // 6821 PIA at 0x3400
 uint8_t de_3_state::dmd_status_r()
 {
@@ -332,6 +352,7 @@ void de_3_state::machine_start()
 	genpin_class::machine_start();
 
 	save_item(NAME(m_row));
+	save_item(NAME(m_sol));
 }
 
 void de_3_state::machine_reset()
@@ -349,6 +370,7 @@ void de_3_state::de_3(machine_config &config)
 	decocpu.switch_read_callback().set(FUNC(de_3_state::switch_r));
 	decocpu.switch_write_callback().set(FUNC(de_3_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_3_state::lamps_w));
+	decocpu.solenoid_write_callback().set(FUNC(de_3_state::sol_w));
 	decocpu.dmdstatus_read_callback().set(FUNC(de_3_state::dmd_status_r));
 
 	genpin_audio(config);

@@ -43,7 +43,6 @@ Status:
 - All machines are playable
 
 ToDo:
-- Outputs
 - Mechanical sounds
 - robo_a29,robo_a34: can't coin up, buggy rom?
 
@@ -118,6 +117,7 @@ private:
 	void type2alpha3_display_w(offs_t offset, uint8_t data);
 	void type3_display_w(offs_t offset, uint8_t data);
 	void lamps_w(offs_t offset, uint8_t data);
+	void sol_w(offs_t, uint8_t);
 
 	// devices
 	required_device<ym2151_device> m_ym2151;
@@ -138,6 +138,7 @@ private:
 	uint8_t m_row = 0U;
 	uint8_t m_diag = 0U;
 	uint8_t m_sound_data = 0U;
+	u16 m_sol = 0U;
 };
 
 
@@ -253,6 +254,7 @@ void de_2_state::machine_start()
 	save_item(NAME(m_more_data));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
+	save_item(NAME(m_sol));
 
 	uint8_t *const ROM = memregion("sound1")->base();
 	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
@@ -389,6 +391,25 @@ uint8_t de_2_state::switch_r()
 void de_2_state::switch_w(uint8_t data)
 {
 	m_row = data;
+}
+
+void de_2_state::sol_w(offs_t offset, u8 data)
+{
+	if (!offset)
+		m_sol = (m_sol & 0xff00) | data;
+	else
+		m_sol = (m_sol & 0xff) | (BIT(data, 1) ? 0x100 : 0);
+
+	// these vary per game, this is an example
+	switch (m_sol)
+	{
+		case 0x0002:
+			m_samples->start(5, 5); // outhole
+			break;
+		case 0x0080:
+			m_samples->start(0, 6); // knocker
+			break;
+	}
 }
 
 // 6821 PIA at 0x3400
@@ -603,6 +624,7 @@ void de_2_state::de_type3(machine_config &config)
 	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
 	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
+	decocpu.solenoid_write_callback().set(FUNC(de_2_state::sol_w));
 
 	/* Video */
 	config.set_default_layout(layout_de2a3);
