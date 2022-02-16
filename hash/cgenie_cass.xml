@@ -13,7 +13,6 @@ ARRAY, Luidger Röckrath (also in the book "Assemblertricks auf dem ColourGenie"
 Bar (aka 'Drinks'), TCS, 1984 (from the book "Das Colour-Genie Buch 2")
 Basic-Monitor, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 Blitz, MCE, 1983
-Break Out
 Bubble Sort, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 Code Breaker, TCG, 1983 (from the book "Colour BASIC - leicht gelernt")
 COLBAS V1.0, Luidger Röckrath, 1983 (also in the book "Assemblertricks auf dem ColourGenie")
@@ -725,6 +724,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="synthy">
+		<description>Synthy</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with SYNTH, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="2094">
+				<rom name="synthy.cas" size="2094" crc="0fe53b80" sha1="07a5ea51cc550e3635a90e05f907d4f008429832" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="syscopy">
 		<description>System Copy</description>
 		<year>198?</year>
@@ -1274,6 +1286,19 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11166">
 				<rom name="botschaft.cas" size="11166" crc="62fe0ec5" sha1="5c56da9a4bb46f63d5882d060e5e0392ef1db02c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Break-Out</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with BREAK, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="7271">
+				<rom name="break_out.cas" size="7271" crc="f97a49df" sha1="af9d5bac73d5672bcb8585c3e6294bf99985fda0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2752,6 +2777,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="pacman">
+		<description>Pacman</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with PACMAN, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="11423">
+				<rom name="pacman.cas" size="11423" crc="aef392a7" sha1="e856dc0f8bff2bc1e0a5625e4c0b5402dca96d3c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="palacem">
 		<description>Palace of Ming</description>
 		<year>1984</year>
@@ -3065,6 +3103,19 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7642">
 				<rom name="space_attack.cas" size="7642" crc="7132e31a" sha1="6e304b85a074db74f5ad977eaa26941c6a3f8ce6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacefig">
+		<description>Space-Fight</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with SPACE, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="7983">
+				<rom name="space_fight.cas" size="7983" crc="a7fec2fb" sha1="0c5718e5f052600338672cd287ef703b63937326" />
 			</dataarea>
 		</part>
 	</software>
