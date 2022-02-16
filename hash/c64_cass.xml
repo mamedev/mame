@@ -9624,6 +9624,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rhythmp">
+		<description>Micro Rhythm +</description>
+		<year>1987</year>
+		<publisher>Firebird Silver</publisher>
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="709984">
+				<rom name="Micro_Rhythm_+_Side_1.tap" size="709984" crc="83a31775" sha1="939801c2fb78143d9268c1cd6e6025b001877dcd"/>
+			</dataarea>
+		</part>
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="710018">
+				<rom name="Micro_Rhythm_+_Side_2.tap" size="710018" crc="d3b0d839" sha1="5acbd97389929fd6f01485dc2041e4538b3f8d8a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="midnghth">
 		<description>Midnight Resistance</description>
 		<year>1992</year>
