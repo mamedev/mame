@@ -6325,19 +6325,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Grandmaster Chess</description>
 		<year>1986</year>
 		<publisher>Audiogenic Software</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="479942">
-				<rom name="grandmsa.tap" size="479942" crc="bb1e3edc" sha1="f35835579544c8b58b3c01cfa402a653c8b3b2e4"/>
+				<rom name="Grandmaster_Chess_Side_1_-_Grandmaster_Chess.tap" size="479942" crc="3f18c040" sha1="f90229abfe6b1e506dcaadd10480f4269cdcdade"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="410344">
-				<rom name="grandmsb.tap" size="410344" crc="002b9b44" sha1="6f2356a96d4433ae9847564d0350d973390a35b5"/>
+				<rom name="Grandmaster_Chess_Side_2_-_Renaissance.tap" size="410344" crc="63f12370" sha1="cc292335d68d111dd17d7ed4e65365f0f7341a99"/>
 			</dataarea>
 		</part>
 	</software>
