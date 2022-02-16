@@ -835,7 +835,6 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-
 	<software name="anarchy">
 		<description>Anarchy</description>
 		<year>1987</year>
@@ -894,19 +893,10 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Angle Ball</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
-		<!-- Dumped by @c64tapes -->
 
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="267415">
-				<rom name="anglebla.tap" size="267415" crc="8a71c7cf" sha1="f60d649fd0087ae4692947750c56733159bffd2a"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="267414">
-				<rom name="angleblb.tap" size="267414" crc="8c58c3c3" sha1="f4db67b46dec798230fea7291445c1cbddf74c0d"/>
+				<rom name="Angle_Ball.tap" size="267414" crc="30771fb2" sha1="1f27972ccc1341758e7d7697f83c2eb79c97748e"/>
 			</dataarea>
 		</part>
 	</software>
