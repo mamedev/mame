@@ -1,45 +1,58 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
-/***********************************************************************
+/*******************************************************************************
 
     DECO Cassette System driver
     by Juergen Buchmueller
-    with contributions by:
-    David Widel
-    Nicola Salmoria
-    Aaron Giles
-    Brian Troha
-    Fabio Priuli
-    Lord Nightmare
-    The Dumping Union
-    Team Japump!!!
-    Hau
-    Jean-Francois Del Nero
-    Omar Cornut
-    Game Preservation Society
-    Joseph Redon
 
-    The DECO cassette system consists of three PCBS in a card cage:
-    Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
-    One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control), two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external amp and volume control)
-    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor and bios, graphics, dipswitches?)
+    with contributions by: David Widel, Nicola Salmoria, Aaron Giles, Brian Troha,
+	Fabio Priuli, Lord Nightmare, The Dumping Union, Team Japump!!!, Hau,
+	Jean-Francois Del Nero, Omar Cornut, Game Preservation Society, Joseph Redon
+
+
+    The DECO cassette system consists of three PCBs in a card cage:
+
+    **** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
+
+    One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control),
+    two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external
+    amp and volume control)
+
+    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor
+    and bios, graphics, dipswitches?)
+
     One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
+
     One DE-0066B-0 card rack board that the other three boards plug into.
-    This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
+    This boardset has two versions: MD, known as "shokase" in Japan, and MT, known as "daikase",
+    which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
-    Later boardset: (1984 onward, schematic is dated October 1983)
-    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
-    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
-    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for DE-109C-0 is shorter than in earlier versions)
+    **** Later boardset: (1984 onward, schematic is dated October 1983) ****
 
-    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
-    Each cassette has one track on it and is separated into clock and data by two Magtek IC in the player, for a form of synchronous serial.
-    The data is stored in blocks with headers and CRC16 checksums.
-    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
-    The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
+    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732)
+    plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM.
+    (audio processor and RAM, Main processor's dram, dipswitches)
 
- ***********************************************************************/
+    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which
+    appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three
+    hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
+
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc,
+    and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
+
+    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for
+    DE-109C-0 is shorter than in earlier versions)
+
+
+    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette
+    form factor, but are larger and will not fit in a conventional microcassette player. Each cassette
+    has one track on it and is separated into clock and data by two Magtek IC in the player, for
+    a form of synchronous serial. The data is stored in blocks with headers and CRC16 checksums.
+    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe)
+    and the total number of blocks left to read. The last physical block on the cassette is a dummy
+    block not used by the system. (only used to mark the end of last block)
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "includes/decocass.h"
@@ -387,7 +400,6 @@ static INPUT_PORTS_START( cdsteljn )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 
 	PORT_START("P1_MP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(1)
