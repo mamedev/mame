@@ -6816,14 +6816,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	</software>
 
 	<software name="headovrh">
-		<description>Head Over Heels</description>
+		<description>Head Over Heels (The Hit Squad)</description>
 		<year>1990</year>
 		<publisher>The Hit Squad</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
-			<dataarea name="cass" size="671518">
-				<rom name="headovhb.tap" size="671518" crc="0fa1d871" sha1="673c375205cc2cd052ccdf52f99f482f26f59038"/>
+			<dataarea name="cass" size="671515">
+				<rom name="Head_Over_Heels.tap" size="671515" crc="816bba6a" sha1="3a8f222566095ee6d79d88f30428b12654e7603a"/>
 			</dataarea>
 		</part>
 	</software>
