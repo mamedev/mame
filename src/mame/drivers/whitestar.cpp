@@ -23,7 +23,7 @@ Apollo 13                             5044    Hold FG, hit 2             DFG
 Independence Day                      5045    Hold FG. hit 1             DF
 X Files                               5046    Hold FG, hit 1 then Shift  DG
 Cut The Cheese Deluxe (Redemption)      --    1
-Titanic (Coin dropper)                  --    (unknown - diag says there's no coin inputs)
+Titanic (Coin dropper)                  --    (unknown)
 Wack-A-Doodle-Doo (Redemption)          --    1
 Lost World Jurassic Park              5053    Hold DEFG, hit 1 H A       DEFG (it can be difficult to start or end a ball)
 Star Wars Trilogy Special Edition     5056    Hold FG, hit 1             DG

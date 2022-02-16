@@ -4,38 +4,47 @@
 PINBALL
 Data East System 3
 
+Data East CPU board is similar to Williams System 11, but without the generic audio board.
+For now, we'll presume the timings are the same.
+
 Here are the key codes to enable play:
 
 Game                                   NUM    Start game                 End ball
 ---------------------------------------------------------------------------------------------
-Back to the Future                    5009
-Checkpoint                            5010
-Batman                                5011
-The Simpsons                          5012
+Back to the Future                    5009    Hold CDE, hit 1            CDE
+Checkpoint                            5010    Hold CDE, hit 1            CDE
+Batman                                5011    Hold CDE, hit 1            CDE
+The Simpsons                          5012    Hold CDE, hit 1            CDE
 World's Fair (not emulated)           5013
-Star Trek                             5014
+Star Trek                             5014    Hold CDE, hit 1            CDE
 Total Recall (not emulated)           5015
 Kill Shot (not emulated)              5016
-Teenage Mutant Ninja Turtles          5017
-Tales from the Crypt                  5018
-Hook                                  5019
-Jurassic Park                         5020
+Teenage Mutant Ninja Turtles          5017    Hold CDE, hit 1            CDE
+Tales from the Crypt                  5018    Hold ABCDE, hit 1          Hold ABCD, hit F
+Hook                                  5019    Hold CDE, hit 1            CDE
+Jurassic Park                         5020    Hold ABCDEF, hit 1         ABCDEF
 Operation Desert Storm (not emulated) 5021
-Adv. of Rocky & Bullwinkle & Friends  5022
-WWF Royal Rumble                      5023
-Star Wars                             5024
+Adv. of Rocky & Bullwinkle & Friends  5022    Hold CDE, hit 1            CDE
+WWF Royal Rumble                      5023    Hold ABC, hit 1            Hold ABC, hit F
+Star Wars                             5024    Hold CDE, hit 1            CDE
 Mad (not emulated)                    5025
-Lethal Weapon 3                       5026
-Last Action Hero                      5027
-The Who's Tommy Pinball Wizard        5028
-Guns n' Roses                         5029
-Aaron Spelling                         --
+Lethal Weapon 3                       5026    Hold CDE, hit 1            CDE
+Last Action Hero                      5027    Hold ABC, hit 1            BCF
+The Who's Tommy Pinball Wizard        5028    Hold ABC, hit 1            Hold ABC, hit F
+Guns n' Roses                         5029    Hold A, hit 1              ABCDEF
+Aaron Spelling                         --     Hold CDE, hit 1            CDE
 Michael Jordan                         --
 
 
 Status:
+- All machines are playable
 
 ToDo:
+- Checkpoint: no sound
+- TMNT: no sound
+- Batman: music missing
+- Outputs
+- Mechanical sounds
 
 *********************************************************************************************************************/
 #include "emu.h"
@@ -43,21 +52,10 @@ ToDo:
 #include "audio/decobsmt.h"
 #include "machine/decopincpu.h"
 #include "machine/genpin.h"
-
-#include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "machine/nvram.h"
 #include "video/decodmd1.h"
 #include "video/decodmd2.h"
 
-// Data East CPU board is similar to Williams System 11, but without the generic audio board.
-// For now, we'll presume the timings are the same.
-
-
 namespace {
-
-extern const char layout_pinball[];
 
 class de_3_state : public genpin_class
 {
@@ -67,8 +65,7 @@ public:
 		, m_dmdtype1(*this, "decodmd1")
 		, m_dmdtype2(*this, "decodmd2")
 		, m_decobsmt(*this, "decobsmt")
-//      , m_digits(*this, "digit%u", 0U)
-//      , m_diag_digit(*this, "digit60")
+		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void de_3_dmd1(machine_config &config);
@@ -80,28 +77,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	void pia34_pa_w(uint8_t data);
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
 	void pia2c_pa_w(uint8_t data);
 	uint8_t pia2c_pb_r();
 	void pia2c_pb_w(uint8_t data);
 	uint8_t pia28_w7_r();
-	void dig0_w(uint8_t data);
-	void dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
+	void lamp0_w(uint8_t data) { }
 	void lamp1_w(uint8_t data) { }
-	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	void sol2_w(uint8_t data) { } // solenoids 8-15
-	[[maybe_unused]] void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
-	void dac_w(uint8_t data) { }
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	uint8_t dmd_status_r();
-
-//  uint8_t sound_latch_r();
-//  void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
 	uint8_t display_r(offs_t offset);
@@ -114,151 +99,107 @@ private:
 	optional_device<decodmd_type1_device> m_dmdtype1;
 	optional_device<decodmd_type2_device> m_dmdtype2;
 	required_device<decobsmt_device> m_decobsmt;
+	required_ioport_array<8> m_io_keyboard;
 
-//  output_finder<32> m_digits;
-//  output_finder<> m_diag_digit;
-
-//  uint32_t m_segment1 = 0U;
-//  uint32_t m_segment2 = 0U;
-	uint8_t m_strobe = 0U;
-	uint8_t m_kbdrow = 0U;
-	uint8_t m_diag = 0U;
-	bool m_ca1 = 0;
-	uint8_t m_sound_data = 0U;
+	uint8_t m_row = 0U;
 };
 
 
-static INPUT_PORTS_START( de_3 )
-	PORT_START("INP0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+static INPUT_PORTS_START( de3 )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )  // Buy extra ball on some machines
 
-	PORT_START("INP1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP16")
 
-	PORT_START("INP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K)
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
 
-	PORT_START("INP4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
 
-	PORT_START("INP8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP40")
 
-	PORT_START("INP10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP48")
 
-	PORT_START("INP20")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP49")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP50")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP51")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP52")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP53")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP54")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP55")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP56")
 
-	PORT_START("INP40")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("INP80")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("INP57")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("INP58")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("INP59")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("INP60")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("INP61")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP62")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP63")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("INP64")
 INPUT_PORTS_END
 
 // 6821 PIA at 0x2000
-void de_3_state::sol3_w(uint8_t data)
-{
-}
-
 void de_3_state::sound_w(uint8_t data)
 {
-	m_sound_data = data;
-	if(m_sound_data != 0xfe)
-		m_decobsmt->bsmt_comms_w(m_sound_data);
-}
-
-WRITE_LINE_MEMBER( de_3_state::pia21_ca2_w )
-{
-// sound ns
-	m_ca1 = state;
+	if(data != 0xfe)
+		m_decobsmt->bsmt_comms_w(data);
 }
 
 // 6821 PIA at 0x2400
-void de_3_state::lamp0_w(uint8_t data)
-{
-}
-
 
 // 6821 PIA at 0x2800
-void de_3_state::dig0_w(uint8_t data)
-{
-//  static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
-//  data &= 0x7f;
-//  m_strobe = data & 15;
-//  m_diag = (data & 0x70) >> 4;
-//  m_diag_digit = patterns[data>>4]; // diag digit
-//  m_segment1 = 0;
-//  m_segment2 = 0;
-}
-
-void de_3_state::dig1_w(uint8_t data)
-{
-//  m_segment2 |= data;
-//  m_segment2 |= 0x30000;
-//  if ((m_segment2 & 0x70000) == 0x30000)
-//  {
-//      if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
-//          m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-//      else
-//          m_digits[m_strobe+16] = bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0);
-//      m_segment2 |= 0x40000;
-//  }
-}
-
 uint8_t de_3_state::pia28_w7_r()
 {
-	uint8_t ret = 0x80;
-
-	ret |= m_strobe;
-	ret |= m_diag << 4;
-
-	return ret;
+	return 0x80;
 }
 
 // 6821 PIA at 0x2c00
@@ -275,19 +216,13 @@ void de_3_state::pia2c_pa_w(uint8_t data)
 		m_dmdtype1->data_w(data);
 		logerror("DMD: Data write %02x\n", data);
 	}
-//  m_segment1 |= (data<<8);
-//  m_segment1 |= 0x10000;
-//  if ((m_segment1 & 0x70000) == 0x30000)
-//  {
-//      m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-//      m_segment1 |= 0x40000;
-//  }
 }
 
 uint8_t de_3_state::pia2c_pb_r()
 {
 	if(m_dmdtype1)
 		return m_dmdtype1->busy_r();
+	else
 	if(m_dmdtype2)
 		return m_dmdtype2->busy_r();
 	return 0;
@@ -299,64 +234,43 @@ void de_3_state::pia2c_pb_w(uint8_t data)
 	if(m_dmdtype2)
 	{
 		m_dmdtype2->ctrl_w(data);
-		logerror("DMD: Control write %02x\n", data);
+		//logerror("DMD: Control write %02x\n", data);
 	}
-	else if(m_dmdtype1)
+	else
+	if(m_dmdtype1)
 	{
 		m_dmdtype1->ctrl_w(data);
-		logerror("DMD: Control write %02x\n", data);
+		//logerror("DMD: Control write %02x\n", data);
 	}
-
-//  m_segment1 |= data;
-//  m_segment1 |= 0x20000;
-//  if ((m_segment1 & 0x70000) == 0x30000)
-//  {
-//      m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-//      m_segment1 |= 0x40000;
-//  }
 }
 
 
 // 6821 PIA at 0x3000
 uint8_t de_3_state::switch_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"INP%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
+	u8 data = 0;
+	if (m_row < 0x81)
+		for (u8 i = 0; i < 8; i++)
+			if (BIT(m_row, i))
+				data |= m_io_keyboard[i]->read();
+
+	return data;
 }
 
 void de_3_state::switch_w(uint8_t data)
 {
-	int x;
-
-	for(x=0;x<8;x++)
-	{
-		if(data & (1<<x))
-			break;
-	}
-	m_kbdrow = data & (1<<x);
+	m_row = data;
 }
 
 // 6821 PIA at 0x3400
-void de_3_state::pia34_pa_w(uint8_t data)
-{
-	// Not connected?
-//  m_segment2 |= (data<<8);
-//  m_segment2 |= 0x10000;
-//  if ((m_segment2 & 0x70000) == 0x30000)
-//  {
-//      m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-//      m_segment2 |= 0x40000;
-//  }
-}
-
 uint8_t de_3_state::dmd_status_r()
 {
 	if(m_dmdtype1)
 	{
 		return m_dmdtype1->status_r();
 	}
-	else if(m_dmdtype2)
+	else
+	if(m_dmdtype2)
 	{
 		return m_dmdtype2->status_r();
 	}
@@ -385,10 +299,8 @@ void de_3_state::display_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 	case 0:
-		dig0_w(data);
 		break;
 	case 1:
-		dig1_w(data);
 		break;
 	case 2:
 		pia2c_pa_w(data);
@@ -397,7 +309,6 @@ void de_3_state::display_w(offs_t offset, uint8_t data)
 		pia2c_pb_w(data);
 		break;
 	case 4:
-		pia34_pa_w(data);
 		break;
 	}
 }
@@ -420,8 +331,7 @@ void de_3_state::machine_start()
 {
 	genpin_class::machine_start();
 
-//  m_digits.resolve();
-//  m_diag_digit.resolve();
+	save_item(NAME(m_row));
 }
 
 void de_3_state::machine_reset()
@@ -1496,74 +1406,74 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1993,  rab_320,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
-GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
-GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
-GAME(1992,  aar_101,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Aaron Spelling (1.01)",                                                    MACHINE_IS_SKELETON_MECHANICAL) // AARON SPELLING V1.01 12/23/92
-GAME(1991,  btmn_106,      0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.06, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.06. DISP VER: BATMAN A1.02
-GAME(1991,  btmn_103,      btmn_106, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.03, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.03. DISP VER: BATMAN A1.02
-GAME(1991,  btmn_103f,     btmn_106, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Batman (France 1.03, display F1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // BATMAN FRANCE 1.03. DISP VER: BATMAN F1.03
-GAME(1991,  btmn_103g,     btmn_106, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Batman (Germany 1.03, display G1.04)",                                     MACHINE_IS_SKELETON_MECHANICAL) // BATMAN GERMANY 1.03. DISP VER: BATMAN G1.04
-GAME(1991,  btmn_101,      btmn_106, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.01, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.01
-GAME(1991,  ckpt_a17,      0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL) // CP80 3/6/91
-GAME(1994,  gnr_300,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 3.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 USA CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
-GAME(1994,  gnr_300f,      gnr_300,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (French 3.00, display F3.00)",                                MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 FRENCH CPU 3.00. DISPLAY VERSION- GNR F3.00 AUGUST 16, 1994
-GAME(1994,  gnr_300d,      gnr_300,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (Dutch 3.00, display A3.00)",                                 MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 DUTCH CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
-GAME(1994,  gnr_200,       gnr_300,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 2.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES JULY 5, 1994 USA CPU 2.00
-GAME(1992,  hook_408,      0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.08, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.08. DISPLAY: HOOK A4.01
-GAME(1992,  hook_404,      hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.04
-GAME(1992,  hook_401,      hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
-GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
-GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL) // HOOK U.K. 4.06
-GAME(1993,  jupk_513,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
-GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
-GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993
-GAME(1993,  jupk_307,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.07, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
-GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
-GAME(1993,  lah_112,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.12, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO NOV. 10, 1993 USA CPU 1.12. DISPLAY VERSION- ACTION HERO A1.06 11/11/1993
-GAME(1993,  lah_110,       lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.10, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO OCT. 18, 1993 USA CPU 1.10
-GAME(1993,  lah_xxx_s105,  lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (unknown CPU, display L1.05)",                            MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- ACTION HERO L1.05 11/11/1993
-GAME(1993,  lah_108s,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.08, display L1.04)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 28, 1993 USA CPU 1.08. DISPLAY VERSION- ACTION HERO L1.04 9/5/1993
-GAME(1993,  lah_107,       lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.07, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 22, 1993 USA CPU 1.07
-GAME(1993,  lah_106c,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (Canada 1.06, display A1.04)",                            MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 20, 1993 CANADA CPU 1.06. DISPLAY VERSION- ACTION HERO A1.04 9/5/1993
-GAME(1993,  lah_104f,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display F1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO F1.01 8/18/1993
-GAME(1993,  lah_104s,      lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display L1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO L1.02 8/30/1993
-GAME(1992,  lw3_208,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.08, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 11/17/92 USA CPU 2.08. DISPLAY VERSION- LETHAL WEAPON A2.06 9/29/1992
-GAME(1992,  lw3_207,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.07, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 USA CPU 2.07
-GAME(1992,  lw3_207c,      lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (Canada 2.07, display A2.06)",                             MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 CANADA CPU 2.07
-GAME(1992,  lw3_205,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.05, display A2.05)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30, 1992 USA CPU 2.05. DISPLAY VERSION- LETHAL WEAPON A2.05 8/14/1992
-GAME(1992,  lw3_204e,      lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (England 2.04, display A2.02)",                            MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30. 1992 ENGLAND CPU 2.04. DISPLAY VERSION LETHAL WEAPON A2.02 7/17/1992
-GAME(1992,  lw3_203,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.03, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 17, 1992 USA CPU 2.03. DISPLAY VERSION- LETHAL WEAPON  A2.04 7/29/1992
-GAME(1992,  lw3_200,       lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.00, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JUNE 16, 1992 USA CPU 2.00. DISPLAY VERSION- LETHAL WEAPON A2.04 7/29/1992
-GAME(1992,  mj_130,        0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Michael Jordan (1.30, display A1.03)",                                     MACHINE_IS_SKELETON_MECHANICAL) // MICHAEL JORDAN V 1.30 11/4/92. DISPLAY VERSION- JORDAN A1.03 8/13/1993
-GAME(1992,  trek_201,      0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.01, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/30/92 USA VER. 2.01. DISPLAY: STARTREK A1.09
-GAME(1992,  trek_200,      trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.00, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/16/92 USA VER. 2.00
-GAME(1992,  trek_120,      trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.20, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 1/10 USA VER. 1.20. DISPLAY: STARTREK A1.06
-GAME(1992,  trek_117,      trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.17, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 12/9 USA VER. 1.17
-GAME(1992,  trek_110,      trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A1.06
-GAME(1992,  trek_110_a027, trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A0.27)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A0.27
-GAME(1992,  stwr_106,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS 2016 UNOFFICIAL 1.06. DISPLAY VERSION- STAR WARS A1.05 12/4/1992
-GAME(1992,  stwr_106_s105, stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display S1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS S1.05 12/4/1992
-GAME(1992,  stwr_106_a046, stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A0.46)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS A0.46 10/9/1992
-GAME(1992,  stwr_104,      stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.04, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.04
-GAME(1992,  stwr_103,      stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03
-GAME(1992,  stwr_103_a104, stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.04)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03. DISPLAY VERSION- STAR WARS A1.04 11/20/1992
-GAME(1992,  stwr_102,      stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.02, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.02
-GAME(1992,  stwr_102e,     stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (England 1.02, display A1.05)",                                  MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS ENGLAND CPU 1.02
-GAME(1992,  stwr_101,      stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.01, display A1.02)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.01. DISPLAY VERSION- STAR WARS A1.02 10/29/1992
-GAME(1992,  stwr_101g,     stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (German 1.01, display G1.02)",                                   MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS GERMAN CPU 1.01. DISPLAY VERSION- STAR WARS G1.02 29/10/1992
-GAME(1993,  tftc_303,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.03, display A3.01)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC FEBRUARY 22,1994 USA CPU 3.03. DISPLAY VERSION- CRYPT A3.01 12/28/1993
-GAME(1993,  tftc_302,      tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (Dutch 3.02, display A3.01)",                         MACHINE_IS_SKELETON_MECHANICAL) // TFTC JANUARY 06, 1994 DUTCH CPU 3.02
-GAME(1993,  tftc_300,      tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.00, display A3.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 15, 1993 USA CPU 3.00. DISPLAY VERSION- CRYPT A3.00 12/16/1993
-GAME(1993,  tftc_200,      tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 2.00, display A2.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 03, 1993 USA CPU 2.00. DISPLAY VERSION- CRYPT A2.00 12/3/1993
-GAME(1993,  tftc_104s,     tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 1.04, display L1.03)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC NOVEMBER 19, 1993 USA CPU 1.04. DISPLAY VERSION- CRYPT L1.03 11/11/1993
-GAME(1991,  tmnt_104,      0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
-GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. GERMANY 1.04.
-GAME(1991,  tmnt_103,      tmnt_104, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.03
-GAME(1991,  tmnt_101,      tmnt_104, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.01
-GAME(1994,  tomy_400,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
-GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
-GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
-GAME(1994,  wwfr_106,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.06, display A1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING AUG. 01, 1994 USA CPU 1.06. DISPLAY VERSION- WWF A1.02 JUNE 29, 1994
-GAME(1994,  wwfr_103,      wwfr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.03, display A1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 USA CPU 1.03. DISPLAY VERSION- WWF A1.01 APRIL 14, 1994
-GAME(1994,  wwfr_103f,     wwfr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (French 1.03, display F1.01)",                            MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 FRENCH CPU 1.03. DISPLAY VERSION- WWF F1.01 APRIL 14, 1994
+GAME(1993,  rab_320,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
+GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
+GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
+GAME(1992,  aar_101,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Aaron Spelling (1.01)",                                                    MACHINE_IS_SKELETON_MECHANICAL) // AARON SPELLING V1.01 12/23/92
+GAME(1991,  btmn_106,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.06, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.06. DISP VER: BATMAN A1.02
+GAME(1991,  btmn_103,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.03, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.03. DISP VER: BATMAN A1.02
+GAME(1991,  btmn_103f,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (France 1.03, display F1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // BATMAN FRANCE 1.03. DISP VER: BATMAN F1.03
+GAME(1991,  btmn_103g,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (Germany 1.03, display G1.04)",                                     MACHINE_IS_SKELETON_MECHANICAL) // BATMAN GERMANY 1.03. DISP VER: BATMAN G1.04
+GAME(1991,  btmn_101,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.01, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.01
+GAME(1991,  ckpt_a17,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL) // CP80 3/6/91
+GAME(1994,  gnr_300,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 3.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 USA CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
+GAME(1994,  gnr_300f,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (French 3.00, display F3.00)",                                MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 FRENCH CPU 3.00. DISPLAY VERSION- GNR F3.00 AUGUST 16, 1994
+GAME(1994,  gnr_300d,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (Dutch 3.00, display A3.00)",                                 MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 DUTCH CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
+GAME(1994,  gnr_200,       gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 2.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES JULY 5, 1994 USA CPU 2.00
+GAME(1992,  hook_408,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.08, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.08. DISPLAY: HOOK A4.01
+GAME(1992,  hook_404,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.04
+GAME(1992,  hook_401,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
+GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
+GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL) // HOOK U.K. 4.06
+GAME(1993,  jupk_513,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
+GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
+GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993
+GAME(1993,  jupk_307,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.07, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  lah_112,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.12, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO NOV. 10, 1993 USA CPU 1.12. DISPLAY VERSION- ACTION HERO A1.06 11/11/1993
+GAME(1993,  lah_110,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.10, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO OCT. 18, 1993 USA CPU 1.10
+GAME(1993,  lah_xxx_s105,  lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (unknown CPU, display L1.05)",                            MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- ACTION HERO L1.05 11/11/1993
+GAME(1993,  lah_108s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.08, display L1.04)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 28, 1993 USA CPU 1.08. DISPLAY VERSION- ACTION HERO L1.04 9/5/1993
+GAME(1993,  lah_107,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.07, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 22, 1993 USA CPU 1.07
+GAME(1993,  lah_106c,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (Canada 1.06, display A1.04)",                            MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 20, 1993 CANADA CPU 1.06. DISPLAY VERSION- ACTION HERO A1.04 9/5/1993
+GAME(1993,  lah_104f,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display F1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO F1.01 8/18/1993
+GAME(1993,  lah_104s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display L1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO L1.02 8/30/1993
+GAME(1992,  lw3_208,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.08, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 11/17/92 USA CPU 2.08. DISPLAY VERSION- LETHAL WEAPON A2.06 9/29/1992
+GAME(1992,  lw3_207,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.07, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 USA CPU 2.07
+GAME(1992,  lw3_207c,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (Canada 2.07, display A2.06)",                             MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 CANADA CPU 2.07
+GAME(1992,  lw3_205,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.05, display A2.05)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30, 1992 USA CPU 2.05. DISPLAY VERSION- LETHAL WEAPON A2.05 8/14/1992
+GAME(1992,  lw3_204e,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (England 2.04, display A2.02)",                            MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30. 1992 ENGLAND CPU 2.04. DISPLAY VERSION LETHAL WEAPON A2.02 7/17/1992
+GAME(1992,  lw3_203,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.03, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 17, 1992 USA CPU 2.03. DISPLAY VERSION- LETHAL WEAPON  A2.04 7/29/1992
+GAME(1992,  lw3_200,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.00, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JUNE 16, 1992 USA CPU 2.00. DISPLAY VERSION- LETHAL WEAPON A2.04 7/29/1992
+GAME(1992,  mj_130,        0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Michael Jordan (1.30, display A1.03)",                                     MACHINE_IS_SKELETON_MECHANICAL) // MICHAEL JORDAN V 1.30 11/4/92. DISPLAY VERSION- JORDAN A1.03 8/13/1993
+GAME(1992,  trek_201,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.01, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/30/92 USA VER. 2.01. DISPLAY: STARTREK A1.09
+GAME(1992,  trek_200,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.00, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/16/92 USA VER. 2.00
+GAME(1992,  trek_120,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.20, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 1/10 USA VER. 1.20. DISPLAY: STARTREK A1.06
+GAME(1992,  trek_117,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.17, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 12/9 USA VER. 1.17
+GAME(1992,  trek_110,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A1.06
+GAME(1992,  trek_110_a027, trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A0.27)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A0.27
+GAME(1992,  stwr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS 2016 UNOFFICIAL 1.06. DISPLAY VERSION- STAR WARS A1.05 12/4/1992
+GAME(1992,  stwr_106_s105, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display S1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS S1.05 12/4/1992
+GAME(1992,  stwr_106_a046, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A0.46)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS A0.46 10/9/1992
+GAME(1992,  stwr_104,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.04, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.04
+GAME(1992,  stwr_103,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03
+GAME(1992,  stwr_103_a104, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.04)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03. DISPLAY VERSION- STAR WARS A1.04 11/20/1992
+GAME(1992,  stwr_102,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.02, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.02
+GAME(1992,  stwr_102e,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (England 1.02, display A1.05)",                                  MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS ENGLAND CPU 1.02
+GAME(1992,  stwr_101,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.01, display A1.02)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.01. DISPLAY VERSION- STAR WARS A1.02 10/29/1992
+GAME(1992,  stwr_101g,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (German 1.01, display G1.02)",                                   MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS GERMAN CPU 1.01. DISPLAY VERSION- STAR WARS G1.02 29/10/1992
+GAME(1993,  tftc_303,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.03, display A3.01)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC FEBRUARY 22,1994 USA CPU 3.03. DISPLAY VERSION- CRYPT A3.01 12/28/1993
+GAME(1993,  tftc_302,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (Dutch 3.02, display A3.01)",                         MACHINE_IS_SKELETON_MECHANICAL) // TFTC JANUARY 06, 1994 DUTCH CPU 3.02
+GAME(1993,  tftc_300,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.00, display A3.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 15, 1993 USA CPU 3.00. DISPLAY VERSION- CRYPT A3.00 12/16/1993
+GAME(1993,  tftc_200,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 2.00, display A2.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 03, 1993 USA CPU 2.00. DISPLAY VERSION- CRYPT A2.00 12/3/1993
+GAME(1993,  tftc_104s,     tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 1.04, display L1.03)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC NOVEMBER 19, 1993 USA CPU 1.04. DISPLAY VERSION- CRYPT L1.03 11/11/1993
+GAME(1991,  tmnt_104,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
+GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. GERMANY 1.04.
+GAME(1991,  tmnt_103,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.03
+GAME(1991,  tmnt_101,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.01
+GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
+GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  wwfr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.06, display A1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING AUG. 01, 1994 USA CPU 1.06. DISPLAY VERSION- WWF A1.02 JUNE 29, 1994
+GAME(1994,  wwfr_103,      wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.03, display A1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 USA CPU 1.03. DISPLAY VERSION- WWF A1.01 APRIL 14, 1994
+GAME(1994,  wwfr_103f,     wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (French 1.03, display F1.01)",                            MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 FRENCH CPU 1.03. DISPLAY VERSION- WWF F1.01 APRIL 14, 1994

@@ -11,6 +11,10 @@ Hardware:
 Data East CPU board is similar to Williams System 11, but without the generic audio board.
 For now, we'll presume the timings are the same.
 
+Display:
+- System 1: 4x 7 digits, each 7-segment+comma, plus 4 digit for balls/credits/match
+- System 2: Alphanumeric display, some have 28 digits, some have 32.
+
 Here are the key codes to enable play:
 
 Game                                   NUM    Start game                 End ball
@@ -39,10 +43,9 @@ Status:
 - All machines are playable
 
 ToDo:
-- Save state
 - Outputs
 - Mechanical sounds
-- robo_a34: can't coin up, buggy rom?
+- robo_a29,robo_a34: can't coin up, buggy rom?
 
 *********************************************************************************************************************/
 #include "emu.h"
@@ -50,9 +53,7 @@ ToDo:
 #include "machine/decopincpu.h"
 #include "machine/genpin.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
 #include "speaker.h"
@@ -61,6 +62,7 @@ ToDo:
 #include "de2.lh"
 #include "de2a3.lh"
 
+namespace {
 
 class de_2_state : public genpin_class
 {
@@ -86,11 +88,10 @@ private:
 	virtual void machine_reset() override;
 
 	void de_bg_audio(machine_config &config);
-	void de_2_map(address_map &map);
 	void de_2_audio_map(address_map &map);
 
 	void sample_w(uint8_t data);
-	void pia34_pa_w(uint8_t data);
+	void pia34_pa_w(uint8_t data) { }
 	void type2alpha3_pia34_pa_w(uint8_t data);
 	void alpha3_pia34_pa_w(uint8_t data);
 	uint8_t switch_r();
@@ -102,14 +103,11 @@ private:
 	void dig1_w(uint8_t data);
 	void type2alpha3_dig1_w(uint8_t data);
 	void alpha3_dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
+	void lamp0_w(uint8_t data) { }
 	void lamp1_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	void sol2_w(uint8_t data) { } // solenoids 8-15
-	void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 
 	uint8_t sound_latch_r();
 	void sample_bank_w(uint8_t data);
@@ -139,26 +137,9 @@ private:
 	uint8_t m_strobe = 0U;
 	uint8_t m_row = 0U;
 	uint8_t m_diag = 0U;
-	bool m_ca1 = 0;
 	uint8_t m_sound_data = 0U;
-
-	uint8_t m_sample_bank_num = 0U;
-	uint8_t m_msm_prescaler = 0U;
 };
 
-
-void de_2_state::de_2_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(FUNC(de_2_state::sol3_w)); // solenoids
-	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
-	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
-	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
-	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	map(0x4000, 0xffff).rom();
-}
 
 void de_2_state::de_2_audio_map(address_map &map)
 {
@@ -263,6 +244,16 @@ void de_2_state::machine_start()
 	m_digits.resolve();
 	m_diag_digit.resolve();
 
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_diag));
+	save_item(NAME(m_segment1));
+	save_item(NAME(m_segment2));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sample_data));
+	save_item(NAME(m_more_data));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_row));
+
 	uint8_t *const ROM = memregion("sound1")->base();
 	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
 	m_sample_bank->set_entry(0);
@@ -290,26 +281,13 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 }
 
 // 6821 PIA at 0x2100
-void de_2_state::sol3_w(uint8_t data)
-{
-}
-
 void de_2_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( de_2_state::pia21_ca2_w )
-{
-// sound ns
-	m_ca1 = state;
-}
-
 // 6821 PIA at 0x2400
-void de_2_state::lamp0_w(uint8_t data)
-{
-}
 
 // 6821 PIA at 0x2800
 void de_2_state::dig0_w(uint8_t data)
@@ -317,7 +295,7 @@ void de_2_state::dig0_w(uint8_t data)
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
-	m_diag = (data & 0x70) >> 4;
+	m_diag = BIT(data, 4, 3);
 	m_diag_digit = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -399,7 +377,7 @@ void de_2_state::pia2c_pb_w(uint8_t data)
 uint8_t de_2_state::switch_r()
 {
 	u8 data = 0;
-	if (m_row < 0x81)
+	if (m_row < 0x41)
 		// last column is never used
 		for (u8 i = 0; i < 7; i++)
 			if (BIT(m_row, i))
@@ -414,11 +392,6 @@ void de_2_state::switch_w(uint8_t data)
 }
 
 // 6821 PIA at 0x3400
-void de_2_state::pia34_pa_w(uint8_t data)
-{
-	// Not connected on alphanumeric type 2 boards
-}
-
 void de_2_state::type2alpha3_pia34_pa_w(uint8_t data)
 {
 	m_segment2 |= (data<<8);
@@ -458,12 +431,10 @@ void de_2_state::sample_bank_w(uint8_t data)
 {
 	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
 
-	m_sample_bank_num = (data & 0x07);
-	m_sample_bank->set_entry(m_sample_bank_num);
-	m_msm_prescaler = (data & 0x30) >> 4;
-	m_nmi_enable = (~data & 0x80);
-	m_msm5205->playmode_w(prescale[m_msm_prescaler]);
-	m_msm5205->reset_w(data & 0x40);
+	m_sample_bank->set_entry(data & 7);
+	m_nmi_enable = !BIT(data, 7);
+	m_msm5205->playmode_w(prescale[BIT(data, 4, 2)]);
+	m_msm5205->reset_w(BIT(data, 6));
 }
 
 uint8_t de_2_state::display_r(offs_t offset)
@@ -981,6 +952,7 @@ ROM_START(torp_a16)
 	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
+} // Anonymous namespace
 
 GAME( 1990, bttf_a28, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1990, bttf_a27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
