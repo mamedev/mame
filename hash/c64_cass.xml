@@ -4801,8 +4801,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<publisher>Bulldog Software</publisher>
 
 		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611910">
 				<rom name="Feud.tap" size="611910" crc="7d2dbcee" sha1="cbc60e99ff54498b680e84b0adffbfc76ff192d6"/>
+			</dataarea>
+		</part>
+
+		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="611912">
+				<rom name="Feud_a1.tap" size="611912" crc="bee4bdb1" sha1="44ffeb57019c5e8f73a2ce8b736237473c274727"/>
 			</dataarea>
 		</part>
 	</software>
