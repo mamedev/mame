@@ -9395,19 +9395,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Master Chess</description>
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="391752">
-				<rom name="mstrchsa.tap" size="391752" crc="42fd4547" sha1="caabae9d2957866f3861e650753edb24da216e9b"/>
+			<dataarea name="cass" size="395366">
+				<rom name="Master_Chess.tap" size="395366" crc="8d43cbbf" sha1="2a44fc9b8c0e247847434dc1559030e7e0b96e63"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="395320">
-				<rom name="mstrchsb.tap" size="395320" crc="ccf02674" sha1="f97584ee6a87da30e79e57c9dec39a888637f683"/>
+			<dataarea name="cass" size="386491">
+				<rom name="Master_Chess_a1.tap" size="386491" crc="0827df3f" sha1="6fb20553dd1b3a2a410554cdaf17494d09ad4dcd"/>
 			</dataarea>
 		</part>
 	</software>
