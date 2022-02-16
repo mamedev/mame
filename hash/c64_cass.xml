@@ -2216,15 +2216,21 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	</software>
 
 	<software name="bdash4h">
-		<description>Boulder Dash 4</description>
+		<description>Boulder Dash IV: The Game</description>
 		<year>1989</year>
 		<publisher>Hi Tec Software</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
-			<feature name="part_id" value="Boulder Dash Construction Kit"/>
-			<dataarea name="cass" size="250098">
-				<rom name="bdashck.tap" size="250098" crc="a1748639" sha1="6a76ba69fdf0709ce330c2c47ceb7677fdd45bb9"/>
+			<feature name="part_id" value="Boulder Dash IV: The Game"/>
+			<dataarea name="cass" size="1190926">
+				<rom name="Boulder_Dash_IV-_The_Game.tap" size="1190926" crc="24aa7245" sha1="36366c7b53f6fb60ea64e483b6e6d2b9d231914a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Boulder Dash IV: The Game Construction Kit"/>
+			<dataarea name="cass" size="250101">
+				<rom name="Boulder_Dash_IV-_The_Game_Construction_Kit.tap" size="250101" crc="4da01a43" sha1="c9aabdeda26b7a3260455d6e2fa9c0fa1456ee7e"/>
 			</dataarea>
 		</part>
 	</software>
