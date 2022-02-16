@@ -3518,19 +3518,10 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Continental Circus</description>
 		<year>1991</year>
 		<publisher>Mastertronic Plus</publisher>
-		<!-- Dumped by @c64tapes -->
 
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="569886">
-				<rom name="circuspa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="569886">
-				<rom name="circuspb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
+				<rom name="Continental_Circus.tap" size="569886" crc="fd433e0d" sha1="e031ec0701314ce91e2a871acfb1177afba6a34d"/>
 			</dataarea>
 		</part>
 	</software>
