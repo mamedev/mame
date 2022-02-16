@@ -4857,19 +4857,10 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Feud</description>
 		<year>1987</year>
 		<publisher>Bulldog Software</publisher>
-		<!-- Dumped by @c64tapes -->
 
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="611910">
-				<rom name="feuda.tap" size="611910" crc="9ac57691" sha1="ff53d728123469ce40c8c1553cb03912aa897e60"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="611910">
-				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
+				<rom name="Feud.tap" size="611910" crc="7d2dbcee" sha1="cbc60e99ff54498b680e84b0adffbfc76ff192d6"/>
 			</dataarea>
 		</part>
 	</software>
