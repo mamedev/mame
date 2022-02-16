@@ -9616,11 +9616,10 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Micro Rhythm</description>
 		<year>1986</year>
 		<publisher>Firebird Silver</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
-			<dataarea name="cass" size="614063">
-				<rom name="rhythma.tap" size="614063" crc="1e2e9fb3" sha1="6c773ae1c38cf38508467025e5538d77c3f57e0b"/>
+			<dataarea name="cass" size="592954">
+				<rom name="Micro_Rhythm.tap" size="592954" crc="d6af441f" sha1="08aafe999bb59b7f0365b42bd997a6a2dde9467b"/>
 			</dataarea>
 		</part>
 	</software>
