@@ -5066,6 +5066,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pkscram.cpp",
 	MAME_DIR .. "src/mame/drivers/playcenter.cpp",
 	MAME_DIR .. "src/mame/drivers/plsonic4.cpp",
+	MAME_DIR .. "src/mame/drivers/pmc.cpp",
 	MAME_DIR .. "src/mame/drivers/pntnpuzl.cpp",
 	MAME_DIR .. "src/mame/drivers/policetr.cpp",
 	MAME_DIR .. "src/mame/includes/policetr.h",

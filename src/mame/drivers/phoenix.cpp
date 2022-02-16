@@ -31,6 +31,7 @@ To Do:
 Phoenix:
 - Emulate the different sound system used at least by phoenixc2, griffono,
    and nextfase.
+- Some of the bootlegs use MN6221AB instead of MN6221AA.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -1343,7 +1344,7 @@ ROM_START( phoenixs )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
-ROM_START( phoenixass )
+ROM_START( phoenixass ) // Uses MN6221AB melody chip (Greensleeves) instead of MN6221AA
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "00-811.ic45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
 	ROM_LOAD( "01-811.ic46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )

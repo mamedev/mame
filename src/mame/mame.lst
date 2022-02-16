@@ -15541,6 +15541,7 @@ adpoker                         // 198?, Unknown
 animpkr                         // 198?, Unknown
 bchancep                        // 198?, Unknown
 bchanceq                        // 198?, Unknown
+boasorte                        // 198?, Unknown
 bonuspkr                        // 1984, Galanthis Inc.
 brasil86                        // 1986, Unknown
 brasil87                        // 1987, Unknown
@@ -35588,6 +35589,9 @@ polynetw                        // GX305 too? (c) 1993
 
 @source:pm68k.cpp
 pm68k                           //
+
+@source:pmc.cpp
+unkpmc
 
 @source:pmd85.cpp
 alfa                            // Alfa (PMD-85.1 clone)

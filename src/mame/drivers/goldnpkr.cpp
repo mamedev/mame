@@ -11105,6 +11105,26 @@ ROM_START( bchanceq )
 	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( boasorte )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic32",  0x4000, 0x4000, CRC(ef0f1e65) SHA1(6a11722ca8089bb57d4e5648266c0f7de9a46303) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic34",   0x4000, 0x2000, CRC(6f23f224) SHA1(243617b9e1050b404020ea581c3e2acf8e5cca81) )    // chars ROM, different cardback logo
+	ROM_IGNORE(                 0x2000) // 11xxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "ic15", 0x0000,         0x2000, CRC(9b5a50ca) SHA1(07ab334421dfc119939314b7026a60132b02a054) )    // cards deck gfx, bitplane1
+	ROM_IGNORE(0x6000) // BADADDR         x---xxxxxxxxxxx
+	ROM_LOAD( "ic24",         0x2000, 0x2000, CRC(805f1a73) SHA1(a2f275de377db5dd3b493d10572ac13d5a48c50f) )    // cards deck gfx, bitplane2
+	ROM_IGNORE( 0x6000) // BADADDR         x---xxxxxxxxxxx
+	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 /*
 
   PCB marked "MONDIAL"
@@ -12032,6 +12052,7 @@ GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init
 
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, boasorte,  bchanceq, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Boa Sorte! (Golden Poker prequel HW)",           MACHINE_NOT_WORKING, layout_goldnpkr )
 
 GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )  // banked selectable program.
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
