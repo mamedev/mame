@@ -11604,16 +11604,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<year>1993</year>
 		<publisher>Kixx</publisher>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass1" size="763489">
+			<dataarea name="cass" size="763489">
 				<rom name="James_Pond_2-_RoboCod_Side_1.tap" size="763489" crc="0f2fd72c" sha1="9b3812144c5719e6dcf0b25167a18724a916439d"/>
 			</dataarea>
 		</part>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass2" size="1638089">
+			<dataarea name="cass" size="1638089">
 				<rom name="James_Pond_2-_RoboCod_Side_2.tap" size="1638089" crc="b914534d" sha1="635bceadc79d314e4234443f3355fd65f246bcba"/>
 			</dataarea>
 		</part>
