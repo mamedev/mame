@@ -17,7 +17,6 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVG of: rkosmosa
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
@@ -1530,7 +1529,7 @@ void gnw_mmouse_state::ehockey(machine_config &config)
 
 void gnw_mmouse_state::rkosmosa(machine_config &config)
 {
-	kb1013vk12_common(config, 1756, 1080); // R mask option ?
+	kb1013vk12_common(config, 1646, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::okhota(machine_config &config)
@@ -1616,8 +1615,8 @@ ROM_START( rkosmosa )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
-	ROM_REGION( 89361, "screen", 0)
-	ROM_LOAD( "rkosmosa.svg", 0, 89361, BAD_DUMP CRC(d61f3bdc) SHA1(932d45dc9302db5550971ce0d295a88e8c507e3f) )
+	ROM_REGION( 81420, "screen", 0)
+	ROM_LOAD( "rkosmosa.svg", 0, 81420, CRC(dc6632be) SHA1(0906d933f4cda39ee1e57b502651a821e61e95ef) )
 ROM_END
 
 ROM_START( okhota )
