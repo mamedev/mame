@@ -937,6 +937,7 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"nintendo",
 		"nix",
 		"nmk",
+		"novadesitec",
 		"omori",
 		"olympia",
 		"orca",
