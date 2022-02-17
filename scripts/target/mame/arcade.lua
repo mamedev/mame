@@ -4654,7 +4654,6 @@ files {
 	MAME_DIR .. "src/mame/video/decodmd2.h",
 	MAME_DIR .. "src/mame/video/decodmd3.cpp",
 	MAME_DIR .. "src/mame/video/decodmd3.h",
-	MAME_DIR .. "src/mame/drivers/de_3b.cpp",
 	MAME_DIR .. "src/mame/drivers/flicker.cpp",
 	MAME_DIR .. "src/mame/drivers/g627.cpp",
 	MAME_DIR .. "src/mame/drivers/gp_1.cpp",

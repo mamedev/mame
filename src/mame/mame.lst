@@ -12063,12 +12063,39 @@ torp_e21                        //
 
 @source:de_3.cpp
 aar_101                         //
+batmanf                         //
+batmanf1                        //
+batmanf2                        //
+batmanf3                        //
+bay_d300                        //
+bay_d400                        //
+bay_e400                        //
+bay_f201                        //
+baywatch                        //
+bmf_at                          //
+bmf_be                          //
+bmf_ch                          //
+bmf_cn                          //
+bmf_de                          //
+bmf_fr                          //
+bmf_it                          //
+bmf_jp                          //
+bmf_nl                          //
+bmf_no                          //
+bmf_sp                          //
+bmf_sv                          //
+bmf_time                        //
+bmf_uk                          //
 btmn_101                        //
 btmn_103                        //
 btmn_103f                       //
 btmn_103g                       //
 btmn_106                        //
 ckpt_a17                        //
+ctcheese                        //
+detest                          //
+frankst                         //
+frankstg                        //
 gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
@@ -12098,6 +12125,10 @@ lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
+mav_100                         //
+mav_400                         //
+mav_401                         //
+mav_402                         //
 mj_130                          //
 rab_103s                        //
 rab_130                         //
@@ -12133,39 +12164,6 @@ trek_201                        //
 wwfr_103                        //
 wwfr_103f                       //
 wwfr_106                        //
-
-@source:de_3b.cpp
-batmanf                         //
-batmanf1                        //
-batmanf2                        //
-batmanf3                        //
-bay_d300                        //
-bay_d400                        //
-bay_e400                        //
-bay_f201                        //
-baywatch                        //
-bmf_at                          //
-bmf_be                          //
-bmf_ch                          //
-bmf_cn                          //
-bmf_de                          //
-bmf_fr                          //
-bmf_it                          //
-bmf_jp                          //
-bmf_nl                          //
-bmf_no                          //
-bmf_sp                          //
-bmf_sv                          //
-bmf_time                        //
-bmf_uk                          //
-ctcheese                        //
-detest                          //
-frankst                         //
-frankstg                        //
-mav_100                         //
-mav_400                         //
-mav_401                         //
-mav_402                         //
 
 @source:deadang.cpp
 deadang                         // (c) 1988 Seibu Kaihatsu
