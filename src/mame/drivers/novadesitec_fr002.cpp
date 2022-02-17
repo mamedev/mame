@@ -26,15 +26,15 @@ Not much can be done until the MCU is somehow dumped.
 
 namespace {
 
-class novadesitec_state : public driver_device
+class novadesitec_fr002_state : public driver_device
 {
 public:
-	novadesitec_state(const machine_config &mconfig, device_type type, const char *tag) :
+	novadesitec_fr002_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void novadesitec(machine_config &config);
+	void fr002(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -44,17 +44,17 @@ private:
 	void main_map(address_map &map);
 };
 
-uint32_t novadesitec_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t novadesitec_fr002_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void novadesitec_state::main_map(address_map &map)
+void novadesitec_fr002_state::main_map(address_map &map)
 {
 }
 
 
-static INPUT_PORTS_START( novadesitec )
+static INPUT_PORTS_START( fr002 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -87,11 +87,11 @@ static INPUT_PORTS_START( novadesitec )
 INPUT_PORTS_END
 
 
-void novadesitec_state::novadesitec(machine_config &config)
+void novadesitec_fr002_state::fr002(machine_config &config)
 {
 	// basic machine hardware
 	F2MC16(config, m_maincpu, 16_MHz_XTAL); // actually MB90F533A
-	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr002_state::main_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
@@ -99,7 +99,7 @@ void novadesitec_state::novadesitec(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(novadesitec_state::screen_update));
+	screen.set_screen_update(FUNC(novadesitec_fr002_state::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
@@ -139,5 +139,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, clrmatch, 0, novadesitec, novadesitec, novadesitec_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_IS_SKELETON )
-GAME( 200?, sportmem, 0, novadesitec, novadesitec, novadesitec_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_IS_SKELETON )
+GAME( 200?, clrmatch, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_IS_SKELETON )
+GAME( 200?, sportmem, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_IS_SKELETON )

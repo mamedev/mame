@@ -33562,9 +33562,18 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 raiders5ta                      //
 
-@source:novadesitec.cpp
+@source:novadesitec_fr002.cpp
 clrmatch
 sportmem
+
+@source:novadesitec_fr004.cpp
+unkfr004
+unkfr004a
+unkfr004b
+unkfr004c
+
+@source:novadesitec_fr009.cpp
+unkfr009
 
 @source:novag_cexpert.cpp
 cexpert

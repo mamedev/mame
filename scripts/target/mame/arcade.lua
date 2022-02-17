@@ -3280,6 +3280,13 @@ files {
 	MAME_DIR .. "src/mame/video/quizpani.cpp",
 }
 
+createMAMEProjects(_target, _subtarget, "novadesitec")
+files {
+	MAME_DIR .. "src/mame/drivers/novadesitec_fr002.cpp",
+	MAME_DIR .. "src/mame/drivers/novadesitec_fr004.cpp",
+	MAME_DIR .. "src/mame/drivers/novadesitec_fr009.cpp",
+}
+
 createMAMEProjects(_target, _subtarget, "olympia")
 files {
 	MAME_DIR .. "src/mame/drivers/dday.cpp",
@@ -5042,7 +5049,6 @@ files {
 	MAME_DIR .. "src/mame/includes/norautp.h",
 	MAME_DIR .. "src/mame/audio/norautp.cpp",
 	MAME_DIR .. "src/mame/drivers/notechan.cpp",
-	MAME_DIR .. "src/mame/drivers/novadesitec.cpp",
 	MAME_DIR .. "src/mame/drivers/nsg6809.cpp",
 	MAME_DIR .. "src/mame/drivers/nsmpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/odyssey.cpp",

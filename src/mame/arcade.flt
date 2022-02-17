@@ -921,7 +921,9 @@ nmkmedal.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
-novadesitec.cpp
+novadesitec_fr002.cpp
+novadesitec_fr004.cpp
+novadesitec_fr009.cpp
 nsg6809.cpp
 nsm.cpp
 nsmpoker.cpp
