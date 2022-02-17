@@ -2116,14 +2116,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<year>1989</year>
 		<publisher>Hi Tec Software</publisher>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Boulder Dash IV: The Game"/>
 			<dataarea name="cass" size="1190926">
 				<rom name="Boulder_Dash_IV-_The_Game.tap" size="1190926" crc="24aa7245" sha1="36366c7b53f6fb60ea64e483b6e6d2b9d231914a"/>
 			</dataarea>
 		</part>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Boulder Dash IV: Construction Kit"/>
 			<dataarea name="cass" size="250101">
 				<rom name="Boulder_Dash_IV-_The_Game_Construction_Kit.tap" size="250101" crc="4da01a43" sha1="c9aabdeda26b7a3260455d6e2fa9c0fa1456ee7e"/>
@@ -4760,14 +4760,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<year>1987</year>
 		<publisher>Bulldog Software</publisher>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611910">
 				<rom name="Feud.tap" size="611910" crc="7d2dbcee" sha1="cbc60e99ff54498b680e84b0adffbfc76ff192d6"/>
 			</dataarea>
 		</part>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="611912">
 				<rom name="Feud_a1.tap" size="611912" crc="bee4bdb1" sha1="44ffeb57019c5e8f73a2ce8b736237473c274727"/>
@@ -9533,13 +9533,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<year>1987</year>
 		<publisher>Firebird Silver</publisher>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="709984">
 				<rom name="Micro_Rhythm_+_Side_1.tap" size="709984" crc="83a31775" sha1="939801c2fb78143d9268c1cd6e6025b001877dcd"/>
 			</dataarea>
 		</part>
 
-		<part name="cass" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="710018">
 				<rom name="Micro_Rhythm_+_Side_2.tap" size="710018" crc="d3b0d839" sha1="5acbd97389929fd6f01485dc2041e4538b3f8d8a"/>
 			</dataarea>
@@ -11604,14 +11604,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="763489">
+			<dataarea name="cass1" size="763489">
 				<rom name="James_Pond_2-_RoboCod_Side_1.tap" size="763489" crc="0f2fd72c" sha1="9b3812144c5719e6dcf0b25167a18724a916439d"/>
 			</dataarea>
 		</part>
 
 		<part name="cass" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="1638089">
+			<dataarea name="cass2" size="1638089">
 				<rom name="James_Pond_2-_RoboCod_Side_2.tap" size="1638089" crc="b914534d" sha1="635bceadc79d314e4234443f3355fd65f246bcba"/>
 			</dataarea>
 		</part>
