@@ -196,6 +196,7 @@ void sdl_osd_interface::extract_video_config()
 #elif (defined SDLMAME_MACOSX)
 		stemp = "bgfx";
 #else
+		osd_printf_warning("Warning: -video not provided. Using 'soft' which can cause slowness in emulation.\n");
 		stemp = "soft";
 #endif
 	}

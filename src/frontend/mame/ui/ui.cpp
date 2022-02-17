@@ -468,6 +468,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				warning_text = machine_info().game_info_string();
 			if (!warning_text.empty())
 			{
+				warning_text.append(_("\n\nHINT: Use '-skip_gameinfo' to get rid of this message in the future."));
 				warning_text.append(_("\n\nPress any key to continue"));
 				set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
 			}
