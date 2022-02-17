@@ -31,26 +31,6 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="10hits2a" cloneof="10hits2">
-		<description>10 Computer Hits 2 (alt)</description>
-		<year>1986</year>
-		<publisher>Beau-Jolly</publisher>
-
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A: Superpipeline 2 / Mutant Monty / Henrys House / Gribblys Day Out / Snooker"/>
-			<dataarea name="cass" size="1756359">
-				<rom name="10_Computer_Hits_2_Tape_A (alt).tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B: Mama Llama / Raskel / Aqua Racer / Frenzy / Circus"/>
-			<dataarea name="cass" size="1767233">
-				<rom name="10_Computer_Hits_2_Tape_B (alt).tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="10hits3">
 		<description>10 Computer Hits 3</description>
 		<year>1986</year>
@@ -519,26 +499,6 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="actionp">
 		<description>Action Pack</description>
-		<year>1990</year>
-		<publisher>Prism Leisure Corporation</publisher>
-
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side 1: Rock &amp; Wrestle / I Ball"/>
-			<dataarea name="cass" size="1408819">
-				<rom name="Action_Pack,_The_Side_1.tap" size="1408819" crc="78270669" sha1="58c29c640ae4ff421df411fe23c9768ba1d32fbd"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side 2: Sea Base Delta / Thrust"/>
-			<dataarea name="cass" size="997661">
-				<rom name="Action_Pack,_The_Side_2.tap" size="997661" crc="e0b5b90b" sha1="67672a5320a8b8dda6452fe2f48aadb43a3ef995"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="actionpa" cloneof="actionp">
-		<description>Action Pack (alt)</description>
 		<year>1990</year>
 		<publisher>Prism Leisure Corporation</publisher>
 
