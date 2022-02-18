@@ -77,7 +77,6 @@ protected:
 private:
 	emu_timer* m_irq_timer = 0;
 	bool m_irq_active = 0;
-	bool m_ca2 = 0;
 	u8 m_lamp_data = 0U;
 
 	// callbacks
@@ -92,7 +91,13 @@ private:
 	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }   // flipper enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[18] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[20] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[21] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[17] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[16] = state; }
 	void lamp0_w(uint8_t data);
 	void lamp1_w(uint8_t data);
 	uint8_t display_strobe_r();
