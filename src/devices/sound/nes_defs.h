@@ -75,6 +75,7 @@ struct apu_t
 
 		uint8 regs[4]; /* regs[1] unused */
 		int linear_length = 0;
+		bool linear_reload = false;
 		int vbl_length = 0;
 		int write_latency = 0;
 		float phaseacc = 0.0;
@@ -82,7 +83,6 @@ struct apu_t
 		bool counter_started = false;
 		bool enabled = false;
 		uint8 output = 0;
-		uint8 output_next = 0;
 	};
 
 	/* Noise Wave */
