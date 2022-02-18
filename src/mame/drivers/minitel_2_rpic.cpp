@@ -25,7 +25,8 @@
 
     What is implemented but not working :
 
-    - The rear serial port. (Internal 8051 serial port emulation missing).
+    - The rear serial port.(Prise péri-informatique) 
+     (Internal 8051 serial port emulation missing).
 
     What is not yet implemented :
 
@@ -49,10 +50,10 @@
 
     With the official ROM you need to press F10 to switch on the CRT.
 
-    Modem and external port can be exported to the "modport0" and "serport0"
+    Modem and external port can be exported to the "modem" and "periinfo"
     interfaces.
     Example : Command line options to use to create a TCP socket linked to
-    the modem port : "-modport0 null_modem -bitb socket.127.0.0.1:20000"
+    the modem port : "-modem null_modem -bitb socket.127.0.0.1:20000"
     Once mame started you can then send vdt files with netcat to this socket.
 
 ****************************************************************************/
@@ -113,8 +114,8 @@ public:
 		, m_ts9347(*this, "ts9347")
 		, m_palette(*this, "palette")
 		, m_i2cmem(*this, "i2cmem")
-		, m_modem(*this, "modport0")
-		, m_serport(*this, "serport0")
+		, m_modem(*this, "modem")
+		, m_serport(*this, "periinfo")
 		, m_io_kbd(*this, "Y%u", 0)
 		{
 		}
