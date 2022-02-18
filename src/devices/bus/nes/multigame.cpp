@@ -434,18 +434,18 @@ nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig
 {
 }
 
-nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mirror_flip(type == NES_BMC_NC20MB)
+nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mirror_flip)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mirror_flip(mirror_flip)
 {
 }
 
 nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_42in1reset_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock, 0)
 {
 }
 
 nes_bmc_nc20mb_device::nes_bmc_nc20mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_42in1reset_device(mconfig, NES_BMC_NC20MB, tag, owner, clock)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_NC20MB, tag, owner, clock, 1)
 {
 }
 

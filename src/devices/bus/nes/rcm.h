@@ -44,7 +44,7 @@ protected:
 	nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bank);
 
 private:
-	u32 m_base;
+	const u32 m_base;
 };
 
 
