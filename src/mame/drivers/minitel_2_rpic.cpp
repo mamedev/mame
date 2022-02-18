@@ -25,7 +25,7 @@
 
     What is implemented but not working :
 
-    - The rear serial port.(Prise péri-informatique) 
+    - The rear serial port.(Prise péri-informatique)
      (Internal 8051 serial port emulation missing).
 
     What is not yet implemented :
