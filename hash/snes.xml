@@ -35374,13 +35374,18 @@ List of unclassified roms
 	</software>
 
 	<software name="ballz3dp" cloneof="ballz3d">
-		<description>Ballz 3D - Fighting at its Ballziest (prototype)</description>
+		<description>Ballz (prototype)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+		<info name="alt_title" value="Ballz 3D - Fighting at its Ballziest" />
 		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
+			<feature name="enhancement" value="DSP1" />
+			<feature name="slot" value="hirom_dsp" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ballz 3d - fighting at its ballziest (prototype).sfc" size="1048576" crc="50e09e71" sha1="85546e6aaa9c0abec060ae8e41d41918e127679e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="addon" size="10240">
+				<rom name="dsp1a.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
