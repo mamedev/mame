@@ -408,6 +408,67 @@ uint32_t _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
+uint32_t _8080bw_state::screen_update_vortex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t x = 0;
+	uint8_t y = MW8080BW_VCOUNTER_START_NO_VBLANK;
+	uint8_t video_data = 0;
+	uint8_t pix = 0;
+	rgb_t col;
+
+	while (1)
+	{
+		// plot the current pixel
+		pen_t pen = (video_data & 0x01) ? col : rgb_t::black();
+
+		if (m_flip_screen)
+			bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
+		else
+			bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
+
+		// next pixel
+		video_data = video_data >> 1;
+		x = x + 1;
+
+		// end of line?
+		if (x == 0)
+		{
+			// yes, flush out the shift register
+			for (int i = 0; i < 4; i++)
+			{
+				pen_t pen = (video_data & 0x01) ? col : rgb_t::black();
+
+				if (m_flip_screen)
+					bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
+				else
+					bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
+
+				video_data = video_data >> 1;
+			}
+
+			// next row, video_data is now 0, so the next line will start with 4 blank pixels
+			y = y + 1;
+
+			// end of screen?
+			if (y == 0)
+				break;
+		}
+		// the video RAM is read at every 8 pixels starting with pixel 4
+		else if ((x & 0x07) == 0x04)
+		{
+			offs_t offs = ((offs_t)y << 5) | (x >> 3);
+			video_data = m_main_ram[offs];
+			pix = m_main_ram[offs + 1] & 0x01;
+			if (pix == 0x01)
+				col = rgb_t(0, 255, (((x >> 5) & 0x01) * 255));
+			else
+				col = rgb_t(255, 0, (((x >> 5) & 0x01) * 255));
+		}
+	}
+
+	return 0;
+}
+
 /*******************************************************/
 /*                                                     */
 /* Model Racing "Orbite"                               */
