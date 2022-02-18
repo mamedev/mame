@@ -31,7 +31,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0220   TMS1000   1980, Tomy Teacher
- *MP0230   TMS1000   1980, Entex Blast It (6015)
+ @MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
@@ -211,6 +211,7 @@ TODO:
 #include "bankshot.lh"
 #include "bcheetah.lh"
 #include "bigtrak.lh"
+#include "blastit.lh"
 #include "bship.lh" // clickable
 #include "cmsport.lh"
 #include "cnbaskb.lh"
@@ -4036,15 +4037,15 @@ static INPUT_PORTS_START( ebball3 )
 
 	PORT_START("IN.2") // R2
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x01, "1" ) // Auto
-	PORT_CONFSETTING(    0x00, "2" ) // Manual
+	PORT_CONFSETTING(    0x01, "1" ) // AUTO
+	PORT_CONFSETTING(    0x00, "2" ) // MAN
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x01, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // AM
+	PORT_CONFSETTING(    0x01, "2" ) // PRO
 INPUT_PORTS_END
 
 void ebball3_state::ebball3(machine_config &config)
@@ -4209,6 +4210,110 @@ ROM_END
 
 /***************************************************************************
 
+  Entex Blast It
+  * TMS1000 MP0230 (die label 1000B, MP0230)
+  * 3 7seg LEDs, 49 other LEDs (both under an overlay mask), 1-bit sound
+
+***************************************************************************/
+
+class blastit_state : public hh_tms1k_state
+{
+public:
+	blastit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+	void blastit(machine_config &config);
+};
+
+// handlers
+
+void blastit_state::update_display()
+{
+	m_display->matrix(m_r >> 1, m_o);
+}
+
+void blastit_state::write_r(u16 data)
+{
+	// R3: input mux
+	m_inp_mux = data >> 3 & 1;
+
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R1-R7: led select
+	// R8-R10: digit select
+	m_r = data;
+	update_display();
+}
+
+void blastit_state::write_o(u16 data)
+{
+	// O0-O6: led state
+	m_o = data;
+	update_display();
+}
+
+u8 blastit_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( blastit )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x08, "1" ) // AM
+	PORT_CONFSETTING(    0x00, "2" ) // PRO
+INPUT_PORTS_END
+
+void blastit_state::blastit(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
+	m_maincpu->k().set(FUNC(blastit_state::read_k));
+	m_maincpu->r().set(FUNC(blastit_state::write_r));
+	m_maincpu->o().set(FUNC(blastit_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x380, 0x7f);
+	m_display->set_bri_levels(0.01, 0.115); // ball/paddle is slightly brighter
+	config.set_default_layout(layout_blastit);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( blastit )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0230", 0x0000, 0x0400, CRC(1eb5f473) SHA1(76cd8c0e04368aa2150d428018643e1d0b9adda0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_blastit_output.pla", 0, 365, CRC(fa8081df) SHA1(99706d5ad58a76d47446576fac18964e602171c8) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Space Invader
   * TMS1100 MP1211 (die label same)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
@@ -4285,8 +4390,8 @@ static INPUT_PORTS_START( einvader )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x08, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
 void einvader_state::einvader(machine_config &config)
@@ -4422,8 +4527,8 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_CONFSETTING(    0x01, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x02, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x02, "2" ) // professional
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Status")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -4544,8 +4649,8 @@ u8 ebaskb2_state::read_k()
 static INPUT_PORTS_START( ebaskb2 )
 	PORT_START("IN.0") // R6
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x01, "Amateur" )
-	PORT_CONFSETTING(    0x00, "Professional" )
+	PORT_CONFSETTING(    0x01, "1" ) // amateur
+	PORT_CONFSETTING(    0x00, "2" ) // professional
 	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
@@ -5017,8 +5122,8 @@ static INPUT_PORTS_START( f3in1 )
 
 	PORT_START("IN.4") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, f3in1_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Regular" ) // REG
-	PORT_CONFSETTING(    0x01, "Professional" ) // PROF
+	PORT_CONFSETTING(    0x00, "1" ) // REG
+	PORT_CONFSETTING(    0x01, "2" ) // PROF
 INPUT_PORTS_END
 
 void f3in1_state::f3in1(machine_config &config)
@@ -13209,6 +13314,7 @@ CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    emp
 CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,    0,         0, ebball3,   ebball3,   ebball3_state,   empty_init, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  empty_init, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, blastit,    0,         0, blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )

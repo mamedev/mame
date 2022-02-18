@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Henrik Algestam
-// thanks-to:Sean Riddle, Igor, Lee Robson
+// thanks-to:Sean Riddle, Igor, Lee Robson, Milan Galcik
 /***************************************************************************
 
 Sharp SM5xx family handhelds.
