@@ -202,6 +202,7 @@ void nesapu_device::device_start()
 
 	save_item(NAME(m_APU.tri.regs));
 	save_item(NAME(m_APU.tri.linear_length));
+	save_item(NAME(m_APU.tri.linear_reload));
 	save_item(NAME(m_APU.tri.vbl_length));
 	save_item(NAME(m_APU.tri.write_latency));
 	save_item(NAME(m_APU.tri.phaseacc));
@@ -209,7 +210,6 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tri.counter_started));
 	save_item(NAME(m_APU.tri.enabled));
 	save_item(NAME(m_APU.tri.output));
-	save_item(NAME(m_APU.tri.output_next));
 
 	save_item(NAME(m_APU.noi.regs));
 	save_item(NAME(m_APU.noi.seed));
@@ -328,19 +328,17 @@ void nesapu_device::apu_square(apu_t::square_t *chan)
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM 0 to +15) */
 void nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 {
-	int freq;
 	/* reg0: 7=holdnote, 6-0=linear length counter
 	** reg2: low 8 bits of frequency
 	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
 	*/
 
 	if (!chan->enabled)
-	{
-		chan->output = 0;
 		return;
-	}
 
-	if (!chan->counter_started && !(chan->regs[0] & 0x80))
+	bool not_held = !BIT(chan->regs[0], 7);
+
+	if (!chan->counter_started && not_held)
 	{
 		if (chan->write_latency)
 			chan->write_latency--;
@@ -350,45 +348,37 @@ void nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 
 	if (chan->counter_started)
 	{
-		if (chan->linear_length > 0)
+		if (chan->linear_reload)
+			chan->linear_length = m_sync_times2[chan->regs[0] & 0x7f];
+		else if (chan->linear_length > 0)
 			chan->linear_length--;
-		if (chan->vbl_length && !(chan->regs[0] & 0x80))
-				chan->vbl_length--;
 
-		if (!chan->vbl_length)
-		{
-			chan->output = 0;
-			return;
-		}
+		if (not_held)
+			chan->linear_reload = false;
+
+		if (chan->vbl_length && not_held)
+			chan->vbl_length--;
 	}
 
-	if (!chan->linear_length)
-	{
-		chan->output = 0;
+	if (!(chan->linear_length && chan->vbl_length))
 		return;
-	}
 
-	freq = (((chan->regs[3] & 7) << 8) + chan->regs[2]) + 1;
+	int freq = ((chan->regs[3] & 7) << 8) + chan->regs[2] + 1;
 
-	if (freq < 4) /* inaudible */
-	{
-		chan->output = 0;
+// FIXME: This halts ultrasonic frequencies. On hardware there should be some popping noise? Crash Man's stage in Mega Man 2 is an example. This can probably be removed if hardware filters are implemented (they vary by machine, NES, FC, VS, etc).
+	if (freq < 2)
 		return;
-	}
 
 	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
-		chan->adder = (chan->adder + 1) & 0x1f;
+		chan->adder++;
 
-		if (chan->adder & 0x10)
-			chan->output_next = chan->adder & 0xf;
-		else
-			chan->output_next = 0xf - (chan->adder & 0xf);
+		chan->output = chan->adder & 0xf;
+		if (!BIT(chan->adder, 4))
+			chan->output ^= 0xf;
 	}
-
-	chan->output = chan->output_next;
 }
 
 /* OUTPUT NOISE WAVE SAMPLE (VALUES FROM 0 to +15) */
@@ -610,6 +600,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 			m_APU.tri.counter_started = false;
 			m_APU.tri.vbl_length = m_vbl_times[value >> 3];
 			m_APU.tri.linear_length = m_sync_times2[m_APU.tri.regs[0] & 0x7f];
+			m_APU.tri.linear_reload = true;
 		}
 
 		break;
