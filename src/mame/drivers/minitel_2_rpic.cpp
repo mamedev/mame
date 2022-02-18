@@ -74,30 +74,34 @@
 
 // 14174 Control register bits definition
 
-#define CTRL_REG_MCBC_BIT      0
-#define CTRL_REG_DTMF_BIT      1
-#define CTRL_REG_CRTON_BIT     3
-#define CTRL_REG_OPTO_BIT      4
-#define CTRL_REG_LINERELAY_BIT 5
+enum CTRL_BITS_DEF {
+	CTRL_REG_MCBC_BIT = 0,
+	CTRL_REG_DTMF_BIT = 1,
+	CTRL_REG_CRTON_BIT = 3,
+	CTRL_REG_OPTO_BIT = 4,
+	CTRL_REG_LINERELAY_BIT = 5
+};
 
 // 80C32 Port IO usage definitions
 
-#define PORT_1_KBSERIN_BIT     0
-#define PORT_1_MDM_DCDn_BIT    1
-#define PORT_1_MDM_PRD_BIT     2
-#define PORT_1_MDM_TXD_BIT     3
-#define PORT_1_MDM_RTS_BIT     4
-#define PORT_1_KBLOAD_BIT      5
-#define PORT_1_SCL_BIT         6
-#define PORT_1_SDA_BIT         7
+enum PORT_1_BITS_DEF {
+	PORT_1_KBSERIN_BIT = 0,
+	PORT_1_MDM_DCDn_BIT = 1,
+	PORT_1_MDM_PRD_BIT = 2,
+	PORT_1_MDM_TXD_BIT = 3,
+	PORT_1_MDM_RTS_BIT = 4,
+	PORT_1_KBLOAD_BIT = 5,
+	PORT_1_SCL_BIT = 6,
+	PORT_1_SDA_BIT = 7
+};
 
-#define PORT_3_SER_RXD_BIT     0
-#define PORT_3_SER_TXD_BIT     1
-#define PORT_3_SER_ZCO_BIT     2
-#define PORT_3_MDM_RXD_BIT     3
-#define PORT_3_SER_RDY_BIT     5
-
-#define MASK(bit) (0x01 << bit)
+enum PORT_3_BITS_DEF {
+	PORT_3_SER_RXD_BIT = 0,
+	PORT_3_SER_TXD_BIT = 1,
+	PORT_3_SER_ZCO_BIT = 2,
+	PORT_3_MDM_RXD_BIT = 3,
+	PORT_3_SER_RDY_BIT = 5
+};
 
 class minitel_state : public driver_device
 {
@@ -108,8 +112,8 @@ public:
 		, m_ts9347(*this, "ts9347")
 		, m_palette(*this, "palette")
 		, m_i2cmem(*this, "i2cmem")
-		, m_modem(*this, "modport0")
-		, m_serport(*this, "serport0")
+		, m_modem(*this, "modem")
+		, m_serport(*this, "periinfo")
 		, m_io_kbd(*this, "Y%u", 0)
 		{
 		}
@@ -154,6 +158,8 @@ private:
 
 	int lineconnected;
 	int tonedetect;
+
+	constexpr uint8_t MASK(int bit) const { return (uint8_t)(0x01 << bit); }
 };
 
 void minitel_state::machine_start()
@@ -172,24 +178,24 @@ void minitel_state::port1_w(uint8_t data)
 {
 	LOG("port_w: write %02X to PORT1\n", data);
 
-	if( BIT( port1 ^ data, PORT_1_KBSERIN_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_KBSERIN_BIT) )
 	{
-		LOG("PORT_1_KBSERIN : %d \n", BIT( data, PORT_1_KBSERIN_BIT ) );
+		LOG("PORT_1_KBSERIN : %d \n", BIT(data, PORT_1_KBSERIN_BIT) );
 	}
 
-	if( BIT( port1 ^ data, PORT_1_MDM_DCDn_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_MDM_DCDn_BIT) )
 	{
-		LOG("PORT_1_MDM_DCD : %d \n", BIT( data, PORT_1_MDM_DCDn_BIT ) );
+		LOG("PORT_1_MDM_DCD : %d \n", BIT(data, PORT_1_MDM_DCDn_BIT) );
 	}
 
-	if( BIT( port1 ^ data, PORT_1_MDM_PRD_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_MDM_PRD_BIT) )
 	{
-		LOG("PORT_1_MDM_PRD : %d \n", BIT( data, PORT_1_MDM_PRD_BIT ) );
+		LOG("PORT_1_MDM_PRD : %d \n", BIT(data, PORT_1_MDM_PRD_BIT) );
 	}
 
-	if( BIT( port1 ^ data, PORT_1_MDM_TXD_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_MDM_TXD_BIT) )
 	{
-		LOG("PORT_1_MDM_TXD : %d \n", BIT( data, PORT_1_MDM_TXD_BIT ) );
+		LOG("PORT_1_MDM_TXD : %d \n", BIT(data, PORT_1_MDM_TXD_BIT) );
 	}
 
 	if(lineconnected)
@@ -197,31 +203,31 @@ void minitel_state::port1_w(uint8_t data)
 		m_modem->write_txd(BIT(data, PORT_1_MDM_TXD_BIT));
 	}
 
-	if( BIT( port1 ^ data, PORT_1_MDM_RTS_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_MDM_RTS_BIT) )
 	{
-		LOG("PORT_1_MDM_RTS : %d \n", BIT( data, PORT_1_MDM_RTS_BIT ) );
+		LOG("PORT_1_MDM_RTS : %d \n", BIT(data, PORT_1_MDM_RTS_BIT) );
 	}
 
-	if( BIT( port1 ^ data, PORT_1_KBLOAD_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_KBLOAD_BIT) )
 	{
-		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", BIT( data, PORT_1_KBLOAD_BIT ),m_maincpu->pc() );
+		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", BIT(data, PORT_1_KBLOAD_BIT),m_maincpu->pc() );
 
-		if( BIT( data, PORT_1_KBLOAD_BIT ) )
+		if( BIT(data, PORT_1_KBLOAD_BIT) )
 			keyboard_para_ser = 1;
 		else
 			keyboard_para_ser = 0;
 	}
 
-	if( BIT( port1 ^ data, PORT_1_SCL_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_SCL_BIT) )
 	{
-		LOG("PORT_1_SCL : %d \n", BIT( data, PORT_1_SCL_BIT ) );
-		m_i2cmem->write_scl( BIT( data, PORT_1_SCL_BIT ) ? 1 : 0);
+		LOG("PORT_1_SCL : %d \n", BIT(data, PORT_1_SCL_BIT) );
+		m_i2cmem->write_scl( BIT(data, PORT_1_SCL_BIT) ? 1 : 0);
 	}
 
-	if( BIT( port1 ^ data, PORT_1_SDA_BIT ) )
+	if( BIT(port1 ^ data, PORT_1_SDA_BIT) )
 	{
-		LOG("PORT_1_SDA : %d \n", BIT( data, PORT_1_SDA_BIT ) );
-		m_i2cmem->write_sda( BIT( data, PORT_1_SDA_BIT ) ? 1 : 0);
+		LOG("PORT_1_SDA : %d \n", BIT(data, PORT_1_SDA_BIT) );
+		m_i2cmem->write_sda( BIT(data, PORT_1_SDA_BIT) ? 1 : 0);
 	}
 
 	port1 = data;
@@ -241,10 +247,10 @@ void minitel_state::port3_w(uint8_t data)
 void minitel_state::update_modem_state()
 {
 	// 1300 Hz tone detection :  PORT_1_MDM_RTS = 1, CTRL_REG_DTMF = 0, CTRL_REG_MCBC = 0
-	if(  BIT( last_ctrl_reg,CTRL_REG_LINERELAY_BIT) &&
-		 BIT( port1,PORT_1_MDM_RTS_BIT) &&
-		!BIT( last_ctrl_reg,CTRL_REG_DTMF_BIT) &&
-		!BIT( last_ctrl_reg,CTRL_REG_MCBC_BIT) )
+	if(  BIT(last_ctrl_reg, CTRL_REG_LINERELAY_BIT) &&
+		 BIT(port1, PORT_1_MDM_RTS_BIT) &&
+		!BIT(last_ctrl_reg, CTRL_REG_DTMF_BIT) &&
+		!BIT(last_ctrl_reg, CTRL_REG_MCBC_BIT) )
 	{
 		tonedetect = 1;
 	}
@@ -294,33 +300,33 @@ uint8_t minitel_state::port3_r()
 
 void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
 {
-	if( last_ctrl_reg != data)
+	if( last_ctrl_reg != data )
 	{
 		LOG("minitel_state::hw_ctrl_reg : %x %x\n",offset, data);
 
-		if( BIT( last_ctrl_reg ^ data, CTRL_REG_DTMF_BIT ) )
+		if( BIT(last_ctrl_reg ^ data, CTRL_REG_DTMF_BIT) )
 		{
-			LOG("CTRL_REG_DTMF : %d \n", BIT( data, CTRL_REG_DTMF_BIT ) );
+			LOG("CTRL_REG_DTMF : %d \n", BIT(data, CTRL_REG_DTMF_BIT) );
 		}
 
-		if( BIT( last_ctrl_reg ^ data, CTRL_REG_MCBC_BIT ) )
+		if( BIT(last_ctrl_reg ^ data, CTRL_REG_MCBC_BIT) )
 		{
-			LOG("CTRL_REG_MCBC : %d \n", BIT( data, CTRL_REG_MCBC_BIT ) );
+			LOG("CTRL_REG_MCBC : %d \n", BIT(data, CTRL_REG_MCBC_BIT) );
 		}
 
-		if( BIT( last_ctrl_reg ^ data, CTRL_REG_OPTO_BIT ) )
+		if( BIT(last_ctrl_reg ^ data, CTRL_REG_OPTO_BIT) )
 		{
-			LOG("CTRL_REG_OPTO : %d \n", BIT( data, CTRL_REG_OPTO_BIT ) );
+			LOG("CTRL_REG_OPTO : %d \n", BIT(data, CTRL_REG_OPTO_BIT) );
 		}
 
-		if( BIT( last_ctrl_reg ^ data, CTRL_REG_LINERELAY_BIT ) )
+		if( BIT(last_ctrl_reg ^ data, CTRL_REG_LINERELAY_BIT) )
 		{
-			LOG("CTRL_REG_RELAY : %d \n", BIT( data, CTRL_REG_LINERELAY_BIT ) );
+			LOG("CTRL_REG_RELAY : %d \n", BIT(data, CTRL_REG_LINERELAY_BIT) );
 		}
 
-		if( BIT( last_ctrl_reg ^ data, CTRL_REG_CRTON_BIT ) )
+		if( BIT(last_ctrl_reg ^ data, CTRL_REG_CRTON_BIT) )
 		{
-			LOG("CTRL_REG_CRTON : %d \n", BIT( data, CTRL_REG_CRTON_BIT ) );
+			LOG("CTRL_REG_CRTON : %d \n", BIT(data, CTRL_REG_CRTON_BIT) );
 		}
 	}
 
