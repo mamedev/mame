@@ -509,10 +509,10 @@ void minitel_state::minitel2(machine_config &config)
 	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
 
 	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
-	m_modem->rxd_handler().set_inputline("maincpu", MCS51_INT1_LINE).invert();
+	m_modem->rxd_handler().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
 
 	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
-	m_serport->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
+	m_serport->rxd_handler().set_inputline(m_maincpu, MCS51_RX_LINE);
 
 	lineconnected = 0;
 
