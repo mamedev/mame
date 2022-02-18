@@ -34304,6 +34304,9 @@ spool3i                         // (c) 1990 Data East Corporation + I-Vics licen
 @source:pcm.cpp
 pcm                             // PC/M Mugler
 
+@source:pcmx2.cpp
+pcmx2                           // Siemens PC-MX2
+
 @source:pcw.cpp
 pcw10                           // 198? PCW10
 pcw8256                         // 1985 PCW8256
