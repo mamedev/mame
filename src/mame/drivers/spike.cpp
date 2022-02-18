@@ -6,9 +6,11 @@ Created 2022-02-13.
 Stern SPIKE/SPIKE2 system.
 
 The current (as of 2022) system for Stern pinball machines. There are a number of boards that take 48 volt
-power and regulate it to the voltages needed. The boards communicate via Cat5 cables.
+power and regulate it to the voltages needed. The boards communicate via Cat5 cables, and each has a unique
+network (node) address. For example the CPU board is Node 0, and other major boards are 8 and 9.
 
-Major components: (to do)
+CPU/GPU = IMX 6 ARMS PROCESSOR CORTEX A9 1.2GHz DUAL CORE. Later games will have a Quad-core processor.
+Like most modern pinballs, updates are uploaded via a USB stick.
 
 This source is not included in the compilation, as there's no code at this time.
 
@@ -84,7 +86,9 @@ Heavy Metal                                 S1
 The Mandalorian (Pro)                       S5
 The Mandalorian (LE)                        S6
 The Mandalorian (Premium)                   S7
-Rush                                        T1
+Rush (Pro)                                  T1
+Rush (LE)                                   T2
+Rush (Premium)                              T3
 Godzilla (Pro)                              T5
 Godzilla (LE)                               T6
 Godzilla (Premium)                          T7

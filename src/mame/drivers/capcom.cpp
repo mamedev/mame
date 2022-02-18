@@ -1,8 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/*
-    Capcom A0015405
-*/
+/******************************************************************************************************
+PINBALL
+Capcom A0015405
+
+Games:
+- Airborne (#3001)
+- Big Bang Bar (#3003)
+- Breakshot (#3002)
+- Flipper Football (#3004)
+- Kingpin (#3005)
+- Pinball Magic (#3000)
+- Red Line Fever (unreleased)
+- Zingy Bingy (unreleased)
+- Goofy Hoops
+- Pool Player
+
+Status:
+- Skeletons
+
+ToDo:
+- Everything
+
+******************************************************************************************************/
 
 
 #include "emu.h"
