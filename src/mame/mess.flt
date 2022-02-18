@@ -788,6 +788,7 @@ pce220.cpp
 pcfx.cpp
 pcipc.cpp
 pcm.cpp
+pcmx2.cpp
 pcw.cpp
 pcw16.cpp
 pda600.cpp
