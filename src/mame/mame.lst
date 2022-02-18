@@ -36957,6 +36957,10 @@ trizn_l1                        //
 trizn_t1                        //
 
 @source:s6.cpp
+algar_l1                        //
+alpok_f6                        //
+alpok_l2                        //
+alpok_l6                        //
 blkou_f1                        //
 blkou_l1                        //
 blkou_t1                        //
@@ -36970,12 +36974,6 @@ lzbal_l2sp                      //
 lzbal_t2                        //
 scrpn_l1                        //
 scrpn_t1                        //
-
-@source:s6a.cpp
-algar_l1                        //
-alpok_f6                        //
-alpok_l2                        //
-alpok_l6                        //
 
 @source:s7.cpp
 barra_l1                        //

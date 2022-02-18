@@ -4711,7 +4711,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/s3.cpp",
 	MAME_DIR .. "src/mame/drivers/s4.cpp",
 	MAME_DIR .. "src/mame/drivers/s6.cpp",
-	MAME_DIR .. "src/mame/drivers/s6a.cpp",
 	MAME_DIR .. "src/mame/drivers/s7.cpp",
 	MAME_DIR .. "src/mame/drivers/s8.cpp",
 	MAME_DIR .. "src/mame/drivers/s8a.cpp",

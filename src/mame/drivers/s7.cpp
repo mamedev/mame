@@ -5,21 +5,22 @@
 PINBALL
 Williams System 7
 
-Differences to system 6/6a:
+Differences to system 6:
 - Extra PIA at 0x2100 to handle sound and more solenoids.
 - Diag digit
 - Leading zero suppression
 - Commas
+- 7 digits for each player
 
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
 
-- Setup: NUM-6 must be in auto/up position. Press NUM-1 to enter setup mode, press
-   NUM-6 to change direction.
+- Setup: NUM-2 must be in auto/up position. Press NUM-1 to enter setup mode, press
+   NUM-2 to change direction.
 
-- Tests: NUM-6 must be in manual/down position. Press NUM-1 twice and tests will
-   begin. Press NUM-1 and NUM-6 together to get from test 1 to test 2. Press NUM-6
+- Tests: NUM-2 must be in manual/down position. Press NUM-1 twice and tests will
+   begin. Press NUM-1 and NUM-2 together to get from test 1 to test 2. Press NUM-2
    to switch between auto/manual stepping.
 
 - Auto Diag Test: Set Dips to SW6. Press NUM-0. Press NUM-ENTER. Press NUM-1. Tests

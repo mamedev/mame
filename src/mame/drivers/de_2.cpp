@@ -31,7 +31,7 @@ King Kong                              --     Hold CDE, hit 1            CDE
 **** not emulated (various systems) ****
 Arnon Milchan
 Flip Out! 1991
-Joel Silver, the pinball
+Joel Silver, the pinball (1991)
 Kabuki
 Richie Rich
 Slap Shot Hockey                      0138
