@@ -4,6 +4,8 @@
 PINBALL
 Alvin G pinball machines.
 
+Undumped PAL16L8 (U29) on sound card.
+
 Pinball games:
 - Al's Garage Band Goes on a World Tour
 - Dual-Pool (unreleased)
@@ -26,10 +28,21 @@ Status:
 - Skeletons
 
 ToDo:
+- CPU sound command to sound card
+- Add bsmt-based sound card
+- Display
+- Mechanical sounds
 - Everything
+
 ****************************************************************************************************/
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6522via.h"
+#include "machine/i8255.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
+#include "speaker.h"
 
 
 namespace {
@@ -38,49 +51,169 @@ class alvg_state : public driver_device
 {
 public:
 	alvg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_ppi0(*this, "ppi0")
+		, m_ppi1(*this, "ppi1")
+		, m_ppi2(*this, "ppi2")
+		, m_via(*this, "via")
+		, m_via0(*this, "via0")
+		, m_via1(*this, "via1")
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void alvg(machine_config &config);
 
-	void init_alvg();
-
-protected:
-	// driver_device overrides
-	virtual void machine_reset() override;
-
 private:
-	void alvg_map(address_map &map);
+	void main_map(address_map &map);
+	void audio_map(address_map &map);
+	void machine_start() override;
+	void machine_reset() override;
+	void display_w(offs_t, u8);
+	void ppi0_pa_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }
+	void ppi0_pb_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }
+	void ppi0_pc_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[16U+i] = BIT(data, i); }
+	void ppi1_pa_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[24U+i] = BIT(data, i); }
+	void ppi1_pb_w(u8 data) { m_row = (m_row & 0xff00) | data; }
+	void ppi1_pc_w(u8 data) { m_row = (m_row & 0xff) | (data << 8); }
+	void ppi2_pa_w(u8 data) { m_lamp_data = (m_lamp_data & 0xff00) | data; }
+	void ppi2_pb_w(u8 data) { m_lamp_data = (m_lamp_data & 0xff) | (data << 8); }
+	void ppi2_pc_w(u8 data);
 
-	// devices
+	u16 m_row = 0U;
+	u16 m_lamp_data = 0U;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
+	required_device<i8255_device> m_ppi0;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
+	required_device<via6522_device> m_via;
+	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
+	output_finder<128> m_io_outputs;   // 32 solenoids + 96 lamps
 };
 
 
-void alvg_state::alvg_map(address_map &map)
+void alvg_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).noprw();
-	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0xffff).rom();
+	map(0x0000, 0xffff).rom();
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2003).mirror(0x3f0).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U12
+	map(0x2400, 0x2403).mirror(0x3f0).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U13
+	map(0x2800, 0x2803).mirror(0x3f0).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U14
+	map(0x2c00, 0x2cff).mirror(0x300).w(FUNC(alvg_state::display_w));
+	map(0x3800, 0x380f).mirror(0x3f0).m("via1", FUNC(via6522_device::map)); // U8
+	map(0x3c00, 0x3c0f).mirror(0x3f0).m("via0", FUNC(via6522_device::map)); // U7
+}
+
+void alvg_state::audio_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+	map(0x2000, 0x2001).mirror(0xffe).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x3000, 0x37ff).mirror(0x800).ram();
+	map(0x4000, 0x4fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x5000, 0x500f).mirror(0xff0).m("via", FUNC(via6522_device::map));
+	map(0x6000, 0x6fff).noprw(); // watchdog
 }
 
 static INPUT_PORTS_START( alvg )
 INPUT_PORTS_END
 
-void alvg_state::machine_reset()
+void alvg_state::display_w(offs_t offset, u8 data)
 {
+	//printf("%X:%X ",offset,data);
 }
 
-void alvg_state::init_alvg()
+void alvg_state::ppi2_pc_w(u8 data)
 {
+	for (u8 i = 0; i < 12; i++)
+		if (BIT(m_lamp_data, i))
+			for (u8 j = 0; j < 8; j++)
+				m_io_outputs[24U+8*i+j] = BIT(data, j);
+}
+
+void alvg_state::machine_start()
+{
+	//genpin_class::machine_start();
+
+	//m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_row));
+	save_item(NAME(m_lamp_data));
+}
+
+void alvg_state::machine_reset()
+{
+	//genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 }
 
 void alvg_state::alvg(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::alvg_map);
+	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::main_map);
+
+	MOS6522(config, m_via0, XTAL(4'000'000) / 2);  // U7, uses clock2 from maincpu; switch inputs
+	//m_via0->readpa_handler().set(FUNC(alvg_state::via0_pa_r));
+	//m_via0->readpb_handler().set(FUNC(alvg_state::via0_pb_r));
+	//m_via0->writepa_handler().set(FUNC(alvg_state::via0_pa_w));
+	//m_via0->writepb_handler().set(FUNC(alvg_state::via0_pb_w));
+	//m_via0->ca2_handler().set_nop();
+	m_via0->cb2_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_via0->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+
+	MOS6522(config, m_via1, XTAL(4'000'000) / 2);  // U8, uses clock2 from maincpu; port A = to sound; port B = serial to display
+	//m_via1->readpa_handler().set(FUNC(alvg_state::via1_pa_r));
+	//m_via1->readpb_handler().set(FUNC(alvg_state::via1_pb_r));
+	//m_via1->writepa_handler().set(FUNC(alvg_state::via1_pa_w));
+	//m_via1->writepb_handler().set(FUNC(alvg_state::via1_pb_w));
+	//m_via1->ca2_handler().set_nop();
+	//m_via1->cb2_handler().set_nop();
+	m_via1->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+
+	I8255A(config, m_ppi0); // U12
+	m_ppi0->out_pa_callback().set(FUNC(alvg_state::ppi0_pa_w)); // Solenoids
+	m_ppi0->out_pb_callback().set(FUNC(alvg_state::ppi0_pb_w)); // Solenoids
+	m_ppi0->out_pc_callback().set(FUNC(alvg_state::ppi0_pc_w)); // Solenoids
+
+	I8255A(config, m_ppi1); // U13
+	m_ppi1->out_pa_callback().set(FUNC(alvg_state::ppi1_pa_w)); // Solenoids
+	m_ppi1->out_pb_callback().set(FUNC(alvg_state::ppi1_pb_w)); // Switch rows
+	m_ppi1->out_pc_callback().set(FUNC(alvg_state::ppi1_pc_w)); // Switch rows
+
+	I8255A(config, m_ppi2); // U14
+	m_ppi2->out_pa_callback().set(FUNC(alvg_state::ppi2_pa_w)); // Lamps
+	m_ppi2->out_pb_callback().set(FUNC(alvg_state::ppi2_pb_w)); // Lamps
+	m_ppi2->out_pc_callback().set(FUNC(alvg_state::ppi2_pc_w)); // Lamps
+
+	// Sound
+	MC6809(config, m_audiocpu, XTAL(8'000'000)); // 68B09, 8 MHz crystal, internal divide by 4 to produce E/Q outputs
+	m_audiocpu->set_addrmap(AS_PROGRAM, &alvg_state::audio_map);
+	MOS6522(config, m_via, XTAL(8'000'000) / 4);  // uses E clock from audiocpu; port A = read sound code; port B = ticket machine
+	//m_via->readpa_handler().set(FUNC(alvg_state::via_pa_r));
+	//m_via->readpb_handler().set(FUNC(alvg_state::via_pb_r));
+	//m_via->writepa_handler().set(FUNC(alvg_state::via_pa_w));
+	//m_via->writepb_handler().set(FUNC(alvg_state::via_pb_w));
+	//m_via->ca2_handler().set_nop();
+	//m_via->cb2_handler().set_nop();
+	m_via->irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+
+	//genpin_audio(config);
+
+	SPEAKER(config, "mono").front_center();
+
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(8'000'000) / 2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /*----------------------------------------------------------------------------
@@ -89,9 +222,9 @@ void alvg_state::alvg(machine_config &config)
 ROM_START(agsoccer)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v24", 0x0000, 0x10000, CRC(4ba36e8d) SHA1(330dcb1eea8c311df0e57a3b74146601c26d63c0)) // label says 2.4, inside the ROM it says 2.5L though
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -101,9 +234,9 @@ ROM_END
 ROM_START(agsoccera)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v21", 0x0000, 0x10000, CRC(aa30bfe4) SHA1(518f7019639a0284461e83ad849bee0be5371580))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -113,9 +246,9 @@ ROM_END
 ROM_START(agsoccer07)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ags_cpu_r07u", 0x0000, 0x10000, CRC(009ef717) SHA1(d770ce8fd032f4f1d96b9792509cceebbfaebbd9))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v14", 0x0000, 0x10000, CRC(2544e468) SHA1(d49e2fc91cbb80fdf96f436c614c6f305efafb6f))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -128,9 +261,9 @@ ROM_END
 ROM_START(wrldtour)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu27c.512", 0x0000, 0x10000, CRC(c9572fb5) SHA1(47a3e8943ef4207011a33f4a03a6e722c937cc48))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -153,16 +286,16 @@ ROM_START(wrldtour)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
 	ROM_RELOAD( 0xc0000, 0x40000)
 	ROM_LOAD("dot27c.512", 0x100000, 0x10000, CRC(c8bd48e7) SHA1(e2dc513dd42c05c2018e6d8c0b6f0b2c56e6e059))
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
 ROM_START(wrldtour2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu02b.512", 0x0000, 0x10000, CRC(1658bf40) SHA1(7af9eedab4e7d0cedaf8bfdbc1f27b989a7171cd))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -185,16 +318,16 @@ ROM_START(wrldtour2)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
 	ROM_RELOAD( 0xc0000, 0x40000)
 	ROM_LOAD("dot02b.512", 0x100000, 0x10000, CRC(50e3d59d) SHA1(db6df3482fc485af6bde341750bf8072a296b8da))
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
 ROM_START(wrldtour3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu03.512", 0x0000, 0x10000, CRC(56dee967) SHA1(f7b1f69d96c72b0cf738bdf45701502f7306a4a0))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -217,7 +350,7 @@ ROM_START(wrldtour3)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
 	ROM_RELOAD( 0xc0000, 0x40000)
 	ROM_LOAD("dot03.512", 0x100000, 0x10000, CRC(f8a084bb) SHA1(30eb344ad96b5605693d3a7c703c9ed5c1770ca4))
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
@@ -227,9 +360,9 @@ ROM_END
 ROM_START(dinoeggs)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dinoeggs.512", 0x0000, 0x10000, CRC(4712f97f) SHA1(593351dcfd475e685c1e5eb2c1006769d3325c8b))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps071.r02", 0x0000, 0x10000, CRC(288f116c) SHA1(5d03ce66bffe39ec02173525078ff07c5005ef18))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("eps072.r02", 0x000000, 0x40000, CRC(780a4364) SHA1(d8a972debee669f0fe66c7407fbed5ef9cd2ce01))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -242,9 +375,9 @@ ROM_END
 ROM_START(mystcast)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mcastle.cpu", 0x0000, 0x10000, CRC(936e6799) SHA1(aa29fb5f12f34c695d1556232744f65cd576a2b1))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("mcastle.102", 0x0000, 0x10000, CRC(752822d0) SHA1(36461ef03cac5aefa0c03dfdc63c3d294a3b9c09))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("mcastle.sr0", 0x000000, 0x40000, CRC(0855cc73) SHA1(c46e08432bcff24594c33171f20669ba63828931))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -261,7 +394,7 @@ ROM_START(mystcast)
 	ROM_RELOAD(0x300000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x300000 + 0x80000, 0x40000)
 	ROM_RELOAD(0x300000 + 0xc0000, 0x40000)
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("mcastle.du4", 0x00000, 0x10000, CRC(686e253a) SHA1(28aff34c120c61e231e2111dc396df515bcbbb89))
 	ROM_REGION(0x100000, "gfx3", 0)
 	ROM_LOAD("mcastle.du5", 0x00000, 0x40000, CRC(9095c367) SHA1(9d3e9416f662ee2aad891eef059278c530448fcc))
@@ -273,9 +406,9 @@ ROM_END
 ROM_START(mystcasta)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu_103.bin", 0x0000, 0x10000, CRC(70ab8ece) SHA1(2bf8cd042450968b7500552419a9af5df2589c13))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("mcastle.103", 0x0000, 0x10000, CRC(bd4849ac) SHA1(f477ea369539a65c0960be1f1c3b4c5503dd6b75))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("mcastle.sr0", 0x000000, 0x40000, CRC(0855cc73) SHA1(c46e08432bcff24594c33171f20669ba63828931))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -292,7 +425,7 @@ ROM_START(mystcasta)
 	ROM_RELOAD(0x300000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x300000 + 0x80000, 0x40000)
 	ROM_RELOAD(0x300000 + 0xc0000, 0x40000)
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("u4.bin", 0x00000, 0x10000, CRC(a6969efc) SHA1(82da976cb3d30d6fb1576e4c67febd7235f73f51))
 	ROM_REGION(0x100000, "gfx3", 0)
 	ROM_LOAD("u5.bin", 0x00000, 0x40000, CRC(e5126980) SHA1(2c6d412c87bf27098dae4351958d84e8f9348423))
@@ -307,9 +440,9 @@ ROM_END
 ROM_START(pstlpkr)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("p_peteu2.512", 0x0000, 0x10000, CRC(490a1e2d) SHA1(907dd858ed948681e7366a64a0e7537ebe301d6b))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("p_pu102.512", 0x0000, 0x10000, CRC(b8fb806e) SHA1(c2dc19820ea22bbcf5808db2fb4be76a4033d6ea))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("p_parom0.c20", 0x000000, 0x40000, CRC(99986af2) SHA1(52fa7d2979f7f2d6d65ab6d4f7bbfbed16303991))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -326,7 +459,7 @@ ROM_START(pstlpkr)
 	ROM_RELOAD(0x300000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x300000 + 0x80000, 0x40000)
 	ROM_RELOAD(0x300000 + 0xc0000, 0x40000)
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("p_peteu4.512", 0x00000, 0x10000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
 	ROM_REGION(0x100000, "gfx3", 0)
 	ROM_LOAD("p_peteu5.c20", 0x00000, 0x40000, CRC(1d2cecd8) SHA1(6072a0f744fb9eef728fe7cf5e17d0007edbddd7))
@@ -338,9 +471,9 @@ ROM_END
 ROM_START(pstlpkr1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2-ddff.512", 0x0000, 0x10000, CRC(83fa0595) SHA1(d6ebb0e63fd964ccaee3979a7fc13b6adf7b837c))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("p_pu102.512", 0x0000, 0x10000, CRC(b8fb806e) SHA1(c2dc19820ea22bbcf5808db2fb4be76a4033d6ea))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "bsmt", 0)
 	ROM_LOAD("p_parom0.c20", 0x000000, 0x40000, CRC(99986af2) SHA1(52fa7d2979f7f2d6d65ab6d4f7bbfbed16303991))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -357,7 +490,7 @@ ROM_START(pstlpkr1)
 	ROM_RELOAD(0x300000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x300000 + 0x80000, 0x40000)
 	ROM_RELOAD(0x300000 + 0xc0000, 0x40000)
-	ROM_REGION(0x20000, "cpu3", 0)
+	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("p_peteu4.512", 0x00000, 0x10000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
 	ROM_REGION(0x100000, "gfx3", 0)
 	ROM_LOAD("p_peteu5.c20", 0x00000, 0x40000, CRC(1d2cecd8) SHA1(6072a0f744fb9eef728fe7cf5e17d0007edbddd7))
@@ -372,9 +505,9 @@ ROM_END
 ROM_START(punchy)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("epc061.r02", 0x0000, 0x10000, CRC(732fca88) SHA1(dff0aa4b856bafb95b08dae675dd2ad59e1860e1))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps061.r02", 0x0000, 0x10000, CRC(cfde1b9a) SHA1(cbf9e67df6a6762843272493c2caa1413f70fb27))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("eps062.r02", 0x000000, 0x40000, CRC(7462a5cd) SHA1(05141bcc91b1a786444bff7fa8ba2a785dc0d376))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -384,9 +517,9 @@ ROM_END
 ROM_START(punchy3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("epc061.r03", 0x0000, 0x10000, CRC(8e91131c) SHA1(1bf1408e4e512b764048f4847cf8e4b7a0bf824d))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps061.r02", 0x0000, 0x10000, CRC(cfde1b9a) SHA1(cbf9e67df6a6762843272493c2caa1413f70fb27))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("eps062.r02", 0x000000, 0x40000, CRC(7462a5cd) SHA1(05141bcc91b1a786444bff7fa8ba2a785dc0d376))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -399,9 +532,9 @@ ROM_END
 ROM_START(usafootb)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("usa_cpu.bin", 0x0000, 0x10000, CRC(53b00873) SHA1(96812c4722026554a830c62eca64f09d25a0de82))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("usa_snd.bin", 0x0000, 0x10000, CRC(9d509cbc) SHA1(0be629945b5102adf75e88661e0f956e32ca77da))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("usa_vox.bin", 0x000000, 0x40000, CRC(baae0aa3) SHA1(7933bffcf1509ceeea58a4449268c10c9fac554c))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -411,9 +544,9 @@ ROM_END
 ROM_START(usafootba)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("usa_cpu1.bin", 0x0000, 0x10000, CRC(3b64a6e9) SHA1(65535bc17395416181bafddc61c0fac177eeba2f))
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("usa_snd.bin", 0x0000, 0x10000, CRC(9d509cbc) SHA1(0be629945b5102adf75e88661e0f956e32ca77da))
-	ROM_REGION(0x400000, "sound1", 0)
+	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("usa_vox.bin", 0x000000, 0x40000, CRC(baae0aa3) SHA1(7933bffcf1509ceeea58a4449268c10c9fac554c))
 	ROM_RELOAD(0x000000 + 0x40000, 0x40000)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
@@ -423,18 +556,18 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccera,  agsoccer, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccer07, agsoccer, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour2,  wrldtour, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour3,  wrldtour, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootb,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootba,  usafootb, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcast,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcasta,  mystcast, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr,    0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr1,   pstlpkr,  alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy,     0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy3,    punchy,   alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, dinoeggs,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccera,  agsoccer, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer07, agsoccer, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour2,  wrldtour, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour3,  wrldtour, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootb,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootba,  usafootb, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcast,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcasta,  mystcast, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr,    0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr1,   pstlpkr,  alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy,     0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy3,    punchy,   alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, dinoeggs,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
