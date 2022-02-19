@@ -1690,6 +1690,21 @@ ROM_START( pitbossps ) /* Roms also found labeled as U5-0C, U6-0 & U7-0 */
 	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
+ROM_START( housecard ) /* Same exact games as pitbossps set above */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hcsd_u5b.u5", 0x0000, 0x2000, CRC(ecef424f) SHA1(9485be5d800b3ad79b3a6ddce86a174f9aae6bdf) ) /* Internal designation: HSC1REV0 */
+	ROM_LOAD( "hcsd_u6.u6",  0x2000, 0x2000, CRC(8fd6ae75) SHA1(6f2fc2903e0eebbe0f3c7bd2b6713046566fa488) ) /* Games included in this set are: */
+	ROM_LOAD( "hcsd_u7.u7",  0x4000, 0x2000, CRC(6adecfa1) SHA1(d6007fbf06cfc4c710a7134de688af439dddcf60) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Licensed By:    */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /*         Merit industries */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr4_u40.u40",   0x0000, 0x2000, CRC(f4c34a26) SHA1(67183237be6952b3be9ef444d2018bc94e714a66) )
+ROM_END
+
 ROM_START( mdchoice )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e4a1_u5.u5",   0x0000, 0x2000, CRC(bd77f8dc) SHA1(c9c85e3180be30e7a1d37abb6d4e7c777acfda81) ) /* Internal designation: E4A1REV0 */
@@ -2639,6 +2654,7 @@ GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state, empty_init, R
 GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A4)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* No labels, so use internal designation */
 GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, housecard,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "House of Cards (HSC1)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state, empty_init, ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
 GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M3C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

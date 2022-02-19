@@ -3792,7 +3792,7 @@ ROM_END
 
 ROM_START( yattrmnp ) // ROM board stickered 837-13598
 	STV_BIOS
-	// TODO: fix loading. This order passes the internal ROM test but then the game hangs with 'ROM has changed push reset' message. Resetting doesn't solve this
+
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21122.ic13",    0x0000000, 0x0080000, CRC(49f56e32) SHA1(7d8bdaaf3a4edd9df90becc3ec5e94a69bb29ffc) ) // ST M27C4002-12F1
 	ROM_LOAD16_WORD_SWAP( "mpr-21125.ic02",    0x0400000, 0x0400000, CRC(40f5f119) SHA1(68fc634734ab05b54ff93256259969f16e26807d) )
@@ -3928,7 +3928,7 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs correct ROM loading
+GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs emulation of the medal specific hardware
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
