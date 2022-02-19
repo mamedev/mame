@@ -4,7 +4,7 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -16,7 +16,7 @@ license:CC0
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="60" top="-2" bottom="25" />

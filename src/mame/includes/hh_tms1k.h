@@ -35,6 +35,16 @@ public:
 		m_out_power(*this, "power")
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -53,19 +63,10 @@ public:
 
 	u8 read_inputs(int columns);
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
 	void set_power(bool state);
-
 	void switch_change(int sel, u32 mask, bool next);
-	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, param, true); }
-	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
