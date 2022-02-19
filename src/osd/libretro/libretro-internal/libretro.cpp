@@ -928,24 +928,7 @@ void retro_run(void)
 		update_runtime_variables();
 	}
 
-	static int mfirst = 1;
-	if (mfirst == 1)
-	{
-		mfirst++;
-		int res = mmain2(1, RPATH);
-		if (log_cb)log_cb(RETRO_LOG_INFO, "RES:%d\n", res);
-		if (res != 0)
-		{
-			retro_pause = -1;
-			retro_load_ok = false;
-		}
-		else {
-			retro_load_ok = true;
-		}
-		if (log_cb)log_cb(RETRO_LOG_INFO, "MAIN FIRST\n");
-		update_runtime_variables();
-		return;
-	}
+	
 
 	if (NEWGAME_FROM_OSD == 1)
 	{
@@ -1015,6 +998,27 @@ bool retro_load_game(const struct retro_game_info* info)
 	extract_basename(basename, info->path, sizeof(basename));
 	extract_directory(g_rom_dir, info->path, sizeof(g_rom_dir));
 	strcpy(RPATH, info->path);
+
+
+	static int mfirst = 1;
+	if (mfirst == 1)
+	{
+		mfirst++;
+		int res = mmain2(1, RPATH);
+		if (log_cb)log_cb(RETRO_LOG_INFO, "RES:%d\n", res);
+		if (res != 0)
+		{
+			retro_pause = -1;
+			retro_load_ok = false;
+}
+		else {
+			retro_load_ok = true;
+		}
+		if (log_cb)log_cb(RETRO_LOG_INFO, "MAIN FIRST\n");
+		update_runtime_variables();
+		return true;
+	}
+
 	return true;
 }
 
