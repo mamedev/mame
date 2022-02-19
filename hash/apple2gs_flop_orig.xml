@@ -3482,4 +3482,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="3stooges">
+		<description>The Three Stooges</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2022-02-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires an Apple IIgs ROM1 or later with 1.25 MB of RAM. -->
+		<!--"The Three Stooges" is a 1987 adventure game developed by John Cutter, Robert Jacob, Phyllis Jacob, Ed Magnin, Russell Truelove, Jim Simmons, and Patrick Cook, and distributed by Cinemaware. It requires an Apple IIgs ROM1 or later with 1.25 MB of RAM.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296239">
+				<rom name="the three stooges iigs - reel 1.woz" size="1296239" crc="e1b20124" sha1="97ac1b2fbdbe77fe05af42284d01fcc966c57783"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1296239">
+				<rom name="the three stooges iigs - reel 2.woz" size="1296239" crc="194170e6" sha1="1ea48fabac3697f6e2c847879f1903c4359e5f79"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

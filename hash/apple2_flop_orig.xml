@@ -18643,4 +18643,743 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tarturian">
+		<description>The Tarturian</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Tarturian" is a 1981 strategy game developed by Butch Greathouse and Garry Rheinhardt, and distributed by Highlands Computer Services. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="the tarturian.woz" size="234829" crc="0e7cd470" sha1="f540366b70f3cf04beb9374810bed28755d9f656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survadv">
+		<description>Survival Adventure</description>
+		<year>1981</year>
+		<publisher>United Software of America</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Survival Adventure" is a 1981 adventure game developed by Charles Kingston and distributed by United Software of America. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234817">
+				<rom name="survival adventure.woz" size="234817" crc="ff9f87ab" sha1="8120c7be803788b641e6fba5b9dcb067a66b149a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stellard">
+		<description>Stellar Defense (Version 1.2)</description>
+		<year>1983</year>
+		<publisher>Rainbow Computing</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Stellar Defense" is a 1983 strategy game developed by Tom Burlew and distributed by Rainbow Computing. This is version 1.2. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="stellar defense.woz" size="234810" crc="49e0991e" sha1="8a9503abb4e5cef2aa5b81182304e743af9cd538"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bapmnr11">
+		<description>Beneath Apple Manor (Version 1.1)</description>
+		<year>1979</year>
+		<publisher>The Software Factory</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2"/>
+		<!-- It requires a 32K Apple ][ with Integer BASIC in ROM. -->
+		<!--"Beneath Apple Manor" is a 1979 adventure game developed by Don Worth and distributed by The Software Factory. This is version 1.1. It requires a 32K Apple ][ with Integer BASIC in ROM.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="beneath apple manor.woz" size="234800" crc="95533df3" sha1="5db4eb223f9daca74d1b06cfbe7593023818ac14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teleport">
+		<description>Teleport</description>
+		<year>1982</year>
+		<publisher>Cavalier Computer Corporation</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Teleport" is a 1982 action game developed by Mike Abbot and distributed by Cavalier Computer Corporation. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="teleport.woz" size="234797" crc="513b789f" sha1="73e02b49529b03956db7bb338da5b84f1ff35610"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="secagnt1">
+		<description>Secret Agent: Mission One</description>
+		<year>1984</year>
+		<publisher>Jor-And</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Secret Agent: Mission One" is a 1984 adventure game developed and distributed by Jor-And. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="secret agent- mission one.woz" size="234778" crc="0f989f71" sha1="035995108da137dfb4de1fcff9e64316894b6377"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scweat35">
+		<description>Science Corner: Weather Watch (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-02-05"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Science Corner: Weather Watch" is a 1989 educational program developed by Peter Andrews, Rob Shaver, Henry F. Olds, Jr., Laura Koller, Christine Borland, and Nancy Davis, and distributed by Society for Visual Education. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296252">
+				<rom name="science corner- weather watch.woz" size="1296252" crc="4c594712" sha1="ea30a8ee0c10f151235db5ad6ab44948bf8b4466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scspcp35">
+		<description>Science Corner: Space Probe (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-02-05"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Science Corner: Space Probe" is a 1989 educational program developed by Peter Andrews, Rob Shaver, Henry F. Olds, Jr., Angela Faeth, Marianne Dunne, and Nancy Davis, and distributed by Society for Visual Education. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296247">
+				<rom name="science corner- space probe.woz" size="1296247" crc="6bf3b71e" sha1="1d50c90411be9fd18514c6d2ddb6f35334758529"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grapple">
+		<description>Grapple</description>
+		<year>1982</year>
+		<publisher>Insoft</publisher>
+		<info name="release" value="2022-02-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Grapple" is a 1982 action game developed by Tony Lewis and distributed by Insoft. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="354570">
+				<rom name="grapple.woz" size="354570" crc="1e8da238" sha1="554833930d430b51c839018ad533c6dfa00ee3e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aoidchpo">
+		<description>Apple-Oids and Chipout</description>
+		<year>1981</year>
+		<publisher>California Pacific Computer</publisher>
+		<info name="release" value="2022-02-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Apple-Oids and Chipout" is a 1981 pair of action games developed by Tom Luhrs and distributed by California Pacific Computer. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="201004">
+				<rom name="apple-oids and chipout.woz" size="201004" crc="e1b224a9" sha1="5bcbdb1329051b2ae2eaf3fa35159a2c9a06d911"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdsheol">
+		<description>Sword of Sheol</description>
+		<year>1982</year>
+		<publisher>Winner's Circle</publisher>
+		<info name="release" value="2022-02-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Sword of Sheol" is a 1982 action game developed by David Riggle and distributed by Winner's Circle. It runs on any Apple II with 48K.&lt;br /&gt;&lt;br /&gt;A 1987 textfile called "Eggs and Keys from Hot Rod" listed "Sword of Sheol" among a list of "vaporwares"; crediting it to Winner's Circle, creators of Sanitron.&lt;br /&gt;&lt;br /&gt;&lt;div&gt;Hot Rod's document is likely based on the advertisement for Sword of Sheol that was included in the August 1983 issue of &lt;i&gt;Creative Computing&lt;/i&gt;, where it appeared next to titles Ice Cave, Exterminator, and Sanitron.&lt;/div&gt;-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="467751">
+				<rom name="sword of sheol.woz" size="467751" crc="ed78e2c8" sha1="f86620a77dc5b6a5d031bfc99c67d0b86f62cc83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcksmth31">
+		<description>Locksmith 3.1</description>
+		<year>1981</year>
+		<publisher>Omega Software Products</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E"/>
+		<!-- It requires an Apple ][, ][+, or unenhanced //e with at least 32K. Due to coding bugs unrelated to copy protection, it will not run on later models -->
+		<!--"Locksmith" is a 1981 disk utility developed and distributed by Omega Software Products. This is version 3.1. It requires an Apple ][, ][+, or unenhanced //e with at least 32K. Due to coding bugs unrelated to copy protection, it will not run on later models.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55061">
+				<rom name="locksmith v3.1.woz" size="55061" crc="6b9321ca" sha1="48de65dd3d3ce9656dc75dce5b328974e2ab748b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compkara">
+		<description>Competition Karate</description>
+		<year>1984</year>
+		<publisher>Motivated Software</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Competition Karate" is a 1984 sports game developed by Edward Badasov and distributed by Motivated Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="competition karate.woz" size="234804" crc="5ad403a7" sha1="97830c60250ad1f487f1508e44e8f6afb07b6bf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv3">
+		<description>Copy II Plus (Version 3.0)</description>
+		<year>1981</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 24K. -->
+		<!--"Copy II Plus" is a 1981 disk utility developed by Michael D. Brown and distributed by Central Point Software. This is version 3.0. It runs on any Apple II with 24K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15154">
+				<rom name="copy ii plus v3.0.woz" size="15154" crc="518e3000" sha1="1b0aa2fd169044298f6a370a731ad084b7bbfb18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw3v125b">
+		<description>Nibbles Away III (Version 1.25B) </description>
+		<year>1985</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Nibbles Away III" is a 1985 disk utility developed and distributed by COMPUTER:applications, Inc. This is version 1.25B. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 1 - program.woz" size="234776" crc="3eb9f3b7" sha1="a7236341f1ba481a780ee25103cd70cb300b2e38"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Library"/>
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 2 - library disk.woz" size="234776" crc="1bd02293" sha1="2a2fb311fec6c4846e8d88befb2eee792ccea106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strlbaseb">
+		<description>Star League Baseball</description>
+		<year>1984</year>
+		<publisher>Gamestar, Inc.</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Star League Baseball" is a 1984 sports game developed and distributed by Gamestar, Inc. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234748">
+				<rom name="star league baseball.woz" size="234748" crc="65cf9157" sha1="6d57bdc1386f9d7d878bc1a2ec7938c2a7e7c343"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pawn23">
+		<description>The Pawn (Version 2.3)</description>
+		<year>1986</year>
+		<publisher>Rainbird</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Pawn" is a 1986 adventure game developed by Magnetic Scrolls and distributed by Rainbird. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="the pawn v2.3.woz" size="234751" crc="d7a0dd57" sha1="46766d12a65f348157b6e8116156707301552500"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grafspee">
+		<description>Pursuit of the Graf Spee</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2022-02-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Pursuit of the Graf Spee" is a 1982 strategy game developed by Joel Billings and distributed by Strategic Simulations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="pursuit of the graf spee.woz" size="234780" crc="99c70418" sha1="e1022a37b8e5b11b5c0143c984b3d74bdd4ebaeb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bezare">
+		<description>Bezare</description>
+		<year>1982</year>
+		<publisher>Southwestern Data Systems</publisher>
+		<info name="release" value="2022-02-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Bezare" is a 1982 action game developed by John Besnard and distributed by Southwestern Data Systems. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="bezare.woz" size="234774" crc="16e2a6c9" sha1="7c6a30c3ad3e6ad394cc5bc3fab1bd6e635f096f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="igprixrs">
+		<description>International Gran Prix (Riverbank Software)</description>
+		<year>1981</year>
+		<publisher>Riverbank Software</publisher>
+		<info name="release" value="2022-02-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"International Gran Prix" is a 1981 action game developed by Richard Orban and distributed by Riverbank Software. (It was later re-released by MUSE with minor changes.) It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174371">
+				<rom name="international gran prix (riverbank software).woz" size="174371" crc="03251a70" sha1="88e4db9b9f2607d13386b929d9bcbd8ced08527b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guildthv">
+		<description>The Guild of Thieves</description>
+		<year>1987</year>
+		<publisher>Rainbird</publisher>
+		<info name="release" value="2022-02-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Guild of Thieves" is a 1987 adventure game developed by Magnetic Scrolls and distributed by Rainbird. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="the guild of thieves.woz" size="234751" crc="882d1bbb" sha1="208c01597505f2601c3774de0c2b09dbf8a7f208"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artesans">
+		<description>Artesians</description>
+		<year>1983</year>
+		<publisher>RenoSoft</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Artesians" is a 1983 action game developed by Caliban Research and distributed by RenoSoft. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="artesians.woz" size="234781" crc="4bc213bd" sha1="c88b4b17029f61d2d490ffb9ad1ea2e1e657940b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinxter1">
+		<description>Jinxter (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>Rainbird</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Jinxter" is a 1987 adventure game developed by Magnetic Scrolls and distributed by Rainbird. This is version 1.0. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234777">
+				<rom name="jinxter disk 1.woz" size="234777" crc="899734f9" sha1="da06f79edfac2c2be21713a11a093915f9901eed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234777">
+				<rom name="jinxter disk 2.woz" size="234777" crc="f3cd96e4" sha1="ae021afa7853ee6c20130d771d3595a304a9d353"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neutrons">
+		<description>Neutrons</description>
+		<year>1981</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Neutrons" is a 1981 action game developed and distributed by Level-10. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234759">
+				<rom name="neutrons.woz" size="234759" crc="5aa0a73a" sha1="093d02b1ce31c94c34ca98b7eb58921df2f7f93c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tunlterr">
+		<description>Tunnel Terror</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Tunnel Terror" is a 1982 action game developed by Eric Popejoy and distributed by Adventure International. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="tunnel terror.woz" size="234788" crc="fe9da050" sha1="c3744acdef24dc9b347df4774d9c3f35912fbdd7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cryptmed">
+		<description>Crypt of Medea</description>
+		<year>1983</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Crypt of Medea" is a 1983 adventure game developed by Allan Lamb and Arthur Britto II, and distributed by Sir-Tech Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="crypt of medea side a.woz" size="234815" crc="aad35539" sha1="041043080b9c2332b2401a6444cb827bf38da4ad"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234815">
+				<rom name="crypt of medea side b.woz" size="234815" crc="406de5eb" sha1="45f9f6695c6466c770d6b4a27d2e80b75d7b95f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handdand">
+		<description>Handy Dandy</description>
+		<year>1983</year>
+		<publisher>Gentry Software</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Handy Dandy" is a 1983 action game developed by Chris Eisnaugle and distributed by Gentry Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="handy dandy.woz" size="234791" crc="3fb7584f" sha1="93b161a913cfb33d659054e6e926411881a8548e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjet">
+		<description>Jump Jet</description>
+		<year>1982</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Jump Jet" is a 1982 action game developed by Chuck Benton and distributed by Avant-Garde Creations. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="242983">
+				<rom name="jump jet.woz" size="242983" crc="7fee2d50" sha1="5b10bc99cd10d8e9099fab161821808731091d5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maxcomm">
+		<description>Max-Command</description>
+		<year>1982</year>
+		<publisher>Rockroy</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Max-Command" is a 1982 strategy game developed and distributed by Rockroy. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234757">
+				<rom name="max-command.woz" size="234757" crc="a20de15a" sha1="4195c2fbcbb90af650bee743c9c73c9ff948fe58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misldef">
+		<description>Missile Defense</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Missile Defense" is a 1981 action game developed by D. W. Clark and distributed by On-Line Systems. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="missile defense.woz" size="234791" crc="dc3abde9" sha1="a148b79074ceb7f4fa2849982ae4a681bf00b466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cryscavr">
+		<description>Crystal Caverns</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Crystal Caverns" is a 1982 adventure game developed by Daniel Kitchen and distributed by Hayden Book Company. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="crystal caverns.woz" size="234793" crc="c0ea16f3" sha1="0101b207d85530d16c74b1a6eb52420cfcc0761a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chsm2000">
+		<description>The Chessmaster 2000</description>
+		<year>1986</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Chessmaster 2000" is a 1986 board game developed and distributed by The Software Toolworks. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the chessmaster 2000 side a.woz" size="234770" crc="b4eb791b" sha1="a1a033faac0b76853d2de452866849434fad1fbf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the chessmaster 2000 side b.woz" size="234770" crc="45ad48e8" sha1="3e6240ea858cfccb2c27370b98f7e5bf99336abe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moscow41">
+		<description>At the Gates of Moscow 1941</description>
+		<year>1985</year>
+		<publisher>Strategic Games Publications</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"At the Gates of Moscow 1941" is a 1985 strategy game developed by Mark Korman and Todd Hochwitz, and distributed by Strategic Games Publications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234830">
+				<rom name="at the gates of moscow 1941 side a.woz" size="234830" crc="bdd647a6" sha1="e4f9258915328e1ae0a80850b5aca76e87bdd615"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234830">
+				<rom name="at the gates of moscow 1941 side b.woz" size="234830" crc="5a7eee20" sha1="16cef55f63abf27f3036889bacd75db6e3a6148d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mouskatk">
+		<description>Mouskattack</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Mouskattack" is a 1982 action game developed by Ken Williams and Al Nystrom, and distributed by On-Line Systems. It runs on any apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234799">
+				<rom name="mouskattack.woz" size="234799" crc="47fb8922" sha1="5e1cf3887d549c20e9c440e26ab27a0bfda00e73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raidrlring">
+		<description>Raiders of the Lost Ring</description>
+		<year>1981</year>
+		<publisher>Cavalier Computer Corporation</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Raiders of the Lost Ring" is a 1981 action game developed by Jim Nitchals and distributed by Cavalier Computer Corporation. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="raiders of the lost ring.woz" size="234807" crc="174cea9a" sha1="69f9124b182c00d66ed59e360728266407ced776"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zodiaccs">
+		<description>Zodiac Castle</description>
+		<year>1982</year>
+		<publisher>Dynacomp</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Zodiac Castle" is a 1982 adventure game developed by Dennis N. Strong and distributed by Dynacomp. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="240932">
+				<rom name="zodiac castle.woz" size="240932" crc="d8d95723" sha1="e33a9324298fe3125d94b0eb40ed86bba91ee669"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bapmnrse">
+		<description>Beneath Apple Manor: The Special Edition</description>
+		<year>1982</year>
+		<publisher>Quality Software</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Beneath Apple Manor: The Special Edition" is a 1982 adventure game developed by Don Worth and distributed by Quality Software. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234826">
+				<rom name="beneath apple manor- the special edition.woz" size="234826" crc="69ad7676" sha1="15992953d222818d96a8a2e87854ebdf32fd62e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batls331">
+		<description>Battlesight (Version 3.3.1)</description>
+		<year>1982</year>
+		<publisher>Versa Computing</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Battlesight" is a 1982 action game developed by Major C. Hanselmann, D. Lubar, V. Bauman, J. Anderson, and E. Wolcott, and distributed by Versa Computing. This is version 3.3.1. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228193">
+				<rom name="battlesight.woz" size="228193" crc="d71ec666" sha1="7bc0e53a839ca7270e5962565337ae87283198cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pythdrgn">
+		<description>Pythagoras and the Dragon</description>
+		<year>1983</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2022-02-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Pythagoras and the Dragon" is a 1983 educational game developed and distributed by Krell Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="pythagoras and the dragon.woz" size="234776" crc="3c7334d5" sha1="c49c45952108278c894358f484b359a3eaee9fe2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robbatl">
+		<description>Robot Battle</description>
+		<year>1982</year>
+		<publisher>United Software of America</publisher>
+		<info name="release" value="2022-02-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Robot Battle" is a 1982 action game developed by Adam Bellin and distributed by United Software of America. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="robot battle.woz" size="234797" crc="b1a9e001" sha1="11ccb410e91ddb8f36dd48a74998b5660e77dfe4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oldorfrv">
+		<description>Oldorf's Revenge</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<info name="release" value="2022-02-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Oldorf's Revenge" is a 1981 adventure game developed by Butch Greathouse and distributed by Highlands Computer Services. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="oldorf's revenge.woz" size="234810" crc="b708091e" sha1="00ffe508d6247d16940027c2437fe23a31352016"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ginrummy">
+		<description>Gin Rummy</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2022-02-17"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Gin Rummy" is a 1982 card game developed by Art Carpet and distributed by Datamost. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="gin rummy.woz" size="234768" crc="6bb57084" sha1="4f29899005955c21ef20594679e2c396d56fab87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starball">
+		<description>Star Ball</description>
+		<year>1983</year>
+		<publisher>Baen Software</publisher>
+		<info name="release" value="2022-02-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Star Ball" is a 1983 action game developed by Dale Koehler and distributed by Baen Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="star ball.woz" size="234782" crc="d76f262b" sha1="749f976f11f0a0d6f92b1d4680d89ee598027b5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadhwk1">
+		<description>Shadow Hawk One</description>
+		<year>1981</year>
+		<publisher>Horizon Simulations</publisher>
+		<info name="release" value="2022-02-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Shadow Hawk One" is a 1981 strategy game developed and distributed by Horizon Simulations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="shadow hawk one.woz" size="234773" crc="bcee3ca5" sha1="92795b9d977de453863d43fb0ab336b39ed15330"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
