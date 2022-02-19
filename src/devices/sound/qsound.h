@@ -47,8 +47,8 @@ private:
 	// for synchronised DSP communication
 	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
 	u16 dsp_pio_r();
-	void set_dsp_ready(void *ptr, s32 param);
-	void set_cmd(void *ptr, s32 param);
+	void set_dsp_ready(s32 param);
+	void set_cmd(s32 param);
 
 	// MAME resources
 	required_device<dsp16_device_base> m_dsp;

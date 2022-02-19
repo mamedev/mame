@@ -124,7 +124,7 @@ namespace {
 
   Mattel Basketball (model 2437)
   * PCB label: MA 6017/18/19
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C NCX)
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C NCX)
   * 4001 and 74145, also bonded to PCB
   * 2-digit 7seg led display, 21 leds, 2-bit sound
 
@@ -333,7 +333,7 @@ ROM_END
 /***************************************************************************
 
   National Semiconductor QuizKid Racer (MM5799 version)
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C DUZ)
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C DUZ)
   * DS8874 LED driver, die bonded to PCB as well
   * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
   * optional link cable to compete with another player (see patent US4051605)
@@ -488,7 +488,7 @@ ROM_END
 /***************************************************************************
 
   National Semiconductor QuizKid Speller
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C NDF)
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C NDF)
   * 2-digit 7seg led display, green led, red led, no sound
 
   The manual included 99 pictures for matching the words, with increased

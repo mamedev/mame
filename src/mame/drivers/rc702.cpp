@@ -89,12 +89,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_q_state;
-	bool m_qbar_state;
-	bool m_drq_state;
-	uint16_t m_beepcnt;
-	bool m_eop;
-	bool m_dack1;
+	bool m_q_state = 0;
+	bool m_qbar_state = 0;
+	bool m_drq_state = 0;
+	uint16_t m_beepcnt = 0U;
+	bool m_eop = 0;
+	bool m_dack1 = 0;
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

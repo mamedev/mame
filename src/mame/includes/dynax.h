@@ -53,6 +53,7 @@ public:
 	void nanajign(machine_config &config);
 	void cdracula(machine_config &config);
 	void tenkai(machine_config &config);
+	void ougonhai(machine_config &config);
 	void hjingi(machine_config &config);
 	void mjreach(machine_config &config);
 	void neruton(machine_config &config);
@@ -95,6 +96,7 @@ protected:
 
 	/* input / output */
 	uint8_t m_input_sel;
+	uint8_t m_input_mode;
 	uint8_t m_dsw_sel;
 	uint8_t m_keyb;
 	uint8_t m_coins;
@@ -169,6 +171,7 @@ private:
 	void tenkai_p7_w(uint8_t data);
 	void tenkai_p8_w(uint8_t data);
 	uint8_t tenkai_p8_r();
+	void ougonhai_p7_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
 	void tenkai_blit_romregion_w(uint8_t data);

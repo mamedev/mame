@@ -96,6 +96,7 @@ void spectrum_kempdisc_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 const tiny_rom_entry *spectrum_kempdisc_device::device_rom_region() const
@@ -174,7 +175,7 @@ uint8_t spectrum_kempdisc_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0xe5: case 0xe7: case 0xed: case 0xef:
-		data &= m_fdc->read(BIT(offset, 1) | (BIT(offset, 3) << 1));
+		data = m_fdc->read(BIT(offset, 1) | (BIT(offset, 3) << 1));
 		break;
 	}
 

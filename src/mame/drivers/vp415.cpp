@@ -105,7 +105,7 @@ void vp415_state::machine_start()
 	m_drive_2ppr_timer = timer_alloc(DRIVE_2PPR_ID);
 }
 
-void vp415_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vp415_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

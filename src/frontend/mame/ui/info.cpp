@@ -15,9 +15,10 @@
 #include "ui/ui.h"
 
 #include "drivenum.h"
-#include "romload.h"
-#include "softlist.h"
 #include "emuopts.h"
+#include "romload.h"
+#include "screen.h"
+#include "softlist.h"
 
 #include <set>
 #include <sstream>
@@ -234,8 +235,8 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	// suppress "requires external artwork" warning when external artwork was loaded
 	if (config.root_device().has_running_machine())
 	{
-		for (render_target *target = config.root_device().machine().render().first_target(); target != nullptr; target = target->next())
-			if (!target->hidden() && target->external_artwork())
+		for (render_target const &target : config.root_device().machine().render().targets())
+			if (!target.hidden() && target.external_artwork())
 			{
 				m_flags &= ~::machine_flags::REQUIRES_ARTWORK;
 				break;
@@ -464,10 +465,16 @@ std::string machine_info::game_info_string() const
 				detail = _("Vector");
 			else
 			{
-				std::string hz(std::to_string(float(screen.frame_period().as_hz())));
-				size_t last = hz.find_last_not_of('0');
-				size_t dpos = hz.find_last_of('.');
-				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+				const u32 rate = u32(screen.frame_period().as_hz() * 1'000'000 + 0.5);
+				const bool valid = rate >= 1'000'000;
+				std::string hz(valid ? std::to_string(rate) : "?");
+				if (valid)
+				{
+					size_t dpos = hz.length() - 6;
+					hz.insert(dpos, ".");
+					size_t last = hz.find_last_not_of('0');
+					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+				}
 
 				const rectangle &visarea = screen.visible_area();
 				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %s" UTF8_NBSP "Hz",

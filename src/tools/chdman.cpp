@@ -2955,7 +2955,7 @@ static void do_dump_metadata(parameters_map &params)
 
 
 //-------------------------------------------------
-//  do_dump_metadata - dump metadata from a CHD
+//  do_list_templates - list hard drive templates
 //-------------------------------------------------
 
 static void do_list_templates(parameters_map &params)

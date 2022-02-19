@@ -6,7 +6,7 @@
  * Barry Silverman mailto:barry@disus.com or mailto:bss@media.mit.edu
  * Vadim Gerasimov mailto:vadim@media.mit.edu
  *
- * MESS driver by Chris Salomon and Raphael Nabet.
+ * MAME driver by Chris Salomon and Raphael Nabet.
  *
  * Basically, it has been rewritten entirely in order to perform cycle-level simulation
  * (with only a few flip-flops being set one cycle too early or too late).  I don't know if

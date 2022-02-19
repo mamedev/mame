@@ -387,10 +387,10 @@ void symbol_table::set_memory_modified_func(memory_modified_func modified)
 //  add - add a new u64 pointer symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, read_write rw, u64 *ptr)
+symbol_entry &symbol_table::add(const char *name, read_write rw, u64 *ptr)
 {
 	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, rw, ptr));
+	return *m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, rw, ptr)).first->second;
 }
 
 
@@ -398,10 +398,10 @@ void symbol_table::add(const char *name, read_write rw, u64 *ptr)
 //  add - add a new value symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, u64 value)
+symbol_entry &symbol_table::add(const char *name, u64 value)
 {
 	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, value));
+	return *m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, value)).first->second;
 }
 
 
@@ -409,10 +409,10 @@ void symbol_table::add(const char *name, u64 value)
 //  add - add a new register symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, getter_func getter, setter_func setter, const std::string &format_string)
+symbol_entry &symbol_table::add(const char *name, getter_func getter, setter_func setter, const std::string &format_string)
 {
 	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, getter, setter, format_string));
+	return *m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, getter, setter, format_string)).first->second;
 }
 
 
@@ -420,10 +420,10 @@ void symbol_table::add(const char *name, getter_func getter, setter_func setter,
 //  add - add a new function symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, int minparams, int maxparams, execute_func execute)
+symbol_entry &symbol_table::add(const char *name, int minparams, int maxparams, execute_func execute)
 {
 	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<function_symbol_entry>(*this, name, minparams, maxparams, execute));
+	return *m_symlist.emplace(name, std::make_unique<function_symbol_entry>(*this, name, minparams, maxparams, execute)).first->second;
 }
 
 

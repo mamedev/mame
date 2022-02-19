@@ -73,7 +73,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	char sign[4];
 	io.read_at(0, sign, 4, actual);
 	if(memcmp(sign, "DFER", 4) == 0) {
-		osd_printf_error("dfi_dsk: Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
+		osd_printf_error("dfi_dsk: Old type Discferret image detected; the MAME Discferret decoder will not handle this properly, bailing out!\n");
 		return false;
 	}
 

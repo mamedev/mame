@@ -1,6 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+/******************************************************************************************************
+PINBALL
+Alvin G pinball machines.
 
+Pinball games:
+- Al's Garage Band Goes on a World Tour
+- Dual-Pool (unreleased)
+- Monte Carlo
+- Mystery Castle
+- Pistol Poker
+- Punchy the Clown
+- Slam 'n Jam (unreleased)
+- Tropical Isle
+Other games:
+- A-MAZE-ING Baseball (redemption)
+- A G Football (head to head)
+- A G Soccer-ball (head to head)
+- Dinosaur Eggs (redemption)
+- The Death Dealing Adventure of Maxx Badazz Champion Kickboxer (unreleased)
+- USA Football (redemption)
+- USA Football (head to head)
+
+Status:
+- Skeletons
+
+ToDo:
+- Everything
+****************************************************************************************************/
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 

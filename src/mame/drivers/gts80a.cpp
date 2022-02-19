@@ -7,9 +7,7 @@ Gottlieb System 80A
 
 Same as system 80, except that the displays have 7 digits.
 
-Most games start up and will accept credits, and the test mode works.
-
-Many games are multiball, and therefore may not respond further to inputs.
+Most games start up and will accept credits, and the test mode works. See key codes below.
 
 Caveman is missing its joystick. Need the manual. The video-pinball interface has not been written.
  If you turn on DIPS6,7,8, you can enter test mode, insert coins and start a game.
@@ -20,6 +18,31 @@ Rocky has a habit of locking up. Have to reboot the machine with F3.
 Sound is wrong in all games.
 
 Note: If DIP28 is set to Novelty, then Match doesn't work.
+
+Here are the key codes to enable play: (may need to hit X to start a ball)
+
+Game                 NUM  Start game                                       End ball (X often works, even when not connected)
+-----------------------------------------------------------------------------------------------------------------
+Devil's Dare         670  1, then hold .enter hit pad-                     .enter hit pad-
+Rocky                672  1                                                X
+Spirit               673  1, then Y and \                                  X then \ (wait for sound)
+Punk!                674  1, then - and num*                               - then num* (wait for sound)
+Striker              675  1, then S and num2                               X
+Krull                676  1, then jiggle X and Y until you hear a sound    X
+Qbert's Quest        677  1, then X (wait for sound), then Z               X
+Super Orbit          680  1                                                X
+Royal Flush Deluxe   681  1                                                X
+Going Nuts           682  1 then num- then num*                            num- then num*
+Amazon Hunt          684  1                                                X
+Rack 'Em Up          685  1 then hold num-enter, hit X                     X
+Ready Aim Fire       686  1                                                X
+Jacks to Open        687  1                                                X
+Touchdown            688  1                                                X
+Alien Star           689  1, then K and \                                  \ then K
+The Games            691  1                                                X
+El Dorado            692  1                                                X
+Ice Fever            695  1 then unknown                                   X
+Caveman            PV810  1 then unknown                                   X
 
 *****************************************************************************************************************/
 
@@ -46,12 +69,12 @@ public:
 		, m_riot1(*this, "riot1")
 		, m_riot2(*this, "riot2")
 		, m_riot3(*this, "riot3")
-		, m_io_dips(*this, "DSW%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0U)
+		, m_io_dips(*this, "DSW%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void gts80a(machine_config &config);
@@ -69,11 +92,11 @@ private:
 	void port3b_w(u8 data);
 	void gts80a_map(address_map &map);
 
-	u8 m_segment = 0;
-	u8 m_lamprow = 0;
-	u8 m_swrow = 0;
-	u8 m_soundex = 0;
-	u8 m_sol_state[9][2];
+	u8 m_segment = 0U;
+	u8 m_lamprow = 0U;
+	u8 m_swrow = 0U;
+	u8 m_soundex = 0U;
+	u8 m_sol_state[9][2]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6502_device> m_maincpu;
@@ -302,7 +325,7 @@ u8 gts80a_state::port1a_r()
 	if ((m_lamprow < 4) && BIT(m_segment, 7))
 		data = m_io_dips[m_lamprow]->read();
 
-	for (u8 i = 0; i < 7; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (!BIT(m_swrow, i))
 			data &= m_io_keyboard[i]->read();
 
@@ -356,11 +379,11 @@ void gts80a_state::port3a_w(u8 data)
 	data ^= 0x1f;   // Z27 inverter
 	// Sound
 	u8 sndcmd = data & 15;
-	if (BIT(data, 4))  // Z31
+	if (!BIT(data, 4))  // Z31
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board
-	if (m_r0_sound && (sndcmd & 15))
+	if (m_r0_sound)
 		m_r0_sound->write(sndcmd);
 	else
 	if (m_r1_sound)
@@ -469,6 +492,9 @@ void gts80a_state::machine_start()
 void gts80a_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_lamprow = 0;
 	m_swrow = 0;
 	m_segment = 0;
@@ -917,7 +943,7 @@ ROM_END
 /* cust  */GAME( 1982, rockyf,   rocky,   gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME( 1982, spirit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1982, punk,     0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME( 1983, krullp,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1983, qbquest,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME( 1983, sorbit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)

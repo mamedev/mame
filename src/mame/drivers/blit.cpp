@@ -49,12 +49,14 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGPIA(...) LOGMASKED(LOG_PIA, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 class blit_state : public driver_device
 {
@@ -95,7 +97,7 @@ private:
 	required_shared_ptr<uint16_t> m_p_ram;
 	required_region_ptr<uint16_t> m_sysrom;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	int m_videostart = 0;
 };
 
@@ -211,20 +213,22 @@ void blit_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x000007, m_sysrom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0x040000, 0x045fff, "rom_shadow_r",[this](offs_t offset, u16 &data, u16 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x040000, 0x045fff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_p_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall ram over the rom shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_p_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 
 	*m_misccr = 0;
 }
@@ -283,6 +287,8 @@ ROM_START( blit )
 	ROMX_LOAD("rom4.bin", 0x4001, 0x08bf, CRC(2af93f8b) SHA1(1168cb341bfe2a5bc283281f6afe42837adb60f1), ROM_BIOS(0)|ROM_SKIP(1))
 	ROMX_LOAD("rom5.bin", 0x4000, 0x08bf, CRC(d87f121f) SHA1(6e776ac29554b8a8bb332168c155bcc502c927b5), ROM_BIOS(0)|ROM_SKIP(1))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT           COMPANY  FULLNAME     FLAGS

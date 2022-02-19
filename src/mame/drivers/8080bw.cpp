@@ -5645,6 +5645,17 @@ ROM_START( attackfc )
 	ROM_LOAD( "39a.bin",       0x1c00, 0x0400, CRC(f538cf08) SHA1(4a375a41ab5d9f0d9f9a2ebef4c448038c139204) )
 ROM_END
 
+ROM_START( attackfcu ) // unencrypted, possibly bootleg, has code differences but one of the ROMs is bad
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "egs0.bin", 0x0000, 0x0400, CRC(653bbb40) SHA1(8627b8e06e42d61ae41fc70654e530974dd2c5d0) )
+	ROM_LOAD( "egs1.bin", 0x0400, 0x0400, CRC(56024445) SHA1(5cf6270977509c4ea1655e9dd4ec1b6a52ba280e) )
+	ROM_LOAD( "egs2.bin", 0x0800, 0x0400, BAD_DUMP CRC(09d94b7d) SHA1(aebda4bba382625f5b3e498e1127619884ffe516) ) // FIXED BITS (xxx0xxxx)
+	ROM_LOAD( "egs3.bin", 0x0c00, 0x0400, CRC(50f7cd22) SHA1(39d5023c5f5e71b5f353960a4b6e848e55f3277f) )
+	ROM_LOAD( "egs4.bin", 0x1000, 0x0400, CRC(f59bac9e) SHA1(eaa807aade1b6a25c41d017e62f229bf1c7e1d0e) )
+	ROM_LOAD( "egs6.bin", 0x1800, 0x0400, CRC(a9eb4699) SHA1(0c170fc6f533b03a0ac626e1074d7ebd27ce216a) )
+	ROM_LOAD( "egs7.bin", 0x1c00, 0x0400, CRC(7e705388) SHA1(22a567059fd28a88cc4b815dfa7c5824a9d3fdc8) )
+ROM_END
+
 ROM_START( cane )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mrcane.71",     0x0000, 0x0800, CRC(47de691e) SHA1(8ed359774489ccf6023819b0d604b5a6d94b9f98) )
@@ -5802,7 +5813,8 @@ GAME( 1979?,orbite,      0,        orbite,    orbite,    orbite_state,   empty_i
 
 GAME( 1980?,astropal,    0,        astropal,  astropal,  _8080bw_state,  empty_init,    ROT0,   "Sidam?",                             "Astropal",                                                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAMEL(1979?,attackfc,    0,        attackfc,  attackfc,  _8080bw_state,  init_attackfc, ROT0,   "Electronic Games Systems",           "Attack Force",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc )
+GAMEL(1979?,attackfc,    0,        attackfc,  attackfc,  _8080bw_state,  init_attackfc, ROT0,   "Electronic Games Systems",           "Attack Force (encrypted)",                                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc )
+GAMEL(1979?,attackfcu,   attackfc, attackfc,  attackfc,  _8080bw_state,  empty_init,    ROT0,   "bootleg?",                           "Attack Force (unencrypted)",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc ) // bad dump
 
 GAME( 2002, invmulti,    0,        invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)",          "Space Invaders Multigame (M8.03D)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a, invmulti, invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)",          "Space Invaders Multigame (M8.03A)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Bryan McPhail, Stephane Humbert, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     SNK/Alpha 68000 I board based games
 
@@ -8,10 +8,11 @@
 
     TODO:
     - Both POST screens are X offset by a large margin,
-      i.e. Paddle Mania draws a middle line there, which isn't shown on real HW.
-    - Paddle Mania: ranking screen is unreadable, maybe
+      i.e. paddlema draws a middle line there, which isn't shown on real HW reference instead.
+    - paddlema: ranking screen is unreadable on 9th/10th positions during attract,
+      maybe the underlying background is supposed to be disabled somehow?
 
-***************************************************************************
+===================================================================================================
 
 The Next Space:
  Mainboard A8004-1
@@ -25,7 +26,7 @@ The Next Space:
  Many PCBs feature a A8004-2 daughtercard with 4 smaller mask ROMs, labeled
   NS 5, NS 6, NS 7 & NS 8 instead of the single larger mask ROM
 
-***************************************************************************
+===================================================================================================
 
 Paddle Mania
  Mainboard 68K-96-I
@@ -35,7 +36,7 @@ Paddle Mania
   24MHz OSC
   8 switch Dipswitch x 2
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/alpha68k.h"

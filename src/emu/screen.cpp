@@ -12,6 +12,7 @@
 #include "screen.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "render.h"
 #include "rendutil.h"
 
@@ -683,9 +684,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Non-raster display cannot have a variable width\n");
 	}
 
-	// check for zero frame rate
-	if (m_refresh == 0)
-		osd_printf_error("Invalid (zero) refresh rate\n");
+	// check for invalid frame rate
+	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
+		osd_printf_error("Invalid (under 1Hz) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
@@ -934,7 +935,7 @@ void screen_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1108,7 +1109,7 @@ void screen_device::realloc_screen_bitmaps()
 	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
 	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
 
-	// reize all registered screen bitmaps
+	// resize all registered screen bitmaps
 	for (auto &item : m_auto_bitmap_list)
 		item->m_bitmap.resize(effwidth, effheight);
 
@@ -1870,7 +1871,7 @@ void screen_device::finalize_burnin()
 			m_visarea.top() * m_burnin.height() / m_height,
 			m_visarea.bottom() * m_burnin.height() / m_height);
 
-	// wrap a bitmap around the memregion we care about
+	// wrap a bitmap around the subregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();

@@ -339,7 +339,8 @@ license:CC0
 	<element name="text_c05"><text string="Set Level"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c06"><text string="Trace"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c06a"><text string="Forward"><color red="0.15" green="0.75" blue="0.6" /></text></element>
-	<element name="text_c07"><text string="Trace Back"><color red="0.15" green="0.75" blue="0.6" /></text></element>
+	<element name="text_c07"><text string="Trace"><color red="0.15" green="0.75" blue="0.6" /></text></element>
+	<element name="text_c07a"><text string="Back"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 
 	<element name="text_c10"><text string=" "><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c11"><text string="Auto Clock"><color red="0.15" green="0.75" blue="0.6" /></text></element>
@@ -400,6 +401,7 @@ license:CC0
 			<element ref="text_g1~i~"><bounds x="~x~" y="26.5" width="14" height="2.15" /></element>
 		</repeat>
 		<element ref="text_c06a"><bounds x="68" y="12" width="14" height="2.15" /></element>
+		<element ref="text_c07a"><bounds x="78" y="12" width="14" height="2.15" /></element>
 
 		<repeat count="8">
 			<param name="x" start="10" increment="10" />

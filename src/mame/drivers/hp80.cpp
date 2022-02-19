@@ -81,7 +81,7 @@
 #include "machine/1ma6.h"
 #include "machine/hp80_optrom.h"
 #include "machine/ram.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "machine/bankdev.h"
 #include "bus/hp80_io/hp80_io.h"
 #include "bus/hp80_io/82937.h"

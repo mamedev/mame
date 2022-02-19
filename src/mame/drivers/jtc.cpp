@@ -56,7 +56,7 @@ protected:
 	u8 p3_r();
 	void p3_w(u8 data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -106,7 +106,7 @@ private:
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);
 	void banksel_w(u8 data);
-	u8 m_video_bank;
+	u8 m_video_bank = 0U;
 
 	memory_share_creator<uint8_t> m_video_ram_40;
 	memory_share_creator<uint8_t> m_color_ram_r;

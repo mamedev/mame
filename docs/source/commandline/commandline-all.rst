@@ -919,8 +919,8 @@ Example:
          supporting both XInput and DirectInput controllers.
 
 
-OSD CLI Options
----------------
+OSD CLI Verbs
+-------------
 
 .. _mame-commandline-listmidi:
 
@@ -1862,7 +1862,7 @@ Core Performance Options
 
 .. _mame-commandline-lowlatency:
 
-**-lowlatency**
+**-[no]lowlatency**
 
     This tells MAME to draw a new frame before throttling to reduce input
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
@@ -2698,11 +2698,11 @@ Core Video OpenGL GLSL Options
 
 .. _mame-commandline-glglsl:
 
-**-gl_glsl**
+**-[no]gl_glsl**
 
     Enable OpenGL GLSL, if available.
 
-    The default is OFF.
+    The default is OFF (**-nogl_glsl**).
 
     Example:
         .. code-block:: bash
@@ -2764,20 +2764,6 @@ Core Video OpenGL GLSL Options
 
             mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
-
-.. _mame-commandline-glglslvidattr:
-
-**-gl_glsl_vid_attr**
-
-    Enable OpenGL GLSL handling of brightness and contrast.
-    Better RGB system performance.
-
-    Default is ``on``.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -gl_glsl -gl_glsl_vid_attr off
 
 Core Sound Options
 ------------------
@@ -2904,7 +2890,7 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -3256,7 +3242,7 @@ Core Input Options
 
 .. _mame-commandline-natural:
 
-**\-natural**
+**\-[no]natural**
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
@@ -3290,7 +3276,7 @@ Core Input Options
 
 .. _mame-commandline-joystickcontradictory:
 
-**-joystick_contradictory**
+**-[no]joystick_contradictory**
 
     Enable contradictory direction digital joystick input at the same time such
     as **Left and Right** or **Up and Down** at the same time.
@@ -3663,7 +3649,7 @@ Core Misc Options
 
 .. _mame-commandline-drcusec:
 
-**\-drc_use_c**
+**\-[no]drc_use_c**
 
     Force DRC to use the C code backend.
 
@@ -3676,7 +3662,7 @@ Core Misc Options
 
 .. _mame-commandline-drcloguml:
 
-**\-drc_log_uml**
+**\-[no]drc_log_uml**
 
     Write DRC UML disassembly log.
 
@@ -3689,7 +3675,7 @@ Core Misc Options
 
 .. _mame-commandline-drclognative:
 
-**\-drc_log_native**
+**\-[no]drc_log_native**
 
     Write DRC native disassembly log.
 
@@ -3788,7 +3774,7 @@ Core Misc Options
 
 .. _mame-commandline-confirmquit:
 
-**\-confirm_quit**
+**\-[no]confirm_quit**
 
     Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
@@ -3802,7 +3788,7 @@ Core Misc Options
 
 .. _mame-commandline-uimouse:
 
-**\-ui_mouse**
+**\-[no]ui_mouse**
 
     Displays a mouse cursor when using the built-in UI for MAME.
 
@@ -3975,7 +3961,7 @@ HTTP Server Options
 PortAudio Options
 -----------------
 
-.. _mame-commandline-pa-api:
+.. _mame-commandline-paapi:
 
 **-pa_api** *API*
 
@@ -4031,7 +4017,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
 
-.. _mame-commandline-pa-device:
+.. _mame-commandline-padevice:
 
 **-pa_device** *device*
 
@@ -4045,7 +4031,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
 
-.. _mame-commandline-pa-latency:
+.. _mame-commandline-palatency:
 
 **-pa_latency** *latency*
 

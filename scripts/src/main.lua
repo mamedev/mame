@@ -149,6 +149,8 @@ else
 				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".html",
 			}
 		end
+
+		targetextension ".html"
 end
 	-- BEGIN libretro overrides to MAME's GENie build
 	configuration { "libretro*" }

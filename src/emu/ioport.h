@@ -663,116 +663,6 @@ typedef device_delegate<void (ioport_field &, u32, ioport_value, ioport_value)> 
 typedef device_delegate<float (float)> ioport_field_crossmap_delegate;
 
 
-// ======================> inp_header
-
-// header at the front of INP files
-class inp_header
-{
-public:
-	// parameters
-	static constexpr unsigned MAJVERSION = 3;
-	static constexpr unsigned MINVERSION = 0;
-
-	bool read(emu_file &f)
-	{
-		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-	bool write(emu_file &f) const
-	{
-		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-
-	bool check_magic() const
-	{
-		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	u64 get_basetime() const
-	{
-		return
-				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
-	}
-	unsigned get_majversion() const
-	{
-		return m_data[OFFS_MAJVERSION];
-	}
-	unsigned get_minversion() const
-	{
-		return m_data[OFFS_MINVERSION];
-	}
-	std::string get_sysname() const
-	{
-		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
-	}
-	std::string get_appdesc() const
-	{
-		return get_string<OFFS_APPDESC, OFFS_END>();
-	}
-
-	void set_magic()
-	{
-		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	void set_basetime(u64 time)
-	{
-		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
-	}
-	void set_version()
-	{
-		m_data[OFFS_MAJVERSION] = MAJVERSION;
-		m_data[OFFS_MINVERSION] = MINVERSION;
-	}
-	void set_sysname(std::string const &name)
-	{
-		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
-	}
-	void set_appdesc(std::string const &desc)
-	{
-		set_string<OFFS_APPDESC, OFFS_END>(desc);
-	}
-
-private:
-	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
-	{
-		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
-		std::memcpy(m_data + BEGIN, str.c_str(), used);
-		if ((END - BEGIN) > used)
-			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
-	}
-	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
-	{
-		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
-		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
-	}
-
-	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
-	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
-	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
-	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
-																// 0x02 bytes reserved
-	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
-	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
-	static constexpr std::size_t    OFFS_END         = 0x40;
-
-	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
-
-	u8                              m_data[OFFS_END];
-};
-
-
 // ======================> input_device_default
 
 // device defined default input settings
@@ -799,7 +689,7 @@ public:
 	ioport_group group() const noexcept { return m_group; }
 	u8 player() const noexcept { return m_player; }
 	const char *token() const noexcept { return m_token; }
-	const char *name() const noexcept { return m_name; }
+	std::string name() const;
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) noexcept { return m_defseq[seqtype]; }
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_seq[seqtype]; }
@@ -915,6 +805,7 @@ public:
 	{
 		m_condition = condition;
 		m_tag = tag;
+		m_port = nullptr;
 		m_mask = mask;
 		m_value = value;
 	}
@@ -1037,7 +928,7 @@ public:
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	u8 impulse() const noexcept { return m_impulse; }
-	const char *name() const;
+	std::string name() const;
 	const char *specific_name() const noexcept { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
@@ -1382,7 +1273,7 @@ public:
 	// type helpers
 	const std::vector<input_type_entry> &types() const noexcept { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
-	const char *type_name(ioport_type type, u8 player) const noexcept;
+	std::string type_name(ioport_type type, u8 player) const;
 	ioport_group type_group(ioport_type type, int player) const noexcept;
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq) noexcept;
@@ -1449,8 +1340,8 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (closed if not recording)
-	emu_file                m_playback_file;        // playback file (closed if not recording)
+	std::unique_ptr<emu_file> m_record_file;        // recording file (nullptr if not recording)
+	std::unique_ptr<emu_file> m_playback_file;      // playback file (nullptr if not recording)
 	util::write_stream::ptr m_record_stream;        // recording stream (nullptr if not recording)
 	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback
@@ -1489,6 +1380,7 @@ public:
 	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
 	ioport_configurer& field_set_impulse(u8 impulse) { m_curfield->m_impulse = impulse; return *this; }
 	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
+	[[deprecated("PORT_RESET is deprecated; manage counter state explicitly")]]
 	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
 	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
 	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }

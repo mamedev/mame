@@ -32,7 +32,7 @@ public:
 	pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void write(offs_t offset, uint8_t data) override;
 	void readz(offs_t offset, uint8_t *value) override;
-	void crureadz(offs_t offset, uint8_t *value) override { };
+	void crureadz(offs_t offset, uint8_t *value) override { }
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_INPUT_CHANGED_MEMBER( sw1_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( sw2_changed );

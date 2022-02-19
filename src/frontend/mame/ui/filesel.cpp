@@ -19,8 +19,8 @@
 
 #include "imagedev/floppy.h"
 
-#include "corestr.h"
-#include "zippath.h"
+#include "util/corestr.h"
+#include "util/zippath.h"
 
 #include <cstring>
 #include <locale>
@@ -133,45 +133,6 @@ bool menu_file_selector::custom_mouse_down()
 	}
 
 	return false;
-}
-
-
-//-------------------------------------------------
-//  compare_file_selector_entries - sorting proc
-//  for file selector entries
-//-------------------------------------------------
-
-int menu_file_selector::compare_entries(const file_selector_entry *e1, const file_selector_entry *e2)
-{
-	int result;
-	const char *e1_basename = e1->basename.c_str();
-	const char *e2_basename = e2->basename.c_str();
-
-	if (e1->type < e2->type)
-	{
-		result = -1;
-	}
-	else if (e1->type > e2->type)
-	{
-		result = 1;
-	}
-	else
-	{
-		result = core_stricmp(e1_basename, e2_basename);
-		if (result == 0)
-		{
-			result = strcmp(e1_basename, e2_basename);
-			if (result == 0)
-			{
-				if (e1 < e2)
-					result = -1;
-				else if (e1 > e2)
-					result = 1;
-			}
-		}
-	}
-
-	return result;
 }
 
 
@@ -450,7 +411,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	if (m_entrylist.size() > first)
 	{
 		// sort the menu entries
-		const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
 		std::sort(
 				m_entrylist.begin() + first,
 				m_entrylist.end(),
@@ -458,7 +419,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 				{
 					std::wstring const xstr = wstring_from_utf8(x.basename);
 					std::wstring const ystr = wstring_from_utf8(y.basename);
-					return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
+					return coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size()) < 0;
 				});
 	}
 

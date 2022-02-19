@@ -43,7 +43,7 @@
 
 #include "emu.h"
 #include "includes/mpz80.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

@@ -52,7 +52,7 @@ used XTA (8-bit IDE) harddisks.
 #include "cpu/i86/i286.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
 

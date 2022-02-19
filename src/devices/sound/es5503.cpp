@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.2
+  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.3
   By R. Belmont.
 
   Copyright R. Belmont.
@@ -33,6 +33,7 @@
   2.1.2 (RB) - Fixed SoundSmith POLY.SYNTH inst where one-shot on the even oscillator and swap on the odd should loop.
                Conversely, the intro voice in FTA Delta Demo has swap on the even and one-shot on the odd and doesn't
                want to loop.
+  2.1.3 (RB) - Fixed oscillator enable register off-by-1 which caused everything to be half a step sharp.
 */
 
 #include "emu.h"
@@ -69,7 +70,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }
@@ -144,7 +145,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	for (int chan = 0; chan < output_channels; chan++)
 	{
-		for (osc = 0; osc < (oscsenabled+1); osc++)
+		for (osc = 0; osc < oscsenabled; osc++)
 		{
 			ES5503Osc *pOsc = &oscillators[osc];
 
@@ -231,15 +232,15 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
 	oscsenabled = 1;
-	output_rate = (clock() / 8) / (2 + oscsenabled);
+	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 void es5503_device::device_clock_changed()
 {
-	output_rate = (clock() / 8) / (2 + oscsenabled);
+	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream->set_sample_rate(output_rate);
 
 	m_mix_buffer.resize((output_rate/50)*8);
@@ -325,7 +326,7 @@ u8 es5503_device::read(offs_t offset)
 				m_irq_func(0);
 
 				// scan all oscillators
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -341,7 +342,7 @@ u8 es5503_device::read(offs_t offset)
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -353,7 +354,7 @@ u8 es5503_device::read(offs_t offset)
 				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
-				return oscsenabled<<1;
+				return (oscsenabled - 1) << 1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();
@@ -427,7 +428,9 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xe1:  // oscillator enable
-				oscsenabled = (data>>1) & 0x1f;
+				// The number here is the number of oscillators to enable -1 times 2.  You can never
+				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
+				oscsenabled = ((data>>1) & 0x1f) + 1;
 				notify_clock_changed();
 				break;
 

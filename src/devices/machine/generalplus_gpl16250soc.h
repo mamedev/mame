@@ -194,7 +194,7 @@ protected:
 	uint16_t m_system_dma_memtype;
 
 	devcb_read16 m_nand_read_cb;
-	int m_csbase;
+	uint32_t m_csbase;
 
 	uint16_t internalrom_lower32_r(offs_t offset);
 
@@ -360,7 +360,7 @@ private:
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	inline uint16_t read_space(uint32_t offset);
 	inline void write_space(uint32_t offset, uint16_t data);
@@ -472,7 +472,9 @@ public:
 		generalplus_gpspi_direct_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
-		m_csbase = 0x30000;
+		//m_csbase = 0x30000;
+		// TODO: is cs_space even used by this type?
+		m_csbase = 0xffffffff;
 	}
 
 	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -480,11 +482,22 @@ public:
 protected:
 	void gpspi_direct_internal_map(address_map &map);
 
-	//virtual void device_start() override;
-	//virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
+	uint16_t ramread_r(offs_t offset);
+	void ramwrite_w(offs_t offset, uint16_t data);
 	uint16_t spi_direct_7b40_r();
+	uint16_t spi_direct_7b46_r();
+	uint16_t spi_direct_7af0_r();
+	void spi_direct_7af0_w(uint16_t data);
+	uint16_t spi_direct_79f5_r();
+	uint16_t spi_direct_78e8_r();
+	void spi_direct_78e8_w(uint16_t data);
+	uint16_t spi_direct_79f4_r();
+
+	uint16_t m_7af0;
 };
 
 

@@ -63,6 +63,7 @@ Timings:
 #include "emu.h"
 #include "includes/dai.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

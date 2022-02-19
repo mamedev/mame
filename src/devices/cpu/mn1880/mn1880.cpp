@@ -363,6 +363,7 @@ u8 mn1880_device::cpu_registers::addcz(u8 data1, u8 data2, bool carry, bool hold
 	return data1;
 }
 
+// 4-bit decimal add with carry (without adjust)
 u8 mn1880_device::cpu_registers::adddcz(u8 data1, u8 data2, bool carry)
 {
 	if (((data1 & 0x0f) + (data2 & 0x0f) + (carry ? 1 : 0)) >= 0x0a)
@@ -391,6 +392,7 @@ u8 mn1880_device::cpu_registers::subcz(u8 data1, u8 data2, bool carry, bool hold
 	return data1;
 }
 
+// 4-bit decimal subtract with carry (without adjust)
 u8 mn1880_device::cpu_registers::subdcz(u8 data1, u8 data2, bool carry)
 {
 	if ((data1 & 0x0f) < (data2 & 0x0f) + (carry ? 1 : 0))
@@ -439,18 +441,11 @@ u8 mn1880_device::cpu_registers::rorc(u8 data)
 
 u8 mn1880_device::cpu_registers::asrc(u8 data)
 {
-	if (BIT(data, 7))
-	{
-		if (!BIT(data, 0))
-			fs &= 0x7f;
-		return (data >> 1) | 0x80;
-	}
+	if (BIT(data, 0))
+		fs |= 0x80;
 	else
-	{
-		if (BIT(data, 0))
-			fs |= 0x80;
-		return data >> 1;
-	}
+		fs &= 0x7f;
+	return (data >> 1) | (data & 0x80);
 }
 
 void mn1880_device::cpu_registers::branch(u16 label)

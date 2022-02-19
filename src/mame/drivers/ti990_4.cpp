@@ -78,7 +78,7 @@ private:
 	void memmap(address_map &map);
 
 	void        hold_load();
-	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	int         m_intlines;
 	int         m_int_level;
 	emu_timer*  m_nmi_timer;
@@ -107,7 +107,7 @@ void ti990_4_state::hold_load()
 /*
     LOAD interrupt trigger callback
 */
-void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_maincpu->set_input_line(INT_9900_LOAD, CLEAR_LINE);
 	logerror("ti990_4: Released LOAD interrupt\n");

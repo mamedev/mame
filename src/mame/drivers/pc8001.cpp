@@ -40,6 +40,7 @@
 #include "emu.h"
 #include "includes/pc8001.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 WRITE_LINE_MEMBER( pc8001_base_state::crtc_reverse_w )

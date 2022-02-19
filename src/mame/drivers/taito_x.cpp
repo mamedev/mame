@@ -218,6 +218,122 @@ Notes:
                HSync: 15.22kHz
 
 
+Superman
+Taito, 1988
+
+PCB Layout
+----------
+
+J1100145A
+K1100331A
+P0-039A
+|---------------------------------------------------|
+| VOL                        B50-07.U34  DSWB DSWA  |
+|      4558       YM2610 Z80  62256              Z80|
+|      4558 YM3014                                  |
+|                                                   |
+|                                  B06-13           |
+|                                   (PAL)           |
+|                                                   |
+|                                                   |
+|                               6264       B50-06.U3|
+|J     TESTSW                                       |
+|A                                                  |
+|M                                                  |
+|M                                                  |
+|A                                 B06-101          |
+|                                    (PAL)          |
+|                                                Z80|
+|               X1-001A                             |
+|                                                   |
+|    X1-004                                         |
+|               X1-002A       12MHz                 |
+|                                                   |
+|         B50-01.U46    B50-03.U39                  |
+|   X1-006                         6264             |
+|X1-007        B50-02.U43   B50-04.U35     B50-05.U1|
+|---------------------------------------------------|
+Notes:
+      All Z80 CPU's running at 6.000MHz (12/2)
+      YM2203 running at 3.000Mz (12/4)
+      VSync 60Hz
+
+There is another version of Superman using a sub board for the graphics ROMs.
+The main program ROMs are the same as existing dumps but there are twice as many
+sub board ROMs in identical pairs. They are programmed in byte mode. When read
+in byte mode (by tying A-1 high and low), the 00's stripped out and both reads
+interleaved together (similar to how byte mode 16Mbit/32Mbit mask ROMs are read),
+the resulting ROM dumps match the existing main board ROM dumps exactly!
+The byte pin on the sub board connectors is not connected to the main board and
+instead, the byte pin on all the sub board ROMs is tied to ground, resulting in
+the ROMs being read in byte mode (8-bit). This is in contrast to the main board
+graphics ROMs where the byte pin is tied high, resulting in the ROMs being read
+in word mode (16-bit).
+For each of the pairs of ROMs on the sub board, the data is being read from
+the ROMs like this.....
+
+original ROM   -> 8-bit D0-D7 only (High or Low ROM)
+-------------------------------
+D0  -> D0 LOW ROM
+D8  -> D0 HIGH ROM
+D1  -> D1 LOW ROM
+D9  -> D1 HIGH ROM
+D2  -> D2 LOW ROM
+D10 -> D2 HIGH ROM
+D3  -> D3 LOW ROM
+D11 -> D3 HIGH ROM
+D4  -> D4 LOW ROM
+D12 -> D4 HIGH ROM
+D5  -> D5 LOW ROM
+D13 -> D5 HIGH ROM
+D6  -> D6 LOW ROM
+D14 -> D6 HIGH ROM
+D7  -> D7 LOW ROM
+D15 -> D7 HIGH ROM
+
+Why this sub board was made instead of using the existing ROM data (B61-14 to -17)
+is not understood.
+The only explanation is that the lower ROM numbers B61-02 to 05 compared to the
+main board ROMs numbers B61-14 to 17 suggests that the sub board version came
+first and later Taito realised they could use the same data in 16-bit mode to
+save 4 ROMs and thus save costs.
+
+If any of the sub board ROMs go bad (mask ROM fail often) the way to fix it is to
+simply program the original main board data from ROMs B61-14 to B61-17 to AM27C400
+EPROMs and plug them into the sub board. Obviously you will need to plug in TWO
+copies of each ROM, otherwise there will be graphical faults. Or just remove the
+sub board and program the original ROM data from B61-14 to B61-17 to AM27C400
+EPROMs and put them into the existing 4 sockets on the main board.
+
+
+Sub Board PCB Layout
+--------------------
+
+K9100202A J9100154A TAITO CORPORATION MADE IN JAPAN
+M4300117A SUPER MAN (sticker)
+K9100202A SUPER MAN
+|-------------------------------|
+| B61-02.U37-H                  |
+| B61-02.U37-L          U37-CN  |
+|                       U38-CN  |
+|                       U43-CN  |
+| B61-03.U38-H          U45-CN  |
+| B61-03.U38-L                  |
+|                               |
+|                               |
+| B61-04.U43-H                  |
+| B61-04.U43-L                  |
+|                  B61-05.U45-H |
+|                  B61-05.U45-L |
+|                               |
+|-------------------------------|
+Notes:
+      B61-xx - All ROMs are 40 pin mask ROMs type 234000, programmed in BYTE mode (8-bit)
+      Uxx-CN - Connectors joining to the main board where the original
+               B61-14 - B61-17 ROMs were on the version that does not use a sub board.
+
+***********************************************************************
+
 C-Chip notes
 ------------
 
@@ -1070,53 +1186,6 @@ void taitox_state::kyustrkr(machine_config &config)
   Game driver(s)
 
 ***************************************************************************/
-
-/*
-Superman
-Taito, 1988
-
-PCB Layout
-----------
-
-J1100145A
-K1100331A
-P0-039A
-|---------------------------------------------------|
-| VOL                        B50-07.U34  DSWB DSWA  |
-|      4558       YM2610 Z80  62256              Z80|
-|      4558 YM3014                                  |
-|                                                   |
-|                                  B06-13           |
-|                                   (PAL)           |
-|                                                   |
-|                                                   |
-|                               6264       B50-06.U3|
-|J     TESTSW                                       |
-|A                                                  |
-|M                                                  |
-|M                                                  |
-|A                                 B06-101          |
-|                                    (PAL)          |
-|                                                Z80|
-|               X1-001A                             |
-|                                                   |
-|    X1-004                                         |
-|               X1-002A       12MHz                 |
-|                                                   |
-|         B50-01.U46    B50-03.U39                  |
-|   X1-006                         6264             |
-|X1-007        B50-02.U43   B50-04.U35     B50-05.U1|
-|---------------------------------------------------|
-Notes:
-      All Z80 CPU's running at 6.000MHz (12/2)
-      YM2203 running at 3.000Mz (12/4)
-      VSync 60Hz
-
-NOTE: There is an alternate version that uses a daughter card (K9100202A J9100154A) to replace
-      the 4Mbit mask ROMs with two 2Mbit mask ROMs. These ROMs are B61-02 through B61-05, high
-      and low for each.
-
-*/
 
 ROM_START( superman )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code

@@ -36,7 +36,7 @@ BK8T - Keys to navigate initial config screen are mostly unknown
 #include "machine/pit8253.h"
 #include "formats/pk8020_dsk.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Address maps */

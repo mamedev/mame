@@ -117,6 +117,34 @@ Parts:
 |-----------------------------------------------------------------------|
 
 
+PCM ROM address/data line scrambling:
+
+     address              data
+external internal   external internal
+   A0 - - -  A0        D0 - - - D2
+   A1 - - -  A5        D1 - - - D7
+   A2 - - -  A4        D2 - - - D6
+   A3 - - -  A6        D3 - - - D4
+   A4 - - -  A1        D4 - - - D1
+   A5 - - -  A2        D5 - - - D3
+   A6 - - -  A3        D6 - - - D0
+   A7 - - -  A8        D7 - - - D5
+   A8 - - - A10
+   A9 - - - A13
+  A10 - - -  A9
+  A11 - - -  A7
+  A12 - - - A11
+  A13 - - - A12
+  A14 - - - A16
+  A15 - - - A14
+  A16 - - - A15
+  A17 - - - A17
+  A18 - - - A18
+
+Line scramling of A0..A6 and D0..D7 matches the SN-U110 cards.
+For A7..A16 they changed the scrambling.
+
+
 PCM ROM Tables
 --------------
 Sample Table (address: 0x00100)
@@ -234,6 +262,7 @@ Some routine locations
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

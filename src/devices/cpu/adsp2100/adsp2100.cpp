@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ADSP2100.c
+    adsp2100.cpp
 
     ADSP-21xx series emulator.
 
@@ -61,8 +61,8 @@
 
         Program Space:                                  Program Space:
             0000-01ff = 512 Internal RAM (booted)           0000-37ff = 14k External access
-            0400-07ff = 1k Reserved                         3800-3bff = 1k Internal RAM
-            0800-3fff = 14k External access                 3c00-3fff = 1k Reserved
+            0200-07ff = 1.5k Reserved                       3800-39ff = 512 Internal RAM
+            0800-3fff = 14k External access                 3a00-3fff = 1.5k Reserved
 
         Data Space:                                     Data Space:
             0000-03ff = 1k External DWAIT0                  0000-03ff = 1k External DWAIT0
@@ -71,7 +71,7 @@
             3000-33ff = 1k External DWAIT3                  3000-33ff = 1k External DWAIT3
             3400-37ff = 1k External DWAIT4                  3400-37ff = 1k External DWAIT4
             3800-38ff = 256 Internal RAM                    3800-38ff = 256 Internal RAM
-            3a00-3bff = 512 Reserved                        3a00-3bff = 512 Reserved
+            3900-3bff = 768 Reserved                        3900-3bff = 768 Reserved
             3c00-3fff = 1k Internal Control regs            3c00-3fff = 1k Internal Control regs
 
 
@@ -80,12 +80,16 @@
 
         MMAP = 0                                        MMAP = 1
 
+        Auto boot loading via BDMA or IDMA              No auto boot loading
+
         Program Space:                                  Program Space:
             0000-1fff = 8k Internal RAM                     0000-1fff = 8k External access
-            2000-3fff = 8k Internal RAM or Overlay          2000-3fff = 8k Internal
+            2000-3fff = 8k Internal RAM (PMOVLAY = 0)       2000-3fff = 8k Internal (PMOVLAY = 0)
+            2000-3fff = 8k External (PMOVLAY = 1,2)
 
         Data Space:                                     Data Space:
-            0000-1fff = 8k Internal RAM or Overlay          0000-1fff = 8k Internal RAM or Overlay
+            0000-1fff = 8k Internal RAM (DMOVLAY = 0)       0000-1fff = 8k Internal RAM (DMOVLAY = 0)
+            0000-1fff = 8k External (DMOVLAY = 1,2)         0000-1fff = 8k External (DMOVLAY = 1,2)
             2000-3fdf = 8k-32 Internal RAM                  2000-3fdf = 8k-32 Internal RAM
             3fe0-3fff = 32 Internal Control regs            3fe0-3fff = 32 Internal Control regs
 
@@ -94,6 +98,10 @@
             0200-03ff = 512 External IOWAIT1                0200-03ff = 512 External IOWAIT1
             0400-05ff = 512 External IOWAIT2                0400-05ff = 512 External IOWAIT2
             0600-07ff = 512 External IOWAIT3                0600-07ff = 512 External IOWAIT3
+
+    TODO:
+    - Move internal stuffs into CPU core file (on-chip RAM, control registers, etc)
+    - Support variable internal memory mappings
 
 ***************************************************************************/
 
@@ -137,6 +145,8 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 		m_astat_clear(0),
 		m_idle(0),
 		m_px(0),
+		m_pmovlay(0),
+		m_dmovlay(0),
 		m_pc_sp(0),
 		m_cntr_sp(0),
 		m_stat_sp(0),
@@ -467,6 +477,8 @@ void adsp21xx_device::device_start()
 	save_item(NAME(m_lmask));
 	save_item(NAME(m_base));
 	save_item(NAME(m_px));
+	save_item(NAME(m_pmovlay));
+	save_item(NAME(m_dmovlay));
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppc));
@@ -587,6 +599,12 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_FL1,     "FL1",       m_fl1).mask(1);
 	state_add(ADSP2100_FL2,     "FL2",       m_fl2).mask(1);
 
+	if (m_chip_type == CHIP_TYPE_ADSP2181)
+	{
+		state_add(ADSP2100_PMOVLAY, "PMOVLAY",   m_pmovlay);
+		state_add(ADSP2100_DMOVLAY, "DMOVLAY",   m_dmovlay);
+	}
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 }
@@ -610,6 +628,14 @@ void adsp21xx_device::device_reset()
 	write_reg2(0x09, m_l[5]);   write_reg2(0x01, m_i[5]);
 	write_reg2(0x0a, m_l[6]);   write_reg2(0x02, m_i[6]);
 	write_reg2(0x0b, m_l[7]);   write_reg2(0x03, m_i[7]);
+
+	// reset overlays
+	if (m_chip_type == CHIP_TYPE_ADSP2181)
+	{
+		m_pmovlay = m_dmovlay = 0;
+		// PMOVLAY
+		update_dmovlay();
+	}
 
 	// reset PC and loops
 	m_pc = (m_chip_type >= CHIP_TYPE_ADSP2101) ? 0 : 4;
@@ -641,6 +667,21 @@ void adsp21xx_device::device_reset()
 	m_imask = 0;
 	for (int irq = 0; irq < 10; irq++)
 		m_irq_state[irq] = m_irq_latch[irq] = CLEAR_LINE;
+}
+
+
+//-------------------------------------------------
+//  device_post_load - called after loading a saved state
+//-------------------------------------------------
+
+void adsp21xx_device::device_post_load()
+{
+	// update overlays
+	if (m_chip_type == CHIP_TYPE_ADSP2181)
+	{
+		// PMOVLAY
+		update_dmovlay();
+	}
 }
 
 
@@ -726,6 +767,11 @@ void adsp21xx_device::state_import(const device_state_entry &entry)
 		case ADSP2100_L6:
 		case ADSP2100_L7:
 			update_l(entry.index() - ADSP2100_L0);
+			break;
+
+		// PMOVLAY
+		case ADSP2100_DMOVLAY:
+			update_dmovlay();
 			break;
 
 		default:
@@ -1048,7 +1094,7 @@ void adsp21xx_device::create_tables()
 	// initialize the mask table
 	for (int i = 0; i < 0x4000; i++)
 	{
-				if (i > 0x2000) m_mask_table[i] = 0x0000;
+		if (i > 0x2000)      m_mask_table[i] = 0x0000;
 		else if (i > 0x1000) m_mask_table[i] = 0x2000;
 		else if (i > 0x0800) m_mask_table[i] = 0x3000;
 		else if (i > 0x0400) m_mask_table[i] = 0x3800;

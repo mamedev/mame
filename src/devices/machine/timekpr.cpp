@@ -18,6 +18,8 @@
 #include "machine/timekpr.h"
 #include "machine/timehelp.h"
 
+#include "fileio.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_TICKS   (1U << 1)
 
@@ -268,7 +270,7 @@ void timekeeper_device::counters_from_ram()
 	m_century = counter_from_ram(&m_data[0], m_offset_century);
 }
 
-void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOGMASKED(LOG_TICKS, "Tick\n");
 	if ((m_seconds & SECONDS_ST) != 0 ||

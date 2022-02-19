@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "sound/awacs.h"
 #include "speaker.h"
 

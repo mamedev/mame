@@ -31,7 +31,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -49,7 +49,7 @@ private:
 
 DECLARE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device)
 
-void iphone2g_spi_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void iphone2g_spi_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_out_irq_func(1);
 }
@@ -138,7 +138,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -161,7 +161,7 @@ private:
 
 DECLARE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device)
 
-void iphone2g_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void iphone2g_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_out_irq_func(1);
 }

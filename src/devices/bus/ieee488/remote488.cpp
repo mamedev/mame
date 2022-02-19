@@ -403,7 +403,7 @@ void remote488_device::process_input_msgs()
 	}
 }
 
-void remote488_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void remote488_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case TMR_ID_POLL:

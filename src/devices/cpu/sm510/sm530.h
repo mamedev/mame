@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sm510.h"
+#include "sm511.h"
 
 
 class sm530_device : public sm511_device
@@ -32,7 +32,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 3 - 1) / 3; } // 3 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 3); } // "
 	virtual void execute_one() override;
-	virtual void get_opcode_param() override;
+	virtual bool op_argument() override;
 
 	using sm510_base_device::do_branch;
 	virtual void do_branch(u8 pu, u8 pl); // does not have Pm
@@ -56,7 +56,6 @@ class sm531_device : public sm530_device
 public:
 	sm531_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
-
 
 
 DECLARE_DEVICE_TYPE(SM530, sm530_device)

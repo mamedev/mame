@@ -92,7 +92,7 @@ void midway_cheap_squeak_deluxe_device::device_start()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_cheap_squeak_deluxe_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midway_cheap_squeak_deluxe_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_pia->ca1_w(param);
 

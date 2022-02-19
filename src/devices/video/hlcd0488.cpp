@@ -55,7 +55,7 @@ void hlcd0488_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void hlcd0488_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hlcd0488_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Latch pulse, when high, resets the %8 latch address counter
 	if (m_latch_pulse)

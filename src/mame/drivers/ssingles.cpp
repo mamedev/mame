@@ -30,7 +30,7 @@ Computer Quiz Atama no Taisou
 
 -----------------------------------------
 TZU-093
-CPU: Z80(IC9) surface scrached Z80?(IC28)
+CPU: Z80(IC9) surface scratched Z80?(IC28)
 Sound: AY-3-8910 x2
 OSC: 14.000MHz
 RAMs:
@@ -50,7 +50,7 @@ CC.48        [209cab0d]  |
 CB.47        [8bc85c0c]  |
 CD.46        [22e8d103] /
 
-IC36.BIN     [643e3077] (surface scrached, 27C256)
+IC36.BIN     [643e3077] (surface scratched, 27C256)
 IC35.BIN     [fe0302a0]  |
 IC34.BIN     [06e7c7da]  |
 IC33.BIN     [323a70e7] /

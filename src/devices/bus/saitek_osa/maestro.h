@@ -77,7 +77,6 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_config_complete() override;
 
 private:
 	required_device<hd44780_device> m_lcd;

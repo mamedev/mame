@@ -161,10 +161,9 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 //-------------------------------------------------
 base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_md_cart_interface>(mconfig, *this),
-	m_type(SEGA_STD), m_cart(nullptr),
-	m_must_be_loaded(1)
+	m_type(SEGA_STD), m_cart(nullptr)
 {
 }
 

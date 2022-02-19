@@ -23,9 +23,9 @@ public:
 
 	void set_is_sudoku();
 	void set_is_pvmilfin();
-	void set_use_spritepages() { m_use_spritepages = true; };
-	void set_force_transpen_ff() { m_force_transpen_ff = true; };
-	void set_force_basic_scroll() { m_force_basic_scroll = true; };
+	void set_use_spritepages() { m_use_spritepages = true; }
+	void set_force_transpen_ff() { m_force_transpen_ff = true; }
+	void set_force_basic_scroll() { m_force_basic_scroll = true; }
 
 protected:
 	// device-level overrides

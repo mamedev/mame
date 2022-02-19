@@ -50,12 +50,14 @@ ToDo:
 // temporary
 #include "machine/keyboard.h"
 
+
+namespace {
+
 class z9001_state : public driver_device
 {
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_framecnt(0)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
@@ -79,11 +81,11 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_framecnt;
-	bool m_cassbit;
+	uint8_t m_framecnt = 0U;
+	bool m_cassbit = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -151,20 +153,22 @@ void z9001_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf000, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall ram over the rom shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void z9001_state::machine_start()
@@ -342,6 +346,8 @@ ROM_START( kc87_20 )
 ROM_END
 
 #define rom_kc87_21 rom_kc87_20
+
+} // anonymous namespace
 
 /* Driver */
 

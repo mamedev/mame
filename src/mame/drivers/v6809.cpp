@@ -71,7 +71,6 @@ class v6809_state : public driver_device
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_video_address(0)
 		, m_pia0(*this, "pia0")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
@@ -103,11 +102,11 @@ private:
 
 	void v6809_mem(address_map &map);
 
-	u16 m_video_address;
-	bool m_speaker_en;
-	u8 m_video_index;
-	u8 m_term_data;
-	u8 m_vidbyte;
+	u16 m_video_address = 0U;
+	bool m_speaker_en = 0;
+	u8 m_video_index = 0U;
+	u8 m_term_data = 0U;
+	u8 m_vidbyte = 0U;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;

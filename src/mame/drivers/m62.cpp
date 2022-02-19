@@ -213,12 +213,7 @@ void m62_state::battroad_map(address_map &map)
 
 void m62_state::battroad_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x80, 0x80).w(FUNC(m62_state::m62_vscroll_low_w));
 	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_high_w));
 	map(0x82, 0x82).w(FUNC(m62_state::m62_hscroll_low_w));
@@ -244,12 +239,7 @@ void m62_state::ldrun2_map(address_map &map)
 
 void m62_state::ldrun2_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x80, 0x80).r(FUNC(m62_state::ldrun2_bankswitch_r));
 	map(0x80, 0x81).w(FUNC(m62_state::ldrun2_bankswitch_w));
 }
@@ -267,12 +257,7 @@ void m62_state::ldrun3_map(address_map &map)
 
 void m62_state::ldrun3_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x80, 0x80).w(FUNC(m62_state::m62_vscroll_low_w));
 	map(0x81, 0x81).w(FUNC(m62_state::ldrun3_topbottom_mask_w));
 }
@@ -289,12 +274,7 @@ void m62_state::ldrun4_map(address_map &map)
 
 void m62_state::ldrun4_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x82, 0x82).w(FUNC(m62_state::m62_hscroll_high_w));
 	map(0x83, 0x83).w(FUNC(m62_state::m62_hscroll_low_w));
 }
@@ -320,12 +300,7 @@ void m62_state::kidniki_map(address_map &map)
 
 void m62_state::kidniki_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x80, 0x80).w(FUNC(m62_state::m62_hscroll_low_w));
 	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_high_w));
 	map(0x82, 0x82).w(FUNC(m62_state::kidniki_text_vscroll_low_w));
@@ -377,12 +352,7 @@ void m62_state::youjyudn_map(address_map &map)
 
 void m62_state::youjyudn_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
+	kungfum_io_map(map);
 	map(0x80, 0x80).w(FUNC(m62_state::m62_hscroll_high_w));
 	map(0x81, 0x81).w(FUNC(m62_state::m62_hscroll_low_w));
 	map(0x83, 0x83).w(FUNC(m62_state::youjyudn_bankswitch_w));
@@ -398,7 +368,7 @@ void m62_state::horizon_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( common )
+INPUT_PORTS_START( m62_common )
 	PORT_START("SYSTEM")
 	/* Start 1 & 2 also restarts and freezes the game with stop mode on
 	   and are used in test mode to enter and esc the various tests */
@@ -448,8 +418,8 @@ static INPUT_PORTS_START( common )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( kungfum )
-	PORT_INCLUDE( common )
+INPUT_PORTS_START( kungfum )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	/* In slowmo mode, press 2 to slow game speed */
@@ -483,7 +453,7 @@ static INPUT_PORTS_START( kungfum )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( battroad )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -509,7 +479,7 @@ static INPUT_PORTS_START( battroad )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ldrun )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -537,7 +507,7 @@ static INPUT_PORTS_START( ldrun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ldrun2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -566,7 +536,7 @@ static INPUT_PORTS_START( ldrun2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ldrun3 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -595,7 +565,7 @@ static INPUT_PORTS_START( ldrun3 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ldrun4 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x02, 0x02, "2 Players Lives" ) PORT_DIPLOCATION("SW2:2")
@@ -629,7 +599,7 @@ static INPUT_PORTS_START( ldrun4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lotlot )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
@@ -656,7 +626,7 @@ static INPUT_PORTS_START( lotlot )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kidniki )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x08, 0x08, "Game Repeats" ) PORT_DIPLOCATION("SW2:4")
@@ -686,7 +656,7 @@ static INPUT_PORTS_START( kidniki )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spelunkr )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:4")
@@ -716,7 +686,7 @@ static INPUT_PORTS_START( spelunkr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spelunk2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	/* Factory shipment setting is all OFF */
 	PORT_MODIFY("DSW2")
@@ -746,7 +716,7 @@ static INPUT_PORTS_START( spelunk2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( youjyudn )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4")
@@ -772,7 +742,7 @@ static INPUT_PORTS_START( youjyudn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( horizon )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( m62_common )
 
 	PORT_MODIFY("DSW2")
 	/* In freeze mode, press 2 to stop and 1 to restart */

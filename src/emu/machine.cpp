@@ -6,69 +6,10 @@
 
     Controls execution of the core MAME system.
 
-****************************************************************************
-
-    Since there has been confusion in the past over the order of
-    initialization and other such things, here it is, all spelled out
-    as of January, 2008:
-
-    main()
-        - does platform-specific init
-        - calls mame_execute() [mame.c]
-
-        mame_execute() [mame.c]
-            - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-            - begins resource tracking (level 1)
-            - calls create_machine [mame.c] to initialize the running_machine structure
-            - calls init_machine() [mame.c]
-
-            init_machine() [mame.c]
-                - calls fileio_init() [fileio.c] to initialize file I/O info
-                - calls config_init() [config.c] to initialize configuration system
-                - calls input_init() [input.c] to initialize the input system
-                - calls output_init() [output.c] to initialize the output system
-                - calls state_init() [state.c] to initialize save state system
-                - calls state_save_allow_registration() [state.c] to allow registrations
-                - calls palette_init() [palette.c] to initialize palette system
-                - calls render_init() [render.c] to initialize the rendering system
-                - calls ui_init() [ui.c] to initialize the user interface
-                - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
-                - calls timer_init() [timer.c] to reset the timer system
-                - calls osd_init() [osdepend.h] to do platform-specific initialization
-                - calls input_port_init() [inptport.c] to set up the input ports
-                - calls rom_init() [romload.c] to load the game's ROMs
-                - calls memory_init() [memory.c] to process the game's memory maps
-                - calls the driver's DRIVER_INIT callback
-                - calls device_list_start() [devintrf.c] to start any devices
-                - calls video_init() [video.c] to start the video system
-                - calls tilemap_init() [tilemap.c] to start the tilemap system
-                - calls crosshair_init() [crsshair.c] to configure the crosshairs
-                - calls sound_init() [sound.c] to start the audio system
-                - calls debugger_init() [debugger.c] to set up the debugger
-                - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
-                - calls cheat_init() [cheat.c] to initialize the cheat system
-                - calls image_init() [image.c] to initialize the image system
-
-            - calls config_load_settings() [config.c] to load the configuration file
-            - calls nvram_load [machine/generic.c] to load NVRAM
-            - calls ui_display_startup_screens() [ui.c] to display the startup screens
-            - begins resource tracking (level 2)
-            - calls soft_reset() [mame.c] to reset all systems
-
-                -------------------( at this point, we're up and running )----------------------
-
-            - calls scheduler->timeslice() [schedule.c] over and over until we exit
-            - ends resource tracking (level 2), freeing all auto_mallocs and timers
-            - calls the nvram_save() [machine/generic.c] to save NVRAM
-            - calls config_save_settings() [config.c] to save the game's configuration
-            - calls all registered exit routines [mame.c]
-            - ends resource tracking (level 1), freeing all auto_mallocs and timers
-
-        - exits the program
-
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
@@ -76,22 +17,27 @@
 #include "render.h"
 #include "uiinput.h"
 #include "crsshair.h"
-#include "unzip.h"
 #include "debug/debugvw.h"
 #include "debug/debugcpu.h"
 #include "dirtc.h"
+#include "fileio.h"
 #include "image.h"
 #include "network.h"
 #include "romload.h"
 #include "tilemap.h"
 #include "natkeyboard.h"
 #include "ui/uimain.h"
+#include "http.h"
+
 #include "corestr.h"
-#include <ctime>
+#include "unzip.h"
+
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#if defined(EMSCRIPTEN) && !defined(__LIBRETRO__)
+#include <ctime>
+
+#if defined(__EMSCRIPTEN__) && !defined(__LIBRETRO__)
 #include <emscripten.h>
 #endif
 
@@ -502,7 +448,7 @@ void running_machine::schedule_soft_reset()
 //-------------------------------------------------
 //  get_statename - allow to specify a subfolder of
 //  the state directory for state loading/saving,
-//  very useful for MESS and consoles or computers
+//  very useful for consoles or computers
 //  where you can have separate folders for diff
 //  software
 //-------------------------------------------------
@@ -650,10 +596,10 @@ void running_machine::schedule_save(std::string &&filename)
 //  immediate_save - save state.
 //-------------------------------------------------
 
-void running_machine::immediate_save(const char *filename)
+void running_machine::immediate_save(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::SAVE;
@@ -687,10 +633,10 @@ void running_machine::schedule_load(std::string &&filename)
 //  immediate_load - load state.
 //-------------------------------------------------
 
-void running_machine::immediate_load(const char *filename)
+void running_machine::immediate_load(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::LOAD;
@@ -1002,7 +948,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, s32 param)
+void running_machine::soft_reset(s32 param)
 {
 	logerror("Soft reset\n");
 
@@ -1029,6 +975,17 @@ void running_machine::logfile_callback(const char *buffer)
 		m_logfile->puts(buffer);
 		m_logfile->flush();
 	}
+}
+
+
+//-------------------------------------------------
+//  steal_debuglogfile - relinquish ownership of
+//  the debug.log file
+//-------------------------------------------------
+
+std::unique_ptr<emu_file> running_machine::steal_debuglogfile()
+{
+	return std::move(m_debuglogfile);
 }
 
 
@@ -1181,6 +1138,7 @@ void running_machine::nvram_load()
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (!file.open(nvram_filename(nvram.device())))
 		{
+			// FIXME: don't swallow errors
 			nvram.nvram_load(file);
 			file.close();
 		}
@@ -1203,6 +1161,7 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				// FIXME: don't swallow errors
 				nvram.nvram_save(file);
 				file.close();
 			}

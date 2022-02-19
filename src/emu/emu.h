@@ -18,6 +18,9 @@
 #ifndef __EMU_H__
 #define __EMU_H__
 
+// get forward declarations before anything else
+#include "emufwd.h"
+
 #include <list>
 #include <forward_list>
 #include <vector>
@@ -34,17 +37,14 @@
 #include "attotime.h"
 #include "profiler.h"
 
-// http interface helpers
-#include "http.h"
-
 // commonly-referenced utilities imported from lib/util
 #include "corealloc.h"
+#include "corefile.h"
+#include "delegate.h"
+#include "hash.h"
 #include "palette.h"
 
 // emulator-specific utilities
-#include "hash.h"
-#include "fileio.h"
-#include "delegate.h"
 #include "devdelegate.h"
 
 // memory and address spaces

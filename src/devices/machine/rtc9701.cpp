@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "machine/rtc9701.h"
 
+#include "fileio.h"
+
 
 ALLOW_SAVE_TYPE(rtc9701_device::state_t);
 

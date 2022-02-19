@@ -303,7 +303,7 @@ void htmusic_device::device_reset()
 #define INVERT(c) (BIT(CTL(c), 4))
 #define PAN(c) (CTL(c) & 0x0f)
 
-void htmusic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void htmusic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// 4-bit channel select
 	uint8_t channel = (m_counter >> 3) & 0x0f;

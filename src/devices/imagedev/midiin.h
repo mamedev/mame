@@ -35,21 +35,22 @@ public:
 	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const noexcept override { return IO_MIDIIN; }
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "mid"; }
 	virtual bool core_opens_image_file() const noexcept override { return false; }
+	virtual const char *image_type_name() const noexcept override { return "midiin"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "min"; }
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// serial overrides
 	virtual void tra_complete() override;    // Tx completed sending byte
@@ -61,6 +62,7 @@ private:
 	void xmit_char(uint8_t data);
 
 	std::unique_ptr<osd_midi_device> m_midi;
+	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
 	uint8_t m_xmitring[XMIT_RING_SIZE];

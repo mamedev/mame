@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-19 02:50+1100\n"
-"PO-Revision-Date: 2021-11-19 09:33+0800\n"
+"POT-Creation-Date: 2021-12-09 04:44+1100\n"
+"PO-Revision-Date: 2021-12-09 14:25+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -274,12 +274,12 @@ msgstr "%1$s %2$s ( %3$d / %4$d 軟體套件 )"
 msgid "Driver: \"%1$s\" software list "
 msgstr "驅動程式： \"%1$s\" 軟體清單 "
 
-#: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1066
+#: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s： %2$s - 搜尋： %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1068
+#: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1078
 #, c-format
 msgid "Search: %1$s_"
 msgstr "搜尋： %1$s_"
@@ -289,7 +289,7 @@ msgstr "搜尋： %1$s_"
 msgid "Software list/item: %1$s:%2$s"
 msgstr "軟體列表/項目: %1$s:%2$s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:165
+#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:161
 msgid "Sound Options"
 msgstr "聲音選項"
 
@@ -384,12 +384,12 @@ msgid "Show mouse pointer"
 msgstr "顯示滑鼠指標"
 
 #: src/frontend/mame/ui/submenu.cpp:39
-msgid "Confirm quit from machines"
-msgstr "確認離開機台"
+msgid "Confirm quit from emulation"
+msgstr "確認離開模擬"
 
 #: src/frontend/mame/ui/submenu.cpp:40
-msgid "Skip information screen at startup"
-msgstr "略過起始的資訊畫面"
+msgid "Skip system information screen"
+msgstr "略過系統資訊畫面"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -404,8 +404,8 @@ msgid "Skip BIOS selection menu"
 msgstr "略過 BIOS 選擇選單"
 
 #: src/frontend/mame/ui/submenu.cpp:44
-msgid "Skip software parts selection menu"
-msgstr "略過軟體部分選擇選單"
+msgid "Skip software part selection menu"
+msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -556,7 +556,7 @@ msgid "UI active"
 msgstr "UI 啟動"
 
 #: src/frontend/mame/ui/submenu.cpp:91
-msgid "Offscreen reload"
+msgid "Off-screen reload"
 msgstr "畫面外重新裝填"
 
 #: src/frontend/mame/ui/submenu.cpp:92
@@ -572,8 +572,8 @@ msgid "Natural keyboard"
 msgstr "自然鍵盤"
 
 #: src/frontend/mame/ui/submenu.cpp:95
-msgid "Simultaneous contradictory"
-msgstr "同時發生的對立狀況"
+msgid "Allow contradictory joystick inputs"
+msgstr "允許搖桿輸入的對立狀況"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -596,8 +596,8 @@ msgid "Pedal Device Assignment"
 msgstr "分配踏板裝置"
 
 #: src/frontend/mame/ui/submenu.cpp:106
-msgid "Adstick Device Assignment"
-msgstr "分配 Adstick 裝置"
+msgid "AD Stick Device Assignment"
+msgstr "分配 AD 搖桿裝置"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
@@ -683,14 +683,14 @@ msgstr "同步更新"
 msgid "Wait Vertical Sync"
 msgstr "等待垂直同步"
 
-#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:687
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:689
 #: src/frontend/mame/ui/videoopt.cpp:191 src/frontend/mame/ui/custui.cpp:490
 #: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "開"
 
-#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:690
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:692
 #: src/frontend/mame/ui/videoopt.cpp:207 src/frontend/mame/ui/custui.cpp:490
 #: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
@@ -698,11 +698,11 @@ msgstr "開"
 msgid "Off"
 msgstr "關"
 
-#: src/frontend/mame/ui/menu.cpp:693
+#: src/frontend/mame/ui/menu.cpp:695
 msgid "Auto"
 msgstr "自動"
 
-#: src/frontend/mame/ui/menu.cpp:1195
+#: src/frontend/mame/ui/menu.cpp:1197
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Return to Previous Menu"
@@ -710,7 +710,7 @@ msgstr "回上一層選單"
 
 #: src/frontend/mame/ui/filemngr.cpp:139
 #: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:559 src/frontend/mame/ui/analogipt.cpp:360
+#: src/frontend/mame/ui/inputmap.cpp:563 src/frontend/mame/ui/analogipt.cpp:360
 #, c-format
 msgid "[root%1$s]"
 msgstr "[root%1$s]"
@@ -969,22 +969,22 @@ msgstr ""
 "CPU：\n"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "GHz"
 msgstr "GHz"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "MHz"
 msgstr "MHz"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "kHz"
 msgstr "kHz"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "Hz"
 msgstr "Hz"
 
@@ -1012,38 +1012,38 @@ msgstr "無\n"
 msgid "Vector"
 msgstr "向量"
 
-#: src/frontend/mame/ui/info.cpp:480
+#: src/frontend/mame/ui/info.cpp:483
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:480
+#: src/frontend/mame/ui/info.cpp:483
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:497
+#: src/frontend/mame/ui/info.cpp:500
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "畫面 '%1$s'"
 
-#: src/frontend/mame/ui/info.cpp:499
+#: src/frontend/mame/ui/info.cpp:502
 msgid "Screen"
 msgstr "畫面"
 
-#: src/frontend/mame/ui/info.cpp:570 src/frontend/mame/ui/info.cpp:581
+#: src/frontend/mame/ui/info.cpp:573 src/frontend/mame/ui/info.cpp:584
 #, c-format
 msgid "%1$s:\n"
 msgstr "%1$s:\n"
 
-#: src/frontend/mame/ui/info.cpp:662
+#: src/frontend/mame/ui/info.cpp:665
 msgid "Not supported"
 msgstr "不支援"
 
-#: src/frontend/mame/ui/info.cpp:665
+#: src/frontend/mame/ui/info.cpp:668
 msgid "Partially supported"
 msgstr "部分支援"
 
-#: src/frontend/mame/ui/info.cpp:674
+#: src/frontend/mame/ui/info.cpp:677
 msgid "[empty]"
 msgstr "[ 空 ]"
 
@@ -1116,7 +1116,7 @@ msgid "Emulated"
 msgstr "模擬"
 
 #: src/frontend/mame/ui/keyboard.cpp:59 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:557 src/frontend/mame/ui/analogipt.cpp:358
+#: src/frontend/mame/ui/inputmap.cpp:561 src/frontend/mame/ui/analogipt.cpp:358
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr "%1$s [root%2$s]"
@@ -1476,7 +1476,7 @@ msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr "軟體列表/項目"
 
-#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2698
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2707
 msgid "Software List Info"
 msgstr "軟體列表資訊"
 
@@ -1597,7 +1597,7 @@ msgstr "儲存機台設定"
 msgid "Configure Machine:"
 msgstr "設定機台："
 
-#: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2638
+#: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2647
 msgid " (default)"
 msgstr " （預設）"
 
@@ -1618,7 +1618,7 @@ msgstr ""
 "按 %1$s 退出 \n"
 "按 %2$s 繼續模擬"
 
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:155
+#: src/frontend/mame/ui/info_pty.cpp:30
 msgid "Pseudo terminals"
 msgstr "偽終端"
 
@@ -1689,52 +1689,52 @@ msgstr "玩家 %1$d 控制"
 msgid "Other Controls"
 msgstr "其他控制"
 
-#: src/frontend/mame/ui/inputmap.cpp:227
+#: src/frontend/mame/ui/inputmap.cpp:231
 msgid "This machine has no configurable inputs."
 msgstr "此機台沒有可設定的輸入"
 
-#: src/frontend/mame/ui/inputmap.cpp:327
+#: src/frontend/mame/ui/inputmap.cpp:331
 msgid "Pressed"
 msgstr "按住"
 
-#: src/frontend/mame/ui/inputmap.cpp:397
+#: src/frontend/mame/ui/inputmap.cpp:401
 msgid "Invalid sequence entered"
 msgstr "輸入了無效序列"
 
-#: src/frontend/mame/ui/inputmap.cpp:542
+#: src/frontend/mame/ui/inputmap.cpp:546
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
 msgstr "%1$s 類比"
 
-#: src/frontend/mame/ui/inputmap.cpp:543
+#: src/frontend/mame/ui/inputmap.cpp:547
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
 msgstr "%1$s 類比增加"
 
-#: src/frontend/mame/ui/inputmap.cpp:544
+#: src/frontend/mame/ui/inputmap.cpp:548
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
 msgstr "%1$s 類比減少"
 
-#: src/frontend/mame/ui/inputmap.cpp:586
+#: src/frontend/mame/ui/inputmap.cpp:590
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr "按下 %1$s 設定\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:587
+#: src/frontend/mame/ui/inputmap.cpp:591
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr "按下 %1$s 加入\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:588
+#: src/frontend/mame/ui/inputmap.cpp:592
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr "按下 %1$s 清除\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:589
+#: src/frontend/mame/ui/inputmap.cpp:593
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr "按下 %1$s 還原預設值\n"
@@ -1802,7 +1802,7 @@ msgstr ""
 "按任意鍵繼續。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:273
-#: src/frontend/mame/ui/selgame.cpp:436
+#: src/frontend/mame/ui/selgame.cpp:443
 msgid "Configure Options"
 msgstr "設定選項"
 
@@ -2136,16 +2136,16 @@ msgstr "縮放 = %1$d"
 msgid "Expand to fit"
 msgstr "展開以符合"
 
-#: src/frontend/mame/ui/selgame.cpp:437
+#: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
 msgstr "設定機台"
 
-#: src/frontend/mame/ui/selgame.cpp:1050
+#: src/frontend/mame/ui/selgame.cpp:1060
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s （ %3$d / %4$d 機台 (%5$d BIOS) ）"
 
-#: src/frontend/mame/ui/selgame.cpp:1078
+#: src/frontend/mame/ui/selgame.cpp:1088
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "系統: %1$-.100s"
@@ -2167,10 +2167,10 @@ msgstr "結果將儲存至 %1$s"
 #: src/frontend/mame/ui/auditmenu.cpp:98
 #, c-format
 msgid ""
-"Auditing ROMs for machine %2$u of %3$u...\n"
+"Auditing media for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"正在驗證供機台 %2$u 的 %3$u ROM 檔...\n"
+"正在驗證供機台 %2$u 的 %3$u 媒體...\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
@@ -2188,13 +2188,13 @@ msgstr ""
 
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
-msgid "Audit ROMs for %1$u machines marked unavailable"
-msgstr "驗證標記為不可用的 %1$u 機台 ROM 檔"
+msgid "Audit media for %1$u machines marked unavailable"
+msgstr "驗證標記為不可用的 %1$u 機台媒體"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
-msgid "Audit ROMs for all %1$u machines"
-msgstr "驗證所有 %1$u 機台的 ROM 檔"
+msgid "Audit media for all %1$u machines"
+msgstr "驗證所有 %1$u 機台的媒體"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
@@ -2399,84 +2399,84 @@ msgctxt "color-sample"
 msgid "Clone"
 msgstr "相容版本"
 
-#: src/frontend/mame/ui/custui.cpp:914
+#: src/frontend/mame/ui/custui.cpp:906
 msgid "ARGB Settings"
 msgstr "ARGB 設定"
 
-#: src/frontend/mame/ui/custui.cpp:919 src/frontend/mame/ui/custui.cpp:922
+#: src/frontend/mame/ui/custui.cpp:911 src/frontend/mame/ui/custui.cpp:914
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "透明度"
 
-#: src/frontend/mame/ui/custui.cpp:927 src/frontend/mame/ui/custui.cpp:930
+#: src/frontend/mame/ui/custui.cpp:919 src/frontend/mame/ui/custui.cpp:922
 msgctxt "color-channel"
 msgid "Red"
 msgstr "紅"
 
-#: src/frontend/mame/ui/custui.cpp:935 src/frontend/mame/ui/custui.cpp:938
+#: src/frontend/mame/ui/custui.cpp:927 src/frontend/mame/ui/custui.cpp:930
 msgctxt "color-channel"
 msgid "Green"
 msgstr "綠"
 
-#: src/frontend/mame/ui/custui.cpp:943 src/frontend/mame/ui/custui.cpp:946
+#: src/frontend/mame/ui/custui.cpp:935 src/frontend/mame/ui/custui.cpp:938
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "藍"
 
-#: src/frontend/mame/ui/custui.cpp:949
+#: src/frontend/mame/ui/custui.cpp:941
 msgid "Choose from palette"
 msgstr "從色盤挑選"
 
-#: src/frontend/mame/ui/custui.cpp:996
+#: src/frontend/mame/ui/custui.cpp:988
 msgid "Color preview:"
 msgstr "顏色預覽："
 
-#: src/frontend/mame/ui/custui.cpp:1093
+#: src/frontend/mame/ui/custui.cpp:1085
 msgctxt "color-preset"
 msgid "White"
 msgstr "白"
 
-#: src/frontend/mame/ui/custui.cpp:1094
+#: src/frontend/mame/ui/custui.cpp:1086
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "銀"
 
-#: src/frontend/mame/ui/custui.cpp:1095
+#: src/frontend/mame/ui/custui.cpp:1087
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "灰"
 
-#: src/frontend/mame/ui/custui.cpp:1096
+#: src/frontend/mame/ui/custui.cpp:1088
 msgctxt "color-preset"
 msgid "Black"
 msgstr "黑"
 
-#: src/frontend/mame/ui/custui.cpp:1097
+#: src/frontend/mame/ui/custui.cpp:1089
 msgctxt "color-preset"
 msgid "Red"
 msgstr "紅"
 
-#: src/frontend/mame/ui/custui.cpp:1098
+#: src/frontend/mame/ui/custui.cpp:1090
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "橘"
 
-#: src/frontend/mame/ui/custui.cpp:1099
+#: src/frontend/mame/ui/custui.cpp:1091
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "黃"
 
-#: src/frontend/mame/ui/custui.cpp:1100
+#: src/frontend/mame/ui/custui.cpp:1092
 msgctxt "color-preset"
 msgid "Green"
 msgstr "綠"
 
-#: src/frontend/mame/ui/custui.cpp:1101
+#: src/frontend/mame/ui/custui.cpp:1093
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "藍"
 
-#: src/frontend/mame/ui/custui.cpp:1102
+#: src/frontend/mame/ui/custui.cpp:1094
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "紫"
@@ -2541,7 +2541,7 @@ msgid "Input (general)"
 msgstr "輸入設定 （一般）"
 
 #: src/frontend/mame/ui/mainmenu.cpp:123
-msgid "Input (this Machine)"
+msgid "Input (this machine)"
 msgstr "輸入設定 （本機台）"
 
 #: src/frontend/mame/ui/mainmenu.cpp:126
@@ -2579,6 +2579,10 @@ msgstr "檔案管理員"
 #: src/frontend/mame/ui/mainmenu.cpp:152
 msgid "Tape Control"
 msgstr "磁帶控制"
+
+#: src/frontend/mame/ui/mainmenu.cpp:155
+msgid "Pseudo Terminals"
+msgstr "偽終端"
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
@@ -2618,8 +2622,8 @@ msgstr "查閱外部文件"
 
 #: src/frontend/mame/ui/mainmenu.cpp:200
 #, c-format
-msgid "About %s"
-msgstr "關於 %s"
+msgid "About %1$s"
+msgstr "關於 %1$s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:212
 msgid "Select New Machine"
@@ -2778,15 +2782,15 @@ msgstr "驅動程式相容於： %1$s"
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:2235
+#: src/frontend/mame/ui/selmenu.cpp:2244
 msgid "Images"
 msgstr "圖片"
 
-#: src/frontend/mame/ui/selmenu.cpp:2236
+#: src/frontend/mame/ui/selmenu.cpp:2245
 msgid "Infos"
 msgstr "資訊"
 
-#: src/frontend/mame/ui/selmenu.cpp:2551
+#: src/frontend/mame/ui/selmenu.cpp:2560
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
@@ -2796,7 +2800,7 @@ msgstr ""
 "請取得正確的檔案或選擇不同的系統。\n"
 "\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2567
+#: src/frontend/mame/ui/selmenu.cpp:2576
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
@@ -2806,353 +2810,353 @@ msgstr ""
 "請取得正確的檔案或選擇不同的軟體項目。\n"
 "\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2583
+#: src/frontend/mame/ui/selmenu.cpp:2592
 msgid "incorrect checksum"
 msgstr "不正確的檢查碼"
 
-#: src/frontend/mame/ui/selmenu.cpp:2586
+#: src/frontend/mame/ui/selmenu.cpp:2595
 msgid "incorrect length"
 msgstr "不正確的長度"
 
-#: src/frontend/mame/ui/selmenu.cpp:2589
+#: src/frontend/mame/ui/selmenu.cpp:2598
 msgid "not found"
 msgstr "未找到"
 
-#: src/frontend/mame/ui/selmenu.cpp:2600
+#: src/frontend/mame/ui/selmenu.cpp:2609
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr "%1$s (%2$s) - %3$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2602
+#: src/frontend/mame/ui/selmenu.cpp:2611
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr "%1$s - %2$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2606
+#: src/frontend/mame/ui/selmenu.cpp:2615
 msgid "Press any key to continue."
 msgstr "按任意鍵繼續。"
 
-#: src/frontend/mame/ui/selmenu.cpp:2735
+#: src/frontend/mame/ui/selmenu.cpp:2744
 msgid "General Info"
 msgstr "一般資訊"
 
-#: src/frontend/mame/ui/selmenu.cpp:2887
+#: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
 msgid "Romset\t%1$s\n"
 msgstr "ROM組\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2888
+#: src/frontend/mame/ui/selmenu.cpp:2897
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "年代\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2889
+#: src/frontend/mame/ui/selmenu.cpp:2898
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "製造商\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2896
+#: src/frontend/mame/ui/selmenu.cpp:2905
 #, c-format
 msgid "Driver is Clone of\t%1$s\n"
 msgstr "驅動程式相容於\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2901
+#: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Driver is Parent\t\n"
 msgstr "驅動程式為主檔\t\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2905
+#: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Analog Controls\tYes\n"
 msgstr "類比控制\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2907
+#: src/frontend/mame/ui/selmenu.cpp:2916
 msgid "Keyboard Inputs\tYes\n"
 msgstr "鍵盤輸入\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2910
+#: src/frontend/mame/ui/selmenu.cpp:2919
 msgid "Overall\tNOT WORKING\n"
 msgstr "整體\t不可執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2912
+#: src/frontend/mame/ui/selmenu.cpp:2921
 msgid "Overall\tUnemulated Protection\n"
 msgstr "整體\t未模擬保護\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2914
+#: src/frontend/mame/ui/selmenu.cpp:2923
 msgid "Overall\tWorking\n"
 msgstr "整體\t可以執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2917
+#: src/frontend/mame/ui/selmenu.cpp:2926
 msgid "Graphics\tUnimplemented\n"
 msgstr "圖形\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2919
+#: src/frontend/mame/ui/selmenu.cpp:2928
 msgid "Graphics\tWrong Colors\n"
 msgstr "圖形\t色彩錯誤\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2921
+#: src/frontend/mame/ui/selmenu.cpp:2930
 msgid "Graphics\tImperfect Colors\n"
 msgstr "圖形\t色彩不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2923
+#: src/frontend/mame/ui/selmenu.cpp:2932
 msgid "Graphics\tImperfect\n"
 msgstr "圖形\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2925
+#: src/frontend/mame/ui/selmenu.cpp:2934
 msgid "Graphics\tOK\n"
 msgstr "圖形\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2928
+#: src/frontend/mame/ui/selmenu.cpp:2937
 msgid "Sound\tNone\n"
 msgstr "聲音\t無\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2930
+#: src/frontend/mame/ui/selmenu.cpp:2939
 msgid "Sound\tUnimplemented\n"
 msgstr "聲音\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2932
+#: src/frontend/mame/ui/selmenu.cpp:2941
 msgid "Sound\tImperfect\n"
 msgstr "聲音\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2934
+#: src/frontend/mame/ui/selmenu.cpp:2943
 msgid "Sound\tOK\n"
 msgstr "聲音\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2937
+#: src/frontend/mame/ui/selmenu.cpp:2946
 msgid "Capture\tUnimplemented\n"
 msgstr "擷取\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2939
+#: src/frontend/mame/ui/selmenu.cpp:2948
 msgid "Capture\tImperfect\n"
 msgstr "擷取\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2942
+#: src/frontend/mame/ui/selmenu.cpp:2951
 msgid "Camera\tUnimplemented\n"
 msgstr "相機\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2944
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Camera\tImperfect\n"
 msgstr "相機\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2947
+#: src/frontend/mame/ui/selmenu.cpp:2956
 msgid "Microphone\tUnimplemented\n"
 msgstr "麥克風\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2949
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Microphone\tImperfect\n"
 msgstr "麥克風\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2952
+#: src/frontend/mame/ui/selmenu.cpp:2961
 msgid "Controls\tUnimplemented\n"
 msgstr "控制\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2954
+#: src/frontend/mame/ui/selmenu.cpp:2963
 msgid "Controls\tImperfect\n"
 msgstr "控制\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2957
+#: src/frontend/mame/ui/selmenu.cpp:2966
 msgid "Keyboard\tUnimplemented\n"
 msgstr "鍵盤\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2959
+#: src/frontend/mame/ui/selmenu.cpp:2968
 msgid "Keyboard\tImperfect\n"
 msgstr "鍵盤\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2962
+#: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Mouse\tUnimplemented\n"
 msgstr "滑鼠\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2964
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Mouse\tImperfect\n"
 msgstr "滑鼠\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2967
+#: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Media\tUnimplemented\n"
 msgstr "媒體\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2969
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Media\tImperfect\n"
 msgstr "媒體\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2972
+#: src/frontend/mame/ui/selmenu.cpp:2981
 msgid "Disk\tUnimplemented\n"
 msgstr "磁碟\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2974
+#: src/frontend/mame/ui/selmenu.cpp:2983
 msgid "Disk\tImperfect\n"
 msgstr "磁碟\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2977
+#: src/frontend/mame/ui/selmenu.cpp:2986
 msgid "Printer\tUnimplemented\n"
 msgstr "印表機\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2979
+#: src/frontend/mame/ui/selmenu.cpp:2988
 msgid "Printer\tImperfect\n"
 msgstr "印表機\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2982
+#: src/frontend/mame/ui/selmenu.cpp:2991
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr "磁帶\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2984
+#: src/frontend/mame/ui/selmenu.cpp:2993
 msgid "Mag. Tape\tImperfect\n"
 msgstr "磁帶\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2987
+#: src/frontend/mame/ui/selmenu.cpp:2996
 msgid "Punch Tape\tUnimplemented\n"
 msgstr "打孔帶\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2989
+#: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Punch Tape\tImperfect\n"
 msgstr "打孔帶\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2992
+#: src/frontend/mame/ui/selmenu.cpp:3001
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr "磁鼓\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2994
+#: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "Mag. Drum\tImperfect\n"
 msgstr "磁鼓\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2997
+#: src/frontend/mame/ui/selmenu.cpp:3006
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr "(EP)ROM\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2999
+#: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "(EP)ROM\tImperfect\n"
 msgstr "(EP)ROM\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3002
+#: src/frontend/mame/ui/selmenu.cpp:3011
 msgid "Communications\tUnimplemented\n"
 msgstr "通訊\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3004
+#: src/frontend/mame/ui/selmenu.cpp:3013
 msgid "Communications\tImperfect\n"
 msgstr "通訊\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3007
+#: src/frontend/mame/ui/selmenu.cpp:3016
 msgid "LAN\tUnimplemented\n"
 msgstr "區域網路\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3018
 msgid "LAN\tImperfect\n"
 msgstr "區域網路\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3012
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "WAN\tUnimplemented\n"
 msgstr "外部網路\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "WAN\tImperfect\n"
 msgstr "外部網路\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3017
+#: src/frontend/mame/ui/selmenu.cpp:3026
 msgid "Timing\tUnimplemented\n"
 msgstr "計時\t無法執行\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3019
+#: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Timing\tImperfect\n"
 msgstr "計時\t不完美\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tYes\n"
 msgstr "機械式機台\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tNo\n"
 msgstr "機械式機台\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tYes\n"
 msgstr "需要裝飾圖\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tNo\n"
 msgstr "需要裝飾圖\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3023
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr "需要可點擊的裝飾圖\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3023
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr "需要可點擊的裝飾圖\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3034
 msgid "Support Cocktail\tNo\n"
 msgstr "支援檯面型筐體\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3026
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tYes\n"
 msgstr "驅動程式為 BIOS\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3026
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tNo\n"
 msgstr "驅動程式為 BIOS\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3027
+#: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tYes\n"
 msgstr "支援即時存檔\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3027
+#: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tNo\n"
 msgstr "支援即時存檔\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3028
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tVertical\n"
 msgstr "畫面方向\t垂直\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3028
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "畫面方向\t水平\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tYes\n"
 msgstr "需要 CHD\t是\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tNo\n"
 msgstr "需要 CHD\t否\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3051
-msgid "ROM Audit Result\tOK\n"
-msgstr "ROM 驗證結果\tOK\n"
+#: src/frontend/mame/ui/selmenu.cpp:3060
+msgid "Media Audit Result\tOK\n"
+msgstr "媒體驗證結果\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3053
-msgid "ROM Audit Result\tBAD\n"
-msgstr "ROM 驗證結果\t錯誤\n"
+#: src/frontend/mame/ui/selmenu.cpp:3062
+msgid "Media Audit Result\tBAD\n"
+msgstr "媒體驗證結果\t錯誤\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3056
+#: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr "樣本檔驗證結果\t不需要\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3058
+#: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Samples Audit Result\tOK\n"
 msgstr "樣本檔驗證結果\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3060
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Samples Audit Result\tBAD\n"
 msgstr "樣本檔驗證結果\t錯誤\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3064
+#: src/frontend/mame/ui/selmenu.cpp:3073
 msgid ""
-"ROM Audit \tDisabled\n"
-"Samples Audit \tDisabled\n"
+"Media Audit\tDisabled\n"
+"Samples Audit\tDisabled\n"
 msgstr ""
-"ROM 驗證 \t停用\n"
-"樣本檔驗證 \t停用\n"
+"媒體驗證\t停用\n"
+"樣本檔驗證\t停用\n"
 
-#: src/frontend/mame/ui/sndmenu.cpp:150
+#: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
 msgstr "聲音"
 
-#: src/frontend/mame/ui/sndmenu.cpp:151
+#: src/frontend/mame/ui/sndmenu.cpp:147
 msgid "Compressor"
 msgstr "壓縮"
 
-#: src/frontend/mame/ui/sndmenu.cpp:152
+#: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sample Rate"
 msgstr "取樣頻率"
 
-#: src/frontend/mame/ui/sndmenu.cpp:153
+#: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Use External Samples"
 msgstr "使用外部樣本檔"
 
@@ -3203,21 +3207,21 @@ msgstr "* 視訊：\n"
 msgid "  Screen '%1$s': Vector\n"
 msgstr "  畫面 '%1$s'： 向量\n"
 
-#: src/frontend/mame/ui/devopt.cpp:132
+#: src/frontend/mame/ui/devopt.cpp:135
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 msgstr "  畫面 '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 
-#: src/frontend/mame/ui/devopt.cpp:133
+#: src/frontend/mame/ui/devopt.cpp:136
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 msgstr "  畫面 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 
-#: src/frontend/mame/ui/devopt.cpp:147
+#: src/frontend/mame/ui/devopt.cpp:150
 msgid "* Sound:\n"
 msgstr "* 聲音:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:211
+#: src/frontend/mame/ui/devopt.cpp:214
 #, c-format
 msgid ""
 "* BIOS settings:\n"
@@ -3226,491 +3230,661 @@ msgstr ""
 "* BIOS 設定：\n"
 "  %1$d 選項    [預設值： %2$s]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:255 src/frontend/mame/ui/devopt.cpp:271
-#: src/frontend/mame/ui/devopt.cpp:332
+#: src/frontend/mame/ui/devopt.cpp:258 src/frontend/mame/ui/devopt.cpp:274
+#: src/frontend/mame/ui/devopt.cpp:335
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
 msgstr "  %1$s    [預設值： %2$s]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:260 src/frontend/mame/ui/devopt.cpp:276
+#: src/frontend/mame/ui/devopt.cpp:263 src/frontend/mame/ui/devopt.cpp:279
 #, c-format
 msgid "  %1$s\n"
 msgstr "  %1$s\n"
 
-#: src/frontend/mame/ui/devopt.cpp:282
+#: src/frontend/mame/ui/devopt.cpp:285
 msgid "* DIP switch settings:\n"
 msgstr "* 指撥開關設定：\n"
 
-#: src/frontend/mame/ui/devopt.cpp:287
+#: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Configuration settings:\n"
 msgstr "* 配置設定：\n"
 
-#: src/frontend/mame/ui/devopt.cpp:291
+#: src/frontend/mame/ui/devopt.cpp:294
 msgid "* Input device(s):\n"
 msgstr "* 輸入裝置:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:293
+#: src/frontend/mame/ui/devopt.cpp:296
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
 msgstr "  使用者輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:295
+#: src/frontend/mame/ui/devopt.cpp:298
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
 msgstr "  麻將輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:297
+#: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
 msgstr "  花牌輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:299
+#: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
 msgstr "  博奕輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:301
+#: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
 msgstr "  類比輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:303
+#: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
 msgstr "  調節器輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:305
+#: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
 msgstr "  數字鍵盤輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:307
+#: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
 msgstr "  鍵盤輸入    [%1$d 輸入]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:312
+#: src/frontend/mame/ui/devopt.cpp:315
 msgid "* Media Options:\n"
 msgstr "* 媒體選項:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:317
+#: src/frontend/mame/ui/devopt.cpp:320
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
 msgstr "  %1$s    [標籤: %2$s]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:327
+#: src/frontend/mame/ui/devopt.cpp:330
 msgid "* Slot Options:\n"
 msgstr "* 插槽選項：\n"
 
-#: src/frontend/mame/ui/devopt.cpp:341
+#: src/frontend/mame/ui/devopt.cpp:344
 msgid "[None]\n"
 msgstr "[ 無 ]\n"
 
-#: src/emu/render.cpp:1847
+#: src/emu/render.cpp:1796
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
 msgstr "畫面  %1$u 標準  (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1873
+#: src/emu/render.cpp:1822
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
 msgstr "畫面 %1$u 像素比例 (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1895 src/emu/render.cpp:2030
+#: src/emu/render.cpp:1844 src/emu/render.cpp:1979
 msgctxt "view-name"
 msgid "Cocktail"
 msgstr "檯面型"
 
-#: src/emu/render.cpp:2015
+#: src/emu/render.cpp:1964
 msgctxt "view-name"
 msgid "Left-to-Right"
 msgstr "左至右"
 
-#: src/emu/render.cpp:2016
+#: src/emu/render.cpp:1965
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
 msgstr "左至右 (無邊)"
 
-#: src/emu/render.cpp:2017
+#: src/emu/render.cpp:1966
 msgctxt "view-name"
 msgid "Top-to-Bottom"
 msgstr "上到下"
 
-#: src/emu/render.cpp:2018
+#: src/emu/render.cpp:1967
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
 msgstr "上到下 (無邊)"
 
-#: src/emu/render.cpp:2069
+#: src/emu/render.cpp:2018
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
 msgstr "%1$u×%2$u 左至右, 上到下"
 
-#: src/emu/render.cpp:2078
+#: src/emu/render.cpp:2027
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
 msgstr "%1$u×%2$u 左至右, 上到下 (無邊)"
 
-#: src/emu/render.cpp:2087
+#: src/emu/render.cpp:2036
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
 msgstr "%1$u×%2$u 上到下, 左至右"
 
-#: src/emu/render.cpp:2096
+#: src/emu/render.cpp:2045
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
 msgstr "%1$u×%2$u 上到下, 左至右 (無邊)"
 
-#: src/emu/inpttype.ipp:22
+#: src/emu/ioport.cpp:332
+#, c-format
+msgctxt "input-name"
+msgid "P%1$u"
+msgstr "P%1$u"
+
+#: src/emu/ioport.cpp:1924
+msgctxt "input-name"
+msgid "???"
+msgstr "???"
+
+#: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
+#: src/emu/inpttype.ipp:255 src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:323
+#: src/emu/inpttype.ipp:357 src/emu/inpttype.ipp:391 src/emu/inpttype.ipp:425
+#: src/emu/inpttype.ipp:459
+#, c-format
+msgctxt "input-name"
+msgid "%p Up"
+msgstr "%p 上"
+
+#: src/emu/inpttype.ipp:23 src/emu/inpttype.ipp:141 src/emu/inpttype.ipp:222
+#: src/emu/inpttype.ipp:256 src/emu/inpttype.ipp:290 src/emu/inpttype.ipp:324
+#: src/emu/inpttype.ipp:358 src/emu/inpttype.ipp:392 src/emu/inpttype.ipp:426
+#: src/emu/inpttype.ipp:460
+#, c-format
+msgctxt "input-name"
+msgid "%p Down"
+msgstr "%p 下"
+
+#: src/emu/inpttype.ipp:24 src/emu/inpttype.ipp:142 src/emu/inpttype.ipp:223
+#: src/emu/inpttype.ipp:257 src/emu/inpttype.ipp:291 src/emu/inpttype.ipp:325
+#: src/emu/inpttype.ipp:359 src/emu/inpttype.ipp:393 src/emu/inpttype.ipp:427
+#: src/emu/inpttype.ipp:461
+#, c-format
+msgctxt "input-name"
+msgid "%p Left"
+msgstr "%p 左"
+
+#: src/emu/inpttype.ipp:25 src/emu/inpttype.ipp:143 src/emu/inpttype.ipp:224
+#: src/emu/inpttype.ipp:258 src/emu/inpttype.ipp:292 src/emu/inpttype.ipp:326
+#: src/emu/inpttype.ipp:360 src/emu/inpttype.ipp:394 src/emu/inpttype.ipp:428
+#: src/emu/inpttype.ipp:462
+#, c-format
+msgctxt "input-name"
+msgid "%p Right"
+msgstr "%p 右"
+
+#: src/emu/inpttype.ipp:26 src/emu/inpttype.ipp:144 src/emu/inpttype.ipp:225
+#: src/emu/inpttype.ipp:259 src/emu/inpttype.ipp:293 src/emu/inpttype.ipp:327
+#: src/emu/inpttype.ipp:361 src/emu/inpttype.ipp:395 src/emu/inpttype.ipp:429
+#: src/emu/inpttype.ipp:463
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Up"
+msgstr "%p 右搖桿/上"
+
+#: src/emu/inpttype.ipp:27 src/emu/inpttype.ipp:145 src/emu/inpttype.ipp:226
+#: src/emu/inpttype.ipp:260 src/emu/inpttype.ipp:294 src/emu/inpttype.ipp:328
+#: src/emu/inpttype.ipp:362 src/emu/inpttype.ipp:396 src/emu/inpttype.ipp:430
+#: src/emu/inpttype.ipp:464
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Down"
+msgstr "%p 右搖桿/下"
+
+#: src/emu/inpttype.ipp:28 src/emu/inpttype.ipp:146 src/emu/inpttype.ipp:227
+#: src/emu/inpttype.ipp:261 src/emu/inpttype.ipp:295 src/emu/inpttype.ipp:329
+#: src/emu/inpttype.ipp:363 src/emu/inpttype.ipp:397 src/emu/inpttype.ipp:431
+#: src/emu/inpttype.ipp:465
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Left"
+msgstr "%p 右搖桿/左"
+
+#: src/emu/inpttype.ipp:29 src/emu/inpttype.ipp:147 src/emu/inpttype.ipp:228
+#: src/emu/inpttype.ipp:262 src/emu/inpttype.ipp:296 src/emu/inpttype.ipp:330
+#: src/emu/inpttype.ipp:364 src/emu/inpttype.ipp:398 src/emu/inpttype.ipp:432
+#: src/emu/inpttype.ipp:466
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Right"
+msgstr "%p 右搖桿/右"
+
+#: src/emu/inpttype.ipp:30 src/emu/inpttype.ipp:148 src/emu/inpttype.ipp:229
+#: src/emu/inpttype.ipp:263 src/emu/inpttype.ipp:297 src/emu/inpttype.ipp:331
+#: src/emu/inpttype.ipp:365 src/emu/inpttype.ipp:399 src/emu/inpttype.ipp:433
+#: src/emu/inpttype.ipp:467
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Up"
+msgstr "%p 左搖桿/上"
+
+#: src/emu/inpttype.ipp:31 src/emu/inpttype.ipp:149 src/emu/inpttype.ipp:230
+#: src/emu/inpttype.ipp:264 src/emu/inpttype.ipp:298 src/emu/inpttype.ipp:332
+#: src/emu/inpttype.ipp:366 src/emu/inpttype.ipp:400 src/emu/inpttype.ipp:434
+#: src/emu/inpttype.ipp:468
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Down"
+msgstr "%p 左搖桿/下"
+
+#: src/emu/inpttype.ipp:32 src/emu/inpttype.ipp:150 src/emu/inpttype.ipp:231
+#: src/emu/inpttype.ipp:265 src/emu/inpttype.ipp:299 src/emu/inpttype.ipp:333
+#: src/emu/inpttype.ipp:367 src/emu/inpttype.ipp:401 src/emu/inpttype.ipp:435
+#: src/emu/inpttype.ipp:469
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Left"
+msgstr "%p 左搖桿/左"
+
+#: src/emu/inpttype.ipp:33 src/emu/inpttype.ipp:151 src/emu/inpttype.ipp:232
+#: src/emu/inpttype.ipp:266 src/emu/inpttype.ipp:300 src/emu/inpttype.ipp:334
+#: src/emu/inpttype.ipp:368 src/emu/inpttype.ipp:402 src/emu/inpttype.ipp:436
+#: src/emu/inpttype.ipp:470
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Right"
+msgstr "%p 左搖桿/右"
+
+#: src/emu/inpttype.ipp:34 src/emu/inpttype.ipp:152 src/emu/inpttype.ipp:233
+#: src/emu/inpttype.ipp:267 src/emu/inpttype.ipp:301 src/emu/inpttype.ipp:335
+#: src/emu/inpttype.ipp:369 src/emu/inpttype.ipp:403 src/emu/inpttype.ipp:437
+#: src/emu/inpttype.ipp:471
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 1"
+msgstr "%p 按鈕 1"
+
+#: src/emu/inpttype.ipp:35 src/emu/inpttype.ipp:153 src/emu/inpttype.ipp:234
+#: src/emu/inpttype.ipp:268 src/emu/inpttype.ipp:302 src/emu/inpttype.ipp:336
+#: src/emu/inpttype.ipp:370 src/emu/inpttype.ipp:404 src/emu/inpttype.ipp:438
+#: src/emu/inpttype.ipp:472
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 2"
+msgstr "%p 按鈕 2"
+
+#: src/emu/inpttype.ipp:36 src/emu/inpttype.ipp:154 src/emu/inpttype.ipp:235
+#: src/emu/inpttype.ipp:269 src/emu/inpttype.ipp:303 src/emu/inpttype.ipp:337
+#: src/emu/inpttype.ipp:371 src/emu/inpttype.ipp:405 src/emu/inpttype.ipp:439
+#: src/emu/inpttype.ipp:473
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 3"
+msgstr "%p 按鈕 3"
+
+#: src/emu/inpttype.ipp:37 src/emu/inpttype.ipp:155 src/emu/inpttype.ipp:236
+#: src/emu/inpttype.ipp:270 src/emu/inpttype.ipp:304 src/emu/inpttype.ipp:338
+#: src/emu/inpttype.ipp:372 src/emu/inpttype.ipp:406 src/emu/inpttype.ipp:440
+#: src/emu/inpttype.ipp:474
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 4"
+msgstr "%p 按鈕 4"
+
+#: src/emu/inpttype.ipp:38 src/emu/inpttype.ipp:156 src/emu/inpttype.ipp:237
+#: src/emu/inpttype.ipp:271 src/emu/inpttype.ipp:305 src/emu/inpttype.ipp:339
+#: src/emu/inpttype.ipp:373 src/emu/inpttype.ipp:407 src/emu/inpttype.ipp:441
+#: src/emu/inpttype.ipp:475
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 5"
+msgstr "%p 按鈕 5"
+
+#: src/emu/inpttype.ipp:39 src/emu/inpttype.ipp:157 src/emu/inpttype.ipp:238
+#: src/emu/inpttype.ipp:272 src/emu/inpttype.ipp:306 src/emu/inpttype.ipp:340
+#: src/emu/inpttype.ipp:374 src/emu/inpttype.ipp:408 src/emu/inpttype.ipp:442
+#: src/emu/inpttype.ipp:476
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 6"
+msgstr "%p 按鈕 6"
+
+#: src/emu/inpttype.ipp:40 src/emu/inpttype.ipp:158 src/emu/inpttype.ipp:239
+#: src/emu/inpttype.ipp:273 src/emu/inpttype.ipp:307 src/emu/inpttype.ipp:341
+#: src/emu/inpttype.ipp:375 src/emu/inpttype.ipp:409 src/emu/inpttype.ipp:443
+#: src/emu/inpttype.ipp:477
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 7"
+msgstr "%p 按鈕 7"
+
+#: src/emu/inpttype.ipp:41 src/emu/inpttype.ipp:159 src/emu/inpttype.ipp:240
+#: src/emu/inpttype.ipp:274 src/emu/inpttype.ipp:308 src/emu/inpttype.ipp:342
+#: src/emu/inpttype.ipp:376 src/emu/inpttype.ipp:410 src/emu/inpttype.ipp:444
+#: src/emu/inpttype.ipp:478
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 8"
+msgstr "%p 按鈕 8"
+
+#: src/emu/inpttype.ipp:42 src/emu/inpttype.ipp:160 src/emu/inpttype.ipp:241
+#: src/emu/inpttype.ipp:275 src/emu/inpttype.ipp:309 src/emu/inpttype.ipp:343
+#: src/emu/inpttype.ipp:377 src/emu/inpttype.ipp:411 src/emu/inpttype.ipp:445
+#: src/emu/inpttype.ipp:479
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 9"
+msgstr "%p 按鈕 9"
+
+#: src/emu/inpttype.ipp:43 src/emu/inpttype.ipp:161 src/emu/inpttype.ipp:242
+#: src/emu/inpttype.ipp:276 src/emu/inpttype.ipp:310 src/emu/inpttype.ipp:344
+#: src/emu/inpttype.ipp:378 src/emu/inpttype.ipp:412 src/emu/inpttype.ipp:446
+#: src/emu/inpttype.ipp:480
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 10"
+msgstr "%p 按鈕 10"
+
+#: src/emu/inpttype.ipp:44 src/emu/inpttype.ipp:162 src/emu/inpttype.ipp:243
+#: src/emu/inpttype.ipp:277 src/emu/inpttype.ipp:311 src/emu/inpttype.ipp:345
+#: src/emu/inpttype.ipp:379 src/emu/inpttype.ipp:413 src/emu/inpttype.ipp:447
+#: src/emu/inpttype.ipp:481
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 11"
+msgstr "%p 按鈕 11"
+
+#: src/emu/inpttype.ipp:45 src/emu/inpttype.ipp:163 src/emu/inpttype.ipp:244
+#: src/emu/inpttype.ipp:278 src/emu/inpttype.ipp:312 src/emu/inpttype.ipp:346
+#: src/emu/inpttype.ipp:380 src/emu/inpttype.ipp:414 src/emu/inpttype.ipp:448
+#: src/emu/inpttype.ipp:482
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 12"
+msgstr "%p 按鈕 12"
+
+#: src/emu/inpttype.ipp:46 src/emu/inpttype.ipp:164 src/emu/inpttype.ipp:245
+#: src/emu/inpttype.ipp:279 src/emu/inpttype.ipp:313 src/emu/inpttype.ipp:347
+#: src/emu/inpttype.ipp:381 src/emu/inpttype.ipp:415 src/emu/inpttype.ipp:449
+#: src/emu/inpttype.ipp:483
+#, c-format
 msgctxt "input-name"
-msgid "P1 Up"
-msgstr "P1 上"
+msgid "%p Button 13"
+msgstr "%p 按鈕 13"
 
-#: src/emu/inpttype.ipp:23
+#: src/emu/inpttype.ipp:47 src/emu/inpttype.ipp:165 src/emu/inpttype.ipp:246
+#: src/emu/inpttype.ipp:280 src/emu/inpttype.ipp:314 src/emu/inpttype.ipp:348
+#: src/emu/inpttype.ipp:382 src/emu/inpttype.ipp:416 src/emu/inpttype.ipp:450
+#: src/emu/inpttype.ipp:484
+#, c-format
 msgctxt "input-name"
-msgid "P1 Down"
-msgstr "P1 下"
+msgid "%p Button 14"
+msgstr "%p 按鈕 14"
 
-#: src/emu/inpttype.ipp:24
+#: src/emu/inpttype.ipp:48 src/emu/inpttype.ipp:166 src/emu/inpttype.ipp:247
+#: src/emu/inpttype.ipp:281 src/emu/inpttype.ipp:315 src/emu/inpttype.ipp:349
+#: src/emu/inpttype.ipp:383 src/emu/inpttype.ipp:417 src/emu/inpttype.ipp:451
+#: src/emu/inpttype.ipp:485
+#, c-format
 msgctxt "input-name"
-msgid "P1 Left"
-msgstr "P1 左"
+msgid "%p Button 15"
+msgstr "%p 按鈕 15"
 
-#: src/emu/inpttype.ipp:25
+#: src/emu/inpttype.ipp:49 src/emu/inpttype.ipp:167 src/emu/inpttype.ipp:248
+#: src/emu/inpttype.ipp:282 src/emu/inpttype.ipp:316 src/emu/inpttype.ipp:350
+#: src/emu/inpttype.ipp:384 src/emu/inpttype.ipp:418 src/emu/inpttype.ipp:452
+#: src/emu/inpttype.ipp:486
+#, c-format
 msgctxt "input-name"
-msgid "P1 Right"
-msgstr "P1 右"
+msgid "%p Button 16"
+msgstr "%p 按鈕 16"
 
-#: src/emu/inpttype.ipp:26
+#: src/emu/inpttype.ipp:50 src/emu/inpttype.ipp:168 src/emu/inpttype.ipp:249
+#: src/emu/inpttype.ipp:283 src/emu/inpttype.ipp:317 src/emu/inpttype.ipp:351
+#: src/emu/inpttype.ipp:385 src/emu/inpttype.ipp:419 src/emu/inpttype.ipp:453
+#: src/emu/inpttype.ipp:487
+#, c-format
 msgctxt "input-name"
-msgid "P1 Right Stick/Up"
-msgstr "P1 右搖桿/上"
+msgid "%p Start"
+msgstr "%p 開始"
 
-#: src/emu/inpttype.ipp:27
+#: src/emu/inpttype.ipp:51 src/emu/inpttype.ipp:169 src/emu/inpttype.ipp:250
+#: src/emu/inpttype.ipp:284 src/emu/inpttype.ipp:318 src/emu/inpttype.ipp:352
+#: src/emu/inpttype.ipp:386 src/emu/inpttype.ipp:420 src/emu/inpttype.ipp:454
+#: src/emu/inpttype.ipp:488
+#, c-format
 msgctxt "input-name"
-msgid "P1 Right Stick/Down"
-msgstr "P1 右搖桿/下"
+msgid "%p Select"
+msgstr "%p 選擇"
 
-#: src/emu/inpttype.ipp:28
+#: src/emu/inpttype.ipp:56 src/emu/inpttype.ipp:174
+#, c-format
 msgctxt "input-name"
-msgid "P1 Right Stick/Left"
-msgstr "P1 右搖桿/左"
+msgid "%p Mahjong A"
+msgstr "%p 麻將 A"
 
-#: src/emu/inpttype.ipp:29
+#: src/emu/inpttype.ipp:57 src/emu/inpttype.ipp:175
+#, c-format
 msgctxt "input-name"
-msgid "P1 Right Stick/Right"
-msgstr "P1 右搖桿/右"
+msgid "%p Mahjong B"
+msgstr "%p 麻將 B"
 
-#: src/emu/inpttype.ipp:30
+#: src/emu/inpttype.ipp:58 src/emu/inpttype.ipp:176
+#, c-format
 msgctxt "input-name"
-msgid "P1 Left Stick/Up"
-msgstr "P1 左搖桿/上"
+msgid "%p Mahjong C"
+msgstr "%p 麻將 C"
 
-#: src/emu/inpttype.ipp:31
+#: src/emu/inpttype.ipp:59 src/emu/inpttype.ipp:177
+#, c-format
 msgctxt "input-name"
-msgid "P1 Left Stick/Down"
-msgstr "P1 左搖桿/下"
+msgid "%p Mahjong D"
+msgstr "%p 麻將 D"
 
-#: src/emu/inpttype.ipp:32
+#: src/emu/inpttype.ipp:60 src/emu/inpttype.ipp:178
+#, c-format
 msgctxt "input-name"
-msgid "P1 Left Stick/Left"
-msgstr "P1 左搖桿/左"
+msgid "%p Mahjong E"
+msgstr "%p 麻將 E"
 
-#: src/emu/inpttype.ipp:33
+#: src/emu/inpttype.ipp:61 src/emu/inpttype.ipp:179
+#, c-format
 msgctxt "input-name"
-msgid "P1 Left Stick/Right"
-msgstr "P1 左搖桿/右"
+msgid "%p Mahjong F"
+msgstr "%p 麻將 F"
 
-#: src/emu/inpttype.ipp:34
+#: src/emu/inpttype.ipp:62 src/emu/inpttype.ipp:180
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 1"
-msgstr "P1 按鈕 1"
+msgid "%p Mahjong G"
+msgstr "%p 麻將 G"
 
-#: src/emu/inpttype.ipp:35
+#: src/emu/inpttype.ipp:63 src/emu/inpttype.ipp:181
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 2"
-msgstr "P1 按鈕 2"
+msgid "%p Mahjong H"
+msgstr "%p 麻將 H"
 
-#: src/emu/inpttype.ipp:36
+#: src/emu/inpttype.ipp:64 src/emu/inpttype.ipp:182
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 3"
-msgstr "P1 按鈕 3"
+msgid "%p Mahjong I"
+msgstr "%p 麻將 I"
 
-#: src/emu/inpttype.ipp:37
+#: src/emu/inpttype.ipp:65 src/emu/inpttype.ipp:183
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 4"
-msgstr "P1 按鈕 4"
+msgid "%p Mahjong J"
+msgstr "%p 麻將 J"
 
-#: src/emu/inpttype.ipp:38
+#: src/emu/inpttype.ipp:66 src/emu/inpttype.ipp:184
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 5"
-msgstr "P1 按鈕 5"
+msgid "%p Mahjong K"
+msgstr "%p 麻將 K"
 
-#: src/emu/inpttype.ipp:39
+#: src/emu/inpttype.ipp:67 src/emu/inpttype.ipp:185
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 6"
-msgstr "P1 按鈕 6"
+msgid "%p Mahjong L"
+msgstr "%p 麻將 L"
 
-#: src/emu/inpttype.ipp:40
+#: src/emu/inpttype.ipp:68 src/emu/inpttype.ipp:186
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 7"
-msgstr "P1 按鈕 7"
+msgid "%p Mahjong M"
+msgstr "%p 麻將 M"
 
-#: src/emu/inpttype.ipp:41
+#: src/emu/inpttype.ipp:69 src/emu/inpttype.ipp:187
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 8"
-msgstr "P1 按鈕 8"
+msgid "%p Mahjong N"
+msgstr "%p 麻將 N"
 
-#: src/emu/inpttype.ipp:42
+#: src/emu/inpttype.ipp:70 src/emu/inpttype.ipp:188
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 9"
-msgstr "P1 按鈕 9"
+msgid "%p Mahjong O"
+msgstr "%p 麻將 O"
 
-#: src/emu/inpttype.ipp:43
+#: src/emu/inpttype.ipp:71 src/emu/inpttype.ipp:189
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 10"
-msgstr "P1 按鈕 10"
+msgid "%p Mahjong P"
+msgstr "%p 麻將 P"
 
-#: src/emu/inpttype.ipp:44
+#: src/emu/inpttype.ipp:72 src/emu/inpttype.ipp:190
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 11"
-msgstr "P1 按鈕 11"
+msgid "%p Mahjong Q"
+msgstr "%p 麻將 Q"
 
-#: src/emu/inpttype.ipp:45
+#: src/emu/inpttype.ipp:73 src/emu/inpttype.ipp:191
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 12"
-msgstr "P1 按鈕 12"
+msgid "%p Mahjong Kan"
+msgstr "%p 麻將 槓"
 
-#: src/emu/inpttype.ipp:46
+#: src/emu/inpttype.ipp:74 src/emu/inpttype.ipp:192
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 13"
-msgstr "P1 按鈕 13"
+msgid "%p Mahjong Pon"
+msgstr "%p 麻將 碰"
 
-#: src/emu/inpttype.ipp:47
+#: src/emu/inpttype.ipp:75 src/emu/inpttype.ipp:193
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 14"
-msgstr "P1 按鈕 14"
+msgid "%p Mahjong Chi"
+msgstr "%p 麻將 吃"
 
-#: src/emu/inpttype.ipp:48
+#: src/emu/inpttype.ipp:76 src/emu/inpttype.ipp:194
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 15"
-msgstr "P1 按鈕 15"
+msgid "%p Mahjong Reach"
+msgstr "%p 麻將 聽"
 
-#: src/emu/inpttype.ipp:49
+#: src/emu/inpttype.ipp:77 src/emu/inpttype.ipp:195
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 16"
-msgstr "P1 按鈕 16"
+msgid "%p Mahjong Ron"
+msgstr "%p 麻將 胡"
 
-#: src/emu/inpttype.ipp:50
+#: src/emu/inpttype.ipp:78 src/emu/inpttype.ipp:200
+#, c-format
 msgctxt "input-name"
-msgid "P1 Start"
-msgstr "P1 開始"
+msgid "%p Mahjong Flip Flop"
+msgstr "%p 麻將 交換牌"
 
-#: src/emu/inpttype.ipp:51
+#: src/emu/inpttype.ipp:79 src/emu/inpttype.ipp:196
+#, c-format
 msgctxt "input-name"
-msgid "P1 Select"
-msgstr "P1 選擇"
+msgid "%p Mahjong Bet"
+msgstr "%p 麻將 押分"
 
-#: src/emu/inpttype.ipp:56
+#: src/emu/inpttype.ipp:80 src/emu/inpttype.ipp:198
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong A"
-msgstr "P1 麻將 A"
+msgid "%p Mahjong Take Score"
+msgstr "%p 麻將 得分"
 
-#: src/emu/inpttype.ipp:57
+#: src/emu/inpttype.ipp:81 src/emu/inpttype.ipp:199
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong B"
-msgstr "P1 麻將 B"
+msgid "%p Mahjong Double Up"
+msgstr "%p 麻將 加倍"
 
-#: src/emu/inpttype.ipp:58
+#: src/emu/inpttype.ipp:82 src/emu/inpttype.ipp:201
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong C"
-msgstr "P1 麻將 C"
+msgid "%p Mahjong Big"
+msgstr "%p 麻將 大"
 
-#: src/emu/inpttype.ipp:59
+#: src/emu/inpttype.ipp:83 src/emu/inpttype.ipp:202
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong D"
-msgstr "P1 麻將 D"
+msgid "%p Mahjong Small"
+msgstr "%p 麻將 小"
 
-#: src/emu/inpttype.ipp:60
+#: src/emu/inpttype.ipp:84 src/emu/inpttype.ipp:197
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong E"
-msgstr "P1 麻將 E"
+msgid "%p Mahjong Last Chance"
+msgstr "%p 麻將 海底機會"
 
-#: src/emu/inpttype.ipp:61
+#: src/emu/inpttype.ipp:89 src/emu/inpttype.ipp:207
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong F"
-msgstr "P1 麻將 F"
+msgid "%p Hanafuda A/1"
+msgstr "%p 花牌 A/1"
 
-#: src/emu/inpttype.ipp:62
+#: src/emu/inpttype.ipp:90 src/emu/inpttype.ipp:208
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong G"
-msgstr "P1 麻將 G"
+msgid "%p Hanafuda B/2"
+msgstr "%p 花牌 B/2"
 
-#: src/emu/inpttype.ipp:63
+#: src/emu/inpttype.ipp:91 src/emu/inpttype.ipp:209
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong H"
-msgstr "P1 麻將 H"
+msgid "%p Hanafuda C/3"
+msgstr "%p 花牌 C/3"
 
-#: src/emu/inpttype.ipp:64
+#: src/emu/inpttype.ipp:92 src/emu/inpttype.ipp:210
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong I"
-msgstr "P1 麻將 I"
+msgid "%p Hanafuda D/4"
+msgstr "%p 花牌 D/4"
 
-#: src/emu/inpttype.ipp:65
+#: src/emu/inpttype.ipp:93 src/emu/inpttype.ipp:211
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong J"
-msgstr "P1 麻將 J"
+msgid "%p Hanafuda E/5"
+msgstr "%p 花牌 E/5"
 
-#: src/emu/inpttype.ipp:66
+#: src/emu/inpttype.ipp:94 src/emu/inpttype.ipp:212
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong K"
-msgstr "P1 麻將 K"
+msgid "%p Hanafuda F/6"
+msgstr "%p 花牌 F/6"
 
-#: src/emu/inpttype.ipp:67
+#: src/emu/inpttype.ipp:95 src/emu/inpttype.ipp:213
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong L"
-msgstr "P1 麻將 L"
+msgid "%p Hanafuda G/7"
+msgstr "%p 花牌 G/7"
 
-#: src/emu/inpttype.ipp:68
+#: src/emu/inpttype.ipp:96 src/emu/inpttype.ipp:214
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong M"
-msgstr "P1 麻將 M"
+msgid "%p Hanafuda H/8"
+msgstr "%p 花牌 H/8"
 
-#: src/emu/inpttype.ipp:69
+#: src/emu/inpttype.ipp:97 src/emu/inpttype.ipp:215
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong N"
-msgstr "P1 麻將 N"
+msgid "%p Hanafuda Yes"
+msgstr "%p 花牌 是"
 
-#: src/emu/inpttype.ipp:70
+#: src/emu/inpttype.ipp:98 src/emu/inpttype.ipp:216
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong O"
-msgstr "P1 麻將 O"
-
-#: src/emu/inpttype.ipp:71
-msgctxt "input-name"
-msgid "P1 Mahjong P"
-msgstr "P1 麻將 P"
-
-#: src/emu/inpttype.ipp:72
-msgctxt "input-name"
-msgid "P1 Mahjong Q"
-msgstr "P1 麻將 Q"
-
-#: src/emu/inpttype.ipp:73
-msgctxt "input-name"
-msgid "P1 Mahjong Kan"
-msgstr "P1 麻將 槓"
-
-#: src/emu/inpttype.ipp:74
-msgctxt "input-name"
-msgid "P1 Mahjong Pon"
-msgstr "P1 麻將 碰"
-
-#: src/emu/inpttype.ipp:75
-msgctxt "input-name"
-msgid "P1 Mahjong Chi"
-msgstr "P1 麻將 吃"
-
-#: src/emu/inpttype.ipp:76
-msgctxt "input-name"
-msgid "P1 Mahjong Reach"
-msgstr "P1 麻將 聽"
-
-#: src/emu/inpttype.ipp:77
-msgctxt "input-name"
-msgid "P1 Mahjong Ron"
-msgstr "P1 麻將 胡"
-
-#: src/emu/inpttype.ipp:78
-msgctxt "input-name"
-msgid "P1 Mahjong Flip Flop"
-msgstr "P1 麻將 交換牌"
-
-#: src/emu/inpttype.ipp:79
-msgctxt "input-name"
-msgid "P1 Mahjong Bet"
-msgstr "P1 麻將 押分"
-
-#: src/emu/inpttype.ipp:80
-msgctxt "input-name"
-msgid "P1 Mahjong Take Score"
-msgstr "P1 麻將 得分"
-
-#: src/emu/inpttype.ipp:81
-msgctxt "input-name"
-msgid "P1 Mahjong Double Up"
-msgstr "P1 麻將 加倍"
-
-#: src/emu/inpttype.ipp:82
-msgctxt "input-name"
-msgid "P1 Mahjong Big"
-msgstr "P1 麻將 大"
-
-#: src/emu/inpttype.ipp:83
-msgctxt "input-name"
-msgid "P1 Mahjong Small"
-msgstr "P1 麻將 小"
-
-#: src/emu/inpttype.ipp:84
-msgctxt "input-name"
-msgid "P1 Mahjong Last Chance"
-msgstr "P1 麻將 海底機會"
-
-#: src/emu/inpttype.ipp:89
-msgctxt "input-name"
-msgid "P1 Hanafuda A/1"
-msgstr "P1 花牌 A/1"
-
-#: src/emu/inpttype.ipp:90
-msgctxt "input-name"
-msgid "P1 Hanafuda B/2"
-msgstr "P1 花牌 B/2"
-
-#: src/emu/inpttype.ipp:91
-msgctxt "input-name"
-msgid "P1 Hanafuda C/3"
-msgstr "P1 花牌 C/3"
-
-#: src/emu/inpttype.ipp:92
-msgctxt "input-name"
-msgid "P1 Hanafuda D/4"
-msgstr "P1 花牌 D/4"
-
-#: src/emu/inpttype.ipp:93
-msgctxt "input-name"
-msgid "P1 Hanafuda E/5"
-msgstr "P1 花牌 E/5"
-
-#: src/emu/inpttype.ipp:94
-msgctxt "input-name"
-msgid "P1 Hanafuda F/6"
-msgstr "P1 花牌 F/6"
-
-#: src/emu/inpttype.ipp:95
-msgctxt "input-name"
-msgid "P1 Hanafuda G/7"
-msgstr "P1 花牌 G/7"
-
-#: src/emu/inpttype.ipp:96
-msgctxt "input-name"
-msgid "P1 Hanafuda H/8"
-msgstr "P1 花牌 H/8"
-
-#: src/emu/inpttype.ipp:97
-msgctxt "input-name"
-msgid "P1 Hanafuda Yes"
-msgstr "P1 花牌 是"
-
-#: src/emu/inpttype.ipp:98
-msgctxt "input-name"
-msgid "P1 Hanafuda No"
-msgstr "P1 花牌 否"
+msgid "%p Hanafuda No"
+msgstr "%p 花牌 否"
 
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
@@ -3836,1551 +4010,6 @@ msgstr "停止捲軸 4"
 msgctxt "input-name"
 msgid "Stop All Reels"
 msgstr "停止所有捲軸"
-
-#: src/emu/inpttype.ipp:140
-msgctxt "input-name"
-msgid "P2 Up"
-msgstr "P2 上"
-
-#: src/emu/inpttype.ipp:141
-msgctxt "input-name"
-msgid "P2 Down"
-msgstr "P2 下"
-
-#: src/emu/inpttype.ipp:142
-msgctxt "input-name"
-msgid "P2 Left"
-msgstr "P2 左"
-
-#: src/emu/inpttype.ipp:143
-msgctxt "input-name"
-msgid "P2 Right"
-msgstr "P2 右"
-
-#: src/emu/inpttype.ipp:144
-msgctxt "input-name"
-msgid "P2 Right Stick/Up"
-msgstr "P2 右搖桿/上"
-
-#: src/emu/inpttype.ipp:145
-msgctxt "input-name"
-msgid "P2 Right Stick/Down"
-msgstr "P2 右搖桿/下"
-
-#: src/emu/inpttype.ipp:146
-msgctxt "input-name"
-msgid "P2 Right Stick/Left"
-msgstr "P2 右搖桿/左"
-
-#: src/emu/inpttype.ipp:147
-msgctxt "input-name"
-msgid "P2 Right Stick/Right"
-msgstr "P2 右搖桿/右"
-
-#: src/emu/inpttype.ipp:148
-msgctxt "input-name"
-msgid "P2 Left Stick/Up"
-msgstr "P2 左搖桿/上"
-
-#: src/emu/inpttype.ipp:149
-msgctxt "input-name"
-msgid "P2 Left Stick/Down"
-msgstr "P2 左搖桿/下"
-
-#: src/emu/inpttype.ipp:150
-msgctxt "input-name"
-msgid "P2 Left Stick/Left"
-msgstr "P2 左搖桿/左"
-
-#: src/emu/inpttype.ipp:151
-msgctxt "input-name"
-msgid "P2 Left Stick/Right"
-msgstr "P2 左搖桿/右"
-
-#: src/emu/inpttype.ipp:152
-msgctxt "input-name"
-msgid "P2 Button 1"
-msgstr "P2 按鈕 1"
-
-#: src/emu/inpttype.ipp:153
-msgctxt "input-name"
-msgid "P2 Button 2"
-msgstr "P2 按鈕 2"
-
-#: src/emu/inpttype.ipp:154
-msgctxt "input-name"
-msgid "P2 Button 3"
-msgstr "P2 按鈕 3"
-
-#: src/emu/inpttype.ipp:155
-msgctxt "input-name"
-msgid "P2 Button 4"
-msgstr "P2 按鈕 4"
-
-#: src/emu/inpttype.ipp:156
-msgctxt "input-name"
-msgid "P2 Button 5"
-msgstr "P2 按鈕 5"
-
-#: src/emu/inpttype.ipp:157
-msgctxt "input-name"
-msgid "P2 Button 6"
-msgstr "P2 按鈕 6"
-
-#: src/emu/inpttype.ipp:158
-msgctxt "input-name"
-msgid "P2 Button 7"
-msgstr "P2 按鈕 7"
-
-#: src/emu/inpttype.ipp:159
-msgctxt "input-name"
-msgid "P2 Button 8"
-msgstr "P2 按鈕 8"
-
-#: src/emu/inpttype.ipp:160
-msgctxt "input-name"
-msgid "P2 Button 9"
-msgstr "P2 按鈕 9"
-
-#: src/emu/inpttype.ipp:161
-msgctxt "input-name"
-msgid "P2 Button 10"
-msgstr "P2 按鈕 10"
-
-#: src/emu/inpttype.ipp:162
-msgctxt "input-name"
-msgid "P2 Button 11"
-msgstr "P2 按鈕 11"
-
-#: src/emu/inpttype.ipp:163
-msgctxt "input-name"
-msgid "P2 Button 12"
-msgstr "P2 按鈕 12"
-
-#: src/emu/inpttype.ipp:164
-msgctxt "input-name"
-msgid "P2 Button 13"
-msgstr "P2 按鈕 13"
-
-#: src/emu/inpttype.ipp:165
-msgctxt "input-name"
-msgid "P2 Button 14"
-msgstr "P2 按鈕 14"
-
-#: src/emu/inpttype.ipp:166
-msgctxt "input-name"
-msgid "P2 Button 15"
-msgstr "P2 按鈕 15"
-
-#: src/emu/inpttype.ipp:167
-msgctxt "input-name"
-msgid "P2 Button 16"
-msgstr "P2 按鈕 16"
-
-#: src/emu/inpttype.ipp:168
-msgctxt "input-name"
-msgid "P2 Start"
-msgstr "P2 開始"
-
-#: src/emu/inpttype.ipp:169
-msgctxt "input-name"
-msgid "P2 Select"
-msgstr "P2 選擇"
-
-#: src/emu/inpttype.ipp:174
-msgctxt "input-name"
-msgid "P2 Mahjong A"
-msgstr "P2 麻將 A"
-
-#: src/emu/inpttype.ipp:175
-msgctxt "input-name"
-msgid "P2 Mahjong B"
-msgstr "P2 麻將 B"
-
-#: src/emu/inpttype.ipp:176
-msgctxt "input-name"
-msgid "P2 Mahjong C"
-msgstr "P2 麻將 C"
-
-#: src/emu/inpttype.ipp:177
-msgctxt "input-name"
-msgid "P2 Mahjong D"
-msgstr "P2 麻將 D"
-
-#: src/emu/inpttype.ipp:178
-msgctxt "input-name"
-msgid "P2 Mahjong E"
-msgstr "P2 麻將 E"
-
-#: src/emu/inpttype.ipp:179
-msgctxt "input-name"
-msgid "P2 Mahjong F"
-msgstr "P2 麻將 F"
-
-#: src/emu/inpttype.ipp:180
-msgctxt "input-name"
-msgid "P2 Mahjong G"
-msgstr "P2 麻將 G"
-
-#: src/emu/inpttype.ipp:181
-msgctxt "input-name"
-msgid "P2 Mahjong H"
-msgstr "P2 麻將 H"
-
-#: src/emu/inpttype.ipp:182
-msgctxt "input-name"
-msgid "P2 Mahjong I"
-msgstr "P2 麻將 I"
-
-#: src/emu/inpttype.ipp:183
-msgctxt "input-name"
-msgid "P2 Mahjong J"
-msgstr "P2 麻將 J"
-
-#: src/emu/inpttype.ipp:184
-msgctxt "input-name"
-msgid "P2 Mahjong K"
-msgstr "P2 麻將 K"
-
-#: src/emu/inpttype.ipp:185
-msgctxt "input-name"
-msgid "P2 Mahjong L"
-msgstr "P2 麻將 L"
-
-#: src/emu/inpttype.ipp:186
-msgctxt "input-name"
-msgid "P2 Mahjong M"
-msgstr "P2 麻將 M"
-
-#: src/emu/inpttype.ipp:187
-msgctxt "input-name"
-msgid "P2 Mahjong N"
-msgstr "P2 麻將 N"
-
-#: src/emu/inpttype.ipp:188
-msgctxt "input-name"
-msgid "P2 Mahjong O"
-msgstr "P2 麻將 O"
-
-#: src/emu/inpttype.ipp:189
-msgctxt "input-name"
-msgid "P2 Mahjong P"
-msgstr "P2 麻將 P"
-
-#: src/emu/inpttype.ipp:190
-msgctxt "input-name"
-msgid "P2 Mahjong Q"
-msgstr "P2 麻將 Q"
-
-#: src/emu/inpttype.ipp:191
-msgctxt "input-name"
-msgid "P2 Mahjong Kan"
-msgstr "P2 麻將 槓"
-
-#: src/emu/inpttype.ipp:192
-msgctxt "input-name"
-msgid "P2 Mahjong Pon"
-msgstr "P2 麻將 碰"
-
-#: src/emu/inpttype.ipp:193
-msgctxt "input-name"
-msgid "P2 Mahjong Chi"
-msgstr "P2 麻將 吃"
-
-#: src/emu/inpttype.ipp:194
-msgctxt "input-name"
-msgid "P2 Mahjong Reach"
-msgstr "P2 麻將 聽"
-
-#: src/emu/inpttype.ipp:195
-msgctxt "input-name"
-msgid "P2 Mahjong Ron"
-msgstr "P2 麻將 胡"
-
-#: src/emu/inpttype.ipp:196
-msgctxt "input-name"
-msgid "P2 Mahjong Bet"
-msgstr "P2 麻將 押分"
-
-#: src/emu/inpttype.ipp:197
-msgctxt "input-name"
-msgid "P2 Mahjong Last Chance"
-msgstr "P2 麻將 海底機會"
-
-#: src/emu/inpttype.ipp:198
-msgctxt "input-name"
-msgid "P2 Mahjong Take Score"
-msgstr "P2 麻將 得分"
-
-#: src/emu/inpttype.ipp:199
-msgctxt "input-name"
-msgid "P2 Mahjong Double Up"
-msgstr "P2 麻將 加倍"
-
-#: src/emu/inpttype.ipp:200
-msgctxt "input-name"
-msgid "P2 Mahjong Flip Flop"
-msgstr "P2 麻將 交換牌"
-
-#: src/emu/inpttype.ipp:201
-msgctxt "input-name"
-msgid "P2 Mahjong Big"
-msgstr "P2 麻將 大"
-
-#: src/emu/inpttype.ipp:202
-msgctxt "input-name"
-msgid "P2 Mahjong Small"
-msgstr "P2 麻將 小"
-
-#: src/emu/inpttype.ipp:207
-msgctxt "input-name"
-msgid "P2 Hanafuda A/1"
-msgstr "P2 花牌 A/1"
-
-#: src/emu/inpttype.ipp:208
-msgctxt "input-name"
-msgid "P2 Hanafuda B/2"
-msgstr "P2 花牌 B/2"
-
-#: src/emu/inpttype.ipp:209
-msgctxt "input-name"
-msgid "P2 Hanafuda C/3"
-msgstr "P2 花牌 C/3"
-
-#: src/emu/inpttype.ipp:210
-msgctxt "input-name"
-msgid "P2 Hanafuda D/4"
-msgstr "P2 花牌 D/4"
-
-#: src/emu/inpttype.ipp:211
-msgctxt "input-name"
-msgid "P2 Hanafuda E/5"
-msgstr "P2 花牌 E/5"
-
-#: src/emu/inpttype.ipp:212
-msgctxt "input-name"
-msgid "P2 Hanafuda F/6"
-msgstr "P2 花牌 F/6"
-
-#: src/emu/inpttype.ipp:213
-msgctxt "input-name"
-msgid "P2 Hanafuda G/7"
-msgstr "P2 花牌 G/7"
-
-#: src/emu/inpttype.ipp:214
-msgctxt "input-name"
-msgid "P2 Hanafuda H/8"
-msgstr "P2 花牌 H/8"
-
-#: src/emu/inpttype.ipp:215
-msgctxt "input-name"
-msgid "P2 Hanafuda Yes"
-msgstr "P2 花牌 是"
-
-#: src/emu/inpttype.ipp:216
-msgctxt "input-name"
-msgid "P2 Hanafuda No"
-msgstr "P2 花牌 否"
-
-#: src/emu/inpttype.ipp:221
-msgctxt "input-name"
-msgid "P3 Up"
-msgstr "P3 上"
-
-#: src/emu/inpttype.ipp:222
-msgctxt "input-name"
-msgid "P3 Down"
-msgstr "P3 下"
-
-#: src/emu/inpttype.ipp:223
-msgctxt "input-name"
-msgid "P3 Left"
-msgstr "P3 左"
-
-#: src/emu/inpttype.ipp:224
-msgctxt "input-name"
-msgid "P3 Right"
-msgstr "P3 右"
-
-#: src/emu/inpttype.ipp:225
-msgctxt "input-name"
-msgid "P3 Right Stick/Up"
-msgstr "P3 右搖桿/上"
-
-#: src/emu/inpttype.ipp:226
-msgctxt "input-name"
-msgid "P3 Right Stick/Down"
-msgstr "P3 右搖桿/下"
-
-#: src/emu/inpttype.ipp:227
-msgctxt "input-name"
-msgid "P3 Right Stick/Left"
-msgstr "P3 右搖桿/左"
-
-#: src/emu/inpttype.ipp:228
-msgctxt "input-name"
-msgid "P3 Right Stick/Right"
-msgstr "P3 右搖桿/右"
-
-#: src/emu/inpttype.ipp:229
-msgctxt "input-name"
-msgid "P3 Left Stick/Up"
-msgstr "P3 左搖桿/上"
-
-#: src/emu/inpttype.ipp:230
-msgctxt "input-name"
-msgid "P3 Left Stick/Down"
-msgstr "P3 左搖桿/下"
-
-#: src/emu/inpttype.ipp:231
-msgctxt "input-name"
-msgid "P3 Left Stick/Left"
-msgstr "P3 左搖桿/左"
-
-#: src/emu/inpttype.ipp:232
-msgctxt "input-name"
-msgid "P3 Left Stick/Right"
-msgstr "P3 左搖桿/右"
-
-#: src/emu/inpttype.ipp:233
-msgctxt "input-name"
-msgid "P3 Button 1"
-msgstr "P3 按鈕 1"
-
-#: src/emu/inpttype.ipp:234
-msgctxt "input-name"
-msgid "P3 Button 2"
-msgstr "P3 按鈕 2"
-
-#: src/emu/inpttype.ipp:235
-msgctxt "input-name"
-msgid "P3 Button 3"
-msgstr "P3 按鈕 3"
-
-#: src/emu/inpttype.ipp:236
-msgctxt "input-name"
-msgid "P3 Button 4"
-msgstr "P3 按鈕 4"
-
-#: src/emu/inpttype.ipp:237
-msgctxt "input-name"
-msgid "P3 Button 5"
-msgstr "P3 按鈕 5"
-
-#: src/emu/inpttype.ipp:238
-msgctxt "input-name"
-msgid "P3 Button 6"
-msgstr "P3 按鈕 6"
-
-#: src/emu/inpttype.ipp:239
-msgctxt "input-name"
-msgid "P3 Button 7"
-msgstr "P3 按鈕 7"
-
-#: src/emu/inpttype.ipp:240
-msgctxt "input-name"
-msgid "P3 Button 8"
-msgstr "P3 按鈕 8"
-
-#: src/emu/inpttype.ipp:241
-msgctxt "input-name"
-msgid "P3 Button 9"
-msgstr "P3 按鈕 9"
-
-#: src/emu/inpttype.ipp:242
-msgctxt "input-name"
-msgid "P3 Button 10"
-msgstr "P3 按鈕 10"
-
-#: src/emu/inpttype.ipp:243
-msgctxt "input-name"
-msgid "P3 Button 11"
-msgstr "P3 按鈕 11"
-
-#: src/emu/inpttype.ipp:244
-msgctxt "input-name"
-msgid "P3 Button 12"
-msgstr "P3 按鈕 12"
-
-#: src/emu/inpttype.ipp:245
-msgctxt "input-name"
-msgid "P3 Button 13"
-msgstr "P3 按鈕 13"
-
-#: src/emu/inpttype.ipp:246
-msgctxt "input-name"
-msgid "P3 Button 14"
-msgstr "P3 按鈕 14"
-
-#: src/emu/inpttype.ipp:247
-msgctxt "input-name"
-msgid "P3 Button 15"
-msgstr "P3 按鈕 15"
-
-#: src/emu/inpttype.ipp:248
-msgctxt "input-name"
-msgid "P3 Button 16"
-msgstr "P3 按鈕 16"
-
-#: src/emu/inpttype.ipp:249
-msgctxt "input-name"
-msgid "P3 Start"
-msgstr "P3 開始"
-
-#: src/emu/inpttype.ipp:250
-msgctxt "input-name"
-msgid "P3 Select"
-msgstr "P3 選擇"
-
-#: src/emu/inpttype.ipp:255
-msgctxt "input-name"
-msgid "P4 Up"
-msgstr "P4 上"
-
-#: src/emu/inpttype.ipp:256
-msgctxt "input-name"
-msgid "P4 Down"
-msgstr "P4 下"
-
-#: src/emu/inpttype.ipp:257
-msgctxt "input-name"
-msgid "P4 Left"
-msgstr "P4 左"
-
-#: src/emu/inpttype.ipp:258
-msgctxt "input-name"
-msgid "P4 Right"
-msgstr "P4 右"
-
-#: src/emu/inpttype.ipp:259
-msgctxt "input-name"
-msgid "P4 Right Stick/Up"
-msgstr "P4 右搖桿/上"
-
-#: src/emu/inpttype.ipp:260
-msgctxt "input-name"
-msgid "P4 Right Stick/Down"
-msgstr "P4 右搖桿/下"
-
-#: src/emu/inpttype.ipp:261
-msgctxt "input-name"
-msgid "P4 Right Stick/Left"
-msgstr "P4 右搖桿/左"
-
-#: src/emu/inpttype.ipp:262
-msgctxt "input-name"
-msgid "P4 Right Stick/Right"
-msgstr "P4 右搖桿/右"
-
-#: src/emu/inpttype.ipp:263
-msgctxt "input-name"
-msgid "P4 Left Stick/Up"
-msgstr "P4 左搖桿/上"
-
-#: src/emu/inpttype.ipp:264
-msgctxt "input-name"
-msgid "P4 Left Stick/Down"
-msgstr "P4 左搖桿/下"
-
-#: src/emu/inpttype.ipp:265
-msgctxt "input-name"
-msgid "P4 Left Stick/Left"
-msgstr "P4 左搖桿/左"
-
-#: src/emu/inpttype.ipp:266
-msgctxt "input-name"
-msgid "P4 Left Stick/Right"
-msgstr "P4 左搖桿/右"
-
-#: src/emu/inpttype.ipp:267
-msgctxt "input-name"
-msgid "P4 Button 1"
-msgstr "P4 按鈕 1"
-
-#: src/emu/inpttype.ipp:268
-msgctxt "input-name"
-msgid "P4 Button 2"
-msgstr "P4 按鈕 2"
-
-#: src/emu/inpttype.ipp:269
-msgctxt "input-name"
-msgid "P4 Button 3"
-msgstr "P4 按鈕 3"
-
-#: src/emu/inpttype.ipp:270
-msgctxt "input-name"
-msgid "P4 Button 4"
-msgstr "P4 按鈕 4"
-
-#: src/emu/inpttype.ipp:271
-msgctxt "input-name"
-msgid "P4 Button 5"
-msgstr "P4 按鈕 5"
-
-#: src/emu/inpttype.ipp:272
-msgctxt "input-name"
-msgid "P4 Button 6"
-msgstr "P4 按鈕 6"
-
-#: src/emu/inpttype.ipp:273
-msgctxt "input-name"
-msgid "P4 Button 7"
-msgstr "P4 按鈕 7"
-
-#: src/emu/inpttype.ipp:274
-msgctxt "input-name"
-msgid "P4 Button 8"
-msgstr "P4 按鈕 8"
-
-#: src/emu/inpttype.ipp:275
-msgctxt "input-name"
-msgid "P4 Button 9"
-msgstr "P4 按鈕 9"
-
-#: src/emu/inpttype.ipp:276
-msgctxt "input-name"
-msgid "P4 Button 10"
-msgstr "P4 按鈕 10"
-
-#: src/emu/inpttype.ipp:277
-msgctxt "input-name"
-msgid "P4 Button 11"
-msgstr "P4 按鈕 11"
-
-#: src/emu/inpttype.ipp:278
-msgctxt "input-name"
-msgid "P4 Button 12"
-msgstr "P4 按鈕 12"
-
-#: src/emu/inpttype.ipp:279
-msgctxt "input-name"
-msgid "P4 Button 13"
-msgstr "P4 按鈕 13"
-
-#: src/emu/inpttype.ipp:280
-msgctxt "input-name"
-msgid "P4 Button 14"
-msgstr "P4 按鈕 14"
-
-#: src/emu/inpttype.ipp:281
-msgctxt "input-name"
-msgid "P4 Button 15"
-msgstr "P4 按鈕 15"
-
-#: src/emu/inpttype.ipp:282
-msgctxt "input-name"
-msgid "P4 Button 16"
-msgstr "P4 按鈕 16"
-
-#: src/emu/inpttype.ipp:283
-msgctxt "input-name"
-msgid "P4 Start"
-msgstr "P4 開始"
-
-#: src/emu/inpttype.ipp:284
-msgctxt "input-name"
-msgid "P4 Select"
-msgstr "P4 選擇"
-
-#: src/emu/inpttype.ipp:289
-msgctxt "input-name"
-msgid "P5 Up"
-msgstr "P5 上"
-
-#: src/emu/inpttype.ipp:290
-msgctxt "input-name"
-msgid "P5 Down"
-msgstr "P5 下"
-
-#: src/emu/inpttype.ipp:291
-msgctxt "input-name"
-msgid "P5 Left"
-msgstr "P5 左"
-
-#: src/emu/inpttype.ipp:292
-msgctxt "input-name"
-msgid "P5 Right"
-msgstr "P5 右"
-
-#: src/emu/inpttype.ipp:293
-msgctxt "input-name"
-msgid "P5 Right Stick/Up"
-msgstr "P5 右搖桿/上"
-
-#: src/emu/inpttype.ipp:294
-msgctxt "input-name"
-msgid "P5 Right Stick/Down"
-msgstr "P5 右搖桿/下"
-
-#: src/emu/inpttype.ipp:295
-msgctxt "input-name"
-msgid "P5 Right Stick/Left"
-msgstr "P5 右搖桿/左"
-
-#: src/emu/inpttype.ipp:296
-msgctxt "input-name"
-msgid "P5 Right Stick/Right"
-msgstr "P5 右搖桿/右"
-
-#: src/emu/inpttype.ipp:297
-msgctxt "input-name"
-msgid "P5 Left Stick/Up"
-msgstr "P5 左搖桿/上"
-
-#: src/emu/inpttype.ipp:298
-msgctxt "input-name"
-msgid "P5 Left Stick/Down"
-msgstr "P5 左搖桿/下"
-
-#: src/emu/inpttype.ipp:299
-msgctxt "input-name"
-msgid "P5 Left Stick/Left"
-msgstr "P5 左搖桿/左"
-
-#: src/emu/inpttype.ipp:300
-msgctxt "input-name"
-msgid "P5 Left Stick/Right"
-msgstr "P5 左搖桿/右"
-
-#: src/emu/inpttype.ipp:301
-msgctxt "input-name"
-msgid "P5 Button 1"
-msgstr "P5 按鈕 1"
-
-#: src/emu/inpttype.ipp:302
-msgctxt "input-name"
-msgid "P5 Button 2"
-msgstr "P5 按鈕 2"
-
-#: src/emu/inpttype.ipp:303
-msgctxt "input-name"
-msgid "P5 Button 3"
-msgstr "P5 按鈕 3"
-
-#: src/emu/inpttype.ipp:304
-msgctxt "input-name"
-msgid "P5 Button 4"
-msgstr "P5 按鈕 4"
-
-#: src/emu/inpttype.ipp:305
-msgctxt "input-name"
-msgid "P5 Button 5"
-msgstr "P5 按鈕 5"
-
-#: src/emu/inpttype.ipp:306
-msgctxt "input-name"
-msgid "P5 Button 6"
-msgstr "P5 按鈕 6"
-
-#: src/emu/inpttype.ipp:307
-msgctxt "input-name"
-msgid "P5 Button 7"
-msgstr "P5 按鈕 7"
-
-#: src/emu/inpttype.ipp:308
-msgctxt "input-name"
-msgid "P5 Button 8"
-msgstr "P5 按鈕 8"
-
-#: src/emu/inpttype.ipp:309
-msgctxt "input-name"
-msgid "P5 Button 9"
-msgstr "P5 按鈕 9"
-
-#: src/emu/inpttype.ipp:310
-msgctxt "input-name"
-msgid "P5 Button 10"
-msgstr "P5 按鈕 10"
-
-#: src/emu/inpttype.ipp:311
-msgctxt "input-name"
-msgid "P5 Button 11"
-msgstr "P5 按鈕 11"
-
-#: src/emu/inpttype.ipp:312
-msgctxt "input-name"
-msgid "P5 Button 12"
-msgstr "P5 按鈕 12"
-
-#: src/emu/inpttype.ipp:313
-msgctxt "input-name"
-msgid "P5 Button 13"
-msgstr "P5 按鈕 13"
-
-#: src/emu/inpttype.ipp:314
-msgctxt "input-name"
-msgid "P5 Button 14"
-msgstr "P5 按鈕 14"
-
-#: src/emu/inpttype.ipp:315
-msgctxt "input-name"
-msgid "P5 Button 15"
-msgstr "P5 按鈕 15"
-
-#: src/emu/inpttype.ipp:316
-msgctxt "input-name"
-msgid "P5 Button 16"
-msgstr "P5 按鈕 16"
-
-#: src/emu/inpttype.ipp:317
-msgctxt "input-name"
-msgid "P5 Start"
-msgstr "P5 開始"
-
-#: src/emu/inpttype.ipp:318
-msgctxt "input-name"
-msgid "P5 Select"
-msgstr "P5 選擇"
-
-#: src/emu/inpttype.ipp:323
-msgctxt "input-name"
-msgid "P6 Up"
-msgstr "P6 上"
-
-#: src/emu/inpttype.ipp:324
-msgctxt "input-name"
-msgid "P6 Down"
-msgstr "P6 下"
-
-#: src/emu/inpttype.ipp:325
-msgctxt "input-name"
-msgid "P6 Left"
-msgstr "P6 左"
-
-#: src/emu/inpttype.ipp:326
-msgctxt "input-name"
-msgid "P6 Right"
-msgstr "P6 右"
-
-#: src/emu/inpttype.ipp:327
-msgctxt "input-name"
-msgid "P6 Right Stick/Up"
-msgstr "P6 右搖桿/上"
-
-#: src/emu/inpttype.ipp:328
-msgctxt "input-name"
-msgid "P6 Right Stick/Down"
-msgstr "P6 右搖桿/下"
-
-#: src/emu/inpttype.ipp:329
-msgctxt "input-name"
-msgid "P6 Right Stick/Left"
-msgstr "P6 右搖桿/左"
-
-#: src/emu/inpttype.ipp:330
-msgctxt "input-name"
-msgid "P6 Right Stick/Right"
-msgstr "P6 右搖桿/右"
-
-#: src/emu/inpttype.ipp:331
-msgctxt "input-name"
-msgid "P6 Left Stick/Up"
-msgstr "P6 左搖桿/上"
-
-#: src/emu/inpttype.ipp:332
-msgctxt "input-name"
-msgid "P6 Left Stick/Down"
-msgstr "P6 左搖桿/下"
-
-#: src/emu/inpttype.ipp:333
-msgctxt "input-name"
-msgid "P6 Left Stick/Left"
-msgstr "P6 左搖桿/左"
-
-#: src/emu/inpttype.ipp:334
-msgctxt "input-name"
-msgid "P6 Left Stick/Right"
-msgstr "P6 左搖桿/右"
-
-#: src/emu/inpttype.ipp:335
-msgctxt "input-name"
-msgid "P6 Button 1"
-msgstr "P6 按鈕 1"
-
-#: src/emu/inpttype.ipp:336
-msgctxt "input-name"
-msgid "P6 Button 2"
-msgstr "P6 按鈕 2"
-
-#: src/emu/inpttype.ipp:337
-msgctxt "input-name"
-msgid "P6 Button 3"
-msgstr "P6 按鈕 3"
-
-#: src/emu/inpttype.ipp:338
-msgctxt "input-name"
-msgid "P6 Button 4"
-msgstr "P6 按鈕 4"
-
-#: src/emu/inpttype.ipp:339
-msgctxt "input-name"
-msgid "P6 Button 5"
-msgstr "P6 按鈕 5"
-
-#: src/emu/inpttype.ipp:340
-msgctxt "input-name"
-msgid "P6 Button 6"
-msgstr "P6 按鈕 6"
-
-#: src/emu/inpttype.ipp:341
-msgctxt "input-name"
-msgid "P6 Button 7"
-msgstr "P6 按鈕 7"
-
-#: src/emu/inpttype.ipp:342
-msgctxt "input-name"
-msgid "P6 Button 8"
-msgstr "P6 按鈕 8"
-
-#: src/emu/inpttype.ipp:343
-msgctxt "input-name"
-msgid "P6 Button 9"
-msgstr "P6 按鈕 9"
-
-#: src/emu/inpttype.ipp:344
-msgctxt "input-name"
-msgid "P6 Button 10"
-msgstr "P6 按鈕 10"
-
-#: src/emu/inpttype.ipp:345
-msgctxt "input-name"
-msgid "P6 Button 11"
-msgstr "P6 按鈕 11"
-
-#: src/emu/inpttype.ipp:346
-msgctxt "input-name"
-msgid "P6 Button 12"
-msgstr "P6 按鈕 12"
-
-#: src/emu/inpttype.ipp:347
-msgctxt "input-name"
-msgid "P6 Button 13"
-msgstr "P6 按鈕 13"
-
-#: src/emu/inpttype.ipp:348
-msgctxt "input-name"
-msgid "P6 Button 14"
-msgstr "P6 按鈕 14"
-
-#: src/emu/inpttype.ipp:349
-msgctxt "input-name"
-msgid "P6 Button 15"
-msgstr "P6 按鈕 15"
-
-#: src/emu/inpttype.ipp:350
-msgctxt "input-name"
-msgid "P6 Button 16"
-msgstr "P6 按鈕 16"
-
-#: src/emu/inpttype.ipp:351
-msgctxt "input-name"
-msgid "P6 Start"
-msgstr "P6 開始"
-
-#: src/emu/inpttype.ipp:352
-msgctxt "input-name"
-msgid "P6 Select"
-msgstr "P6 選擇"
-
-#: src/emu/inpttype.ipp:357
-msgctxt "input-name"
-msgid "P7 Up"
-msgstr "P7 上"
-
-#: src/emu/inpttype.ipp:358
-msgctxt "input-name"
-msgid "P7 Down"
-msgstr "P7 下"
-
-#: src/emu/inpttype.ipp:359
-msgctxt "input-name"
-msgid "P7 Left"
-msgstr "P7 左"
-
-#: src/emu/inpttype.ipp:360
-msgctxt "input-name"
-msgid "P7 Right"
-msgstr "P7 右"
-
-#: src/emu/inpttype.ipp:361
-msgctxt "input-name"
-msgid "P7 Right Stick/Up"
-msgstr "P7 右搖桿/上"
-
-#: src/emu/inpttype.ipp:362
-msgctxt "input-name"
-msgid "P7 Right Stick/Down"
-msgstr "P7 右搖桿/下"
-
-#: src/emu/inpttype.ipp:363
-msgctxt "input-name"
-msgid "P7 Right Stick/Left"
-msgstr "P7 右搖桿/左"
-
-#: src/emu/inpttype.ipp:364
-msgctxt "input-name"
-msgid "P7 Right Stick/Right"
-msgstr "P7 右搖桿/右"
-
-#: src/emu/inpttype.ipp:365
-msgctxt "input-name"
-msgid "P7 Left Stick/Up"
-msgstr "P7 左搖桿/上"
-
-#: src/emu/inpttype.ipp:366
-msgctxt "input-name"
-msgid "P7 Left Stick/Down"
-msgstr "P7 左搖桿/下"
-
-#: src/emu/inpttype.ipp:367
-msgctxt "input-name"
-msgid "P7 Left Stick/Left"
-msgstr "P7 左搖桿/左"
-
-#: src/emu/inpttype.ipp:368
-msgctxt "input-name"
-msgid "P7 Left Stick/Right"
-msgstr "P7 左搖桿/右"
-
-#: src/emu/inpttype.ipp:369
-msgctxt "input-name"
-msgid "P7 Button 1"
-msgstr "P7 按鈕 1"
-
-#: src/emu/inpttype.ipp:370
-msgctxt "input-name"
-msgid "P7 Button 2"
-msgstr "P7 按鈕 2"
-
-#: src/emu/inpttype.ipp:371
-msgctxt "input-name"
-msgid "P7 Button 3"
-msgstr "P7 按鈕 3"
-
-#: src/emu/inpttype.ipp:372
-msgctxt "input-name"
-msgid "P7 Button 4"
-msgstr "P7 按鈕 4"
-
-#: src/emu/inpttype.ipp:373
-msgctxt "input-name"
-msgid "P7 Button 5"
-msgstr "P7 按鈕 5"
-
-#: src/emu/inpttype.ipp:374
-msgctxt "input-name"
-msgid "P7 Button 6"
-msgstr "P7 按鈕 6"
-
-#: src/emu/inpttype.ipp:375
-msgctxt "input-name"
-msgid "P7 Button 7"
-msgstr "P7 按鈕 7"
-
-#: src/emu/inpttype.ipp:376
-msgctxt "input-name"
-msgid "P7 Button 8"
-msgstr "P7 按鈕 8"
-
-#: src/emu/inpttype.ipp:377
-msgctxt "input-name"
-msgid "P7 Button 9"
-msgstr "P7 按鈕 9"
-
-#: src/emu/inpttype.ipp:378
-msgctxt "input-name"
-msgid "P7 Button 10"
-msgstr "P7 按鈕 10"
-
-#: src/emu/inpttype.ipp:379
-msgctxt "input-name"
-msgid "P7 Button 11"
-msgstr "P7 按鈕 11"
-
-#: src/emu/inpttype.ipp:380
-msgctxt "input-name"
-msgid "P7 Button 12"
-msgstr "P7 按鈕 12"
-
-#: src/emu/inpttype.ipp:381
-msgctxt "input-name"
-msgid "P7 Button 13"
-msgstr "P7 按鈕 13"
-
-#: src/emu/inpttype.ipp:382
-msgctxt "input-name"
-msgid "P7 Button 14"
-msgstr "P7 按鈕 14"
-
-#: src/emu/inpttype.ipp:383
-msgctxt "input-name"
-msgid "P7 Button 15"
-msgstr "P7 按鈕 15"
-
-#: src/emu/inpttype.ipp:384
-msgctxt "input-name"
-msgid "P7 Button 16"
-msgstr "P7 按鈕 16"
-
-#: src/emu/inpttype.ipp:385
-msgctxt "input-name"
-msgid "P7 Start"
-msgstr "P7 開始"
-
-#: src/emu/inpttype.ipp:386
-msgctxt "input-name"
-msgid "P7 Select"
-msgstr "P7 選擇"
-
-#: src/emu/inpttype.ipp:391
-msgctxt "input-name"
-msgid "P8 Up"
-msgstr "P8 上"
-
-#: src/emu/inpttype.ipp:392
-msgctxt "input-name"
-msgid "P8 Down"
-msgstr "P8 下"
-
-#: src/emu/inpttype.ipp:393
-msgctxt "input-name"
-msgid "P8 Left"
-msgstr "P8 左"
-
-#: src/emu/inpttype.ipp:394
-msgctxt "input-name"
-msgid "P8 Right"
-msgstr "P8 右"
-
-#: src/emu/inpttype.ipp:395
-msgctxt "input-name"
-msgid "P8 Right Stick/Up"
-msgstr "P8 右搖桿/上"
-
-#: src/emu/inpttype.ipp:396
-msgctxt "input-name"
-msgid "P8 Right Stick/Down"
-msgstr "P8 右搖桿/下"
-
-#: src/emu/inpttype.ipp:397
-msgctxt "input-name"
-msgid "P8 Right Stick/Left"
-msgstr "P8 右搖桿/左"
-
-#: src/emu/inpttype.ipp:398
-msgctxt "input-name"
-msgid "P8 Right Stick/Right"
-msgstr "P8 右搖桿/右"
-
-#: src/emu/inpttype.ipp:399
-msgctxt "input-name"
-msgid "P8 Left Stick/Up"
-msgstr "P8 左搖桿/上"
-
-#: src/emu/inpttype.ipp:400
-msgctxt "input-name"
-msgid "P8 Left Stick/Down"
-msgstr "P8 左搖桿/下"
-
-#: src/emu/inpttype.ipp:401
-msgctxt "input-name"
-msgid "P8 Left Stick/Left"
-msgstr "P8 左搖桿/左"
-
-#: src/emu/inpttype.ipp:402
-msgctxt "input-name"
-msgid "P8 Left Stick/Right"
-msgstr "P8 左搖桿/右"
-
-#: src/emu/inpttype.ipp:403
-msgctxt "input-name"
-msgid "P8 Button 1"
-msgstr "P8 按鈕 1"
-
-#: src/emu/inpttype.ipp:404
-msgctxt "input-name"
-msgid "P8 Button 2"
-msgstr "P8 按鈕 2"
-
-#: src/emu/inpttype.ipp:405
-msgctxt "input-name"
-msgid "P8 Button 3"
-msgstr "P8 按鈕 3"
-
-#: src/emu/inpttype.ipp:406
-msgctxt "input-name"
-msgid "P8 Button 4"
-msgstr "P8 按鈕 4"
-
-#: src/emu/inpttype.ipp:407
-msgctxt "input-name"
-msgid "P8 Button 5"
-msgstr "P8 按鈕 5"
-
-#: src/emu/inpttype.ipp:408
-msgctxt "input-name"
-msgid "P8 Button 6"
-msgstr "P8 按鈕 6"
-
-#: src/emu/inpttype.ipp:409
-msgctxt "input-name"
-msgid "P8 Button 7"
-msgstr "P8 按鈕 7"
-
-#: src/emu/inpttype.ipp:410
-msgctxt "input-name"
-msgid "P8 Button 8"
-msgstr "P8 按鈕 8"
-
-#: src/emu/inpttype.ipp:411
-msgctxt "input-name"
-msgid "P8 Button 9"
-msgstr "P8 按鈕 9"
-
-#: src/emu/inpttype.ipp:412
-msgctxt "input-name"
-msgid "P8 Button 10"
-msgstr "P8 按鈕 10"
-
-#: src/emu/inpttype.ipp:413
-msgctxt "input-name"
-msgid "P8 Button 11"
-msgstr "P8 按鈕 11"
-
-#: src/emu/inpttype.ipp:414
-msgctxt "input-name"
-msgid "P8 Button 12"
-msgstr "P8 按鈕 12"
-
-#: src/emu/inpttype.ipp:415
-msgctxt "input-name"
-msgid "P8 Button 13"
-msgstr "P8 按鈕 13"
-
-#: src/emu/inpttype.ipp:416
-msgctxt "input-name"
-msgid "P8 Button 14"
-msgstr "P8 按鈕 14"
-
-#: src/emu/inpttype.ipp:417
-msgctxt "input-name"
-msgid "P8 Button 15"
-msgstr "P8 按鈕 15"
-
-#: src/emu/inpttype.ipp:418
-msgctxt "input-name"
-msgid "P8 Button 16"
-msgstr "P8 按鈕 16"
-
-#: src/emu/inpttype.ipp:419
-msgctxt "input-name"
-msgid "P8 Start"
-msgstr "P8 開始"
-
-#: src/emu/inpttype.ipp:420
-msgctxt "input-name"
-msgid "P8 Select"
-msgstr "P8 選擇"
-
-#: src/emu/inpttype.ipp:425
-msgctxt "input-name"
-msgid "P9 Up"
-msgstr "P9 上"
-
-#: src/emu/inpttype.ipp:426
-msgctxt "input-name"
-msgid "P9 Down"
-msgstr "P9 下"
-
-#: src/emu/inpttype.ipp:427
-msgctxt "input-name"
-msgid "P9 Left"
-msgstr "P9 左"
-
-#: src/emu/inpttype.ipp:428
-msgctxt "input-name"
-msgid "P9 Right"
-msgstr "P9 右"
-
-#: src/emu/inpttype.ipp:429
-msgctxt "input-name"
-msgid "P9 Right Stick/Up"
-msgstr "P9 右搖桿/上"
-
-#: src/emu/inpttype.ipp:430
-msgctxt "input-name"
-msgid "P9 Right Stick/Down"
-msgstr "P9 右搖桿/下"
-
-#: src/emu/inpttype.ipp:431
-msgctxt "input-name"
-msgid "P9 Right Stick/Left"
-msgstr "P9 右搖桿/左"
-
-#: src/emu/inpttype.ipp:432
-msgctxt "input-name"
-msgid "P9 Right Stick/Right"
-msgstr "P9 右搖桿/右"
-
-#: src/emu/inpttype.ipp:433
-msgctxt "input-name"
-msgid "P9 Left Stick/Up"
-msgstr "P9 左搖桿/上"
-
-#: src/emu/inpttype.ipp:434
-msgctxt "input-name"
-msgid "P9 Left Stick/Down"
-msgstr "P9 左搖桿/下"
-
-#: src/emu/inpttype.ipp:435
-msgctxt "input-name"
-msgid "P9 Left Stick/Left"
-msgstr "P9 左搖桿/左"
-
-#: src/emu/inpttype.ipp:436
-msgctxt "input-name"
-msgid "P9 Left Stick/Right"
-msgstr "P9 左搖桿/右"
-
-#: src/emu/inpttype.ipp:437
-msgctxt "input-name"
-msgid "P9 Button 1"
-msgstr "P9 按鈕 1"
-
-#: src/emu/inpttype.ipp:438
-msgctxt "input-name"
-msgid "P9 Button 2"
-msgstr "P9 按鈕 2"
-
-#: src/emu/inpttype.ipp:439
-msgctxt "input-name"
-msgid "P9 Button 3"
-msgstr "P9 按鈕 3"
-
-#: src/emu/inpttype.ipp:440
-msgctxt "input-name"
-msgid "P9 Button 4"
-msgstr "P9 按鈕 4"
-
-#: src/emu/inpttype.ipp:441
-msgctxt "input-name"
-msgid "P9 Button 5"
-msgstr "P9 按鈕 5"
-
-#: src/emu/inpttype.ipp:442
-msgctxt "input-name"
-msgid "P9 Button 6"
-msgstr "P9 按鈕 6"
-
-#: src/emu/inpttype.ipp:443
-msgctxt "input-name"
-msgid "P9 Button 7"
-msgstr "P9 按鈕 7"
-
-#: src/emu/inpttype.ipp:444
-msgctxt "input-name"
-msgid "P9 Button 8"
-msgstr "P9 按鈕 8"
-
-#: src/emu/inpttype.ipp:445
-msgctxt "input-name"
-msgid "P9 Button 9"
-msgstr "P9 按鈕 9"
-
-#: src/emu/inpttype.ipp:446
-msgctxt "input-name"
-msgid "P9 Button 10"
-msgstr "P9 按鈕 10"
-
-#: src/emu/inpttype.ipp:447
-msgctxt "input-name"
-msgid "P9 Button 11"
-msgstr "P9 按鈕 11"
-
-#: src/emu/inpttype.ipp:448
-msgctxt "input-name"
-msgid "P9 Button 12"
-msgstr "P9 按鈕 12"
-
-#: src/emu/inpttype.ipp:449
-msgctxt "input-name"
-msgid "P9 Button 13"
-msgstr "P9 按鈕 13"
-
-#: src/emu/inpttype.ipp:450
-msgctxt "input-name"
-msgid "P9 Button 14"
-msgstr "P9 按鈕 14"
-
-#: src/emu/inpttype.ipp:451
-msgctxt "input-name"
-msgid "P9 Button 15"
-msgstr "P9 按鈕 15"
-
-#: src/emu/inpttype.ipp:452
-msgctxt "input-name"
-msgid "P9 Button 16"
-msgstr "P9 按鈕 16"
-
-#: src/emu/inpttype.ipp:453
-msgctxt "input-name"
-msgid "P9 Start"
-msgstr "P9 開始"
-
-#: src/emu/inpttype.ipp:454
-msgctxt "input-name"
-msgid "P9 Select"
-msgstr "P9 選擇"
-
-#: src/emu/inpttype.ipp:459
-msgctxt "input-name"
-msgid "P10 Up"
-msgstr "P10 上"
-
-#: src/emu/inpttype.ipp:460
-msgctxt "input-name"
-msgid "P10 Down"
-msgstr "P10 下"
-
-#: src/emu/inpttype.ipp:461
-msgctxt "input-name"
-msgid "P10 Left"
-msgstr "P10 左"
-
-#: src/emu/inpttype.ipp:462
-msgctxt "input-name"
-msgid "P10 Right"
-msgstr "P10 右"
-
-#: src/emu/inpttype.ipp:463
-msgctxt "input-name"
-msgid "P10 Right Stick/Up"
-msgstr "P10 右搖桿/上"
-
-#: src/emu/inpttype.ipp:464
-msgctxt "input-name"
-msgid "P10 Right Stick/Down"
-msgstr "P10 右搖桿/下"
-
-#: src/emu/inpttype.ipp:465
-msgctxt "input-name"
-msgid "P10 Right Stick/Left"
-msgstr "P10 右搖桿/左"
-
-#: src/emu/inpttype.ipp:466
-msgctxt "input-name"
-msgid "P10 Right Stick/Right"
-msgstr "P10 右搖桿/右"
-
-#: src/emu/inpttype.ipp:467
-msgctxt "input-name"
-msgid "P10 Left Stick/Up"
-msgstr "P10 左搖桿/上"
-
-#: src/emu/inpttype.ipp:468
-msgctxt "input-name"
-msgid "P10 Left Stick/Down"
-msgstr "P10 左搖桿/下"
-
-#: src/emu/inpttype.ipp:469
-msgctxt "input-name"
-msgid "P10 Left Stick/Left"
-msgstr "P10 左搖桿/左"
-
-#: src/emu/inpttype.ipp:470
-msgctxt "input-name"
-msgid "P10 Left Stick/Right"
-msgstr "P10 左搖桿/右"
-
-#: src/emu/inpttype.ipp:471
-msgctxt "input-name"
-msgid "P10 Button 1"
-msgstr "P10 按鈕 1"
-
-#: src/emu/inpttype.ipp:472
-msgctxt "input-name"
-msgid "P10 Button 2"
-msgstr "P10 按鈕 2"
-
-#: src/emu/inpttype.ipp:473
-msgctxt "input-name"
-msgid "P10 Button 3"
-msgstr "P10 按鈕 3"
-
-#: src/emu/inpttype.ipp:474
-msgctxt "input-name"
-msgid "P10 Button 4"
-msgstr "P10 按鈕 4"
-
-#: src/emu/inpttype.ipp:475
-msgctxt "input-name"
-msgid "P10 Button 5"
-msgstr "P10 按鈕 5"
-
-#: src/emu/inpttype.ipp:476
-msgctxt "input-name"
-msgid "P10 Button 6"
-msgstr "P10 按鈕 6"
-
-#: src/emu/inpttype.ipp:477
-msgctxt "input-name"
-msgid "P10 Button 7"
-msgstr "P10 按鈕 7"
-
-#: src/emu/inpttype.ipp:478
-msgctxt "input-name"
-msgid "P10 Button 8"
-msgstr "P10 按鈕 8"
-
-#: src/emu/inpttype.ipp:479
-msgctxt "input-name"
-msgid "P10 Button 9"
-msgstr "P10 按鈕 9"
-
-#: src/emu/inpttype.ipp:480
-msgctxt "input-name"
-msgid "P10 Button 10"
-msgstr "P10 按鈕 10"
-
-#: src/emu/inpttype.ipp:481
-msgctxt "input-name"
-msgid "P10 Button 11"
-msgstr "P10 按鈕 11"
-
-#: src/emu/inpttype.ipp:482
-msgctxt "input-name"
-msgid "P10 Button 12"
-msgstr "P10 按鈕 12"
-
-#: src/emu/inpttype.ipp:483
-msgctxt "input-name"
-msgid "P10 Button 13"
-msgstr "P10 按鈕 13"
-
-#: src/emu/inpttype.ipp:484
-msgctxt "input-name"
-msgid "P10 Button 14"
-msgstr "P10 按鈕 14"
-
-#: src/emu/inpttype.ipp:485
-msgctxt "input-name"
-msgid "P10 Button 15"
-msgstr "P10 按鈕 15"
-
-#: src/emu/inpttype.ipp:486
-msgctxt "input-name"
-msgid "P10 Button 16"
-msgstr "P10 按鈕 16"
-
-#: src/emu/inpttype.ipp:487
-msgctxt "input-name"
-msgid "P10 Start"
-msgstr "P10 開始"
-
-#: src/emu/inpttype.ipp:488
-msgctxt "input-name"
-msgid "P10 Select"
-msgstr "P10 選擇"
 
 #: src/emu/inpttype.ipp:493
 msgctxt "input-name"
@@ -5562,155 +4191,32 @@ msgctxt "input-name"
 msgid "Volume Up"
 msgstr "音量提升"
 
-#: src/emu/inpttype.ipp:550
-msgctxt "input-name"
-msgid "P1 Pedal 1"
-msgstr "P1 踏板 1"
-
-#: src/emu/inpttype.ipp:551
-msgctxt "input-name"
-msgid "P2 Pedal 1"
-msgstr "P2 踏板 1"
-
-#: src/emu/inpttype.ipp:552
-msgctxt "input-name"
-msgid "P3 Pedal 1"
-msgstr "P3 踏板 1"
-
-#: src/emu/inpttype.ipp:553
-msgctxt "input-name"
-msgid "P4 Pedal 1"
-msgstr "P4 踏板 1"
-
-#: src/emu/inpttype.ipp:554
-msgctxt "input-name"
-msgid "P5 Pedal 1"
-msgstr "P5 踏板 1"
-
-#: src/emu/inpttype.ipp:555
-msgctxt "input-name"
-msgid "P6 Pedal 1"
-msgstr "P6 踏板 1"
-
-#: src/emu/inpttype.ipp:556
-msgctxt "input-name"
-msgid "P7 Pedal 1"
-msgstr "P7 踏板 1"
-
-#: src/emu/inpttype.ipp:557
-msgctxt "input-name"
-msgid "P8 Pedal 1"
-msgstr "P8 踏板 1"
-
-#: src/emu/inpttype.ipp:558
-msgctxt "input-name"
-msgid "P9 Pedal 1"
-msgstr "P9 踏板 1"
-
+#: src/emu/inpttype.ipp:550 src/emu/inpttype.ipp:551 src/emu/inpttype.ipp:552
+#: src/emu/inpttype.ipp:553 src/emu/inpttype.ipp:554 src/emu/inpttype.ipp:555
+#: src/emu/inpttype.ipp:556 src/emu/inpttype.ipp:557 src/emu/inpttype.ipp:558
 #: src/emu/inpttype.ipp:559
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 1"
-msgstr "P10 踏板 1"
+msgid "%p Pedal 1"
+msgstr "%p 踏板 1"
 
-#: src/emu/inpttype.ipp:564
-msgctxt "input-name"
-msgid "P1 Pedal 2"
-msgstr "P1 踏板 2"
-
-#: src/emu/inpttype.ipp:565
-msgctxt "input-name"
-msgid "P2 Pedal 2"
-msgstr "P2 踏板 2"
-
-#: src/emu/inpttype.ipp:566
-msgctxt "input-name"
-msgid "P3 Pedal 2"
-msgstr "P3 踏板 2"
-
-#: src/emu/inpttype.ipp:567
-msgctxt "input-name"
-msgid "P4 Pedal 2"
-msgstr "P4 踏板 2"
-
-#: src/emu/inpttype.ipp:568
-msgctxt "input-name"
-msgid "P5 Pedal 2"
-msgstr "P5 踏板 2"
-
-#: src/emu/inpttype.ipp:569
-msgctxt "input-name"
-msgid "P6 Pedal 2"
-msgstr "P6 踏板 2"
-
-#: src/emu/inpttype.ipp:570
-msgctxt "input-name"
-msgid "P7 Pedal 2"
-msgstr "P7 踏板 2"
-
-#: src/emu/inpttype.ipp:571
-msgctxt "input-name"
-msgid "P8 Pedal 2"
-msgstr "P8 踏板 2"
-
-#: src/emu/inpttype.ipp:572
-msgctxt "input-name"
-msgid "P9 Pedal 2"
-msgstr "P9 踏板 2"
-
+#: src/emu/inpttype.ipp:564 src/emu/inpttype.ipp:565 src/emu/inpttype.ipp:566
+#: src/emu/inpttype.ipp:567 src/emu/inpttype.ipp:568 src/emu/inpttype.ipp:569
+#: src/emu/inpttype.ipp:570 src/emu/inpttype.ipp:571 src/emu/inpttype.ipp:572
 #: src/emu/inpttype.ipp:573
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 2"
-msgstr "P10 踏板 2"
+msgid "%p Pedal 2"
+msgstr "%p 踏板 2"
 
-#: src/emu/inpttype.ipp:578
-msgctxt "input-name"
-msgid "P1 Pedal 3"
-msgstr "P1 踏板 3"
-
-#: src/emu/inpttype.ipp:579
-msgctxt "input-name"
-msgid "P2 Pedal 3"
-msgstr "P2 踏板 3"
-
-#: src/emu/inpttype.ipp:580
-msgctxt "input-name"
-msgid "P3 Pedal 3"
-msgstr "P3 踏板 3"
-
-#: src/emu/inpttype.ipp:581
-msgctxt "input-name"
-msgid "P4 Pedal 3"
-msgstr "P4 踏板 3"
-
-#: src/emu/inpttype.ipp:582
-msgctxt "input-name"
-msgid "P5 Pedal 3"
-msgstr "P5 踏板 3"
-
-#: src/emu/inpttype.ipp:583
-msgctxt "input-name"
-msgid "P6 Pedal 3"
-msgstr "P6 踏板 3"
-
-#: src/emu/inpttype.ipp:584
-msgctxt "input-name"
-msgid "P7 Pedal 3"
-msgstr "P7 踏板 3"
-
-#: src/emu/inpttype.ipp:585
-msgctxt "input-name"
-msgid "P8 Pedal 3"
-msgstr "P8 踏板 3"
-
-#: src/emu/inpttype.ipp:586
-msgctxt "input-name"
-msgid "P9 Pedal 3"
-msgstr "P9 踏板 3"
-
+#: src/emu/inpttype.ipp:578 src/emu/inpttype.ipp:579 src/emu/inpttype.ipp:580
+#: src/emu/inpttype.ipp:581 src/emu/inpttype.ipp:582 src/emu/inpttype.ipp:583
+#: src/emu/inpttype.ipp:584 src/emu/inpttype.ipp:585 src/emu/inpttype.ipp:586
 #: src/emu/inpttype.ipp:587
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 3"
-msgstr "P10 踏板 3"
+msgid "%p Pedal 3"
+msgstr "%p 踏板 3"
 
 #: src/emu/inpttype.ipp:592
 msgctxt "input-name"
@@ -7604,3 +6110,6 @@ msgid ""
 msgstr ""
 "輸入序列或按下 %s 取消\n"
 "%s"
+
+#~ msgid "Skip software parts selection menu"
+#~ msgstr "略過軟體部分選擇選單"

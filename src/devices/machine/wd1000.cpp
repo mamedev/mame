@@ -114,7 +114,7 @@ void wd1000_device::device_reset()
 //  device_timer - device-specific timer
 //-------------------------------------------------
 
-void wd1000_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void wd1000_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

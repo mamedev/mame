@@ -26,7 +26,7 @@
 #include "imagedev/snapquik.h"
 #include "video/tms9928a.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

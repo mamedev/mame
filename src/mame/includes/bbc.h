@@ -145,7 +145,7 @@ public:
 	void bbcm_drive_control_w(uint8_t data);
 	void serial_ula_w(uint8_t data);
 	void video_ula_w(offs_t offset, uint8_t data);
-	uint8_t bbc_fe_r() { return 0xfe; };
+	uint8_t bbc_fe_r() { return 0xfe; }
 
 	DECLARE_VIDEO_START(bbc);
 

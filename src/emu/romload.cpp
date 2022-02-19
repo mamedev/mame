@@ -11,11 +11,13 @@
 #include "emu.h"
 #include "romload.h"
 
-#include "corestr.h"
-#include "emuopts.h"
 #include "drivenum.h"
+#include "emuopts.h"
+#include "fileio.h"
 #include "softlist_dev.h"
 #include "ui/uimain.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <set>
@@ -1200,7 +1202,7 @@ void rom_load_manager::normalize_flags_for_device(std::string_view rgntag, u8 &w
 /*-------------------------------------------------
     load_software_part_region - load a software part
 
-    This is used by MESS when loading a piece of
+    This is used by MAME when loading a piece of
     software. The code should be merged with
     process_region_list or updated to use a slight
     more general process_region_list.

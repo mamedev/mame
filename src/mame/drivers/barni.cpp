@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-// PINBALL
-// Skeleton driver for Barni pinballs.
-// Known pinballs to be dumped: Shield (1985) - different electronics
-// Hardware listing and ROM definitions from PinMAME.
+/**************************************************************************************************************
+PINBALL
+Driver for Barni pinballs.
+Known pinballs to be dumped: Shield (1985) - different electronics
+Hardware listing and ROM definitions from PinMAME.
 
-/*
-    Hardware:
+Hardware:
     CPU: 2 x 6809E, optional MC6802 which may replace second 6809E
     INT: IRQ on CPU 0, FIRQ on CPU 1
     IO: 2x PIA 6821
@@ -16,6 +16,9 @@
 
 Undumped 16L8 at position U9
 
+Status:
+- Skeletons
+
 TODO:
 - Almost everything
 - Value of crystal on audio cpu
@@ -23,10 +26,10 @@ TODO:
 - Inputs (switches, dips)
 - Display needs to be done properly, SDA2131 to be a device.
 - How to trigger sounds?
-- Does speech work? DAC works by poking $5D in audio cpu.
+- Does speech work? DAC works if you poke data into $5D in audio cpu.
 - Manuals are difficult to read, and don't show everything we need.
 
-*/
+**************************************************************************************************************/
 
 #include "emu.h"
 #include "machine/genpin.h"
@@ -38,6 +41,8 @@ TODO:
 #include "sound/dac.h"
 #include "speaker.h"
 #include "barni.lh"
+
+namespace {
 
 class barni_state : public genpin_class
 {
@@ -55,7 +60,7 @@ public:
 		, m_speech(*this, "tms5220")
 		, m_dac(*this, "dac")
 		, m_dac2(*this, "dac2")
-		, m_digits(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		{ }
 
 	void barni(machine_config &config);
@@ -71,9 +76,9 @@ private:
 	void pias1_pb_w(u8);
 	void pias2_pb_w(u8);
 	void showseg(u8, u8);
-	u8 m_via_pa = 0;
-	u8 m_bitcount = 0;
-	u8 m_soundcmd = 0;
+	u8 m_via_pa = 0U;
+	u8 m_bitcount = 0U;
+	u8 m_soundcmd = 0U;
 	//void machine_reset() override;
 	void machine_start() override { m_digits.resolve(); }
 	required_device<mc6809e_device> m_maincpu;
@@ -298,6 +303,7 @@ ROM_START(redbarnp)
 	ROM_LOAD("rbsnd4.732", 0x0000, 0x1000, CRC(fd8db899) SHA1(0978213f14f73ccc4a24eb42a39db00d9299c5d0))
 ROM_END
 
+} // Anonymous namespace
 
 GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

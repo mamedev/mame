@@ -390,7 +390,6 @@ void am29000_cpu_device::MUL()
 	uint32_t a = GET_RA_VAL;
 	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
 	uint32_t r;
-	uint64_t v;
 	uint32_t sign;
 
 	if (m_q & 1)
@@ -404,10 +403,9 @@ void am29000_cpu_device::MUL()
 		sign = b >> 31;
 	}
 
-	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)sign << 63);
-	m_q = v & 0xffffffff;
-
-	m_r[RC] = v >> 32;
+	// Shift combined value right one bit position, entering sign into bit 31 of destination
+	m_r[RC] = (r >> 1) | (sign << 31);
+	m_q = (m_q >> 1) | (r << 31);
 }
 
 void am29000_cpu_device::MULL()
@@ -416,7 +414,6 @@ void am29000_cpu_device::MULL()
 	uint32_t a = GET_RA_VAL;
 	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
 	uint32_t r;
-	uint64_t v;
 	uint32_t sign;
 
 	if (m_q & 1)
@@ -430,10 +427,9 @@ void am29000_cpu_device::MULL()
 		sign = b >> 31;
 	}
 
-	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)sign << 63);
-	m_q = v & 0xffffffff;
-
-	m_r[RC] = v >> 32;
+	// Shift combined value right one bit position, entering sign into bit 31 of destination
+	m_r[RC] = (r >> 1) | (sign << 31);
+	m_q = (m_q >> 1) | (r << 31);
 }
 
 void am29000_cpu_device::MULU()
@@ -442,7 +438,6 @@ void am29000_cpu_device::MULU()
 	uint32_t a = GET_RA_VAL;
 	uint32_t b = INST_M_BIT ? I8 : GET_RB_VAL;
 	uint32_t r;
-	uint64_t v;
 	uint32_t c;
 
 	if (m_q & 1)
@@ -456,10 +451,9 @@ void am29000_cpu_device::MULU()
 		c = 0;
 	}
 
-	v = ((((uint64_t)r << 32) | m_q) >> 1) | ((uint64_t)c << 63);
-	m_q = v & 0xffffffff;
-
-	m_r[RC] = v >> 32;
+	// Shift combined value right one bit position, entering carry into bit 31 of destination
+	m_r[RC] = (r >> 1) | (c << 31);
+	m_q = (m_q >> 1) | (r << 31);
 }
 
 void am29000_cpu_device::DIVIDE()
@@ -479,7 +473,6 @@ void am29000_cpu_device::DIVIDU()
 void am29000_cpu_device::DIV0()
 {
 	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
-	uint64_t v;
 
 	if (!FREEZE_MODE)
 	{
@@ -487,11 +480,9 @@ void am29000_cpu_device::DIV0()
 		SET_ALU_N(b);
 	}
 
-	v = (((uint64_t)b << 32) | m_q) << 1;
-
-	m_q = v & 0xffffffff;
-
-	m_r[RC] = v >> 32;
+	// Shift combined value left one bit position, zeroing bit 0 of Q
+	m_r[RC] = (b << 1) | (m_q >> 31);
+	m_q <<= 1;
 }
 
 void am29000_cpu_device::DIV()
@@ -500,7 +491,6 @@ void am29000_cpu_device::DIV()
 	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
 	uint32_t c;
 	uint32_t r;
-	uint64_t r64;
 	uint32_t df;
 
 	if (m_alu & ALU_DF)
@@ -524,10 +514,9 @@ void am29000_cpu_device::DIV()
 		SET_ALU_N(r);
 	}
 
-	r64 = ((((uint64_t)r << 32) | m_q) << 1) | df;
-	m_q = r64 & 0xffffffff;
-
-	m_r[RC] = r64 >> 32;
+	// Shift combined value left one bit position, entering DF into bit 0 of Q
+	m_r[RC] = (r << 1) | (m_q >> 31);
+	m_q = (m_q << 1) | df;
 }
 
 void am29000_cpu_device::DIVL()

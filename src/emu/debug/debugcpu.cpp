@@ -19,6 +19,7 @@
 
 #include "debugger.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "screen.h"
 #include "uiinput.h"
 
@@ -458,14 +459,14 @@ device_debug::device_debug(device_t &device)
 	// set up notifiers and clear the passthrough handlers
 	if (m_memory) {
 		int count = m_memory->max_space_count();
-		m_phw.resize(count, nullptr);
+		m_phw.resize(count);
 		for (int i=0; i != count; i++)
 			if (m_memory->has_space(i)) {
 				address_space &space = m_memory->space(i);
-				m_notifiers.push_back(space.add_change_notifier([this, &space](read_or_write mode) { reinstall(space, mode); }));
+				m_notifiers.emplace_back(space.add_change_notifier([this, &space] (read_or_write mode) { reinstall(space, mode); }));
 			}
 			else
-				m_notifiers.push_back(-1);
+				m_notifiers.emplace_back();
 	}
 
 	// set up state-related stuff
@@ -562,15 +563,14 @@ void device_debug::reinstall(address_space &space, read_or_write mode)
 	int id = space.spacenum();
 	if (u32(mode) & u32(read_or_write::WRITE))
 	{
-		if (m_phw[id])
-			m_phw[id]->remove();
+		m_phw[id].remove();
 		if (m_track_mem)
 			switch (space.data_width())
 			{
-			case  8: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 16: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 32: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 64: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case  8: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space] (offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, &m_phw[id]); break;
+			case 16: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space] (offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, &m_phw[id]); break;
+			case 32: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space] (offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, &m_phw[id]); break;
+			case 64: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space] (offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, &m_phw[id]); break;
 			}
 	}
 }

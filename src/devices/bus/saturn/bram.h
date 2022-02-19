@@ -5,6 +5,8 @@
 
 #include "sat_slot.h"
 
+#include "fileio.h"
+
 
 // ======================> saturn_bram_device
 

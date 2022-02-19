@@ -14,6 +14,7 @@
 #include "texturemanager.h"
 #include "texture.h"
 #include "bgfxutil.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include "modules/render/copyutil.h"
 

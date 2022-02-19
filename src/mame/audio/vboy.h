@@ -4,7 +4,7 @@
     vboy.h - Virtual Boy audio emulation
 
     By Richard Bannister and Gil Pedersen.
-    MESS device adaptation by R. Belmont
+    MAME device adaptation by R. Belmont
 */
 #ifndef MAME_AUDIO_VBOY_H
 #define MAME_AUDIO_VBOY_H
@@ -70,7 +70,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
