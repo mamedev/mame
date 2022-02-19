@@ -14026,6 +14026,7 @@ granits                         // RCS
 miniscco
 
 @source:fidel_phantom.cpp
+cphantom                        //
 fphantom                        //
 
 @source:fidel_sc12.cpp
