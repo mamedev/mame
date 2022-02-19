@@ -44,12 +44,30 @@ public:
 
 private:
 	void rom_map(address_map &map);
+	void rom_ports_map(address_map &map);
+	void ram_map(address_map &map);
+	void ram_status_map(address_map &map);
 };
 
 
 void pmc_state::rom_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rom().region("maincpu", 0x0000); // TODO: to be verified
+	map(0x000, 0x3ff).rom().region("maincpu", 0x000);
+}
+
+void pmc_state::rom_ports_map(address_map &map)
+{
+	// TODO
+}
+
+void pmc_state::ram_map(address_map &map)
+{
+	map(0x000, 0x03f).ram();
+}
+
+void pmc_state::ram_status_map(address_map &map)
+{
+	map(0x000, 0x00f).ram();
 }
 
 void pmc_state::pmc(machine_config &config)
@@ -57,6 +75,9 @@ void pmc_state::pmc(machine_config &config)
 	// basic machine hardware
 	i4040_cpu_device &cpu(I4040(config, "maincpu", 5.185_MHz_XTAL / 7)); // P4201A divides the incoming clock by seven to get the multi-phase clock
 	cpu.set_rom_map(&pmc_state::rom_map);
+	cpu.set_rom_ports_map(&pmc_state::rom_ports_map);
+	cpu.set_ram_memory_map(&pmc_state::ram_map);
+	cpu.set_ram_status_map(&pmc_state::ram_status_map);
 
 	// video hardware
 	// SCREEN(config, "screen", SCREEN_TYPE_RASTER); // TODO
@@ -66,12 +87,12 @@ void pmc_state::pmc(machine_config &config)
 }
 
 
-ROM_START( unkpmc ) // TODO: verify ROM loading
+ROM_START( unkpmc )
 	ROM_REGION( 0x400, "maincpu", 0 )
-	ROM_LOAD( "1", 0x000, 0x0100, CRC(396fc572) SHA1(29b39d1119b28f6c75378f855129e132a5cb2370) )
-	ROM_LOAD( "2", 0x100, 0x0100, CRC(9e6a0570) SHA1(fbf6ce4066121019d0db0de0c75fb5869853c613) )
-	ROM_LOAD( "3", 0x200, 0x0100, CRC(727f2186) SHA1(8c1dcbf3099010f510400db03946d7aba813cf97) )
-	ROM_LOAD( "4", 0x300, 0x0100, CRC(7bafe4ad) SHA1(afb02aebf2ff9e733368545c0c0100bdcaa5c89b) )
+	ROM_LOAD( "4", 0x000, 0x0100, CRC(7bafe4ad) SHA1(afb02aebf2ff9e733368545c0c0100bdcaa5c89b) )
+	ROM_LOAD( "3", 0x100, 0x0100, CRC(727f2186) SHA1(8c1dcbf3099010f510400db03946d7aba813cf97) )
+	ROM_LOAD( "2", 0x200, 0x0100, CRC(9e6a0570) SHA1(fbf6ce4066121019d0db0de0c75fb5869853c613) )
+	ROM_LOAD( "1", 0x300, 0x0100, CRC(396fc572) SHA1(29b39d1119b28f6c75378f855129e132a5cb2370) )
 
 	ROM_REGION( 0x500, "proms", 0 )
 	ROM_LOAD( "5",  0x000, 0x0100, CRC(4023885f) SHA1(af94454583af10938746caf7bbe326081d21241d) )
