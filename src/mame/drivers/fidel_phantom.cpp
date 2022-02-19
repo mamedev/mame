@@ -18,9 +18,12 @@ Hardware notes:
 - magnetized x/y DC motors under chessboard, chesspieces have magnet underneath
 - piezo speaker, LEDs, 8*8 chessboard buttons
 
-Chesster Phantom is on similar base hardware, and adds the Chesster voice to it,
-using the same ROM as the original Chesster. It also has a motion sensor at the
-front and 2 leds to mimick eyes.
+Chesster Phantom is on the same base hardware, and adds the Chesster voice to it,
+using the same ROM as the original Chesster. Model 6124 extra hardware is on a
+daughterboard, the housing is the same as model 6100, except for button labels.
+
+Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
+and 2 leds to mimick eyes, and the housing is green instead of beige.
 
 To play, wait until the motor is finished before making a move. At boot-up, the
 computer will do a self-test.
@@ -611,4 +614,4 @@ ROM_END
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT     STATE            INIT          COMPANY, FULLNAME, FLAGS
 CONS( 1988, fphantom,  0,     0,  phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
 
-CONS( 1991, cphantom,  0,     0,  cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
+CONS( 1991, cphantom,  0,     0,  cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
