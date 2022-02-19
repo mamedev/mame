@@ -191,7 +191,11 @@ void sdl_osd_interface::extract_video_config()
 	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
+#if (defined SDLMAME_EMSCRIPTEN)
+		stemp = "soft";
+#else
 		stemp = "bgfx";
+#endif
 	}
 	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
