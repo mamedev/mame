@@ -32,7 +32,7 @@ void applefdintf_device::formats_35(format_registration &fr)
 	fr.add(FLOPPY_APPLE_GCR_FORMAT);
 	fr.add(FLOPPY_APPLE_2MG_FORMAT);
 
-	fr.add(FS_PRODOS);
+	fr.add(fs::PRODOS);
 }
 
 void applefdintf_device::floppies_525(device_slot_interface &device)

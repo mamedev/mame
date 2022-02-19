@@ -401,14 +401,14 @@ u8 wico_state::switch_r(offs_t offset)
 // write digits in main display
 u8 wico_state::lampst_r()
 {
-	int i, j;
+	u8 i, j;
 	for (i = 0; i < 5; i++)
 	{
 		if (m_disp_on)
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		m_digits[i * 10 + (m_shared_ram[0x96] & 7)] = bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+		m_digits[i * 10 + (m_shared_ram[0x96] & 7)] = j;
 	}
 	// Lamps
 	for (i = 0; i < 16; i++)

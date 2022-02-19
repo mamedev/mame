@@ -100,7 +100,7 @@ void ti99_handset_device::write_dev(uint8_t data)
     of P0 is changed, because, in one occasion, the ISR asserts the line before
     it reads the data, so we need to delay the acknowledge process.
 */
-void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_clock_high = !m_clock_high;
 	m_buf >>= 4;

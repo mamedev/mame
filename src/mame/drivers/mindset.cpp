@@ -12,6 +12,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "mindset.lh"

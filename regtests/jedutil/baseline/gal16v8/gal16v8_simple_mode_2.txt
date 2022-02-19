@@ -1,0 +1,25 @@
+Inputs:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19
+
+Outputs:
+
+12 (Combinatorial, Output feedback output, Active low)
+15 (Combinatorial, No output feedback, Active low)
+16 (Combinatorial, No output feedback, Active low)
+
+Equations:
+
+/o12 = i1 +
+       i2 +
+       i3 +
+       /i4 +
+       /i5
+o12.oe = vcc
+
+/o15 = 
+o15.oe = vcc
+
+/o16 = 
+o16.oe = vcc
+

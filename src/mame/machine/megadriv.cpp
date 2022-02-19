@@ -79,7 +79,7 @@ void md_base_state::megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
 TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 {
-	m_io_stage[(int)(uintptr_t)ptr] = -1;
+	m_io_stage[(int)param] = -1;
 }
 
 
@@ -366,7 +366,7 @@ void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t
 		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			m_io_stage[portnum]++;
-			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192));
+			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192), portnum);
 		}
 
 	}

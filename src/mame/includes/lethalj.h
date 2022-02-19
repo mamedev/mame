@@ -59,7 +59,7 @@ private:
 	void lethalj_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void video_start() override;
 
 	required_device<tms34010_device> m_maincpu;

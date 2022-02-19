@@ -8,13 +8,15 @@
 #include "sound/ay8910.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/tzx_cas.h"
 
 
 namespace {
+
+#define PENTAGON_SCREEN  rectangle{138, 393, 80, 271}
 
 class pentagon_state : public spectrum_128_state
 {
@@ -34,7 +36,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -65,6 +67,13 @@ private:
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void pentagon_update_memory();
+
+	// Redefined here as POC of improved screen porocessing. Intended to update original implementation.
+	void to_display(unsigned int &x, unsigned int &y);
+	void spectrum_UpdateScreenBitmap(bool eof = false) override;
+	// Following 2 are obsolete
+	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	void spectrum_UpdateBorderBitmap() override;
 };
 
 void pentagon_state::pentagon_update_memory()
@@ -130,15 +139,88 @@ void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
-void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+// This one not needed as we draw directly at screen's bitmap.
+u32 pentagon_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+void pentagon_state::to_display(unsigned int &x, unsigned int &y)
+{
+	rectangle va = m_screen->visible_area();
+	if(y < va.top() || y > va.bottom()) {
+		x = va.left();
+		y = va.top();
+	} else if(x < va.left()) {
+		x = va.left();
+	} else if(x > va.right()) {
+		x = va.left();
+		y++;
+		to_display(x, y);
+	}
+}
+
+void pentagon_state::spectrum_UpdateScreenBitmap(bool eof)
+{
+	unsigned int to_x = m_screen->hpos();
+	unsigned int to_y = m_screen->vpos();
+	to_display(to_x, to_y);
+
+	if ((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y) && !eof)
+		return;
+
+	bitmap_ind16 *bm = &m_screen->curbitmap().as_ind16();
+	if (bm->valid())
+	{
+		u16 border_color = get_border_color();
+		do
+		{
+			u16 x = m_previous_screen_x - PENTAGON_SCREEN.left();
+			u16 y = m_previous_screen_y - PENTAGON_SCREEN.top();
+
+			if(PENTAGON_SCREEN.contains(m_previous_screen_x, m_previous_screen_y))
+			{
+				// this can/must be optimised
+				if ((x & 7) == 0)
+				{
+					u16 *pix = &bm->pix(m_previous_screen_y, m_previous_screen_x);
+					u8 attr = *(m_screen_location + ((y & 0xF8) << 2) + (x >> 3) + 0x1800);
+					u8 scr = *(m_screen_location + ((y & 7) << 8) + ((y & 0x38) << 2) + ((y & 0xC0) << 5) + (x >> 3));
+					u16 ink = (attr & 0x07) + ((attr >> 3) & 0x08);
+					u16 pap = (attr >> 3) & 0x0f;
+
+					if (m_flash_invert && (attr & 0x80))
+						scr = ~scr;
+
+					for (uint8_t b = 0x80; b != 0; b >>= 1)
+						*pix++ = (scr & b) ? ink : pap;
+				}
+			}
+			else
+			{
+				bm->pix(m_previous_screen_y, m_previous_screen_x) = border_color;
+			}
+
+			to_display(++m_previous_screen_x, m_previous_screen_y);
+		} while (!((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y)));
+	}
+}
+
+// Any calls must be replaced with spectrum_UpdateScreenBitmap()
+void pentagon_state::spectrum_UpdateBorderBitmap()
+{
+	spectrum_UpdateScreenBitmap();
+}
+
+void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_IRQ_ON:
-		irq_on(ptr, param);
+		irq_on(param);
 		break;
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pentagon_state::device_timer");
@@ -158,7 +240,7 @@ TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(attotime::from_ticks(179, XTAL(14'000'000) / 4), TIMER_IRQ_ON, 0);
+	timer_set(attotime::zero, TIMER_IRQ_ON, 0);
 }
 
 uint8_t pentagon_state::beta_neutral_r(offs_t offset)
@@ -210,7 +292,7 @@ void pentagon_state::pentagon_io(address_map &map)
 	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
 	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(pentagon_state::spectrum_port_fe_r), FUNC(pentagon_state::spectrum_port_fe_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(pentagon_state::spectrum_ula_r), FUNC(pentagon_state::spectrum_ula_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
@@ -256,12 +338,8 @@ void pentagon_state::video_start()
 	m_frame_number = 0;
 	m_flash_invert = 0;
 
-	m_previous_border_x = 0;
-	m_previous_border_y = 0;
-	m_screen->register_screen_bitmap(m_border_bitmap);
-	m_previous_screen_x = 0;
-	m_previous_screen_y = 0;
-	m_screen->register_screen_bitmap(m_screen_bitmap);
+	m_previous_border_x = m_previous_border_y = 0;
+	m_previous_screen_x = m_previous_screen_y = 0;
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
 }
@@ -296,7 +374,7 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
 
 	//m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304);
-	m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287);
+	m_screen->set_raw(XTAL(14'000'000) / 2, 448, PENTAGON_SCREEN.left() - 48, PENTAGON_SCREEN.right() + 49,  320, PENTAGON_SCREEN.top() - 48, PENTAGON_SCREEN.bottom() + 49);
 
 	BETA_DISK(config, m_beta, 0);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
@@ -400,6 +478,6 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY      FULLNAME         FLAGS
-COMP( 1989, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon",      0 )
-COMP( 19??, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 1024", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 128K",   0 )
+COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 1024SL", 0 )

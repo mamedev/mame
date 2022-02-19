@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "machine/serflash.h"
 
+#include "fileio.h"
+
 #include <algorithm>
 
 ALLOW_SAVE_TYPE(serflash_device::flash_state_t);

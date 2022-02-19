@@ -42,6 +42,7 @@ static const nes_pcb pcb_list[] =
 	{ "pal_zz",           PAL_ZZ },
 	{ "nes_qj",           NES_QJ },
 	{ "nes_event",        STD_EVENT },
+	{ "nes_event2",       STD_EVENT2 },
 	{ "discrete_74x139",  DIS_74X139X74 },
 	{ "discrete_74x377",  DIS_74X377 },
 	{ "discrete_74x161",  DIS_74X161X161X32 },
@@ -159,6 +160,7 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_sh2",      WAIXING_SH2 },
 	{ "fs304",            WAIXING_FS304 },   // used in Zelda 3 by Waixing
 	{ "cony",             CONY_BOARD },
+	{ "cony1k",           CONY1K_BOARD },
 	{ "yoko",             YOKO_BOARD },
 	{ "hengg_srich",      HENGG_SRICH },
 	{ "hengg_xhzs",       HENGG_XHZS },
@@ -200,7 +202,7 @@ static const nes_pcb pcb_list[] =
 	{ "xiaozy",           UNL_XIAOZY },
 	{ "edu2k",            UNL_EDU2K },
 	{ "t230",             UNL_T230 },
-	{ "mk2",              UNL_MK2 },
+	{ "jy830623c",        UNL_JY830623C },
 	{ "zemina",           ZEMINA_BOARD },
 	// misc bootleg boards
 	{ "ax40g",            UNL_AX40G },
@@ -262,10 +264,12 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_60311c",       BMC_60311C },
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
+	{ "bmc_82ab",         BMC_82AB },
 	{ "bmc_830425c",      BMC_830425C },
 	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
+	{ "bmc_891227",       BMC_891227 },
 	{ "bmc_970630c",      BMC_970630C },
 	{ "bmc_jy012005",     BMC_JY012005 },
 	{ "bmc_jy820845c",    BMC_JY820845C },
@@ -273,6 +277,8 @@ static const nes_pcb pcb_list[] =
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
+	{ "bmc_ctc12in1",     BMC_CTC_12IN1 },
+	{ "bmc_fam250",       BMC_FAM250 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
@@ -328,6 +334,8 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
 	{ "bmc_jy208",        BMC_JY208 },
+	{ "bmc_jy302",        BMC_JY302 },
+	{ "bmc_kc885",        BMC_KC885 },
 	{ "bmc_sfc12",        BMC_SFC12 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
@@ -647,6 +655,9 @@ void nes_cart_slot_device::call_load_pcb()
 						0);
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
+
+	if (m_pcb_id == KONAMI_VRC7)
+		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc7-pin19")), 0, 0);
 
 	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
 	{

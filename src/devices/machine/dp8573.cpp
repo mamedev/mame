@@ -10,6 +10,8 @@
 #include "machine/dp8573.h"
 #include "machine/timehelp.h"
 
+#include "fileio.h"
+
 #define LOG_GENERAL (1 << 0)
 #define LOG_TICKS   (1 << 1)
 #define LOG_ALL     (LOG_GENERAL | LOG_TICKS)
@@ -79,7 +81,7 @@ void dp8573_device::save_registers()
 	m_ram[REG_SAVE_MONTH]  = m_ram[REG_MONTH];
 }
 
-void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if ((m_pfr & PFR_OSF) || !(m_ram[REG_RTMR] & RTMR_CSS))
 	{

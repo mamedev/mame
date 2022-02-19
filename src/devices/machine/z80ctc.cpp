@@ -497,7 +497,7 @@ void z80ctc_channel_device::trigger(bool state)
 			{
 				// if we hit zero, do the same thing as for a timer interrupt
 				if (--m_down == 0)
-					timer_callback(nullptr,0);
+					timer_callback(0);
 			}
 		}
 	}

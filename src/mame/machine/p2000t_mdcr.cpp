@@ -132,7 +132,7 @@ void mdcr_device::device_post_load()
 	m_cassette->seek(m_save_tape_time, SEEK_SET);
 }
 
-void mdcr_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mdcr_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!m_recording && m_cassette->motor_on())
 	{

@@ -156,7 +156,7 @@ void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

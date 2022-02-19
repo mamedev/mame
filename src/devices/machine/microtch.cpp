@@ -160,7 +160,7 @@ void microtouch_device::send_touch_packet()
 	}
 }
 
-void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!id)
 	{

@@ -337,7 +337,7 @@ void archimedes_keyboard_device::tra_callback()
 	m_kout(transmit_register_get_data_bit());
 }
 
-void archimedes_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void archimedes_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	//  Mouse quadrature signals
 	//  Increase      Decrease

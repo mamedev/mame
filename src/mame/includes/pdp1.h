@@ -10,9 +10,9 @@
 #define MAME_INCLUDES_PDP1_H
 
 #include "cpu/pdp1/pdp1.h"
+#include "imagedev/papertape.h"
 #include "video/crt.h"
 #include "emupal.h"
-#include "softlist_dev.h"
 
 /* defines for each bit and mask in input port "CSW" */
 enum
@@ -172,8 +172,7 @@ enum
 class pdp1_state;
 
 // tape reader device
-class pdp1_readtape_image_device :  public device_t,
-									public device_image_interface
+class pdp1_readtape_image_device :  public paper_tape_reader_device
 {
 public:
 	// construction/destruction
@@ -192,18 +191,10 @@ protected:
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 public:
 	TIMER_CALLBACK_MEMBER(reader_callback);
@@ -229,8 +220,7 @@ public:
 
 
 // tape puncher device
-class pdp1_punchtape_image_device : public device_t,
-									public device_image_interface
+class pdp1_punchtape_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
@@ -247,12 +237,9 @@ protected:
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
@@ -293,14 +280,14 @@ protected:
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PRINTER; }
-
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "typ"; }
+	virtual const char *image_type_name() const noexcept override { return "printout"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "prin"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -350,14 +337,14 @@ protected:
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_CYLINDER; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "drm"; }
+	virtual const char *image_type_name() const noexcept override { return "cylinder"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "cyln"; }
+
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;

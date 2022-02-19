@@ -95,7 +95,7 @@ ToDo:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class pencil2_state : public driver_device

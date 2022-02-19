@@ -125,12 +125,12 @@ static inline int64_t normalised_multiply(int32_t a, int32_t b)
 	return result >> 14;
 }
 
-void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_MAC_DONE:
-		mac_done_callback(ptr, param);
+		mac_done_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in micro3d_state::device_timer");

@@ -100,15 +100,13 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t  image_type()                    const noexcept override { return IO_ROM; }
 	virtual bool        is_readable()                   const noexcept override { return true; }
 	virtual bool        is_writeable()                  const noexcept override { return false; }
 	virtual bool        is_creatable()                  const noexcept override { return false; }
-	virtual bool        must_be_loaded()                const noexcept override { return false; }
 	virtual bool        is_reset_on_load()              const noexcept override { return false; }
 	virtual char const *file_extensions()               const noexcept override { return "rom,bin"; }
-	virtual char const *custom_instance_name()          const noexcept override { return "promimage"; }
-	virtual char const *custom_brief_instance_name()    const noexcept override { return "prom"; }
+	virtual char const *image_type_name()               const noexcept override { return "promimage"; }
+	virtual char const *image_brief_type_name()         const noexcept override { return "prom"; }
 
 protected:
 	virtual void device_start() override;

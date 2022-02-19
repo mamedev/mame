@@ -20,6 +20,7 @@
 *********************************************************************/
 
 #include "emu.h"
+
 #include "video/agat9.h"
 
 #include "screen.h"
@@ -62,15 +63,15 @@ void agat9video_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-agat9video_device::agat9video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AGAT9VIDEO, tag, owner, clock),
-	device_palette_interface(mconfig, *this),
-	m_screen(*this, "a9screen"),
-	m_ram_dev(*this, finder_base::DUMMY_TAG),
-	m_char_region(*this, finder_base::DUMMY_TAG),
-	m_char_ptr(nullptr),
-	m_char_size(0),
-	m_start_address(0)
+agat9video_device::agat9video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AGAT9VIDEO, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, m_screen(*this, "a9screen")
+	, m_ram_dev(*this, finder_base::DUMMY_TAG)
+	, m_char_region(*this, finder_base::DUMMY_TAG)
+	, m_char_ptr(nullptr)
+	, m_char_size(0)
+	, m_start_address(0)
 {
 }
 
@@ -182,7 +183,7 @@ void agat9video_device::do_apple_io(int offset)
 	if (offset < 0x8)
 	{
 		m_video_mode = APPLE;
-		m_screen->set_visible_area(0, 280-1, 0, 192-1);
+		m_screen->set_visible_area(0, 280 - 1, 0, 192 - 1);
 	}
 
 	switch (offset)
@@ -235,7 +236,7 @@ void agat9video_device::do_io(int offset)
 
 	m_mode = offset;
 
-	m_screen->set_visible_area(0, 2*256-1, 0, 256-1);
+	m_screen->set_visible_area(0, 2 * 256 - 1, 0, 256 - 1);
 
 	switch (offset & 3)
 	{
@@ -343,10 +344,13 @@ void agat9video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 			address = m_start_address + (col * 2) + (row * 8);
 			ch = m_ram_dev->read(address);
 			attr = m_ram_dev->read(address + 1);
-			fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
-			if (BIT(attr, 5)) {
+			fg = bitswap<8>(attr, 7, 6, 5, 3, 4, 2, 1, 0) & 15;
+			if (BIT(attr, 5))
+			{
 				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
-			} else {
+			}
+			else
+			{
 				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, bg, fg);
 			}
 		}

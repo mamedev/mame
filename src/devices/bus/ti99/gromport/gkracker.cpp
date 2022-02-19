@@ -97,6 +97,8 @@
 #include "emu.h"
 #include "gkracker.h"
 
+#include "fileio.h"
+
 #define LOG_WARN         (1U<<1)   // Warnings
 #define LOG_CHANGE       (1U<<2)   // Cartridge change
 #define LOG_GKRACKER     (1U<<3)   // Gram Kracker operation

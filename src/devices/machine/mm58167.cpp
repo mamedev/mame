@@ -22,14 +22,14 @@ DEFINE_DEVICE_TYPE(MM58167, mm58167_device, "mm58167", "National Semiconductor M
 // registers (0-7 are the live data, 8-f are the setting for the compare IRQ)
 typedef enum
 {
-	R_CNT_MILLISECONDS = 0, // 0 = milliseconds
-	R_CNT_HUNDTENTHS,       // 1 = hundreds and tenths of seconds
-	R_CNT_SECONDS,          // 2 = seconds
-	R_CNT_MINUTES,          // 3 = minutes
-	R_CNT_HOURS,            // 4 = hours
-	R_CNT_DAYOFWEEK,        // 5 = day of the week
-	R_CNT_DAYOFMONTH,       // 6 = day of the month
-	R_CNT_MONTH,            // 7 = month
+	R_CNT_MILLISECONDS = 0, // 0 = milliseconds [0..9]
+	R_CNT_HUNDTENTHS,       // 1 = hundreds and tenths of seconds [0..99]
+	R_CNT_SECONDS,          // 2 = seconds [0..59]
+	R_CNT_MINUTES,          // 3 = minutes [0..59]
+	R_CNT_HOURS,            // 4 = hours [0..23]
+	R_CNT_DAYOFWEEK,        // 5 = day of the week [1..7, Sunday = 1]
+	R_CNT_DAYOFMONTH,       // 6 = day of the month [1..31; but Feb 29 = Mar 0]
+	R_CNT_MONTH,            // 7 = month [1..12]
 	R_RAM_MILLISECONDS,     // 8 = milliseconds
 	R_RAM_HUNDTENTHS,       // 9 = hundreds and tenths of seconds
 	R_RAM_SECONDS,          // a = seconds
@@ -97,7 +97,7 @@ void mm58167_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mm58167_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mm58167_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_milliseconds++;
 

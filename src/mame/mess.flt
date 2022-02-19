@@ -26,6 +26,7 @@ actions_atj2279b.cpp
 acvirus.cpp
 adacp150.cpp
 adam.cpp
+adds2020.cpp
 adm11.cpp
 adm23.cpp
 adm31.cpp
@@ -240,6 +241,8 @@ dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
 digel804.cpp
+digilog320.cpp
+digilog400.cpp
 digijet.cpp
 dim68k.cpp
 dm7000.cpp
@@ -306,8 +309,9 @@ exorterm.cpp
 exp85.cpp
 f387x.cpp
 facit4440.cpp
-falco5220.cpp
+falco500.cpp
 falcots.cpp
+falcots28.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -524,7 +528,6 @@ korgm1.cpp
 korgws.cpp
 korgz3.cpp
 kramermc.cpp
-krokha.cpp
 kron.cpp
 krz2000.cpp
 ktm3.cpp
@@ -534,6 +537,7 @@ lb186.cpp
 lbpc.cpp
 lc80.cpp
 lcmate2.cpp
+ld50.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
 leapfrog_leapster_explorer.cpp
@@ -784,6 +788,7 @@ pce220.cpp
 pcfx.cpp
 pcipc.cpp
 pcm.cpp
+pcmx2.cpp
 pcw.cpp
 pcw16.cpp
 pda600.cpp

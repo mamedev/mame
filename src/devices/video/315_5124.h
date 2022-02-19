@@ -76,8 +76,8 @@ public:
 	void hcount_latch();
 	bool hcount_latched() { return m_hcounter_latched; }
 
-	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
-	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
+	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; }
+	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; }
 
 	/* update the screen */
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -94,7 +94,7 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;

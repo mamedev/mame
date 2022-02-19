@@ -57,7 +57,7 @@
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class dim68k_state : public driver_device

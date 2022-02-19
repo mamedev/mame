@@ -93,6 +93,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "config.h"
+#include "fileio.h"
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
@@ -338,6 +339,117 @@ std::string substitute_player(std::string_view name, u8 player)
 	}
 	return result;
 }
+
+
+
+// ======================> inp_header
+
+// header at the front of INP files
+class inp_header
+{
+public:
+	// parameters
+	static constexpr unsigned MAJVERSION = 3;
+	static constexpr unsigned MINVERSION = 0;
+
+	bool read(emu_file &f)
+	{
+		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+	bool write(emu_file &f) const
+	{
+		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+
+	bool check_magic() const
+	{
+		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	u64 get_basetime() const
+	{
+		return
+				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
+	}
+	unsigned get_majversion() const
+	{
+		return m_data[OFFS_MAJVERSION];
+	}
+	unsigned get_minversion() const
+	{
+		return m_data[OFFS_MINVERSION];
+	}
+	std::string get_sysname() const
+	{
+		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
+	}
+	std::string get_appdesc() const
+	{
+		return get_string<OFFS_APPDESC, OFFS_END>();
+	}
+
+	void set_magic()
+	{
+		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	void set_basetime(u64 time)
+	{
+		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
+	}
+	void set_version()
+	{
+		m_data[OFFS_MAJVERSION] = MAJVERSION;
+		m_data[OFFS_MINVERSION] = MINVERSION;
+	}
+	void set_sysname(std::string const &name)
+	{
+		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
+	}
+	void set_appdesc(std::string const &desc)
+	{
+		set_string<OFFS_APPDESC, OFFS_END>(desc);
+	}
+
+private:
+	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
+	{
+		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
+		std::memcpy(m_data + BEGIN, str.c_str(), used);
+		if ((END - BEGIN) > used)
+			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
+	}
+	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
+	{
+		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
+		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
+	}
+
+	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
+	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
+	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
+	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
+																// 0x02 bytes reserved
+	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
+	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
+	static constexpr std::size_t    OFFS_END         = 0x40;
+
+	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
+
+	u8                              m_data[OFFS_END];
+};
 
 } // anonymous namespace
 
@@ -1716,8 +1828,6 @@ ioport_manager::ioport_manager(running_machine &machine)
 	, m_safe_to_read(false)
 	, m_last_frame_time(attotime::zero)
 	, m_last_delta_nsec(0)
-	, m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)
-	, m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ)
 	, m_playback_accumulated_speed(0)
 	, m_playback_accumulated_frames(0)
 	, m_deselected_card_config()
@@ -2793,7 +2903,8 @@ time_t ioport_manager::playback_init()
 		return 0;
 
 	// open the playback file
-	std::error_condition const filerr = m_playback_file.open(filename);
+	m_playback_file = std::make_unique<emu_file>(machine().options().input_directory(), OPEN_FLAG_READ);
+	std::error_condition const filerr = m_playback_file->open(filename);
 
 	// return an explicit error if file isn't found in given path
 	if (filerr == std::errc::no_such_file_or_directory)
@@ -2805,7 +2916,7 @@ time_t ioport_manager::playback_init()
 
 	// read the header and verify that it is a modern version; if not, print an error
 	inp_header header;
-	if (!header.read(m_playback_file))
+	if (!header.read(*m_playback_file))
 		fatalerror("Input file is corrupt or invalid (missing header)\n");
 	if (!header.check_magic())
 		fatalerror("Input file invalid or in an older, unsupported format\n");
@@ -2825,7 +2936,7 @@ time_t ioport_manager::playback_init()
 		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
-	m_playback_stream = util::zlib_read(m_playback_file, 16386);
+	m_playback_stream = util::zlib_read(*m_playback_file, 16386);
 	return basetime;
 }
 
@@ -2841,7 +2952,7 @@ void ioport_manager::playback_end(const char *message)
 	{
 		// close the file
 		m_playback_stream.reset();
-		m_playback_file.close();
+		m_playback_file.reset();
 
 		// pop a message
 		if (message != nullptr)
@@ -2963,7 +3074,8 @@ void ioport_manager::record_init()
 		return;
 
 	// open the record file
-	std::error_condition const filerr = m_record_file.open(filename);
+	m_record_file = std::make_unique<emu_file>(machine().options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	std::error_condition const filerr = m_record_file->open(filename);
 	if (filerr)
 		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording (%s:%d %s)", filerr.category().name(), filerr.value(), filerr.message());
 
@@ -2980,10 +3092,10 @@ void ioport_manager::record_init()
 	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
 
 	// write it
-	header.write(m_record_file);
+	header.write(*m_record_file);
 
 	// enable compression
-	m_record_stream = util::zlib_write(m_record_file, 6, 16384);
+	m_record_stream = util::zlib_write(*m_record_file, 6, 16384);
 }
 
 
@@ -2998,7 +3110,7 @@ void ioport_manager::record_end(const char *message)
 	{
 		// close the file
 		m_record_stream.reset(); // TODO: check for errors flushing the last compressed block before doing this
-		m_record_file.close();
+		m_record_file.reset();
 
 		// pop a message
 		if (message != nullptr)

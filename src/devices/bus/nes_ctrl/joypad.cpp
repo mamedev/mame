@@ -48,6 +48,7 @@ DEFINE_DEVICE_TYPE(NES_FCPAD_P2,    nes_fcpad2_device,   "nes_fcpad2",   "Ninten
 DEFINE_DEVICE_TYPE(NES_CCPAD_LEFT,  nes_ccpadl_device,   "nes_ccpadl",   "FC Crazy Climber Left Pad")
 DEFINE_DEVICE_TYPE(NES_CCPAD_RIGHT, nes_ccpadr_device,   "nes_ccpadr",   "FC Crazy Climber Right Pad")
 DEFINE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device, "nes_arcstick", "Nintendo Family Computer Arcade Stick")
+DEFINE_DEVICE_TYPE(NES_VBOYCTRL,    nes_vboyctrl_device, "nes_vboyctrl", "Nintendo Virtual Boy Controller")
 
 INPUT_PORTS_START( nes_joypad )
 	PORT_START("JOYPAD")
@@ -121,6 +122,26 @@ static INPUT_PORTS_START( nes_arcstick )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY  PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( nes_vboyctrl )
+	PORT_START("JOYPAD")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p L") // Left button on back
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p R") // Right button on back
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNUSED ) // Always 1
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
+INPUT_PORTS_END
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -150,6 +171,11 @@ ioport_constructor nes_arcstick_device::device_input_ports() const
 	return INPUT_PORTS_NAME( nes_arcstick );
 }
 
+ioport_constructor nes_vboyctrl_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( nes_vboyctrl );
+}
+
 static void arcstick_daisy(device_slot_interface &device)
 {
 	device.option_add("arcstick", NES_ARCSTICK);
@@ -177,11 +203,12 @@ void nes_arcstick_device::device_add_mconfig(machine_config &config)
 //  nes_joypad_device - constructor
 //-------------------------------------------------
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_joypad(*this, "JOYPAD")
 	, m_latch(0)
+	, m_latch_fill(latch_fill)
 {
 }
 
@@ -190,8 +217,8 @@ nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_joypad_device(mconfig, type, tag, owner, clock)
+nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill)
+	: nes_joypad_device(mconfig, type, tag, owner, clock, latch_fill)
 {
 }
 
@@ -223,6 +250,11 @@ nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const ch
 {
 }
 
+nes_vboyctrl_device::nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_VBOYCTRL, tag, owner, clock, 0x8000)
+{
+}
+
 
 //-------------------------------------------------
 //  device_start
@@ -242,10 +274,11 @@ void nes_joypad_device::device_start()
 u8 nes_joypad_device::read_bit0()
 {
 	if (m_strobe)
-		m_latch = m_joypad->read();
+		set_latch();
 
 	u8 ret = m_latch & 1;
-	m_latch = (m_latch >> 1) | 0x80;  // fill shift reg with 1s, since excess reads on official pads return 1
+	m_latch >>= 1;
+	m_latch |= m_latch_fill;
 
 	return ret;
 }
@@ -285,7 +318,7 @@ u8 nes_arcstick_device::read_exp(offs_t offset)
 void nes_joypad_device::write(u8 data)
 {
 	if (write_strobe(data))
-		m_latch = m_joypad->read();
+		set_latch();
 }
 
 void nes_arcstick_device::write(u8 data)

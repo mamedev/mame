@@ -50,6 +50,7 @@ To Do:
 #include "sound/beep.h"
 #include "video/dp8350.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include <algorithm>
 

@@ -105,7 +105,7 @@ private:
 	void spaceint_map(address_map &map);
 	void spaceint_portmap(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
 	std::unique_ptr<uint8_t[]>    m_colorram;
@@ -251,15 +251,15 @@ uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INT_OFF:
-		kamikaze_int_off(ptr, param);
+		kamikaze_int_off(param);
 		break;
 	case TIMER_INT_GEN:
-		kamizake_int_gen(ptr, param);
+		kamizake_int_gen(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in astinvad_state::device_timer");

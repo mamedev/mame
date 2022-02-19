@@ -19,6 +19,7 @@
 
 #include <csetjmp>
 #include <cstdlib>
+#include <tuple>
 
 
 namespace {
@@ -375,118 +376,118 @@ static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth,
 }
 
 
-/*-------------------------------------------------
-    render_clip_line - clip a line to a rectangle
--------------------------------------------------*/
+//-------------------------------------------------
+//  render_clip_line - clip a line to a rectangle
+//-------------------------------------------------
 
-bool render_clip_line(render_bounds *bounds, const render_bounds *clip)
+bool render_clip_line(render_bounds &bounds, const render_bounds &clip)
 {
-	/* loop until we get a final result */
-	while (1)
+	// loop until we get a final result
+	while (true)
 	{
 		u8 code0 = 0, code1 = 0;
 		u8 thiscode;
 		float x, y;
 
-		/* compute Cohen Sutherland bits for first coordinate */
-		if (bounds->y0 > clip->y1)
+		// compute Cohen Sutherland bits for first coordinate
+		if (bounds.y0 > clip.y1)
 			code0 |= 1;
-		if (bounds->y0 < clip->y0)
+		if (bounds.y0 < clip.y0)
 			code0 |= 2;
-		if (bounds->x0 > clip->x1)
+		if (bounds.x0 > clip.x1)
 			code0 |= 4;
-		if (bounds->x0 < clip->x0)
+		if (bounds.x0 < clip.x0)
 			code0 |= 8;
 
-		/* compute Cohen Sutherland bits for second coordinate */
-		if (bounds->y1 > clip->y1)
+		// compute Cohen Sutherland bits for second coordinate
+		if (bounds.y1 > clip.y1)
 			code1 |= 1;
-		if (bounds->y1 < clip->y0)
+		if (bounds.y1 < clip.y0)
 			code1 |= 2;
-		if (bounds->x1 > clip->x1)
+		if (bounds.x1 > clip.x1)
 			code1 |= 4;
-		if (bounds->x1 < clip->x0)
+		if (bounds.x1 < clip.x0)
 			code1 |= 8;
 
-		/* trivial accept: just return false */
+		// trivial accept: just return false
 		if ((code0 | code1) == 0)
 			return false;
 
-		/* trivial reject: just return true */
+		// trivial reject: just return true
 		if ((code0 & code1) != 0)
 			return true;
 
-		/* fix one of the OOB cases */
+		// fix one of the OOB cases
 		thiscode = code0 ? code0 : code1;
 
-		/* off the bottom */
+		// off the bottom
 		if (thiscode & 1)
 		{
-			x = bounds->x0 + (bounds->x1 - bounds->x0) * (clip->y1 - bounds->y0) / (bounds->y1 - bounds->y0);
-			y = clip->y1;
+			x = bounds.x0 + (bounds.x1 - bounds.x0) * (clip.y1 - bounds.y0) / (bounds.y1 - bounds.y0);
+			y = clip.y1;
 		}
 
-		/* off the top */
+		// off the top
 		else if (thiscode & 2)
 		{
-			x = bounds->x0 + (bounds->x1 - bounds->x0) * (clip->y0 - bounds->y0) / (bounds->y1 - bounds->y0);
-			y = clip->y0;
+			x = bounds.x0 + (bounds.x1 - bounds.x0) * (clip.y0 - bounds.y0) / (bounds.y1 - bounds.y0);
+			y = clip.y0;
 		}
 
-		/* off the right */
+		// off the right
 		else if (thiscode & 4)
 		{
-			y = bounds->y0 + (bounds->y1 - bounds->y0) * (clip->x1 - bounds->x0) / (bounds->x1 - bounds->x0);
-			x = clip->x1;
+			y = bounds.y0 + (bounds.y1 - bounds.y0) * (clip.x1 - bounds.x0) / (bounds.x1 - bounds.x0);
+			x = clip.x1;
 		}
 
-		/* off the left */
+		// off the left
 		else
 		{
-			y = bounds->y0 + (bounds->y1 - bounds->y0) * (clip->x0 - bounds->x0) / (bounds->x1 - bounds->x0);
-			x = clip->x0;
+			y = bounds.y0 + (bounds.y1 - bounds.y0) * (clip.x0 - bounds.x0) / (bounds.x1 - bounds.x0);
+			x = clip.x0;
 		}
 
-		/* fix the appropriate coordinate */
+		// fix the appropriate coordinate
 		if (thiscode == code0)
 		{
-			bounds->x0 = x;
-			bounds->y0 = y;
+			bounds.x0 = x;
+			bounds.y0 = y;
 		}
 		else
 		{
-			bounds->x1 = x;
-			bounds->y1 = y;
+			bounds.x1 = x;
+			bounds.y1 = y;
 		}
 	}
 }
 
 
-/*-------------------------------------------------
-    render_clip_quad - clip a quad to a rectangle
--------------------------------------------------*/
+//-------------------------------------------------
+//  render_clip_quad - clip a quad to a rectangle
+//-------------------------------------------------
 
-bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords)
+bool render_clip_quad(render_bounds &bounds, const render_bounds &clip, render_quad_texuv *texcoords)
 {
-	/* ensure our assumptions about the bounds are correct */
-	assert(bounds->x0 <= bounds->x1);
-	assert(bounds->y0 <= bounds->y1);
+	// ensure our assumptions about the bounds are correct
+	assert(bounds.x0 <= bounds.x1);
+	assert(bounds.y0 <= bounds.y1);
 
-	/* trivial reject */
-	if (bounds->y1 < clip->y0)
+	// trivial reject
+	if (bounds.y1 < clip.y0)
 		return true;
-	if (bounds->y0 > clip->y1)
+	if (bounds.y0 > clip.y1)
 		return true;
-	if (bounds->x1 < clip->x0)
+	if (bounds.x1 < clip.x0)
 		return true;
-	if (bounds->x0 > clip->x1)
+	if (bounds.x0 > clip.x1)
 		return true;
 
-	/* clip top (x0,y0)-(x1,y1) */
-	if (bounds->y0 < clip->y0)
+	// clip top (x0,y0)-(x1,y1)
+	if (bounds.y0 < clip.y0)
 	{
-		float frac = (clip->y0 - bounds->y0) / (bounds->y1 - bounds->y0);
-		bounds->y0 = clip->y0;
+		float frac = (clip.y0 - bounds.y0) / (bounds.y1 - bounds.y0);
+		bounds.y0 = clip.y0;
 		if (texcoords != nullptr)
 		{
 			texcoords->tl.u += (texcoords->bl.u - texcoords->tl.u) * frac;
@@ -496,11 +497,11 @@ bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_q
 		}
 	}
 
-	/* clip bottom (x3,y3)-(x2,y2) */
-	if (bounds->y1 > clip->y1)
+	// clip bottom (x3,y3)-(x2,y2)
+	if (bounds.y1 > clip.y1)
 	{
-		float frac = (bounds->y1 - clip->y1) / (bounds->y1 - bounds->y0);
-		bounds->y1 = clip->y1;
+		float frac = (bounds.y1 - clip.y1) / (bounds.y1 - bounds.y0);
+		bounds.y1 = clip.y1;
 		if (texcoords != nullptr)
 		{
 			texcoords->bl.u -= (texcoords->bl.u - texcoords->tl.u) * frac;
@@ -510,11 +511,11 @@ bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_q
 		}
 	}
 
-	/* clip left (x0,y0)-(x3,y3) */
-	if (bounds->x0 < clip->x0)
+	// clip left (x0,y0)-(x3,y3)
+	if (bounds.x0 < clip.x0)
 	{
-		float frac = (clip->x0 - bounds->x0) / (bounds->x1 - bounds->x0);
-		bounds->x0 = clip->x0;
+		float frac = (clip.x0 - bounds.x0) / (bounds.x1 - bounds.x0);
+		bounds.x0 = clip.x0;
 		if (texcoords != nullptr)
 		{
 			texcoords->tl.u += (texcoords->tr.u - texcoords->tl.u) * frac;
@@ -524,11 +525,11 @@ bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_q
 		}
 	}
 
-	/* clip right (x1,y1)-(x2,y2) */
-	if (bounds->x1 > clip->x1)
+	// clip right (x1,y1)-(x2,y2)
+	if (bounds.x1 > clip.x1)
 	{
-		float frac = (bounds->x1 - clip->x1) / (bounds->x1 - bounds->x0);
-		bounds->x1 = clip->x1;
+		float frac = (bounds.x1 - clip.x1) / (bounds.x1 - bounds.x0);
+		bounds.x1 = clip.x1;
 		if (texcoords != nullptr)
 		{
 			texcoords->tr.u -= (texcoords->tr.u - texcoords->tl.u) * frac;
@@ -541,14 +542,14 @@ bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_q
 }
 
 
-/*-------------------------------------------------
-    render_line_to_quad - convert a line and a
-    width to four points
--------------------------------------------------*/
+//-------------------------------------------------
+//  render_line_to_quad - convert a line and a
+//  width to four points
+//-----------------------------------------------
 
-void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1)
+std::pair<render_bounds, render_bounds> render_line_to_quad(const render_bounds &bounds, float width, float length_extension)
 {
-	render_bounds modbounds = *bounds;
+	render_bounds modbounds = bounds;
 
 	/*
 	    High-level logic -- due to math optimizations, this info is lost below.
@@ -595,18 +596,18 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 	        D.y = p1.y - 0.5 * w * u.x
 	*/
 
-	/* we only care about the half-width */
+	// we only care about the half-width
 	float half_width = width * 0.5f;
 
-	/* compute a vector from point 0 to point 1 */
+	// compute a vector from point 0 to point 1
 	float unitx = modbounds.x1 - modbounds.x0;
 	float unity = modbounds.y1 - modbounds.y0;
 
-	/* points just use a +1/+1 unit vector; this gives a nice diamond pattern */
+	// points just use a +1/+1 unit vector; this gives a nice diamond pattern
 	if (unitx == 0 && unity == 0)
 	{
-		/* length of a unit vector (1,1) */
-		float unit_length = 0.70710678f;
+		// length of a unit vector (1,1)
+		constexpr float unit_length = 0.70710678f;
 
 		unitx = unity = unit_length * half_width;
 		modbounds.x0 -= unitx;
@@ -615,12 +616,12 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 		modbounds.y1 += unity;
 	}
 
-	/* lines need to be divided by their length */
+	// lines need to be divided by their length
 	else
 	{
 		float length = sqrtf(unitx * unitx + unity * unity);
 
-		/* extend line length */
+		// extend line length
 		if (length_extension > 0.0f)
 		{
 			float half_length_extension = length_extension *0.5f;
@@ -634,27 +635,16 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 			modbounds.y1 += directiony * half_length_extension;
 		}
 
-		/* prescale unitx and unity by the half-width */
+		// prescale unitx and unity by the half-width
 		float invlength = half_width / length;
 		unitx *= invlength;
 		unity *= invlength;
 	}
 
-	/* rotate the unit vector by 90 degrees and add to point 0 */
-	bounds0->x0 = modbounds.x0 - unity;
-	bounds0->y0 = modbounds.y0 + unitx;
-
-	/* rotate the unit vector by -90 degrees and add to point 0 */
-	bounds0->x1 = modbounds.x0 + unity;
-	bounds0->y1 = modbounds.y0 - unitx;
-
-	/* rotate the unit vector by 90 degrees and add to point 1 */
-	bounds1->x0 = modbounds.x1 - unity;
-	bounds1->y0 = modbounds.y1 + unitx;
-
-	/* rotate the unit vector by -90 degrees and add to point 1 */
-	bounds1->x1 = modbounds.x1 + unity;
-	bounds1->y1 = modbounds.y1 - unitx;
+	// rotate the unit vector by 90 and -90 degrees and add to points 0 and 1
+	return std::make_pair(
+			render_bounds{ modbounds.x0 - unity, modbounds.y0 + unitx, modbounds.x0 + unity, modbounds.y0 - unitx },
+			render_bounds{ modbounds.x1 - unity, modbounds.y1 + unitx, modbounds.x1 + unity, modbounds.y1 - unitx });
 }
 
 

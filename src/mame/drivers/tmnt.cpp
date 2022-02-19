@@ -61,6 +61,7 @@ Updates:
 #include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/eepromser.h"
@@ -70,6 +71,7 @@ Updates:
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/samples.h"
 #include "sound/ymopm.h"
@@ -253,7 +255,7 @@ void tmnt_state::sound_nmi_callback( int param )
 }
 #endif
 
-void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1013,6 +1015,20 @@ void tmnt_state::tmnt_audio_map(address_map &map)
 	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
+	map(0xf000, 0xf000).r(FUNC(tmnt_state::tmnt_upd_busy_r));
+}
+
+
+void tmnt_state::tmntucbl_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	// TODO: MC68705R3P + Oki M5205
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
@@ -2086,6 +2102,19 @@ void tmnt_state::tmnt(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void tmnt_state::tmntucbl(machine_config &config)
+{
+	tmnt(config);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmntucbl_audio_map);
+
+	M68705R3(config, "mcu", XTAL(4'000'000)).set_disable(); // not dumped
+
+	MSM5205(config, "msm", 384'000).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: hook up, frequency unknown
+
+	config.device_remove("k007232");
+}
+
 void tmnt_state::punkshot(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2848,6 +2877,63 @@ ROM_START( tmntuc )
 
 	ROM_REGION( 0x80000, "title", 0 )   /* 512k for the title music sample */
 	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
+ROM_END
+
+ROM_START( tmntucbl ) // bootleg board with Konami customs. Only the K007232 is substituted by an Oki M5205. There`s also an MC68705R3P lodged between the title song ROMs and the Oki ROMs. Function unknown (possibly driving the Oki?).
+	ROM_REGION( 0x60000, "maincpu", 0 ) // same as the original version H
+	ROM_LOAD16_BYTE( "ic215", 0x00000, 0x20000, CRC(718086e1) SHA1(6fd07a36195521be101782a05a9ecbcc5aaebbbd) )
+	ROM_LOAD16_BYTE( "ic216", 0x00001, 0x20000, CRC(2f7d66e1) SHA1(53bd51458609662066b696f3edd19075e883bcde) )
+	ROM_LOAD16_BYTE( "ic217", 0x40000, 0x10000, CRC(1944641e) SHA1(6664dbd9856d3d579a63c6537feef9a6e9bd09c5) )
+	ROM_LOAD16_BYTE( "ic218", 0x40001, 0x10000, CRC(50ce5512) SHA1(641bf4d60a64f23cd3b52af983565dc6b38037c1) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ic233", 0x0000, 0x8000, CRC(de119176) SHA1(afd5c25b9c606132263d90c705d6d4c71e28776c) ) // very slightly adapted to run the Oki (or MC68705R3P?) instead of the K007232
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mc68705r3p", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "k052109", 0 ) // same as the original, just smaller ROMs on a daughter board
+	ROM_LOAD32_BYTE( "9",  0x00000, 0x20000, CRC(bd5df35c) SHA1(b0db3be16f3e18487834b0c877780cc440ca5292) )
+	ROM_LOAD32_BYTE( "11", 0x00001, 0x20000, CRC(e26301ce) SHA1(fe34a9ee19d0e15b9d804d75117bcf12853070c4) )
+	ROM_LOAD32_BYTE( "21", 0x00002, 0x20000, CRC(db335bb4) SHA1(ae222df7a1b31821f3ee0288ed6f5d9ebd99ba44) )
+	ROM_LOAD32_BYTE( "23", 0x00003, 0x20000, CRC(d1d5efae) SHA1(c14429ebbbb356df3164df41763aa9f52e67a01a) )
+	ROM_LOAD32_BYTE( "10", 0x80000, 0x20000, CRC(b9d026fe) SHA1(6b6b9c531042a25d152754a807ee822bdc4c35cd) )
+	ROM_LOAD32_BYTE( "12", 0x80001, 0x20000, CRC(82eb6dae) SHA1(4d1e97be2d811bbbd8ec2ec5e6464f1e3208d97e) )
+	ROM_LOAD32_BYTE( "22", 0x80002, 0x20000, CRC(f8f59c01) SHA1(afd16b355271c350e2b75b7f48c0dad5b7d4fd34) )
+	ROM_LOAD32_BYTE( "24", 0x80003, 0x20000, CRC(e7068b0d) SHA1(4efe28768adb80e03fe1edd667822fa739e9437e) )
+
+	ROM_REGION( 0x200000, "k051960", 0 ) // same as the original, just smaller ROMs on a daughter board
+	ROM_LOAD32_BYTE( "1",  0x000000, 0x20000, CRC(eabb0238) SHA1(396ca9192e1d7921109897ef7906b93467473f62) )
+	ROM_LOAD32_BYTE( "5",  0x000001, 0x20000, CRC(9330c763) SHA1(38b4808736d37bfb139add8746aabc6da83e6cc6) )
+	ROM_LOAD32_BYTE( "13", 0x000002, 0x20000, CRC(9ab1eede) SHA1(9d1720e0cce374a390a38d00d54d35d3c80d1d8d) )
+	ROM_LOAD32_BYTE( "17", 0x000003, 0x20000, CRC(9592f27f) SHA1(a19edef177f0feae8c29748d94d878ae4f172a9d) )
+	ROM_LOAD32_BYTE( "2",  0x080000, 0x20000, CRC(4ba802e3) SHA1(5a5286087559846d06ed38e2fa93f64c1050787f) )
+	ROM_LOAD32_BYTE( "6",  0x080001, 0x20000, CRC(641ea298) SHA1(f5ded36fd4779d987d9ef7c171191856813664b5) )
+	ROM_LOAD32_BYTE( "14", 0x080002, 0x20000, CRC(777235a5) SHA1(8cd75c55b283a19c54b2007633b7d16878dd2773) )
+	ROM_LOAD32_BYTE( "18", 0x080003, 0x20000, CRC(41c0c28c) SHA1(b5464024ba63eac1150542ea888ce3bea2932769) )
+	ROM_LOAD32_BYTE( "3",  0x100000, 0x20000, CRC(159b5858) SHA1(e431f9d945ec0c21385ba9390ce350437f022191) )
+	ROM_LOAD32_BYTE( "7",  0x100001, 0x20000, CRC(45a1bea8) SHA1(d90824afbda6af5cc86ca74aadd275c07d28f5e1) )
+	ROM_LOAD32_BYTE( "15", 0x100002, 0x20000, CRC(748e66f9) SHA1(109cde6be2a25dae898092bca13b680d1665fc85) )
+	ROM_LOAD32_BYTE( "19", 0x100003, 0x20000, CRC(9e6dd23b) SHA1(7c7080a9435a35f62b8203167b8d514e8a47b5b4) )
+	ROM_LOAD32_BYTE( "4",  0x180000, 0x20000, CRC(7dde75ee) SHA1(1e4a85dd108218a8f7761724aecd6ef2f2af0a6e) )
+	ROM_LOAD32_BYTE( "8",  0x180001, 0x20000, CRC(6337e146) SHA1(938aafbb60fd390b5c5c1bc93e9233b90a723e1b) )
+	ROM_LOAD32_BYTE( "16", 0x180002, 0x20000, CRC(287f8d80) SHA1(7ea7b83662c0ef2af65f6c6b474ae4176ff6d71e) )
+	ROM_LOAD32_BYTE( "20", 0x180003, 0x20000, CRC(bb675176) SHA1(8a106b1778101dbd900c287712cd53826791f0db) )
+
+	ROM_REGION( 0x200, "proms", 0 ) // not dumped for this set, but probably identical
+	ROM_LOAD( "963a30.g7",  0x000, 0x100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )
+	ROM_LOAD( "963a31.g19", 0x100, 0x100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )
+
+	ROM_REGION( 0x20000, "msm", 0 )
+	ROM_LOAD( "ic252", 0x00000, 0x10000, CRC(cb916429) SHA1(41eff6e15890b45b5ea3b8cc3367891d87c3bf09) )
+	ROM_LOAD( "ic253", 0x10000, 0x10000, CRC(c2d3b2c1) SHA1(d4d66cbfbbf5d3396aafedda99bfa2b06fafbf24) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "ic285", 0x00000, 0x20000, CRC(2dfd674b) SHA1(bbec5896c70056964fbc972a84bd5b0dfc6af257) ) // same as the original
+
+	ROM_REGION( 0x80000, "title", 0 )   // why only the odd bytes? though the song seems to play fine as is..
+	ROM_LOAD16_BYTE( "ic275", 0x00001, 0x20000, CRC(a021c0be) SHA1(f44ea6c56b8fae7aeff120ee6c2ca924086654be) ) // ic275               963a25.d5    [odd 1/2]  IDENTICAL
+	ROM_LOAD16_BYTE( "ic274", 0x40001, 0x20000, CRC(9ff5f250) SHA1(53b75ca910c645ebb55002d70e3e1abd15db6d41) ) // ic274               963a25.d5    [odd 2/2]  IDENTICAL
 ROM_END
 
 ROM_START( tmht )
@@ -4316,20 +4402,21 @@ GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebric
 GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version N)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntuc,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version N)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntuc,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntucbl,    tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "bootleg", "Teenage Mutant Ninja Turtles (bootleg, US 4 Players, version H)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Needs MC68705R3P / Oki M5205 hook up
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )

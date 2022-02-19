@@ -106,7 +106,7 @@ void ay3600_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int ako = 0;
 

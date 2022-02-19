@@ -36,6 +36,18 @@ s32 ns32000_disassembler::displacement(offs_t pc, data_buffer const &opcodes, un
 		return s8(byte0 << 1) >> 1;
 }
 
+std::string ns32000_disassembler::displacement_string(offs_t pc, data_buffer const &opcodes, unsigned &bytes, std::string const zero)
+{
+	s32 const d = displacement(pc, opcodes, bytes);
+
+	if (d < 0)
+		return util::string_format("-0x%X", -d);
+	else if (d > 0)
+		return util::string_format("0x%X", d);
+	else
+		return zero;
+}
+
 void ns32000_disassembler::decode(addr_mode *mode, offs_t pc, data_buffer const &opcodes, unsigned &bytes)
 {
 	char const scale_size[] = { 'B', 'W', 'D', 'Q' };
@@ -66,30 +78,30 @@ void ns32000_disassembler::decode(addr_mode *mode, offs_t pc, data_buffer const 
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// register relative
-			mode[i].mode = util::string_format("%d(R%d)", displacement(pc, opcodes, bytes), mode[i].gen & 7);
+			mode[i].mode = util::string_format("%s(R%d)", displacement_string(pc, opcodes, bytes), mode[i].gen & 7);
 			break;
 		case 0x10:
 			// frame memory relative disp2(disp1(FP))
 			{
-				s32 const disp1 = displacement(pc, opcodes, bytes);
-				s32 const disp2 = displacement(pc, opcodes, bytes);
-				mode[i].mode = util::string_format("%d(%d(FP))", disp2, disp1);
+				std::string const disp1 = displacement_string(pc, opcodes, bytes);
+				std::string const disp2 = displacement_string(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%s(%s(FP))", disp2, disp1);
 			}
 			break;
 		case 0x11:
 			// stack memory relative disp2(disp1(SP))
 			{
-				s32 const disp1 = displacement(pc, opcodes, bytes);
-				s32 const disp2 = displacement(pc, opcodes, bytes);
-				mode[i].mode = util::string_format("%d(%d(SP))", disp2, disp1);
+				std::string const disp1 = displacement_string(pc, opcodes, bytes);
+				std::string const disp2 = displacement_string(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%s(%s(SP))", disp2, disp1);
 			}
 			break;
 		case 0x12:
 			// static memory relative disp2(disp1(SB))
 			{
-				s32 const disp1 = displacement(pc, opcodes, bytes);
-				s32 const disp2 = displacement(pc, opcodes, bytes);
-				mode[i].mode = util::string_format("%d(%d(SB))", disp2, disp1);
+				std::string const disp1 = displacement_string(pc, opcodes, bytes);
+				std::string const disp2 = displacement_string(pc, opcodes, bytes);
+				mode[i].mode = util::string_format("%s(%s(SB))", disp2, disp1);
 			}
 			break;
 		case 0x13:
@@ -112,14 +124,14 @@ void ns32000_disassembler::decode(addr_mode *mode, offs_t pc, data_buffer const 
 		case 0x16:
 			// external EXT(disp1) + disp2
 			{
-				s32 const disp1 = displacement(pc, opcodes, bytes);
+				std::string const disp1 = displacement_string(pc, opcodes, bytes, "0");
 				s32 const disp2 = displacement(pc, opcodes, bytes);
 				if (disp2 < 0)
-					mode[i].mode = util::string_format("EXT(%d) - %d", disp1, -disp2);
+					mode[i].mode = util::string_format("EXT(%s) - 0x%X", disp1, -disp2);
 				else if (disp2 > 0)
-					mode[i].mode = util::string_format("EXT(%d) + %d", disp1, disp2);
+					mode[i].mode = util::string_format("EXT(%s) + 0x%X", disp1, disp2);
 				else
-					mode[i].mode = util::string_format("EXT(%d)", disp1);
+					mode[i].mode = util::string_format("EXT(%s)", disp1);
 			}
 			break;
 		case 0x17:
@@ -128,15 +140,15 @@ void ns32000_disassembler::decode(addr_mode *mode, offs_t pc, data_buffer const 
 			break;
 		case 0x18:
 			// frame memory disp(FP)
-			mode[i].mode = util::string_format("%d(FP)", displacement(pc, opcodes, bytes));
+			mode[i].mode = util::string_format("%s(FP)", displacement_string(pc, opcodes, bytes));
 			break;
 		case 0x19:
 			// stack memory disp(SP)
-			mode[i].mode = util::string_format("%d(SP)", displacement(pc, opcodes, bytes));
+			mode[i].mode = util::string_format("%s(SP)", displacement_string(pc, opcodes, bytes));
 			break;
 		case 0x1a:
 			// static memory disp(SB)
-			mode[i].mode = util::string_format("%d(SB)", displacement(pc, opcodes, bytes));
+			mode[i].mode = util::string_format("%s(SB)", displacement_string(pc, opcodes, bytes));
 			break;
 		case 0x1b:
 			// program memory *+disp
@@ -188,14 +200,14 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 		switch (BIT(opbyte, 4, 4))
 		{
 		case 0x0: util::stream_format(stream, "BSR     0x%X", pc + displacement(pc, opcodes, bytes)); flags |= STEP_OVER; break;
-		case 0x1: util::stream_format(stream, "RET     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
-		case 0x2: util::stream_format(stream, "CXP     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OVER; break;
-		case 0x3: util::stream_format(stream, "RXP     %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
-		case 0x4: util::stream_format(stream, "RETT    %d", displacement(pc, opcodes, bytes)); flags |= STEP_OUT; break;
+		case 0x1: util::stream_format(stream, "RET     %s", displacement_string(pc, opcodes, bytes, "0")); flags |= STEP_OUT; break;
+		case 0x2: util::stream_format(stream, "CXP     %s", displacement_string(pc, opcodes, bytes, "0")); flags |= STEP_OVER; break;
+		case 0x3: util::stream_format(stream, "RXP     %s", displacement_string(pc, opcodes, bytes, "0")); flags |= STEP_OUT; break;
+		case 0x4: util::stream_format(stream, "RETT    %s", displacement_string(pc, opcodes, bytes, "0")); flags |= STEP_OUT; break;
 		case 0x5: util::stream_format(stream, "RETI"); flags |= STEP_OUT; break;
 		case 0x6: util::stream_format(stream, "SAVE    [%s]", reglist(imm)); break;
 		case 0x7: util::stream_format(stream, "RESTORE [%s]", reglist(bitswap(imm, 0, 1, 2, 3, 4, 5, 6, 7))); break;
-		case 0x8: util::stream_format(stream, "ENTER   [%s], %d", reglist(imm), displacement(pc, opcodes, bytes)); break;
+		case 0x8: util::stream_format(stream, "ENTER   [%s], %s", reglist(imm), displacement_string(pc, opcodes, bytes, "0")); break;
 		case 0x9: util::stream_format(stream, "EXIT    [%s]", reglist(bitswap(imm, 0, 1, 2, 3, 4, 5, 6, 7))); break;
 		case 0xa: util::stream_format(stream, "NOP"); break;
 		case 0xb: util::stream_format(stream, "WAIT"); break;
@@ -239,7 +251,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			case 0x4: util::stream_format(stream, "JUMP    %s", mode[0].mode); break;
 			case 0x6: util::stream_format(stream, "BISPSR%c %s", size_char[size], mode[0].mode); break;
 			case 0xa: util::stream_format(stream, "ADJSP%c  %s", size_char[size], mode[0].mode); break;
-			case 0xc: util::stream_format(stream, "JUMP    %s", mode[0].mode); flags |= STEP_OVER; break;
+			case 0xc: util::stream_format(stream, "JSR     %s", mode[0].mode); flags |= STEP_OVER; break;
 			case 0xe: util::stream_format(stream, "CASE%c   %s", size_char[size], mode[0].mode); break;
 			default: bytes = 1; break;
 			}

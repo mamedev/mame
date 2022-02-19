@@ -114,14 +114,14 @@ private:
 	void thayers_io_map(address_map &map);
 	void thayers_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 static const uint8_t led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
 /* Interrupts */
 
-void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

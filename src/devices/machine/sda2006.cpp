@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "machine/sda2006.h"
 
+#include "fileio.h"
+
 //-------------------------------------------------
 //
 // Siemens SDA2006 512-bit (32x16) NV EEPROM

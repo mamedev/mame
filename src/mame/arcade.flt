@@ -308,6 +308,7 @@ dassault.cpp
 dblcrown.cpp
 dblewing.cpp
 dbz.cpp
+dc_atomiswave.cpp
 dcheese.cpp
 dcon.cpp
 dday.cpp
@@ -331,7 +332,6 @@ deshoros.cpp
 destroyr.cpp
 de_2.cpp
 de_3.cpp
-de_3b.cpp
 dfruit.cpp
 dgpix.cpp
 diamondking.cpp
@@ -436,6 +436,7 @@ fresh.cpp
 fromanc2.cpp
 fromance.cpp
 fruitpc.cpp
+funeball.cpp
 fungames.cpp
 funkball.cpp
 funkybee.cpp
@@ -530,6 +531,7 @@ gts80a.cpp
 gts80b.cpp
 guab.cpp
 gumbo.cpp
+gumrally.cpp
 gunbustr.cpp
 gundealr.cpp
 gunpey.cpp
@@ -666,6 +668,7 @@ kontest.cpp
 kopunch.cpp
 kpontoon.cpp
 kpython.cpp
+krokha.cpp
 ksayakyu.cpp
 ksys573.cpp
 kungfur.cpp
@@ -717,6 +720,7 @@ m52.cpp
 m57.cpp
 m58.cpp
 m62.cpp
+m62_bkungfu.cpp
 m63.cpp
 m72.cpp
 m79amb.cpp
@@ -897,6 +901,7 @@ nbmj8991.cpp
 nbmj9195.cpp
 nemesis.cpp
 neogeo.cpp
+neomania.cpp
 neopcb.cpp
 neoprint.cpp
 neptunp2.cpp
@@ -916,6 +921,9 @@ nmkmedal.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
+novadesitec_fr002.cpp
+novadesitec_fr004.cpp
+novadesitec_fr009.cpp
 nsg6809.cpp
 nsm.cpp
 nsmpoker.cpp
@@ -989,6 +997,7 @@ playcenter.cpp
 plsonic4.cpp
 pluto5.cpp
 plygonet.cpp
+pmc.cpp
 pntnpuzl.cpp
 pokechmp.cpp
 poker72.cpp
@@ -1089,7 +1098,6 @@ s11c.cpp
 s3.cpp
 s4.cpp
 s6.cpp
-s6a.cpp
 s7.cpp
 s8.cpp
 s8a.cpp
@@ -1460,7 +1468,6 @@ welltris.cpp
 wgp.cpp
 wheelfir.cpp
 whitestar.cpp
-white_mod.cpp
 wico.cpp
 wildpkr.cpp
 williams.cpp
@@ -1471,6 +1478,7 @@ witch.cpp
 wiz.cpp
 wmg.cpp
 wms.cpp
+wms_shuffle.cpp
 wolfpack.cpp
 wpc_95.cpp
 wpc_an.cpp

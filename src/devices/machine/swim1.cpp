@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "swim1.h"
 
-#include "cpu/m68000/m68000.h"
-
 DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak Integrated Machine) version 1 floppy controller")
 
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	applefdintf_device(mconfig, SWIM1, tag, owner, clock)
+	applefdintf_device(mconfig, SWIM1, tag, owner, clock),
+	m_floppy(nullptr),
+	m_timer(nullptr)
 {
 }
 
@@ -22,6 +22,7 @@ void swim1_device::device_start()
 {
 	applefdintf_device::device_start();
 
+	m_timer = timer_alloc();
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_flux_write_start));
 	save_item(NAME(m_flux_write));
@@ -380,7 +381,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	}
 }
 
-void swim1_device::device_timer(emu_timer &, device_timer_id, int, void *)
+void swim1_device::device_timer(emu_timer &, device_timer_id, int)
 {
 	if(m_iwm_active == MODE_DELAY) {
 		flush_write();

@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
 	void km035_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -52,10 +53,6 @@ private:
 	void bus_w(uint8_t data);
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	uint8_t p1_r();
-	uint8_t p2_r();
-	DECLARE_READ_LINE_MEMBER( t0_r );
-	DECLARE_READ_LINE_MEMBER( t1_r );
 };
 
 // device type definition

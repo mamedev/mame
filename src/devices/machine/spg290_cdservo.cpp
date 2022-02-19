@@ -101,7 +101,7 @@ void spg290_cdservo_device::device_reset()
 	change_status();
 }
 
-void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!(m_control1 & 0x04) && m_cur_sector == m_seek_lba + SPG290_LEADIN_LEN)
 	{

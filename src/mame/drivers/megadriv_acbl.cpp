@@ -1084,7 +1084,7 @@ void md_boot_6button_state::machine_start()
 
 	// Setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this));
 }
 
 void md_boot_6button_state::megadrvb_6b(machine_config &config)

@@ -283,7 +283,7 @@ void laserdisc_device::device_validity_check(validity_checker &valid) const
 //  device
 //-------------------------------------------------
 
-void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

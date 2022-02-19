@@ -217,7 +217,7 @@ int mb89352_device::get_scsi_cmd_len(uint8_t cbyte)
 	//return 6;
 }
 
-void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

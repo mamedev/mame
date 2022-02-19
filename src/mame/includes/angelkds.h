@@ -46,7 +46,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	uint8_t angeklds_ff_r() { return 0xff; };
+	uint8_t angeklds_ff_r() { return 0xff; }
 	void angelkds_cpu_bank_write(uint8_t data);
 	void angelkds_main_sound_w(offs_t offset, uint8_t data);
 	uint8_t angelkds_main_sound_r(offs_t offset);

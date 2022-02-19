@@ -152,6 +152,12 @@ class memory_view;
 // declared in emuopts.h
 class emu_options;
 
+// declared in fileio.h
+class emu_file;
+
+// declared in http.h
+class http_manager;
+
 // declared in gamedrv.h
 class game_driver;
 

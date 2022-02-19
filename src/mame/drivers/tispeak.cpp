@@ -418,7 +418,7 @@ Y-1320 : T.I. Dataman
 #include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "render.h"
 

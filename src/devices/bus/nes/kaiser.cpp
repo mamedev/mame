@@ -492,7 +492,7 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -526,7 +526,7 @@ void nes_ks7032_device::write_h(offs_t offset, u8 data)
 		case 0x2000:
 		case 0x3000:
 		{
-			int shift = (offset >> 10);
+			int shift = 4 * BIT(offset, 12, 2);
 			m_irq_count_latch &= ~(0x000f << shift);
 			m_irq_count_latch |= (data & 0x0f) << shift;
 			break;
@@ -661,7 +661,7 @@ void nes_ks7016_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

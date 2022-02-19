@@ -176,7 +176,7 @@ Known Issues (MZ, 2019-05-10)
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // Debugging

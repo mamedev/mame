@@ -40,6 +40,8 @@
 #include "emu.h"
 #include "at29x.h"
 
+#include "fileio.h"
+
 #define LOG_DETAIL      (1U<<1)     // More detail
 #define LOG_WARN        (1U<<2)     // Warning
 #define LOG_PRG         (1U<<3)     // Programming
@@ -135,7 +137,7 @@ void at29x_device::nvram_write(emu_file &file)
 /*
     Programming timer callback
 */
-void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (m_pgm)
 	{

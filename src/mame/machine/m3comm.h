@@ -8,6 +8,8 @@
 #include "machine/ram.h"
 #include "cpu/m68000/m68000.h"
 
+#include "fileio.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -45,7 +47,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:

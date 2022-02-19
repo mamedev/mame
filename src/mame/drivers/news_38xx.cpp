@@ -113,7 +113,7 @@ protected:
 
 	u32 bus_error_r();
 	void timer_w(u8 data);
-	void timer(void *ptr, s32 param);
+	void timer(s32 param);
 
 	// devices
 //  required_device<r3000a_device> m_cpu;
@@ -297,7 +297,7 @@ void news_38xx_state::timer_w(u8 data)
 		m_iop->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
 }
 
-void news_38xx_state::timer(void *ptr, s32 param)
+void news_38xx_state::timer(s32 param)
 {
 	if (param)
 		m_iop->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);

@@ -53,7 +53,7 @@ void hyhoo_state::hyhoo_romsel_w(uint8_t data)
 	}
 }
 
-void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

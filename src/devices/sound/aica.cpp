@@ -17,6 +17,11 @@
     - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
     - Derive from SCSP device;
+    - Sound clips a bit too much (cfr. deathcox, bdrdown, samba title screen, cfield).
+      According to skmp note: "The [ADX] sound decompression code on the sh4 uses FTRC
+      (float -> int) to convert the samples. Make sure you saturate the value when converting"
+      -> Verify this statement.
+
 */
 
 #include "emu.h"
@@ -839,19 +844,10 @@ void aica_device::UpdateRegR(int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot = m_Slots + slotnum;
-				u32 CA;
-
-				if (PCMS(slot) == 0)    // 16-bit samples
-				{
-					CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;
-				}
-				else    // 8-bit PCM and 4-bit ADPCM
-				{
-					CA = (slot->cur_addr >> SHIFT);
-				}
-
-				//printf("%08x %08x\n",CA,slot->cur_addr & ~1);
-
+				// NB: despite previous implementation this does not depend on PCMS setting.
+				// Was "CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;" on 16-bit path,
+				// causing repeated samples/hangs in several ADX driven entries.
+				u32 CA = (slot->cur_addr >> SHIFT);
 				m_udata.data[0x14 / 2] = CA;
 			}
 			break;
@@ -918,7 +914,12 @@ void aica_device::w16(u32 addr,u16 val)
 		else if (addr < 0x3300)
 			*((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2)) = val;
 		else if (addr < 0x3400)
-			popmessage("AICADSP write to undocumented reg %04x -> %04x", addr, val);
+		{
+			// 3300-fc zapped along with the full 0x3000-0x3bfc range,
+			// most likely done by the SDK for convenience in resetting DSP in one go.
+			if (val)
+				logerror("%s: AICADSP write to undocumented reg %04x -> %04x\n", machine().describe_context(), addr, val);
+		}
 		else if (addr < 0x3c00)
 		{
 			*((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2)) = val;
@@ -978,7 +979,9 @@ u16 aica_device::r16(u32 addr)
 			v = m_EFSPAN[addr & 0x7f];
 		}
 		else if (addr < 0x2800)
-			popmessage("AICA read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICA read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x28be)
 		{
 			UpdateRegR(addr & 0xff);
@@ -1001,11 +1004,15 @@ u16 aica_device::r16(u32 addr)
 		else if (addr < 0x3300)
 			v= *((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2));
 		else if (addr < 0x3400)
-			popmessage("AICADSP read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x3c00)
 			v= *((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2));
 		else if (addr < 0x4000)
-			popmessage("AICADSP read undocumented reg %04x",addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x4400)
 		{
 			if (addr & 4)
@@ -1191,9 +1198,6 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 			}
 			break;
 		case 1: //normal loop
-			// TODO: loop mechanism causes hangs in Border Down/Metal Slug 6/Karous etc.
-			// - For mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow)
-			// - The lpend mechanism more or less works if the ARM CPU is downclocked at about 10%.
 			if (*addr[addr_select] >= chanlea)
 			{
 				slot->lpend = 1;

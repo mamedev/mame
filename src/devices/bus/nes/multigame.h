@@ -1174,6 +1174,42 @@ private:
 };
 
 
+// ======================> nes_bmc_ctc12in1_device
+
+class nes_bmc_ctc12in1_device : public nes_vram_protect_device
+{
+public:
+	// construction/destruction
+	nes_bmc_ctc12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_bmc_ctc12in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	u8 m_reg[2];
+};
+
+
+// ======================> nes_bmc_891227_device
+
+class nes_bmc_891227_device : public nes_bmc_ctc12in1_device
+{
+public:
+	// construction/destruction
+	nes_bmc_891227_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
 // ======================> nes_bmc_k1029_device
 
 class nes_bmc_k1029_device : public nes_vram_protect_device
@@ -1183,6 +1219,32 @@ public:
 	nes_bmc_k1029_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// construction/destruction
+	nes_bmc_k1029_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_bmc_fam250_device
+
+class nes_bmc_fam250_device : public nes_bmc_k1029_device
+{
+public:
+	// construction/destruction
+	nes_bmc_fam250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch, m_reg;
 };
 
 
@@ -1218,6 +1280,23 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vram_prot_bit);
+
+private:
+	const u8 m_vram_prot_bit;
+};
+
+
+// ======================> nes_bmc_82ab_device
+
+class nes_bmc_82ab_device : public nes_bmc_th22913_device
+{
+public:
+	// construction/destruction
+	nes_bmc_82ab_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -1241,9 +1320,12 @@ DECLARE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device)
+DECLARE_DEVICE_TYPE(NES_BMC_891227,     nes_bmc_891227_device)
 DECLARE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device)
 DECLARE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
+DECLARE_DEVICE_TYPE(NES_BMC_CTC12IN1,   nes_bmc_ctc12in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device)
@@ -1288,5 +1370,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_NC20MB,     nes_bmc_nc20mb_device)
 DECLARE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device)
+DECLARE_DEVICE_TYPE(NES_BMC_82AB,       nes_bmc_82ab_device)
 
 #endif // MAME_BUS_NES_MULTIGAME_H

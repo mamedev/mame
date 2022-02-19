@@ -11,10 +11,11 @@
 #include "emu.h"
 #include "upd78kd.h"
 
-upd78k_family_disassembler::upd78k_family_disassembler(const char *const sfr_names[], const char *const sfrp_names[])
+upd78k_family_disassembler::upd78k_family_disassembler(const char *const sfr_names[], const char *const sfrp_names[], u16 saddr_ram_base)
 	: util::disasm_interface()
 	, m_sfr_names(sfr_names)
 	, m_sfrp_names(sfrp_names)
+	, m_saddr_ram_base(saddr_ram_base)
 {
 }
 
@@ -101,7 +102,7 @@ void upd78k_family_disassembler::format_saddr(std::ostream &stream, u8 addr)
 	if (addr < 0x20)
 		format_sfr(stream, addr);
 	else
-		util::stream_format(stream, "0%04XH", 0xfe00 + addr);
+		util::stream_format(stream, "0%04XH", m_saddr_ram_base + addr);
 }
 
 void upd78k_family_disassembler::format_sfrp(std::ostream &stream, u8 addr)
@@ -161,7 +162,7 @@ offs_t upd78k_family_disassembler::dasm_illegal3(std::ostream &stream, u8 op1, u
 
 // For families with 4 banks of 8 registers and only one PSW byte
 upd78k_8reg_disassembler::upd78k_8reg_disassembler(const char *const sfr_names[], const char *const sfrp_names[])
-	: upd78k_family_disassembler(sfr_names, sfrp_names)
+	: upd78k_family_disassembler(sfr_names, sfrp_names, 0xfe00)
 {
 }
 

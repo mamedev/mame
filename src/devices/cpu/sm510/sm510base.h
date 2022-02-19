@@ -16,15 +16,9 @@
 
 // I/O ports setup
 
-// when in halt state, any K input going high can wake up the CPU,
-// driver is required to use set_input_line(SM510_INPUT_LINE_K1/K2/K3/K4, state)
-enum
-{
-	SM510_INPUT_LINE_K1 = 0,
-	SM510_INPUT_LINE_K2,
-	SM510_INPUT_LINE_K3,
-	SM510_INPUT_LINE_K4
-};
+// when in halt state, any active K input can wake up the CPU,
+// driver is required to use set_input_line(SM510_EXT_WAKEUP_LINE, state)
+#define SM510_EXT_WAKEUP_LINE 0
 
 // ACL input pin
 #define SM510_INPUT_LINE_ACL INPUT_LINE_RESET
@@ -97,8 +91,7 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_clk_div); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 3+1; }
-	virtual u32 execute_input_lines() const noexcept override { return 4; }
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return valid_wakeup_line(inputnum); }
+	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
@@ -115,7 +108,6 @@ protected:
 
 	virtual void reset_vector() { do_branch(3, 7, 0); }
 	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
-	virtual bool valid_wakeup_line(int line) const { return (line >= 0 && line < 4); }
 
 	int m_prgwidth;
 	int m_datawidth;
@@ -140,8 +132,7 @@ protected:
 	u8 m_r;
 	u8 m_r_out;
 	int m_r_mask_option;
-	int m_k_input[4];
-	bool m_k_rise;
+	bool m_ext_wakeup;
 	bool m_halt;
 	int m_clk_div;
 

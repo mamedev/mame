@@ -198,24 +198,25 @@ void vsnes_state::vsnes_coin_counter_1_w(uint8_t data)
 
 void vsnes_state::vsnes_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
-	map(0x6000, 0x7fff).ram();
+	map(0x4020, 0x4020).mirror(0x1fdf).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
 
 void vsnes_state::vsnes_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram_1");
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_1_w));
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x4020, 0x4020).mirror(0x1fdf).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -273,13 +274,13 @@ void vsnes_state::vssmbbl_sn_w(offs_t offset, uint8_t data)
 // the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
 void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
+	map(0x0000, 0x07ff).mirror(0x0800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4000, 0x400f).w(FUNC(vsnes_state::bootleg_sound_write));
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
 	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w));
-	map(0x6000, 0x7fff).ram();
+	map(0x6000, 0x67ff).mirror(0x0800).ram();
 	map(0x8000, 0xffff).rom();
 }
 
@@ -299,7 +300,7 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("sub", 0);
-	map(0x2000, 0x23ff).ram();
+	map(0x2000, 0x27ff).ram();
 
 	map(0x4000, 0x5fff).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
 	map(0x6000, 0x7fff).rw(FUNC(vsnes_state::vsnes_bootleg_z80_address_r), FUNC(vsnes_state::vssmbbl_sn_w));
@@ -470,7 +471,7 @@ static INPUT_PORTS_START( vsnes_zapper )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // low 6 bits always read 0b010000
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* sprite hit */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           /* gun trigger */
@@ -495,11 +496,11 @@ static INPUT_PORTS_START( vsnes_zapper )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("GUNX")  /* FAKE - Gun X pos */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
+	PORT_START("GUNX")  // FAKE - Gun X pos
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)
 
-	PORT_START("GUNY")  /* FAKE - Gun Y pos */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
+	PORT_START("GUNY")  // FAKE - Gun Y pos
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0, 239)
 INPUT_PORTS_END
 
 
@@ -1733,11 +1734,11 @@ void vsnes_state::vsnes(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
-	screen1.set_refresh_hz(60);
-	screen1.set_size(32*8, 262);
-	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
@@ -1799,21 +1800,19 @@ void vsnes_state::vsdual(machine_config &config)
 	n2a03_device &subcpu(N2A03(config, m_subcpu, NTSC_APU_CLOCK));
 	subcpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
 	config.set_default_layout(layout_dualhsxs);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
-	screen1.set_refresh_hz(60);
-	screen1.set_size(32*8, 262);
-	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
-	screen2.set_size(32*8, 262);
-	screen2.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen2.set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
@@ -2170,7 +2169,7 @@ ROM_START( cluclu )
 ROM_END
 
 
-ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
+ROM_START( excitebk ) /* EB4-3 = Excitebike, Palette 3, revision 'E' */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-3e.1d",  0x8000, 0x2000, CRC(f58a392e) SHA1(ca721e47e5dbe72d6f231d9b20b1ca33304c5370) )
 	ROM_LOAD( "mds-eb4-3e.1c",  0xa000, 0x2000, CRC(6ae01102) SHA1(f3f49644f7e2887e14655e8934c7c75d4b92968e) )
@@ -2184,7 +2183,7 @@ ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
 	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
-ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
+ROM_START( excitebko ) /* EB4-3 = Excitebike, Palette 3, unknown revision */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-3.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-eb4-3.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) ) /* Need to verify correct label */
@@ -2198,7 +2197,7 @@ ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
 	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
-ROM_START( excitebkj ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
+ROM_START( excitebkj ) /* EB4-4 A = Excitebike, Palette 4, rev A */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-4 a.6d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
 	ROM_LOAD( "mds-eb4-4 a.6c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )

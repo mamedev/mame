@@ -1253,11 +1253,6 @@ int renderer_ogl::draw(const int update)
 				}
 				#else
 				{
-					const line_aa_step *step = line_aa_4step;
-					render_bounds b0, b1;
-					float r, g, b, a;
-					float effwidth;
-
 					// we're not gonna play fancy here.  close anything pending and let's go.
 					if (pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
 					{
@@ -1268,12 +1263,10 @@ int renderer_ogl::draw(const int update)
 					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim.flags));
 
 					// compute the effective width based on the direction of the line
-					effwidth = prim.width();
-					if (effwidth < 0.5f)
-						effwidth = 0.5f;
+					float effwidth = std::max(prim.width(), 0.5f);
 
 					// determine the bounds of a quad to draw this line
-					render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
+					auto [b0, b1] = render_line_to_quad(prim.bounds, effwidth, 0.0f);
 
 					// fix window position
 					b0.x0 += hofs;
@@ -1286,7 +1279,7 @@ int renderer_ogl::draw(const int update)
 					b1.y1 += vofs;
 
 					// iterate over AA steps
-					for (step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
+					for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
 					{
 						glBegin(GL_TRIANGLE_STRIP);
 
@@ -1303,14 +1296,10 @@ int renderer_ogl::draw(const int update)
 						glVertex2f(b1.x1 + step->xoffs, b1.y1 + step->yoffs);
 
 						// determine the color of the line
-						r = (prim.color.r * step->weight);
-						g = (prim.color.g * step->weight);
-						b = (prim.color.b * step->weight);
-						a = (prim.color.a * 255.0f);
-						if (r > 1.0) r = 1.0;
-						if (g > 1.0) g = 1.0;
-						if (b > 1.0) b = 1.0;
-						if (a > 1.0) a = 1.0;
+						float r = std::min(prim.color.r * step->weight, 1.0f);
+						float g = std::min(prim.color.g * step->weight, 1.0f);
+						float b = std::min(prim.color.b * step->weight, 1.0f);
+						float a = std::min(prim.color.a * 255.0f, 1.0f);
 						glColor4f(r, g, b, a);
 
 //                      texture = texture_update(window, &prim, 0);

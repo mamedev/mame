@@ -185,6 +185,7 @@ void nes_control_port1_devices(device_slot_interface &device)
 	device.option_add("4score_p1p3", NES_4SCORE_P1P3);
 	device.option_add("miracle_piano", NES_MIRACLE);
 	device.option_add("snes_adapter", NES_SNESADAPTER);
+	device.option_add("vboy", NES_VBOYCTRL);
 }
 
 void nes_control_port2_devices(device_slot_interface &device)
@@ -195,6 +196,7 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("powerpad", NES_POWERPAD);
 	device.option_add("4score_p2p4", NES_4SCORE_P2P4);
 	device.option_add("snes_adapter", NES_SNESADAPTER);
+	device.option_add("vboy", NES_VBOYCTRL);
 }
 
 void fc_control_port1_devices(device_slot_interface &device)
@@ -231,4 +233,15 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
 	device.option_add("taptapmat", NES_TAPTAPMAT);
 	device.option_add("turbofile", NES_TURBOFILE);
+}
+
+void famibox_control_port12_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("zapper", NES_ZAPPER);
+}
+
+void famibox_control_port3_devices(device_slot_interface &device)
+{
+	device.option_add("zapper", NES_ZAPPER);
 }

@@ -33,7 +33,7 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class microdec_state : public driver_device

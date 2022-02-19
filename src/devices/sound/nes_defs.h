@@ -56,12 +56,12 @@ struct apu_t
 		int vbl_length = 0;
 		int freq = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		float sweep_phase = 0.0;
 		uint8 adder = 0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* Triangle Wave */
@@ -75,13 +75,14 @@ struct apu_t
 
 		uint8 regs[4]; /* regs[1] unused */
 		int linear_length = 0;
+		bool linear_reload = false;
 		int vbl_length = 0;
 		int write_latency = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		uint8 adder = 0;
 		bool counter_started = false;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* Noise Wave */
@@ -97,10 +98,10 @@ struct apu_t
 		u32 seed = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* DPCM Wave */
@@ -117,11 +118,11 @@ struct apu_t
 		uint32 length = 0;
 		int bits_left = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		uint8 cur_byte = 0;
 		bool enabled = false;
 		bool irq_occurred = false;
-		signed char vol = 0;
+		int16 vol = 0;
+		uint8 output = 0;
 	};
 
 
@@ -195,7 +196,7 @@ struct apu_t
 /* vblank length table used for squares, triangle, noise */
 static const apu_t::uint8 vbl_length[32] =
 {
-	5, 127, 10, 1, 19,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
+	5, 127, 10, 1, 20,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
 	6,   8, 12, 9, 24, 10, 48, 11, 96, 12, 36, 13, 8, 14, 16, 15
 };
 
@@ -205,23 +206,30 @@ static const int freq_limit[8] =
 	0x3FF, 0x555, 0x666, 0x71C, 0x787, 0x7C1, 0x7E0, 0x7F0,
 };
 
-/* table of noise frequencies */
-static const int noise_freq[16] =
+// table of noise period
+// each fundamental is determined as: freq = master / period / 93
+static const int noise_freq[2][16] =
 {
-	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
+	{ 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 }, // NTSC
+	{ 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 }  // PAL
 };
 
-/* dpcm transfer freqs */
-static const int dpcm_clocks[16] =
+// dpcm (cpu) cycle period
+// each frequency is determined as: freq = master / period
+static const int dpcm_clocks[2][16] =
 {
-	428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54
+	{ 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54 }, // NTSC
+	{ 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98, 78, 66, 50 }  // PAL
 };
 
 /* ratios of pos/neg pulse for square waves */
 /* 2/16 = 12.5%, 4/16 = 25%, 8/16 = 50%, 12/16 = 75% */
 static const int duty_lut[4] =
 {
-	2, 4, 8, 12
+	0b01000000, // 01000000 (12.5%)
+	0b01100000, // 01100000 (25%)
+	0b01111000, // 01111000 (50%)
+	0b10011111, // 10011111 (25% negated)
 };
 
 #endif // MAME_SOUND_NES_DEFS_H

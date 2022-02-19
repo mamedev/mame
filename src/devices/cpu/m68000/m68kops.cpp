@@ -26542,16 +26542,12 @@ void m68000_base_device::x4e73_rte_l_71()
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* type 1000 stack frame */
+			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
 			{
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();   /* format word */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
-				m_instr_mode = INSTRUCTION_YES;
-				m_run_mode = RUN_MODE_NORMAL;
-				m68ki_fake_pull_16();  /* special status */
+				m68ki_fake_pull_16();  /* format word */
+				m68ki_fake_pull_16();  /* special status word */
 				m68ki_fake_pull_32();  /* fault address */
 				m68ki_fake_pull_32();  /* reserved and data output buffer */
 				m68ki_fake_pull_32();  /* reserved and data input buffer */
@@ -26564,6 +26560,10 @@ void m68000_base_device::x4e73_rte_l_71()
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
+				m68ki_jump(new_pc);
+				m68ki_set_sr(new_sr);
+				m_instr_mode = INSTRUCTION_YES;
+				m_run_mode = RUN_MODE_NORMAL;
 			}
 			else
 			{

@@ -686,7 +686,7 @@ void xt_hdc_device::command()
 	}
 }
 
-void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	command();
 }

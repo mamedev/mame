@@ -63,7 +63,7 @@ static constexpr int KCGD_PAGE_1 = 005574;
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
@@ -108,7 +108,7 @@ private:
 		KCGD_STATUS_TIMER_VAL = 15
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint16_t vram_addr_r();
 	uint16_t vram_data_r();
@@ -187,7 +187,7 @@ static DEVICE_INPUT_DEFAULTS_START( host_rs232_defaults )
 DEVICE_INPUT_DEFAULTS_END
 
 
-void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

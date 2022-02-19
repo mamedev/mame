@@ -38,11 +38,12 @@
 #define LOG_IRQ (1 << 1U)
 #define LOG_BT (1 << 2U)
 #define LOG_LCDC (1 << 3U)
+#define VERBOSE LOG_IRQ
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
-	: r65c02_device(mconfig, type, tag, owner, clock)
+	: w65c02s_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this)
 	, m_out_port_cb(*this)
@@ -64,6 +65,7 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_misc(0)
 	, m_ireq(0)
 	, m_iena(0)
+	, m_irq_level(0xff)
 	, m_lssa(0)
 	, m_lvpw(0)
 	, m_lxmax(0)
@@ -186,6 +188,7 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_misc));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
+	save_item(NAME(m_irq_level));
 	if (st2xxx_lctr_mask() != 0)
 	{
 		save_item(NAME(m_lssa));
@@ -281,24 +284,47 @@ void st2xxx_device::device_reset()
 	m_bctr = 0;
 }
 
-u8 st2xxx_device::acknowledge_irq()
+u8 st2xxx_device::active_irq_level() const
 {
 	// IREQH interrupts have priority over IREQL interrupts
-	for (int pri = 0; pri < 16; pri++)
+	u16 ireq_active = swapendian_int16(m_ireq & m_iena);
+	if (ireq_active != 0)
+		return 31 - (8 ^ count_leading_zeros_32(ireq_active & -ireq_active));
+	else
+		return 0xff;
+}
+
+u8 st2xxx_device::read_vector(u16 adr)
+{
+	if (adr >= 0xfffe)
 	{
-		int level = pri ^ 8;
-		if (BIT(m_ireq & m_iena, level))
+		if (adr == 0xfffe)
 		{
-			LOGMASKED(LOG_IRQ, "%s interrupt acknowledged (PC = $%04X, vector = $%04X)\n",
-				st2xxx_irq_name(level),
+			set_irq_service(true);
+
+			// Make sure this doesn't change in between vector pull cycles
+			m_irq_level = irq_taken ? active_irq_level() : 0xff;
+		}
+
+		if (m_irq_level != 0xff)
+		{
+			adr -= (m_irq_level + 3) << 1;
+
+			LOGMASKED(LOG_IRQ, "Acknowledging %s interrupt (PC = $%04X, IREQ = $%04X, IENA = $%04X, vector pull from $%04X)\n",
+				st2xxx_irq_name(m_irq_level),
 				PPC,
-				0x7ff8 - (level << 1));
-			m_ireq &= ~(1 << level);
-			update_irq_state();
-			return level;
+				m_ireq,
+				m_iena,
+				adr & 0x7fff);
+
+			if (BIT(adr, 0))
+			{
+				m_ireq &= ~(1 << m_irq_level);
+				update_irq_state();
+			}
 		}
 	}
-	throw emu_fatalerror("ST2XXX: no IRQ to acknowledge!\n");
+	return downcast<mi_st2xxx &>(*mintf).read_vector(adr);
 }
 
 u8 st2xxx_device::pdata_r(offs_t offset)
@@ -892,5 +918,3 @@ void st2xxx_device::bdiv_w(u8 data)
 {
 	m_bdiv = data;
 }
-
-#include "cpu/m6502/st2xxx.hxx"
