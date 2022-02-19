@@ -639,6 +639,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cc500.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cc500.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cisco.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cisco.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/datacentre.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/datacentre.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/emrmidi.cpp",
