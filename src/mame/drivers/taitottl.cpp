@@ -443,4 +443,4 @@ GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito",
 GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",      MACHINE_IS_SKELETON )
 
 // Not from Taito
-GAME( 1978, srdchamp,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions [TTL]", MACHINE_IS_SKELETON )
+GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions [TTL]", MACHINE_IS_SKELETON )
