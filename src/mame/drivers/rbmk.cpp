@@ -218,7 +218,6 @@ void rbmk_state::magslot_mem(address_map &map)
 	map(0x600000, 0x600001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
-	map(0x618080, 0x618081).r(FUNC(rbmk_state::unk_r));
 	map(0x620000, 0x620001).portr("IN3");
 	map(0x628000, 0x628001).w(FUNC(rbmk_state::unk_w));
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -964,6 +963,27 @@ ROM_START( rbspm )
 ROM_END
 
 
+ROM_START( sc2in1 ) // Basically same PCB as magslot, but with only 1 dip bank. Most labels have been covered with other labels with 'TETRIS' hand-written
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(c0ad5df0) SHA1(a51f30e76493ea9fb5313c0064dac9a2a4f70cc3) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "u83", 0x00000, 0x80000, CRC(d7ff589b) SHA1(38e61dd7509862dec1299708da8785d1df713fe9) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "u178", 0x000000, 0x200000,  CRC(eaceb446) SHA1(db312f555e060eea6450f506cbbdca8874a05d58) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "u41", 0x00000, 0x40000, CRC(9ea462f7) SHA1(8cec497691f0121693a482b452ddf7a7dcedaf87) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "u169", 0x00000, 0x80000, CRC(f442fa70) SHA1(d06a84080e0196e1917b6f942adc29f97314be58) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "is93c46.u136", 0x00, 0x080, CRC(f0552ce8) SHA1(2dae746d9808d8a37f4f928dedda500063efdcfe) )
+ROM_END
+
+
 // the PCB is slightly different from the others, both layout-wise and component-wise, but it's mostly compatible. It seems to use one more GFX layer and not to have the 89C51.
 ROM_START( magslot ) // All labels have SLOT canceled with a black pen. No sum matches the one on label.
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
@@ -976,7 +996,7 @@ ROM_START( magslot ) // All labels have SLOT canceled with a black pen. No sum m
 	ROM_LOAD( "magic a1.0c _ _ _ _.u178", 0x000000, 0x200000,  CRC(11028627) SHA1(80b38acab1cd12462d8fc36a9cdce5e5e76f6403) ) // no sum on label, 1xxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "magic t1.0c ec43.u64", 0x00000, 0x80000, CRC(18df608d) SHA1(753b8090e8fd89e50131a22259ef3280d7e6b282) )
+	ROM_LOAD( "magic t1.0c ec43.u41", 0x00000, 0x80000, CRC(18df608d) SHA1(753b8090e8fd89e50131a22259ef3280d7e6b282) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "magic u1.0c f7f6.u169", 0x00000, 0x40000, CRC(582631d3) SHA1(92d1b767bc7ef15eed6dad599392c17620210678) )
@@ -989,8 +1009,11 @@ ROM_END
 
 
 // mahjong
-GAME( 1998, rbmk,    0, rbmk,    rbmk,    rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
-GAME( 1998, rbspm,   0, rbspm,   rbspm,   rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,    0, rbmk,    rbmk,    rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",        MACHINE_NOT_WORKING )
+GAME( 1998, rbspm,   0, rbspm,   rbspm,   rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",    MACHINE_NOT_WORKING )
+
+// card game
+GAME( 2001, sc2in1,  0, magslot, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)", MACHINE_NOT_WORKING ) // stops during boot
 
 // slot, on slightly different PCB
-GAME( 2003, magslot, 0, magslot, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Magic Slot (normal 1.0C)",               MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot, 0, magslot, magslot, rbmk_state, empty_init, ROT0,  "GMS", "Magic Slot (normal 1.0C)",                  MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
