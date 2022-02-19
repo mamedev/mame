@@ -16,6 +16,7 @@
 #include "textbuf.h"
 
 #include "debugger.h"
+#include "fileio.h"
 
 #include "corestr.h"
 
@@ -84,6 +85,10 @@ debugger_console::debugger_console(running_machine &machine)
 			break;
 		}
 	}
+}
+
+debugger_console::~debugger_console()
+{
 }
 
 

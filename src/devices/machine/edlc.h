@@ -55,9 +55,9 @@ protected:
 	virtual void tx_command_w(u8 data);
 
 	// helpers
-	void transmit(void *ptr, int param);
+	void transmit(int param);
 	int receive(u8 *buf, int length);
-	void interrupt(void *ptr = nullptr, int param = 0);
+	void interrupt(int param = 0);
 	virtual bool address_filter(u8 *address);
 	void dump_bytes(u8 *buf, int length);
 

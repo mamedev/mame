@@ -190,6 +190,7 @@ Afega Games
 Afega stands for "Art-Fiction Electronic Game"
 
 Reference of music tempo:
+    tdragon3h - https://youtu.be/-cHM5EQnxA8
     stagger1 - https://www.youtube.com/watch?v=xWszb2fP07M
 
 ********************************************************************/
@@ -665,13 +666,6 @@ printed on the up-left corner of the screen).
 		m_mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-#ifdef UNUSED_FUNCTION
-u16 nmk16_state::mcu_shared_r()
-{
-	return nmk16_mcu_shared_ram[offset];
-}
-#endif
-
 //td     - hmf
 //008D9E - 00796e
 /*
@@ -1030,7 +1024,7 @@ void nmk16_state::tdragon_map(address_map &map)
 //  map(0x0b0000, 0x0b7fff).ram();    // Work RAM
 //  map(0x0b8000, 0x0b8fff).ram().share("spriteram"); // Sprite RAM
 //  map(0x0b9000, 0x0bdfff).ram().share("mcu_work_ram");   // Work RAM
-//  map(0x0be000, 0x0befff).rw(FUNC(nmk16_state::mcu_shared_r), FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  // Work RAM
+//  map(0x0be000, 0x0befff).lr(NAME([this] (offs_t offset) { return nmk16_mcu_shared_ram[offset]; })).w(FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  // Work RAM
 //  map(0x0bf000, 0x0bffff).ram();    // Work RAM
 	map(0x0b0000, 0x0bffff).ram().share("mainram");
 	map(0x0c0000, 0x0c0001).portr("IN0");
@@ -5005,12 +4999,15 @@ void nmk16_state::tdragon2(machine_config &config)
 
 void nmk16_state::tdragon3h(machine_config &config)
 {
+	// PCB has 12 MHz and 16 MHz XTAL, clocks are same as original except 68000 clock? it's has no 10 MHz XTAL.
 	tdragon2(config);
+	m_maincpu->set_clock(XTAL(12'000'000)); // MC68000P12 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon3h_map);
 
 	// No YM2203 and only one OKI, the PCB has a space for the YM2203, populated by a 7474 and a 74367.
 	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
 
+	// Z84C0006PEC 4? MHz
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
 
 	config.device_remove("ymsnd");

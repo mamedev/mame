@@ -66,9 +66,9 @@ public:
 		, m_ic6(*this, "ic6")
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_leds(*this, "led%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void allied(machine_config &config);
@@ -96,16 +96,16 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void mem_map(address_map &map);
 
-	u32 m_player_score[6];
-	u8 m_display;
-	u8 m_bit_counter;
-	bool m_disp_data;
-	u8 m_ic5a;
-	u8 m_ic6a0;
-	u8 m_ic6a1;
-	u8 m_ic6a2;
-	u8 m_ic6b4;
-	u8 m_ic6b7;
+	u32 m_player_score[6]{};
+	u8 m_display = 0U;
+	u8 m_bit_counter = 0U;
+	bool m_disp_data = 0;
+	u8 m_ic5a = 0U;
+	u8 m_ic6a0 = 0U;
+	u8 m_ic6a1 = 0U;
+	u8 m_ic6a2 = 0U;
+	u8 m_ic6b4 = 0U;
+	u8 m_ic6b7 = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
@@ -626,6 +626,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 
 void allied_state::machine_start()
 {
+	genpin_class::machine_start();
 	m_digits.resolve();
 	m_leds.resolve();
 	m_io_outputs.resolve();
@@ -644,6 +645,10 @@ void allied_state::machine_start()
 
 void allied_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_display = 0;
 	m_bit_counter = 0;
 	m_disp_data = 0;

@@ -12,6 +12,8 @@
 #include "ds1386.h"
 #include "machine/timehelp.h"
 
+#include "fileio.h"
+
 #define DISABLE_OSC     (0x80)
 #define DISABLE_SQW     (0x40)
 
@@ -199,7 +201,7 @@ void ds1386_device::watchdog_alarm()
 	}
 }
 
-void ds1386_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds1386_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

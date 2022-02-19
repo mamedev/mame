@@ -197,7 +197,7 @@ private:
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
 	//crystal timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void ti83pse_count(uint8_t timer, uint8_t data);
 
 	emu_timer *m_crystal_timer1;

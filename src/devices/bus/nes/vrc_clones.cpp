@@ -250,7 +250,7 @@ void nes_th21311_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_900218_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_900218_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -508,7 +508,7 @@ void nes_tf1201_device::irq_ack_w()
 
  -------------------------------------------------*/
 
-void nes_th21311_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_th21311_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

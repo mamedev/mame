@@ -636,15 +636,17 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
 
-// TODO: remove me, cfr. pc9801.cpp
-#define MAIN_CLOCK_X2 2'457'600
+// TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
+#define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
+#define MAIN_CLOCK_X1   (BASE_CLOCK / 16)   // 1.9968 MHz
+#define MAIN_CLOCK_X2   (BASE_CLOCK / 13)   // 2.4576 MHz
 
 void pc9821_state::pc9821(machine_config &config)
 {
 	// TODO: specs for a vanilla MULTi doesn't match
 	// should be 386sx at 20 MHz, this may be "just" a FA/BX class instead
 	pc9801rs(config);
-	const double xtal = 16000000;
+	const auto xtal = BASE_CLOCK / 2;
 	I486(config.replace(), m_maincpu, xtal); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_state::pc9821_io);

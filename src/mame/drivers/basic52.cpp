@@ -62,7 +62,7 @@ private:
 	uint8_t from_term();
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<speaker_sound_device> m_speaker;

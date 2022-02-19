@@ -17,7 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/gamate.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class gamate_state : public driver_device

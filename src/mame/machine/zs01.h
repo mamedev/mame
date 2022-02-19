@@ -38,6 +38,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -72,6 +73,18 @@ private:
 		STATE_READ_DATA
 	};
 
+	enum status_t
+	{
+		STATUS_OK,
+		STATUS_ERROR = 2,
+	};
+
+	enum configuration_registers_t
+	{
+		CONFIG_RR = 4, // Retry Register
+		CONFIG_RC = 5  // Reset Counter
+	};
+
 	// internal state
 	optional_device<ds2401_device> m_ds2401;
 	optional_memory_region m_region;
@@ -85,13 +98,15 @@ private:
 	int m_shift;
 	int m_bit;
 	int m_byte;
+	int m_previous_byte;
 	uint8_t m_write_buffer[ 12 ];
 	uint8_t m_read_buffer[ 12 ];
 	uint8_t m_response_key[ 8 ];
 	uint8_t m_response_to_reset[ 4 ];
 	uint8_t m_command_key[ 8 ];
 	uint8_t m_data_key[ 8 ];
-	uint8_t m_data[ 4096 ];
+	uint8_t m_configuration_registers[ 8 ];
+	uint8_t m_data[ 112 ];
 };
 
 

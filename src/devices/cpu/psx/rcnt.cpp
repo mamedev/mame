@@ -227,7 +227,7 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 	}
 }
 
-void psxrcnt_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void psxrcnt_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int n_counter = id;
 	psx_root *root = &root_counter[ n_counter ];

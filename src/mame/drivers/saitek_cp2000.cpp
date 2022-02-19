@@ -26,11 +26,13 @@ Capturing pieces is also unintuitive, having to press the destination square twi
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -213,7 +215,7 @@ INPUT_PORTS_END
 
 void cp2000_state::cp2000(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	F8(config, m_maincpu, 2750000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
@@ -226,12 +228,12 @@ void cp2000_state::cp2000(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_saitek_cp2000);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }

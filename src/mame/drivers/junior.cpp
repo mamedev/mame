@@ -63,8 +63,8 @@ private:
 	u8 riot_a_r();
 	void riot_a_w(u8 data);
 	void riot_b_w(u8 data);
-	u8 m_digit;
-	u8 m_seg;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 
 	virtual void machine_start() override;
 
@@ -227,4 +227,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor", "Junior Computer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

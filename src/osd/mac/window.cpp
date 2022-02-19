@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "render.h"
+#include "screen.h"
 #include "ui/uimain.h"
 
 // OSD headers

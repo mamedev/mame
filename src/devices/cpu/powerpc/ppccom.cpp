@@ -1150,7 +1150,7 @@ void ppc_device::device_reset()
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor)
 		{
-			decrementer_int_callback(nullptr, 0);
+			decrementer_int_callback(0);
 		}
 	}
 
@@ -1834,9 +1834,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(nullptr, false);
+					ppc4xx_fit_callback(false);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(nullptr, false);
+					ppc4xx_pit_callback(false);
 				return;
 
 			/* timer status register */
@@ -1849,7 +1849,7 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(nullptr, false);
+				ppc4xx_pit_callback(false);
 				return;
 
 			/* timebase */

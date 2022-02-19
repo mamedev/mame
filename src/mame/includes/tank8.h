@@ -85,7 +85,7 @@ private:
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int index);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void tank8_cpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;

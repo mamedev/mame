@@ -1040,6 +1040,7 @@ void dynax_state::tenkai_ipsel_w(offs_t offset, uint8_t data)
 
 void dynax_state::tenkai_ip_w(uint8_t data)
 {
+	m_input_mode = data;
 	switch (m_input_sel)
 	{
 	case 0x0c:
@@ -1070,6 +1071,7 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 			switch (m_input_sel)
 			{
 				case 0x00:
+				case 0x80:
 					return ioport("COINS")->read(); // coins
 
 				default:
@@ -1093,8 +1095,13 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 
 				// player 1
 				case 0x82:
+					if (m_input_mode != 0xff)
+						return 0x00;
 					if (m_keyb >= 5)
+					{
 						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
+						return 0x00;
+					}
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
@@ -1160,6 +1167,7 @@ void dynax_state::tenkai_p3_w(uint8_t data)
 	m_rombank = ((data & 0x04) << 1) | (m_rombank & 0x07);
 	tenkai_update_rombank();
 }
+
 void dynax_state::tenkai_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x08) | ((data & 0x0e) >> 1);
@@ -1331,6 +1339,14 @@ void dynax_state::gekisha_banked_map(address_map &map)
 	map(0x10067, 0x10067).portr("DSW2");         // DSW
 	map(0x10070, 0x10071).w("ym2413", FUNC(ym2413_device::write));        //
 	map(0x10080, 0x10080).nopw();   // ? 0,1,6 (bit 0 = screen disable?)
+}
+
+void dynax_state::ougonhai_p7_w(uint8_t data)
+{
+	m_tenkai_p5_val &= 0xf0;
+
+	if (data & 0x0f)
+		m_tenkai_p5_val |= (1 << 3);
 }
 
 
@@ -4122,6 +4138,7 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_blitter2_irq_mask));
 
 	save_item(NAME(m_input_sel));
+	save_item(NAME(m_input_mode));
 	save_item(NAME(m_dsw_sel));
 	save_item(NAME(m_keyb));
 	save_item(NAME(m_coins));
@@ -4145,6 +4162,7 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
 	m_input_sel = 0;
+	m_input_mode = 0;
 	m_dsw_sel = 0;
 	m_keyb = 0;
 	m_coins = 0;
@@ -4907,6 +4925,14 @@ void dynax_state::mjreach(machine_config &config)
 {
 	tenkai(config);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)); // not inverted
+}
+
+void dynax_state::ougonhai(machine_config &config)
+{
+	tenkai(config);
+
+	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	tmp.port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
 }
 
 /***************************************************************************
@@ -7022,7 +7048,7 @@ ROM_START( ougonhai )
 	ROM_LOAD( "dynax_6201b.2c", 0x00000, 0x40000, CRC(18ef8eda) SHA1(48a3e4566b0a86db907602fd235c01d96eddec23) )
 	ROM_RELOAD(                 0x10000, 0x40000 )
 	ROM_RELOAD(                 0x50000, 0x40000 )
-	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, BAD_DUMP CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
 	ROM_LOAD( "dynax_6202.11b", 0x000000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonhaib)
@@ -7062,19 +7088,47 @@ PCB Layout
 
 ***************************************************************************/
 
-ROM_START( ougonhaib )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+ROM_START( ougonhaib1 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_RELOAD(                   0x50000, 0x40000 )
-	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "ougonhaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
+
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
 	ROM_LOAD( "tydg002.u8",  0x000000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // = lzc-01.u6 [1/2]
 	ROM_LOAD( "tydg003.u6",  0x080000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
 	ROM_LOAD( "tydg004.u21", 0x100000, 0x80000, CRC(b7d49d04) SHA1(756c35bbe207b5bfc6e05d6da99a7ad5a3453506) )
 	ROM_LOAD( "tydg005.u19", 0x180000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // = taicom01.15b = lzc-01.u6 [2/2]
+ROM_END
+
+
+ROM_START( ougonhaib2 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "hc03.u11",      0x00000, 0x40000, CRC(fc635d8a) SHA1(fb4cbe676022890c53e79cb173ceada5e22687f2) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
+	ROM_LOAD( "hc02.u8", 0x000000, 0x80000, CRC(f656e314) SHA1(69069a3cb961179edb7ba9ada3f574f37e3cbd80) )
+	ROM_CONTINUE(0x100000, 0x80000)
+	ROM_LOAD( "hc01.u19", 0x080000, 0x80000, CRC(57ce658b) SHA1(0608625ac112dea5d433f843230cf192623eddfc) )
+	ROM_CONTINUE(0x180000, 0x80000)
+ROM_END
+
+
+ROM_START( ougonhaib3 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "mg-1.u11",      0x00000, 0x40000, CRC(dd1ed979) SHA1(53ae532f789b184c7cd4d504408f4ad2c1492cfb) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	ROM_RELOAD(                   0x10000, 0x38000 )
+	ROM_CONTINUE(0, 0x4000)
+	ROM_IGNORE(0x4000)
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
+	ROM_LOAD( "mc-1.u8",  0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
+	ROM_LOAD( "mg-3.u21", 0x100000, 0x080000, CRC(8ef6a17a) SHA1(f4cbf91dd33b2a96a6a2ad67da3c9a69892e2405) )
+	ROM_LOAD( "m27c512.u15", 0x180000, 0x010000, CRC(4adbb785) SHA1(6838de0a7fb0fb4d566b9ed33993a51c59fb4686) )
 ROM_END
 
 /***************************************************************************
@@ -7359,8 +7413,10 @@ GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai, 0,        tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib,ougonhai, tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai, 0,        ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib1,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 1)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 2)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 3)",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, empty_init,    ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, empty_init,    ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?

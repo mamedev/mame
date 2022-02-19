@@ -179,7 +179,7 @@ static INPUT_PORTS_START( bladestl_joy ) // Joystick set does not even have a Tr
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8") // This is buggy in version E: while it shows Off in Test Mode, the sounds always play. It was fixed for later versions
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 

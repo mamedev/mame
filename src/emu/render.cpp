@@ -41,6 +41,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
@@ -536,8 +537,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container, u
 //-------------------------------------------------
 
 render_container::render_container(render_manager &manager, screen_device *screen)
-	: m_next(nullptr)
-	, m_manager(manager)
+	: m_manager(manager)
 	, m_screen(screen)
 	, m_overlaybitmap(nullptr)
 	, m_overlaytexture(nullptr)
@@ -894,7 +894,6 @@ render_target::render_target(render_manager &manager, util::xml::data_node const
 template <typename T> render_target::render_target(render_manager &manager, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
-	, m_filelist(std::make_unique<std::list<layout_file>>())
 	, m_curview(0U)
 	, m_flags(flags)
 	, m_listindex(0)
@@ -960,7 +959,7 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 
 	// load the layout files
 	load_layout_files(std::forward<T>(layout), flags & RENDER_CREATE_SINGLE_FILE);
-	for (layout_file &file : *m_filelist)
+	for (layout_file &file : m_filelist)
 		for (layout_view &view : file.views())
 			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 				m_views.emplace_back(view, view.default_visibility_mask());
@@ -1199,63 +1198,103 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
-				src_aspect = 1.0 / src_aspect;
+				src_aspect = 1.0f / src_aspect;
 
-			// get target aspect
-			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
+			// we need the ratio of target to source aspect
+			float aspect_ratio = m_keepaspect ? (float)target_width / (float)target_height * target_pixel_aspect / src_aspect : 1.0f;
+
+			// first compute (a, b) scale factors to fit the screen
+			float a = (float)target_width / src_width;
+			float b = (float)target_height / src_height;
 
 			// apply automatic axial stretching if required
 			int scale_mode = m_scale_mode;
-			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
+			if (scale_mode == SCALE_FRACTIONAL_AUTO)
+				scale_mode = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY) ?
+							SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+
+			// determine the scaling method for each axis
+			bool a_is_fract = (scale_mode == SCALE_FRACTIONAL_X || scale_mode == SCALE_FRACTIONAL);
+			bool b_is_fract = (scale_mode == SCALE_FRACTIONAL_Y || scale_mode == SCALE_FRACTIONAL);
+
+			// check if we have user defined scale factors, if so use them instead, but only on integer axes
+			int a_user = a_is_fract ? 0 : m_int_scale_x;
+			int b_user = b_is_fract ? 0 : m_int_scale_y;
+
+			// we allow overscan either explicitely or if integer scale factors are forced by user
+			bool int_overscan = m_int_overscan || (m_keepaspect && (a_user != 0 || b_user != 0));
+			float a_max = std::max(a, (float)a_user);
+			float b_max = std::max(b, (float)b_user);
+
+
+			// get the usable bounding box considering the type of scaling for each axis
+			float usable_aspect = (a_is_fract ? a : std::max(1.0f, floorf(a))) * src_width /
+								 ((b_is_fract ? b : std::max(1.0f, floorf(b))) * src_height) * target_pixel_aspect;
+
+			// depending on the relative shape between target and source, let's define 'a' and 'b' so that:
+			// * a is the leader axis (first to hit a boundary)
+			// * b is the follower axis
+			if (usable_aspect > src_aspect)
 			{
-				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
-				scale_mode = is_rotated ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+				std::swap(a, b);
+				std::swap(a_user, b_user);
+				std::swap(a_is_fract, b_is_fract);
+				std::swap(a_max, b_max);
+				aspect_ratio = 1.0f / aspect_ratio;
 			}
 
-			// first compute scale factors to fit the screen
-			float xscale = (float)target_width / src_width;
-			float yscale = (float)target_height / src_height;
+			// now find an (a, b) pair that best fits our boundaries and scale options
+			float a_best = 1.0f, b_best = 1.0f;
+			float diff = 1000;
 
-			// apply aspect correction
-			if (m_keepaspect)
+			// fill (a0, a1) range
+			float u = a_user == 0 ? a : (float)a_user;
+			float a_range[] = {a_is_fract ? u : std::max(1.0f, floorf(u)), a_is_fract ? u : std::max(1.0f, roundf(u))};
+
+			for (float aa : a_range)
 			{
-				if (target_aspect > src_aspect)
-					xscale *= src_aspect / target_aspect;
-				else
-					yscale *= target_aspect / src_aspect;
-			}
+				// apply aspect correction to 'b' axis if needed, considering resulting 'a' borders
+				float ba = b * (m_keepaspect ? aspect_ratio * (aa / a) : 1.0f);
 
-			bool x_fits = render_round_nearest(xscale) * src_width <= target_width;
-			bool y_fits = render_round_nearest(yscale) * src_height <= target_height;
+				// fill (b0, b1) range
+				float v = b_user == 0 ? ba : (float)b_user;
+				float b_range[] = {b_is_fract ? v : std::max(1.0f, floorf(v)), b_is_fract ? v : std::max(1.0f, roundf(v))};
 
-			// compute integer scale factors
-			float integer_x = std::max(1.0f, float(m_int_overscan || x_fits ? render_round_nearest(xscale) : floor(xscale)));
-			float integer_y = std::max(1.0f, float(m_int_overscan || y_fits ? render_round_nearest(yscale) : floor(yscale)));
+				for (float bb : b_range)
+				{
+					// we may need to propagate proportions back to 'a' axis
+					float ab = aa;
+					if (m_keepaspect && a_user == 0)
+					{
+						if (a_is_fract) ab *= (bb / ba);
+						else if (b_user != 0) ab = std::max(1.0f, roundf(ab * (bb / ba)));
+					}
 
-			// check if we have user defined scale factors, if so use them instead
-			integer_x = m_int_scale_x > 0 ? m_int_scale_x : integer_x;
-			integer_y = m_int_scale_y > 0 ? m_int_scale_y : integer_y;
+					// if overscan isn't allowed, discard values that exceed the usable bounding box, except a minimum of 1.0f
+					if (!int_overscan && ((ab > a_max && bb > 1.0f) || (bb > b_max && ab > 1.0f)))
+						continue;
 
-			// now apply desired scale mode
-			if (scale_mode == SCALE_FRACTIONAL_X)
-			{
-				if (m_keepaspect) xscale *= integer_y / yscale;
-				yscale = integer_y;
+					// score the result
+					float new_diff = fabsf(aspect_ratio * (a / b) - (ab / bb));
+
+					if (new_diff <= diff)
+					{
+						diff = new_diff;
+						a_best = ab;
+						b_best = bb;
+					}
+				}
 			}
-			else if (scale_mode == SCALE_FRACTIONAL_Y)
-			{
-				if (m_keepaspect) yscale *= integer_x / xscale;
-				xscale = integer_x;
-			}
-			else
-			{
-				xscale = integer_x;
-				yscale = integer_y;
-			}
+			a = a_best;
+			b = b_best;
+
+			// restore orientation
+			if (usable_aspect > src_aspect)
+				std::swap(a, b);
 
 			// set the final width/height
-			visible_width = render_round_nearest(src_width * xscale);
-			visible_height = render_round_nearest(src_height * yscale);
+			visible_width = render_round_nearest(src_width * a);
+			visible_height = render_round_nearest(src_height * b);
 			break;
 		}
 	}
@@ -1340,10 +1379,6 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 
 render_primitive_list &render_target::get_primitives()
 {
-	// remember the base values if this is the first frame
-	if (!m_base_view)
-		m_base_view = &current_view();
-
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
 	m_listindex = (m_listindex + 1) % std::size(m_primlist);
@@ -1415,23 +1450,6 @@ render_primitive_list &render_target::get_primitives()
 			prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 			list.append(*prim);
 		}
-	}
-
-	// process the debug containers
-	for (render_container &debug : m_debug_containers)
-	{
-		object_transform ui_xform;
-		ui_xform.xoffs = 0;
-		ui_xform.yoffs = 0;
-		ui_xform.xscale = (float)m_width;
-		ui_xform.yscale = (float)m_height;
-		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = 1.0f;
-		ui_xform.color.a = 0.9f;
-		ui_xform.orientation = m_orientation;
-		ui_xform.no_center = true;
-
-		// add UI elements
-		add_container_primitives(list, root_xform, ui_xform, debug, BLENDMODE_ALPHA);
 	}
 
 	// process the UI if we are the UI target
@@ -1604,44 +1622,12 @@ void render_target::invalidate_all(void *refptr)
 
 
 //-------------------------------------------------
-//  debug_alloc - allocate a container for a debug
-//  view
-//-------------------------------------------------
-
-render_container *render_target::debug_alloc()
-{
-	return &m_debug_containers.append(*m_manager.container_alloc());
-}
-
-
-//-------------------------------------------------
-//  debug_free - free a container for a debug view
-//-------------------------------------------------
-
-void render_target::debug_free(render_container &container)
-{
-	m_debug_containers.remove(container);
-}
-
-
-//-------------------------------------------------
-//  debug_append - move a debug view container to
-//  the end of the list
-//-------------------------------------------------
-
-void render_target::debug_append(render_container &container)
-{
-	m_debug_containers.append(m_debug_containers.detach(container));
-}
-
-
-//-------------------------------------------------
 //  resolve_tags - resolve tag lookups
 //-------------------------------------------------
 
 void render_target::resolve_tags()
 {
-	for (layout_file &file : *m_filelist)
+	for (layout_file &file : m_filelist)
 		file.resolve_tags();
 
 	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
@@ -1808,7 +1794,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	auto const nth_view =
 		[this] (unsigned n) -> layout_view *
 		{
-			for (layout_file &file : *m_filelist)
+			for (layout_file &file : m_filelist)
 				for (layout_view &view : file.views())
 					if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 						if (n-- == 0)
@@ -1821,7 +1807,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		if (!nth_view(0))
 		{
 			load_layout_file(nullptr, layout_noscreens);
-			if (m_filelist->empty())
+			if (m_filelist.empty())
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
 	}
@@ -2226,7 +2212,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	// parse and catch any errors
 	try
 	{
-		m_filelist->emplace_back(device, rootnode, searchpath, dirname);
+		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -2364,11 +2350,11 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				// clip the primitive
 				if (!m_transform_container && PRIMFLAG_GET_VECTOR(curitem.flags()))
 				{
-					clipped = render_clip_line(&prim->bounds, &root_cliprect);
+					clipped = render_clip_line(prim->bounds, root_cliprect);
 				}
 				else
 				{
-					clipped = render_clip_line(&prim->bounds, &cliprect);
+					clipped = render_clip_line(prim->bounds, cliprect);
 				}
 				break;
 
@@ -2401,7 +2387,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					prim->texcoords = oriented_texcoords[finalorient];
 
 					// apply clipping
-					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+					clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
 					prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2461,7 +2447,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						prim->texcoords = oriented_texcoords[finalorient];
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+						clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 						// apply the final orientation from the quad flags and then build up the final flags
 						prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2477,7 +2463,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 							| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
+						clipped = render_clip_quad(prim->bounds, cliprect, nullptr);
 					}
 				}
 				break;
@@ -2602,7 +2588,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		}
 
 		// add to the list or free if we're clipped out
-		bool const clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+		bool const clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 		list.append_or_return(*prim, clipped);
 	}
 }
@@ -2664,10 +2650,18 @@ int render_target::view_index(layout_view &targetview) const
 //  config_load - process config information
 //-------------------------------------------------
 
-void render_target::config_load(util::xml::data_node const &targetnode)
+void render_target::config_load(util::xml::data_node const *targetnode)
 {
+	// remember the view selected via command line and INI options
+	if (!m_base_view)
+		m_base_view = &current_view();
+
+	// bail if no configuration
+	if (!targetnode)
+		return;
+
 	// find the view
-	const char *viewname = targetnode.get_attribute_string("view", nullptr);
+	const char *viewname = targetnode->get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
 		for (int viewnum = 0; viewnum < 1000; viewnum++)
 		{
@@ -2682,12 +2676,12 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	int const zoom = targetnode.get_attribute_int("zoom", -1);
+	int const zoom = targetnode->get_attribute_int("zoom", -1);
 	if (zoom == 0 || zoom == 1)
 		set_zoom_to_screen(zoom);
 
 	// apply orientation
-	int rotate = targetnode.get_attribute_int("rotate", -1);
+	int rotate = targetnode->get_attribute_int("rotate", -1);
 	if (rotate != -1)
 	{
 		if (rotate == 90)
@@ -2711,7 +2705,7 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 	}
 
 	// apply per-view settings
-	for (util::xml::data_node const *viewnode = targetnode.get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
+	for (util::xml::data_node const *viewnode = targetnode->get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
 	{
 		char const *const viewname = viewnode->get_attribute_string("name", nullptr);
 		if (!viewname)
@@ -3107,7 +3101,7 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_target(nullptr)
 	, m_live_textures(0)
 	, m_texture_id(0)
-	, m_ui_container(new render_container(*this))
+	, m_ui_container(std::make_unique<render_container>(*this))
 {
 	// register callbacks
 	machine.configuration().config_register(
@@ -3117,7 +3111,7 @@ render_manager::render_manager(running_machine &machine)
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
-		screen.set_container(*container_alloc(&screen));
+		screen.set_container(m_screen_container_list.emplace_back(*this, &screen));
 }
 
 
@@ -3128,8 +3122,8 @@ render_manager::render_manager(running_machine &machine)
 render_manager::~render_manager()
 {
 	// free all the containers since they may own textures
-	container_free(m_ui_container);
-	m_screen_container_list.reset();
+	m_ui_container.reset();
+	m_screen_container_list.clear();
 
 	// better not be any outstanding textures when we die
 	assert(m_live_textures == 0);
@@ -3229,7 +3223,7 @@ float render_manager::ui_aspect(render_container *rc)
 	int orient;
 	float aspect;
 
-	if (rc == m_ui_container || rc == nullptr) {
+	if (rc == m_ui_container.get() || rc == nullptr) {
 		// ui container, aggregated multi-screen target
 
 		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
@@ -3341,29 +3335,6 @@ void render_manager::resolve_tags()
 
 
 //-------------------------------------------------
-//  container_alloc - allocate a new container
-//-------------------------------------------------
-
-render_container *render_manager::container_alloc(screen_device *screen)
-{
-	auto container = new render_container(*this, screen);
-	if (screen != nullptr)
-		m_screen_container_list.append(*container);
-	return container;
-}
-
-
-//-------------------------------------------------
-//  container_free - release a container
-//-------------------------------------------------
-
-void render_manager::container_free(render_container *container)
-{
-	m_screen_container_list.remove(*container);
-}
-
-
-//-------------------------------------------------
 //  config_load - read and apply data from the
 //  configuration file
 //-------------------------------------------------
@@ -3371,8 +3342,20 @@ void render_manager::container_free(render_container *container)
 void render_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// we only care about system-specific configuration with matching nodes
-	if ((cfg_type != config_type::SYSTEM) || !parentnode)
+	if (cfg_type == config_type::DEFAULT)
+	{
+		// let the targets stabilise themselves
+		for (render_target &target : m_targetlist)
+		{
+			if (!target.hidden())
+				target.config_load(nullptr);
+		}
 		return;
+	}
+	else if ((cfg_type != config_type::SYSTEM) || !parentnode)
+	{
+		return;
+	}
 
 	// check the UI target
 	util::xml::data_node const *const uinode = parentnode->get_child("interface");
@@ -3388,31 +3371,36 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 	{
 		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
 		if (target && !target->hidden())
-			target->config_load(*targetnode);
+			target->config_load(targetnode);
 	}
 
 	// iterate over screen nodes
 	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
 	{
 		int const index = screennode->get_attribute_int("index", -1);
-		render_container *container = m_screen_container_list.find(index);
+		render_container *container = nullptr;
+		if (index >= 0 && index < m_screen_container_list.size())
+			container = &*std::next(m_screen_container_list.begin(), index);
 
-		// fetch current settings
-		render_container::user_settings settings = container->get_user_settings();
+		if (container != nullptr)
+		{
+			// fetch current settings
+			render_container::user_settings settings = container->get_user_settings();
 
-		// fetch color controls
-		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
-		settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
-		settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
+			// fetch color controls
+			settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
+			settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
+			settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
 
-		// fetch positioning controls
-		settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
-		settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
-		settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
-		settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
+			// fetch positioning controls
+			settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
+			settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
+			settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
+			settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
 
-		// set the new values
-		container->set_user_settings(settings);
+			// set the new values
+			container->set_user_settings(settings);
+		}
 	}
 }
 
@@ -3457,7 +3445,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 
 	// iterate over screen containers
 	int scrnum = 0;
-	for (render_container *container = m_screen_container_list.first(); container != nullptr; container = container->next(), scrnum++)
+	for (render_container &container : m_screen_container_list)
 	{
 		// create a node
 		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
@@ -3468,7 +3456,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			// output the basics
 			screennode->set_attribute_int("index", scrnum);
 
-			render_container::user_settings settings = container->get_user_settings();
+			render_container::user_settings const settings = container.get_user_settings();
 
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())
@@ -3518,5 +3506,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			if (!changed)
 				screennode->delete_node();
 		}
+
+		scrnum++;
 	}
 }

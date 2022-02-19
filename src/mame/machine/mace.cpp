@@ -440,7 +440,7 @@ void mace_device::rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 //  TIMERS
 //**************************************************************************
 
-void mace_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mace_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_UST)
 	{

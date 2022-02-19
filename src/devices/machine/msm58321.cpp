@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "msm58321.h"
 
+#include "fileio.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -247,7 +249,7 @@ void msm58321_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -107,7 +107,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_banks(*this, "bank%u", 1U)
-		, m_io_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_io_dsw(*this, "DSW")
 		, m_digits(*this, "digit%u", 0U)
 		, m_p(*this, "p%u_%u", 0U, 0U)
@@ -140,7 +140,7 @@ private:
 	void mem_map(address_map &map);
 	void reset_banks();
 
-	u8 m_digit;
+	u8 m_digit = 0U;
 	std::unique_ptr<u8[]> m_ram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;

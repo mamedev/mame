@@ -54,7 +54,7 @@ void ym3802_device::device_reset()
 	set_comms_mode();
 }
 
-void ym3802_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ym3802_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// TODO: support clock and timers
 	switch(id)

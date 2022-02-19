@@ -21,8 +21,8 @@ public:
 	virtual uint16_t read_cart(offs_t offset) override;
 	virtual void write_cart(offs_t offset, uint16_t data) override;
 
-	virtual uint8_t read_cart_seeprom(void) override { return 1; };
-	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { };
+	virtual uint8_t read_cart_seeprom(void) override { return 1; }
+	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { }
 
 	virtual uint16_t read_rom(offs_t offset);
 	virtual void write_rom(offs_t offset, uint16_t data);

@@ -683,13 +683,13 @@ INPUT_PORTS_START( j6bigbuk )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Lo")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi/Exchange Number") // flashes a different lamp for Exchange Number, but same button?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 
 	PORT_MODIFY("J10_2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) // unknown, responds in switch test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Exchange Number")
 
 	PORT_MODIFY("J9_2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) // unknown, responds in switch test

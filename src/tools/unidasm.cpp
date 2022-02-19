@@ -183,6 +183,7 @@ using util::BIT;
 #include "cpu/upd78k/upd78k1d.h"
 #include "cpu/upd78k/upd78k2d.h"
 #include "cpu/upd78k/upd78k3d.h"
+#include "cpu/upd78k/upd78k4d.h"
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/v850/v850dasm.h"
@@ -561,14 +562,15 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm590",           le,  0, []() -> util::disasm_interface * { return new sm590_disassembler; } },
 	{ "sm5a",            le,  0, []() -> util::disasm_interface * { return new sm5a_disassembler; } },
 	{ "sm8500",          le,  0, []() -> util::disasm_interface * { return new sm8500_disassembler; } },
-	{ "sparcv7",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 7); } },
-	{ "sparcv8",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 8); } },
-	{ "sparcv9",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9); } },
-	{ "sparcv9vis1",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9, sparc_disassembler::vis_1); } },
-	{ "sparcv9vis2",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9, sparc_disassembler::vis_2); } },
-	{ "sparcv9vis2p",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9, sparc_disassembler::vis_2p); } },
-	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9, sparc_disassembler::vis_3); } },
-	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, 9, sparc_disassembler::vis_3b); } },
+	{ "sparclite",       be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::sparclite); } },
+	{ "sparcv7",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v7); } },
+	{ "sparcv8",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v8); } },
+	{ "sparcv9",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9); } },
+	{ "sparcv9vis1",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_1); } },
+	{ "sparcv9vis2",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_2); } },
+	{ "sparcv9vis2p",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_2p); } },
+	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3); } },
+	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3b); } },
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
@@ -633,6 +635,13 @@ static const dasm_table_entry dasm_table[] =
 	{ "upd78356",        le,  0, []() -> util::disasm_interface * { return new upd78356_disassembler; } },
 	{ "upd78366a",       le,  0, []() -> util::disasm_interface * { return new upd78366a_disassembler; } },
 	{ "upd78372",        le,  0, []() -> util::disasm_interface * { return new upd78372_disassembler; } },
+	{ "upd784026",       le,  0, []() -> util::disasm_interface * { return new upd784026_disassembler; } },
+	{ "upd784038",       le,  0, []() -> util::disasm_interface * { return new upd784038_disassembler; } },
+	{ "upd784046",       le,  0, []() -> util::disasm_interface * { return new upd784046_disassembler; } },
+	{ "upd784054",       le,  0, []() -> util::disasm_interface * { return new upd784054_disassembler; } },
+	{ "upd784216",       le,  0, []() -> util::disasm_interface * { return new upd784216_disassembler; } },
+	{ "upd784218",       le,  0, []() -> util::disasm_interface * { return new upd784218_disassembler; } },
+	{ "upd784225",       le,  0, []() -> util::disasm_interface * { return new upd784225_disassembler; } },
 	{ "upd780065",       le,  0, []() -> util::disasm_interface * { return new upd780065_disassembler; } },
 	{ "upd780988",       le,  0, []() -> util::disasm_interface * { return new upd78083_disassembler; } },
 	{ "upd78k0kx1",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx1_disassembler; } },

@@ -102,7 +102,7 @@ COLOR EMULATION (NEC 7220 + extra hardware)
 
 DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (a bit of history)
    (1) the standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-   (2) an unofficial DIY cable enabled R-G-B graphics + seperate text
+   (2) an unofficial DIY cable enabled R-G-B graphics + separate text
 
 EMULATION SPECIFIC
    (1) COLOR_MONITOR reflects DEC's recommendation (R-M-B with VR241 above)
@@ -508,7 +508,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void rainbow8088_base_map(address_map &map);
 	void rainbow8088_base_io(address_map &map);
@@ -1280,7 +1280,7 @@ void rainbow_modelb_state::machine_reset()
 }
 
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
-void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{
@@ -2168,7 +2168,7 @@ uint8_t rainbow_modela_state::system_parameter_r()
 	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
 
 	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
-	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
+	BIOS uses a separate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)
@@ -2188,7 +2188,7 @@ uint8_t rainbow_modelb_state::system_parameter_r()
 	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
 
 	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
-	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
+	BIOS uses a separate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)

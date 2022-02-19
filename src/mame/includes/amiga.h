@@ -545,7 +545,7 @@ protected:
 	virtual void machine_reset() override;
 
 	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void custom_chip_reset();
 
@@ -558,7 +558,7 @@ protected:
 
 	virtual void vblank();
 
-	virtual void potgo_w(uint16_t data) {};
+	virtual void potgo_w(uint16_t data) {}
 
 	// joystick/mouse
 	virtual uint16_t joy0dat_r();

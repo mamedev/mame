@@ -79,6 +79,7 @@ class debugger_console
 {
 public:
 	debugger_console(running_machine &machine);
+	~debugger_console();
 
 	// command handling
 	CMDERR          execute_command(const std::string &command, bool echo);

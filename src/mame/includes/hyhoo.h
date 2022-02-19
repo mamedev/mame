@@ -52,5 +52,5 @@ private:
 	void hyhoo_io_map(address_map &map);
 	void hyhoo_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

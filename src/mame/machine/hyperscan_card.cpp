@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "hyperscan_card.h"
 
+#include "softlist_dev.h"
+
 //#define LOG_OUTPUT_FUNC printf
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -19,8 +21,13 @@ DEFINE_DEVICE_TYPE(HYPERSCAN_CARD, hyperscan_card_device, "hyperscan_card", "Hyp
 
 hyperscan_card_device::hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HYPERSCAN_CARD, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_memcard_image_interface(mconfig, *this)
 {
+}
+
+const software_list_loader &hyperscan_card_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 //-------------------------------------------------

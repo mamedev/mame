@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "machine/at28c64b.h"
 
+#include "fileio.h"
+
 static constexpr int AT28C64B_DATA_BYTES = 0x10000;
 static constexpr int AT28C64B_ID_BYTES = 0x40;
 static constexpr int AT28C64B_TOTAL_BYTES = AT28C64B_DATA_BYTES + AT28C64B_ID_BYTES;
@@ -268,7 +270,7 @@ WRITE_LINE_MEMBER( at28c64b_device::set_oe_12v )
 }
 
 
-void at28c64b_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void at28c64b_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch( id )
 	{

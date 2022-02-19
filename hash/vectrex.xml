@@ -266,7 +266,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="darktowr">
-		<description>Dark Tower (Prototype)</description>
+		<description>Dark Tower (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -278,7 +278,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="enginean">
-		<description>Engine Analyzer (Prototype)</description>
+		<description>Engine Analyzer (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -353,7 +353,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="mailplan">
-		<description>Mail Plane (Prototype)</description>
+		<description>Mail Plane (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -366,7 +366,7 @@ War of the Worlds - Time Rift
 
 <!-- This is an incomplete version (or badly burned on cart). It does not work beyond the initial cargo phase. -->
 	<software name="mailplan1" cloneof="mailplan">
-		<description>Mail Plane (Early Prototype)</description>
+		<description>Mail Plane (early prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -478,7 +478,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="ptchduel">
-		<description>Pitcher's Duel (Prototype)</description>
+		<description>Pitcher's Duel (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -502,7 +502,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="polarresp" cloneof="polarres">
-		<description>Polar Rescue (Prototype)</description>
+		<description>Polar Rescue (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -827,7 +827,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="tourfrnc">
-		<description>Tour de France (Prototype)</description>
+		<description>Tour de France (prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -944,6 +944,18 @@ War of the Worlds - Time Rift
 		</part>
 	</software>
 
+	<software name="lasrball" cloneof="webwarp">
+		<description>Laser Ball (prototype)</description>
+		<year>1982</year>
+		<publisher>GCE</publisher>
+		<part name="cart" interface="vectrex_cart">
+			<feature name="slot" value="vec_rom" />
+			<dataarea name="rom" size = "4096">
+				<rom name="laserball.bin" size="4096" crc="7a21e5eb" sha1="65de87607ae3de784fd963dcf1c3a00325415081" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="webwars" cloneof="webwarp">
 		<description>Web Wars</description>
 		<year>1983</year>
@@ -972,7 +984,7 @@ War of the Worlds - Time Rift
 <!-- Are these legit dumps or hacked versions by the guy at ClassicGameCreations.com? -->
 
 	<software name="berzerkd" cloneof="berzerk">
-		<description>Berzerk (Debugged Prototype)</description>
+		<description>Berzerk (debugged prototype)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -984,7 +996,7 @@ War of the Worlds - Time Rift
 	</software>
 
 	<software name="startrekd" cloneof="startrek">
-		<description>Star Trek (Debugged Prototype)</description>
+		<description>Star Trek (debugged prototype)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">

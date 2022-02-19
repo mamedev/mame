@@ -21,11 +21,11 @@ DEFINE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device, "nes_bandaihs", "Bandai Hy
 
 static INPUT_PORTS_START( nes_zapper )
 	PORT_START("ZAPPER_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0,255)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)
 	PORT_START("ZAPPER_Y")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0,255)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0, 239)
 	PORT_START("ZAPPER_T")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Lightgun Trigger")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger")
 INPUT_PORTS_END
 
 
@@ -34,7 +34,7 @@ static INPUT_PORTS_START( nes_bandaihs )
 
 	PORT_START("JOYPAD")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )  // has complete joypad inputs except button A
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -86,7 +86,6 @@ nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const ch
 	: nes_zapper_device(mconfig, NES_BANDAIHS, tag, owner, clock)
 	, m_joypad(*this, "JOYPAD")
 	, m_latch(0)
-	, m_strobe(0)
 {
 }
 
@@ -117,25 +116,42 @@ u8 nes_zapper_device::read_bit34()
 	int x = m_lightx->read();
 	int y = m_lighty->read();
 
+	// radius of circle picked up by the gun's photodiode
+	constexpr int radius = 5;
+	// brightness threshold
+	constexpr int bright = 0xc0;
+	// # of CRT scanlines that sustain brightness
+	constexpr int sustain = 22;
+
+	int vpos = m_port->m_screen->vpos();
+	int hpos = m_port->m_screen->hpos();
+
 	// update the screen if necessary
 	if (!m_port->m_screen->vblank())
-	{
-		int vpos = m_port->m_screen->vpos();
-		int hpos = m_port->m_screen->hpos();
-
-		if (vpos > y || (vpos == y && hpos >= x))
+		if (vpos > y - radius || (vpos == y - radius && hpos >= x - radius))
 			m_port->m_screen->update_now();
-	}
 
-	// get the pixel at the gun position
-	rgb_t pix = m_port->m_screen->pixel(x, y);
+	int sum = 0;
+	int scanned = 0;
 
-	// check if the cursor is over a bright pixel
-	// FIXME: still a gross hack
-	if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
-		ret &= ~0x08; // sprite hit
-	else
-		ret |= 0x08;  // no sprite hit
+	// sum brightness of pixels nearby the gun position
+	for (int i = x - radius; i <= x + radius; i++)
+		for (int j = y - radius; j <= y + radius; j++)
+			// look at pixels within circular sensor
+			if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius)
+			{
+				rgb_t pix = m_port->m_screen->pixel(i, j);
+
+				// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
+				// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
+				if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
+					sum += pix.r() + pix.g() + pix.b();
+				scanned++;
+			}
+
+	// light not detected if average brightness is below threshold (default bit 3 is 0: light detected)
+	if (sum < bright * scanned)
+		ret |= 0x08;
 
 	return ret;
 }
@@ -144,17 +160,23 @@ u8 nes_zapper_device::read_exp(offs_t offset)
 {
 	u8 ret = 0;
 	if (offset == 1)    // $4017
-		ret |= nes_zapper_device::read_bit34();
+		ret = nes_zapper_device::read_bit34();
 	return ret;
 }
 
-u8 nes_bandaihs_device::read_bit0()
+u8 nes_bandaihs_device::read_exp(offs_t offset)
 {
-	if (m_strobe & 1)
-		m_latch = m_joypad->read();
+	u8 ret = 0;
 
-	u8 ret = m_latch & 1;
-	m_latch = (m_latch >> 1) | 0x80;
+	if (offset == 0)    // $4016
+	{
+		if (m_strobe)
+			m_latch = m_joypad->read();
+		ret = (m_latch & 1) << 1;
+		m_latch = (m_latch >> 1) | 0x80;
+	}
+	else                // $4017
+		ret = nes_zapper_device::read_exp(offset);
 
 	return ret;
 }
@@ -167,8 +189,6 @@ u8 nes_bandaihs_device::read_bit0()
 // carried on expansion port pin 2, so there's likely nothing more going on.
 void nes_bandaihs_device::write(u8 data)
 {
-	if (m_strobe & 1)
+	if (write_strobe(data))
 		m_latch = m_joypad->read();
-
-	m_strobe = data;
 }

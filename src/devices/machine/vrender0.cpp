@@ -164,8 +164,10 @@ void vrender0soc_device::device_start()
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
-	for (int i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
+	m_Timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<0>),this));
+	m_Timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<1>),this));
+	m_Timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<2>),this));
+	m_Timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<3>),this));
 
 	write_tx.resolve_all_safe();
 
@@ -362,17 +364,17 @@ void vrender0soc_device::TimerStart(int which)
 //  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
 }
 
+template<int Which>
 TIMER_CALLBACK_MEMBER(vrender0soc_device::Timercb)
 {
-	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	if (m_timer_control[which] & 2)
-		TimerStart(which);
+	if (m_timer_control[Which] & 2)
+		TimerStart(Which);
 	else
-		m_timer_control[which] &= ~1;
+		m_timer_control[Which] &= ~1;
 
-	IntReq(num[which]);
+	IntReq(num[Which]);
 }
 
 template<int Which>

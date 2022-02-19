@@ -8,6 +8,7 @@
 
     TODO:
     - Decryption;
+    - Once decrypted, verify if BattleFront needs to be moved to own driver
 
 =============================================================================
 
@@ -39,9 +40,10 @@ so I suspect the data is in reverse order and maybe some blocks scrambled about.
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/se3208/se3208.h"
-#include "machine/nvram.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "machine/vrender0.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
@@ -51,7 +53,8 @@ so I suspect the data is in reverse order and maybe some blocks scrambled about.
 
 #include <algorithm>
 
-#define IDLE_LOOP_SPEEDUP
+
+namespace {
 
 class ddz_state : public driver_device
 {
@@ -68,18 +71,19 @@ public:
 	void init_ddz();
 	void ddz(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	/* memory pointers */
+private:
+	// memory pointers
 	required_shared_ptr<uint32_t> m_workram;
 	required_region_ptr<uint8_t> m_encdata;
 
-	/* devices */
+	// devices
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void ddz_mem(address_map &map);
 };
 
@@ -176,6 +180,17 @@ ROM_START( crzclass )
 	// rom4 not populated
 ROM_END
 
+ROM_START( btlfront )
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x2201000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD("mxg023338.rom5", 0x0000000, 0x200000, CRC(9d27c8dd) SHA1(9ff30bde6cc8711167876e78319e6ba6a2c12390) ) // 29L1611GPC-10, there are remains of a sticker
+	ROM_LOAD("mxs0331.rom1",   0x0200000, 0x800400, CRC(f3319e25) SHA1(87a743b425693434b380adb5bd73ea02a4c63796) ) // 26L6420MC-10, no sticker
+	ROM_LOAD("mxs0304.rom2",   0x0a00400, 0x800400, CRC(ebc4f521) SHA1(193c13688899183230e8fb3c82355cd3662d4294) ) // 26L6420MC-90, "
+	ROM_LOAD("mxs0239.rom3",   0x1200800, 0x800400, CRC(b5314232) SHA1(0e9b878ccf0c59c99a338ef824597d0a5856893a) ) // 26L6420MC-90, "
+	ROM_LOAD("mxs0524.rom4",   0x1a00c00, 0x800400, CRC(fe1f0e9d) SHA1(3705d9c5318fa011de3b7a2520298524f71c606d) ) // 26L6420MC-90, "
+ROM_END
+
 void ddz_state::init_ddz()
 {
 	uint8_t *ipl = reinterpret_cast<uint8_t *>(memregion("ipl")->base());
@@ -188,5 +203,9 @@ void ddz_state::init_ddz()
 	}
 }
 
-GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz, ROT0, "IGS?", "Dou Di Zhu",     MACHINE_IS_SKELETON )
-GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz, ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
+} // anonymous namespace
+
+
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Di Zhu",     MACHINE_IS_SKELETON )
+GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
+GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",    MACHINE_IS_SKELETON ) // encrypted, V133F?

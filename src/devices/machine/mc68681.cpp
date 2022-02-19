@@ -208,7 +208,7 @@ void duart_base_device::device_start()
 	read_inport.resolve();
 	write_outport.resolve_safe();
 
-	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duart_base_device::duart_timer_callback),this), nullptr);
+	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duart_base_device::duart_timer_callback),this));
 
 	save_item(NAME(ACR));
 	save_item(NAME(IMR));

@@ -99,6 +99,8 @@ void s32comm_device::device_add_mconfig(machine_config &config)
 s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S32COMM, tag, owner, clock)
 {
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
+
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -133,8 +135,6 @@ void s32comm_device::device_reset()
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
-
-	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 }
 
 uint8_t s32comm_device::zfg_r(offs_t offset)

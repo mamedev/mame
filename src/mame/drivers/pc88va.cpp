@@ -28,6 +28,12 @@
 #include "emu.h"
 #include "includes/pc88va.h"
 
+#include "softlist_dev.h"
+
+
+// TODO: verify clocks
+#define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)
+#define FM_CLOCK        (XTAL(31'948'800) / 8) // 3993600
 
 
 void pc88va_state::video_start()
@@ -368,24 +374,24 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PC8801FD_UPD765_TC_TO_ZERO:
-		pc8801fd_upd765_tc_to_zero(ptr, param);
+		pc8801fd_upd765_tc_to_zero(param);
 		break;
 	case TIMER_T3_MOUSE_CALLBACK:
-		t3_mouse_callback(ptr, param);
+		t3_mouse_callback(param);
 		break;
 	case TIMER_PC88VA_FDC_TIMER:
-		pc88va_fdc_timer(ptr, param);
+		pc88va_fdc_timer(param);
 		break;
 	case TIMER_PC88VA_FDC_MOTOR_START_0:
-		pc88va_fdc_motor_start_0(ptr, param);
+		pc88va_fdc_motor_start_0(param);
 		break;
 	case TIMER_PC88VA_FDC_MOTOR_START_1:
-		pc88va_fdc_motor_start_1(ptr, param);
+		pc88va_fdc_motor_start_1(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pc88va_state::device_timer");
@@ -1573,7 +1579,7 @@ void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 
 void pc88va_state::pc88va(machine_config &config)
 {
-	V50(config, m_maincpu, 8000000); // μPD9002, aka V30 + μPD70008AC (for PC8801 compatibility mode)
+	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V30 + μPD70008AC (for PC8801 compatibility mode)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
@@ -1626,7 +1632,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
-	AM9517A(config, m_dmac, 8000000); // ch2 is FDC, ch0/3 are "user". ch1 is unused
+	AM9517A(config, m_dmac, MASTER_CLOCK); // ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_dmac->out_hreq_callback().set(FUNC(pc88va_state::pc88va_hlda_w));
 	m_dmac->out_eop_callback().set(FUNC(pc88va_state::pc88va_tc_w));
 	m_dmac->in_ior_callback<2>().set(FUNC(pc88va_state::fdc_dma_r));
@@ -1642,15 +1648,15 @@ void pc88va_state::pc88va(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
-	pit8253.set_clk<0>(8000000); /* general purpose timer 1 */
+	pit8253.set_clk<0>(MASTER_CLOCK); /* general purpose timer 1 */
 	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
-	pit8253.set_clk<1>(8000000); /* BEEP frequency setting */
-	pit8253.set_clk<2>(8000000); /* RS232C baud rate setting */
+	pit8253.set_clk<1>(MASTER_CLOCK); /* BEEP frequency setting */
+	pit8253.set_clk<2>(MASTER_CLOCK); /* RS232C baud rate setting */
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 
 	SPEAKER(config, "mono").front_center();
-	ym2203_device &ym(YM2203(config, "ym", 3993600)); //unknown clock / divider
+	ym2203_device &ym(YM2203(config, "ym", FM_CLOCK)); //unknown clock / divider
 	ym.add_route(0, "mono", 0.25);
 	ym.add_route(1, "mono", 0.25);
 	ym.add_route(2, "mono", 0.50);

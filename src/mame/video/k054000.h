@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Angelo Salese
 #ifndef MAME_VIDEO_K054000_H
 #define MAME_VIDEO_K054000_H
 
@@ -12,8 +12,7 @@ public:
 	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k054000_device() {}
 
-	void write(offs_t offset, u8 data);
-	u8 read(offs_t offset);
+	void map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -22,7 +21,18 @@ protected:
 
 private:
 	// internal state
-	uint8_t    m_regs[0x20];
+	void acx_w(offs_t offset, u8 data);
+	void acy_w(offs_t offset, u8 data);
+	void bcx_w(offs_t offset, u8 data);
+	void bcy_w(offs_t offset, u8 data);
+	int convert_raw_to_result(u8 *buf);
+	u8 status_r();
+
+	u8 m_raw_Acx[4], m_raw_Acy[4], m_raw_Bcx[4], m_raw_Bcy[4];
+	int m_Acx, m_Acy, m_Bcx, m_Bcy;
+	int m_Aax, m_Aay, m_Bax, m_Bay;
+
+	std::string print_hitbox_state(bool result);
 };
 
 DECLARE_DEVICE_TYPE(K054000, k054000_device)

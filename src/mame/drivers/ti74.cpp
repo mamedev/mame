@@ -78,7 +78,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "ti74.lh"
 #include "ti95.lh"

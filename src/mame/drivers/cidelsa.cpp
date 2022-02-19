@@ -356,7 +356,7 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -149,7 +149,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		//, m_io_keyboard(*this, "LINE%u", 0)
+		//, m_io_keyboard(*this, "LINE%u", 0U)
 	{ }
 
 	void junior80(machine_config &config);

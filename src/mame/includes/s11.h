@@ -3,7 +3,7 @@
 /*
  * s11.h
  *
- *  Created on: 1/01/2013
+ *  Created on: 2013-01-01
  */
 
 #ifndef MAME_INCLUDES_S11_H
@@ -59,10 +59,9 @@ public:
 		, m_pia34(*this, "pia34")
 		, m_bg(*this, "bg")
 		, m_ps88(*this, "ps88")
-		, m_digits(*this, "digit%u", 0U)
-		, m_swarray(*this, "SW.%u", 0U)
-		, m_timer_irq_active(false)
-		, m_pia_irq_active(false)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void s11(machine_config &config);
@@ -75,50 +74,55 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
-	uint8_t sound_r();
-	void bank_w(uint8_t data);
-	void dig0_w(uint8_t data);
-	void dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
-	void lamp1_w(uint8_t data) { };
-	void sol2_w(uint8_t data) { }; // solenoids 8-15
-	void sol3_w(uint8_t data); // solenoids 0-7
-	void sound_w(uint8_t data);
+protected:
 
-	void pia2c_pa_w(uint8_t data);
-	void pia2c_pb_w(uint8_t data);
-	void pia34_pa_w(uint8_t data);
-	void pia34_pb_w(uint8_t data);
+	u8 sound_r();
+	void bank_w(u8 data);
+	void dig1_w(u8 data);
+	void lamp0_w(u8 data);
+	void lamp1_w(u8 data);
+	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
+	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
+	void sound_w(u8 data);
+
+	void pia2c_pa_w(u8 data);
+	void pia2c_pb_w(u8 data);
+	void pia34_pa_w(u8 data);
+	void pia34_pb_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[20] = state; } // E
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[21] = state; } // F
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4 (not used)
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2 (not used)
+	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[17] = state; } // B
+	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[18] = state; } // C
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[16] = state; } // D
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[19] = state; } // A
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
-	uint8_t switch_r();
-	void switch_w(uint8_t data);
-	uint8_t pia28_w7_r();
+	u8 switch_r();
+	void switch_w(u8 data);
+	u8 pia28_w7_r();
 
 	void s11_main_map(address_map &map);
 	void s11_audio_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_piairq;
-	// the following devices are optional because certain board variants (i.e. system 11c) do not have the audio section on the mainboard populated
+	// the following devices are optional because certain board variants (i.e. system 11c)
+	//  do not have the audio section on the mainboard populated
 	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<input_merger_device> m_audioirq;
 	optional_device<hc55516_device> m_hc55516;
@@ -135,32 +139,109 @@ protected:
 	optional_device<s11c_bg_device> m_bg;
 	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
-	required_ioport_array<8> m_swarray;
+	required_ioport_array<8> m_io_keyboard;
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
 	// getters/setters
-	uint8_t get_strobe() { return m_strobe; }
-	void set_strobe(uint8_t s) { m_strobe = s; }
-	uint8_t get_diag() { return m_diag; }
-	void set_diag(uint8_t d) { m_diag = d; }
-	uint32_t get_segment1() { return m_segment1; }
-	void set_segment1(uint32_t s) { m_segment1 = s; }
-	uint32_t get_segment2() { return m_segment2; }
-	void set_segment2(uint32_t s) { m_segment2 = s; }
+	u8 get_strobe() { return m_strobe; }
+	void set_strobe(u8 s) { m_strobe = s; }
+	u8 get_diag() { return m_diag; }
+	void set_diag(u8 d) { m_diag = d; }
+	u32 get_segment1() { return m_segment1; }
+	void set_segment1(u32 s) { m_segment1 = s; }
+	u32 get_segment2() { return m_segment2; }
+	void set_segment2(u32 s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
 	static const device_timer_id TIMER_IRQ = 0;
 
-private:
-	uint8_t m_sound_data;
-	uint8_t m_strobe;
-	uint8_t m_switch_col;
-	uint8_t m_diag;
-	uint32_t m_segment1;
-	uint32_t m_segment2;
-	uint32_t m_timer_count;
+	u8 m_sound_data = 0U;
+	u8 m_strobe = 0U;
+	u8 m_row = 0U;
+	u8 m_diag = 0U;
+	u8 m_lamp_data = 0U;
+	u32 m_segment1 = 0U;
+	u32 m_segment2 = 0U;
+	u32 m_timer_count = 0U;
 	emu_timer* m_irq_timer;
-	bool m_timer_irq_active;
-	bool m_pia_irq_active;
+	bool m_timer_irq_active = false;
+	bool m_pia_irq_active = false;
+	u8 m_lock1 = 0U;
+	u8 m_lock2 = 0U;
+	void set_lock1(u8 x) { m_lock1 = x; }
+	u8 get_lock1() { return m_lock1; }
+	void set_lock2(u8 x) { m_lock2 = x; }
+	u8 get_lock2() { return m_lock2; }
+
+private:
+	void dig0_w(u8 data);
 };
+
+
+class s11a_state : public s11_state
+{
+public:
+	s11a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11_state(mconfig, type, tag)
+	{ }
+
+	void s11a_base(machine_config &config);
+	void s11a(machine_config &config);
+	void s11a_obg(machine_config &config);
+
+	void init_s11a();
+
+protected:
+	void s11a_dig0_w(u8 data);
+};
+
+
+class s11b_state : public s11a_state
+{
+public:
+	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11a_state(mconfig, type, tag)
+	{ }
+
+	void s11b_base(machine_config &config);
+	void s11b(machine_config &config);
+	void s11b_jokerz(machine_config &config);
+
+	void init_s11bnn();  // normal
+	void init_s11bin();  // invert
+	void init_s11bn7();  // 7seg34
+	void init_s11bi7();  // invert and 7seg34
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	bool m_invert = false;  // later System 11B games start expecting inverted data to the display LED segments.
+	void set_invert(bool i) { m_invert = i; }
+	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
+	void set_7seg(bool i) { m_is7seg34 = i; }
+
+	void s11b_dig1_w(u8 data);
+	void s11b_pia2c_pa_w(u8 data);
+	void s11b_pia2c_pb_w(u8 data);
+	void s11b_pia34_pa_w(u8 data);
+};
+
+
+class s11c_state : public s11b_state
+{
+public:
+	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11b_state(mconfig, type, tag)
+	{ }
+
+	void s11c(machine_config &config);
+
+	void init_s11c();
+	void init_s11c7();
+
+protected:
+	virtual void machine_reset() override;
+};
+
 
 #endif // MAME_INCLUDES_S11_H

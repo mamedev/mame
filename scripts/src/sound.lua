@@ -1158,7 +1158,7 @@ end
 
 
 ---------------------------------------------------
--- WAVE file (used for MESS cassette)
+-- WAVE file (used for cassette)
 --@src/devices/sound/wave.h,SOUNDS["WAVE"] = true
 ---------------------------------------------------
 
@@ -1563,5 +1563,17 @@ if (SOUNDS["UDA1344"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/uda1344.cpp",
 		MAME_DIR .. "src/devices/sound/uda1344.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/lynx.h,SOUNDS["LYNX"] = true
+---------------------------------------------------
+
+if (SOUNDS["LYNX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lynx.cpp",
+		MAME_DIR .. "src/devices/sound/lynx.h",
 	}
 end

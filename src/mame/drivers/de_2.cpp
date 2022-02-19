@@ -1,36 +1,67 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/*
-    DataEast/Sega Version 1 and 2
+/********************************************************************************************************************
+PINBALL
+Data East System 1 and 2
 
-    Main CPU: 6808 @ 4MHz (internally divided by 4)
-    Audio CPU: 68B09E @ 2MHz
-    Audio: YM2151 @ 3.58MHz, MSM5205 @ 384kHz
-*/
+Hardware:
+- Main CPU: 6808 @ 4MHz (internally divided by 4)
+- Audio CPU: 68B09E @ 2MHz
+- Audio: YM2151 @ 3.58MHz, MSM5205 @ 384kHz
+Data East CPU board is similar to Williams System 11, but without the generic audio board.
+For now, we'll presume the timings are the same.
 
+Display:
+- System 1: 4x 7 digits, each 7-segment+comma, plus 4 digit for balls/credits/match
+- System 2: Alphanumeric display, some have 28 digits, some have 32.
+
+Here are the key codes to enable play:
+
+Game                                   NUM    Start game                 End ball
+---------------------------------------------------------------------------------------------
+Laser War                             5001    Hold BCD, hit 1            BCD
+Secret Service                        5002    Hold Up Left Right, hit 1  Up Left Right
+Torpedo Alley                         5003    Hold CDE, hit 1            CDE
+Time Machine                          5004    Hold CDE, hit 1            CD
+Playboy 35th Anniversary              5005    Hold CDE, hit 1            CDE
+Robocop                               5006    Hold CDE, hit 1            CDE
+Monday Night Football                 5007    Hold CDE, hit 1            CDE
+Phantom of the Opera                  5008    Hold CDE, hit 1            CDE
+King Kong                              --     Hold CDE, hit 1            CDE
+**** not emulated (various systems) ****
+Arnon Milchan
+Flip Out! 1991
+Joel Silver, the pinball (1991)
+Kabuki
+Richie Rich
+Slap Shot Hockey                      0138
+Wild Horse Saloon
+Trump's Secret Service
+
+
+Status:
+- All machines are playable
+
+ToDo:
+- Mechanical sounds
+- robo_a29,robo_a34: can't coin up, buggy rom?
+
+*********************************************************************************************************************/
 #include "emu.h"
 
 #include "machine/decopincpu.h"
 #include "machine/genpin.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
 #include "speaker.h"
 
+#include "de1.lh"
 #include "de2.lh"
 #include "de2a3.lh"
 
-
-// To start Secret Service, hold I, O and Left ALT while pressing Start.
-// To start Laser War, hold S, D, and F while pressing Start.
-// To start Back to the Future, hold D and F while pressing Start.
-// To start The Simpsons, hold D, F and G while pressing Start (can be tempremental)
-
-// Data East CPU board is similar to Williams System 11, but without the generic audio board.
-// For now, we'll presume the timings are the same.
+namespace {
 
 class de_2_state : public genpin_class
 {
@@ -41,7 +72,8 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_msm5205(*this, "msm5205")
 		, m_sample_bank(*this, "sample_bank")
-		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_diag_digit(*this, "digit60")
 	{ }
 
@@ -55,32 +87,26 @@ private:
 	virtual void machine_reset() override;
 
 	void de_bg_audio(machine_config &config);
-	void de_2_map(address_map &map);
 	void de_2_audio_map(address_map &map);
 
 	void sample_w(uint8_t data);
-	void pia34_pa_w(uint8_t data);
+	void pia34_pa_w(uint8_t data) { }
 	void type2alpha3_pia34_pa_w(uint8_t data);
 	void alpha3_pia34_pa_w(uint8_t data);
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
 	void pia2c_pa_w(uint8_t data);
 	void pia2c_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
 	uint8_t pia28_w7_r();
 	void dig0_w(uint8_t data);
 	void dig1_w(uint8_t data);
 	void type2alpha3_dig1_w(uint8_t data);
 	void alpha3_dig1_w(uint8_t data);
-	void lamp0_w(uint8_t data);
+	void lamp0_w(uint8_t data) { }
 	void lamp1_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	void sol2_w(uint8_t data) { } // solenoids 8-15
-	void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 
 	uint8_t sound_latch_r();
 	void sample_bank_w(uint8_t data);
@@ -91,44 +117,30 @@ private:
 	void type2alpha3_display_w(offs_t offset, uint8_t data);
 	void type3_display_w(offs_t offset, uint8_t data);
 	void lamps_w(offs_t offset, uint8_t data);
+	void sol_w(offs_t, uint8_t);
 
 	// devices
 	required_device<ym2151_device> m_ym2151;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm5205;
 	required_memory_bank m_sample_bank;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<32> m_digits;
 	output_finder<> m_diag_digit;
 
-	uint8_t m_sample_data;
-	bool m_more_data;
-	bool m_nmi_enable;
+	uint8_t m_sample_data = 0U;
+	bool m_more_data = 0;
+	bool m_nmi_enable = 0;
 
-	uint32_t m_segment1;
-	uint32_t m_segment2;
-	uint8_t m_strobe;
-	uint8_t m_kbdrow;
-	uint8_t m_diag;
-	bool m_ca1;
-	uint8_t m_sound_data;
-
-	uint8_t m_sample_bank_num;
-	uint8_t m_msm_prescaler;
+	uint32_t m_segment1 = 0U;
+	uint32_t m_segment2 = 0U;
+	uint8_t m_strobe = 0U;
+	uint8_t m_row = 0U;
+	uint8_t m_diag = 0U;
+	uint8_t m_sound_data = 0U;
+	u16 m_sol = 0U;
 };
 
-
-void de_2_state::de_2_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(FUNC(de_2_state::sol3_w)); // solenoids
-	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
-	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
-	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
-	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	map(0x4000, 0xffff).rom();
-}
 
 void de_2_state::de_2_audio_map(address_map &map)
 {
@@ -143,77 +155,78 @@ void de_2_state::de_2_audio_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-static INPUT_PORTS_START( de_2 )
-	PORT_START("INP0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+static INPUT_PORTS_START( de2 )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ball Tilt")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("INP1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP16")
 
-	PORT_START("INP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
 
-	PORT_START("INP4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
 
-	PORT_START("INP8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP40")
 
-	PORT_START("INP10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP48")
 
-	PORT_START("INP20")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP49")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP50")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP51")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP52")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP53")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP54")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP55")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP56")
 
-	PORT_START("INP40")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("INP80")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+	PORT_START("X7")
 INPUT_PORTS_END
 
 
@@ -231,6 +244,17 @@ void de_2_state::machine_start()
 
 	m_digits.resolve();
 	m_diag_digit.resolve();
+
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_diag));
+	save_item(NAME(m_segment1));
+	save_item(NAME(m_segment2));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sample_data));
+	save_item(NAME(m_more_data));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_row));
+	save_item(NAME(m_sol));
 
 	uint8_t *const ROM = memregion("sound1")->base();
 	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
@@ -259,26 +283,13 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 }
 
 // 6821 PIA at 0x2100
-void de_2_state::sol3_w(uint8_t data)
-{
-}
-
 void de_2_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( de_2_state::pia21_ca2_w )
-{
-// sound ns
-	m_ca1 = state;
-}
-
 // 6821 PIA at 0x2400
-void de_2_state::lamp0_w(uint8_t data)
-{
-}
 
 // 6821 PIA at 0x2800
 void de_2_state::dig0_w(uint8_t data)
@@ -286,7 +297,7 @@ void de_2_state::dig0_w(uint8_t data)
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
-	m_diag = (data & 0x70) >> 4;
+	m_diag = BIT(data, 4, 3);
 	m_diag_digit = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -298,7 +309,12 @@ void de_2_state::dig1_w(uint8_t data)
 	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0);
+		u16 seg = m_segment2;
+		if (BIT(seg, 6))
+			seg |= 0x800; // fix g seg
+		if (BIT(seg, 7))
+			seg |= 0x8000; // fix comma
+		m_digits[m_strobe+16] = bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		m_segment2 |= 0x40000;
 	}
 }
@@ -362,30 +378,41 @@ void de_2_state::pia2c_pb_w(uint8_t data)
 // 6821 PIA at 0x3000
 uint8_t de_2_state::switch_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"INP%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
+	u8 data = 0;
+	if (m_row < 0x41)
+		// last column is never used
+		for (u8 i = 0; i < 7; i++)
+			if (BIT(m_row, i))
+				data |= m_io_keyboard[i]->read();
+
+	return data;
 }
 
 void de_2_state::switch_w(uint8_t data)
 {
-	int x;
-	// about every second, 0xFF is written here, but it would be impossible to select more than one set of switches
-	// at once, so just return the first bit set.  Maybe 0xFF has special meaning, or is just a disable?
-	for(x=0;x<8;x++)
+	m_row = data;
+}
+
+void de_2_state::sol_w(offs_t offset, u8 data)
+{
+	if (!offset)
+		m_sol = (m_sol & 0xff00) | data;
+	else
+		m_sol = (m_sol & 0xff) | (BIT(data, 1) ? 0x100 : 0);
+
+	// these vary per game, this is an example
+	switch (m_sol)
 	{
-		if(data & (1<<x))
+		case 0x0002:
+			m_samples->start(5, 5); // outhole
+			break;
+		case 0x0080:
+			m_samples->start(0, 6); // knocker
 			break;
 	}
-	m_kbdrow = data & (1<<x);
 }
 
 // 6821 PIA at 0x3400
-void de_2_state::pia34_pa_w(uint8_t data)
-{
-	// Not connected on alphanumeric type 2 boards
-}
-
 void de_2_state::type2alpha3_pia34_pa_w(uint8_t data)
 {
 	m_segment2 |= (data<<8);
@@ -425,12 +452,10 @@ void de_2_state::sample_bank_w(uint8_t data)
 {
 	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
 
-	m_sample_bank_num = (data & 0x07);
-	m_sample_bank->set_entry(m_sample_bank_num);
-	m_msm_prescaler = (data & 0x30) >> 4;
-	m_nmi_enable = (~data & 0x80);
-	m_msm5205->playmode_w(prescale[m_msm_prescaler]);
-	m_msm5205->reset_w(data & 0x40);
+	m_sample_bank->set_entry(data & 7);
+	m_nmi_enable = !BIT(data, 7);
+	m_msm5205->playmode_w(prescale[BIT(data, 4, 2)]);
+	m_msm5205->reset_w(BIT(data, 6));
 }
 
 uint8_t de_2_state::display_r(offs_t offset)
@@ -557,7 +582,7 @@ void de_2_state::de_type1(machine_config &config)
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	config.set_default_layout(layout_de2);
+	config.set_default_layout(layout_de1);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -586,8 +611,6 @@ void de_2_state::de_type2_alpha3(machine_config &config)
 	/* basic machine hardware */
 	de_type2(config);
 	subdevice<decocpu_type2_device>("decocpu")->display_write_callback().set(FUNC(de_2_state::type2alpha3_display_w));
-
-	/* Video */
 	config.set_default_layout(layout_de2a3);
 }
 
@@ -601,6 +624,7 @@ void de_2_state::de_type3(machine_config &config)
 	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
 	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
+	decocpu.solenoid_write_callback().set(FUNC(de_2_state::sol_w));
 
 	/* Video */
 	config.set_default_layout(layout_de2a3);
@@ -950,32 +974,33 @@ ROM_START(torp_a16)
 	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
+} // Anonymous namespace
 
-GAME( 1990, bttf_a28, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a27, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a20, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a21, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 199?, bttf_g27, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, kiko_a10, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_a83, 0,        de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_a81, lwar_a83, de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_e90, lwar_a83, de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a32, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, play_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a34, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a30, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a29, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_a26, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, simp_a27, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, simp_a20, simp_a27, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_a18, tmac_a24, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_g18, tmac_a24, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, torp_e21, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, torp_a16, torp_e21, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a28, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a20, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a21, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 199?, bttf_g27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, kiko_a10, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_a83, 0,        de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_a81, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_e90, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a32, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, play_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a34, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a30, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a29, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_a26, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, simp_a27, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, simp_a20, simp_a27, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_a18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_g18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, torp_e21, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, torp_a16, torp_e21, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL)

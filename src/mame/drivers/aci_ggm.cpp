@@ -58,7 +58,7 @@ TODO:
 #include "video/pwm.h"
 
 #include "speaker.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 // internal artwork
 #include "aci_ggm.lh" // clickable
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( ggm )
 
 	PORT_START("IN.4")
 	PORT_CONFNAME( 0x01, 0x00, "Version" ) // factory-set
-	PORT_CONFSETTING(    0x00, "GGS (Applied Concepts)" )
+	PORT_CONFSETTING(    0x00, "GGM (Applied Concepts)" )
 	PORT_CONFSETTING(    0x01, "MGS (Chafitz)" )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, reset_switch, 0) PORT_NAME("Memory Switch")
 

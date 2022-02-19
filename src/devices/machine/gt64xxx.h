@@ -29,9 +29,9 @@ public:
 	void set_autoconfig(int autoconfig) { m_autoconfig = autoconfig; }
 	void set_irq_num(int irq_num) { m_irq_num = irq_num; }
 	virtual void config_map(address_map &map) override;
-	void set_simm_size(int index, int size) { m_simm_size[index] = size; };
-	void set_simm0_size(int size) { m_simm_size[0] = size; };
-	void set_simm1_size(int size) { m_simm_size[1] = size; };
+	void set_simm_size(int index, int size) { m_simm_size[index] = size; }
+	void set_simm0_size(int size) { m_simm_size[0] = size; }
+	void set_simm1_size(int size) { m_simm_size[1] = size; }
 
 	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 

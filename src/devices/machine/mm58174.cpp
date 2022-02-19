@@ -282,7 +282,7 @@ void mm58174_device::write(offs_t offset, uint8_t data)
 
 
 // Increment RTC clock (timed interrupt every 1/10s)
-void mm58174_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mm58174_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id > 0) return;
 

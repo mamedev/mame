@@ -62,6 +62,7 @@ For Model III:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "emupal.h"
+#include "softlist_dev.h"
 
 class meritum_state : public trs80_state
 {

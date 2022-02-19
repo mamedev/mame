@@ -94,7 +94,7 @@ void zx_state::pow3000_io_map(address_map &map)
 
 static INPUT_PORTS_START( zx80 )
 /* PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)  */
-/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MESS currently cannot show
+/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MAME currently cannot show
 these functions in Input (This System) menu, hence we live some empty space in the menu */
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)

@@ -97,8 +97,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_cone;
-	u8 m_port85;
+	bool m_cone = 0;
+	u8 m_port85 = 0U;
 	void machine_start() override;
 	void machine_reset() override;
 	required_device<z80_device> m_maincpu;

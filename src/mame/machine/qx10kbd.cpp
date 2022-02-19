@@ -37,7 +37,7 @@ WRITE_LINE_MEMBER(qx10_keyboard_device::input_txd)
 	m_rxd = state;
 }
 
-void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_clk_state = !m_clk_state;
 }

@@ -109,7 +109,7 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 
 void epson_pf10_device::device_start()
 {
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 //-------------------------------------------------
@@ -125,7 +125,7 @@ void epson_pf10_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

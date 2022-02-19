@@ -119,7 +119,7 @@ public:
 	bool cs259();
 
 private:
-	void device_start() override { };
+	void device_start() override { }
 	void device_config_complete() override;
 
 	myarc_fdc_device* m_board;

@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "pcf8593.h"
 
+#include "fileio.h"
+
 
 /***************************************************************************
     PARAMETERS/CONSTANTS/MACROS
@@ -90,7 +92,7 @@ void pcf8593_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void pcf8593_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcf8593_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

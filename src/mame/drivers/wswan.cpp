@@ -34,7 +34,7 @@
 #include "emupal.h"
 #include "render.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "wswan.lh"
@@ -320,6 +320,8 @@ void wscolor_state::wscolor(machine_config &config)
 	config.device_remove("wsc_list");
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("wscolor");
 	SOFTWARE_LIST(config, "ws_list").set_compatible("wswan");
+
+	m_cart->set_must_be_loaded(true);
 }
 
 

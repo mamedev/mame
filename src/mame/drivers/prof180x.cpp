@@ -31,7 +31,7 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

@@ -2,7 +2,7 @@
 // copyright-holders:Robert Justice,68bit
 /**************************************************************************
 
-    SWTPC S/09 Mess driver
+    SWTPC S/09
     Robert Justice ,2009-2014
 
     Emulates four different fixed combinations of hardware

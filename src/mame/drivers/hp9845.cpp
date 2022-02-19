@@ -43,7 +43,7 @@
 #include "machine/timer.h"
 
 #include "render.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "hp9845b.lh"

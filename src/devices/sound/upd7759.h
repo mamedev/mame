@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual void port_w(u8 data);
-	void set_start_delay(uint32_t data) { m_start_delay = data; };
+	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
 protected:
 	virtual void internal_start_w(int state) = 0;
@@ -131,7 +131,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	devcb_write_line m_drqcallback;
 	emu_timer *m_timer;

@@ -102,9 +102,9 @@ private:
 	}
 
 	/* keyboard state */
-	bool m_keyclk;
-	u8 m_digit;
-	u8 m_seg;
+	bool m_keyclk = 0;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 

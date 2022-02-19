@@ -31,7 +31,6 @@ public:
 
 	void map_video(address_map &map);
 
-	double hue2rgb(double p, double q, double t);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -86,7 +85,7 @@ public:
 	void tmap0_regs_w(offs_t offset, uint16_t data);
 	void tmap1_regs_w(offs_t offset, uint16_t data);
 
-	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -130,6 +129,9 @@ private:
 	required_shared_ptr<uint16_t> m_sprtileno;
 	required_shared_ptr<uint16_t> m_sprattr1;
 	required_shared_ptr<uint16_t> m_sprattr2;
+
+	static uint16_t rgb_to_hsl(uint8_t r, uint8_t g, uint8_t b);
+	static std::tuple<uint8_t, uint8_t, uint8_t> hsl_to_rgb(uint16_t hsl);
 
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

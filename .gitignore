@@ -43,6 +43,7 @@
 !/*.bdf
 !/LICENSE
 /.idea
+.vscode
 docs/build
 docs/source/_build
 regtests/chdman/temp

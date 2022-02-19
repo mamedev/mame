@@ -1149,9 +1149,9 @@ u32 voodoo_2_device::cmdfifo_2d_w(u32 offset, u32 data)
 //  of VBLANK
 //-------------------------------------------------
 
-void voodoo_2_device::vblank_start(void *ptr, s32 param)
+void voodoo_2_device::vblank_start(s32 param)
 {
-	voodoo_1_device::vblank_start(ptr, param);
+	voodoo_1_device::vblank_start(param);
 
 	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
 	if (m_reg.intr_ctrl().vsync_rising_enable())
@@ -1168,9 +1168,9 @@ void voodoo_2_device::vblank_start(void *ptr, s32 param)
 //  VBLANK
 //-------------------------------------------------
 
-void voodoo_2_device::vblank_stop(void *ptr, s32 param)
+void voodoo_2_device::vblank_stop(s32 param)
 {
-	voodoo_1_device::vblank_stop(ptr, param);
+	voodoo_1_device::vblank_stop(param);
 
 	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
 	if (m_reg.intr_ctrl().vsync_falling_enable())

@@ -193,7 +193,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Free Fall Associates" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
-			<!--- Bad Dump? Doesn't work at all. MESS say invalid Image -->
+			<!--- Bad Dump? Doesn't work at all. MAME say invalid Image -->
 			<dataarea name="flop" size="204800">
 				<rom name="archon.img" size="204800" crc="484ebbbd" sha1="4a913c1310ad590b6947dd6ceb69e187bcb641f9"/>
 			</dataarea>
@@ -302,6 +302,25 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="black">
 		<description>The Black Cauldron (v1.1m)</description>
+		<year>1986</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1100673">
+				<rom name="the_black_cauldron_v1.1m_disk1.mfm" size="1100673" crc="e321b2e6" sha1="c80815f1404597c8f5baa792b12f5c8faa22c050"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="the_black_cauldron_v1.1m_disk2.img" size="368640" crc="f80e0fc4" sha1="766818981335386b27fee1dc6f10bcf8850c50f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackc" cloneof="black">
+		<description>The Black Cauldron (v1.1m, cracked)</description>
 		<year>1986</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="usage" value="PC Booter" />
@@ -920,7 +939,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="galaxant">
-		<description>Galaxian (Tengen Version)</description>
+		<description>Galaxian (Tengen version)</description>
 		<year>1983</year>
 		<publisher>Tengen</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1605,7 +1624,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="mspacmann" cloneof="mspacman">
-		<description>Ms. Pac-Man (Namco Version)</description>
+		<description>Ms. Pac-Man (Namco release)</description>
 		<year>1983</year>
 		<publisher>Namco</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1629,7 +1648,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="mulecr" cloneof="mule">
-		<description>M.U.L.E. (Cracked)</description>
+		<description>M.U.L.E. (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts / IBM</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1641,7 +1660,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="zindrnef">
-		<description>Murder On The Zinderneuf</description>
+		<description>Murder on the Zinderneuf</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1957,7 +1976,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="7citygld">
-		<description>Seven Cities Of Gold</description>
+		<description>Seven Cities of Gold</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2856,6 +2875,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ibmcom1">
+		<description>Asynchronous Communications Support (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<!-- Bad dump, DOS already copied and extra files added -->
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="fcc34ee6" sha1="7ff482ca3ceacb05e647123fd107cc666d08a6d4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbmovie">
 		<description>Banner Blue Movie Guide</description>
 		<year>1991</year>
@@ -3104,6 +3136,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="diag100">
+		<description>Diagnostics (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="163840">
+				<rom name="diags100.img" size="163840" crc="6a98472a" sha1="6c0e360ba0dcea67ad7828f00dd08d324ceea6dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="easypc">
 		<description>Easy-PC Demonstrator for Printed Circuit Boards and Schematics</description>
 		<year>1991</year>
@@ -3113,6 +3157,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="easy-pc demonstrator for printed circuit boards and schematics (rev i0123).img" size="368640" crc="1e105d54" sha1="a63629b56539a1d52fdbe25642a71a860ad89e7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easywr1">
+		<description>EasyWriter (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="51789">
+				<rom name="EASYWRIT.IMD" size="51789" crc="0c43b9bc" sha1="9147aabf6e49a8d6979d25325e151cac5617953f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3253,6 +3309,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Printgraph, Translate &amp; Help Disk"/>
 			<dataarea name="flop" size = "737280">
 				<rom name="Lotus-Amstel-2.img" size="737280" crc="6ba54dce" sha1="8d5be21d71f30372271e336c7526b7febde6a74e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masm1">
+		<description>Macro Assembler (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<dataarea name="flop" size="163840">
+				<rom name="Disk01.img" size="163840" crc="aa2d9e46" sha1="90b6378332404f6185b39322a6fedc6e7e62d99e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3416,6 +3484,28 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Subito 3 - Wordprocessor Io Scrivo"/>
 			<dataarea name="flop" size = "737280">
 				<rom name="Per Cominciare Subito 3.dsk" size="737280" crc="9e258d1b" sha1="f27f6b9831c821a65cd79b7e8dbb0dd469e9a06d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascom1">
+		<description>Pascal Compiler (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<!-- Origin: WinWorld -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="badec3d7" sha1="25f09731cd2e6939aabcb42612084c3e8c7ba009"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk02.img" size="163840" crc="d33c8051" sha1="3be06495c2c9610899822b53e7b36e65ac13bb7c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="disk03.img" size="163840" crc="9ca6270a" sha1="c3eeab648d93874286c1cdbf59aac67abc74721a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3907,6 +3997,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="typtut">
+		<description>Typing Tutor (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Origin: WinWorld -->
+			<!-- Bad dump, DOS already copied and user profiles created -->
+			<dataarea name="flop" size="163840">
+				<rom name="disk01.img" size="163840" crc="4692f500" sha1="caf202708031bf740cf6959835f0327414078558" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="videocmp">
 		<description>Video Companion: The Software (Spring '92 Edition)</description>
 		<year>1992</year>
@@ -3942,6 +4045,21 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="161562">
 				<rom name="visicalc.imd" size="161562" crc="23089a93" sha1="70f3914e07c52657294fe618a341c25f8c423189"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vc156y0" supported="no">
+		<description>VisiCalc (VC-156Y0-IBM)</description>
+		<year>1981</year>
+		<publisher>Personal Software</publisher>
+		<!-- Origin: WinWorld, SCP image converted to MFM using HxC 2.5.6.6 -->
+		<!-- Doesn't work, gives either fake "Bad command or file name" error (failed copy protection check)
+		     or "Disk read error" -->
+		<!-- Tested working on 86Box v3.0 -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1639095">
+				<rom name="disk01.mfm" size="1639095" crc="210692c8" sha1="d4fda94c9dd65a81cee460410e0f86b3b42cae05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7708,7 +7826,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="azurebnd">
-		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.2)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (v1.2)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.2" />
@@ -7735,7 +7853,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="azurebnda" cloneof="azurebnd">
-		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.1)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (v1.1)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.1" />
@@ -7762,7 +7880,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="azurebndb" cloneof="azurebnd">
-		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (v1.0)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="SSI" />
@@ -7917,7 +8035,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silvblad">
-		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (1.20)</description>
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (v1.20)</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.20" />
@@ -7929,7 +8047,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silvblada" cloneof="silvblad">
-		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (1.10)</description>
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (v1.10)</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.10" />
@@ -8305,7 +8423,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="bat">
-		<description>B.A.T. (VGA Version)</description>
+		<description>B.A.T. (VGA version)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft Entertainment Software</publisher>
 		<info name="developer" value="Computer's Dream" />
@@ -8322,7 +8440,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="batcet" cloneof="bat">
-		<description>B.A.T. (CGA/EGA/Tandy versions) (Quest &amp; Glory compilation)</description>
+		<description>B.A.T. (CGA/EGA/Tandy version) (Quest &amp; Glory compilation)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft Entertainment Software</publisher>
 		<info name="developer" value="Computer's Dream" />
@@ -8382,6 +8500,26 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Back to the Future Part II [3.5DD] [Disk 1 of 1].img" size="737280" crc="1c100c7e" sha1="3328852909d9e15896ca8dfe3d103415b6f7ac4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="bttf3" supported="no">
+		<description>Back to the Future Part III</description>
+		<year>1991</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="Probe Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1" />
+			<dataarea name="flop" size = "2156253">
+				<rom name="back_to_the_future_part_iii_disk1.mfm" size="2156253" crc="2e581898" sha1="1dd5c82fc9d6903fdfbb0458fb7774b5652f840f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 2" />
+			<dataarea name="flop" size = "2164441">
+				<rom name="back_to_the_future_part_iii_disk2.mfm" size="2164441" crc="e1246bf3" sha1="945c32c361743d308e4cab04c9e1a2037dcf0eb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8741,7 +8879,25 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="bcauldrn">
-		<description>The Black Cauldron (v2.10)</description>
+		<description>The Black Cauldron (5.25", v2.10)</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Version 2.10, 11/10/88" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Black Cauldron [Sierra] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="c723b935" sha1="e84e2cac0621d086c73617d4c7f18b9ef1100e56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Black Cauldron [Sierra] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="f52bb9a2" sha1="301b7a87e0c1cf3eff981211c2b69efc8e390103"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcauldrn35" cloneof="bcauldrn">
+		<description>The Black Cauldron (3.5", v2.10)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
@@ -8759,7 +8915,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Konami</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Blades of Steel (1990)(Konami).dsk" size="737280" crc="9e2ecf8b" sha1="9339e576516b1f36a93a9fb7c0e9c8b3e1f7dabb"/>
+				<rom name="Blades of Steel [Konami] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7e29491e" sha1="3d6cfc1a604ca005cc84397e6a618d2e3c645f86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8840,6 +8996,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="bobo.dsk" size="737280" crc="9234d795" sha1="f90767c67d676934cc6a989f598c92ecf6308228"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Non-booter rerelease -->
+	<software name="bdash_35" cloneof="bdash">
+		<description>Boulder Dash (3.5")</description>
+		<year>1988</year>
+		<publisher>Prism Leisure</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2546439">
+				<rom name="boulder_dash.mfm" size="2546439" crc="011ea462" sha1="7510f06b03be2739af0e4396f40518a96c8683e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8938,6 +9106,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Budokan - The Martial Spirit (Big Games release) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7c3acc15" sha1="ed1e6883d394b2e1fce1006105cc6a5a05f926f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbrodeo">
+		<description>Buffalo Bill's Rodeo Games</description>
+		<year>1989</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2166194">
+				<rom name="buffalo_bills_rodeo_games.mfm" size="2166194" crc="d503114d" sha1="494db14c0cb2ccf7e43f2f90b3b79ddcd6b5d7aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9061,6 +9240,72 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Cartooners In Space.bin" size="368640" crc="e7246370" sha1="3e9a1c70ab677b8d0c48853f7d10ccf09b6dc7e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castles">
+		<description>Castles (5.25")</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Quicksilver Software" />
+		<info name="version" value="1.0"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 1 of 4] [Startup Disk].img" size="368640" crc="44daceb3" sha1="57d2bdf94a649672f6cb50250a1b3c073c5d0d7d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 2 of 4] [Data Disk].img" size="368640" crc="003b1314" sha1="3f4342e4a82f12f05922dddc0470a151bf03c7c0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Introduction Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 3 of 4] [Introduction Disk].img" size="368640" crc="7c0a61e5" sha1="92c6ed6aeca6f1b1146c8e709e424bef6cd02848"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Messenger Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 4 of 4] [Messenger Disk].img" size="368640" crc="be818299" sha1="12798c9a25d3c296f663c6972d48536fa41e3fbf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castles35" cloneof="castles">
+		<description>Castles (3.5")</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Quicksilver Software" />
+		<info name="version" value="1.0"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Castles [Interplay] [1991] [3.5DD] [Disk 1 of 2] [Startup Disk].img" size="737280" crc="865f2f21" sha1="2530bb748627e42c2cc349fc66706c03b96649eb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Castles [Interplay] [1991] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="a539c801" sha1="263dd2213e7d7e19aca72c5dd33e2e4a5492b98c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castlesnc">
+		<description>Castles: The Northern Campaign</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Quicksilver Software" />
+		<info name="usage" value="Data expansion disk for Castles." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size="737280">
+				<rom name="Castles - Northern Campaign [Interplay] [1991] [3.5DD] [Disk 1 of 1] [Startup Disk].img" size="737280" crc="f775ce5a" sha1="7196dc778a1e7b77424341eec29a3f3888e927ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9254,7 +9499,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- copied disks with copy utility watermark on final track -->
 	<software name="cyeagaftfr" cloneof="cyeagaft">
-		<description>Chuck Yeager's Advanced Flight Trainer (5.25", French)</description>
+		<description>Chuck Yeager's Advanced Flight Trainer (5.25", France)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="version" value="2.0" />
@@ -9369,7 +9614,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="keen123">
-		<description>Commander Keen in Invasion of the Vorticons (v1.31, 5.25")</description>
+		<description>Commander Keen in Invasion of the Vorticons (5.25", v1.31)</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
@@ -9386,7 +9631,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="keen123a" cloneof="keen123">
-		<description>Commander Keen in Invasion of the Vorticons (v1.31, 3.5")</description>
+		<description>Commander Keen in Invasion of the Vorticons (3.5", v1.31)</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
@@ -9398,7 +9643,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="keen1g" cloneof="keen123">
-		<description>Commander Keen in Invasion of the Vorticons (v1.32, 5.25", Gravis pack-in)</description>
+		<description>Commander Keen in Invasion of the Vorticons (5.25", v1.32, Gravis pack-in)</description>
 		<year>1991</year>
 		<publisher>Advanced Gravis</publisher>
 		<info name="developer" value="id Software" />
@@ -9410,7 +9655,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="kdreams">
-		<description>Commander Keen in Keen Dreams (Version 1.92 Rev(0))</description>
+		<description>Commander Keen in Keen Dreams (v1.92)</description>
 		<year>1993</year>
 		<publisher>Softdisk</publisher>
 		<info name="developer" value="id Software" />
@@ -9626,7 +9871,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="crimewav35" cloneof="crimewav">
-		<description>Crime Wave (v2.0, 3.5")</description>
+		<description>Crime Wave (3.5", v2.0)</description>
 		<year>1990</year>
 		<publisher>Access Software</publisher>
 		<info name="version" value="2.0" />
@@ -9676,7 +9921,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="crystalca">
-		<description>Crystal Caves (1.0)</description>
+		<description>Crystal Caves</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Apogee Software" />
@@ -9878,6 +10123,7 @@ has been replaced with an all-zero block. -->
 		<description>Double Dragon (5.25")</description>
 		<year>1988</year>
 		<publisher>Arcadia</publisher>
+		<info name="developer" value="Technos Japan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Double Dragon (World) (5.25'') (Disk 1).img" size="368640" crc="35bcf889" sha1="1bf43db289dceb544cd3ebbdc5d95159a20ba089"/>
@@ -9894,6 +10140,7 @@ has been replaced with an all-zero block. -->
 		<description>Double Dragon (3.5")</description>
 		<year>1988</year>
 		<publisher>Arcadia</publisher>
+		<info name="developer" value="Technos Japan" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Double Dragon (World) (3.5'').img" size="737280" crc="8627a3a9" sha1="02e9a8aeaa60416e9661ac8d1e162599d99b7fc8"/>
@@ -9906,6 +10153,7 @@ has been replaced with an all-zero block. -->
 		<description>Double Dragon (5.25", older)</description>
 		<year>1988</year>
 		<publisher>Arcadia</publisher>
+		<info name="developer" value="Technos Japan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Double Dragon D1.2 [5.25].img" size="368640" crc="1ff27d27" sha1="4276093a6c49ca2a44c0b6d104ae8b506f27165f"/>
@@ -10205,6 +10453,32 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dreamtm">
+		<description>The Dream Team: 3 on 3 Challenge</description>
+		<year>1991</year>
+		<publisher>Data East</publisher>
+		<info name="developer" value="Park Place Productions, Season Ticket Productions" />
+		<info name="version" value="Version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Camera 1 Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="The Dream Team - 3 On 3 Challenge [Data East] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="0fe15971" sha1="829dc338e48f3ce94241bed230e806e5e6b0854d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Camera 2 Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="The Dream Team - 3 On 3 Challenge [Data East] [1991] [3.5DD] [Disk 2 of 3].img" size="737280" crc="c51d3d75" sha1="c0a935741ed8b579583d54d7fd1775e5f5ee3628"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Camera 3 Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="The Dream Team - 3 On 3 Challenge [Data East] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="2a09e49d" sha1="8abc1453cc848997fc037bd882f23f257dc12d76"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ducktale">
 		<description>Duck Tales: The Quest for Gold</description>
 		<year>1990</year>
@@ -10391,7 +10665,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="f19">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>F-19 Stealth Fighter (Version 435.04)</description>
+		<description>F-19 Stealth Fighter (Version 435.04, manual protection)</description>
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -10406,6 +10680,24 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f19a" cloneof="f19">
+		<description>F-19 Stealth Fighter (Version 435.04, disk + manual protection)</description>
+		<year>1988</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="2176416">
+				<rom name="f19_stealth_fighter_diska.mfm" size="2176416" crc="28597122" sha1="059882a798cab7270215649037186aa4d560c507"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="737280">
+				<rom name="f19_stealth_fighter_diskb.img" size="737280" crc="a9faf42d" sha1="aef388d2d45cfe1a1fb3520ece772cb8edf2f183"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10567,7 +10859,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="futurwar">
-		<description>Future Wars - Adventures in Time</description>
+		<description>Future Wars - Adventures in Time (5.25")</description>
 		<year>1990</year>
 		<publisher>Interplay</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -10627,7 +10919,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="goldrush">
-		<description>Gold Rush (Version 2.01, 5.25")</description>
+		<description>Gold Rush (5.25", v2.01)</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>
 		<info name="version" value="2.01" />
@@ -10659,7 +10951,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="goldrush35" cloneof="goldrush">
-		<description>Gold Rush (Version 2.01, 3.5")</description>
+		<description>Gold Rush (3.5", v2.01)</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>
 		<info name="version" value="2.01" />
@@ -10722,6 +11014,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="gpcircuit">
+		<description>Grand Prix Circuit</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2168656">
+				<rom name="grand_prix_circuit.mfm" size="2168656" crc="94610ea0" sha1="9c7518d479ba0c25d1137d75b1571390e7b45bd4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gryzor">
 		<!-- Dumped from a copied disk -->
 		<description>Gryzor</description>
@@ -10751,7 +11055,7 @@ has been replaced with an all-zero block. -->
 	<software name="gunboata" cloneof="gunboat">
 		<description>Gunboat: River Combat Simulation (Hit Squad release)</description>
 		<year>1990</year>
-		<publisher>Accolade</publisher>
+		<publisher>The Hit Squad</publisher>
 		<info name="developer" value="Accolade" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -10866,6 +11170,37 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="herosqst">
+		<description>Hero's Quest: So You Want to be a Hero</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="v1.001" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hero's Quest [Sierra] [1989] [3.5DD] [Disk 1 of 4].img" size="737280" crc="9c89c789" sha1="4ede381eb7337b3c12412c159a3348b216cb9d02"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hero's Quest [Sierra] [1989] [3.5DD] [Disk 2 of 4].img" size="737280" crc="0513e8c0" sha1="dc512084634fcc66c80b3655f60caa23bb08e9bb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hero's Quest [Sierra] [1989] [3.5DD] [Disk 3 of 4].img" size="737280" crc="df3a2102" sha1="4886b213dc153bf8eb73c324853d462216d84917"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hero's Quest [Sierra] [1989] [3.5DD] [Disk 4 of 4].img" size="737280" crc="602933b3" sha1="310811bbaba0b0d84d68827856794c018ccd50ea"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="herolanc">
 		<description>Heroes of the Lance</description>
 		<year>1991</year>
@@ -10924,6 +11259,26 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="hoylev3">
+		<description>Hoyle: Official Book of Games - Volume 3 (EGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Version 1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hoyle Book of Games - Vol 3 (16 color) [Sierra] [1991] [3.5DD] [Disk 1 of 2] [Startup Disk].img" size="737280" crc="6efa95b3" sha1="2d03694d40f136bfc32968eba75ac68d83e00dce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Game Disk 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Hoyle Book of Games - Vol 3 (16 color) [Sierra] [1991] [3.5DD] [Disk 2 of 2] [Game Disk 1].img" size="737280" crc="9bd60e27" sha1="3bd6ee015a8df1fb63e678d97db29b9021d298e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1987</year>
@@ -10969,7 +11324,7 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped via Kryoflux -->
 		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
 		<year>1989</year>
-		<publisher>Lucasfilm - U.S. Gold</publisher>
+		<publisher>Kixx</publisher>
 		<info name="developer" value="Lucasfilm Games" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
@@ -11174,8 +11529,9 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Dardari Bros." />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
+			<dataarea name="flop" size = "2152032">
+				<!-- 80-track disk with only the first 40 formatted -->
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2152032" crc="f60c1a9d" sha1="302d4ed84aea32a8d78a9d83462a22f5d370058a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11200,7 +11556,7 @@ has been replaced with an all-zero block. -->
 	<software name="ironmnso35" cloneof="ironmnso">
 		<description>Ivan "Ironman" Stewart's Super Off Road (16 Blitz release) (3.5")</description>
 		<year>1992</year>
-		<publisher>Virgin Games</publisher>
+		<publisher>16 Blitz</publisher>
 		<info name="developer" value="Leland Corporation" />
 		<info name="ported by" value="Graftgold" />
 		<part name="flop1" interface="floppy_3_5">
@@ -11288,10 +11644,34 @@ has been replaced with an all-zero block. -->
 		<description>John Madden Football</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="disk_serial" value="347102" />
 			<dataarea name="flop" size = "737280">
-				<rom name="John Madden Football [Electronic Arts] [1989] [3.5].img" size="737280" crc="6d70c5cd" sha1="9acae820477eda9606487eacfb2c1aa2a3e20a68"/>
+				<rom name="John Madden Football [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7faf93e3" sha1="31e78337d0e32209e9b1f27a9833966e6546d70e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maddena" cloneof="madden">
+		<description>John Madden Football (alt)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="John Madden Football (alt) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6a9db420" sha1="ff8e2a0e305bbce2f28cf06835c5181ccc15b868"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madden2">
+		<description>John Madden Football II</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="D. C. True" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="John Madden Football II [Electronic Arts] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6fb72845" sha1="45b742f6a8cb01772f9df4e20d98aab6ae1bc208"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11401,9 +11781,46 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="kingqst2_35">
+		<description>King's Quest II: Romancing the Throne (v2.2, 3.5")</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="Copy the files to a blank disk and run the game from it. Insert the original disk when prompted." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2192301">
+				<rom name="kings_quest_ii_3.5.mfm" size="2192301" crc="48df8ac1" sha1="e99cda128ed9e2c148d3adbc927708c39ed885da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst3">
+		<description>King's Quest III: To Heir Is Human (v2.00, 5.25")</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="Copy the files from disk 1 to a blank disk and run the game from it. Insert the original disk when prompted." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1108796">
+				<rom name="kings_quest_iii_5.25_disk1.mfm" size="1108796" crc="3717b706" sha1="d792d371d5ebc6366656678d7fe40757c3528001"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="kings_quest_iii_5.25_disk2.img" size="368640" crc="5a2488ff" sha1="32ed6d403e1bb32b94de84eace41ac8d7b8578d0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="368640">
+				<rom name="kings_quest_iii_5.25_disk3.img" size="368640" crc="97cd532f" sha1="13e781a5a2b0f96db201c17e2e491bd632710c62"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingqst4_35" cloneof="kingqst4">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 3.5")</description>
+		<description>King's Quest IV: The Perils of Rosella (3.5", version #2.2)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -11428,7 +11845,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="kingqst4">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 5.25")</description>
+		<description>King's Quest IV: The Perils of Rosella (5.25", version #2.2)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -11562,6 +11979,39 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "327680">
 				<rom name="Laser Surgeon - The Microscopic Mission [1987] [Activision] [5.25] [1 of 1].img" size="327680" crc="728e2c05" sha1="f5293c2860fa6dea89d89d00d2d63cdc4c8f8e6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja">
+		<description>The Last Ninja</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2180307">
+				<rom name="the_last_ninja.mfm" size="2180307" crc="1ce49ec5" sha1="91cb38ac9e5e428b4aabfc47da787a97d9fd0efc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastnja2">
+		<description>Last Ninja 2: Back with a Vengeance</description>
+		<year>1990</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="System 3 Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Last Ninja 2 [Activision] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="119df2b4" sha1="4066cf2da192137104eeb4daa2258be9201e6eef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Last Ninja 2 [Activision] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="a3d8aa92" sha1="6c42da621b0eb637f6e530e006c1dba59b2d547a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Last Ninja 2 [Activision] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="c3f256d6" sha1="553c4293f256afa8eddf4e087c11a895a8becfa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11732,7 +12182,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="lsl3fr" cloneof="lsl3">
 		<!-- Dumped from copied disks -->
-		<description>Leisure Suit Larry 3: Patti la Passion à la Poursuite des Pectoraux Puissants (3.5", French)</description>
+		<description>Leisure Suit Larry 3: Patti la Passion à la Poursuite des Pectoraux Puissants (3.5", France)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -11901,6 +12351,7 @@ has been replaced with an all-zero block. -->
 		<description>Loom (5.25")</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -11930,6 +12381,52 @@ has been replaced with an all-zero block. -->
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="disk6.img" size="368640" crc="c5f65522" sha1="c1046af2aeae58b2b9f35a2a3289672cef5fd000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loom35" cloneof="loom">
+		<description>Loom (3.5", v1.1)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="1.1 (3537) 29 Mar 90" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.1) [LucasFilm] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="ca40bc1f" sha1="657ae0edd606f6ba4bb981ce07fcfd112b6f68d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.1) [LucasFilm] [1991] [3.5DD] [Disk 2 of 3].img" size="737280" crc="a1373bf2" sha1="b5280213e692066fc66c82d4776ea1be85fd47dc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.1) [LucasFilm] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="9406b496" sha1="115bb6fcd795d55c3af9fb5c1c304073e11d24e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loom35a" cloneof="loom">
+		<description>Loom (3.5", v1.0)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="1.0 (3537) 8 Mar 90" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.0) [LucasFilm] [1990] [3.5DD] [Disk 1 of 3].img" size="737280" crc="d3ff7f8c" sha1="6b3eac89537814492404684fe3ffda24f3f71180"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.0) [LucasFilm] [1990] [3.5DD] [Disk 2 of 3].img" size="737280" crc="e8176969" sha1="9dd5c4588262f2a14a34abce0737d473b79abc1f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Loom (v1.0) [LucasFilm] [1990] [3.5DD] [Disk 3 of 3].img" size="737280" crc="8b7a77db" sha1="028f46dbffe061a528cd2cdf00b764e48d7e8744"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12490,6 +12987,44 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="midwintr" supported="no">
+		<description>Midwinter</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Maelstrom Games" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1" />
+			<dataarea name="flop" size = "2156382">
+				<rom name="midwinter_disk1.mfm" size="2156382" crc="b07cd287" sha1="d0b202616befdd8d4ed61bc2172158f88157a52a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disc 2" />
+			<dataarea name="flop" size = "2156467">
+				<rom name="midwinter_disk2.mfm" size="2156467" crc="e8677966" sha1="ed1103bc0bc02c4ff10cf9f389ed93e90e60125e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmagic">
+		<description>Might and Magic: Book One: Secret of the Inner Sanctum</description>
+		<year>1987</year>
+		<publisher>New World Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1110732">
+				<rom name="might_and_magic_disk1.mfm" size="1110732" crc="f55fd5ae" sha1="3d7e6fbce6261276c41c1d5e3bbd3f6f169f0ad4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="might_and_magic_disk2.img" size="368640" crc="79e3e51b" sha1="b661231c9523394511f2ee654f243830968a4696"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minesttn">
 		<description>Mines of Titan</description>
 		<year>1989</year>
@@ -12645,7 +13180,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="nova9">
-		<description>Nova 9: The Return of Gir Draxon (version 1.1)</description>
+		<description>Nova 9: The Return of Gir Draxon (v1.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
@@ -12684,7 +13219,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- matches dump of 3.5" "International Version" -->
 	<software name="nova9a" cloneof="nova9">
-		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
+		<description>Nova 9: The Return of Gir Draxon (v1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
@@ -12818,8 +13353,8 @@ has been replaced with an all-zero block. -->
 	<software name="opwolf">
 		<description>Operation Wolf (5.25")</description>
 		<year>1989</year>
-		<publisher>Taito Corporation</publisher>
-		<info name="developer" value="Taito Corporation" />
+		<publisher>Taito</publisher>
+		<info name="developer" value="Taito" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Operation Wolf [Taito Corporation] [1989] [5.25] [disk 1 of 2].img" size="368640" crc="fd9f35d4" sha1="356c16b69b424ecfec117054ef5530c9b0414651"/>
@@ -12836,8 +13371,8 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped from a copied disk -->
 		<description>Operation Wolf (3.5")</description>
 		<year>1989</year>
-		<publisher>Taito Corporation</publisher>
-		<info name="developer" value="Taito Corporation" />
+		<publisher>Taito</publisher>
+		<info name="developer" value="Taito" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Operation Wolf [3.5DD] [Disk 1 of 1].img" size="737280" crc="503b46c4" sha1="c935a1b639b653433380589894d61b573e7c6c5a"/>
@@ -12849,7 +13384,7 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped from a copied disk -->
 		<description>Out Run</description>
 		<year>1989</year>
-		<publisher>Sega Computer Software</publisher>
+		<publisher>Sega</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Outrun [3.5DD]  [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
@@ -12860,7 +13395,7 @@ has been replaced with an all-zero block. -->
 	<software name="outruna" cloneof="outrun">
 		<description>Out Run (Kixx release)</description>
 		<year>1989</year>
-		<publisher>Sega Computer Software</publisher>
+		<publisher>Kixx</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD]  [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
@@ -12891,6 +13426,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same image works on real hardware. -->
+	<software name="paperboy" supported="no">
+		<description>Paperboy</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2160528">
+				<rom name="paperboy.mfm" size="2160528" crc="448e1e67" sha1="db7c9c87dee0ee7198f4f5f0d4be9b1ed97ef737"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paperbo2">
 		<description>Paperboy 2</description>
 		<year>1991</year>
@@ -12907,7 +13454,7 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped via Kryoflux -->
 		<description>Panza Kick Boxing (Kixx budget release)</description>
 		<year>1991</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Kixx</publisher>
 		<info name="developer" value="Futura" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
@@ -13020,6 +13567,25 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="pitfight" supported="no">
+		<description>Pit-Fighter (The Hit Squad release)</description>
+		<year>1991</year>
+		<publisher>The Hit Squad</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "2162049">
+				<rom name="pit_fighter_disk1.mfm" size="2162049" crc="e95e55a2" sha1="9283a619884680c9ba978bf784ca2a135e818475"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="pit_fighter_disk2.img" size="737280" crc="9b261773" sha1="50893bda71e64ce9fb74c20a38774119b0b20a17"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- dumped from an Olivetti Prodest PC1 branded release -->
 	<software name="pitstop2_35" cloneof="pitstop2">
 		<description>Pitstop II (3.5")</description>
@@ -13050,51 +13616,45 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="pquest2">
-		<description>Police Quest II - The Vengeance (5.25", 1.002.011, Sierra's Value Pack)</description>
+		<description>Police Quest II - The Vengeance (5.25", v1.002.011)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="Ver.#1.002.011/Int.#0.000.490" />
 		<info name="serial" value="3124789072340023" />
 		<part name="flop1" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, 2 tracks show as modified (config file) -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_1.img" size="368640" crc="f5a0f6b2" sha1="8bb21062ee07a3e8ccd436c95fefe5c03c38fe7d"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 1 of 6].img" size="368640" crc="e893a5f2" sha1="3f795d2fbbeb12c09da96821c0f8e7624862d51c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_2.img" size="368640" crc="bf771b06" sha1="43359f5bbd8dbbf0dea98adb2e88c77dbb9df294"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 2 of 6].img" size="368640" crc="bf771b06" sha1="43359f5bbd8dbbf0dea98adb2e88c77dbb9df294"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_3.img" size="368640" crc="dabebfbd" sha1="76bae0887380386cd949eb1aa1ffd28b0e8d2fa2"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 3 of 6].img" size="368640" crc="dabebfbd" sha1="76bae0887380386cd949eb1aa1ffd28b0e8d2fa2"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_4.img" size="368640" crc="96a021d8" sha1="6e8f56716d1efc717c4d7898747f88472e7d3da1"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 4 of 6].img" size="368640" crc="96a021d8" sha1="6e8f56716d1efc717c4d7898747f88472e7d3da1"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_5.img" size="368640" crc="c87edbf9" sha1="b3713acea255a788ef66d6195278122ab3329f97"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 5 of 6].img" size="368640" crc="c87edbf9" sha1="b3713acea255a788ef66d6195278122ab3329f97"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="pquest2_6.img" size="368640" crc="f23b5680" sha1="f4b503a2fa5c1e55868cc219defe6445145a8bc6"/>
+				<rom name="Police Quest II [Sierra] [1989] [5.25DD] [Disk 6 of 6].img" size="368640" crc="f23b5680" sha1="f4b503a2fa5c1e55868cc219defe6445145a8bc6"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pquest2a" cloneof="pquest2">
-		<description>Police Quest II - The Vengeance (5.25", 1.001.006)</description>
+		<description>Police Quest II - The Vengeance (5.25", v1.001.006)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.001.006" />
@@ -13131,36 +13691,33 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="pquest2_35" cloneof="pquest2">
-		<description>Police Quest II - The Vengeance (3.5", 1.002.011, Sierra's Value Pack)</description>
+		<description>Police Quest II - The Vengeance (3.5", v1.002.011, Sierra's Value Pack)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="Ver#1.002.011 Int#0.000.490" />
 		<info name="serial" value="3124789072103380" />
 		<part name="flop1" interface="floppy_3_5">
-			<!-- Dumped via Kryoflux, 2 tracks show as modified (config file) -->
 			<dataarea name="flop" size = "737280">
-				<rom name="pquest2_35_1.img" size="737280" crc="f4adcc9c" sha1="7ba87cadc30e86fc9b54b2b9354b91567d047d51"/>
+				<rom name="Police Quest II [Sierra] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="52cbbc7d" sha1="418d1bae1ebaaa65c4a41fdc3b37f78ebd4ba90f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "737280">
-				<rom name="pquest2_35_2.img" size="737280" crc="11b7a529" sha1="ee4963926b2743e6d83d7e204e8d13eb8d403734"/>
+				<rom name="Police Quest II [Sierra] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="11b7a529" sha1="ee4963926b2743e6d83d7e204e8d13eb8d403734"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 			<dataarea name="flop" size = "737280">
-				<rom name="pquest2_35_3.img" size="737280" crc="50cfbbbf" sha1="c269960cc888477fa81e8c7c12c7c8e129a6cd68"/>
+				<rom name="Police Quest II [Sierra] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="50cfbbbf" sha1="c269960cc888477fa81e8c7c12c7c8e129a6cd68"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pquest2_35a" cloneof="pquest2">
-		<description>Police Quest II - The Vengeance (3.5", 1.001.006)</description>
+		<description>Police Quest II - The Vengeance (3.5", v1.001.006)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="version" value="1.001.006" />
+		<info name="version" value="Ver#1.001.006" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (3.5'') (Disk 1).img" size="737280" crc="d6e9f3fb" sha1="b562165c5b40a86f1d1e5cbf28c052f9ed0c2581"/>
@@ -13174,6 +13731,28 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Police Quest 2 - The Vengeance (USA) (v1.001.006) (3.5'') (Disk 3).img" size="737280" crc="8f15da9b" sha1="015d8d3cb01cce442a56a2cc60691a7b906184ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest2_35b" cloneof="pquest2">
+		<description>Police Quest II - The Vengeance (3.5", v1.001.000)</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="Ver#1.001.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest II (v1.001) [Sierra] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="e5660154" sha1="5f843f8846736110dee29e26f6f6922023a3a2a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest II (v1.001) [Sierra] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="73df103c" sha1="ad9c14790138cfec68e52397074f3971118da431"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Police Quest II (v1.001) [Sierra] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="a7dfa325" sha1="20bff0d7bb66f7f6bce0015edf0807f12622d130"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13296,7 +13875,7 @@ has been replaced with an all-zero block. -->
 	<software name="ppersia35a" cloneof="ppersia">
 		<description>Prince of Persia (3.5", v1.1, Hit Squad release)</description>
 		<year>1992</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<info name="version" value="V1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -13342,6 +13921,25 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Prince of Persia v1.0 (French) [Broderbund] [1990] [3.5DD].img" size="737280" crc="45d00b42" sha1="541b653a58491e21f45f151b0643646145cd616a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="protennis">
+		<description>Pro Tennis Tour (The Hit Squad release)</description>
+		<year>1989</year>
+		<publisher>The Hit Squad</publisher>
+		<info name="developer" value="Blue Byte Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "737280">
+				<rom name="pro_tennis_tour_disk1.img" size="737280" crc="51faa633" sha1="76399435b248eb9ea03c8e31718544df8a751847"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "2164357">
+				<rom name="pro_tennis_tour_disk2.mfm" size="2164357" crc="3b1d0a4d" sha1="24ee937ae698f6fd6ea94ff4c98d29770a2ad5b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13402,10 +14000,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="rampage">
+		<description>Rampage</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Monarch Development" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2163793">
+				<rom name="rampage.mfm" size="2163793" crc="b7a2ba2b" sha1="097ca071cf39864f7021d51a2a7ec505f107ca3f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampart">
 		<description>Rampart (Hit Squad release)</description>
 		<year>1992</year>
-		<publisher>Electronic Arts</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Rampart (Hit Squad release) [Electronic Arts] [1992] [3.5DD] [Disk 1 of 3].img" size="737280" crc="00204ee9" sha1="7a700a2273f44be658dd22965e239407dca81238"/>
@@ -13436,6 +14046,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Renegade [Taito] [1988] [5.25DD] [Disk B].img" size="368640" crc="c1e39e0a" sha1="390e0408323eed7ae7e54b124a5b3e87eaa18d95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rick">
+		<description>Rick Dangerous</description>
+		<year>1994</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="Core Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Rick Dangerous [Kixx] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="372e8970" sha1="1af52f6eca5972cccd072ee8d61e2a3c31ecdbac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13497,6 +14119,20 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "368640">
 				<rom name="RoboCop (USA) (Disk D).img" size="368640" crc="64190df0" sha1="48c8faafebaa4bf6c089e7aefb817241f9e4f0b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--To use the install.bat, to install the game on the hard disk, you must before rename the file readme.doc to readme.1st-->
+	<software name="rocketrg">
+		<description>Rocket Ranger (UK)</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="developer" value="Cinemaware" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Reel #1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Rocket Ranger [Cinemaware] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="1cca26da" sha1="e0fae98120bf57155dd20fb2c6693e5617e74a40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13631,7 +14267,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silents2">
-		<description>Silent Service II (v457.03, 5.25")</description>
+		<description>Silent Service II (5.25", v457.03)</description>
 		<year>1991</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MPS Labs" />
@@ -13659,7 +14295,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silents2a" cloneof="silents2">
-		<description>Silent Service II (v457.01, 5.25")</description>
+		<description>Silent Service II (5.25", v457.01)</description>
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MPS Labs" />
@@ -13688,7 +14324,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="silents2_35" cloneof="silents2">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>Silent Service II (v457.01, 3.5")</description>
+		<description>Silent Service II (3.5", v457.01)</description>
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MPS Labs" />
@@ -13941,17 +14577,19 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="simearth">
-		<description>SimEarth: The Living Planet (3.5", v1.4)</description>
-		<year>1990</year>
+		<description>SimEarth: The Living Planet (USA, 3.5", v1.4)</description>
+		<year>1992</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk 1" />
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth [Maxis] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="cdd4e652" sha1="4024b10089787a7c76ca01b773fbb48325cd807e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk 2" />
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth [Maxis] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="72ebd131" sha1="4a3aabedfe6df4920b1f24fbcc9e88d7a116ea46"/>
 			</dataarea>
@@ -13959,31 +14597,8 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="simeartha" cloneof="simearth">
-		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>SimEarth: The Living Planet (3.5", v1.3)</description>
-		<year>1990</year>
-		<publisher>Maxis Software</publisher>
-		<info name="developer" value="Maxis Software" />
-		<info name="version" value="1.3" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Install Disk, Data Disk #1" />
-			<feature name="disk_serial" value="010-09-605" />
-			<dataarea name="flop" size = "737280">
-				<rom name="simeartha_1.img" size="737280" crc="96e54064" sha1="0779b278ca89060a439ef055b9a4c0f1821690d8"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Data Disk #2 &amp; #3" />
-			<feature name="disk_serial" value="010-09-606" />
-			<dataarea name="flop" size = "737280">
-				<rom name="simeartha_2.img" size="737280" crc="7d133b8e" sha1="9b98f185333ad8ff5d48fd22cb44f8c00f5061ac"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simearthb" cloneof="simearth">
-		<description>SimEarth: The Living Planet (5.25", v1.1)</description>
-		<year>1990</year>
+		<description>SimEarth: The Living Planet (USA, 5.25", v1.1)</description>
+		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
 		<info name="version" value="1.1" />
@@ -14012,27 +14627,64 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="simearthb35" cloneof="simearth">
-		<description>SimEarth: The Living Planet (3.5", v1.1)</description>
-		<year>1990</year>
+	<software name="simearthb" cloneof="simearth">
+		<description>SimEarth: The Living Planet (Europe, 5.25", v1.0)</description>
+		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
-		<info name="version" value="1.1" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 1).img" size="737280" crc="e95402e7" sha1="e7f22ccf3220110e23a5e9f2fe18bf34611f1e36"/>
+		<info name="language" value="English, French, German" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth [Maxis] [1991] [5.25DD] [Disk 1 of 4].img" size="368640" crc="d915704f" sha1="546912199a4d334f93197d505af0f4664ea9065b"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 2).img" size="737280" crc="6bb45f7b" sha1="90df8dc1323efcb531ed072861972182b83c8081"/>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth [Maxis] [1991] [5.25DD] [Disk 2 of 4].img" size="368640" crc="fd6ddd31" sha1="ba36265362ed09cfdae07874121045c949468daa"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth [Maxis] [1991] [5.25DD] [Disk 3 of 4].img" size="368640" crc="32cf78f6" sha1="d9035b3a2627e39cd75ba0d632c8bdf7f2a01f34"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth [Maxis] [1991] [5.25DD] [Disk 4 of 4].img" size="368640" crc="40d10f2f" sha1="a73e7c4f8e398d189a1a370c7819958848ac5694"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="simearthc" cloneof="simearth">
+	<software name="simearth35" cloneof="simearth">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>SimEarth: The Living Planet (3.5", v1.3)</description>
+		<year>1991</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk, Data Disk #1" />
+			<feature name="disk_serial" value="010-09-605" />
+			<dataarea name="flop" size = "737280">
+				<rom name="simeartha_1.img" size="737280" crc="96e54064" sha1="0779b278ca89060a439ef055b9a4c0f1821690d8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk #2 &amp; #3" />
+			<feature name="disk_serial" value="010-09-606" />
+			<dataarea name="flop" size = "737280">
+				<rom name="simeartha_2.img" size="737280" crc="7d133b8e" sha1="9b98f185333ad8ff5d48fd22cb44f8c00f5061ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simearth35a" cloneof="simearth">
 		<description>SimEarth: The Living Planet (Europe, 3.5", v1.0)</description>
-		<year>1990</year>
+		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
 		<info name="version" value="1.0" />
@@ -14044,6 +14696,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth - The Living Planet (Europe) (3.5'') (Disk 2).img" size="737280" crc="78ab310c" sha1="ba2358ac6d7695449cc6ca4136f73c4d5482da39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simearth35b" cloneof="simearth">
+		<description>SimEarth: The Living Planet (USA, 3.5", v1.1)</description>
+		<year>1991</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 1).img" size="737280" crc="e95402e7" sha1="e7f22ccf3220110e23a5e9f2fe18bf34611f1e36"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 2).img" size="737280" crc="6bb45f7b" sha1="90df8dc1323efcb531ed072861972182b83c8081"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14066,9 +14736,9 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="bartvssma" cloneof="bartvssm">
-		<description>The Simpsons - Bart vs. the Space Mutants (Hit-Squad release)</description>
+		<description>The Simpsons - Bart vs. the Space Mutants (Hit Squad release)</description>
 		<year>1991</year>
-		<publisher>Acclaim / Ocean</publisher>
+		<publisher>The Hit Squad</publisher>
 		<info name="developer" value="Imagineering" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -14258,6 +14928,35 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Spot [Virgin Games] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="71084708" sha1="cfd29a97c4fa9fb479525b5907a0567c5fa0a366"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starctrl">
+		<description>Star Control (5.25")</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Toys for Bob" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Control [Accolade] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="a9b2ac3b" sha1="5e635f8b6f13d69d0b8402be432536c5a710a212"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Control [Accolade] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="771df3d1" sha1="4f572a4a3bb501711a08837bdc71e95efd6edd80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starctrl35" cloneof="starctrl">
+		<description>Star Control (3.5")</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Toys for Bob" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Control [Accolade] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="508ebb49" sha1="b9875e8a0b6f0619859438771654ffdb24e8a57f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14470,9 +15169,8 @@ has been replaced with an all-zero block. -->
 		<!-- (Amiga, OCS, PAL) -->
 		<!-- (PC, PAL) -->
 		<year>1988</year>
-		<publisher>KIXX</publisher>
+		<publisher>Kixx</publisher>
 		<info name="SPS Release" value="3041" />
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="991457">
@@ -14793,6 +15491,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="tenniscup2">
+		<description>Tennis Cup II (Kixx release)</description>
+		<year>1992</year>
+		<publisher>Kixx</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A/B" />
+			<dataarea name="flop" size = "2157740">
+				<rom name="tennis_cup_2_disk_a-b.mfm" size="2157740" crc="21f6700d" sha1="dc7c7fe9642f77a28efec08728a8c9feed6260f0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C/D" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tennis_cup_2_disk_c-d.img" size="737280" crc="a829cd2a" sha1="9d773aa9ed718cbf2cacab3548f70226139e518c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="term2">
 		<description>Terminator 2: Judgment Day</description>
 		<year>1991</year>
@@ -14873,6 +15589,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="toiacid">
+		<description>Toi Acid Game</description>
+		<year>1989</year>
+		<publisher>Iber Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2232621">
+				<rom name="toi_acid_game.mfm" size="2232621" crc="3d3fd3c0" sha1="d912c216baadbe7b62595d83d0be777f0bd31b28"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="topgold2">
 		<description>Top 10 Solid Gold Volume II</description>
 		<year>1991</year>
@@ -14934,6 +15661,44 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- keyboard input locks when the manual copy protection screen's appears -->
+	<software name="toutrun" supported="partial">
+		<description>Turbo Out Run (5.25")</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Turbo Out Run [Sega] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="5c2ed4fe" sha1="6f5ca56e4e40b81cbf7a9e07f55e9cb18f31e0da"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Turbo Out Run [Sega] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="bd1123c3" sha1="11bab48adf9f60c3715ecd4444fd50562a33085c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Turbo Out Run [Sega] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="2698cd86" sha1="d9a5757eddace6de10808228de236ec6a02c0212"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- keyboard input locks when the manual copy protection screen's appears -->
+	<software name="toutrun35" cloneof="toutrun" supported="partial">
+		<description>Turbo Out Run (3.5")</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Turbo Out Run [Sega] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="67d93e45" sha1="9b6a1ee5abfa46f879c1bfdc661bfc95b2539853"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Turbo Out Run [Sega] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="8af00126" sha1="7d5c8c5dfbe27deb54366e3000d7d7afa71e2048"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="tvsbbv">
 		<description>TV Sports Basketball (5.25", UK, VGA version)</description>
@@ -14950,6 +15715,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="tvsbbe" cloneof="tvsbbv">
 		<description>TV Sports Basketball (5.25", UK, EGA/TANDY version)</description>
 		<year>1990</year>
@@ -14965,6 +15731,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="tvsbbv35" cloneof="tvsbbv">
 		<description>TV Sports Basketball (3.5", USA, VGA version)</description>
 		<year>1990</year>
@@ -14975,6 +15742,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="tvsbbe35" cloneof="tvsbbv">
 		<description>TV Sports Basketball (3.5", USA, EGA/TANDY version)</description>
 		<year>1990</year>
@@ -15290,19 +16058,37 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="xenon">
-		<description>Xenon (5.25")</description>
-		<year>1988</year>
-		<publisher>Melbourne House</publisher>
+		<description>Xenon (5.25", USA)</description>
+		<year>1989</year>
+		<publisher>Virgin Mastertronic</publisher>
 		<info name="developer" value="The Bitmap Brothers" />
 		<info name="ported by" value="M.C. Lothlorien" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4fdbb490" sha1="e2b174953e254c5bd77a7ee816748ca19d417c41"/>
+				<rom name="Xenon [Virgin Mastertronic] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4fdbb490" sha1="e2b174953e254c5bd77a7ee816748ca19d417c41"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14"/>
+				<rom name="Xenon [Virgin Mastertronic] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenona" cloneof="xenon">
+		<description>Xenon (16 Blitz Plus release) (5.25")</description>
+		<year>1990</year>
+		<publisher>16 Blitz</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<info name="ported by" value="M.C. Lothlorien" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Xenon (16 Blitz) [Virgin Mastertronic] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="1986daab" sha1="b9114a658b82ec54ea74df1117f3c59d3cca180e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Xenon (16 Blitz) [Virgin Mastertronic] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="46bbbd1c" sha1="05013e1b5b8ec8ea6d4f23a0dbce92bbbc72a038"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15310,12 +16096,12 @@ has been replaced with an all-zero block. -->
 	<software name="xenon35" cloneof="xenon">
 		<description>Xenon (16 Blitz Plus release) (3.5")</description>
 		<year>1990</year>
-		<publisher>Virgin Mastertronic</publisher>
+		<publisher>16 Blitz</publisher>
 		<info name="developer" value="The Bitmap Brothers" />
 		<info name="ported by" value="M.C. Lothlorien" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Xenon (16 Blitz Plus release) [Virgin Mastertronic] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="725ed8e2" sha1="f2f9a97f83f9d00493b374b1cac0940c4a5c87e2"/>
+				<rom name="Xenon (16 Blitz Plus release) [Virgin Mastertronic] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="725ed8e2" sha1="f2f9a97f83f9d00493b374b1cac0940c4a5c87e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15375,8 +16161,8 @@ has been replaced with an all-zero block. -->
 	<software name="zool">
 		<description>Zool</description>
 		<year>1993</year>
-		<publisher>Gremlin Graphics Software</publisher>
-		<info name="developer" value="Gremlin Graphics Software" />
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Gremlin Graphics" />
 		<info name="ported by" value="Cygnus Software" />
 		<info name="version" value="10/03/93" />
 		<part name="flop1" interface="floppy_3_5">
@@ -15389,8 +16175,8 @@ has been replaced with an all-zero block. -->
 	<software name="zoola" cloneof="zool">
 		<description>Zool (Big Games release)</description>
 		<year>1993</year>
-		<publisher>Gremlin Graphics Software</publisher>
-		<info name="developer" value="Gremlin Graphics Software" />
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Gremlin Graphics" />
 		<info name="ported by" value="Cygnus Software" />
 		<info name="version" value="14/09/93" />
 		<part name="flop1" interface="floppy_3_5">

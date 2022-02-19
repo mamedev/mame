@@ -58,7 +58,7 @@ uint32_t pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 }
 
-void pc4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

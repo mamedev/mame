@@ -29,6 +29,8 @@
 #include "emu.h"
 #include "seals8k.h"
 
+#include "fileio.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

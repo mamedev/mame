@@ -445,7 +445,7 @@ void isbc202_device::device_reset()
 	m_f_timer->reset();
 }
 
-void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case TIMEOUT_TMR_ID:

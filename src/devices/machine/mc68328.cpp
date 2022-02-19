@@ -778,7 +778,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 
 void mc68328_device::scr_w(uint8_t data) // 0x000
 {
-	LOGMASKED(LOG_SCR, "scr_w: SCR = %02x\n", (data >> 8) & 0x00ff);
+	LOGMASKED(LOG_SCR, "scr_w: SCR = %02x\n", data);
 }
 
 void mc68328_device::grpbasea_w(uint16_t data) // 0x100

@@ -68,24 +68,30 @@ private:
 	/* GLOBAL CONSTANTS */
 	static constexpr unsigned  SYNCS_MAX1     = 0x20;
 	static constexpr unsigned  SYNCS_MAX2     = 0x80;
+	static constexpr u32       NTSC_APU_CLOCK = 21477272 / 12;
+	static constexpr u32       PAL_APU_CLOCK  = 26601712 / 16;
 
 	// internal state
 	apu_t   m_APU;                   /* Actual APUs */
+	int     m_is_pal;
 	u32     m_samps_per_sync;        /* Number of samples per vsync */
 	u32     m_buffer_size;           /* Actual buffer size in bytes */
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
+	stream_buffer::sample_t m_square_lut[31];       // Non-linear Square wave output LUT
+	stream_buffer::sample_t m_tnd_lut[16][16][128]; // Non-linear Triangle, Noise, DMC output LUT
+
 	sound_stream *m_stream;
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_mem_read_cb;
 
 	void calculate_rates();
 	void create_syncs(unsigned long sps);
-	s8 apu_square(apu_t::square_t *chan);
-	s8 apu_triangle(apu_t::triangle_t *chan);
-	s8 apu_noise(apu_t::noise_t *chan);
-	s8 apu_dpcm(apu_t::dpcm_t *chan);
+	void apu_square(apu_t::square_t *chan);
+	void apu_triangle(apu_t::triangle_t *chan);
+	void apu_noise(apu_t::noise_t *chan);
+	void apu_dpcm(apu_t::dpcm_t *chan);
 	inline void apu_regwrite(int address, u8 value);
 };
 

@@ -235,7 +235,7 @@ void tubep_state::tubep_sound_portmap(address_map &map)
 }
 
 
-void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -243,10 +243,10 @@ void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_mcu->set_input_line(0, ASSERT_LINE);
 		break;
 	case TIMER_TUBEP_SCANLINE:
-		tubep_scanline_callback(ptr, param);
+		tubep_scanline_callback(param);
 		break;
 	case TIMER_RJAMMER_SCANLINE:
-		rjammer_scanline_callback(ptr, param);
+		rjammer_scanline_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in tubep_state::device_timer");

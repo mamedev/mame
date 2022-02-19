@@ -748,20 +748,20 @@ void dgn_beta_state::dgn_beta_frame_interrupt (int data)
 	ScanInKeyboard();
 }
 
-#ifdef UNUSED_FUNCTION
-void dgn_beta_state::dgn_beta_line_interrupt (int data)
+void dgn_beta_state::dgn_beta_line_interrupt(int data)
 {
-//  /* Set PIA line, so it recognises interrupt */
-//  if (data)
-//  {
-//      m_pia_0->cb1_w(ASSERT_LINE);
-//  }
-//  else
-//  {
-//      m_pia_0->cb1_w(CLEAR_LINE);
-//  }
-}
+#if 0
+	/* Set PIA line, so it recognises interrupt */
+	if (data)
+	{
+		m_pia_0->cb1_w(ASSERT_LINE);
+	}
+	else
+	{
+		m_pia_0->cb1_w(CLEAR_LINE);
+	}
 #endif
+}
 
 
 /********************************* Machine/Driver Initialization ****************************************/

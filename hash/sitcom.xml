@@ -11,7 +11,7 @@ license:CC0
 		<year>2002</year>
 		<publisher>San Bergmans</publisher>
 		<part name="san" interface="rs232">
-			<dataarea name="bitb" size="122">
+			<dataarea name="input" size="122">
 				<rom name="san.hex" size="122" crc="fecdae5e" sha1="bca50b488330f08146f6978b2d098c048e6dae69" offset="0" />
 			</dataarea>
 		</part>
@@ -22,7 +22,7 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="flash1" interface="rs232">
-			<dataarea name="bitb" size="99">
+			<dataarea name="input" size="99">
 				<rom name="flash1.hex" size="99" crc="23fe0130" sha1="6f77c78d651de1c9d8d50239c50efa991970511c" offset="0" />
 			</dataarea>
 		</part>
@@ -33,7 +33,7 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="s" interface="rs232">
-			<dataarea name="bitb" size="1081">
+			<dataarea name="input" size="1081">
 				<rom name="s.hex" size="1081" crc="93fa910c" sha1="cee797462888fdcfa01086b6bbadb16ec3b815fd" offset="0" />
 			</dataarea>
 		</part>
@@ -44,17 +44,17 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson1a" interface="rs232">
-			<dataarea name="bitb" size="52">
+			<dataarea name="input" size="52">
 				<rom name="lesson1a.hex" size="52" crc="e9a64757" sha1="469f8ea0587e0dceb2d78b5cfce3905ba3911362" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson1b" interface="rs232">
-			<dataarea name="bitb" size="54">
+			<dataarea name="input" size="54">
 				<rom name="lesson1b.hex" size="54" crc="60a901b9" sha1="e2dd75aa136e55752f70b03c5a3f80e323a6bd01" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson1c" interface="rs232">
-			<dataarea name="bitb" size="99">
+			<dataarea name="input" size="99">
 				<rom name="lesson1c.hex" size="99" crc="23fe0130" sha1="6f77c78d651de1c9d8d50239c50efa991970511c" offset="0" />
 			</dataarea>
 		</part>
@@ -65,22 +65,22 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson2a" interface="rs232">
-			<dataarea name="bitb" size="99">
+			<dataarea name="input" size="99">
 				<rom name="lesson2a.hex" size="99" crc="84700789" sha1="9accbeb4d689849db65b2074507dc15a647f8327" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson2b" interface="rs232">
-			<dataarea name="bitb" size="138">
+			<dataarea name="input" size="138">
 				<rom name="lesson2b.hex" size="138" crc="f91d4a99" sha1="642b50e0d9f1ee6fcff0255196bf667dc1caa34f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson2c" interface="rs232">
-			<dataarea name="bitb" size="232">
+			<dataarea name="input" size="232">
 				<rom name="lesson2c.hex" size="232" crc="3ef03d54" sha1="aa2c369696cd99ed2c690fd6af556bffb63cf018" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson2d" interface="rs232">
-			<dataarea name="bitb" size="300">
+			<dataarea name="input" size="300">
 				<rom name="lesson2d.hex" size="300" crc="15bd9eb6" sha1="80e0f30daad6bd3f1e3f229cd469ee387257fb4f" offset="0" />
 			</dataarea>
 		</part>
@@ -91,22 +91,22 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson3a" interface="rs232">
-			<dataarea name="bitb" size="275">
+			<dataarea name="input" size="275">
 				<rom name="lesson3a.hex" size="275" crc="8aeb4a94" sha1="cf80d8cffc984bbfffda32417329b5ffd55ceb99" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson3b" interface="rs232">
-			<dataarea name="bitb" size="271">
+			<dataarea name="input" size="271">
 				<rom name="lesson3b.hex" size="271" crc="ed94066c" sha1="30a26946ab76c44af4bb83a18df1dd9b68a84465" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson3c" interface="rs232">
-			<dataarea name="bitb" size="318">
+			<dataarea name="input" size="318">
 				<rom name="lesson3c.hex" size="318" crc="f94a5811" sha1="af6e3d38d431c3b8d5220b0245c7d2b9784a1c62" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson3d" interface="rs232">
-			<dataarea name="bitb" size="179">
+			<dataarea name="input" size="179">
 				<rom name="lesson3d.hex" size="179" crc="24601f67" sha1="ac211ecde9d9cf2b44612171701e31bcbe0a8298" offset="0" />
 			</dataarea>
 		</part>
@@ -117,22 +117,22 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson4a" interface="rs232">
-			<dataarea name="bitb" size="193">
+			<dataarea name="input" size="193">
 				<rom name="lesson4a.hex" size="193" crc="a86ad64b" sha1="97bef5c08cbba08b24ea695616ec87393493541f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson4b" interface="rs232">
-			<dataarea name="bitb" size="175">
+			<dataarea name="input" size="175">
 				<rom name="lesson4b.hex" size="175" crc="366ee1bf" sha1="0e8bbe341fa92ee0a711f414600b27d730a57d69" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson4c" interface="rs232">
-			<dataarea name="bitb" size="216">
+			<dataarea name="input" size="216">
 				<rom name="lesson4c.hex" size="216" crc="19ed2324" sha1="27422a61cbb923a18c69216afed4df6e0879e0be" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson4d" interface="rs232">
-			<dataarea name="bitb" size="224">
+			<dataarea name="input" size="224">
 				<rom name="lesson4d.hex" size="224" crc="1f2a1ecd" sha1="8316d6cfcedb5b0aadbc27cb94c38a583bb1aaf0" offset="0" />
 			</dataarea>
 		</part>
@@ -143,27 +143,27 @@ license:CC0
 		<year>2002</year>
 		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson5a" interface="rs232">
-			<dataarea name="bitb" size="148">
+			<dataarea name="input" size="148">
 				<rom name="lesson5a.hex" size="148" crc="4a9c316a" sha1="46ad8f02c244eaf934c484c791be5c30600c2fe0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson5b" interface="rs232">
-			<dataarea name="bitb" size="191">
+			<dataarea name="input" size="191">
 				<rom name="lesson5b.hex" size="191" crc="eec56088" sha1="103a7ee4242e14a626431c16ca050152338d6ad5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson5c" interface="rs232">
-			<dataarea name="bitb" size="228">
+			<dataarea name="input" size="228">
 				<rom name="lesson5c.hex" size="228" crc="61b09163" sha1="3924c385878b521cfbe031e623cfe2bc667f9022" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson5d" interface="rs232">
-			<dataarea name="bitb" size="255">
+			<dataarea name="input" size="255">
 				<rom name="lesson5d.hex" size="255" crc="f8f47539" sha1="ba5de7bafcf242f7661d86418e4c4058d835088c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="lesson5e" interface="rs232">
-			<dataarea name="bitb" size="302">
+			<dataarea name="input" size="302">
 				<rom name="lesson5e.hex" size="302" crc="fedb753c" sha1="dcafdbf3413050dabf7394cfe85d3585b1af4bd0" offset="0" />
 			</dataarea>
 		</part>

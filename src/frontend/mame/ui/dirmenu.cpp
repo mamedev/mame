@@ -16,12 +16,18 @@
 #include "ui/optsmenu.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "mame.h"
 
-#include "corestr.h"
+#include "util/corestr.h"
+#include "util/path.h"
+
+#include <locale>
 
 
 namespace ui {
+
+namespace {
 
 static int ADDING = 1;
 static int CHANGE = 2;
@@ -67,6 +73,8 @@ static const folders_entry s_folders[] =
 	{ N_p("path-option", "Versus"),             OPTION_VERSUS_PATH,        ADDING },
 	{ N_p("path-option", "Covers"),             OPTION_COVER_PATH,         ADDING }
 };
+
+} // anonymous namespace
 
 
 /**************************************************
@@ -175,7 +183,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 	path_iterator path(m_searchpath);
 	std::string curpath;
 	m_folders.clear();
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 
 	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), 0, (void *)ADD_CHANGE);
@@ -230,7 +238,7 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 
 	path_iterator path(searchpath);
 	std::string curpath;
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 }
 
@@ -249,27 +257,21 @@ void menu_add_change_folder::handle(event const *ev)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
 		{
-			int index = (uintptr_t)ev->itemref - 1;
-			const menu_item &pitem = item(index);
+			assert(ev->item);
+			menu_item const &pitem = *ev->item;
 
 			// go up to the parent path
 			if (pitem.text() == "..")
 			{
-				size_t first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
-				size_t last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
-				if (first_sep != last_sep)
-					m_current_path.erase(++last_sep);
+				size_t const first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
+				size_t const last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
+				m_current_path.erase(last_sep + ((first_sep == last_sep) ? 1 : 0));
 			}
 			else
 			{
 				// if isn't a drive, appends the directory
 				if (pitem.subtext() != "[DRIVE]")
-				{
-					if (m_current_path[m_current_path.length() - 1] == PATH_SEPARATOR[0])
-						m_current_path.append(pitem.text());
-					else
-						m_current_path.append(PATH_SEPARATOR).append(pitem.text());
-				}
+					util::path_append(m_current_path, pitem.text());
 				else
 					m_current_path = pitem.text();
 			}
@@ -291,9 +293,7 @@ void menu_add_change_folder::handle(event const *ev)
 					if (ui().options().exists(s_folders[m_ref].option))
 						ui().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					else if (machine().options().value(s_folders[m_ref].option) != m_current_path)
-					{
 						machine().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-					}
 				}
 				else
 				{
@@ -309,9 +309,7 @@ void menu_add_change_folder::handle(event const *ev)
 					if (ui().options().exists(s_folders[m_ref].option))
 						ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					else if (machine().options().value(s_folders[m_ref].option) != tmppath)
-					{
 						machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-					}
 				}
 
 				reset_parent(reset_options::SELECT_FIRST);
@@ -383,21 +381,37 @@ void menu_add_change_folder::handle(event const *ev)
 
 void menu_add_change_folder::populate(float &customtop, float &custombottom)
 {
-	// open a path
-	file_enumerator path(m_current_path.c_str());
-	const osd::directory::entry *dirent;
 	int folders_count = 0;
 
 	// add the drives
 	for (std::string const &volume_name : osd_get_volume_names())
 		item_append(volume_name, "[DRIVE]", 0, (void *)(uintptr_t)++folders_count);
 
-	// add the directories
+	// get subdirectories
+	std::vector<std::string> dirnames;
+	file_enumerator path(m_current_path);
+	const osd::directory::entry *dirent;
 	while ((dirent = path.next()) != nullptr)
 	{
-		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0)
-			item_append(dirent->name, "[DIR]", 0, (void *)(uintptr_t)++folders_count);
+		if ((osd::directory::entry::entry_type::DIR == dirent->type) && strcmp(dirent->name, "."))
+			dirnames.emplace_back(dirent->name);
 	}
+
+	// sort
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+	std::sort(
+			dirnames.begin(),
+			dirnames.end(),
+			[&coll] (std::string const &x, std::string const &y)
+			{
+				std::wstring const xw = wstring_from_utf8(x);
+				std::wstring const yw = wstring_from_utf8(y);
+				return coll.compare(xw.data(), xw.data() + xw.size(), yw.data(), yw.data() + yw.size()) < 0;
+			});
+
+	// add to menu
+	for (std::string const &name : dirnames)
+		item_append(name, "[DIR]", 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -450,7 +464,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 
 	path_iterator path(m_searchpath);
 	std::string curpath;
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 }
 

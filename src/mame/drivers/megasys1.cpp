@@ -2303,8 +2303,8 @@ ROM_START( lordofkb )
 	ROM_LOAD16_BYTE( "maincpu.e",   0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "soundcpu1",  0x000000, 0x010000, BAD_DUMP CRC(b3e53583) SHA1(d8f01b06d82e04f730138d42c37f2c335db04fa5) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD16_BYTE( "soundcpu0",  0x000001, 0x010000, BAD_DUMP CRC(1d97e578) SHA1(d7b759a8684f703f21b30c6e0ae3962ff90aff60) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "soundcpu1",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
+	ROM_LOAD16_BYTE( "soundcpu0",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) // identical to astyanax, but with smaller ROMs
 	ROM_LOAD( "gfxc2.a20",   0x000000, 0x010000, CRC(e8be2851) SHA1(ee73fee09bf589f833d5c7e3ff8fa0f1fd8e5ec5) )
@@ -2315,8 +2315,8 @@ ROM_START( lordofkb )
 	ROM_LOAD( "gfxc6.lower", 0x050000, 0x010000, CRC(3a412a0f) SHA1(36a73a1255e27dcba6bd676bc6575957e37a7a56) )
 	ROM_LOAD( "gfxc6.upper", 0x060000, 0x010000, CRC(92a5171e) SHA1(06a57ba54dd9b4e7ab5754c6912f8b40489559b7) )
 
-	ROM_REGION( 0x80000, "scroll1", 0 ) // probably identical to astyanax, but with smaller ROMs
-	ROM_LOAD( "gfxb6.a14", 0x000000, 0x010000, BAD_DUMP CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) ) // ROM read empty, but the rest of the GFX ROMs is identical to astyanax so we'll use this handcrafted one for now
+	ROM_REGION( 0x80000, "scroll1", 0 ) // identical to astyanax, but with smaller ROMs
+	ROM_LOAD( "gfxb6.a14", 0x000000, 0x010000, CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) )
 	ROM_LOAD( "gfxb7.a15", 0x010000, 0x010000, CRC(0b48e8e5) SHA1(371b910e6227f919202b5e25ec9b6ed41a7ca79a) )
 	ROM_LOAD( "gfxb2.bin", 0x020000, 0x010000, CRC(af3aa84d) SHA1(45b4688254ca6958bfe04b264a2ec9da6fd8965f) )
 	ROM_LOAD( "gfxb3.bin", 0x030000, 0x010000, CRC(76dc6632) SHA1(38add1a5ba7c92d09756eb9cc9d823eb0c9ffe3c) )
@@ -2325,9 +2325,9 @@ ROM_START( lordofkb )
 	ROM_LOAD( "gfxb4.bin", 0x060000, 0x010000, CRC(cdf45985) SHA1(1d2611e555164a3dd1b4f4a7f9f788d14b899e30) )
 	ROM_LOAD( "gfxb5.bin", 0x070000, 0x010000, CRC(d609e379) SHA1(b83fc8922967702fbb2b6576b8787913c13a5640) )
 
-	ROM_REGION( 0x20000, "scroll2", 0 ) // probably identical to astyanax, but with smaller ROMs
+	ROM_REGION( 0x20000, "scroll2", 0 ) // second ROM differs from astyanax
 	ROM_LOAD( "lower.18", 0x000000, 0x010000, CRC(1c5df501) SHA1(4eb3f3e31ff91b1734fe1bbdcf43f1798e0c5911) )
-	ROM_LOAD( "upper.18", 0x010000, 0x010000, BAD_DUMP CRC(1babf60c) SHA1(056d81bd2eccb05154305a7dd5398a362c15308a) ) // ROM read empty, but the rest of the GFX ROMs is identical to astyanax so we'll use this handcrafted one for now
+	ROM_LOAD( "upper.18", 0x010000, 0x010000, CRC(c0943ffe) SHA1(a433c85e48963b6c0637f15692c9cb6599d332eb) )
 
 	ROM_REGION( 0x80000, "sprites", 0 ) // identical to astyanax, but with smaller ROMs
 	ROM_LOAD( "gfxa2.bin", 0x000000, 0x010000, CRC(8c82e91f) SHA1(837a9234cef35a6533686f9b94110adebf3f47a2) )
@@ -2349,6 +2349,73 @@ ROM_START( lordofkb )
 
 	ROM_REGION( 0x0200, "proms", 0 )        // Priority PROM, not dumped for this set
 	ROM_LOAD( "rd.bpr",       0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+ROM_END
+
+
+// this is basically the same as the above, but has a small daughter card with the load.dc ROM and an undumped MC68705R3P probably used to decrypt the ROM.
+ROM_START( lordofkbp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "load.d18", 0x00000, 0x10000, CRC(36e4de06) SHA1(69db06bbf0818be7ed37087314773b3463b24ef6) )
+	ROM_LOAD16_BYTE( "load.b18", 0x00001, 0x10000, CRC(c0e1076f) SHA1(e6171194b2e2bcbb62dfe4e6f5e102c52dbe2408) )
+	ROM_LOAD16_BYTE( "load.d17", 0x20000, 0x10000, CRC(b8cd3151) SHA1(1bf1bf42b0e12750ea22e7da4c576cdaf76505f5) )
+	ROM_LOAD16_BYTE( "load.dc",  0x20001, 0x10000, CRC(cbb9728d) SHA1(3585ca615a9db05186410d8ebb50d717e02cba35) )
+	ROM_LOAD16_BYTE( "load.a10", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
+	ROM_LOAD16_BYTE( "load.a15", 0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "load.h15", 0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
+	ROM_LOAD16_BYTE( "load.i15", 0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // MC68705R3P
+	ROM_LOAD( "68705r3p.dc", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "load.m17",  0x000000, 0x010000, CRC(e8be2851) SHA1(ee73fee09bf589f833d5c7e3ff8fa0f1fd8e5ec5) )
+	ROM_LOAD( "load.m16",  0x010000, 0x010000, CRC(b7b80980) SHA1(9ed12481ab6aae2a1793d605eb0791a63fdb05bf) )
+	ROM_LOAD( "load.m18",  0x020000, 0x010000, CRC(b3363955) SHA1(c074073e29b44f2a7809a8bea6779b95567c77cf) )
+	ROM_LOAD( "load.m14",  0x030000, 0x010000, CRC(805ac7a9) SHA1(35ba1e22a5ae04cc11a34aaee3c4d5c99b7f1a48) )
+	ROM_LOAD( "load.m13",  0x040000, 0x010000, CRC(4bb43e5e) SHA1(79a036e60282e3cccbb039382ad59ef4e1dbada7) )
+	ROM_LOAD( "load.m11b", 0x050000, 0x010000, CRC(3a412a0f) SHA1(36a73a1255e27dcba6bd676bc6575957e37a7a56) )
+	ROM_LOAD( "load.m11t", 0x060000, 0x010000, CRC(92a5171e) SHA1(06a57ba54dd9b4e7ab5754c6912f8b40489559b7) )
+
+	ROM_REGION( 0x80000, "scroll1", ROMREGION_ERASEFF )
+	ROM_LOAD( "load.b3", 0x000000, 0x010000, CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) )
+	ROM_LOAD( "load.b2", 0x010000, 0x010000, CRC(0b48e8e5) SHA1(371b910e6227f919202b5e25ec9b6ed41a7ca79a) )
+	ROM_LOAD( "load.a8", 0x020000, 0x010000, CRC(af3aa84d) SHA1(45b4688254ca6958bfe04b264a2ec9da6fd8965f) )
+	ROM_LOAD( "load.a6", 0x030000, 0x010000, CRC(76dc6632) SHA1(38add1a5ba7c92d09756eb9cc9d823eb0c9ffe3c) )
+	ROM_LOAD( "load.d2", 0x040000, 0x010000, CRC(07c27836) SHA1(b4df7919743efa6c1690dd4471de6b77f179cdaa) )
+	ROM_LOAD( "load.d3", 0x050000, 0x010000, CRC(e2c40977) SHA1(914f5f46ce95ad8f4f4d5f3f0a1e3801bf42debc) )
+	ROM_LOAD( "load.a4", 0x060000, 0x010000, CRC(cdf45985) SHA1(1d2611e555164a3dd1b4f4a7f9f788d14b899e30) )
+	// 0x70000 - 0x7ffff empty
+
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "load.g3b", 0x000000, 0x010000, CRC(1c5df501) SHA1(4eb3f3e31ff91b1734fe1bbdcf43f1798e0c5911) )
+	ROM_LOAD( "load.g3t", 0x010000, 0x010000, CRC(c0943ffe) SHA1(a433c85e48963b6c0637f15692c9cb6599d332eb) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "load.g2", 0x000000, 0x010000, CRC(8c82e91f) SHA1(837a9234cef35a6533686f9b94110adebf3f47a2) )
+	ROM_LOAD( "load.g1", 0x010000, 0x010000, CRC(82183cb3) SHA1(b8a5a0f7256d54f97e58684a3adbd4667e6f4f53) )
+	ROM_LOAD( "load.h2", 0x020000, 0x010000, CRC(e747928b) SHA1(22a8fb2e5c8fa316961e5aeba587cea127e13407) )
+	ROM_LOAD( "load.h1", 0x030000, 0x010000, CRC(5ea64444) SHA1(60301f3bfb8a8daba55469a99bae8e6f4e51b1cd) )
+	ROM_LOAD( "load.g3", 0x040000, 0x010000, CRC(6b1572b4) SHA1(4e39d68988d55fa559ca8c633ea04db41e9f80d3) )
+	ROM_LOAD( "load.h3", 0x050000, 0x010000, CRC(88b5d7f8) SHA1(477dbb354defa71d1fc54a891559023d5698ce5d) )
+	ROM_LOAD( "load.i2", 0x060000, 0x010000, CRC(210eb169) SHA1(d82d3834c1c69990b3eda3e6c85edbe607af5756) )
+	ROM_LOAD( "load.i1", 0x070000, 0x010000, CRC(f6d91d5b) SHA1(3fce4e641e327b40950d088418b3fbbb35f2cf13) )
+
+	ROM_REGION( 0x40000, "oki1", ROMREGION_ERASEFF ) // read below
+
+	ROM_REGION( 0x40000, "oki2", 0 ) // this bootleg only has an OKI and its ROMs' contents match the one from astyanax's 'oki2' region
+	ROM_LOAD( "load.h17", 0x000000, 0x010000, CRC(6f18a8c9) SHA1(3845e699d2baa17ca8f33cb728cc93aee2e7b487) )
+	ROM_LOAD( "load.i17", 0x010000, 0x010000, CRC(5a5bf82e) SHA1(ac7ee84e1d4d136c9a2cf776f48e537967d6787a) )
+	ROM_LOAD( "load.j17", 0x020000, 0x010000, CRC(7a818ada) SHA1(cf5ad0f996927fa6d86fe18d38a51fdd726d3af7) )
+	ROM_LOAD( "load.k17", 0x020000, 0x010000, CRC(f8f0a2db) SHA1(3776770e9f86d1aa38ffad7f203d4d8ba8005ca6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        // Priority PROM, not dumped for this set
+	ROM_LOAD( "rd.bpr", 0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) // both PALs have identical content
+	ROM_LOAD( "pal16l8acn.i7", 0x0000, 0x0104, CRC(4e9118f6) SHA1(f5da2bc1846cecbf9d4e435773f8c27366f05d0c) )
+	ROM_LOAD( "pal16l8acn.j7", 0x0200, 0x0104, CRC(4e9118f6) SHA1(f5da2bc1846cecbf9d4e435773f8c27366f05d0c) )
 ROM_END
 
 
@@ -3296,7 +3363,7 @@ ROM_START( inyourfa )
 	ROM_LOAD( "08.27c1001",  0x020000, 0x020000, CRC(cadd4731) SHA1(1c4e7ea7064b9c6b2dfdf01fd64f37de6d50bdfa) ) // 11xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(1341ba02) SHA1(edff62979d0376ac01b8da0aca46df087d6e4051) ) // wasn't dumped, this one has been handcrafted
+	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(21390e3a) SHA1(e641be8ee6ed2ac62a027bf47ec49acb30d65ced) ) // was missing from PCB, this one has been handcrafted
 ROM_END
 
 /***************************************************************************
@@ -4238,6 +4305,63 @@ ROM_START( rodlandjb )
 ROM_END
 
 
+ROM_START( rodlandjb2 ) // very cheaply done PCB with unpopulated Okis; the same as the bootleg above but for smaller ROMs and unencrypted GFX.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "19.bin", 0x00000, 0x10000, CRC(028de21f) SHA1(04c88a0138dd119655b4a8a965617781a9a6ff71) )
+	ROM_LOAD16_BYTE( "17.bin", 0x00001, 0x10000, CRC(9c720046) SHA1(8543f0942863b4aa5329572dd1f374ea18c29851) )
+	ROM_LOAD16_BYTE( "20.bin", 0x20000, 0x10000, CRC(3f536d07) SHA1(cfcf47c42677fae204b3a7d70786d157279ba6e5) )
+	ROM_LOAD16_BYTE( "18.bin", 0x20001, 0x10000, CRC(5aa61717) SHA1(3292cdafc10b412c06addc3c6d4e39ee70ff06e8) )
+	ROM_LOAD16_BYTE( "12.bin", 0x40000, 0x10000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
+	ROM_LOAD16_BYTE( "11.bin", 0x40001, 0x10000, CRC(9ec61048) SHA1(71b6af054a528af04e23affff635a9358537cd3b) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x10000, CRC(d26eae8f) SHA1(1c6d514e6d006f78fa7b24d18a3eb4c5a4c5cbce) )
+	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x10000, CRC(04cf24bc) SHA1(e754cce3c83a7088daf90e753fbb0df9ef7fc9be) )
+
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "27.bin",  0x00000, 0x10000, CRC(673a5986) SHA1(659a7854210f461ca67fada778a4277332ad41d8) )
+	ROM_LOAD( "28.bin",  0x10000, 0x10000, CRC(523a731d) SHA1(90da3644e0b7913dcdbe29261e901787dad9d830) )
+	ROM_LOAD( "26.bin",  0x20000, 0x10000, CRC(4d0a5c97) SHA1(8ff64420e65502be586877db82f5a1d6b5e0b6f6) )
+	ROM_LOAD( "29b.bin", 0x30000, 0x10000, CRC(2279cb76) SHA1(91db071d15ab92f830a7f0e136527698c1ad3ea9) )
+	ROM_LOAD( "30.bin",  0x40000, 0x10000, CRC(b155f39e) SHA1(5c47176816baa263bf04c7e44ed611a14c26fbd3) )
+	ROM_LOAD( "29a.bin", 0x50000, 0x10000, CRC(9fd628f1) SHA1(cdd81dcb2ccb138634ab7d39c08ec0c7f9835367) )
+	ROM_LOAD( "31a.bin", 0x60000, 0x10000, CRC(a9bc5b84) SHA1(7766de2b451a3486ad02399b8742faa71465fada) )
+	ROM_LOAD( "31b.bin", 0x70000, 0x10000, CRC(fb2faa69) SHA1(0c867c4b9bffc2fd38847f3f6b67ca488d86751a) )
+
+	ROM_REGION( 0x80000, "scroll1", 0 )
+	ROM_LOAD( "21.bin", 0x00000, 0x10000, CRC(32fc0bc6) SHA1(93295e5db75825da227d4fb557654755dabc4ef5) )
+	ROM_LOAD( "22.bin", 0x10000, 0x10000, CRC(0969daa9) SHA1(6298dd6522134479cd4bea9e32ed9e27228224e4) )
+	ROM_LOAD( "13.bin", 0x20000, 0x10000, CRC(1203cdf6) SHA1(4af882ebd534e995b05a3a6673422904c5a9b49f) )
+	ROM_LOAD( "14.bin", 0x30000, 0x10000, CRC(d53e094b) SHA1(4689284ac742932d26dd804a467bd2ad548c23a8) )
+	ROM_LOAD( "24.bin", 0x40000, 0x10000, CRC(b04343e6) SHA1(871646815de2d3f3004da6b4814f015e6296755e) )
+	ROM_LOAD( "23.bin", 0x50000, 0x10000, CRC(70aa7e2c) SHA1(08e75707192fc7496accdad48df22914eff16767) )
+	ROM_LOAD( "15.bin", 0x60000, 0x10000, CRC(38ac846e) SHA1(788186914df9af3ea6c4b12eaec5c0fcb72940e2) )
+	ROM_LOAD( "16.bin", 0x70000, 0x10000, CRC(5e31f0b2) SHA1(ab04ecb2a1147eda05ea3cadbe1c68c7a5bc543c) )
+
+	ROM_REGION( 0x20000, "scroll2", ROMREGION_ERASEFF )
+	ROM_LOAD( "25.bin", 0x00000, 0x10000, CRC(4ca57cb6) SHA1(a665ee530644eb599fc9aa09676fb7acbf23accd) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "4.bin",  0x00000, 0x10000, CRC(cfcf9f97) SHA1(02a5ac96d172dda138e95850a133158ab03f8f08) )
+	ROM_LOAD( "5.bin",  0x10000, 0x10000, CRC(38c05d15) SHA1(a27e753e714f08fa37f3bcf11a15bc2b3640965e) )
+	ROM_LOAD( "7.bin",  0x20000, 0x10000, CRC(e117cb72) SHA1(cceb60023e4a2dea16bf3796f146e161ec7a8046) )
+	ROM_LOAD( "8.bin",  0x30000, 0x10000, CRC(2f9b40c3) SHA1(bc8e1f1e5f159db12035e5235a9d6bc6e96ef419) )
+	ROM_LOAD( "3.bin",  0x40000, 0x10000, CRC(f6a88efd) SHA1(ac0cd9d1fcf4aae138eb7219a20d278f442e6bda) )
+	ROM_LOAD( "6.bin",  0x50000, 0x10000, CRC(90a78af1) SHA1(da237a2671c864998d0dd415fef5163f516db7cb) )
+	ROM_LOAD( "9.bin",  0x60000, 0x10000, CRC(427a0908) SHA1(cd201f4d157676fff2d74492791c0f979ad41f7d) )
+	ROM_LOAD( "10.bin", 0x70000, 0x10000, CRC(53cc2c11) SHA1(beb9b760d8bcf4f4901a67b065d98d80b9ef7b99) )
+
+	ROM_REGION( 0x40000, "oki1", ROMREGION_ERASEFF )
+	// Oki chip and ROMs not populated
+
+	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASEFF )
+	// Oki chip and ROMs not populated
+
+	ROM_REGION( 0x200, "proms", 0 ) // Priority PROM
+	ROM_LOAD( "ps89013a.14m", 0x000, 0x200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+ROM_END
+
+
 /***************************************************************************
 
                             [ Saint Dragon ]
@@ -4766,6 +4890,19 @@ void megasys1_state::init_astyanax()
 	save_item(NAME(m_mcu_hs_ram));
 }
 
+void megasys1_state::init_lordofkbp()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x20000; i < 0x40000; i += 2)
+	{
+		if (i & 0x02)
+			rom[i] = 0x51 - rom[i];
+		else
+			rom[i] = 0xc7 - rom[i];
+	}
+}
+
 void megasys1_state::init_avspirit()
 {
 	m_ip_select_values[0] = 0x37;
@@ -5088,59 +5225,61 @@ void megasys1_state::init_monkelf()
  *************************************/
 
 // Type Z
-GAME( 1988, lomakai,  0,        system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lomakai,    0,        system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
-GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47b,     p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
-GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinjub,kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanaxa,astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofkb, astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the two audio CPU ROMs are suspect. May be bootleg crappiness, but doubtful
-GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, jitsupro, 0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, init_stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlanda, rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, init_rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, init_edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, init_soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47,        0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47j,       p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47je,      p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47b,       p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoff,    0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoffb,   kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
+GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinjub,  kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanax,   0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jitsupro,   0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragona,  stdragon, system_A,          stdragon, megasys1_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragonb,  stdragon, system_A,          stdragon, megasys1_state, init_stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlanda,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandj,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_state, init_rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandjb,  rodland,  system_A,          rodland,  megasys1_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandjb2, rodland,  system_A,          rodland,  megasys1_state, empty_init,    ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_state, init_edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_state, init_soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, monkelf,  avspirit, system_B_monkelf,  avspirit, megasys1_state, init_monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, empty_init,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, monkelf,    avspirit, system_B_monkelf,  avspirit, megasys1_state, init_monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edf,        0,        system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfa,       edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfu,       edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,      edf,      system_Bbl,        edf,      megasys1_state, empty_init,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetja,64street,system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64street,   0,        system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,  64street, system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja, 64street, system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C,          bigstrik, megasys1_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C,          chimerab, megasys1_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C,          cybattlr, megasys1_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )

@@ -6,12 +6,27 @@ Gaelco video RAM encryption
 
 Thanks to GAELCO SA for information on the algorithm.
 
+TODO: the device must be able to know a 32-bit write was from the same
+      opcode WITHOUT looking at the host program counter.
+
 */
 
 #include "emu.h"
-#include "includes/gaelcrpt.h"
+#include "gaelcrpt.h"
 
-static int decrypt(int const param1, int const param2, int const enc_prev_word, int const dec_prev_word, int const enc_word)
+DEFINE_DEVICE_TYPE(GAELCO_VRAM_ENCRYPTION, gaelco_vram_encryption_device, "gaelco_vram_crypt", "Gaelco VRAM Encryption")
+
+
+gaelco_vram_encryption_device::gaelco_vram_encryption_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GAELCO_VRAM_ENCRYPTION, tag, owner, clock),
+	m_param1(0),
+	m_param2(0)
+{
+}
+
+
+
+int gaelco_vram_encryption_device::decrypt(int const enc_prev_word, int const dec_prev_word, int const enc_word)
 {
 	int const swap = (BIT(dec_prev_word, 8) << 1) | BIT(dec_prev_word, 7);
 	int const type = (BIT(dec_prev_word,12) << 1) | BIT(dec_prev_word, 2);
@@ -26,7 +41,7 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 		case 3: res = bitswap<16>(enc_word,  3, 8, 1,13,14, 4,15, 0,10, 2, 7,12, 6,11, 9, 5); break;
 	}
 
-	res ^= param2;
+	res ^= m_param2;
 
 	switch (type)
 	{
@@ -67,11 +82,11 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 			break;
 	}
 
-	k ^= param1;
+	k ^= m_param1;
 
 	res = (res & 0xffc0) | ((res + k) & 0x003f);
 
-	res ^= param1;
+	res ^= m_param1;
 
 	switch (type)
 	{
@@ -109,46 +124,57 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 			break;
 	}
 
-	k ^= param1;
+	k ^= m_param1;
 
 	res =   (res & 0x003f) |
 			((res + (k <<  6)) & 0x07c0) |
 			((res + (k << 11)) & 0xf800);
 
-	res ^= (param1 << 6) | (param1 << 11);
+	res ^= (m_param1 << 6) | (m_param1 << 11);
 
 	return bitswap<16>(res, 2,6,0,11,14,12,7,10,5,4,8,3,9,1,13,15);
 }
 
 
 
-uint16_t gaelco_decrypt(cpu_device &cpu, int offset, int data, int param1, int param2)
+uint16_t gaelco_vram_encryption_device::gaelco_decrypt(cpu_device &cpu, int offset, int data)
 {
-	static int lastpc, lastoffset, lastencword, lastdecword;
-
 	int thispc = cpu.pc();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */
-	if(lastpc == thispc && offset == lastoffset + 1)
+	if(m_lastpc == thispc && offset == m_lastoffset + 1)
 	{
-		lastpc = 0;
-		data = decrypt(param1, param2, lastencword, lastdecword, data);
+		m_lastpc = 0;
+		data = decrypt(m_lastencword, m_lastdecword, data);
 	}
 	else
 	{
 		/* code as 1st word */
 
-		lastpc = thispc;
-		lastoffset = offset;
-		lastencword = data;
+		m_lastpc = thispc;
+		m_lastoffset = offset;
+		m_lastencword = data;
 
 		/* high word returned */
-		data = decrypt(param1, param2, 0, 0, data);
+		data = decrypt(0, 0, data);
 
-		lastdecword = data;
+		m_lastdecword = data;
 
-//      logerror("%s : data1 = %4x > %4x @ %8x\n",machine().describe_context(),savedata,data,lastoffset);
+//      logerror("%s : data1 = %4x > %4x @ %8x\n",machine().describe_context(),savedata,data,m_lastoffset);
 	}
 	return data;
+}
+
+void gaelco_vram_encryption_device::device_start()
+{
+	save_item(NAME(m_lastpc));
+	save_item(NAME(m_lastoffset));
+	save_item(NAME(m_lastencword));
+	save_item(NAME(m_lastdecword));
+}
+
+void gaelco_vram_encryption_device::device_reset()
+{
+	m_lastpc = m_lastoffset = m_lastencword = m_lastdecword = -1;
 }

@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "ds2404.h"
 
+#include "fileio.h"
+
 #include <algorithm>
 #include <ctime> // FIXME: re-write in terms of device_rtc_interface and remove this
 
@@ -317,7 +319,7 @@ void ds2404_device::clk_w(uint8_t data)
 	}
 }
 
-void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
