@@ -25,7 +25,7 @@ public:
 	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void set_link_connected(bool connected) { m_link_unconnected = !connected; };
+	void set_link_connected(bool connected) { m_link_unconnected = !connected; }
 
 protected:
 	enum class dev_type {
@@ -273,29 +273,29 @@ private:
 	// FIFO for allocated (queued) transmit packets
 	u8 m_queued_tx[FIFO_SIZE];
 	int m_queued_tx_h, m_queued_tx_t;
-	void reset_queued_tx() { m_queued_tx_t = m_queued_tx_h = 0; };
-	void push_queued_tx(const u8 &data) { m_queued_tx[m_queued_tx_h++] = data; m_queued_tx_h &= FIFO_SIZE - 1; };
-	u8 pop_queued_tx() { u8 val = m_queued_tx[m_queued_tx_t++]; m_queued_tx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_queued_tx() const { return m_queued_tx_h == m_queued_tx_t; };
-	u8 curr_queued_tx() const { return m_queued_tx[m_queued_tx_t]; };
+	void reset_queued_tx() { m_queued_tx_t = m_queued_tx_h = 0; }
+	void push_queued_tx(const u8 &data) { m_queued_tx[m_queued_tx_h++] = data; m_queued_tx_h &= FIFO_SIZE - 1; }
+	u8 pop_queued_tx() { u8 val = m_queued_tx[m_queued_tx_t++]; m_queued_tx_t &= FIFO_SIZE - 1; return val; }
+	bool empty_queued_tx() const { return m_queued_tx_h == m_queued_tx_t; }
+	u8 curr_queued_tx() const { return m_queued_tx[m_queued_tx_t]; }
 
 	// FIFO for completed transmit packets
 	u8 m_completed_tx[FIFO_SIZE];
 	int m_completed_tx_h, m_completed_tx_t;
-	void reset_completed_tx() { m_completed_tx_t = m_completed_tx_h = 0; };
-	void push_completed_tx(const u8 &data) { m_completed_tx[m_completed_tx_h++] = data; m_completed_tx_h &= FIFO_SIZE - 1; };
-	u8 pop_completed_tx() { u8 val = m_completed_tx[m_completed_tx_t++]; m_completed_tx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_completed_tx() const { return m_completed_tx_h == m_completed_tx_t; };
-	u8 curr_completed_tx() const { return m_completed_tx[m_completed_tx_t]; };
+	void reset_completed_tx() { m_completed_tx_t = m_completed_tx_h = 0; }
+	void push_completed_tx(const u8 &data) { m_completed_tx[m_completed_tx_h++] = data; m_completed_tx_h &= FIFO_SIZE - 1; }
+	u8 pop_completed_tx() { u8 val = m_completed_tx[m_completed_tx_t++]; m_completed_tx_t &= FIFO_SIZE - 1; return val; }
+	bool empty_completed_tx() const { return m_completed_tx_h == m_completed_tx_t; }
+	u8 curr_completed_tx() const { return m_completed_tx[m_completed_tx_t]; }
 
 	// FIFO for completed receive packets
 	u8 m_completed_rx[FIFO_SIZE];
 	int m_completed_rx_h, m_completed_rx_t;
-	void reset_completed_rx() { m_completed_rx_t = m_completed_rx_h = 0; };
-	void push_completed_rx(const u8 &data) { m_completed_rx[m_completed_rx_h++] = data; m_completed_rx_h &= FIFO_SIZE - 1; };
-	u8 pop_completed_rx() { u8 val = m_completed_rx[m_completed_rx_t++]; m_completed_rx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_completed_rx() const { return m_completed_rx_h == m_completed_rx_t; };
-	u8 curr_completed_rx() const { return m_completed_rx[m_completed_rx_t]; };
+	void reset_completed_rx() { m_completed_rx_t = m_completed_rx_h = 0; }
+	void push_completed_rx(const u8 &data) { m_completed_rx[m_completed_rx_h++] = data; m_completed_rx_h &= FIFO_SIZE - 1; }
+	u8 pop_completed_rx() { u8 val = m_completed_rx[m_completed_rx_t++]; m_completed_rx_t &= FIFO_SIZE - 1; return val; }
+	bool empty_completed_rx() const { return m_completed_rx_h == m_completed_rx_t; }
+	u8 curr_completed_rx() const { return m_completed_rx[m_completed_rx_t]; }
 
 };
 

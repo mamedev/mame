@@ -4157,10 +4157,10 @@ ROM_END
 
 ROM_START( ridgera2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rrs2prll.4d",  0x00003, 0x80000, CRC(88199c0f) SHA1(5cf5bb714c3d209943a8d815eaea60afd34641ff) )
-	ROM_LOAD32_BYTE( "rrs1prlmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
-	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
-	ROM_LOAD32_BYTE( "rrs1pruub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
+	ROM_LOAD32_BYTE( "rrs2prll.4d", 0x00003, 0x80000, CRC(88199c0f) SHA1(5cf5bb714c3d209943a8d815eaea60afd34641ff) ) // One byte different compared to the Rev.B Japanese set below
+	ROM_LOAD32_BYTE( "rrs2prlm.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) ) // The "World" set's ROMs are NOT marked as Rev.B even though
+	ROM_LOAD32_BYTE( "rrs2prum.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) ) // they are clearly based off of the Japanese Rev.B ROM set.
+	ROM_LOAD32_BYTE( "rrs2pruu.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -6072,7 +6072,7 @@ GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state,  init_rid
 GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
 GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
 GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
 GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
 GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
 GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94

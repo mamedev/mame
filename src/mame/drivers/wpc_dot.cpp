@@ -26,7 +26,8 @@ ToDo:
 - NVRAM
 - Outputs
 - Mechanical sounds
-- Party Zone speech is barely audible - should be louder than the music
+- Volume control does nothing
+- Speech not working
 
 *********************************************************************************************/
 #include "emu.h"

@@ -57,7 +57,7 @@
 
 #include "bus/gio64/gio64.h"
 
-#include "cpu/mips/r4000.h"
+#include "cpu/mips/mips3.h"
 
 #include "machine/ds1386.h"
 #include "machine/edlc.h"
@@ -134,7 +134,7 @@ protected:
 
 	static void scsi_devices(device_slot_interface &device);
 
-	required_device<r4000_base_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
@@ -182,7 +182,7 @@ template <uint32_t addr_base>
 uint64_t ip24_state::bus_error_r(offs_t offset, uint64_t mem_mask)
 {
 	logerror("Bus error (read)\n");
-	m_maincpu->bus_error();
+	// FIXME: m_maincpu->bus_error();
 	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 	return 0;
 }
@@ -191,7 +191,7 @@ template <uint32_t addr_base>
 void ip24_state::bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	logerror("Bus error (write)\n");
-	m_maincpu->bus_error();
+	// FIXME: m_maincpu->bus_error();
 	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 }
 
@@ -407,7 +407,9 @@ void ip24_state::indy_5015(machine_config &config)
 {
 	ip24(config);
 
-	R5000(config, m_maincpu, 75'000'000);
+	R5000BE(config, m_maincpu, 75'000'000);
+	m_maincpu->set_icache_size(0x8000);
+	m_maincpu->set_dcache_size(0x8000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -415,7 +417,9 @@ void ip24_state::indy_4613(machine_config &config)
 {
 	ip24(config);
 
-	R4600(config, m_maincpu, 66'666'666);
+	R4600BE(config, m_maincpu, 66'666'666);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -423,7 +427,9 @@ void ip24_state::indy_4610(machine_config &config)
 {
 	ip24(config);
 
-	R4600(config, m_maincpu, 50'000'000);
+	R4600BE(config, m_maincpu, 50'000'000);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -436,7 +442,9 @@ void ip22_state::wd33c93_2(device_t *device)
 
 void ip22_state::indigo2_4415(machine_config &config)
 {
-	R4400(config, m_maincpu, 75'000'000);
+	R4400BE(config, m_maincpu, 75'000'000);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	ip24_base(config);

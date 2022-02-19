@@ -143,8 +143,8 @@ protected:
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
 
-	virtual void ioc_map(address_map &map) { };
-	virtual void memc_map(address_map &map) { };
+	virtual void ioc_map(address_map &map) { }
+	virtual void memc_map(address_map &map) { }
 
 	archimedes_exp_device *m_exp;
 	const char *m_exp_slottag;

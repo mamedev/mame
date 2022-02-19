@@ -109,15 +109,15 @@ public:
 	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
 	// this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly
-	virtual void write_tmss_bank(offs_t offset, uint16_t data) { device().logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
+	virtual void write_tmss_bank(offs_t offset, uint16_t data) { device().logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); }
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
-	virtual uint16_t* get_rom_base() { return m_rom; };
-	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; };
-	virtual uint32_t get_rom_size() { return m_rom_size; };
-	virtual uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint16_t); };
-	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) {};
+	virtual uint16_t* get_rom_base() { return m_rom; }
+	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; }
+	virtual uint32_t get_rom_size() { return m_rom_size; }
+	virtual uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint16_t); }
+	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) {}
 
 	void save_nvram() { device().save_item(NAME(m_nvram)); }
 
@@ -184,7 +184,7 @@ public:
 	virtual void write_a13(offs_t offset, uint16_t data);
 	virtual uint16_t read_a15(offs_t offset);
 	virtual void write_a15(offs_t offset, uint16_t data);
-	virtual void write_tmss_bank(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_tmss_bank(offset, data); };
+	virtual void write_tmss_bank(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_tmss_bank(offset, data); }
 
 	virtual int read_test() { if (m_cart) return m_cart->read_test(); else return 0; }  // used by Virtua Racing test
 

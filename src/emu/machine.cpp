@@ -20,6 +20,7 @@
 #include "debug/debugvw.h"
 #include "debug/debugcpu.h"
 #include "dirtc.h"
+#include "fileio.h"
 #include "image.h"
 #include "network.h"
 #include "romload.h"
@@ -590,10 +591,10 @@ void running_machine::schedule_save(std::string &&filename)
 //  immediate_save - save state.
 //-------------------------------------------------
 
-void running_machine::immediate_save(const char *filename)
+void running_machine::immediate_save(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::SAVE;
@@ -627,10 +628,10 @@ void running_machine::schedule_load(std::string &&filename)
 //  immediate_load - load state.
 //-------------------------------------------------
 
-void running_machine::immediate_load(const char *filename)
+void running_machine::immediate_load(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::LOAD;
@@ -973,6 +974,17 @@ void running_machine::logfile_callback(const char *buffer)
 
 
 //-------------------------------------------------
+//  steal_debuglogfile - relinquish ownership of
+//  the debug.log file
+//-------------------------------------------------
+
+std::unique_ptr<emu_file> running_machine::steal_debuglogfile()
+{
+	return std::move(m_debuglogfile);
+}
+
+
+//-------------------------------------------------
 //  start_all_devices - start any unstarted devices
 //-------------------------------------------------
 
@@ -1121,6 +1133,7 @@ void running_machine::nvram_load()
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (!file.open(nvram_filename(nvram.device())))
 		{
+			// FIXME: don't swallow errors
 			nvram.nvram_load(file);
 			file.close();
 		}
@@ -1143,6 +1156,7 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				// FIXME: don't swallow errors
 				nvram.nvram_save(file);
 				file.close();
 			}

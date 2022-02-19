@@ -70,8 +70,7 @@ void cirrus_gd5428_device::device_start()
 {
 	zero();
 
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -81,11 +80,10 @@ void cirrus_gd5428_device::device_start()
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
-	vga.svga_intf.vram_size = 0x200000;
-
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
+
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);

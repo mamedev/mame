@@ -5,21 +5,22 @@
 PINBALL
 Williams System 7
 
-Differences to system 6/6a:
+Differences to system 6:
 - Extra PIA at 0x2100 to handle sound and more solenoids.
 - Diag digit
 - Leading zero suppression
 - Commas
+- 7 digits for each player
 
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
 
-- Setup: NUM-6 must be in auto/up position. Press NUM-1 to enter setup mode, press
-   NUM-6 to change direction.
+- Setup: NUM-2 must be in auto/up position. Press NUM-1 to enter setup mode, press
+   NUM-2 to change direction.
 
-- Tests: NUM-6 must be in manual/down position. Press NUM-1 twice and tests will
-   begin. Press NUM-1 and NUM-6 together to get from test 1 to test 2. Press NUM-6
+- Tests: NUM-2 must be in manual/down position. Press NUM-1 twice and tests will
+   begin. Press NUM-1 and NUM-2 together to get from test 1 to test 2. Press NUM-2
    to switch between auto/manual stepping.
 
 - Auto Diag Test: Set Dips to SW6. Press NUM-0. Press NUM-ENTER. Press NUM-1. Tests
@@ -247,9 +248,9 @@ static INPUT_PORTS_START( s7 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Coin Door") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_coin, 1) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Coin Door") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_coin, 1) PORT_TOGGLE
 
 	PORT_START("DS1") // DS1 switches exist but do nothing
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

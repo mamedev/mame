@@ -17,6 +17,7 @@
 #include "ui/uimain.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "romload.h"
 #include "speaker.h"
 #include "screen.h"

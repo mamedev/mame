@@ -1,22 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Peter Ferrie
-/*
-    Pinball 2000
+/*****************************************************************************************************************
+PINBALL
+Williams Pinball 2000
 
-    Skeleton by R. Belmont, based on mediagx.c by Ville Linde
+Skeleton by R. Belmont, based on mediagx.c by Ville Linde
 
-    TODO:
-        - Everything!
-        - MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
+Hardware:
+- Cyrix MediaGX processor/VGA (northbridge)
+- Cyrix CX5520 (southbridge)
+- VS9824AG SuperI/O standard PC I/O chip
+- 1 ISA, 2 PCI slots, 2 IDE headers
+- "Prism" PCI card with PLX PCI9052 PCI-to-random stuff bridge
+   Card also contains DCS2 Stereo sound system with ADSP-2104
 
-    Hardware:
-        - Cyrix MediaGX processor/VGA (northbridge)
-        - Cyrix CX5520 (southbridge)
-        - VS9824AG SuperI/O standard PC I/O chip
-        - 1 ISA, 2 PCI slots, 2 IDE headers
-        - "Prism" PCI card with PLX PCI9052 PCI-to-random stuff bridge
-          Card also contains DCS2 Stereo sound system with ADSP-2104
-*/
+Games:
+- Star Wars Episode 1 (#50069)
+- Revenge from Mars (#50070)
+- Wizard Blocks (#50072) (cancelled)
+- Playboy (cancelled)
+
+Status:
+- Skeletons
+
+TODO:
+- Everything!
+- MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
+
+****************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -65,30 +76,30 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
-	uint8_t m_pal[768];
+	uint8_t m_pal[768]{};
 
 
-	uint32_t m_disp_ctrl_reg[256/4];
-	int m_frame_width;
-	int m_frame_height;
+	uint32_t m_disp_ctrl_reg[256/4]{};
+	int m_frame_width = 0;
+	int m_frame_height = 0;
 
-	uint32_t m_memory_ctrl_reg[256/4];
-	int m_pal_index;
+	uint32_t m_memory_ctrl_reg[256/4]{};
+	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint8_t m_mediagx_config_reg_sel;
-	uint8_t m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel = 0;
+	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data;
-	//uint8_t m_parallel_pointer;
-	//uint8_t m_parallel_latched;
-	//uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
+	//uint8_t m_controls_data = 0U;
+	//uint8_t m_parallel_pointer = 0U;
+	//uint8_t m_parallel_latched = 0U;
+	//uint32_t m_parport = 0U;
+	//int m_control_num = 0;
+	//int m_control_num2 = 0;
+	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4]{};
 
 	uint32_t disp_ctrl_r(offs_t offset);
 	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -161,11 +172,8 @@ static const rgb_t cga_palette[16] =
 
 void pinball2k_state::video_start()
 {
-	int i;
-	for (i=0; i < 16; i++)
-	{
+	for (u8 i=0; i < 16; i++)
 		m_palette->set_pen_color(i, cga_palette[i]);
-	}
 }
 
 void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
@@ -194,17 +202,16 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int width, height;
 	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -649,6 +656,9 @@ void pinball2k_state::init_pinball2k()
 
 /*****************************************************************************/
 
+/*------------------------------
+/ Star Wars Episode 1 (#50069)
+/------------------------------*/
 ROM_START( swe1pb )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "awdbios.bin",     0x000000, 0x040000, CRC(854ce8c6) SHA1(7826de74026e052dacce8516382f664004c327ad) )
@@ -676,6 +686,10 @@ ROM_START( swe1pb )
 	ROM_LOAD("cga.chr",          0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
+
+/*----------------------------
+/ Revenge from Mars (#50070)
+/----------------------------*/
 ROM_START( rfmpb )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "awdbios.bin",     0x000000, 0x040000, CRC(854ce8c6) SHA1(7826de74026e052dacce8516382f664004c327ad) )

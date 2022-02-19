@@ -47,7 +47,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 	void tube_arm_mem(address_map &map);
 };

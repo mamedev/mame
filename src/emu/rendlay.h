@@ -291,7 +291,7 @@ public:
 
 	// interactivity
 	bool has_input() const { return bool(m_input_port); }
-	std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
+	std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); }
 	bool clickthrough() const { return m_clickthrough; }
 
 	// fetch state based on configured source

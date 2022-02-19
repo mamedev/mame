@@ -25,6 +25,8 @@ there are two standard values.
 #include "emu.h"
 #include "machine/i2cmem.h"
 
+#include "fileio.h"
+
 constexpr int STATE_IDLE(0);
 constexpr int STATE_DEVSEL(1);
 constexpr int STATE_ADDRESSHIGH(2);
@@ -106,6 +108,7 @@ i2cmem_device::i2cmem_device(
 	m_wc(0),
 	m_sdar(1),
 	m_state(STATE_IDLE),
+	m_bits(0),
 	m_shift(0),
 	m_devsel(0),
 	m_addresshigh(0),
@@ -330,7 +333,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 			}
 			else
 			{
-				verboselog( this, 2, "start\n" );
+				verboselog( this, 1, "start\n" );
 				m_state = STATE_DEVSEL;
 				m_bits = 0;
 			}

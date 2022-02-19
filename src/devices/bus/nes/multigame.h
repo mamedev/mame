@@ -1280,6 +1280,23 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vram_prot_bit);
+
+private:
+	const u8 m_vram_prot_bit;
+};
+
+
+// ======================> nes_bmc_82ab_device
+
+class nes_bmc_82ab_device : public nes_bmc_th22913_device
+{
+public:
+	// construction/destruction
+	nes_bmc_82ab_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -1353,5 +1370,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_NC20MB,     nes_bmc_nc20mb_device)
 DECLARE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device)
+DECLARE_DEVICE_TYPE(NES_BMC_82AB,       nes_bmc_82ab_device)
 
 #endif // MAME_BUS_NES_MULTIGAME_H

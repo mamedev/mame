@@ -147,8 +147,8 @@ class mfmhd_image_format_t
 {
 public:
 	mfmhd_image_format_t(): m_lastbit(false), m_current_crc(0)
-		{ m_devtag = std::string("mfmhd_image_format_t"); };
-	virtual ~mfmhd_image_format_t() {};
+		{ m_devtag = std::string("mfmhd_image_format_t"); }
+	virtual ~mfmhd_image_format_t() {}
 
 	// Load the image.
 	virtual std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
@@ -195,7 +195,7 @@ protected:
 class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
-	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
+	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); }
 	std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 	std::error_condition save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 

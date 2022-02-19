@@ -236,7 +236,7 @@ const Gp::Id REG_PARAM4    = Gp::kIdCx;
 //**************************************************************************
 
 #define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
-#define X86_NOT_CONDITION(condition)    (condition_map[condition - uml::COND_Z] ^ 1)
+#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
 
 #define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
 #define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
@@ -276,24 +276,24 @@ static uint32_t float_register_map[REG_F_COUNT] =
 };
 
 // condition mapping table
-static const Condition::Code condition_map[uml::COND_MAX - uml::COND_Z] =
+static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 {
-	Condition::Code::kZ,    // COND_Z = 0x80,    requires Z
-	Condition::Code::kNZ,   // COND_NZ,          requires Z
-	Condition::Code::kS,    // COND_S,           requires S
-	Condition::Code::kNS,   // COND_NS,          requires S
-	Condition::Code::kC,    // COND_C,           requires C
-	Condition::Code::kNC,   // COND_NC,          requires C
-	Condition::Code::kO,    // COND_V,           requires V
-	Condition::Code::kNO,   // COND_NV,          requires V
-	Condition::Code::kP,    // COND_U,           requires U
-	Condition::Code::kNP,   // COND_NU,          requires U
-	Condition::Code::kA,    // COND_A,           requires CZ
-	Condition::Code::kBE,   // COND_BE,          requires CZ
-	Condition::Code::kG,    // COND_G,           requires SVZ
-	Condition::Code::kLE,   // COND_LE,          requires SVZ
-	Condition::Code::kL,    // COND_L,           requires SV
-	Condition::Code::kGE,   // COND_GE,          requires SV
+	CondCode::kZ,    // COND_Z = 0x80,    requires Z
+	CondCode::kNZ,   // COND_NZ,          requires Z
+	CondCode::kS,    // COND_S,           requires S
+	CondCode::kNS,   // COND_NS,          requires S
+	CondCode::kC,    // COND_C,           requires C
+	CondCode::kNC,   // COND_NC,          requires C
+	CondCode::kO,    // COND_V,           requires V
+	CondCode::kNO,   // COND_NV,          requires V
+	CondCode::kP,    // COND_U,           requires U
+	CondCode::kNP,   // COND_NU,          requires U
+	CondCode::kA,    // COND_A,           requires CZ
+	CondCode::kBE,   // COND_BE,          requires CZ
+	CondCode::kG,    // COND_G,           requires SVZ
+	CondCode::kLE,   // COND_LE,          requires SVZ
+	CondCode::kL,    // COND_L,           requires SV
+	CondCode::kGE,   // COND_GE,          requires SV
 };
 
 #if 0
@@ -490,20 +490,26 @@ inline Xmm drcbe_x64::be_parameter::select_register(Xmm defreg) const
 	return defreg;
 }
 
-template <typename T> T drcbe_x64::be_parameter::select_register(T defreg, be_parameter const &checkparam) const
+Gp drcbe_x64::be_parameter::select_register(Gp defreg, be_parameter const &checkparam) const
 {
 	if (*this == checkparam)
 		return defreg;
 	return select_register(defreg);
 }
 
-template <typename T> T drcbe_x64::be_parameter::select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const
+Gp drcbe_x64::be_parameter::select_register(Gp defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const
 {
 	if (*this == checkparam || *this == checkparam2)
 		return defreg;
 	return select_register(defreg);
 }
 
+Xmm drcbe_x64::be_parameter::select_register(Xmm defreg, be_parameter const &checkparam) const
+{
+	if (*this == checkparam)
+		return defreg;
+	return select_register(defreg);
+}
 
 //-------------------------------------------------
 //  select_register - select a register to use,
@@ -819,7 +825,7 @@ size_t drcbe_x64::emit(CodeHolder &ch)
 	if (cachetop == nullptr)
 		return 0;
 
-	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CodeHolder::kCopyWithPadding);
+	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CopySectionFlags::kPadTargetBuffer);
 	if (err)
 		throw emu_fatalerror("asmjit::CodeHolder::copyFlattenedData() error %d", err);
 
@@ -844,26 +850,26 @@ void drcbe_x64::reset()
 	x86code *dst = (x86code *)m_cache.top();
 
 	CodeHolder ch;
-	ch.init(hostEnvironment(), uint64_t(dst));
+	ch.init(Environment::host(), uint64_t(dst));
 
 	FileLogger logger(m_log_asmjit);
 	if (logger.file())
 	{
-		logger.setFlags(FormatOptions::Flags::kFlagHexOffsets | FormatOptions::Flags::kFlagHexImms | FormatOptions::Flags::kFlagMachineCode);
-		logger.setIndentation(FormatOptions::IndentationType::kIndentationCode, 4);
+		logger.setFlags(FormatFlags::kHexOffsets | FormatFlags::kHexImms | FormatFlags::kMachineCode);
+		logger.setIndentation(FormatIndentationGroup::kCode, 4);
 		ch.setLogger(&logger);
 	}
 
 	Assembler a(&ch);
 	if (logger.file())
-		a.addValidationOptions(BaseEmitter::kValidationOptionIntermediate);
+		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
 	// generate an entry point
 	m_entry = (x86_entry_point_func)dst;
 	a.bind(a.newNamedLabel("entry_point"));
 
 	FuncDetail entry_point;
-	entry_point.init(FuncSignatureT<uint32_t, uint8_t *, x86code *>(CallConv::kIdHost), hostEnvironment());
+	entry_point.init(FuncSignatureT<uint32_t, uint8_t *, x86code *>(CallConvId::kHost), Environment::host());
 
 	FuncFrame frame;
 	frame.init(entry_point);
@@ -939,21 +945,21 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	x86code *dst = (x86code *)(uint64_t(m_cache.top() + 63) & ~63);
 
 	CodeHolder ch;
-	ch.init(hostEnvironment(), uint64_t(dst));
+	ch.init(Environment::host(), uint64_t(dst));
 	ThrowableErrorHandler e;
 	ch.setErrorHandler(&e);
 
 	FileLogger logger(m_log_asmjit);
 	if (logger.file())
 	{
-		logger.setFlags(FormatOptions::Flags::kFlagHexOffsets | FormatOptions::Flags::kFlagHexImms | FormatOptions::Flags::kFlagMachineCode);
-		logger.setIndentation(FormatOptions::IndentationType::kIndentationCode, 4);
+		logger.setFlags(FormatFlags::kHexOffsets | FormatFlags::kHexImms | FormatFlags::kMachineCode);
+		logger.setIndentation(FormatIndentationGroup::kCode, 4);
 		ch.setLogger(&logger);
 	}
 
 	Assembler a(&ch);
 	if (logger.file())
-		a.addValidationOptions(BaseEmitter::kValidationOptionIntermediate);
+		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
 	// generate code
 	std::string blockname;
@@ -1031,7 +1037,6 @@ void drcbe_x64::get_info(drcbe_info &info)
 void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize)
 {
 	bool const is64 = dst.size() == 8;
-	u32 const rs = is64 ? Gpq::kSignature : Gpd::kSignature;
 
 	if (param.is_immediate())
 	{
@@ -1052,10 +1057,10 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 		if (dst.isMem())
 		{
 			// use temporary register for memory,memory
-			Gp const reg = param.select_register(is64 ? rax : eax);
+			Gp const tmp = is64 ? param.select_register(rax) : param.select_register(eax);
 
-			a.mov(reg, MABS(param.memory()));                                           // mov   reg,param
-			a.emit(opcode, dst, reg);                                                   // op    [dst],reg
+			a.mov(tmp, MABS(param.memory()));                                           // mov   tmp,param
+			a.emit(opcode, dst, tmp);                                                   // op    [dst],tmp
 		}
 		else if (opcode != Inst::kIdTest)
 			// most instructions are register,memory
@@ -1066,7 +1071,7 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 	}
 	else if (param.is_int_register())
 	{
-		Gp const src = Gp(rs, param.ireg());
+		Gp const src = Gp::fromTypeAndId(is64 ? RegType::kX86_Gpq : RegType::kX86_Gpd, param.ireg());
 
 		a.emit(opcode, dst, src);                                                       // op    dst,param
 	}
@@ -1119,30 +1124,27 @@ void drcbe_x64::mov_param_reg(Assembler &a, be_parameter const &param, Gp const 
 void drcbe_x64::mov_mem_param(Assembler &a, Mem const &mem, be_parameter const &param)
 {
 	bool const is64 = mem.size() == 8;
-	u32 const rs = is64 ? Gpq::kSignature : Gpd::kSignature;
 
 	if (param.is_immediate())
 	{
 		if (is64 && !short_immediate(param.immediate()))
 		{
-			Gp const tmp = Gp(rs, Gp::kIdAx);
-
-			a.mov(tmp, param.immediate());                                              // mov   tmp,param
-			a.mov(mem, tmp);                                                            // mov   [mem],tmp
+			a.mov(rax, param.immediate());                                              // mov   tmp,param
+			a.mov(mem, rax);                                                            // mov   [mem],tmp
 		}
 		else
 			a.mov(mem, param.immediate());                                              // mov   [mem],param
 	}
 	else if (param.is_memory())
 	{
-		Gp const tmp = Gp(rs, Gp::kIdAx);
+		Gp const tmp = Gp::fromTypeAndId(is64 ? RegType::kX86_Gpq : RegType::kX86_Gpd, Gp::kIdAx);
 
 		a.mov(tmp, MABS(param.memory()));                                               // mov   tmp,[param]
 		a.mov(mem, tmp);                                                                // mov   [mem],tmp
 	}
 	else if (param.is_int_register())
 	{
-		Gp const src = Gp(rs, param.ireg());
+		Gp const src = Gp::fromTypeAndId(is64 ? RegType::kX86_Gpq : RegType::kX86_Gpd, param.ireg());
 
 		a.mov(mem, src);                                                                // mov   [mem],param
 	}
@@ -2149,7 +2151,7 @@ void drcbe_x64::op_loads(Assembler &a, const instruction &inst)
 	Gp basereg = get_base_register_and_offset(a, basep.memory(), rdx, baseoffs);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 	// immediate index
 	if (indp.is_immediate())
@@ -2640,7 +2642,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter bitp(*this, inst.param(1), PTYPE_MRI);
 
-	u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
+	Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
 
 	// degenerate case: source is immediate
 	if (srcp.is_immediate() && bitp.is_immediate())
@@ -2663,14 +2665,14 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 		if (srcp.is_memory())
 			a.bt(MABS(srcp.memory(), inst.size()), bitp.immediate());                   // bt     [srcp],bitp
 		else if (srcp.is_int_register())
-			a.bt(Gp(rs, srcp.ireg()), bitp.immediate());                                // bt     srcp,bitp
+			a.bt(src, bitp.immediate());                                                // bt     srcp,bitp
 	}
 	else
 	{
 		if (srcp.is_memory())
 			a.bt(MABS(srcp.memory(), inst.size()), ecx);                                // bt     [srcp],ecx
 		else if (srcp.is_int_register())
-			a.bt(Gp(rs, srcp.ireg()), ecx);                                             // bt     srcp,ecx
+			a.bt(src, ecx);                                                             // bt     srcp,ecx
 	}
 }
 
@@ -2690,7 +2692,7 @@ void drcbe_x64::op_set(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register(inst.size() == 4 ? eax : rax);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 	// set to AL
 	a.set(X86_CONDITION(inst.condition()), al);                                         // setcc  al
@@ -2714,8 +2716,6 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
-	u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
-
 	// add a conditional branch unless a conditional move is possible
 	Label skip = a.newLabel();
 	if (inst.condition() != uml::COND_ALWAYS && !(dstp.is_int_register() && !srcp.is_immediate()))
@@ -2723,8 +2723,11 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 
 	// register to memory
 	if (dstp.is_memory() && srcp.is_int_register())
-		a.mov(MABS(dstp.memory()), Gp(rs, srcp.ireg()));                                // mov   [dstp],srcp
+	{
+		Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
 
+		a.mov(MABS(dstp.memory()), src);                                                // mov   [dstp],srcp
+	}
 	// immediate to memory
 	else if (dstp.is_memory() && srcp.is_immediate() && short_immediate(srcp.immediate()))
 		a.mov(MABS(dstp.memory(), inst.size()), s32(srcp.immediate()));                 // mov   [dstp],srcp
@@ -2732,19 +2735,22 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 	// conditional memory to register
 	else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_memory())
 	{
-		a.cmov(X86_CONDITION(inst.condition()), Gp(rs, dstp.ireg()), MABS(srcp.memory())); // cmovcc dstp,[srcp]
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
+		a.cmov(X86_CONDITION(inst.condition()), dst, MABS(srcp.memory()));              // cmovcc dstp,[srcp]
 	}
 
 	// conditional register to register
 	else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_int_register())
 	{
-		a.cmov(X86_CONDITION(inst.condition()), Gp(rs, dstp.ireg()), Gp(rs, srcp.ireg())); // cmovcc dstp,srcp
+		Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
+		a.cmov(X86_CONDITION(inst.condition()), dst, src);                              // cmovcc dstp,srcp
 	}
 
 	// general case
 	else
 	{
-		Gp dstreg = dstp.select_register(inst.size() == 4 ? eax : rax);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 		mov_reg_param(a, dstreg, srcp, true);                                           // mov   dstreg,srcp
 		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
@@ -2854,7 +2860,7 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	// pick a target register
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, shiftp, maskp);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, shiftp, maskp) : dstp.select_register(rax, shiftp, maskp);
 
 	mov_reg_param(a, dstreg, srcp);                                                     // mov   dstreg,srcp
 	if (!shiftp.is_immediate_value(0))
@@ -2978,24 +2984,27 @@ void drcbe_x64::op_add(Assembler &a, const instruction &inst)
 	// reg = reg + imm
 	else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && short_immediate(src2p.immediate()) && !inst.flags())
 	{
-		u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
+		Gp const src1 = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src1p.ireg());
 
-		a.lea(Gp(rs, dstp.ireg()), ptr(Gp(rs, src1p.ireg()), src2p.immediate()));       // lea   dstp,[src1p+src2p]
+		a.lea(dst, ptr(src1, src2p.immediate()));                                       // lea   dstp,[src1p+src2p]
 	}
 
 	// reg = reg + reg
 	else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_int_register() && !inst.flags())
 	{
-		u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
+		Gp const src1 = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src1p.ireg());
+		Gp const src2 = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg());
 
-		a.lea(Gp(rs, dstp.ireg()), ptr(Gp(rs, src1p.ireg()), Gp(rs, src2p.ireg())));    // lea   dstp,[src1p+src2p]
+		a.lea(dst, ptr(src1, src2));                                                    // lea   dstp,[src1p+src2p]
 	}
 
 	// general case
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdAdd, dstreg, src2p,                                    // add   dstreg,src2p
@@ -3034,7 +3043,7 @@ void drcbe_x64::op_addc(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p, true);                                          // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdAdc, dstreg, src2p);                                   // adc   dstreg,src2p
@@ -3071,9 +3080,8 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 	// reg = reg - imm
 	else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && short_immediate(src2p.immediate()) && !inst.flags())
 	{
-		u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
-		Gp const dst = Gp(rs, dstp.ireg());
-		Gp const src1 = Gp(rs, src1p.ireg());
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
+		Gp const src1 = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src1p.ireg());
 
 		a.lea(dst, ptr(src1, -src2p.immediate()));                                      // lea   dstp,[src1p-src2p]
 	}
@@ -3082,7 +3090,7 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdSub, dstreg, src2p,                                    // sub   dstreg,src2p
@@ -3120,7 +3128,7 @@ void drcbe_x64::op_subc(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p, true);                                          // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdSbb, dstreg, src2p);                                   // sbb   dstreg,src2p
@@ -3152,7 +3160,7 @@ void drcbe_x64::op_cmp(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp src1reg = src1p.select_register((inst.size() == 4) ? eax : rax);
+		Gp src1reg = (inst.size() == 4) ? src1p.select_register(eax) : src1p.select_register(rax);
 
 		if (src1p.is_immediate())
 		{
@@ -3634,7 +3642,7 @@ void drcbe_x64::op_and(Assembler &a, const instruction &inst)
 	normalize_commutative(src1p, src2p);
 
 	// pick a target register
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 	// dstp == src1p in memory
 	if (dstp.is_memory() && dstp == src1p)
@@ -3749,7 +3757,7 @@ void drcbe_x64::op_test(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp src1reg = src1p.select_register((inst.size() == 4) ? eax : rax);
+		Gp src1reg = (inst.size() == 4) ? src1p.select_register(eax) : src1p.select_register(rax);
 
 		mov_reg_param(a, src1reg, src1p);                                               // mov   src1reg,src1p
 		alu_op_param(a, Inst::kIdTest, src1reg, src2p);                                 // test  src1reg,src2p
@@ -3812,7 +3820,7 @@ void drcbe_x64::op_or(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdOr, dstreg, src2p,                                     // or    dstreg,src2p
@@ -3888,9 +3896,9 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 	// dstp == src1p register
 	else if (dstp.is_int_register() && dstp == src1p)
 	{
-		u32 const rs = (inst.size() == 4) ? Gpd::kSignature : Gpq::kSignature;
+		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
 
-		alu_op_param(a, Inst::kIdXor, Gp(rs, dstp.ireg()), src2p,                       // xor   dstp,src2p
+		alu_op_param(a, Inst::kIdXor, dst, src2p,                                       // xor   dstp,src2p
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize all-zero and all-one cases
@@ -3909,7 +3917,7 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 	else
 	{
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
+		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdXor, dstreg, src2p,                                    // xor   dstreg,src2p
@@ -4033,7 +4041,7 @@ void drcbe_x64::op_bswap(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
 	// pick a target register
-	Gp dstreg = dstp.select_register(inst.size() == 4 ? eax : rax);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 	mov_reg_param(a, dstreg, srcp);                                                     // mov   dstreg,src1p
 	a.bswap(dstreg);                                                                    // bswap dstreg
@@ -4067,7 +4075,7 @@ template <Inst::Id Opcode> void drcbe_x64::op_shift(Assembler &a, const uml::ins
 		else
 		{
 			// pick a target register
-			Gp dstreg = dstp.select_register(inst.size() == 4 ? eax : rax, src2p);
+			Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
 			if (carry)
 				mov_reg_param(a, dstreg, src1p, true);                                  // mov   dstreg,src1p
@@ -4355,7 +4363,7 @@ void drcbe_x64::op_ftoint(Assembler &a, const instruction &inst)
 	assert(roundp.is_rounding());
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register((sizep.size() == SIZE_DWORD) ? eax : rax);
+	Gp dstreg = (sizep.size() == SIZE_DWORD) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 	// set rounding mode if necessary
 	if (roundp.rounding() != ROUND_DEFAULT && roundp.rounding() != ROUND_TRUNC)

@@ -8,6 +8,8 @@
 #include "machine/ram.h"
 #include "cpu/m68000/m68000.h"
 
+#include "fileio.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

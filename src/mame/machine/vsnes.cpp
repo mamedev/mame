@@ -259,71 +259,63 @@ void vsnes_state::init_vsnormal()
 }
 
 /**********************************************************************************/
-/* Gun games: VROM Banking in controller 0 write */
+// Gun games: VROM Banking in controller 0 write
 
 void vsnes_state::gun_in0_w(uint8_t data)
 {
 	if (m_do_vrom_bank)
 	{
-		/* switch vrom */
+		// switch vrom
 		v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
 	}
 
-	/* here we do things a little different */
+	// here we do things a little different
 	if (m_input_strobe[0] & ~data & 1)
 	{
-		/* load up the latches */
+		// load up the latches
 		m_input_latch[0] = ioport("IN0")->read();
+		m_input_latch[1] = ioport("IN1")->read();
 
-		/* do the gun thing */
+		// do the gun thing
 		int x = ioport("GUNX")->read();
-		float y = ioport("GUNY")->read();
+		int y = ioport("GUNY")->read();
 
-		y = y * 0.9375f; // scale 256 (our gun input range is 0 - 255) to 240 (screen visible area / bitmap we're using is 0 - 239)
+		// radius of circle picked up by the gun's photodiode
+		constexpr int radius = 5;
+		// brightness threshold
+		constexpr int bright = 0xc0;
+		// # of CRT scanlines that sustain brightness
+		constexpr int sustain = 22;
 
-		uint8_t realy = (int)y;
+		int vpos = m_ppu1->screen().vpos();
+		int hpos = m_ppu1->screen().hpos();
 
 		// update the screen if necessary
 		if (!m_ppu1->screen().vblank())
-		{
-			int vpos = m_ppu1->screen().vpos();
-			int hpos = m_ppu1->screen().hpos();
-
-			if (vpos > realy || (vpos == realy && hpos >= x))
+			if (vpos > y - radius || (vpos == y - radius && hpos >= x - radius))
 				m_ppu1->screen().update_now();
-		}
 
-		/* get the pixel at the gun position */
-		rgb_t col = m_ppu1->screen().pixel(x, realy);
-		uint8_t bright = col.brightness();
-		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
-		// the mame calc above is uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)
-#if 0
-		uint8_t r = col.r();
-		uint8_t g = col.g();
-		uint8_t b = col.b();
-		printf("pix is %02x %02x %02x | %02x\n", r,g,b,bright);
-#endif
-		if (bright == 0xff)
-		{
+		int sum = 0;
+		int scanned = 0;
+
+		// sum brightness of pixels nearby the gun position
+		for (int i = x - radius; i <= x + radius; i++)
+			for (int j = y - radius; j <= y + radius; j++)
+				// look at pixels within circular sensor
+				if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius)
+				{
+					rgb_t pix = m_ppu1->screen().pixel(i, j);
+
+					// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
+					// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
+					if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
+						sum += pix.r() + pix.g() + pix.b();
+					scanned++;
+				}
+
+		// light detected if average brightness is above threshold
+		if (sum >= bright * scanned)
 			m_input_latch[0] |= 0x40;
-		}
-
-
-
-#if 0 // this is junk code, only works for NES palette..
-		/* get the color base from the ppu */
-		uint32_t color_base = 0;
-
-		/* look at the screen and see if the cursor is over a bright pixel */
-		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
-			(pix == color_base + 0x33 ) || (pix == color_base + 0x34))
-		{
-			m_input_latch[0] |= 0x40;
-		}
-#endif
-
-		m_input_latch[1] = ioport("IN1")->read();
 	}
 
 	m_input_strobe[0] = data;

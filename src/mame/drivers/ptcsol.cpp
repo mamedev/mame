@@ -133,18 +133,7 @@
 #include "formats/sol_cas.h"
 
 
-struct cass_data_t {
-	struct {
-		int length;     /* time cassette level is at input.level */
-		int level;      /* cassette level */
-		int bit;        /* bit being read */
-	} input;
-	struct {
-		int length;     /* time cassette level is at output.level */
-		int level;      /* cassette level */
-		int bit;        /* bit to output */
-	} output;
-};
+namespace {
 
 class sol20_state : public driver_device
 {
@@ -180,6 +169,20 @@ private:
 		TIMER_SOL20_CASSETTE_TC,
 	};
 
+	struct cass_data_t
+	{
+		struct {
+			int length;     /* time cassette level is at input.level */
+			int level;      /* cassette level */
+			int bit;        /* bit being read */
+		} input;
+		struct {
+			int length;     /* time cassette level is at output.level */
+			int level;      /* cassette level */
+			int bit;        /* bit to output */
+		} output;
+	};
+
 	u8 sol20_f8_r();
 	u8 sol20_fa_r();
 	u8 sol20_fc_r();
@@ -205,7 +208,7 @@ private:
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8080a_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -625,20 +628,22 @@ void sol20_state::machine_reset()
 	// Boot tap
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xc7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xc000, 0xc7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 
@@ -820,6 +825,8 @@ ROM_START( sol20 )
 	ROM_REGION( 0x100, "keyboard", 0 )
 	ROM_LOAD( "8574.u18", 0x000, 0x100, NO_DUMP ) // 256x4 bipolar PROM or mask ROM; second half unused
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS

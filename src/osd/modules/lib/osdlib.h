@@ -163,7 +163,7 @@ public:
 
 	static ptr open(std::vector<std::string> &&libraries);
 
-	virtual ~dynamic_module() { };
+	virtual ~dynamic_module() { }
 
 	template <typename T>
 	typename std::enable_if_t<std::is_pointer_v<T>, T> bind(char const *symbol)

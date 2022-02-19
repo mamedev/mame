@@ -47,7 +47,7 @@ public:
 	auto nmi_callback() { return m_nmi_callback.bind(); }
 
 	// address map manipulations
-	address_space &memspace() const { return *m_memspace; };
+	address_space &memspace() const { return *m_memspace; }
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -5310,44 +5310,46 @@ void cave_state::init_korokoro()
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08)", MACHINE_SUPPORTS_SAVE )
 
+// Version/Date string is stored at 68000 ROM 0x1200-0x121f
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1994, mazinger,   0,        mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mazinger,   0,        mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
+GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
 
-GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachij,  donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachijs, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan, Satsuei version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachikr, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachihk, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+// Version/Date string is stored at 68000 ROM 0x400-0x41f
+GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",                     MACHINE_SUPPORTS_SAVE ) // Ver.1.12 1995/05/2x XXXXX
+GAME( 1995, donpachij,  donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",                  MACHINE_SUPPORTS_SAVE ) // Ver.1.01 1995/05/11
+GAME( 1995, donpachijs, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan, Satsuei version)", MACHINE_SUPPORTS_SAVE ) // Ver.1.01 1995/05/11
+GAME( 1995, donpachikr, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",                  MACHINE_SUPPORTS_SAVE ) // Ver.1.12 1995/05/2x XXXXX
+GAME( 1995, donpachihk, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)",              MACHINE_SUPPORTS_SAVE ) // Ver.1.10 1995/05/17  asia
 
-GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (World)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95.06.20)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95.06.20)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,   0,        sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnu,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnj,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnk,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnt,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnh,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnn,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnu, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnk, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnt, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormno,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Europe)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnou, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, USA)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnok, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Korea)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnot, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Ver. 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormn,   0,        sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnu,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnj,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnk,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnt,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnh,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnn,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, Europe)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnu, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, USA)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnk, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22, Korea)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnt, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormno,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, Europe)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, USA)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnok, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/21, Korea)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnot, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Bishoujo Senshi Sailor Moon (Version 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1996, agallet,    0,        sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
@@ -5365,6 +5367,7 @@ GAME( 1996, agalletak,  agallet,  sailormn, cave,     cave_state, init_agallet, 
 GAME( 1996, agalletat,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, agalletah,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
+// 68000 ROM string 0x328e-32b5 has 1993 copyright and publisher string, it's planned release date but cancelled?
 GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",     MACHINE_SUPPORTS_SAVE )
@@ -5376,23 +5379,28 @@ GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan,  cave_state, init_ppsatan, 
 GAME( 1997, tekkencw,   0,        tekkencw, tekkencw, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tekkenbs,   0,        tekkenbs, tekkenbs, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, ddonpach,   0,        ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
+// Version/Date string at 68000 ROM 0x400-0x41f is leftover from donpachi (DONPACHI Ver.1.12 1995/05/2x XXXXX)
+GAME( 1997, ddonpach,   0,        ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (World, 1997 2/ 5 Master Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, 1997 2/ 5 Master Ver.)", MACHINE_SUPPORTS_SAVE )
 // NOT an official CAVE release, but several PCBs have been converted to it and used on location.
 GAME( 2012, ddonpacha,  ddonpach, ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, dfeveron,   feversos, dfeveron, cave,     cave_state, init_dfeveron,  ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1998, feversos,   0,        dfeveron, cave,     cave_state, init_feversos,  ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )
+// Version/Date string is stored at 68000 ROM 0x400-0x427
+GAME( 1998, dfeveron,   feversos, dfeveron, cave,     cave_state, init_dfeveron,  ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, 98/09/17 VER.)", MACHINE_SUPPORTS_SAVE ) // ca005 Ver0.01 Thu Sep 17 18:40:02 1998
+GAME( 1998, feversos,   0,        dfeveron, cave,     cave_state, init_feversos,  ROT270, "Cave (Nihon System license)",            "Fever SOS (World, 98/09/25 VER)",       MACHINE_SUPPORTS_SAVE ) // ca005 Ver0.01 Fri Sep 25 10:10:15 1998
 
-GAME( 1998, esprade,    0,        esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradej,   esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradejo,  esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         MACHINE_SUPPORTS_SAVE )
+// Version/Date string at 68000 ROM 0x400-0x41f is leftover from donpachi (DONPACHI Ver.1.12 1995/05/2x XXXXX)
+GAME( 1998, esprade,    0,        esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (World, 1998 4/22 International Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradej,   esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, 1998 4/21 Master Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradejo,  esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, 1998 4/14 Master Ver.)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, uopoko,     0,        uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         MACHINE_SUPPORTS_SAVE )
+// Date string is stored at 68000 ROM 0x100-0x1ff
+GAME( 1998, uopoko,     0,        uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (World)", MACHINE_SUPPORTS_SAVE ) // CAVE 1998.FEB.06 UOPOKO CV-02-00 OVER SEA
+GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)", MACHINE_SUPPORTS_SAVE ) // CAVE 1998.FEB.06 UOPOKO CV-02-00 JAPAN
 
-GAME( 1999, guwange,    0,        guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1999, guwanges,   guwange,  guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", MACHINE_SUPPORTS_SAVE )
+// Version/Date string at 68000 ROM 0x400-0x41f is leftover from donpachi (DONPACHI Ver.1.12 1995/05/2x XXXXX)
+GAME( 1999, guwange,    0,        guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, 1999 6/24 Master Ver 16:55)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, guwanges,   guwange,  guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, 2000 7/ 7 Special Ver 13:22)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, gaia,       0,        gaia,     gaia,     cave_state, init_gaia,      ROT0,   "Noise Factory",                          "Gaia Crusaders", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
 

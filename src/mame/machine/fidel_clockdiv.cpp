@@ -81,28 +81,29 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 	m_div_timer->adjust(period, 0, period);
 
 	// set up memory passthroughs
-	if (m_read_tap)
-	{
-		m_read_tap->remove();
-		m_write_tap->remove();
-		m_read_tap = nullptr;
-		m_write_tap = nullptr;
-	}
+	m_read_tap.remove();
+	m_write_tap.remove();
 
 	if (val)
 	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 
-		m_read_tap = program.install_read_tap(0x0000, 0xffff, "program_div_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			if (!machine().side_effects_disabled())
-				div_set_cpu_freq(offset & 0x6000);
-			return data;
-		});
-		m_write_tap = program.install_write_tap(0x0000, 0xffff, "program_div_w",[this](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			div_set_cpu_freq(offset & 0x6000);
-			return data;
-		});
+		m_read_tap = program.install_read_tap(
+				0x0000, 0xffff,
+				"program_div_r",
+				[this] (offs_t offset, u8 &data, u8 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+						div_set_cpu_freq(offset & 0x6000);
+				},
+				&m_read_tap);
+		m_write_tap = program.install_write_tap(
+				0x0000, 0xffff,
+				"program_div_w",
+				[this] (offs_t offset, u8 &data, u8 mem_mask)
+				{
+					div_set_cpu_freq(offset & 0x6000);
+				},
+				&m_write_tap);
 	}
 }

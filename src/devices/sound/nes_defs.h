@@ -56,12 +56,12 @@ struct apu_t
 		int vbl_length = 0;
 		int freq = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		float sweep_phase = 0.0;
 		uint8 adder = 0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* Triangle Wave */
@@ -75,13 +75,14 @@ struct apu_t
 
 		uint8 regs[4]; /* regs[1] unused */
 		int linear_length = 0;
+		bool linear_reload = false;
 		int vbl_length = 0;
 		int write_latency = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		uint8 adder = 0;
 		bool counter_started = false;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* Noise Wave */
@@ -97,10 +98,10 @@ struct apu_t
 		u32 seed = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		float env_phase = 0.0;
 		uint8 env_vol = 0;
 		bool enabled = false;
+		uint8 output = 0;
 	};
 
 	/* DPCM Wave */
@@ -117,11 +118,11 @@ struct apu_t
 		uint32 length = 0;
 		int bits_left = 0;
 		float phaseacc = 0.0;
-		float output_vol = 0.0;
 		uint8 cur_byte = 0;
 		bool enabled = false;
 		bool irq_occurred = false;
-		signed char vol = 0;
+		int16 vol = 0;
+		uint8 output = 0;
 	};
 
 
@@ -225,7 +226,10 @@ static const int dpcm_clocks[2][16] =
 /* 2/16 = 12.5%, 4/16 = 25%, 8/16 = 50%, 12/16 = 75% */
 static const int duty_lut[4] =
 {
-	2, 4, 8, 12
+	0b01000000, // 01000000 (12.5%)
+	0b01100000, // 01100000 (25%)
+	0b01111000, // 01111000 (50%)
+	0b10011111, // 10011111 (25% negated)
 };
 
 #endif // MAME_SOUND_NES_DEFS_H

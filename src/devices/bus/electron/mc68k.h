@@ -48,7 +48,7 @@ private:
 	required_memory_region m_boot_rom;
 	required_memory_region m_exp_rom;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 	void mem_map(address_map &map);
 
