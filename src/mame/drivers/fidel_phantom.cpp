@@ -202,8 +202,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
 void phantom_state::init_motors()
 {
 	m_motors_ctrl = 0;
-	m_hmotor_pos = 0x80;
-	m_vmotor_pos = 0x80;
+	m_hmotor_pos = 0x23;
+	m_vmotor_pos = 0x0e;
 	m_vmotor_sensor0_ff = false;
 	m_vmotor_sensor1_ff = false;
 	m_hmotor_sensor0_ff = false;
@@ -215,12 +215,12 @@ void phantom_state::init_motors()
 
 void phantom_state::check_rotation()
 {
-	if (m_vmotor_pos != 0 && m_vmotor_pos != 0xff)
+	if (m_vmotor_pos != 0 && m_vmotor_pos != 0x88)
 	{
 		if (m_motors_ctrl & 0x03) m_vmotor_sensor0_ff = true;
 		if (m_motors_ctrl & 0x02) m_vmotor_sensor1_ff = true;
 	}
-	if (m_hmotor_pos != 0 && m_hmotor_pos != 0xff)
+	if (m_hmotor_pos != 0 && m_hmotor_pos != 0xc0)
 	{
 		if (m_motors_ctrl & 0x0c) m_hmotor_sensor0_ff = true;
 		if (m_motors_ctrl & 0x04) m_hmotor_sensor1_ff = true;
@@ -231,11 +231,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 {
 	check_rotation();
 
-	// simulate 1 rotation per each tick
+	// simulate 1 rotation gap per each tick
 	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00) m_vmotor_pos--;
-	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0xff) m_vmotor_pos++;
+	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0x88) m_vmotor_pos++;
 	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00) m_hmotor_pos--;
-	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xff) m_hmotor_pos++;
+	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xc0) m_hmotor_pos++;
 
 	check_rotation();
 }

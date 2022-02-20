@@ -124,8 +124,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
- *MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
- @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
+ @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
+ @MP7304   TMS1400   1980, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
   MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
@@ -223,6 +223,7 @@ TODO:
 #include "copycatm2.lh" // clickable
 #include "dataman.lh"
 #include "ditto.lh" // clickable
+#include "dxfootb.lh"
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -12315,6 +12316,266 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Deluxe Football (model 7-550)
+  * TMS1400NLL MP7302 (die label TMS1400 MP7302)
+  * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
+
+  According to the manual, player 1 is green, player 2 is red. But when
+  playing a 1-player game, the CPU controls green, so on MAME, player 1
+  is the red side.
+
+***************************************************************************/
+
+class dxfootb_state : public hh_tms1k_state
+{
+public:
+	dxfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void dxfootb(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void dxfootb_state::update_display()
+{
+	// 2 led groups (double multiplexed)
+	u16 g1 = (m_r & 0x100) ? 0x7f : 0;
+	u16 g2 = (m_r & 0x80) ? 0x7f << 7 : 0;
+	m_display->matrix((m_r & g1) | (m_r << 7 & g2), m_o);
+}
+
+void dxfootb_state::write_r(u16 data)
+{
+	// R9,R10: speaker out
+	m_speaker->level_w(data >> 9 & 3);
+
+	// R3-R6: input mux
+	m_inp_mux = data >> 3 & 0xf;
+
+	// R0-R6: led select
+	// R7,R8: group select
+	m_r = data;
+	update_display();
+}
+
+void dxfootb_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 dxfootb_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( dxfootb )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Replay / Skill (Green)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Score / Skill (Red)")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+
+	PORT_START("IN.3") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+INPUT_PORTS_END
+
+void dxfootb_state::dxfootb(machine_config &config)
+{
+	// basic machine hardware
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(dxfootb_state::read_k));
+	m_maincpu->r().set(FUNC(dxfootb_state::write_r));
+	m_maincpu->o().set(FUNC(dxfootb_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(7+7, 8);
+	m_display->set_segmask(0x3c00, 0x7f);
+	config.set_default_layout(layout_dxfootb);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( dxfootb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7302", 0x0000, 0x1000, CRC(a8077062) SHA1(c1318fe5c8f2db021d7d1264fc70158944045fa3) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_dxfootb_output.pla", 0, 557, CRC(a1b3d2c0) SHA1(8030e6dcd3878b58668c98cff36d93b764e1d67f) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger 7 in 1 Sports Stadium (model 7-555)
+  * TMS1400 MP7304 (die label TMS1400 MP7304A)
+  * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
+
+  This handheld includes 7 games: 1: Basketball, 2: Hockey, 3: Soccer,
+  4: Maze, 5: Baseball, 6: Football, 7: Raquetball.
+  MAME external artwork is needed for the switchable overlays.
+
+  known releases:
+  - World: 7 in 1 Sports Stadium, published by Tiger
+  - USA: 7 in 1 Sports, published by Sears
+
+***************************************************************************/
+
+class ss7in1_state : public hh_tms1k_state
+{
+public:
+	ss7in1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ss7in1(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ss7in1_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ss7in1_state::write_r(u16 data)
+{
+	// R9: speaker out
+	m_speaker->level_w(data >> 9 & 1);
+
+	// R0-R2,R10: input mux
+	m_inp_mux = (data & 7) | (data >> 7 & 8);
+
+	// R0-R3: digit select
+	// R4-R8: led select
+	m_r = data;
+	update_display();
+}
+
+void ss7in1_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 ss7in1_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( ss7in1 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.3") // R10
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ss7in1_state::ss7in1(machine_config &config)
+{
+	// basic machine hardware
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(ss7in1_state::read_k));
+	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
+	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.01, 0.04); // player led is brighter
+	config.set_default_layout(layout_7in1ss);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( 7in1ss )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7304", 0x0000, 0x1000, CRC(2a1c8390) SHA1(fa10e60686af6828a61f05046abc3854ab49af95) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
@@ -12606,137 +12867,6 @@ ROM_START( ditto )
 	ROM_LOAD( "tms1000_ditto_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_ditto_output.pla", 0, 365, CRC(2b708a27) SHA1(e95415e51ffbe5da3bde1484fcd20467dde9f09a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Tiger 7 in 1 Sports Stadium (model 7-555)
-  * TMS1400 MP7304 (die label TMS1400 MP7304A)
-  * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
-
-  This handheld includes 7 games: 1: Basketball, 2: Hockey, 3: Soccer,
-  4: Maze, 5: Baseball, 6: Football, 7: Raquetball.
-  MAME external artwork is needed for the switchable overlays.
-
-  known releases:
-  - World: 7 in 1 Sports Stadium, published by Tiger
-  - USA: 7 in 1 Sports, published by Sears
-
-***************************************************************************/
-
-class ss7in1_state : public hh_tms1k_state
-{
-public:
-	ss7in1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
-	{ }
-
-	void ss7in1(machine_config &config);
-
-private:
-	void update_display();
-	void write_r(u16 data);
-	void write_o(u16 data);
-	u8 read_k();
-};
-
-// handlers
-
-void ss7in1_state::update_display()
-{
-	m_display->matrix(m_r, m_o);
-}
-
-void ss7in1_state::write_r(u16 data)
-{
-	// R9: speaker out
-	m_speaker->level_w(data >> 9 & 1);
-
-	// R0-R2,R10: input mux
-	m_inp_mux = (data & 7) | (data >> 7 & 8);
-
-	// R0-R3: digit select
-	// R4-R9: led select
-	m_r = data;
-	update_display();
-}
-
-void ss7in1_state::write_o(u16 data)
-{
-	// O0-O7: led data
-	m_o = data;
-	update_display();
-}
-
-u8 ss7in1_state::read_k()
-{
-	// K: multiplexed inputs
-	return read_inputs(4);
-}
-
-// config
-
-static INPUT_PORTS_START( ss7in1 )
-	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-
-	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-
-	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-
-	PORT_START("IN.3") // R10
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x01, "2" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-void ss7in1_state::ss7in1(machine_config &config)
-{
-	// basic machine hardware
-	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ss7in1_state::read_k));
-	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
-	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
-
-	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	m_display->set_segmask(0xf, 0x7f);
-	m_display->set_bri_levels(0.005, 0.05); // player led is brighter
-	config.set_default_layout(layout_7in1ss);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( 7in1ss )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7304", 0x0000, 0x1000, CRC(2a1c8390) SHA1(fa10e60686af6828a61f05046abc3854ab49af95) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
 ROM_END
 
 
@@ -13522,10 +13652,11 @@ CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    emp
 SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
