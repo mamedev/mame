@@ -33,10 +33,6 @@
      point should be just about 100% accurate, though I cannot tell for
      certain as yet.
 
-     A queue interface is also available for additional speed.  However,
-     the implementation is not yet 100% (DPCM sounds are inaccurate),
-     so it is disabled by default.
-
  *****************************************************************************
 
    BUGFIXES:
@@ -49,25 +45,6 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-// INTERNAL FUNCTIONS
-
-// INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE
-static void create_vbltimes(u32 *table, const u8 *vbl, unsigned int rate)
-{
-	for (int i = 0; i < 0x20; i++)
-		table[i] = vbl[i] * rate;
-}
-
-// INITIALIZE SAMPLE TIMES IN TERMS OF VSYNCS
-void nesapu_device::create_syncs(unsigned long sps)
-{
-	for (int i = 0; i < SYNCS_MAX1; i++)
-		m_sync_times1[i] = sps * (i + 1);
-
-	for (int i = 0; i < SYNCS_MAX2; i++)
-		m_sync_times2[i] = (sps * i) >> 2;
-}
-
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 
 nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -75,25 +52,10 @@ nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, co
 	, device_sound_interface(mconfig, *this)
 	, m_is_pal(0)
 	, m_samps_per_sync(0)
-	, m_buffer_size(0)
 	, m_stream(nullptr)
 	, m_irq_handler(*this)
 	, m_mem_read_cb(*this)
 {
-	for (auto & elem : m_vbl_times)
-	{
-		elem = 0;
-	}
-
-	for (auto & elem : m_sync_times1)
-	{
-		elem = 0;
-	}
-
-	for (auto & elem : m_sync_times2)
-	{
-		elem = 0;
-	}
 }
 
 nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
@@ -114,16 +76,19 @@ void nesapu_device::device_clock_changed()
 
 void nesapu_device::calculate_rates()
 {
-	int rate = clock() / 4;
-
 	m_samps_per_sync = 89490 / 12; // Is there a different PAL value?
-	m_buffer_size = m_samps_per_sync;
 
-	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
-	create_syncs(m_samps_per_sync);
+	// initialize sample times in terms of vsyncs
+	for (int i = 0; i < SYNCS_MAX1; i++)
+	{
+		m_vbl_times[i] = vbl_length[i] * m_samps_per_sync / 2;
+		m_sync_times1[i] = m_samps_per_sync * (i + 1);
+	}
 
-	/* Adjust buffer size if 16 bits */
-	m_buffer_size+=m_samps_per_sync;
+	for (int i = 0; i < SYNCS_MAX2; i++)
+		m_sync_times2[i] = (m_samps_per_sync * i) >> 2;
+
+	int rate = clock() / 4;
 
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
@@ -231,15 +196,6 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.dpcm.vol));
 	save_item(NAME(m_APU.dpcm.output));
 
-	save_item(NAME(m_APU.regs));
-
-	#ifdef USE_QUEUE
-	save_item(NAME(m_APU.queue));
-	save_item(NAME(m_APU.head));
-	save_item(NAME(m_APU.tail));
-	#else
-	save_item(NAME(m_APU.buf_pos));
-	#endif
 	save_item(NAME(m_APU.step_mode));
 }
 
@@ -516,11 +472,13 @@ void nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 }
 
 /* WRITE REGISTER VALUE */
-inline void nesapu_device::apu_regwrite(int address, u8 value)
+void nesapu_device::write(offs_t offset, u8 value)
 {
-	int chan = (address & 4) ? 1 : 0;
+	m_stream->update();
 
-	switch (address)
+	int chan = BIT(offset, 2);
+
+	switch (offset)
 	{
 	/* squares */
 	case apu_t::WRA0:
@@ -713,18 +671,16 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		break;
 	default:
 #ifdef MAME_DEBUG
-logerror("invalid apu write: $%02X at $%04X\n", value, address);
+logerror("invalid apu write: $%02X at $%04X\n", value, offset);
 #endif
 		break;
 	}
 }
 
-
-
 /* READ VALUES FROM REGISTERS */
-u8 nesapu_device::read(offs_t address)
+u8 nesapu_device::read(offs_t offset)
 {
-	if (address == 0x15) /*FIXED* Address $4015 has different behaviour*/
+	if (offset == 0x15) /*FIXED* Address $4015 has different behaviour*/
 	{
 		int readval = 0;
 		if (m_APU.squ[0].vbl_length > 0)
@@ -739,24 +695,16 @@ u8 nesapu_device::read(offs_t address)
 		if (m_APU.noi.vbl_length > 0)
 			readval |= 0x08;
 
-		if (m_APU.dpcm.enabled == true)
+		if (m_APU.dpcm.enabled)
 			readval |= 0x10;
 
-		if (m_APU.dpcm.irq_occurred == true)
+		if (m_APU.dpcm.irq_occurred)
 			readval |= 0x80;
 
 		return readval;
 	}
 	else
-		return m_APU.regs[address];
-}
-
-/* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
-void nesapu_device::write(offs_t address, u8 value)
-{
-	m_APU.regs[address]=value;
-	m_stream->update();
-	apu_regwrite(address,value);
+		return 0xff; // FIXME: this should be open bus?
 }
 
 
