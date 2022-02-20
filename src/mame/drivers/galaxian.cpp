@@ -2075,7 +2075,24 @@ void galaxian_state::froggervd_map(address_map &map)
 	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
-/* map not derived from schematics. Used by explorer and takeoff */
+void galaxian_state::mandinka_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x97ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa001, 0xa001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xa002, 0xa002).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0xa003, 0xa003).w(FUNC(galaxian_state::scramble_background_enable_w));
+	map(0xa006, 0xa006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa007, 0xa007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa800, 0xa800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xb000, 0xb003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb800, 0xb803).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+// Map not derived from schematics. Used by explorer and takeoff
 void galaxian_state::explorer_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -7475,6 +7492,12 @@ void galaxian_state::mandingarf(machine_config &config)
 {
 	galaxian(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mandingarf_map);
+}
+
+void galaxian_state::mandinka(machine_config &config)
+{
+	scramble_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mandinka_map);
 }
 
 void galaxian_state::pacmanbl(machine_config &config)
@@ -13709,6 +13732,29 @@ ROM_START( mandingac )
 	ROM_LOAD( "82s123.bin",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
 ROM_END
 
+ROM_START( mandinka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",         0x0000, 0x0800, CRC(ad332c55) SHA1(4f33485e0247cc8e9e9c6cb93a55ba08506d063f) )
+	ROM_LOAD( "2.bin",         0x0800, 0x0800, CRC(2cb90c95) SHA1(b1721165395018a02e718d7d5e5dfa8ab794546b) )
+	ROM_LOAD( "3.bin",         0x1000, 0x0800, CRC(5c7c74d4) SHA1(a321508525d4cf774924dd3e6ca9688d9d3cc4f6) )
+	ROM_LOAD( "4.bin",         0x1800, 0x0800, CRC(57fe5a01) SHA1(4c4378f5e392549a85a6f52cf27719887315e36d) )
+	ROM_LOAD( "no_id_2.bin",   0x2000, 0x0800, CRC(83b91651) SHA1(9c514743da47a92deea39c7a41f032d5dc0f5700) )
+	ROM_LOAD( "6.bin",         0x2800, 0x0800, CRC(33dfca98) SHA1(ef15742674ad8f6c27dd9fd67fc0e8335699ad1b) )
+	ROM_LOAD( "7.bin",         0x3000, 0x0800, CRC(b6b835e3) SHA1(ba14e664dbaa0e4e8b4e55e732ba7581afe4c9a7) )
+	ROM_LOAD( "no_id_1.bin",   0x3800, 0x0800, CRC(d6721955) SHA1(725cacc8486f197e2a88ee1bbe9af01c792772a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1a_sonido.bin", 0x0000, 0x1000, NO_DUMP ) // missing
+	ROM_LOAD( "2b_sonido.bin", 0x1000, 0x1000, BAD_DUMP CRC(e8af1d77) SHA1(d05d7c015962989651a90f4bf9e64cd98c2ddd38) ) // FIXED BITS (xxx1xxxx)
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",  0x0000, 0x0800, BAD_DUMP CRC(cba03b26) SHA1(9aa307db69bac1f7b14194b68ea969a547e6f92f) ) // bitrot
+	ROM_LOAD( "10.bin", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6e.bin", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // Not dumped on this set
+ROM_END
+
 ROM_START( olmandingo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "olmandingo_1.bin",  0x0000, 0x0800, CRC(b5b9fcd9) SHA1(7a134de30041ac18521274f330eb4afe349da2db) )
@@ -15809,6 +15855,7 @@ GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
 GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinka,    amidar,   mandinka,   amidar,     galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Mandinka (bootleg of Amidar)",                                           MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 GAME( 1982, olmandingo,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
