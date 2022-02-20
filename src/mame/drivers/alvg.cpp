@@ -43,6 +43,7 @@ ToDo:
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
+#include "alvg.lh"
 
 
 namespace {
@@ -58,10 +59,12 @@ public:
 		, m_ppi0(*this, "ppi0")
 		, m_ppi1(*this, "ppi1")
 		, m_ppi2(*this, "ppi2")
+		, m_ppi3(*this, "ppi3")
 		, m_via(*this, "via")
 		, m_via0(*this, "via0")
 		, m_via1(*this, "via1")
 		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -82,6 +85,9 @@ private:
 	void ppi2_pa_w(u8 data) { m_lamp_data = (m_lamp_data & 0xff00) | data; }
 	void ppi2_pb_w(u8 data) { m_lamp_data = (m_lamp_data & 0xff) | (data << 8); }
 	void ppi2_pc_w(u8 data);
+	void ppi3_pa_w(u8 data);
+	void ppi3_pb_w(u8 data);
+	void ppi3_pc_w(u8 data);
 	void via_pb_w(u8 data);
 	u8 via0_pa_r();
 	u8 via0_pb_r() { return m_io_keyboard[12]->read(); }
@@ -89,16 +95,19 @@ private:
 
 	u16 m_row = 0U;
 	u16 m_lamp_data = 0U;
+	u8 m_strobe = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
+	required_device<i8255_device> m_ppi3;
 	required_device<via6522_device> m_via;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_ioport_array<13> m_io_keyboard;
+	output_finder<40> m_digits;
 	output_finder<128> m_io_outputs;   // 32 solenoids + 96 lamps
 };
 
@@ -110,7 +119,8 @@ void alvg_state::main_map(address_map &map)
 	map(0x2000, 0x2003).mirror(0x3f0).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U12
 	map(0x2400, 0x2403).mirror(0x3f0).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U13
 	map(0x2800, 0x2803).mirror(0x3f0).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U14
-	map(0x2c00, 0x2cff).mirror(0x300).w(FUNC(alvg_state::display_w));
+	map(0x2c00, 0x2c00).mirror(0x37f).w(FUNC(alvg_state::display_w));
+	map(0x2c80, 0x2c83).mirror(0x37c).rw(m_ppi3, FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC1 on display board
 	map(0x3800, 0x380f).mirror(0x3f0).m("via1", FUNC(via6522_device::map)); // U8
 	map(0x3c00, 0x3c0f).mirror(0x3f0).m("via0", FUNC(via6522_device::map)); // U7
 }
@@ -138,7 +148,7 @@ static INPUT_PORTS_START( alvg )
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP10") // Tilt on Mystery Castle, Punchy, Pistol Pete
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP10") // Tilt on Mystery Castle, Punchy, Pistol Poker
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP11")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP12")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP13")
@@ -201,7 +211,7 @@ static INPUT_PORTS_START( alvg )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP58")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP59")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP60")
-	// From here, these inputs only used by Pistol Pete
+	// From here, these inputs only used by Pistol Poker
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP61")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("INP62")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("INP63")
@@ -238,17 +248,36 @@ static INPUT_PORTS_START( alvg )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test")
 INPUT_PORTS_END
 
-void alvg_state::display_w(offs_t offset, u8 data)
-{
-	//printf("%X:%X ",offset,data);
-}
-
 void alvg_state::ppi2_pc_w(u8 data)
 {
 	for (u8 i = 0; i < 12; i++)
 		if (BIT(m_lamp_data, i))
 			for (u8 j = 0; j < 8; j++)
 				m_io_outputs[24U+8*i+j] = BIT(data, j);
+}
+
+void alvg_state::ppi3_pa_w(u8 data)
+{
+	u16 t = m_digits[m_strobe] & 0xff00;
+	m_digits[m_strobe] = t | data;
+}
+
+void alvg_state::ppi3_pb_w(u8 data)
+{
+	u16 t = m_digits[m_strobe] & 0xff;
+	m_digits[m_strobe] = t | (data << 8);
+}
+
+void alvg_state::ppi3_pc_w(u8 data)
+{
+	u16 t = m_digits[m_strobe+20] & 0xff00;
+	m_digits[m_strobe+20] = t | data;
+}
+
+void alvg_state::display_w(offs_t offset, u8 data)
+{
+	u16 t = m_digits[m_strobe+20] & 0xff;
+	m_digits[m_strobe+20] = t | (data << 8);
 }
 
 void alvg_state::via_pb_w(u8 data)
@@ -259,6 +288,12 @@ void alvg_state::via_pb_w(u8 data)
 void alvg_state::via1_pb_w(u8 data)
 {
 	m_via->write_ca2(BIT(data, 1));
+	if ((data & 0x38)==0)
+	{
+		m_strobe++;
+		if (m_strobe > 19)
+			m_strobe = 0;
+	}
 }
 
 u8 alvg_state::via0_pa_r()
@@ -275,7 +310,7 @@ void alvg_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	//m_digits.resolve();
+	m_digits.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_row));
@@ -287,6 +322,7 @@ void alvg_state::machine_reset()
 	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
+	m_strobe = 0U;
 }
 
 void alvg_state::alvg(machine_config &config)
@@ -296,6 +332,9 @@ void alvg_state::alvg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::main_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	/* Video */
+	config.set_default_layout(layout_alvg);
 
 	MOS6522(config, m_via0, XTAL(4'000'000) / 2);  // U7, uses clock2 from maincpu; switch inputs
 	m_via0->readpa_handler().set(FUNC(alvg_state::via0_pa_r));
@@ -308,7 +347,7 @@ void alvg_state::alvg(machine_config &config)
 
 	MOS6522(config, m_via1, XTAL(4'000'000) / 2);  // U8, uses clock2 from maincpu; port A = to sound; port B = serial to display
 	//m_via1->readpb_handler().set(FUNC(alvg_state::via1_pb_r));
-	m_via1->writepa_handler().set("via", FUNC(via6522_device::write_pa));
+	m_via1->writepa_handler().set(m_via, FUNC(via6522_device::write_pa));
 	m_via1->writepb_handler().set(FUNC(alvg_state::via1_pb_w));
 	//m_via1->ca2_handler().set_nop();
 	//m_via1->cb2_handler().set_nop();
@@ -328,6 +367,11 @@ void alvg_state::alvg(machine_config &config)
 	m_ppi2->out_pa_callback().set(FUNC(alvg_state::ppi2_pa_w)); // Lamps
 	m_ppi2->out_pb_callback().set(FUNC(alvg_state::ppi2_pb_w)); // Lamps
 	m_ppi2->out_pc_callback().set(FUNC(alvg_state::ppi2_pc_w)); // Lamps
+
+	I8255A(config, m_ppi3); // U14
+	m_ppi3->out_pa_callback().set(FUNC(alvg_state::ppi3_pa_w)); // Alpha Display
+	m_ppi3->out_pb_callback().set(FUNC(alvg_state::ppi3_pb_w)); // Alpha Display
+	m_ppi3->out_pc_callback().set(FUNC(alvg_state::ppi3_pc_w)); // Alpha Display
 
 	// Sound
 	MC6809(config, m_audiocpu, XTAL(8'000'000)); // 68B09, 8 MHz crystal, internal divide by 4 to produce E/Q outputs
