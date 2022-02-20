@@ -144,13 +144,13 @@ void multifont_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 void multifont_device::device_start()
 {
-	m_iobase = 0x00;
+	m_hard_reset = true;
+
 	m_data_out = 0x00;
 	m_data_in = 0x00;
 	m_p1 = 0xff;
 	m_p2 = 0xff;
 
-	save_item(NAME(m_iobase));
 	save_item(NAME(m_status));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_data_in));
@@ -160,6 +160,7 @@ void multifont_device::device_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_bus_reset));
+	save_item(NAME(m_hard_reset));
 }
 
 //-------------------------------------------------
@@ -167,15 +168,16 @@ void multifont_device::device_start()
 //-------------------------------------------------
 void multifont_device::device_reset()
 {
+	uint8_t iobase;
+
 	m_status = 0x00;
-	address_space &space = m_bus->iospace();
 
-	if (m_iobase != 0) {
-		space.unmap_readwrite(m_iobase, m_iobase+1);
+	if (m_hard_reset) {
+		address_space &space = m_bus->iospace();
+		iobase = (m_ioport->read() & 0x06) + 0xf8;
+		space.install_device(iobase, iobase+1, *this, &multifont_device::map);
+		m_hard_reset = false;
 	}
-	m_iobase = (m_ioport->read() & 0x06) + 0xf8;
-
-	space.install_device(m_iobase, m_iobase+1, *this, &multifont_device::map);
 
 	m_bus_reset = true;
 }

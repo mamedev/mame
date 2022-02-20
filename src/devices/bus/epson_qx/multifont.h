@@ -62,8 +62,6 @@ private:
 	required_memory_region_array<8> m_fonts;
 	required_ioport m_ioport;
 
-	offs_t  m_iobase;
-
 	uint8_t m_status;
 
 	uint8_t m_data_out;
@@ -75,6 +73,7 @@ private:
 	uint8_t m_rom_bank;
 
 	bool m_bus_reset;
+	bool m_hard_reset;
 };
 
 } // namespace bus::epson_qx
