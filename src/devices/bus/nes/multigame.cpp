@@ -3344,7 +3344,7 @@ void nes_bmc_891227_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_891227 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x4000)
-	     data = (data & 0x80) >> 2 | (data & 0x60) << 1 | (data & 0x1f);
+		 data = (data & 0x80) >> 2 | (data & 0x60) << 1 | (data & 0x1f);
 
 	nes_bmc_ctc12in1_device::write_h(offset, data);
 

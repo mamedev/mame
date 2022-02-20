@@ -358,13 +358,13 @@ void tsconf_state::spectrum_UpdateBorderBitmap()
 }
 
 /*
-SFILE	Reg.16	7		6		5		4		3		2		1		0
-0		R0L		Y[7:0]
-1		R0H		YF		LEAP	ACT		-		YS[2:0]					Y[8]
-2		R1L		X[7:0]
-3		R1H		XF		-		-		-		XS[2:0]					X[8]
-4		R2L		TNUM[7:0]
-5		R2H		SPAL[7:4]						TNUM[11:8]
+SFILE   Reg.16  7       6       5       4       3       2       1       0
+0       R0L     Y[7:0]
+1       R0H     YF      LEAP    ACT     -       YS[2:0]                 Y[8]
+2       R1L     X[7:0]
+3       R1H     XF      -       -       -       XS[2:0]                 X[8]
+4       R2L     TNUM[7:0]
+5       R2H     SPAL[7:4]                       TNUM[11:8]
 */
 void tsconf_state::draw_sprites(const rectangle &cliprect)
 {

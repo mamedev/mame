@@ -9,25 +9,25 @@
 
     32k ram
     32k eprom
-	15.6672Mhz crystal
-	SWIM 1 Chip (1987)
+    15.6672Mhz crystal
+    SWIM 1 Chip (1987)
     65c02 processor (~2mhz)
 
-	uc:
+    uc:
 
-	$0000-$7fff is ram
-	$8000-$ffff is rom
-	$0a00-$0aff is i/o
+    $0000-$7fff is ram
+    $8000-$ffff is rom
+    $0a00-$0aff is i/o
 
-	apple 2 bus:
+    apple 2 bus:
 
-	$c0n0-$c0nf - memory latch. selects a 1k window for $c800-$cbff
-	$cn00-$cnff - uc ram ($7b00-$7bff)
-	$c800-$cbff - uc ram ($0000-$3cff, based on memory latch)
-	$cc00-$cfff - uc ram ($7c00-$7fff) 
+    $c0n0-$c0nf - memory latch. selects a 1k window for $c800-$cbff
+    $cn00-$cnff - uc ram ($7b00-$7bff)
+    $c800-$cbff - uc ram ($0000-$3cff, based on memory latch)
+    $cc00-$cfff - uc ram ($7c00-$7fff)
 
-	spamming Control-D while booting will invoke the built-in
-	diagnostics.  An alternative entry is Cx0DG from the monitor.
+    spamming Control-D while booting will invoke the built-in
+    diagnostics.  An alternative entry is Cx0DG from the monitor.
 
 *********************************************************************/
 

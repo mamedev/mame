@@ -147,7 +147,7 @@ void nesapu_device::device_start()
 	/*
 	pulse channel output:
 
-		     95.88
+	         95.88
 	-----------------------
 	      8128
 	----------------- + 100
@@ -163,7 +163,7 @@ void nesapu_device::device_start()
 	/*
 	triangle, noise, DMC channel output:
 
-		         159.79
+	             159.79
 	-------------------------------
 	            1
 	------------------------- + 100

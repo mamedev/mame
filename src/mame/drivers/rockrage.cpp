@@ -153,7 +153,7 @@ static INPUT_PORTS_START( rockrage )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )	// Actually noted as "テーブル" / "Table". Set here as initial in original Japanese version 
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) ) // Actually noted as "テーブル" / "Table". Set here as initial in original Japanese version
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "30k & Every 70k" )
