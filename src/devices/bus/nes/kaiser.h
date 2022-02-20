@@ -130,13 +130,14 @@ public:
 
 protected:
 	// construction/destruction
-	nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);
+	nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 a15_flip);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-	u8 m_latch, m_mask;
+	u8 m_latch;
+	const u8 m_a15_flip;
 };
 
 

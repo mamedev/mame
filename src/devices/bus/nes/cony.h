@@ -26,7 +26,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,8 +44,8 @@ protected:
 	u8 m_mmc_prg_bank[4];
 	u8 m_mmc_vrom_bank[8];
 	u8 m_extra_ram[4];
-	u16 m_extra_addr;
-	u8 m_mask;
+	const u16 m_extra_addr;
+	const u8 m_mask;
 	u8 m_mode_reg;
 	u8 m_outer_reg;
 };

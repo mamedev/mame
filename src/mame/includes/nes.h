@@ -22,31 +22,8 @@
 #include "screen.h"
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define NES_BATTERY_SIZE 0x2000
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/*PPU fast banking constants and structures */
-
-#define CHRROM 0
-#define CHRRAM 1
-
-
-/*PPU nametable fast banking constants and structures */
-
-#define CIRAM 0
-#define ROM 1
-#define EXRAM 2
-#define MMC5FILL 3
-#define CART_NTRAM 4
-
-#define NES_BATTERY 0
-#define NES_WRAM 1
 
 class nes_base_state : public driver_device
 {
@@ -115,16 +92,13 @@ public:
 	void fds(machine_config &config);
 	void nes_map(address_map &map);
 private:
-	memory_bank       *m_prg_bank_mem[5];
-
-	/* video-related */
+	// video-related
 	int m_last_frame_flip;
 
-	/* misc */
+	// misc
 	ioport_port       *m_io_disksel;
 
-	uint8_t      *m_vram;
-	std::unique_ptr<uint8_t[]>    m_ciram; //PPU nametable RAM - external to PPU!
+	std::unique_ptr<uint8_t[]>    m_ciram; // PPU nametable RAM - external to PPU!
 
 	required_shared_ptr<uint8_t> m_mainram;
 
