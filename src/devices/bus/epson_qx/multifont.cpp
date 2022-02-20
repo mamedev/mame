@@ -21,8 +21,8 @@
  *          Left:  Extends to the left 0 = No, 1 = Yes
  *          Down:  Extends downwards 0 = No, 1 = Yes
  *        Write:
- *          Data wriiten to this consists of a command byte followed by two bytes representing
- *          the character code being requested, low byte first. (0x0000-0x0DFF)
+ *          Data written to this consists of a command byte followed by two bytes representing
+ *          the character code being requested, least significant byte first. (0x0000-0x0DFF)
  *          Command byte:
  *          ------------------------------------------
  *          |  1  |  MODE  |  0  0  0  0  0  |  BIT  |
@@ -182,12 +182,12 @@ void multifont_device::device_reset()
 
 uint8_t multifont_device::t0_r()
 {
-	return m_status & 0x01;
+	return BIT(m_status, 0);
 }
 
 uint8_t multifont_device::t1_r()
 {
-	return (m_status & 0x80) >> 7;
+	return BIT(m_status, 7);
 }
 
 void multifont_device::write_bus(uint8_t data)
@@ -202,10 +202,10 @@ void multifont_device::write_bus(uint8_t data)
 
 uint8_t multifont_device::read_bus()
 {
-	if (m_p1 & 0x01) {
+	if (BIT(m_p1, 0)) {
 		m_status = (m_status & 0xfe);
 		return m_data_in;
-	} else if (m_p1 & 0x02) {
+	} else if (BIT(m_p1, 1)) {
 		uint8_t *rom = m_fonts[m_rom_bank]->base();
 		return rom[m_address];
 	}
@@ -215,7 +215,7 @@ uint8_t multifont_device::read_bus()
 void multifont_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
-	if ((m_p1 & 0x80) == 0) {
+	if (BIT(m_p1, 7) == 0) {
 		get_slot()->intl_w(ASSERT_LINE);
 	}
 }
