@@ -250,7 +250,9 @@ uint8_t multifont_device::read(offs_t offset)
 {
 	if (offset) {
 		if (!machine().side_effects_disabled()) {
-			get_slot()->intl_w(CLEAR_LINE);
+			if (BIT(m_p1, 7)) {
+				get_slot()->intl_w(CLEAR_LINE);
+			}
 		}
 		return m_status;
 	}
