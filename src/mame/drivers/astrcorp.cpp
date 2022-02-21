@@ -1218,7 +1218,7 @@ ROM_START( magibombf )
 	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, BAD_DUMP CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) )
+	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, CRC(532b7aae) SHA1(cb93a3061a05a9741d01fcdc19b7319ad4792e49) )
 ROM_END
 
 /***************************************************************************
