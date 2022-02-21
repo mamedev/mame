@@ -63,7 +63,7 @@ public:
 	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
 	uint8_t dma2_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
 	void dma2_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
-	
+
 	void dump();
 
 protected:
@@ -88,7 +88,7 @@ private:
 		DMAMAP_R0_LO,
 		DMAMAP_R0_HI
 	};
-	
+
 	offs_t get_physical_offset(offs_t offset, int task, bool &nonx, bool &wp);
 
 	offs_t get_dma_address(int index, uint16_t offset);
@@ -109,12 +109,12 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 
 	devcb_read8        m_read_fc;
-	devcb_write8   	   m_write_buserr;
+	devcb_write8       m_write_buserr;
 
 	bool m_boote;
 	bool m_magic;
 	int m_task;
-	
+
 	uint8_t m_dmamap[8];
 	uint8_t m_cause;
 };

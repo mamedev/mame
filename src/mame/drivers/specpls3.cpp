@@ -462,7 +462,7 @@ void specpls3_state::spectrum_plus3(machine_config &config)
     +2A/B has built-in tape "datacorder", +3/B has built-in 3" fdd
     +2A/+3 use common z70830 pcb with v4.0 rom  (fdc etc. unpopulated on +2A)
     +2B/+3B use unique z70833/z70835 pcbs but use same v4.1 rom
-	 
+
    Note, +2 (non-A/B, aka "grey case") although Amstrad built is essentially a re-cased Sinclair 128K, see spec128.cpp
 */
 ROM_START(specpl2a)

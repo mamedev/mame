@@ -5678,14 +5678,15 @@ public:
 		inp_fixed_last();
 	}
 
-	// R2 connects to a single LED behind the screen
-	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
-	output_finder<> m_led_out;
-
 	void tgaiden(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+
+private:
+	// R2 connects to a single LED behind the screen
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
+	output_finder<> m_led_out;
 };
 
 void tgaiden_state::machine_start()
@@ -5736,7 +5737,6 @@ INPUT_PORTS_END
 void tgaiden_state::tgaiden(machine_config &config)
 {
 	sm510_tiger(config, 1476, 1080);
-
 	m_maincpu->write_r().append(FUNC(tgaiden_state::led_w));
 }
 
@@ -8164,8 +8164,10 @@ public:
 		inp_fixed_last();
 	}
 
-	virtual void input_w(u8 data) override;
 	void tnmarebc(machine_config &config);
+
+private:
+	virtual void input_w(u8 data) override;
 };
 
 // handlers

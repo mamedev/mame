@@ -37,12 +37,12 @@ Features (TS-Configuration):
 
 Refs:
 ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-		Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-		Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
+        Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+        Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
 TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
-		https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
+        https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
 FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
-	ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
+    ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
 HowTo:
 # Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
@@ -139,8 +139,8 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 static const gfx_layout spectrum_charlayout =
 {
 	8, 8, /* 8 x 8 characters */
-	96,	  /* 96 characters */
-	1,	  /* 1 bits per pixel */
+	96,   /* 96 characters */
+	1,    /* 1 bits per pixel */
 	{0},  /* no bitplanes */
 	/* x offsets */
 	{STEP8(0, 1)},
@@ -174,10 +174,10 @@ static const gfx_layout tsconf_tile_16cpp_layout =
 };
 
 static GFXDECODE_START(gfx_tsconf)
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)		  // TM_TS_CHAR : TXT
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_TILES0  : T0 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_TILES1  : T1 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_SPRITES : Sprites 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)         // TM_TS_CHAR : TXT
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES0  : T0 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES1  : T1 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_SPRITES : Sprites 16cpp
 	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1) // TM_ZX_CHAR
 GFXDECODE_END
 
@@ -218,27 +218,27 @@ void tsconf_state::machine_reset()
 	m_port_f7_ext = DISABLED;
 
 	m_scanline_delayed_regs_update = {};
-	m_regs[V_CONFIG] = 0x00;		// 00000000
-	m_regs[V_PAGE] = 0x05;			// 00000101
-	m_regs[G_X_OFFS_L] = 0x00;		// 00000000
-	m_regs[G_X_OFFS_H] &= 0xfe;		// xxxxxxx0
-	m_regs[G_Y_OFFS_L] = 0x00;		// 00000000
-	m_regs[G_Y_OFFS_H] &= 0xfe;		// xxxxxxx0
-	m_regs[TS_CONFIG] &= 0x03;		// 000000xx
-	m_regs[PAL_SEL] = 0x0f;			// 00001111
-	m_regs[PAGE0] = 0x00;			// 00000000
-	m_regs[PAGE1] = 0x05;			// 00000101
-	m_regs[PAGE2] = 0x02;			// 00000010
-	m_regs[PAGE3] = 0x00;			// 00000000
-	m_regs[FMAPS] &= 0xef;			// xxx0xxxx
-	m_regs[SYS_CONFIG] = 0x00;		// 00000000
-	m_regs[MEM_CONFIG] = 0x04;		// 00000100
-	m_regs[HS_INT] = 0x01;			// 00000001
-	m_regs[VS_INT_L] = 0x00;		// 00000000
-	m_regs[VS_INT_H] &= 0x0e;		// 0000xxx0
-	m_regs[FDD_VIRT] &= 0xf0;		// xxxx0000
-	m_regs[INT_MASK] = 0x01;		// xxxxx001
-	m_regs[CACHE_CONFIG] &= 0xf0;	// xxxx0000
+	m_regs[V_CONFIG] = 0x00;        // 00000000
+	m_regs[V_PAGE] = 0x05;          // 00000101
+	m_regs[G_X_OFFS_L] = 0x00;      // 00000000
+	m_regs[G_X_OFFS_H] &= 0xfe;     // xxxxxxx0
+	m_regs[G_Y_OFFS_L] = 0x00;      // 00000000
+	m_regs[G_Y_OFFS_H] &= 0xfe;     // xxxxxxx0
+	m_regs[TS_CONFIG] &= 0x03;      // 000000xx
+	m_regs[PAL_SEL] = 0x0f;         // 00001111
+	m_regs[PAGE0] = 0x00;           // 00000000
+	m_regs[PAGE1] = 0x05;           // 00000101
+	m_regs[PAGE2] = 0x02;           // 00000010
+	m_regs[PAGE3] = 0x00;           // 00000000
+	m_regs[FMAPS] &= 0xef;          // xxx0xxxx
+	m_regs[SYS_CONFIG] = 0x00;      // 00000000
+	m_regs[MEM_CONFIG] = 0x04;      // 00000100
+	m_regs[HS_INT] = 0x01;          // 00000001
+	m_regs[VS_INT_L] = 0x00;        // 00000000
+	m_regs[VS_INT_H] &= 0x0e;       // 0000xxx0
+	m_regs[FDD_VIRT] &= 0xf0;       // xxxx0000
+	m_regs[INT_MASK] = 0x01;        // xxxxx001
+	m_regs[CACHE_CONFIG] &= 0xf0;   // xxxx0000
 
 	if (m_beta->started())
 		m_beta->enable();

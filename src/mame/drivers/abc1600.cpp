@@ -59,7 +59,7 @@
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - Z80 SCC DMA request
-	- [:2a:chb] - TX FIFO is full, discarding data
+    - [:2a:chb] - TX FIFO is full, discarding data
 
 */
 

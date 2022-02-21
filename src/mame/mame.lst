@@ -3421,6 +3421,7 @@ bbca                            // 1981 BBC Micro Model A
 bbcb                            // 1981 BBC Micro Model B
 bbcb_de                         // 1982 BBC Micro Model B (German)
 bbcb_us                         // 1983 BBC Micro Model B (US)
+bbcb_no                         // 1984 BBC Micro Model B (Norway)
 bbcbp                           // 1985 BBC Micro Model B+ 64K
 bbcbp128                        // 1985 BBC Micro Model B+ 128K
 bbcm                            // 1986 BBC Master 128
@@ -3445,6 +3446,7 @@ ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
 autoc15                         // 1988 Autocue 1500
 reutapm                         // 1985 Reuters APM Board
+sist1                           // 198? Cisco SIST1 Terminal
 torchf                          // 1982 Torch CF240
 torchh                          // 1982 Torch CH240
 torch301                        // 1984 Torch Model 301
@@ -14024,6 +14026,7 @@ granits                         // RCS
 miniscco
 
 @source:fidel_phantom.cpp
+cphantom                        //
 fphantom                        //
 
 @source:fidel_sc12.cpp
@@ -14657,6 +14660,7 @@ mandinga                        // bootleg (Artemi)
 mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
+mandinka                        // bootleg
 meteora                         // bootleg (Alca)
 mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonsco                        // (c) 1982 bootleg
@@ -16688,6 +16692,7 @@ copycatm2                       // Tiger Electronics
 cqback                          // Coleco
 dataman                         // Texas Instruments
 ditto                           // Tiger Electronics
+dxfootb                         // Tiger Electronics
 ebaskb2                         // Entex
 ebball                          // Entex
 ebball2                         // Entex
@@ -43744,6 +43749,7 @@ wy75                            // WY-75
 
 @source:wy55.cpp
 wy55                            // WY-55
+wy65                            // WY-65
 
 @source:wy60.cpp
 wy60                            // WY-60

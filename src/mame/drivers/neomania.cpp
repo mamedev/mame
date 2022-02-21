@@ -2,7 +2,7 @@
 // copyright-holders:
 /*
 Neo Mania:
- The Portuguese (Vila Nova de Gaia) company "Hyper M.A.R." created this machine on 2002 with 40 games, 
+ The Portuguese (Vila Nova de Gaia) company "Hyper M.A.R." created this machine on 2002 with 40 games,
  and updated it on 2003 increasing the number of games up to 48. There was a latest newer version
  where they added "Strikers 1945" and "Prehistoric Isle 2", reaching 50 games.
  There are Spanish and Portuguese localizations.

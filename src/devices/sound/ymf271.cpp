@@ -18,7 +18,7 @@
       "determines if slot output is accumulated(1), or output directly(0)"
     - Is memory handling 100% correct? At the moment, seibuspi.cpp is the only
       hardware currently emulated that uses external handlers.
-	- *16 multiplier for timer B is free-running like other yamaha FM chips?
+    - *16 multiplier for timer B is free-running like other yamaha FM chips?
 */
 
 #include "emu.h"
@@ -254,10 +254,10 @@ inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 		return;
 
 	/*
-    bit scheme is kinda twisted
-    status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
-    status2 End44 End32 End20 End8  End40 End28 End16 End4
-    */
+	bit scheme is kinda twisted
+	status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
+	status2 End44 End32 End20 End8  End40 End28 End16 End4
+	*/
 	uint8_t subbit = slotnum / 12;
 	uint8_t bankbit = ((slotnum % 12) >> 2);
 

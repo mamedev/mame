@@ -129,6 +129,7 @@ void k1003_state::seg_w(uint8_t data)
 void k1003_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
+	map.global_mask(0x1f);
 	map(0x00, 0x00).r(FUNC(k1003_state::key_r));
 	map(0x02, 0x02).r(FUNC(k1003_state::port2_r));
 

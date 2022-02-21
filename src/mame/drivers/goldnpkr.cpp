@@ -4633,13 +4633,13 @@ void goldnpkr_state::caspoker(machine_config &config)
 void goldnpkr_state::gldnirq0(machine_config &config)
 {
 	goldnpkr_base(config);
-	
+
 	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -11133,12 +11133,12 @@ ROM_START( boasorte )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL( 0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
-	ROM_COPY( "gfx", 0x0000,  0x1000, 0X0800 )
+	ROM_COPY( "gfx", 0x0000,  0x1000, 0x0800 )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "gfx", 0x8000,  0x0000, 0X0800 ) 
-	ROM_COPY( "gfx", 0xC000,  0x0800, 0X0800 ) 
-	ROM_COPY( "gfx", 0x0800,  0x1000, 0X0800 )
+	ROM_COPY( "gfx", 0x8000,  0x0000, 0x0800 )
+	ROM_COPY( "gfx", 0xC000,  0x0800, 0x0800 )
+	ROM_COPY( "gfx", 0x0800,  0x1000, 0x0800 )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )

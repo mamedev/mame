@@ -74,6 +74,6 @@ int abc1600_format::get_image_offset(const format &f, int head, int track)
 		const format &tf = get_track_format(f, head, trk);
 		offset += compute_track_size(tf);
 	}
-	
+
 	return offset;
 }

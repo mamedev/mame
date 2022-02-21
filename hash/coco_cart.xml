@@ -57,7 +57,8 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<!--software name="alphazoo">
+	<!--
+	<software name="alphazoo">
 	    <description>Alphabet Zoo</description>
 	    <year>1984</year>
 	    <publisher>Tandy</publisher>
@@ -68,7 +69,8 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	            <rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="16384" crc="dae0e23d" sha1="f27b97b81eccd0314f71894cbd2e0aed7ccab525"/>
 	        </dataarea>
 	    </part>
-	</software-->
+	</software>
+	-->
 
 	<software name="amazing">
 		<description>A Mazing World of Malcom Mortar</description>

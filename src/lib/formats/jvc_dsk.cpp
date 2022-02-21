@@ -105,8 +105,10 @@
 ***************************************************************************/
 
 #include "jvc_dsk.h"
+
 #include "ioprocs.h"
-#include "imageutl.h"
+
+#include "osdcore.h" // osd_printf_*
 
 
 jvc_format::jvc_format()
@@ -154,7 +156,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 	switch (header_size)
 	{
 	case 5:
-		LOG_FORMATS("jvc_format: sector attribute flag unsupported\n");
+		osd_printf_info("jvc_format: sector attribute flag unsupported\n");
 		return false;
 	case 4: base_sector_id = header[3];
 		[[fallthrough]];
@@ -168,7 +170,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 		break;
 	}
 
-	LOG_FORMATS("jvc_format: Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
+	osd_printf_verbose("jvc_format: Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
 
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
@@ -190,7 +192,7 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	// safety check
 	if (sector_count * sector_size > 10000)
 	{
-		LOG_FORMATS("jvc_format: incorrect track layout\n");
+		osd_printf_error("jvc_format: incorrect track layout\n");
 		return false;
 	}
 
@@ -198,13 +200,13 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	if (track_count > max_tracks)
 	{
-		LOG_FORMATS("jvc_format: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, max_tracks);
+		osd_printf_error("jvc_format: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, max_tracks);
 		return false;
 	}
 
 	if (head_count > max_heads)
 	{
-		LOG_FORMATS("jvc_format: Floppy disk has too many sides for this drive (floppy sides=%d, drive sides=%d).\n", head_count, max_heads);
+		osd_printf_error("jvc_format: Floppy disk has too many sides for this drive (floppy sides=%d, drive sides=%d).\n", head_count, max_heads);
 		return false;
 	}
 
@@ -274,7 +276,7 @@ bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			{
 				if (sectors[1 + i].size() != 256)
 				{
-					LOG_FORMATS("jvc_format: invalid sector size: %d\n", sectors[1 + i].size());
+					osd_printf_error("jvc_format: invalid sector size: %d\n", sectors[1 + i].size());
 					return false;
 				}
 
