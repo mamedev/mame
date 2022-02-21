@@ -11,8 +11,8 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "machine/toaplan_gxl.h"
 #include "sound/ymopl.h"
+#include "machine/toaplan_dsp_interface.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
@@ -193,7 +193,8 @@ class toaplan1_demonwld_state : public toaplan1_state
 public:
 	toaplan1_demonwld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		toaplan1_state(mconfig, type, tag),
-		m_gxl(*this, "gxl")
+		m_dsp(*this, "dsp"),
+		m_dsp_intf(*this, "dsp_intf")
 	{
 	}
 
@@ -206,7 +207,10 @@ private:
 	bool dsp_write_cb(u32 main_ram_seg, u32 dsp_addr, bool &dsp_execute, u16 data);
 	void dsp_ctrl_w(u8 data);
 
-	required_device<toaplan_gxl_device> m_gxl;
+	required_device<tms32010_device> m_dsp;
+	required_device<toaplan_dsp_intf_device> m_dsp_intf;
+
+	void dsp_io_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 };

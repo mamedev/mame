@@ -2,20 +2,24 @@
 // copyright-holders:Quench
 /***************************************************************************
 
-    Toaplan GXL-0x family MCU (and compatible clones)
-    Toaplan used this chip at 1987 to 1990 for protection and DSP operations.
-    This chip has embedded TMS320C10 DSP with internal ROM,
-    There's 4 Known revisions:
+    Toaplan common DSP interface emulation
 
-        GXL-01 (Hishou Zame)
-        GXL-02 (Flying Shark, Sky Shark, Wardner, Pyros, Wardner no Mori)
-        GXL-03 (Kyukyoku Tiger)
-        GXL-04 (Twin Cobra, Demon's World, Horror Story)
+    Toaplan used custom GXC DSP* with common interface at 1987 to 1990
+    for protection and DSP operations,
+    Some bootleg hardware also cloned this configurations.
+
+    Used at:
+    - twincobr.cpp (All hardwares)
+    - wardner.cpp (All hardwares)
+    - toaplan1.cpp (demonwld)
+
+    * it's actually TI TMS320C10 with pre-programmed on-chip ROM,
+      see toaplan_gxc.cpp
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/toaplan_gxl.h"
+#include "machine/toaplan_dsp_interface.h"
 
 
 #define LOG_DSP_CALLS      (1U<<1)
@@ -26,12 +30,12 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(TOAPLAN_GXL, toaplan_gxl_device, "toaplan_gxl", "Toaplan GXL DSP")
+DEFINE_DEVICE_TYPE(TOAPLAN_DSP_INTF, toaplan_dsp_intf_device, "toaplan_dsp_intf", "Toaplan DSP Interface")
 
 
-toaplan_gxl_device::toaplan_gxl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, TOAPLAN_GXL, tag, owner, clock),
-	m_dsp(*this, "dsp"),
+toaplan_dsp_intf_device::toaplan_dsp_intf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, TOAPLAN_DSP_INTF, tag, owner, clock),
+	m_dsp(*this, finder_base::DUMMY_TAG),
 	m_halt_cb(*this),
 	m_dsp_addr_cb(*this),
 	m_dsp_read_cb(*this),
@@ -40,7 +44,7 @@ toaplan_gxl_device::toaplan_gxl_device(const machine_config &mconfig, const char
 }
 
 
-void toaplan_gxl_device::dsp_addrsel_w(u16 data)
+void toaplan_dsp_intf_device::dsp_addrsel_w(u16 data)
 {
 	// This sets the main CPU RAM address the DSP should
 	//  read/write, via the DSP IO port 0
@@ -50,7 +54,7 @@ void toaplan_gxl_device::dsp_addrsel_w(u16 data)
 }
 
 
-u16 toaplan_gxl_device::dsp_r()
+u16 toaplan_dsp_intf_device::dsp_r()
 {
 	// DSP can read data from main CPU RAM via DSP IO port 1
 
@@ -64,7 +68,7 @@ u16 toaplan_gxl_device::dsp_r()
 }
 
 
-void toaplan_gxl_device::dsp_w(u16 data)
+void toaplan_dsp_intf_device::dsp_w(u16 data)
 {
 	// Data written to main CPU RAM via DSP IO port 1
 
@@ -77,7 +81,7 @@ void toaplan_gxl_device::dsp_w(u16 data)
 }
 
 
-void toaplan_gxl_device::dsp_bio_w(u16 data)
+void toaplan_dsp_intf_device::dsp_bio_w(u16 data)
 {
 	// data 0xffff  means inhibit BIO line to DSP and enable
 	//              communication to main processor
@@ -102,13 +106,13 @@ void toaplan_gxl_device::dsp_bio_w(u16 data)
 }
 
 
-READ_LINE_MEMBER(toaplan_gxl_device::bio_r)
+READ_LINE_MEMBER(toaplan_dsp_intf_device::bio_r)
 {
 	return m_dsp_bio;
 }
 
 
-WRITE_LINE_MEMBER(toaplan_gxl_device::dsp_int_w)
+WRITE_LINE_MEMBER(toaplan_dsp_intf_device::dsp_int_w)
 {
 	m_dsp_on = state;
 	if (state)
@@ -129,33 +133,7 @@ WRITE_LINE_MEMBER(toaplan_gxl_device::dsp_int_w)
 }
 
 
-void toaplan_gxl_device::dsp_program_map(address_map &map)
-{
-	map(0x000, 0x7ff).rom().region("dsp", 0);
-}
-
-
-// $000 - 08F  TMS32010 Internal Data RAM in Data Address Space
-
-
-void toaplan_gxl_device::dsp_io_map(address_map &map)
-{
-	map(0x00, 0x00).w(FUNC(toaplan_gxl_device::dsp_addrsel_w));
-	map(0x01, 0x01).rw(FUNC(toaplan_gxl_device::dsp_r), FUNC(toaplan_gxl_device::dsp_w));
-	map(0x03, 0x03).w(FUNC(toaplan_gxl_device::dsp_bio_w));
-}
-
-
-void toaplan_gxl_device::device_add_mconfig(machine_config &config)
-{
-	TMS32010(config, m_dsp, DERIVED_CLOCK(1,1));
-	m_dsp->set_addrmap(AS_PROGRAM, &toaplan_gxl_device::dsp_program_map);
-	m_dsp->set_addrmap(AS_IO, &toaplan_gxl_device::dsp_io_map);
-	m_dsp->bio().set(FUNC(toaplan_gxl_device::bio_r));
-}
-
-
-void toaplan_gxl_device::device_resolve_objects()
+void toaplan_dsp_intf_device::device_resolve_objects()
 {
 	m_halt_cb.resolve_safe();
 	m_dsp_addr_cb.resolve();
@@ -164,13 +142,13 @@ void toaplan_gxl_device::device_resolve_objects()
 }
 
 
-void toaplan_gxl_device::device_post_load()
+void toaplan_dsp_intf_device::device_post_load()
 {
 	dsp_int_w(m_dsp_on);
 }
 
 
-void toaplan_gxl_device::device_start()
+void toaplan_dsp_intf_device::device_start()
 {
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
@@ -180,10 +158,11 @@ void toaplan_gxl_device::device_start()
 }
 
 
-void toaplan_gxl_device::device_reset()
+void toaplan_dsp_intf_device::device_reset()
 {
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = false;
 	m_dsp_bio = CLEAR_LINE;
 }
+

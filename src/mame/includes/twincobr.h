@@ -11,9 +11,9 @@
 
 #include "cpu/tms32010/tms32010.h"
 #include "machine/74259.h"
-#include "machine/toaplan_gxl.h"
-#include "video/mc6845.h"
 #include "video/bufsprite.h"
+#include "video/mc6845.h"
+#include "machine/toaplan_dsp_interface.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
@@ -28,7 +28,8 @@ public:
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
-		m_gxl(*this, "gxl"),
+		m_dsp(*this, "dsp"),
+		m_dsp_intf(*this, "dsp_intf"),
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -39,11 +40,13 @@ public:
 
 	void twincobr(machine_config &config);
 	void twincobrw(machine_config &config);
-	void fsharkbt(machine_config &config);
+	void ktiger(machine_config &config);
 	void fshark(machine_config &config);
+	void fshark_gxc(machine_config &config);
+	void hishouza(machine_config &config);
+	void fsharkbt(machine_config &config);
 
 	void init_twincobr();
-	void init_fsharkbt();
 
 protected:
 	virtual void machine_reset() override;
@@ -130,7 +133,8 @@ protected:
 	void log_vram();
 	void driver_savestate();
 	required_device<cpu_device> m_maincpu;
-	required_device<toaplan_gxl_device> m_gxl;
+	required_device<tms32010_device> m_dsp;
+	required_device<toaplan_dsp_intf_device> m_dsp_intf;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -138,7 +142,10 @@ protected:
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_coinlatch;
 
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void fsharkbt_i8741_io_map(address_map &map);
+	void fsharkbt_dsp_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);

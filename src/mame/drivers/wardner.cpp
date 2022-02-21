@@ -130,10 +130,10 @@ out:
 #include "includes/twincobr.h"
 #include "includes/toaplipt.h"
 
-#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "sound/ymopl.h"
+#include "machine/toaplan_gxc.h"
 #include "speaker.h"
 
 namespace {
@@ -149,6 +149,7 @@ public:
 	}
 
 	void wardner(machine_config &config);
+	void wardner_gxc(machine_config &config);
 
 	void init_wardner();
 
@@ -394,11 +395,17 @@ void wardner_state::wardner(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	TOAPLAN_GXL(config, m_gxl, XTAL(14'000'000));       // 14MHz Crystal CLKin
-	m_gxl->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_gxl->set_dsp_addr_callback(FUNC(wardner_state::wardner_dsp_addr_cb));
-	m_gxl->set_dsp_read_callback(FUNC(wardner_state::wardner_dsp_read_cb));
-	m_gxl->set_dsp_write_callback(FUNC(wardner_state::wardner_dsp_write_cb));
+	TMS32010(config, m_dsp, XTAL(14'000'000));       // 14MHz Crystal CLKin
+	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(m_dsp_intf, FUNC(toaplan_dsp_intf_device::bio_r));
+
+	TOAPLAN_DSP_INTF(config, m_dsp_intf, XTAL(14'000'000));       // 14MHz Crystal CLKin
+	m_dsp_intf->set_dsp_tag(m_dsp);
+	m_dsp_intf->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dsp_intf->set_dsp_addr_callback(FUNC(wardner_state::wardner_dsp_addr_cb));
+	m_dsp_intf->set_dsp_read_callback(FUNC(wardner_state::wardner_dsp_read_cb));
+	m_dsp_intf->set_dsp_write_callback(FUNC(wardner_state::wardner_dsp_write_cb));
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame
 
@@ -410,7 +417,7 @@ void wardner_state::wardner(machine_config &config)
 	m_mainlatch->q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
 	LS259(config, m_coinlatch);
-	m_coinlatch->q_out_cb<0>().set(m_gxl, FUNC(toaplan_gxl_device::dsp_int_w));
+	m_coinlatch->q_out_cb<0>().set(m_dsp_intf, FUNC(toaplan_dsp_intf_device::dsp_int_w));
 	m_coinlatch->q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
 	m_coinlatch->q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
 	m_coinlatch->q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
@@ -448,6 +455,16 @@ void wardner_state::wardner(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void wardner_state::wardner_gxc(machine_config &config)
+{
+	wardner(config);
+
+	// D70012U GXC-02 MCU ^ 71900
+	TOAPLAN_GXC_02(config.replace(), m_dsp, XTAL(14'000'000));
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(m_dsp_intf, FUNC(toaplan_dsp_intf_device::bio_r));
+}
+
 
 
 /***************************************************************************
@@ -465,9 +482,6 @@ ROM_START( wardner )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
-
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  // Co-Processor TMS320C10
-	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
 
 	ROM_REGION( 0x0c000, "chars", 0 )
 	ROM_LOAD( "b25-28.10f", 0x00000, 0x04000, CRC(1392b60d) SHA1(86b9eab87f8d5f68fda500420f4ed61331089fc2) )
@@ -511,7 +525,7 @@ ROM_START( wardnerb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  // Co-Processor TMS320C10
+	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10
 	ROMX_LOAD( "82s137.1d",  0x0000, 0x0400, CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // MSB
 	ROMX_LOAD( "82s137.1e",  0x0000, 0x0400, CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "82s137.3d",  0x0001, 0x0400, CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // LSB
@@ -562,9 +576,6 @@ ROM_START( pyros )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  // Co-Processor TMS320C10
-	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
-
 	ROM_REGION( 0x0c000, "chars", 0 )
 	ROM_LOAD( "b25-35.10f", 0x00000, 0x04000, CRC(fec6f0c0) SHA1(f91d698fa0712659c2e6b382a8166b1cacc50a3f) )
 	ROM_LOAD( "b25-34.8f",  0x04000, 0x04000, CRC(02505dad) SHA1(28993c68a17929d6b819ca81cdf60985531fc80b) )
@@ -605,9 +616,6 @@ ROM_START( wardnerj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
-
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  // Co-Processor TMS320C10
-	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
 
 	ROM_REGION( 0x0c000, "chars", 0 )
 	ROM_LOAD( "b25-07.10f", 0x00000, 0x04000, CRC(50e329e0) SHA1(5d5fb7043457d952b28101acb909ed65bf13a2dc) )
@@ -652,7 +660,7 @@ ROM_START( wardnerjb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "16.bin", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  // Co-Processor TMS320C10, not dumped for this set
+	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10, not dumped for this set
 	ROMX_LOAD( "82s137.1d", 0x0000, 0x0400, BAD_DUMP CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // MSB
 	ROMX_LOAD( "82s137.1e", 0x0000, 0x0400, BAD_DUMP CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "82s137.3d", 0x0001, 0x0400, BAD_DUMP CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // LSB
@@ -699,8 +707,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                             "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                             "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,   0,       wardner_gxc, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerb,  wardner, wardner,     wardner,   wardner_state, empty_init, ROT0, "bootleg",                             "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,     wardner, wardner_gxc, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj,  wardner, wardner_gxc, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerjb, wardner, wardner,     wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                             "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

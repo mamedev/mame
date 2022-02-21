@@ -88,8 +88,8 @@ void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
 
 	switch (data)
 	{
-		case 0x00:  m_gxl->dsp_int_w(ASSERT_LINE); break;  /* Enable the INT line to the DSP */
-		case 0x01:  m_gxl->dsp_int_w(CLEAR_LINE);  break;  /* Inhibit the INT line to the DSP */
+		case 0x00:  m_dsp_intf->dsp_int_w(ASSERT_LINE); break;  /* Enable the INT line to the DSP */
+		case 0x01:  m_dsp_intf->dsp_int_w(CLEAR_LINE);  break;  /* Inhibit the INT line to the DSP */
 		default:    logerror("68000:%08x  Writing unknown command %02x to $e0000b\n",m_maincpu->pcbase() ,data); break;
 	}
 }

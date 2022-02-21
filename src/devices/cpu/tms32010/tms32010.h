@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
 	/**************************************************************************\
-	*                 Texas Instruments TMS32010 DSP Emulator                  *
+	*                 Texas Instruments TMS3201X DSP Emulator                  *
 	*                                                                          *
 	*                  Copyright Tony La Porta                                 *
 	*                                                                          *
@@ -31,19 +31,18 @@ enum
  */
 
 
-class tms32010_device : public cpu_device
+class tms3201x_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
-	auto bio() { return m_bio_in.bind(); }
+	auto bio() { return m_bio_in.bind(); } // BIO pin
+	void set_mp_mc(bool state) { m_mp_mc = state; } // MP/MC pin
 
-	void tms32010_ram(address_map &map);
-	void tms32015_ram(address_map &map);
+	void ram_144_map(address_map &map);
+	void ram_256_map(address_map &map);
+
 protected:
-	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
+	tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_width, uint32_t rom_size, address_map_constructor data_map, address_map_constructor io_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -67,14 +66,13 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
 	devcb_read_line m_bio_in;
 
-	typedef void ( tms32010_device::*opcode_func ) ();
+	typedef void ( tms3201x_base_device::*opcode_func ) ();
 	struct tms32010_opcode
 	{
 		uint8_t       cycles;
@@ -87,24 +85,35 @@ private:
 	uint16_t  m_PC;
 	uint16_t  m_PREVPC;     /* previous program counter */
 	uint16_t  m_STR;
-	PAIR    m_ACC;
-	PAIR    m_ALU;
-	PAIR    m_Preg;
+	PAIR      m_ACC;
+	PAIR      m_ALU;
+	PAIR      m_Preg;
 	uint16_t  m_Treg;
 	uint16_t  m_AR[2];
 	uint16_t  m_STACK[4];
 
-	PAIR    m_opcode;
-	int     m_INTF;       /* Pending Interrupt flag */
-	int     m_icount;
-	PAIR    m_oldacc;
+	PAIR      m_opcode;
+	int       m_INTF;       /* Pending Interrupt flag */
+	int       m_icount;
+	PAIR      m_oldacc;
 	uint16_t  m_memaccess;
-	int     m_addr_mask;
+	int       m_addr_mask;
+	uint32_t  m_rom_size;   // Size of internal ROM (words)
+	bool      m_mp_mc;      // MP/MC pin
+
+	optional_memory_region m_internal_rom;
 
 	memory_access<12, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_cache16;
 	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program16;
 	memory_access< 8, 1, -1, ENDIANNESS_BIG>::specific m_data;
 	memory_access< 4, 1, -1, ENDIANNESS_BIG>::specific m_io;
+
+	std::function<u16 (offs_t)> m_op_r16;
+
+	std::function<u16 (offs_t)> m_prg_r16;
+	std::function<void (offs_t, u16)> m_prg_w16;
 
 	inline void CLR(uint16_t flag);
 	inline void SET_FLAG(uint16_t flag);
@@ -187,19 +196,39 @@ private:
 };
 
 
-class tms32015_device : public tms32010_device
+class tms32010_device : public tms3201x_base_device
+{
+public:
+	// construction/destruction
+	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// construction/destruction
+	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
+};
+
+
+class tms32015_device : public tms3201x_base_device
 {
 public:
 	// construction/destruction
 	tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// construction/destruction
+	tms32015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 };
 
 
-class tms32016_device : public tms32010_device
+class tms32016_device : public tms3201x_base_device
 {
 public:
 	// construction/destruction
 	tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// construction/destruction
+	tms32016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 };
 
 

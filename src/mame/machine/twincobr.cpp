@@ -155,7 +155,7 @@ u16 twincobr_state::fsharkbt_dsp_r()
 	if (!machine().side_effects_disabled())
 	{
 		m_fsharkbt_8741 += 1;
-		LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",m_gxl->dsp().pcbase(),(m_fsharkbt_8741 & 0x08)));
+		LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",m_dsp->pcbase(),(m_fsharkbt_8741 & 0x08)));
 	}
 	return (m_fsharkbt_8741 & 1);
 }
@@ -165,7 +165,7 @@ void twincobr_state::fsharkbt_dsp_w(u16 data)
 {
 	/* Flying Shark bootleg DSP writes data to an extra MCU (8741) at IO port 2 */
 #if 0
-	logerror("DSP PC:%04x IO write from DSP RAM:%04x to 8741 MCU (port 2)\n",m_gxl->dsp().pcbase(),m_fsharkbt_8741);
+	logerror("DSP PC:%04x IO write from DSP RAM:%04x to 8741 MCU (port 2)\n",m_dsp->pcbase(),m_fsharkbt_8741);
 #endif
 }
 

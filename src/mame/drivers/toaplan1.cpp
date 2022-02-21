@@ -612,6 +612,7 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 #include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"
 #include "machine/74259.h"
+#include "machine/toaplan_gxc.h"
 #include "speaker.h"
 
 
@@ -921,6 +922,16 @@ void toaplan1_state::outzone_sound_io_map(address_map &map)
 	map(0x14, 0x14).portr("P1");
 	map(0x18, 0x18).portr("P2");
 	map(0x1c, 0x1c).portr("TJUMP");
+}
+
+
+/***************************** TMS32010 Memory Map **************************/
+
+void toaplan1_demonwld_state::dsp_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(m_dsp_intf, FUNC(toaplan_dsp_intf_device::dsp_addrsel_w));
+	map(0x01, 0x01).rw(m_dsp_intf, FUNC(toaplan_dsp_intf_device::dsp_r), FUNC(toaplan_dsp_intf_device::dsp_w));
+	map(0x03, 0x03).w(m_dsp_intf, FUNC(toaplan_dsp_intf_device::dsp_bio_w));
 }
 
 
@@ -2070,11 +2081,17 @@ void toaplan1_demonwld_state::demonwld(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_demonwld_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_demonwld_state::sound_io_map);
 
-	TOAPLAN_GXL(config, m_gxl, XTAL(28'000'000) / 2);
-	m_gxl->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_gxl->set_dsp_addr_callback(FUNC(toaplan1_demonwld_state::dsp_addr_cb));
-	m_gxl->set_dsp_read_callback(FUNC(toaplan1_demonwld_state::dsp_read_cb));
-	m_gxl->set_dsp_write_callback(FUNC(toaplan1_demonwld_state::dsp_write_cb));
+	// D70016U GXC-04 MCU ^ 91300
+	TOAPLAN_GXC_04(config, m_dsp, XTAL(28'000'000) / 2);
+	m_dsp->set_addrmap(AS_IO, &toaplan1_demonwld_state::dsp_io_map);
+	m_dsp->bio().set(m_dsp_intf, FUNC(toaplan_dsp_intf_device::bio_r));
+
+	TOAPLAN_DSP_INTF(config, m_dsp_intf, XTAL(28'000'000) / 2);
+	m_dsp_intf->set_dsp_tag(m_dsp);
+	m_dsp_intf->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dsp_intf->set_dsp_addr_callback(FUNC(toaplan1_demonwld_state::dsp_addr_cb));
+	m_dsp_intf->set_dsp_read_callback(FUNC(toaplan1_demonwld_state::dsp_read_cb));
+	m_dsp_intf->set_dsp_write_callback(FUNC(toaplan1_demonwld_state::dsp_write_cb));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -2537,10 +2554,6 @@ ROM_START( demonwld )
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11.v2",  0x0000, 0x8000, CRC(dbe08c85) SHA1(536a242bfe916d15744b079261507af6f12b5b50) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
-
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
 	ROM_LOAD16_BYTE( "rom07",  0x00001, 0x20000, CRC(a3a0d993) SHA1(50311b9447eb04271b17b212ca31d083ab5b2414) )
@@ -2568,10 +2581,6 @@ ROM_START( demonwld1 )
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "o16-11.bin",  0x0000, 0x8000, CRC(dbe08c85) SHA1(536a242bfe916d15744b079261507af6f12b5b50) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
-
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
 	ROM_LOAD16_BYTE( "rom07",  0x00001, 0x20000, CRC(a3a0d993) SHA1(50311b9447eb04271b17b212ca31d083ab5b2414) )
@@ -2596,10 +2605,6 @@ ROM_START( demonwld2 )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
-
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
@@ -2626,10 +2631,6 @@ ROM_START( demonwld3 )
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
-
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
 	ROM_LOAD16_BYTE( "rom07",  0x00001, 0x20000, CRC(a3a0d993) SHA1(50311b9447eb04271b17b212ca31d083ab5b2414) )
@@ -2654,10 +2655,6 @@ ROM_START( demonwld4 )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
-
-	ROM_REGION( 0x2000, "gxl:dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
