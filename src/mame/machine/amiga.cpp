@@ -1335,14 +1335,6 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 		case REG_DMACONR:
 			return CUSTOM_REG(REG_DMACON);
 
-#ifdef UNUSED_FUNCTION
-		case REG_VPOSR:
-			CUSTOM_REG(REG_VPOSR) &= 0xff00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos() >> 16;
-
-			return CUSTOM_REG(REG_VPOSR);
-#endif
-
 		case REG_VHPOSR:
 			return amiga_gethvpos() & 0xffff;
 
@@ -1656,18 +1648,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 		case REG_BPL5PTH:   case REG_BPL6PTH:
 			data &= ( m_chip_ram_mask >> 16 );
 			break;
-
-#ifdef UNUSED_FUNCTION
-		case REG_BPLCON0:
-			if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
-			{
-				/* planes go from 0 to 6, inclusive */
-				logerror( "This game is doing funky planes stuff. (planes > 6)\n" );
-				data &= ~BPLCON0_BPU0;
-			}
-			CUSTOM_REG(offset) = data;
-			break;
-#endif
 
 		case REG_BPL1MOD:   case REG_BPL2MOD:
 			// bit 0 is implicitly ignored on writes,

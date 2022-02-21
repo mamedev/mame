@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Mariusz Wojcieszek, Aaron Giles
-/***************************************************************************
+/**************************************************************************************************
 
-    Amiga AGA hardware
+    Amiga AGA hardware "Lisa"
 
     Driver by: Ernesto Corvi, Mariusz Wojcieszek, Aaron Giles
 
@@ -13,11 +13,16 @@ Done:
     - HAM8 mode
     - preliminary sprites
 
-To do:
-    - incorrect hstart/hstop values in CD32 logo, lsrquiz & lsrquiz2
-    - sprite collisions
+TODO:
+    - Merge with base OCS/ECS Denise video emulation, use virtual overrides where applicable;
+    - High bits sprite collisions;
+    - SHRES video mode;
+    - Confirm diwstrt/diwstop values;
+    - Add custom screen geometry registers (specific to AGA chipset, $1c0-$1ef, most are shared
+      with Agnus/Alice really);
+    - Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRBLNK, BRDRSPRT, BPLAMx);
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/amiga.h"
@@ -181,7 +186,8 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 
 			/* fetch data into the control words */
 			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			// Diggers AGA suggests that the fmode increments with ctl is interleaved.
+			// diggers AGA suggests that the fmode increments with ctl are interleaved,
+			// otherwise no sprites are drawn.
 			// (it enables sprite 0 only, and +8 for the vstop values)
 			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;

@@ -347,12 +347,6 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		/* extract common wait/skip values */
 		m_waitval = word0 & 0xfffe;
 
-		// ???
-		#ifdef UNUSED_FUNCTION
-		if (m_waitval != 0xfffe)
-			m_waitval = (word0 & 0x00fe) | ((((word0 >> 8) & 0xff) + 1) << 8);
-		#endif
-
 		m_waitmask = word1 | 0x8001;
 		m_state_waitblit = (~word1 >> 15) & 1;
 
