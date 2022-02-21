@@ -293,7 +293,22 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 1)
 INPUT_PORTS_END
 
+// ar_ldrb manual specifically claims to have 4-way gate sticks.
+static INPUT_PORTS_START( arcadia_4way )
+	PORT_INCLUDE( arcadia )
 
+	PORT_MODIFY("p1_joy")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_4WAY
+
+	PORT_MODIFY("p2_joy")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_4WAY
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -1010,9 +1025,9 @@ GAME( 1987, ar_dart2, ar_dart, arcadia, arcadia, arcadia_amiga_state, init_dart,
 GAME( 1988, ar_fast,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
 GAME( 1988, ar_fasta, ar_fast, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.7)", 0 )
 
-GAME( 1988, ar_ldrb,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_ldrb,    ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
-GAME( 1988, ar_ldrba, ar_ldrb, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )
-GAME( 1988, ar_ldrbb, ar_ldrb, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 3)", 0 )
+GAME( 1988, ar_ldrb,  ar_bios, arcadia, arcadia_4way, arcadia_amiga_state, init_ldrb,    ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1988, ar_ldrba, ar_ldrb, arcadia, arcadia_4way, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 2, V 2.4)", 0 )
+GAME( 1988, ar_ldrbb, ar_ldrb, arcadia, arcadia_4way, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 3)", 0 )
 
 GAME( 1987, ar_ninj,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_ninj,    ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
 GAME( 1987, ar_ninj2, ar_ninj, arcadia, arcadia, arcadia_amiga_state, init_ninj,    ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )
