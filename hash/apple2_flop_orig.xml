@@ -19382,4 +19382,91 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drace82">
+		<description>Death Race '82</description>
+		<year>1982</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2022-02-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Death Race '82" is a 1982 action game developed by Don Fudge and distributed by Avant-Garde Creations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="death race '82.woz" size="234790" crc="26f894dc" sha1="865a593d599ab5fdbf60aff58765b1590f204607"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemsthll12">
+		<description>Gemstone Healer (Version 1.2)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2022-02-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Gemstone Healer" is a 1986 strategy game developed by Peter Lount, Trouba Gossen, and Kevin Pickell, and distributed by Strategic Simulations, Inc. This is version 1.2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234826">
+				<rom name="gemstone healer v1.2 side a.woz" size="234826" crc="e8812105" sha1="33ce745ec584cf5d3969519d188eeaa649f7428e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234826">
+				<rom name="gemstone healer v1.2 side b.woz" size="234826" crc="80116114" sha1="59064735ffaae9b5f566556f1d4199d36285fb54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcadv1">
+		<description>Space Adventure: Episode One</description>
+		<year>1981</year>
+		<publisher>Sierra Software</publisher>
+		<info name="release" value="2022-02-19"/>
+		<sharedfeat name="compatibility" value="A2,A2P"/>
+		<!-- It requires a 48K Apple II or II+. -->
+		<!--"Space Adventure: Episode One" is a 1981 action game developed by Alick Dziabczenko and distributed by Sierra Software. It requires a 48K Apple ][ or ][+. Due to aggressive copy protection, it does not run on later models.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="221475">
+				<rom name="space adventure - episode one.woz" size="221475" crc="8c718bc2" sha1="b098cd15b5d19bab38d91ec6b9ffb52f716e9f2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="staxman2">
+		<description>Super Taxman 2</description>
+		<year>1981</year>
+		<publisher>H.A.L. Labs</publisher>
+		<info name="release" value="2022-02-19"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Super Taxman 2" is a 1981 action game developed by Brian Fitzgerald and distributed by H.A.L. Labs. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="161558">
+				<rom name="super taxman 2.woz" size="161558" crc="d70d7eb5" sha1="8f4c7a4fcb9121950a04883754361f29f409fcfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scadette">
+		<description>Space Cadette</description>
+		<year>1982</year>
+		<publisher>Funtastic</publisher>
+		<info name="release" value="2022-02-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Space Cadette" is a 1982 action game developed by Dan Illowsky and distributed by Funtastic. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="95008">
+				<rom name="space cadette.woz" size="95008" crc="8d15a3db" sha1="a6f468a5970f688b7df4c34734a637e60f0486d7"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
