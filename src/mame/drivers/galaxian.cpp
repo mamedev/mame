@@ -13301,11 +13301,11 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-/* Hermatic Frogger, found on a Video Dens PCB */
+// Hermatic Frogger, found on a Video Dens PCB
 ROM_START( froggervd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
-	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) BAD_DUMP ) // 2716 (hand-patched at XX0)
+	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) ) // 2716
 	ROM_LOAD( "frogvd_r3-libro-s3.af9", 0x1000, 0x0800, CRC(637a2ff8) SHA1(e9b9fc692ca5d8deb9cd30d9d73ad25c8d8bafe1) ) // 2716
 	ROM_LOAD( "frogvd_r4-libro-s4.ah9", 0x1800, 0x0800, CRC(1dc9ab15) SHA1(94b327dd2eaf0ffb19fee86a2a890a0012d52849) ) // 2716
 	ROM_LOAD( "frogvd_r5-libro-s5.aj9", 0x2000, 0x0800, CRC(35e11cd2) SHA1(c2d01324c052d79ad9de00d13ddc4322f9c44292) ) // 2716
@@ -13313,7 +13313,7 @@ ROM_START( froggervd )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "frogvd_r11-ot1.bc5", 0x0000, 0x0800, CRC(79326efe) SHA1(087cd61ba9c09be6ff71be8f89933a4a0f620650) ) // 2716
-	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) BAD_DUMP ) // 2716 (hand-patched at XXe)
+	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) ) // 2716
 	ROM_LOAD( "frogvd_r13-ot3.be5", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
