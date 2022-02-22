@@ -23,7 +23,7 @@ using the same ROM as the original Chesster. Model 6124 extra hardware is on a
 daughterboard, the housing is the same as model 6100, except for button labels.
 
 Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
-and 2 leds to mimick eyes, and the housing is green instead of beige.
+and 2 leds to mimick eyes, and the housing color theme is green instead of beige.
 
 To play, wait until the motor is finished before making a move. At boot-up, the
 computer will do a self-test.
@@ -34,6 +34,12 @@ TODO:
 - sensorboard undo buffer goes out of control, probably not worth solving this issue
 - cphantom artwork should be green instead of beige
 - motor position in artwork?
+
+BTANB:
+- cphantom: As the manual suggests, the computer's move should be displayed on the
+  LCD while it's moving the piece just like in fphantom, but this is often too brief
+  or not displayed at all. (This may seem like a minor bug in the game, but it
+  actually makes it more difficult to write a MAME UCI plugin for this driver.)
 
 ******************************************************************************/
 

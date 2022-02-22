@@ -7,13 +7,13 @@ license:CC0
 <!-- define elements -->
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.28" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.1" green="0.025" blue="0.028" /></disk>
-		<disk state="1"><color red="0.5" green="0.125" blue="0.14" /></disk>
-		<disk state="2"><color red="1.0" green="0.25" blue="0.28" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="0.5" green="0.05" blue="0.075" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
 	</element>
 
 

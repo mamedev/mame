@@ -53,7 +53,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
- *MP1215   TMS1100   1980, Tiger Playmaker
+ @MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
@@ -261,6 +261,7 @@ TODO:
 #include "palmmd8.lh"
 #include "pbmastm.lh"
 #include "phpball.lh"
+#include "playmaker.lh"
 #include "qfire.lh" // clickable
 #include "quizwizc.lh"
 #include "raisedvl.lh"
@@ -2381,8 +2382,7 @@ class quizwizc_state : public hh_tms1k_state
 {
 public:
 	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
-		m_pinout(0)
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void quizwizc(machine_config &config);
@@ -2392,7 +2392,7 @@ protected:
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u16 m_pinout; // cartridge R pins
+	u16 m_pinout = 0x07; // cartridge R pins
 
 	void update_display();
 	void write_r(u16 data);
@@ -2419,9 +2419,15 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 	}
 
 	// get cartridge pinout K1 to R connections
-	std::string pinout(image.get_feature("pinout"));
-	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
+	const char *pinout = image.get_feature("pinout");
+	m_pinout = pinout ? strtoul(pinout, nullptr, 2) & 0xe7 : 0;
 	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
+
+	if (m_pinout == 0)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Invalid cartridge pinout");
+		return image_init_result::FAIL;
+	}
 
 	return image_init_result::PASS;
 }
@@ -2571,8 +2577,7 @@ class tc4_state : public hh_tms1k_state
 {
 public:
 	tc4_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
-		m_pinout(0)
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void tc4(machine_config &config);
@@ -2582,7 +2587,7 @@ protected:
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u8 m_pinout; // cartridge K pins
+	u8 m_pinout = 0xf; // cartridge K pins
 
 	void update_display();
 	void write_r(u16 data);
@@ -2609,8 +2614,8 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 	}
 
 	// get cartridge pinout R9 to K connections
-	std::string pinout(image.get_feature("pinout"));
-	m_pinout = std::stoul(pinout, nullptr, 0) & 0xf;
+	const char *pinout = image.get_feature("pinout");
+	m_pinout = pinout ? strtoul(pinout, nullptr, 0) & 0xf : 0xf;
 
 	return image_init_result::PASS;
 }
@@ -5242,8 +5247,6 @@ public:
 	void gpoker(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-
 	required_device<beep_device> m_beeper;
 
 	void update_display();
@@ -5251,12 +5254,6 @@ protected:
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
-
-void gpoker_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	m_beeper->set_state(0);
-}
 
 // handlers
 
@@ -12316,13 +12313,179 @@ ROM_END
 
 /***************************************************************************
 
-  Tiger Deluxe Football (model 7-550)
+  Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
+  * TMS1100 MP1215 (die label 1100B MP1215)
+  * 2-digit 7seg LED display + 40 other LEDs, 1-bit sound
+
+  The games are on playcards(Tiger calls them that), the hardware detects which
+  game is inserted from a notch at the lower-right. The playcards also function
+  as an overlay. MAME external artwork is needed for those.
+
+  Booting the handheld with no playcard inserted will initiate a halftime show.
+
+  "Playmaker" is actually Tiger's trademark for the d-pad controller, this
+  controller term was also used in for example Deluxe Football, and 7 in 1 Sports
+  Stadium. The d-pad has a ball shape at the bottom that sits on a concave base.
+  Note that this was 2 years before Nintendo's d-pad invention.
+
+***************************************************************************/
+
+class playmaker_state : public hh_tms1k_state
+{
+public:
+	playmaker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void playmaker(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	u8 m_notch = 0; // cartridge K1/K2
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+void playmaker_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_notch));
+}
+
+// handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge notch
+	const char *notch = image.get_feature("notch");
+	m_notch = notch ? strtoul(notch, nullptr, 0) & 3 : 0;
+
+	return image_init_result::PASS;
+}
+
+void playmaker_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void playmaker_state::write_r(u16 data)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R3: input mux
+	m_inp_mux = data & 0xf;
+
+	// R0-R7: led select
+	// R8,R9: digit select
+	m_r = data;
+	update_display();
+}
+
+void playmaker_state::write_o(u16 data)
+{
+	// O0-O6: led data
+	m_o = data;
+	update_display();
+}
+
+u8 playmaker_state::read_k()
+{
+	// K: multiplexed inputs, cartridge notch from R3
+	return read_inputs(3) | ((m_inp_mux & 8) ? m_notch : 0);
+}
+
+// config
+
+static INPUT_PORTS_START( playmaker )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Shoot / P1 Skill")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass / P2 Skill")
+INPUT_PORTS_END
+
+void playmaker_state::playmaker(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=20K, C=250pF
+	m_maincpu->k().set(FUNC(playmaker_state::read_k));
+	m_maincpu->r().set(FUNC(playmaker_state::write_r));
+	m_maincpu->o().set(FUNC(playmaker_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x300, 0x7f);
+	m_display->set_bri_levels(0.004, 0.04); // player 1 leds are brighter
+	config.set_default_layout(layout_playmaker);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	// cartridge
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "playmaker_cart"));
+	cartslot.set_must_be_loaded(false);
+	cartslot.set_device_load(FUNC(playmaker_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("playmaker");
+}
+
+// roms
+
+ROM_START( playmaker )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1215", 0x0000, 0x0800, CRC(bfc7b6c8) SHA1(33f6e2b86fae2fd9e4b0a4b8dc842c257ca3047d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_playmaker_output.pla", 0, 365, CRC(0cd484d6) SHA1(4a9af9f3d18af504145690cb0f6444ff1aef26ca) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Deluxe Football with Instant Replay (model 7-550)
   * TMS1400NLL MP7302 (die label TMS1400 MP7302)
   * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
 
   According to the manual, player 1 is green, player 2 is red. But when
   playing a 1-player game, the CPU controls green, so on MAME, player 1
   is the red side.
+
+  Booting the handheld with the Score and Replay buttons held down will
+  initiate a halftime show.
 
 ***************************************************************************/
 
@@ -12388,10 +12551,10 @@ static INPUT_PORTS_START( dxfootb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
 
 	PORT_START("IN.2") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
@@ -12549,7 +12712,7 @@ void ss7in1_state::ss7in1(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	m_display->set_bri_levels(0.01, 0.04); // player led is brighter
+	m_display->set_bri_levels(0.004, 0.04); // player led is brighter
 	config.set_default_layout(layout_7in1ss);
 
 	// sound hardware
@@ -13652,6 +13815,7 @@ CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    emp
 SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, playmaker,  0,         0, playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
