@@ -24,13 +24,29 @@ Other games:
 - USA Football (redemption)
 - USA Football (head to head)
 
+Here are the key codes to enable play:
+
+Game                                   Start game                          End ball
+---------------------------------------------------------------------------------------------
+agsoccer, agsoccera, agsoccer07        Hold N, hit 8                       (timed game)
+usafoot                                Hold N, hit 8                       (timed game)
+usafoota                               Hold N and Quote, hit 8             (timed game)
+Dinosaur Eggs                          (mnw)
+Punchy the Clown                       (mnw)
+Al's Garage Band Goes On A World Tour  (mnw)
+Mystery Castle                         (mnw)
+Pistol Poker                           (mnw)
+
 Status:
-- Skeletons
+- A G Soccer, USA Football: Playable.
+- Dinosaur Eggs, Punchy: Show a display then freeze
+- Others: Skeletons
 
 ToDo:
 - Add bsmt-based sound card
-- Display
-- Inputs not working
+- DMD Display
+- Dinosaur Eggs: Soundcard crash at start
+- Dinosaur Eggs, Punchy: Freeze at start
 - Mechanical sounds
 
 ****************************************************************************************************/
@@ -69,6 +85,13 @@ public:
 	{ }
 
 	void alvg(machine_config &config);
+	void group1(machine_config &config);
+	void group2(machine_config &config);
+	void group3(machine_config &config);
+	void pca002(machine_config &config);  // Gen 1 sound board
+	void pca003(machine_config &config);  // Alphanumeric display
+	void pca008(machine_config &config);  // Gen 2 sound board
+	void pca021(machine_config &config);  // DMD
 
 private:
 	void main_map(address_map &map);
@@ -97,13 +120,13 @@ private:
 	u16 m_lamp_data = 0U;
 	u8 m_strobe = 0U;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<okim6295_device> m_oki;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
-	required_device<i8255_device> m_ppi3;
-	required_device<via6522_device> m_via;
+	optional_device<i8255_device> m_ppi3;
+	optional_device<via6522_device> m_via;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_ioport_array<13> m_io_keyboard;
@@ -120,7 +143,7 @@ void alvg_state::main_map(address_map &map)
 	map(0x2400, 0x2403).mirror(0x3f0).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U13
 	map(0x2800, 0x2803).mirror(0x3f0).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U14
 	map(0x2c00, 0x2c00).mirror(0x37f).w(FUNC(alvg_state::display_w));
-	map(0x2c80, 0x2c83).mirror(0x37c).rw(m_ppi3, FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC1 on display board
+	map(0x2c80, 0x2c83).mirror(0x37c).lrw8(NAME([this] (offs_t offset) -> u8 { return m_ppi3->read(offset^3); }), NAME([this] (offs_t offset, u8 data) { m_ppi3->write(offset^3, data); })); // IC1 on display board
 	map(0x3800, 0x380f).mirror(0x3f0).m("via1", FUNC(via6522_device::map)); // U8
 	map(0x3c00, 0x3c0f).mirror(0x3f0).m("via0", FUNC(via6522_device::map)); // U7
 }
@@ -245,7 +268,7 @@ static INPUT_PORTS_START( alvg )
 
 	PORT_START("X12") // DIAGS
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // Manual incorrectly says 0x20
 INPUT_PORTS_END
 
 void alvg_state::ppi2_pc_w(u8 data)
@@ -265,7 +288,7 @@ void alvg_state::ppi3_pa_w(u8 data)
 void alvg_state::ppi3_pb_w(u8 data)
 {
 	u16 t = m_digits[m_strobe] & 0xff;
-	m_digits[m_strobe] = t | (data << 8);
+	m_digits[m_strobe] = t | (bitswap<8>(data, 7, 6, 3, 2, 5, 4, 1, 0) << 8);
 }
 
 void alvg_state::ppi3_pc_w(u8 data)
@@ -277,7 +300,7 @@ void alvg_state::ppi3_pc_w(u8 data)
 void alvg_state::display_w(offs_t offset, u8 data)
 {
 	u16 t = m_digits[m_strobe+20] & 0xff;
-	m_digits[m_strobe+20] = t | (data << 8);
+	m_digits[m_strobe+20] = t | (bitswap<8>(data, 7, 6, 3, 2, 5, 4, 1, 0) << 8);
 }
 
 void alvg_state::via_pb_w(u8 data)
@@ -294,6 +317,8 @@ void alvg_state::via1_pb_w(u8 data)
 		if (m_strobe > 19)
 			m_strobe = 0;
 	}
+	if (BIT(data, 5))
+		m_strobe = 0;
 }
 
 u8 alvg_state::via0_pa_r()
@@ -325,6 +350,43 @@ void alvg_state::machine_reset()
 	m_strobe = 0U;
 }
 
+void alvg_state::pca002(machine_config &config)
+{
+	MC6809(config, m_audiocpu, XTAL(8'000'000)); // 68B09, 8 MHz crystal, internal divide by 4 to produce E/Q outputs
+	m_audiocpu->set_addrmap(AS_PROGRAM, &alvg_state::audio_map);
+	MOS6522(config, m_via, XTAL(8'000'000) / 4);  // uses E clock from audiocpu; port A = read sound code; port B = ticket machine
+	m_via->writepb_handler().set(FUNC(alvg_state::via_pb_w));
+	m_via->irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+
+	SPEAKER(config, "mono").front_center();
+
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(8'000'000) / 2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void alvg_state::pca003(machine_config &config)
+{
+	/* Video */
+	config.set_default_layout(layout_alvg);
+
+	I8255A(config, m_ppi3); // U14
+	m_ppi3->out_pa_callback().set(FUNC(alvg_state::ppi3_pa_w));
+	m_ppi3->out_pb_callback().set(FUNC(alvg_state::ppi3_pb_w));
+	m_ppi3->out_pc_callback().set(FUNC(alvg_state::ppi3_pc_w));
+}
+
+void alvg_state::pca008(machine_config &config)
+{
+}
+
+void alvg_state::pca021(machine_config &config)
+{
+}
+
 void alvg_state::alvg(machine_config &config)
 {
 	/* basic machine hardware */
@@ -332,9 +394,6 @@ void alvg_state::alvg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::main_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* Video */
-	config.set_default_layout(layout_alvg);
 
 	MOS6522(config, m_via0, XTAL(4'000'000) / 2);  // U7, uses clock2 from maincpu; switch inputs
 	m_via0->readpa_handler().set(FUNC(alvg_state::via0_pa_r));
@@ -368,33 +427,29 @@ void alvg_state::alvg(machine_config &config)
 	m_ppi2->out_pb_callback().set(FUNC(alvg_state::ppi2_pb_w)); // Lamps
 	m_ppi2->out_pc_callback().set(FUNC(alvg_state::ppi2_pc_w)); // Lamps
 
-	I8255A(config, m_ppi3); // U14
-	m_ppi3->out_pa_callback().set(FUNC(alvg_state::ppi3_pa_w)); // Alpha Display
-	m_ppi3->out_pb_callback().set(FUNC(alvg_state::ppi3_pb_w)); // Alpha Display
-	m_ppi3->out_pc_callback().set(FUNC(alvg_state::ppi3_pc_w)); // Alpha Display
-
-	// Sound
-	MC6809(config, m_audiocpu, XTAL(8'000'000)); // 68B09, 8 MHz crystal, internal divide by 4 to produce E/Q outputs
-	m_audiocpu->set_addrmap(AS_PROGRAM, &alvg_state::audio_map);
-	MOS6522(config, m_via, XTAL(8'000'000) / 4);  // uses E clock from audiocpu; port A = read sound code; port B = ticket machine
-	//m_via->readpa_handler().set(FUNC(alvg_state::via_pa_r));
-	//m_via->readpb_handler().set(FUNC(alvg_state::via_pb_r));
-	//m_via->writepa_handler().set(FUNC(alvg_state::via_pa_w));
-	m_via->writepb_handler().set(FUNC(alvg_state::via_pb_w));
-	//m_via->ca2_handler().set_nop();
-	//m_via->cb2_handler().set_nop();
-	m_via->irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-
 	genpin_audio(config);
+}
 
-	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(8'000'000) / 2));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+void alvg_state::group1(machine_config &config)
+{
+	alvg(config);
+	pca003(config);  // A-N display
+	pca002(config);  // Gen 1 sound
+}
 
-	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
+void alvg_state::group2(machine_config &config)
+{
+	alvg(config);
+	pca003(config);  // A-N display
+	pca008(config);  // Gen 2 sound
+}
+
+void alvg_state::group3(machine_config &config)
+{
+	alvg(config);
+	pca021(config);  // DMD
+	pca008(config);  // Gen 2 sound
 }
 
 /*----------------------------------------------------------------------------
@@ -737,18 +792,18 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccera,  agsoccer, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccer07, agsoccer, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour2,  wrldtour, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour3,  wrldtour, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootb,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootba,  usafootb, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcast,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcasta,  mystcast, alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr,    0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr1,   pstlpkr,  alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy,     0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy3,    punchy,   alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, dinoeggs,   0,        alvg, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccera,  agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer07, agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour2,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour3,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootb,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootba,  usafootb, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcast,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcasta,  mystcast, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr,    0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr1,   pstlpkr,  group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy,     0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy3,    punchy,   group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, dinoeggs,   0,        group2, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
