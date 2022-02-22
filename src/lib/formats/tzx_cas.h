@@ -17,5 +17,6 @@ extern const cassette_image::Format tzx_cassette_format;
 
 CASSETTE_FORMATLIST_EXTERN(tzx_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(cdt_cassette_formats);
+CASSETTE_FORMATLIST_EXTERN(tsx_cassette_formats);//add TSX MSX cassette format
 
 #endif // MAME_FORMATS_TZX_CAS_H

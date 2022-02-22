@@ -181,6 +181,10 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
+		case 0x4B:// for MSX blocks
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16) + (casdata[pos + 3] << 24)-12;
+			pos += 4 + datasize + 12;
+			break;
 		case 0x5A:
 			pos += 9;
 			break;
@@ -283,6 +287,85 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
+		wave_data = WAVE_LOW;
+		tzx_output_wave(buffer, rest_pause_samples);
+		size += rest_pause_samples;
+	}
+	return size;
+}
+
+static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int bitcfg, int bytecfg, int bit0, int bit1)
+{
+	int pilot_samples = tcycles_to_samplecount(pilot);
+	int bit0_samples  = tcycles_to_samplecount(bit0);
+	int bit1_samples  = tcycles_to_samplecount(bit1);
+	int data_index;
+	int size = 0;
+	int bit1_pulses = (bitcfg  & 0b00001111);
+	int bit0_pulses = (bitcfg  & 0b11110000) >> 4;
+	int startvalue  = (bytecfg & 0b00100000) >> 5;
+	int startbits   = (bytecfg & 0b11000000) >> 6;
+	int stopvalue   = (bytecfg & 0b00000100) >> 2;
+	int stopbits    = (bytecfg & 0b00011000) >> 3;
+	
+	/* PILOT */
+	for ( ; pilot_length > 0; pilot_length--)
+	{
+		tzx_output_wave(buffer, pilot_samples);
+		size += pilot_samples;
+		toggle_wave_data();
+	}
+		
+	/* data */
+	int start_bits = (startvalue & 0x01) ? bit1_samples : bit0_samples;
+	int stop_bits  = (stopvalue  & 0x01) ? bit1_samples : bit0_samples;
+	int multistart = startbits * ((startvalue & 0x01) ? bit1_pulses : bit0_pulses)/2;
+	int multistop  = stopbits  * ((stopvalue  & 0x01) ? bit1_pulses : bit0_pulses)/2;
+	for (data_index = 0; data_index < data_size; data_index++)
+	{
+		uint8_t byte = bytes[data_index];
+		
+		for (int startloop = 0; startloop < multistart; startloop++)
+		{
+			tzx_output_wave(buffer, start_bits);
+			size += start_bits;
+			toggle_wave_data();
+			tzx_output_wave(buffer, start_bits);
+			size += start_bits;
+			toggle_wave_data();
+		}
+		int bits_to_go = 8;
+		
+		for (;bits_to_go > 0; (byte>>=1) , bits_to_go--)
+		{
+			int bit_samples = (byte & 0x01) ? bit1_samples : bit0_samples;
+			for (int pulsesloop = 0; pulsesloop < ((byte & 0x01) ? bit1_pulses : bit0_pulses)/2; pulsesloop++)
+			{
+				tzx_output_wave(buffer, bit_samples);
+				size += bit_samples;
+				toggle_wave_data();
+				tzx_output_wave(buffer, bit_samples);
+				size += bit_samples;
+				toggle_wave_data();
+			}
+		}
+		for (int stoploop = 0; stoploop < multistop; stoploop++)
+		{
+			tzx_output_wave(buffer, stop_bits);
+			size += stop_bits;
+			toggle_wave_data();
+			tzx_output_wave(buffer, stop_bits);
+			size += stop_bits;
+			toggle_wave_data();
+		}
+	}
+	/* pause */
+	if (pause > 0)
+	{
+		size += pause_one_millisec(buffer);
+		
+		int rest_pause_samples = millisec_to_samplecount(pause - 1);
+		
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -513,6 +596,7 @@ static int tzx_cas_do_work( int16_t **buffer )
 		int text_size, total_size, i;
 		int pilot, pilot_length, sync1, sync2;
 		int bit0, bit1, bits_in_last_byte;
+		int bitcfg, bytecfg;//MSX bits and bytes definition:
 		uint8_t *cur_block = blocks[current_block];
 		uint8_t block_type = cur_block[0];
 		uint16_t tstates = 0;
@@ -648,6 +732,18 @@ static int tzx_cas_do_work( int16_t **buffer )
 			for (data_size = 0; data_size < text_size; data_size++)
 				LOG_FORMATS("%c", cur_block[15 + data_size]);
 			LOG_FORMATS("\n");
+			current_block++;
+			break;
+		case 0x4B:   /* Kansas City */
+			data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24)-12;
+			pause_time= cur_block[5] + (cur_block[6] << 8);
+			pilot = cur_block[7] + (cur_block[8] << 8);
+			pilot_length = cur_block[9] + (cur_block[10] << 8);
+			bit0 = cur_block[11] + (cur_block[12] << 8);
+			bit1 = cur_block[13] + (cur_block[14] << 8);
+			bitcfg = cur_block[15];
+			bytecfg = cur_block[16];
+			size += tsx_msx_handle_block(buffer, &cur_block[0x11],pause_time, data_size, pilot, pilot_length, bitcfg, bytecfg, bit0, bit1);
 			current_block++;
 			break;
 		case 0x5A:  /* "Glue" Block */
@@ -923,6 +1019,14 @@ static const cassette_image::Format cdt_cassette_format =
 	nullptr
 };
 
+static const cassette_image::Format tsx_cassette_format =// add TSX format
+{
+	"tsx",
+	tzx_cassette_identify,
+	tzx_cassette_load,
+	nullptr
+};
+
 CASSETTE_FORMATLIST_START(tzx_cassette_formats)
 	CASSETTE_FORMAT(tzx_cassette_format)
 	CASSETTE_FORMAT(tap_cassette_format)
@@ -930,4 +1034,8 @@ CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(cdt_cassette_formats)
 	CASSETTE_FORMAT(cdt_cassette_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(tsx_cassette_formats)// add TSX format
+	CASSETTE_FORMAT(tsx_cassette_format)
 CASSETTE_FORMATLIST_END
