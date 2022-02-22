@@ -53,6 +53,7 @@ public:
 	void spcewarla(machine_config &config);
 	void escmars(machine_config &config);
 	void lrescue(machine_config &config);
+	void lrescuem2(machine_config &config);
 	void invmulti(machine_config &config);
 	void yosakdon(machine_config &config);
 	void polaris(machine_config &config);
@@ -254,6 +255,7 @@ private:
 	void invrvnge_io_map(address_map &map);
 	void invrvnge_sound_map(address_map &map);
 	void lrescue_io_map(address_map &map);
+	void lrescuem2_io_map(address_map &map);
 	void lupin3_io_map(address_map &map);
 	void polaris_io_map(address_map &map);
 	void rollingc_io_map(address_map &map);

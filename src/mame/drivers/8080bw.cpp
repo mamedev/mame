@@ -827,11 +827,12 @@ void _8080bw_state::spacecom_io_map(address_map &map)
 void _8080bw_state::spacecom(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'000'000) / 9); // divider guessed
+	i8080a_cpu_device &maincpu(I8080A(config, m_maincpu, XTAL(18'000'000) / 9)); // divider guessed
 	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
@@ -1120,6 +1121,18 @@ void _8080bw_state::lrescue_io_map(address_map &map)
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x06, 0x06).nopw(); // noise? LED?
+}
+
+void _8080bw_state::lrescuem2_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
+	map(0x04, 0x04).nopw(); // one leftover write
+	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x06, 0x06).nopw(); // noise? LED?
 }
 
 
@@ -1164,13 +1177,23 @@ void _8080bw_state::lrescue(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void _8080bw_state::lrescuem2(machine_config &config)
+{
+	lrescue(config);
+
+	// no shifter
+	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescuem2_io_map);
+	config.device_remove("mb14241");
+}
+
 void _8080bw_state::escmars(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(18'000'000) / 10)); // divider guessed
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -1556,10 +1579,11 @@ void _8080bw_state::schaser(machine_config &config)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
@@ -2775,11 +2799,12 @@ void _8080bw_state::shuttlei_io_map(address_map &map)
 void _8080bw_state::shuttlei(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 9);
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(18'000'000) / 9));
 	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -3862,10 +3887,11 @@ void cane_state::cane(machine_config &config)
 	mw8080bw_root(config);
 
 	// Basic machine hardware
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cane_state::cane_map);
-	m_maincpu->set_addrmap(AS_IO, &cane_state::cane_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cane_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &cane_state::cane_map);
+	maincpu.set_addrmap(AS_IO, &cane_state::cane_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(cane_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(cane_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
@@ -3968,10 +3994,11 @@ void orbite_state::orbite(machine_config &config)
 	mw8080bw_root(config);
 
 	// basic machine hardware
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &orbite_state::orbite_map);
-	m_maincpu->set_addrmap(AS_IO, &orbite_state::orbite_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(orbite_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &orbite_state::orbite_map);
+	maincpu.set_addrmap(AS_IO, &orbite_state::orbite_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(orbite_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(orbite_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
@@ -5740,7 +5767,7 @@ GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito (Universal license?)",         "Galaxy Rescue",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, lrescuem2,   lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Destination Earth (bootleg of Lunar Rescue)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Escape from Mars (bootleg of Lunar Rescue)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 GAMEL(1980, resclunar,   lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Niemer S.A.)",              "Rescate Lunar (Spanish bootleg of Lunar Rescue)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
