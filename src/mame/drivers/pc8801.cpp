@@ -245,7 +245,7 @@
 
 
 #define IRQ_DEBUG       (0)
-#define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
+#define IRQ_LOG(x) do { if (IRQ_DEBUG) logerror x; } while (0)
 
 #define PC8801FH_OSC1   XTAL(28'636'363)
 #define PC8801FH_OSC2   XTAL(42'105'200)
@@ -1099,7 +1099,7 @@ void pc8801_state::irq_mask_w(uint8_t data)
 //  IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
 	//if(data & 4)
-	//  printf("IRQ mask %02x\n",data);
+	//  logerror("IRQ mask %02x\n",data);
 }
 #endif
 
@@ -1163,10 +1163,18 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 	#endif
 }
 
+/*
+ * I/O Port $52
+ *
+ * -xxx ---- Index for pen #0
+ * ---- -xxx Border color? (NB: according to SystemSoft techbook not all machines have this)
+ *
+ */
+// TODO: sorcerml uses index on main playlist (0x10 setting, should have blue instead of black)
 void pc8801_state::bgpal_w(uint8_t data)
 {
 	if(data)
-		printf("BG Pal %02x\n",data);
+		logerror("BG Pal %02x\n",data);
 }
 
 void pc8801_state::palram_w(offs_t offset, uint8_t data)
@@ -1190,6 +1198,8 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 		m_palram[offset].g = data & 4 ? 7 : 0;
 	}
 
+	// TODO: sorcerml writes white to pen #0 on initial bootup, causing the underlying message to not be visible
+	// "Press space to load disk in drive 2\nSound Board installed (Y/N)"
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
@@ -1210,7 +1220,7 @@ void pc8801_state::layer_masking_w(uint8_t data)
 
 uint8_t pc8801_state::crtc_param_r()
 {
-	printf("CRTC param reading\n");
+	logerror("CRTC param reading\n");
 	return 0xff;
 }
 
@@ -1269,7 +1279,7 @@ void pc8801_state::pc88_crtc_cmd_w(uint8_t data)
 			m_crtc.inverse = data & 1;
 
 			if(data & 1) /* Ink Pot uses it, but I want another test case before removing this log */
-				printf("CRTC inverse mode ON\n");
+				logerror("CRTC inverse mode ON\n");
 			break;
 		case 2:  // set irq mask
 			m_crtc.irq_mask = data & 3;
@@ -1287,12 +1297,12 @@ void pc8801_state::pc88_crtc_cmd_w(uint8_t data)
 	}
 
 	//if((data >> 5) != 4)
-	//  printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
+	//  logerror("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
 uint8_t pc8801_state::dmac_r(offs_t offset)
 {
-	printf("DMAC R %08x\n",offset);
+	logerror("DMAC R %08x\n",offset);
 	return 0xff;
 }
 
@@ -1308,7 +1318,7 @@ void pc8801_state::dmac_w(offs_t offset, uint8_t data)
 
 uint8_t pc8801_state::dmac_status_r()
 {
-	//printf("DMAC R STATUS\n");
+	//logerror("DMAC R STATUS\n");
 	return 0xff;
 }
 
@@ -1319,7 +1329,7 @@ void pc8801_state::dmac_mode_w(uint8_t data)
 
 	// Valis II sets 0x20
 	//if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
-	//  printf("%02x DMAC mode\n",data);
+	//  logerror("%02x DMAC mode\n",data);
 }
 
 uint8_t pc8801_state::extram_mode_r()
@@ -1464,13 +1474,13 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 
 uint8_t pc8801_state::unk_r()
 {
-	printf("Read port 0x33\n");
+	logerror("Read port 0x33\n");
 	return 0xff;
 }
 
 void pc8801_state::unk_w(uint8_t data)
 {
-	printf("Write port 0x33\n");
+	logerror("Write port 0x33\n");
 }
 
 /*
@@ -2070,7 +2080,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
 		return 2*2;
 	}
 
-	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",m_i8214_irq_level,m_sound_irq_latch,m_vrtc_irq_latch,m_timer_irq_latch);
+	logerror("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",m_i8214_irq_level,m_sound_irq_latch,m_vrtc_irq_latch,m_timer_irq_latch);
 	machine().debug_break();
 
 	return 4*2; //TODO: mustn't happen
@@ -2078,7 +2088,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
 
 WRITE_LINE_MEMBER(pc8801_state::sound_irq)
 {
-//  printf("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
+//  logerror("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
 	/* TODO: correct i8214 irq level? */
 	if(state)
 	{
@@ -2258,7 +2268,7 @@ uint8_t pc8801_state::opn_porta_r()
 		shift = (m_mouse.phase & 1) ? 0 : 4;
 		res = (m_mouse.phase & 2) ? m_mouse.y : m_mouse.x;
 
-//      printf("%d\n",m_mouse.phase);
+//      logerror("%d\n",m_mouse.phase);
 
 		return ((res >> shift) & 0x0f) | 0xf0;
 	}
