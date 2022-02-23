@@ -298,11 +298,17 @@ void pc8801_state::video_start()
 {
 }
 
+void pc8801_state::palette_init(palette_device &palette) const
+{
+	for(int i = 0; i< 0x10; i++) //text + bitmap
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+}
+
 void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint32_t count = 0;
 
-	uint16_t y_double = (pc8801_pixel_clock());
+	uint16_t y_double = pixel_clock();
 	uint16_t y_size = (y_double+1) * 200;
 
 	for(int y=0;y<y_size;y+=(y_double+1))
@@ -471,12 +477,12 @@ uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t wid
 	return vram[address-3+offset];
 }
 
-void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special)
+void pc8801_state::draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special)
 {
 	uint8_t *vram = m_work_ram.get();
 
 	uint8_t y_height = lines_per_char;
-	uint8_t y_double = (pc8801_pixel_clock());
+	uint8_t y_double = pixel_clock();
 	uint8_t y_step = (non_special) ? 80 : 120; // trusted by Elthlead
 	uint8_t is_cursor = 0;
 
@@ -596,7 +602,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 
 			}
 
-			pc8801_draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
+			draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
 		}
 	}
 }
@@ -627,7 +633,7 @@ uint32_t pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-uint8_t pc8801_state::pc8801_alu_r(offs_t offset)
+uint8_t pc8801_state::alu_r(offs_t offset)
 {
 	int i;
 	uint8_t b,r,g;
@@ -646,7 +652,7 @@ uint8_t pc8801_state::pc8801_alu_r(offs_t offset)
 	return b & r & g;
 }
 
-void pc8801_state::pc8801_alu_w(offs_t offset, uint8_t data)
+void pc8801_state::alu_w(offs_t offset, uint8_t data)
 {
 	int i;
 
@@ -689,17 +695,17 @@ void pc8801_state::pc8801_alu_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t pc8801_state::pc8801_wram_r(offs_t offset)
+uint8_t pc8801_state::wram_r(offs_t offset)
 {
 	return m_work_ram[offset];
 }
 
-void pc8801_state::pc8801_wram_w(offs_t offset, uint8_t data)
+void pc8801_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data;
 }
 
-uint8_t pc8801_state::pc8801_ext_wram_r(offs_t offset)
+uint8_t pc8801_state::ext_wram_r(offs_t offset)
 {
 	if(offset < m_extram_size)
 		return m_ext_work_ram[offset];
@@ -707,38 +713,38 @@ uint8_t pc8801_state::pc8801_ext_wram_r(offs_t offset)
 	return 0xff;
 }
 
-void pc8801_state::pc8801_ext_wram_w(offs_t offset, uint8_t data)
+void pc8801_state::ext_wram_w(offs_t offset, uint8_t data)
 {
 	if(offset < m_extram_size)
 		m_ext_work_ram[offset] = data;
 }
 
-uint8_t pc8801_state::pc8801_nbasic_rom_r(offs_t offset)
+uint8_t pc8801_state::nbasic_rom_r(offs_t offset)
 {
 	return m_n80rom[offset];
 }
 
-uint8_t pc8801_state::pc8801_n88basic_rom_r(offs_t offset)
+uint8_t pc8801_state::n88basic_rom_r(offs_t offset)
 {
 	return m_n88rom[offset];
 }
 
-uint8_t pc8801_state::pc8801_gvram_r(offs_t offset)
+uint8_t pc8801_state::gvram_r(offs_t offset)
 {
 	return m_gvram[offset];
 }
 
-void pc8801_state::pc8801_gvram_w(offs_t offset, uint8_t data)
+void pc8801_state::gvram_w(offs_t offset, uint8_t data)
 {
 	m_gvram[offset] = data;
 }
 
-uint8_t pc8801_state::pc8801_high_wram_r(offs_t offset)
+uint8_t pc8801_state::high_wram_r(offs_t offset)
 {
 	return m_hi_work_ram[offset];
 }
 
-void pc8801_state::pc8801_high_wram_w(offs_t offset, uint8_t data)
+void pc8801_state::high_wram_w(offs_t offset, uint8_t data)
 {
 	m_hi_work_ram[offset] = data;
 }
@@ -750,52 +756,52 @@ uint8_t pc8801_state::pc8801ma_dic_r(offs_t offset)
 	return dic_rom[offset];
 }
 
-uint8_t pc8801_state::pc8801_cdbios_rom_r(offs_t offset)
+uint8_t pc8801_state::cdbios_rom_r(offs_t offset)
 {
 	uint8_t *cdrom_bios = memregion("cdrom")->base();
 
 	return cdrom_bios[offset];
 }
 
-uint8_t pc8801_state::pc8801_mem_r(offs_t offset)
+uint8_t pc8801_state::mem_r(offs_t offset)
 {
 	if(offset <= 0x7fff)
 	{
 		if(m_extram_mode & 1)
-			return pc8801_ext_wram_r(offset | (m_extram_bank * 0x8000));
+			return ext_wram_r(offset | (m_extram_bank * 0x8000));
 
 		if(m_gfx_ctrl & 2)
-			return pc8801_wram_r(offset);
+			return wram_r(offset);
 
 		if(m_has_cdrom && m_cdrom_reg[9] & 0x10)
-			return pc8801_cdbios_rom_r((offset & 0x7fff) | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000));
+			return cdbios_rom_r((offset & 0x7fff) | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000));
 
 		if(m_gfx_ctrl & 4)
-			return pc8801_nbasic_rom_r(offset);
+			return nbasic_rom_r(offset);
 
 		if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
-			return pc8801_n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
+			return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
 
-		return pc8801_n88basic_rom_r(offset);
+		return n88basic_rom_r(offset);
 	}
 	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
 	{
 		uint32_t window_offset;
 
 		if(m_gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
-			return pc8801_wram_r(offset);
+			return wram_r(offset);
 
 		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 		// castlex and imenes accesses this
 		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-			return pc8801_high_wram_r(window_offset & 0xfff);
+			return high_wram_r(window_offset & 0xfff);
 
-		return pc8801_wram_r(window_offset);
+		return wram_r(window_offset);
 	}
 	else if(offset >= 0x8400 && offset <= 0xbfff)
 	{
-		return pc8801_wram_r(offset);
+		return wram_r(offset);
 	}
 	else if(offset >= 0xc000 && offset <= 0xffff)
 	{
@@ -808,38 +814,38 @@ uint8_t pc8801_state::pc8801_mem_r(offs_t offset)
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
-				return pc8801_alu_r(offset & 0x3fff);
+				return alu_r(offset & 0x3fff);
 		}
 
 		if(m_vram_sel == 3)
 		{
 			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
-				return pc8801_high_wram_r(offset & 0xfff);
+				return high_wram_r(offset & 0xfff);
 
-			return pc8801_wram_r(offset);
+			return wram_r(offset);
 		}
 
-		return pc8801_gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
+		return gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
 	}
 
 	return 0xff;
 }
 
-void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
+void pc8801_state::mem_w(offs_t offset, uint8_t data)
 {
 	if(offset <= 0x7fff)
 	{
 		if(m_extram_mode & 0x10)
-			pc8801_ext_wram_w(offset | (m_extram_bank * 0x8000),data);
+			ext_wram_w(offset | (m_extram_bank * 0x8000),data);
 		else
-			pc8801_wram_w(offset,data);
+			wram_w(offset,data);
 
 		return;
 	}
 	else if(offset >= 0x8000 && offset <= 0x83ff)
 	{
 		if(m_gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
-			pc8801_wram_w(offset,data);
+			wram_w(offset,data);
 		else
 		{
 			uint32_t window_offset;
@@ -850,16 +856,16 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 			// TODO: high TVRAM even
 			// (uPD3301 reads from this instead of the regular work RAM)
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-				pc8801_high_wram_w(window_offset & 0xfff,data);
+				high_wram_w(window_offset & 0xfff,data);
 			else
-				pc8801_wram_w(window_offset,data);
+				wram_w(window_offset,data);
 		}
 
 		return;
 	}
 	else if(offset >= 0x8400 && offset <= 0xbfff)
 	{
-		pc8801_wram_w(offset,data);
+		wram_w(offset,data);
 		return;
 	}
 	else if(offset >= 0xc000 && offset <= 0xffff)
@@ -871,7 +877,7 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 
 			if(m_alu_ctrl2 & 0x80)
 			{
-				pc8801_alu_w(offset & 0x3fff,data);
+				alu_w(offset & 0x3fff,data);
 				return;
 			}
 		}
@@ -880,25 +886,25 @@ void pc8801_state::pc8801_mem_w(offs_t offset, uint8_t data)
 		{
 			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
 			{
-				pc8801_high_wram_w(offset & 0xfff,data);
+				high_wram_w(offset & 0xfff,data);
 				return;
 			}
 
-			pc8801_wram_w(offset,data);
+			wram_w(offset,data);
 			return;
 		}
 
-		pc8801_gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel),data);
+		gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel),data);
 		return;
 	}
 }
 
-void pc8801_state::pc8801_mem(address_map &map)
+void pc8801_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(pc8801_state::pc8801_mem_r), FUNC(pc8801_state::pc8801_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(pc8801_state::mem_r), FUNC(pc8801_state::mem_w));
 }
 
-uint8_t pc8801_state::pc8801_ctrl_r()
+uint8_t pc8801_state::ctrl_r()
 {
 	/*
 	11-- ----
@@ -912,7 +918,7 @@ uint8_t pc8801_state::pc8801_ctrl_r()
 	return ioport("CTRL")->read();
 }
 
-void pc8801_state::pc8801_ctrl_w(uint8_t data)
+void pc8801_state::ctrl_w(uint8_t data)
 {
 	/*
 	x--- ---- SING (buzzer mask?)
@@ -964,24 +970,24 @@ void pc8801_state::pc8801_ctrl_w(uint8_t data)
 	m_device_ctrl_data = data;
 }
 
-uint8_t pc8801_state::pc8801_ext_rom_bank_r()
+uint8_t pc8801_state::ext_rom_bank_r()
 {
 	return m_ext_rom_bank;
 }
 
-void pc8801_state::pc8801_ext_rom_bank_w(uint8_t data)
+void pc8801_state::ext_rom_bank_w(uint8_t data)
 {
 	m_ext_rom_bank = data;
 }
 
-uint8_t pc8801_state::pc8801_pixel_clock(void)
+uint8_t pc8801_state::pixel_clock(void)
 {
 	int ysize = m_screen->height(); /* TODO: correct condition*/
 
 	return (ysize >= 400);
 }
 
-void pc8801_state::pc8801_dynamic_res_change(void)
+void pc8801_state::dynamic_res_change(void)
 {
 	rectangle visarea;
 	int xsize,ysize,xvis,yvis;
@@ -999,7 +1005,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 //  popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
-	if(pc8801_pixel_clock())
+	if(pixel_clock())
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
@@ -1007,7 +1013,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 	m_screen->configure(xsize, ysize, visarea, refresh);
 }
 
-void pc8801_state::pc8801_gfx_ctrl_w(uint8_t data)
+void pc8801_state::gfx_ctrl_w(uint8_t data)
 {
 	/*
 	--x- ---- ???
@@ -1020,15 +1026,15 @@ void pc8801_state::pc8801_gfx_ctrl_w(uint8_t data)
 
 	m_gfx_ctrl = data;
 
-	pc8801_dynamic_res_change();
+	dynamic_res_change();
 }
 
-uint8_t pc8801_state::pc8801_vram_select_r()
+uint8_t pc8801_state::vram_select_r()
 {
 	return 0xf8 | ((m_vram_sel == 3) ? 0 : (1 << m_vram_sel));
 }
 
-void pc8801_state::pc8801_vram_select_w(offs_t offset, uint8_t data)
+void pc8801_state::vram_select_w(offs_t offset, uint8_t data)
 {
 	m_vram_sel = offset & 3;
 }
@@ -1051,7 +1057,7 @@ void pc8801_state::i8214_irq_mask_w(uint8_t data)
 
 
 #else
-void pc8801_state::pc8801_irq_level_w(uint8_t data)
+void pc8801_state::irq_level_w(uint8_t data)
 {
 	if(data & 8)
 		m_i8214_irq_level = 7;
@@ -1062,7 +1068,7 @@ void pc8801_state::pc8801_irq_level_w(uint8_t data)
 }
 
 
-void pc8801_state::pc8801_irq_mask_w(uint8_t data)
+void pc8801_state::irq_mask_w(uint8_t data)
 {
 	m_timer_irq_mask = data & 1;
 	m_vrtc_irq_mask = data & 2;
@@ -1083,17 +1089,17 @@ void pc8801_state::pc8801_irq_mask_w(uint8_t data)
 }
 #endif
 
-uint8_t pc8801_state::pc8801_window_bank_r()
+uint8_t pc8801_state::window_bank_r()
 {
 	return m_window_offset_bank;
 }
 
-void pc8801_state::pc8801_window_bank_w(uint8_t data)
+void pc8801_state::window_bank_w(uint8_t data)
 {
 	m_window_offset_bank = data;
 }
 
-void pc8801_state::pc8801_window_bank_inc_w(uint8_t data)
+void pc8801_state::window_bank_inc_w(uint8_t data)
 {
 	m_window_offset_bank++;
 	m_window_offset_bank&=0xff;
@@ -1113,12 +1119,12 @@ void pc8801_state::pc8801_window_bank_inc_w(uint8_t data)
  * ---- 11-- Optional mode
  * ---- --xx internal EROM selection
  */
-uint8_t pc8801_state::pc8801_misc_ctrl_r()
+uint8_t pc8801_state::misc_ctrl_r()
 {
 	return m_misc_ctrl;
 }
 
-void pc8801_state::pc8801_misc_ctrl_w(uint8_t data)
+void pc8801_state::misc_ctrl_w(uint8_t data)
 {
 	m_misc_ctrl = data;
 
@@ -1143,13 +1149,13 @@ void pc8801_state::pc8801_misc_ctrl_w(uint8_t data)
 	#endif
 }
 
-void pc8801_state::pc8801_bgpal_w(uint8_t data)
+void pc8801_state::bgpal_w(uint8_t data)
 {
 	if(data)
 		printf("BG Pal %02x\n",data);
 }
 
-void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
+void pc8801_state::palram_w(offs_t offset, uint8_t data)
 {
 	if(m_misc_ctrl & 0x20) //analog palette
 	{
@@ -1176,7 +1182,7 @@ void pc8801_state::pc8801_palram_w(offs_t offset, uint8_t data)
 	// TODO: at least analog mode can do rasters
 }
 
-void pc8801_state::pc8801_layer_masking_w(uint8_t data)
+void pc8801_state::layer_masking_w(uint8_t data)
 {
 	/*
 	---- x--- green gvram masked flag
@@ -1188,7 +1194,7 @@ void pc8801_state::pc8801_layer_masking_w(uint8_t data)
 	m_layer_mask = data;
 }
 
-uint8_t pc8801_state::pc8801_crtc_param_r()
+uint8_t pc8801_state::crtc_param_r()
 {
 	printf("CRTC param reading\n");
 	return 0xff;
@@ -1200,13 +1206,13 @@ void pc8801_state::pc88_crtc_param_w(uint8_t data)
 	{
 		m_crtc.param[m_crtc.cmd][m_crtc.param_count] = data;
 		if(m_crtc.cmd == 0)
-			pc8801_dynamic_res_change();
+			dynamic_res_change();
 
 		m_crtc.param_count++;
 	}
 }
 
-uint8_t pc8801_state::pc8801_crtc_status_r()
+uint8_t pc8801_state::crtc_status_r()
 {
 	/*
 	---x ---- video enable
@@ -1270,13 +1276,13 @@ void pc8801_state::pc88_crtc_cmd_w(uint8_t data)
 	//  printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
-uint8_t pc8801_state::pc8801_dmac_r(offs_t offset)
+uint8_t pc8801_state::dmac_r(offs_t offset)
 {
 	printf("DMAC R %08x\n",offset);
 	return 0xff;
 }
 
-void pc8801_state::pc8801_dmac_w(offs_t offset, uint8_t data)
+void pc8801_state::dmac_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_dma_counter[offset >> 1] = (m_dmac_ff) ? (m_dma_counter[offset >> 1]&0xff)|(data<<8) : (m_dma_counter[offset >> 1]&0xff00)|(data&0xff);
@@ -1286,13 +1292,13 @@ void pc8801_state::pc8801_dmac_w(offs_t offset, uint8_t data)
 	m_dmac_ff ^= 1;
 }
 
-uint8_t pc8801_state::pc8801_dmac_status_r()
+uint8_t pc8801_state::dmac_status_r()
 {
 	//printf("DMAC R STATUS\n");
 	return 0xff;
 }
 
-void pc8801_state::pc8801_dmac_mode_w(uint8_t data)
+void pc8801_state::dmac_mode_w(uint8_t data)
 {
 	m_dmac_mode = data;
 	m_dmac_ff = 0;
@@ -1302,12 +1308,12 @@ void pc8801_state::pc8801_dmac_mode_w(uint8_t data)
 	//  printf("%02x DMAC mode\n",data);
 }
 
-uint8_t pc8801_state::pc8801_extram_mode_r()
+uint8_t pc8801_state::extram_mode_r()
 {
 	return (m_extram_mode ^ 0x11) | 0xee;
 }
 
-void pc8801_state::pc8801_extram_mode_w(uint8_t data)
+void pc8801_state::extram_mode_w(uint8_t data)
 {
 	/*
 	---x ---- Write EXT RAM access at 0x0000 - 0x7fff
@@ -1317,22 +1323,22 @@ void pc8801_state::pc8801_extram_mode_w(uint8_t data)
 	m_extram_mode = data & 0x11;
 }
 
-uint8_t pc8801_state::pc8801_extram_bank_r()
+uint8_t pc8801_state::extram_bank_r()
 {
 	return m_extram_bank;
 }
 
-void pc8801_state::pc8801_extram_bank_w(uint8_t data)
+void pc8801_state::extram_bank_w(uint8_t data)
 {
 	m_extram_bank = data;
 }
 
-void pc8801_state::pc8801_alu_ctrl1_w(uint8_t data)
+void pc8801_state::alu_ctrl1_w(uint8_t data)
 {
 	m_alu_ctrl1 = data;
 }
 
-void pc8801_state::pc8801_alu_ctrl2_w(uint8_t data)
+void pc8801_state::alu_ctrl2_w(uint8_t data)
 {
 	m_alu_ctrl2 = data;
 }
@@ -1341,12 +1347,12 @@ void pc8801_state::pc8801_alu_ctrl2_w(uint8_t data)
 // It's an HAL Laboratory custom board with PCG (maps to chars $80-$ff),
 // dual AY-3-891x & PIT, I/O $b0-$b2 is the I/O ID for it?
 // Find a supported SW (only HAL seems to support it) & investigate
-void pc8801_state::pc8801_pcg8100_w(offs_t offset, uint8_t data)
+void pc8801_state::pcg8100_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: Possible write to PCG-8100 %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-void pc8801_state::pc8801_txt_cmt_ctrl_w(uint8_t data)
+void pc8801_state::txt_cmt_ctrl_w(uint8_t data)
 {
 	/* bits 2 to 5 are cmt related */
 
@@ -1357,7 +1363,7 @@ void pc8801_state::pc8801_txt_cmt_ctrl_w(uint8_t data)
 }
 
 
-uint8_t pc8801_state::pc8801_kanji_r(offs_t offset)
+uint8_t pc8801_state::kanji_r(offs_t offset)
 {
 	if((offset & 2) == 0)
 		return m_kanji_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
@@ -1365,13 +1371,13 @@ uint8_t pc8801_state::pc8801_kanji_r(offs_t offset)
 	return 0xff;
 }
 
-void pc8801_state::pc8801_kanji_w(offs_t offset, uint8_t data)
+void pc8801_state::kanji_w(offs_t offset, uint8_t data)
 {
 	if((offset & 2) == 0)
 		m_knj_addr[0] = ((offset & 1) == 0) ? ((m_knj_addr[0]&0xff00)|(data&0xff)) : ((m_knj_addr[0]&0x00ff)|(data<<8));
 }
 
-uint8_t pc8801_state::pc8801_kanji_lv2_r(offs_t offset)
+uint8_t pc8801_state::kanji_lv2_r(offs_t offset)
 {
 	if((offset & 2) == 0)
 		return m_kanji_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
@@ -1379,20 +1385,20 @@ uint8_t pc8801_state::pc8801_kanji_lv2_r(offs_t offset)
 	return 0xff;
 }
 
-void pc8801_state::pc8801_kanji_lv2_w(offs_t offset, uint8_t data)
+void pc8801_state::kanji_lv2_w(offs_t offset, uint8_t data)
 {
 	if((offset & 2) == 0)
 		m_knj_addr[1] = ((offset & 1) == 0) ? ((m_knj_addr[1]&0xff00)|(data&0xff)) : ((m_knj_addr[1]&0x00ff)|(data<<8));
 }
 
-void pc8801_state::pc8801_dic_bank_w(uint8_t data)
+void pc8801_state::dic_bank_w(uint8_t data)
 {
 	printf("JISHO BANK = %02x\n",data);
 	if(m_has_dictionary)
 		m_dic_bank = data  & 0x1f;
 }
 
-void pc8801_state::pc8801_dic_ctrl_w(uint8_t data)
+void pc8801_state::dic_ctrl_w(uint8_t data)
 {
 	printf("JISHO CTRL = %02x\n",data);
 	if(m_has_dictionary)
@@ -1403,8 +1409,8 @@ void pc8801_state::pc8801_dic_ctrl_w(uint8_t data)
  * [8] xxxx xxxx CD data
  *               ^ if bit 7 is held then system will bring to a
  *               "CD-System initialize\n[Space]->CD player" screen.
-*/
-uint8_t pc8801_state::pc8801_cdrom_r(offs_t offset)
+ */
+uint8_t pc8801_state::cdrom_r(offs_t offset)
 {
 	if(m_has_cdrom)
 		return m_cdrom_reg[offset];
@@ -1416,7 +1422,7 @@ uint8_t pc8801_state::pc8801_cdrom_r(offs_t offset)
  * [9] ---x ---- CD-ROM BIOS bank
  *     ---- ---x CD-ROM E-ROM bank (?)
  */
-void pc8801_state::pc8801_cdrom_w(offs_t offset, uint8_t data)
+void pc8801_state::cdrom_w(offs_t offset, uint8_t data)
 {
 
 	//printf("CD-ROM write %02x -> [%02x]\n",data,offset);
@@ -1425,7 +1431,7 @@ void pc8801_state::pc8801_cdrom_w(offs_t offset, uint8_t data)
 		m_cdrom_reg[offset] = data;
 }
 
-uint8_t pc8801_state::pc8801_cpuclock_r()
+uint8_t pc8801_state::cpuclock_r()
 {
 	if(m_has_clock_speed)
 		return 0x10 | m_clock_setting;
@@ -1433,7 +1439,7 @@ uint8_t pc8801_state::pc8801_cpuclock_r()
 	return 0xff;
 }
 
-uint8_t pc8801_state::pc8801_baudrate_r()
+uint8_t pc8801_state::baudrate_r()
 {
 	if(m_has_clock_speed)
 		return 0xf0 | m_baudrate_val;
@@ -1441,13 +1447,13 @@ uint8_t pc8801_state::pc8801_baudrate_r()
 	return 0xff;
 }
 
-void pc8801_state::pc8801_baudrate_w(uint8_t data)
+void pc8801_state::baudrate_w(uint8_t data)
 {
 	if(m_has_clock_speed)
 		m_baudrate_val = data & 0xf;
 }
 
-void pc8801_state::pc8801_rtc_w(uint8_t data)
+void pc8801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 1) >> 0);
 	m_rtc->c1_w((data & 2) >> 1);
@@ -1457,7 +1463,7 @@ void pc8801_state::pc8801_rtc_w(uint8_t data)
 	/* TODO: remaining bits */
 }
 
-uint8_t pc8801_state::pc8801_sound_board_r(offs_t offset)
+uint8_t pc8801_state::sound_board_r(offs_t offset)
 {
 	if(m_has_opna)
 		return m_opna->read(offset);
@@ -1465,7 +1471,7 @@ uint8_t pc8801_state::pc8801_sound_board_r(offs_t offset)
 	return (offset & 2) ? 0xff : m_opn->read(offset);
 }
 
-void pc8801_state::pc8801_sound_board_w(offs_t offset, uint8_t data)
+void pc8801_state::sound_board_w(offs_t offset, uint8_t data)
 {
 	if(m_has_opna)
 		m_opna->write(offset, data);
@@ -1473,7 +1479,7 @@ void pc8801_state::pc8801_sound_board_w(offs_t offset, uint8_t data)
 		m_opn->write(offset, data);
 }
 
-uint8_t pc8801_state::pc8801_opna_r(offs_t offset)
+uint8_t pc8801_state::opna_r(offs_t offset)
 {
 	if(m_has_opna && (offset & 2) == 0)
 		return m_opna->read((offset & 1) | ((offset & 4) >> 1));
@@ -1481,7 +1487,7 @@ uint8_t pc8801_state::pc8801_opna_r(offs_t offset)
 	return 0xff;
 }
 
-void pc8801_state::pc8801_opna_w(offs_t offset, uint8_t data)
+void pc8801_state::opna_w(offs_t offset, uint8_t data)
 {
 	if(m_has_opna && (offset & 2) == 0)
 		m_opna->write((offset & 1) | ((offset & 4) >> 1),data);
@@ -1504,18 +1510,18 @@ void pc8801_state::pc8801_opna_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t pc8801_state::pc8801_unk_r()
+uint8_t pc8801_state::unk_r()
 {
 	printf("Read port 0x33\n");
 	return 0xff;
 }
 
-void pc8801_state::pc8801_unk_w(uint8_t data)
+void pc8801_state::unk_w(uint8_t data)
 {
 	printf("Write port 0x33\n");
 }
 
-void pc8801_state::pc8801_io(address_map &map)
+void pc8801_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -1535,54 +1541,54 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x0d, 0x0d).portr("KEY13");
 	map(0x0e, 0x0e).portr("KEY14");
 	map(0x0f, 0x0f).portr("KEY15");
-	map(0x00, 0x02).w(FUNC(pc8801_state::pc8801_pcg8100_w));
-	map(0x10, 0x10).w(FUNC(pc8801_state::pc8801_rtc_w));
+	map(0x00, 0x02).w(FUNC(pc8801_state::pcg8100_w));
+	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
 	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
-	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
-	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::pc8801_gfx_ctrl_w));
-	map(0x32, 0x32).rw(FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
-	map(0x33, 0x33).rw(FUNC(pc8801_state::pc8801_unk_r), FUNC(pc8801_state::pc8801_unk_w));
-	map(0x34, 0x34).w(FUNC(pc8801_state::pc8801_alu_ctrl1_w));
-	map(0x35, 0x35).w(FUNC(pc8801_state::pc8801_alu_ctrl2_w));
-	map(0x40, 0x40).rw(FUNC(pc8801_state::pc8801_ctrl_r), FUNC(pc8801_state::pc8801_ctrl_w));
-	map(0x44, 0x47).rw(FUNC(pc8801_state::pc8801_sound_board_r), FUNC(pc8801_state::pc8801_sound_board_w)); /* OPN / OPNA ports */
-	map(0x50, 0x50).rw(FUNC(pc8801_state::pc8801_crtc_param_r), FUNC(pc8801_state::pc88_crtc_param_w));
-	map(0x51, 0x51).rw(FUNC(pc8801_state::pc8801_crtc_status_r), FUNC(pc8801_state::pc88_crtc_cmd_w));
-	map(0x52, 0x52).w(FUNC(pc8801_state::pc8801_bgpal_w));
-	map(0x53, 0x53).w(FUNC(pc8801_state::pc8801_layer_masking_w));
-	map(0x54, 0x5b).w(FUNC(pc8801_state::pc8801_palram_w));
-	map(0x5c, 0x5c).r(FUNC(pc8801_state::pc8801_vram_select_r));
-	map(0x5c, 0x5f).w(FUNC(pc8801_state::pc8801_vram_select_w));
-	map(0x60, 0x67).rw(FUNC(pc8801_state::pc8801_dmac_r), FUNC(pc8801_state::pc8801_dmac_w));
-	map(0x68, 0x68).rw(FUNC(pc8801_state::pc8801_dmac_status_r), FUNC(pc8801_state::pc8801_dmac_mode_w));
-	map(0x6e, 0x6e).r(FUNC(pc8801_state::pc8801_cpuclock_r));
-	map(0x6f, 0x6f).rw(FUNC(pc8801_state::pc8801_baudrate_r), FUNC(pc8801_state::pc8801_baudrate_w));
-	map(0x70, 0x70).rw(FUNC(pc8801_state::pc8801_window_bank_r), FUNC(pc8801_state::pc8801_window_bank_w));
-	map(0x71, 0x71).rw(FUNC(pc8801_state::pc8801_ext_rom_bank_r), FUNC(pc8801_state::pc8801_ext_rom_bank_w));
-	map(0x78, 0x78).w(FUNC(pc8801_state::pc8801_window_bank_inc_w));
-	map(0x90, 0x9f).rw(FUNC(pc8801_state::pc8801_cdrom_r), FUNC(pc8801_state::pc8801_cdrom_w));
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::txt_cmt_ctrl_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::gfx_ctrl_w));
+	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
+	map(0x33, 0x33).rw(FUNC(pc8801_state::unk_r), FUNC(pc8801_state::unk_w));
+	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
+	map(0x40, 0x40).rw(FUNC(pc8801_state::ctrl_r), FUNC(pc8801_state::ctrl_w));
+	map(0x44, 0x47).rw(FUNC(pc8801_state::sound_board_r), FUNC(pc8801_state::sound_board_w)); /* OPN / OPNA ports */
+	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::pc88_crtc_param_w));
+	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::pc88_crtc_cmd_w));
+	map(0x52, 0x52).w(FUNC(pc8801_state::bgpal_w));
+	map(0x53, 0x53).w(FUNC(pc8801_state::layer_masking_w));
+	map(0x54, 0x5b).w(FUNC(pc8801_state::palram_w));
+	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
+	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
+	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
+	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
+	map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
+	map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
+	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
+	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
+	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
+	map(0x90, 0x9f).rw(FUNC(pc8801_state::cdrom_r), FUNC(pc8801_state::cdrom_w));
 //  map(0xa0, 0xa3).noprw();                                     /* music & network */
-	map(0xa8, 0xad).rw(FUNC(pc8801_state::pc8801_opna_r), FUNC(pc8801_state::pc8801_opna_w));  /* second sound board */
+	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  /* second sound board */
 //  map(0xb4, 0xb5).noprw();                                     /* Video art board */
 //  map(0xc1, 0xc1).noprw();                                     /* (unknown) */
 //  map(0xc2, 0xcf).noprw();                                     /* music */
 //  map(0xd0, 0xd7).noprw();                                     /* music & GP-IB */
 //  map(0xd8, 0xd8).noprw();                                     /* GP-IB */
 //  map(0xdc, 0xdf).noprw();                                     /* MODEM */
-	map(0xe2, 0xe2).rw(FUNC(pc8801_state::pc8801_extram_mode_r), FUNC(pc8801_state::pc8801_extram_mode_w));            /* expand RAM mode */
-	map(0xe3, 0xe3).rw(FUNC(pc8801_state::pc8801_extram_bank_r), FUNC(pc8801_state::pc8801_extram_bank_w));            /* expand RAM bank */
+	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w));            /* expand RAM mode */
+	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w));            /* expand RAM bank */
 #if USE_PROPER_I8214
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::i8214_irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::i8214_irq_mask_w));
 #else
-	map(0xe4, 0xe4).w(FUNC(pc8801_state::pc8801_irq_level_w));
-	map(0xe6, 0xe6).w(FUNC(pc8801_state::pc8801_irq_mask_w));
+	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
 #endif
 //  map(0xe7, 0xe7).noprw();                                     /* Arcus writes here, almost likely to be a mirror of above */
-	map(0xe8, 0xeb).rw(FUNC(pc8801_state::pc8801_kanji_r), FUNC(pc8801_state::pc8801_kanji_w));
-	map(0xec, 0xef).rw(FUNC(pc8801_state::pc8801_kanji_lv2_r), FUNC(pc8801_state::pc8801_kanji_lv2_w));
-	map(0xf0, 0xf0).w(FUNC(pc8801_state::pc8801_dic_bank_w));
-	map(0xf1, 0xf1).w(FUNC(pc8801_state::pc8801_dic_ctrl_w));
+	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r), FUNC(pc8801_state::kanji_w));
+	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_lv2_r), FUNC(pc8801_state::kanji_lv2_w));
+	map(0xf0, 0xf0).w(FUNC(pc8801_state::dic_bank_w));
+	map(0xf1, 0xf1).w(FUNC(pc8801_state::dic_ctrl_w));
 //  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
 //  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
 //  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
@@ -1927,7 +1933,7 @@ static const cassette_interface pc88_cassette_interface =
 #endif
 
 #if USE_PROPER_I8214
-void pc8801_state::pc8801_raise_irq(uint8_t irq,uint8_t state)
+void pc8801_state::raise_irq(uint8_t irq,uint8_t state)
 {
 	if(state)
 	{
@@ -1967,7 +1973,7 @@ static I8214_INTERFACE( pic_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pic_enlg_w)
 };
 
-IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
+IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
 {
 	uint8_t vector = (7 - m_pic->a_r());
 
@@ -1977,21 +1983,21 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return vector << 1;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
+WRITE_LINE_MEMBER(pc8801_state::sound_irq)
 {
 	if(m_sound_irq_mask && state)
 		pc8801_raise_irq(machine(),1<<(4),1);
 }
 
 /*
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::rtc_irq)
 {
     if(m_timer_irq_mask)
         pc8801_raise_irq(machine(),1<<(2),1);
 }
 */
 
-INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
 {
 	if(m_vblank_irq_mask)
 		pc8801_raise_irq(machine(),1<<(1),1);
@@ -2001,7 +2007,7 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 #include "debugger.h"
 
-IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
+IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
 {
 	if(m_sound_irq_latch)
 	{
@@ -2025,7 +2031,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return 4*2; //TODO: mustn't happen
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
+WRITE_LINE_MEMBER(pc8801_state::sound_irq)
 {
 //  printf("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
 	/* TODO: correct i8214 irq level? */
@@ -2043,7 +2049,7 @@ WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::rtc_irq)
 {
 	if(m_timer_irq_mask && m_i8214_irq_level >= 3)
 	{
@@ -2053,7 +2059,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
 {
 	if(m_vrtc_irq_mask && m_i8214_irq_level >= 2)
 	{
@@ -2099,7 +2105,7 @@ void pc8801_state::machine_reset()
 	m_layer_mask = 0x00;
 	m_vram_sel = 3;
 
-//  pc8801_dynamic_res_change(machine());
+//  dynamic_res_change();
 
 	m_mouse.phase = 0;
 
@@ -2165,7 +2171,7 @@ void pc8801_state::machine_reset()
 	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
+MACHINE_RESET_MEMBER(pc8801_state, pc8801_clock_speed)
 {
 	pc8801_state::machine_reset();
 	m_has_clock_speed = 1;
@@ -2177,7 +2183,7 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_baudrate_val = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_dic)
+MACHINE_RESET_MEMBER(pc8801_state, pc8801_dic)
 {
 	MACHINE_RESET_CALL_MEMBER( pc8801_clock_speed );
 	m_has_dictionary = 1;
@@ -2185,7 +2191,7 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_dic)
 	m_dic_ctrl = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
+MACHINE_RESET_MEMBER(pc8801_state, pc8801_cdrom)
 {
 	MACHINE_RESET_CALL_MEMBER( pc8801_dic );
 	m_has_cdrom = 1;
@@ -2199,12 +2205,6 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 
 	// Hold STOP during boot to bypass CDROM BIOS at POST (PC=0x10)
 	m_cdrom_reg[9] = 0x10;
-}
-
-void pc8801_state::pc8801_palette(palette_device &palette) const
-{
-	for(int i = 0; i< 0x10; i++) //text + bitmap
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 /* YM2203 Interface */
@@ -2242,10 +2242,10 @@ void pc8801_state::pc8801(machine_config &config)
 {
 	/* main CPU */
 	Z80(config, m_maincpu, MASTER_CLOCK);        /* 4 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801_mem);
-	m_maincpu->set_addrmap(AS_IO, &pc8801_state::pc8801_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::pc8801_vrtc_irq));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::pc8801_irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pc8801_state::main_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::irq_callback));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
 	config.set_perfect_quantum(m_maincpu);
@@ -2278,7 +2278,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
-	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
+	PALETTE(config, m_palette, FUNC(pc8801_state::palette_init), 0x10);
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
@@ -2288,7 +2288,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	// TODO: sound irqs goes different routes when both boards are installed
 	YM2203(config, m_opn, MASTER_CLOCK);
-	m_opn->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opn->irq_handler().set(FUNC(pc8801_state::sound_irq));
 	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
 	m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	// TODO: handtune mixing
@@ -2299,7 +2299,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	YM2608(config, m_opna, MASTER_CLOCK*2);
 	m_opna->set_addrmap(0, &pc8801_state::opna_map);
-	m_opna->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opna->irq_handler().set(FUNC(pc8801_state::sound_irq));
 	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
 	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	// TODO: handtune mixing
@@ -2309,7 +2309,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::rtc_irq), attotime::from_hz(600));
 }
 
 void pc8801_state::pc8801mk2mr(machine_config &config)
