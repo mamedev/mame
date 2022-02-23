@@ -1544,7 +1544,7 @@ u8 mdallas_state::read_in()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     <  ON>  [YES]   [NO]   [NEXT]
     [<W]    [^N]    [Sv]   [E>]

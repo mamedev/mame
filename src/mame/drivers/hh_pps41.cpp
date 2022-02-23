@@ -988,7 +988,7 @@ void horocomp_state::write_spk(u8 data)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
               CAP.
        AQU.   [ ]   SAG.
@@ -1197,7 +1197,7 @@ void mwcfootb_state::sub_write_r(u16 data)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
      (home team side)                                                      (visitor team side)
     [1] RECEIVERS [2]                                                       [1] RECEIVERS [2]

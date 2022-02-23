@@ -449,7 +449,7 @@ u8 bmboxing_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P2 side *                                       * right = P1 side *
 
@@ -3774,7 +3774,7 @@ u8 mwcbaseb_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
         (visitor team side)                                       (home team side)
     COMP PITCH                     [SCORE]       [INNING]

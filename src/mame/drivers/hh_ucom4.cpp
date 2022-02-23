@@ -424,7 +424,7 @@ u8 ssfball_state::input_b_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [A]    [B]    [C]    [PASS]  [KICK/
        ^FORMATION^                DISPLAY]
@@ -845,7 +845,7 @@ u8 splasfgt_state::input_b_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
 
@@ -2453,7 +2453,7 @@ u8 tmtennis_state::input_r(offs_t offset)
 
 // config
 
-/* Pro-Tennis physical button layout and labels is like this:
+/* Pro-Tennis physical button layout and labels are like this:
 
     * left = P2/CPU side *    * right = P1 side *
 
@@ -2946,7 +2946,7 @@ u8 alnchase_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     POWER SOUND LEVEL PLAYER
      ON    ON    PRO   TWO        START
