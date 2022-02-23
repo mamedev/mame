@@ -40,7 +40,7 @@ private:
 void rc2014mini_state::rc2014mini_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xffff).ram();
+	map(0x8000, 0xffff).ram();
 }
 
 void rc2014mini_state::rc2014mini_io(address_map &map)
