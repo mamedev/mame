@@ -2261,9 +2261,7 @@ void pc8801mc_state::machine_reset()
 	pc8801ma_state::machine_reset();
 
 	{
-		int i;
-
-		for(i = 0; i < 0x10; i++)
+		for(int i = 0; i < 0x10; i++)
 			m_cdrom_reg[i] = 0;
 	}
 
@@ -2289,7 +2287,6 @@ uint8_t pc8801_state::opn_porta_r()
 
 	return ioport("OPN_PA")->read();
 }
-uint8_t pc8801_state::opn_portb_r(){ return ioport("OPN_PB")->read(); }
 
 /* Cassette Configuration */
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
@@ -2344,18 +2341,25 @@ void pc8801_state::pc8801(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10);
 
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::rtc_irq), attotime::from_hz(600));
+
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	// TODO: sound irqs goes different routes when both boards are installed
+	// TODO: separate this into specific sound slot
+	// This is a legacy attempt to map a "Sound-Board II",
+	// other noteworthy cards are HMB-20 (single YM2151) and GSX-8800 (AY8910 x 4 + PIT)
+	// Misc notes:
+	// - sound irqs are cascaded on a SBII;
+	// - mixing is stereo, also needs handtuning;
+	// - read callbacks aren't shared obviously;
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801_state::sound_irq));
 	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
-	m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	// TODO: handtune mixing
+	m_opn->port_b_read_callback().set_ioport("OPN_PB");
 	m_opn->add_route(0, "mono", 0.25);
 	m_opn->add_route(1, "mono", 0.25);
 	m_opn->add_route(2, "mono", 0.25);
@@ -2365,15 +2369,12 @@ void pc8801_state::pc8801(machine_config &config)
 	m_opna->set_addrmap(0, &pc8801_state::opna_map);
 	m_opna->irq_handler().set(FUNC(pc8801_state::sound_irq));
 	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
-	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	// TODO: handtune mixing
+	m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	m_opna->add_route(0, "mono", 0.25);
 	m_opna->add_route(1, "mono", 0.25);
 	m_opna->add_route(2, "mono", 0.25);
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::rtc_irq), attotime::from_hz(600));
 }
 
 void pc8801_state::pc8801mk2mr(machine_config &config)
