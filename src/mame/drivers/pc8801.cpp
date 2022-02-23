@@ -749,18 +749,27 @@ void pc8801_state::high_wram_w(offs_t offset, uint8_t data)
 	m_hi_work_ram[offset] = data;
 }
 
-uint8_t pc8801_state::pc8801ma_dic_r(offs_t offset)
+// TODO: remove these virtual trampolines once we modernize memory map
+// Needs confirmation about really not being there tho, given the design
+// may be that both dictionary and CD-ROM are generic slots instead.
+inline uint8_t pc8801_state::dictionary_rom_r(offs_t offset)
 {
-	uint8_t *dic_rom = memregion("dictionary")->base();
-
-	return dic_rom[offset];
+	return 0xff;
 }
 
-uint8_t pc8801_state::cdbios_rom_r(offs_t offset)
+inline bool pc8801_state::dictionary_rom_enable()
 {
-	uint8_t *cdrom_bios = memregion("cdrom")->base();
+	return false;
+}
 
-	return cdrom_bios[offset];
+inline uint8_t pc8801_state::cdbios_rom_r(offs_t offset)
+{
+	return 0xff;
+}
+
+inline bool pc8801_state::cdbios_rom_enable()
+{
+	return false;
 }
 
 uint8_t pc8801_state::mem_r(offs_t offset)
@@ -773,8 +782,8 @@ uint8_t pc8801_state::mem_r(offs_t offset)
 		if(m_gfx_ctrl & 2)
 			return wram_r(offset);
 
-		if(m_has_cdrom && m_cdrom_reg[9] & 0x10)
-			return cdbios_rom_r((offset & 0x7fff) | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000));
+		if(cdbios_rom_enable())
+			return cdbios_rom_r(offset & 0x7fff);
 
 		if(m_gfx_ctrl & 4)
 			return nbasic_rom_r(offset);
@@ -805,8 +814,8 @@ uint8_t pc8801_state::mem_r(offs_t offset)
 	}
 	else if(offset >= 0xc000 && offset <= 0xffff)
 	{
-		if(m_has_dictionary && m_dic_ctrl)
-			return pc8801ma_dic_r((offset & 0x3fff) + ((m_dic_bank & 0x1f) * 0x4000));
+		if(dictionary_rom_enable())
+			return dictionary_rom_r(offset & 0x3fff);
 
 		if(m_misc_ctrl & 0x40)
 		{
@@ -904,33 +913,36 @@ void pc8801_state::main_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(pc8801_state::mem_r), FUNC(pc8801_state::mem_w));
 }
 
+/*
+ * I/O Port $40 reads
+ *
+ * 11-- ----
+ * --x- ---- vrtc
+ * ---x ---- calendar CDO
+ * ---- x--- fdc auto-boot DIP-SW
+ * ---- -x-- (RS-232C related)
+ * ---- --x- monitor refresh rate DIP-SW
+ * ---- ---x (pbsy?)
+ */
 uint8_t pc8801_state::ctrl_r()
 {
-	/*
-	11-- ----
-	--x- ---- vrtc
-	---x ---- calendar CDO
-	---- x--- fdc auto-boot DIP-SW
-	---- -x-- (RS-232C related)
-	---- --x- monitor refresh rate DIP-SW
-	---- ---x (pbsy?)
-	*/
 	return ioport("CTRL")->read();
 }
 
+/*
+ * I/O Port $40 writes
+ *
+ * x--- ---- SING (buzzer mask?)
+ * -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
+ * --x- ---- beeper
+ * ---x ---- ghs mode
+ * ---- x--- crtc i/f sync mode
+ * ---- -x-- upd1990a clock bit
+ * ---- --x- upd1990a strobe bit
+ * ---- ---x printer strobe
+ */
 void pc8801_state::ctrl_w(uint8_t data)
 {
-	/*
-	x--- ---- SING (buzzer mask?)
-	-x-- ---- mouse latch (JOP1, routes on OPN sound port A)
-	--x- ---- beeper
-	---x ---- ghs mode
-	---- x--- crtc i/f sync mode
-	---- -x-- upd1990a clock bit
-	---- --x- upd1990a strobe bit
-	---- ---x printer strobe
-	*/
-
 	m_rtc->stb_w((data & 2) >> 1);
 	m_rtc->clk_w((data & 4) >> 2);
 
@@ -1013,17 +1025,19 @@ void pc8801_state::dynamic_res_change(void)
 	m_screen->configure(xsize, ysize, visarea, refresh);
 }
 
+/*
+ * I/O Port $31 (w/o)
+ *
+ * --x- ---- ???
+ * ---x ---- graphic color yes (1) / no (0)
+ * ---- x--- graphic display yes (1) / no (0)
+ * ---- -x-- RMODE: Basic N (1) / N88 (0)
+ * ---- --x- RAM select yes (1) / no (0)
+ * ---- ---x VRAM 200 lines (1) / 400 lines (0) in 1bpp mode
+ *
+ */
 void pc8801_state::gfx_ctrl_w(uint8_t data)
 {
-	/*
-	--x- ---- ???
-	---x ---- graphic color yes (1) / no (0)
-	---- x--- graphic display yes (1) / no (0)
-	---- -x-- Basic N (1) / N88 (0)
-	---- --x- RAM select yes (1) / no (0)
-	---- ---x VRAM 200 lines (1) / 400 lines (0) in 1bpp mode
-	*/
-
 	m_gfx_ctrl = data;
 
 	dynamic_res_change();
@@ -1391,68 +1405,6 @@ void pc8801_state::kanji_lv2_w(offs_t offset, uint8_t data)
 		m_knj_addr[1] = ((offset & 1) == 0) ? ((m_knj_addr[1]&0xff00)|(data&0xff)) : ((m_knj_addr[1]&0x00ff)|(data<<8));
 }
 
-void pc8801_state::dic_bank_w(uint8_t data)
-{
-	printf("JISHO BANK = %02x\n",data);
-	if(m_has_dictionary)
-		m_dic_bank = data  & 0x1f;
-}
-
-void pc8801_state::dic_ctrl_w(uint8_t data)
-{
-	printf("JISHO CTRL = %02x\n",data);
-	if(m_has_dictionary)
-		m_dic_ctrl = (data ^ 1) & 1;
-}
-
-/*
- * [8] xxxx xxxx CD data
- *               ^ if bit 7 is held then system will bring to a
- *               "CD-System initialize\n[Space]->CD player" screen.
- */
-uint8_t pc8801_state::cdrom_r(offs_t offset)
-{
-	if(m_has_cdrom)
-		return m_cdrom_reg[offset];
-
-	return 0xff;
-}
-
-/*
- * [9] ---x ---- CD-ROM BIOS bank
- *     ---- ---x CD-ROM E-ROM bank (?)
- */
-void pc8801_state::cdrom_w(offs_t offset, uint8_t data)
-{
-
-	//printf("CD-ROM write %02x -> [%02x]\n",data,offset);
-
-	if(m_has_cdrom)
-		m_cdrom_reg[offset] = data;
-}
-
-uint8_t pc8801_state::cpuclock_r()
-{
-	if(m_has_clock_speed)
-		return 0x10 | m_clock_setting;
-
-	return 0xff;
-}
-
-uint8_t pc8801_state::baudrate_r()
-{
-	if(m_has_clock_speed)
-		return 0xf0 | m_baudrate_val;
-
-	return 0xff;
-}
-
-void pc8801_state::baudrate_w(uint8_t data)
-{
-	if(m_has_clock_speed)
-		m_baudrate_val = data & 0xf;
-}
-
 void pc8801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 1) >> 0);
@@ -1521,6 +1473,82 @@ void pc8801_state::unk_w(uint8_t data)
 	printf("Write port 0x33\n");
 }
 
+/*
+ * PC8801FH overrides (CPU clock switch)
+ */
+
+uint8_t pc8801fh_state::cpuclock_r()
+{
+	return 0x10 | m_clock_setting;
+}
+
+uint8_t pc8801fh_state::baudrate_r()
+{
+	return 0xf0 | m_baudrate_val;
+}
+
+void pc8801fh_state::baudrate_w(uint8_t data)
+{
+	m_baudrate_val = data & 0xf;
+}
+
+/*
+ * PC8801MA overrides (dictionary)
+ */
+
+inline uint8_t pc8801ma_state::dictionary_rom_r(offs_t offset)
+{
+	return m_dictionary_rom[offset + ((m_dic_bank & 0x1f) * 0x4000)];
+}
+
+inline bool pc8801ma_state::dictionary_rom_enable()
+{
+	return m_dic_ctrl;
+}
+
+void pc8801ma_state::dic_bank_w(uint8_t data)
+{
+	m_dic_bank = data & 0x1f;
+}
+
+void pc8801ma_state::dic_ctrl_w(uint8_t data)
+{
+	m_dic_ctrl = (data ^ 1) & 1;
+}
+
+/*
+ * PC8801MC overrides (CD-ROM)
+ */
+
+inline uint8_t pc8801mc_state::cdbios_rom_r(offs_t offset)
+{
+	return m_cdrom_bios[offset | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000)];
+}
+
+inline bool pc8801mc_state::cdbios_rom_enable()
+{
+	return m_cdrom_reg[9] & 0x10;
+}
+
+/*
+ * [8] xxxx xxxx CD data
+ *               ^ if bit 7 is held then system will bring to a
+ *               "CD-System initialize\n[Space]->CD player" screen.
+ */
+uint8_t pc8801mc_state::cdrom_r(offs_t offset)
+{
+	return m_cdrom_reg[offset];
+}
+
+/*
+ * [9] ---x ---- CD-ROM BIOS bank
+ *     ---- ---x CD-ROM E-ROM bank (?)
+ */
+void pc8801mc_state::cdrom_w(offs_t offset, uint8_t data)
+{
+	m_cdrom_reg[offset] = data;
+}
+
 void pc8801_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
@@ -1561,12 +1589,11 @@ void pc8801_state::main_io(address_map &map)
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
 	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
 	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
-	map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
-	map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
+//	map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
+//	map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-	map(0x90, 0x9f).rw(FUNC(pc8801_state::cdrom_r), FUNC(pc8801_state::cdrom_w));
 //  map(0xa0, 0xa3).noprw();                                     /* music & network */
 	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  /* second sound board */
 //  map(0xb4, 0xb5).noprw();                                     /* Video art board */
@@ -1587,12 +1614,30 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xe7, 0xe7).noprw();                                     /* Arcus writes here, almost likely to be a mirror of above */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r), FUNC(pc8801_state::kanji_w));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_lv2_r), FUNC(pc8801_state::kanji_lv2_w));
-	map(0xf0, 0xf0).w(FUNC(pc8801_state::dic_bank_w));
-	map(0xf1, 0xf1).w(FUNC(pc8801_state::dic_ctrl_w));
 //  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
 //  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
 //  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
+}
+
+void pc8801fh_state::main_io(address_map &map)
+{
+	pc8801_state::main_io(map);
+	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
+	map(0x6f, 0x6f).rw(FUNC(pc8801fh_state::baudrate_r), FUNC(pc8801fh_state::baudrate_w));
+}
+
+void pc8801ma_state::main_io(address_map &map)
+{
+	pc8801fh_state::main_io(map);
+	map(0xf0, 0xf0).w(FUNC(pc8801ma_state::dic_bank_w));
+	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
+}
+
+void pc8801mc_state::main_io(address_map &map)
+{
+	pc8801ma_state::main_io(map);
+	map(0x90, 0x9f).rw(FUNC(pc8801mc_state::cdrom_r), FUNC(pc8801mc_state::cdrom_w));
 }
 
 void pc8801_state::opna_map(address_map &map)
@@ -1815,7 +1860,8 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CFG")       /* EXSWITCH */
-	#if 0 // reference only, afaik there isn't a thing like this ...
+	#if 0
+	// reference only, afaik there isn't a thing like this ...
 	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
 	PORT_DIPSETTING(    0x01, "75bps" )
 	PORT_DIPSETTING(    0x02, "150bps" )
@@ -1872,7 +1918,8 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
 
 	PORT_START("BOARD_CONFIG")
-	PORT_CONFNAME( 0x01, 0x01, "Sound Board" ) /* TODO: is it possible to have BOTH sound chips in there? */
+	// TODO: extend both via slot options
+	PORT_CONFNAME( 0x01, 0x01, "Sound Board" )
 	PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
 	PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
@@ -2163,18 +2210,14 @@ void pc8801_state::machine_reset()
 			m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 
-	m_has_clock_speed = 0;
-	m_has_dictionary = 0;
-	m_has_cdrom = 0;
-
 	m_extram_size = extram_type[ioport("MEM")->read() & 0x0f];
 	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state, pc8801_clock_speed)
+void pc8801fh_state::machine_reset()
 {
 	pc8801_state::machine_reset();
-	m_has_clock_speed = 1;
+
 	m_clock_setting = ioport("CFG")->read() & 0x80;
 
 	m_maincpu->set_unscaled_clock(m_clock_setting ? (PC8801FH_OSC3 / 8) : (PC8801FH_OSC3 / 4));
@@ -2183,18 +2226,17 @@ MACHINE_RESET_MEMBER(pc8801_state, pc8801_clock_speed)
 	m_baudrate_val = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state, pc8801_dic)
+void pc8801ma_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( pc8801_clock_speed );
-	m_has_dictionary = 1;
+	pc8801fh_state::machine_reset();
+
 	m_dic_bank = 0;
 	m_dic_ctrl = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state, pc8801_cdrom)
+void pc8801mc_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( pc8801_dic );
-	m_has_cdrom = 1;
+	pc8801ma_state::machine_reset();
 
 	{
 		int i;
@@ -2318,22 +2360,25 @@ void pc8801_state::pc8801mk2mr(machine_config &config)
 	PC80S31K(config.replace(), m_pc80s31, MASTER_CLOCK);
 }
 
-void pc8801_state::pc8801fh(machine_config &config)
+void pc8801fh_state::pc8801fh(machine_config &config)
 {
 	pc8801mk2mr(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
+	// TODO: add possible configuration override for baudrate here
+	// ...
 }
 
-void pc8801_state::pc8801ma(machine_config &config)
+void pc8801ma_state::pc8801ma(machine_config &config)
 {
 	pc8801fh(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
+	// TODO: option slot for optional CD-ROM bus
+	// ...
 }
 
-void pc8801_state::pc8801mc(machine_config &config)
+void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
+	// TODO: required CD-ROM bus device
+	// ...
 }
 
 ROM_START( pc8801 )
@@ -2480,7 +2525,6 @@ ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
-	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "ma_jisyo.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
@@ -2543,14 +2587,14 @@ COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empt
 COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
 COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc88sr, pc8801_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc88sr, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
+COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc88sr, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc88sr, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc88sr, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc88sr, pc8801fh_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
+COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc88sr, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc88sr, pc8801fh_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
+COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc88sr, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
 
 //COMP( 1989, pc98do,      0,      0,      pc88va,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )
 //COMP( 1990, pc98dop,     0,      0,      pc88va,      pc88sr, pc8801_state, empty_init, "NEC",   "PC-98DO+",      MACHINE_NOT_WORKING )

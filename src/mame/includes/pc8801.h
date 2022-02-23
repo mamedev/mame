@@ -53,14 +53,21 @@ public:
 
 	void pc8801(machine_config &config);
 	void pc8801mk2mr(machine_config &config);
-	void pc8801fh(machine_config &config);
-	void pc8801ma(machine_config &config);
-	void pc8801mc(machine_config &config);
 
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+
+	virtual uint8_t dictionary_rom_r(offs_t offset);
+	virtual bool dictionary_rom_enable();
+
+	virtual uint8_t cdbios_rom_r(offs_t offset);
+	virtual bool cdbios_rom_enable();
+	virtual void main_io(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -73,7 +80,11 @@ protected:
 	required_device<ym2203_device> m_opn;
 	required_device<palette_device> m_palette;
 
+	uint8_t m_gfx_ctrl;
+
 private:
+	void main_map(address_map &map);
+
 	struct crtc_t
 	{
 		uint8_t cmd,param_count,cursor_on,status,irq_mask;
@@ -101,7 +112,6 @@ private:
 	uint8_t m_i8255_1_pc;
 	uint8_t m_fdc_irq_opcode;
 	uint8_t m_ext_rom_bank;
-	uint8_t m_gfx_ctrl;
 	uint8_t m_vram_sel;
 	uint8_t m_misc_ctrl;
 	uint8_t m_device_ctrl_data;
@@ -132,14 +142,6 @@ private:
 	uint8_t m_sound_irq_latch;
 	uint8_t m_sound_irq_pending;
 #endif
-	uint8_t m_has_clock_speed;
-	uint8_t m_clock_setting;
-	uint8_t m_baudrate_val;
-	uint8_t m_has_dictionary;
-	uint8_t m_dic_ctrl;
-	uint8_t m_dic_bank;
-	uint8_t m_has_cdrom;
-	uint8_t m_cdrom_reg[0x10];
 	crtc_t m_crtc;
 	mouse_t m_mouse;
 	struct { uint8_t r, g, b; } m_palram[8];
@@ -160,10 +162,6 @@ private:
 	void gvram_w(offs_t offset, uint8_t data);
 	uint8_t high_wram_r(offs_t offset);
 	void high_wram_w(offs_t offset, uint8_t data);
-	uint8_t pc8801ma_dic_r(offs_t offset);
-	uint8_t cdbios_rom_r(offs_t offset);
-	uint8_t mem_r(offs_t offset);
-	void mem_w(offs_t offset, uint8_t data);
 	uint8_t ctrl_r();
 	void ctrl_w(uint8_t data);
 	uint8_t ext_rom_bank_r();
@@ -201,18 +199,7 @@ private:
 	void kanji_w(offs_t offset, uint8_t data);
 	uint8_t kanji_lv2_r(offs_t offset);
 	void kanji_lv2_w(offs_t offset, uint8_t data);
-	void dic_bank_w(uint8_t data);
-	void dic_ctrl_w(uint8_t data);
-	uint8_t cdrom_r(offs_t offset);
-	void cdrom_w(offs_t offset, uint8_t data);
-	uint8_t cpuclock_r();
-	uint8_t baudrate_r();
-	void baudrate_w(uint8_t data);
 	void rtc_w(uint8_t data);
-	void upd765_mc_w(uint8_t data);
-	uint8_t upd765_tc_r();
-	void fdc_irq_vector_w(uint8_t data);
-	void fdc_drive_mode_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
 	uint8_t sound_board_r(offs_t offset);
@@ -235,9 +222,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette) const;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
 	INTERRUPT_GEN_MEMBER(vrtc_irq);
@@ -251,6 +235,83 @@ private:
 	void opna_map(address_map &map);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+};
+
+// both FH and MH family bases sports selectable 8/4 MHz CPU clock switch
+class pc8801fh_state : public pc8801_state
+{
+public:
+	pc8801fh_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8801_state(mconfig, type, tag)
+	{ }
+
+	void pc8801fh(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void main_io(address_map &map) override;
+
+private:
+	uint8_t cpuclock_r();
+	uint8_t baudrate_r();
+	void baudrate_w(uint8_t data);
+
+	uint8_t m_clock_setting;
+	uint8_t m_baudrate_val;
+};
+
+class pc8801ma_state : public pc8801fh_state
+{
+public:
+	pc8801ma_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8801fh_state(mconfig, type, tag)
+		, m_dictionary_rom(*this, "dictionary")
+	{ }
+
+	void pc8801ma(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+	virtual void main_io(address_map &map) override;
+
+	virtual uint8_t dictionary_rom_r(offs_t offset) override;
+	virtual bool dictionary_rom_enable() override;
+
+private:
+	void dic_bank_w(uint8_t data);
+	void dic_ctrl_w(uint8_t data);
+	required_region_ptr<u8> m_dictionary_rom;
+
+	uint8_t m_dic_ctrl;
+	uint8_t m_dic_bank;
+};
+
+class pc8801mc_state : public pc8801ma_state
+{
+public:
+	pc8801mc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8801ma_state(mconfig, type, tag)
+		, m_cdrom_bios(*this, "cdrom")
+	{ }
+
+	void pc8801mc(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+	virtual void main_io(address_map &map) override;
+
+private:
+	virtual uint8_t cdbios_rom_r(offs_t offset) override;
+	virtual bool cdbios_rom_enable() override;
+
+	required_region_ptr<u8> m_cdrom_bios;
+
+	uint8_t m_cdrom_reg[0x10];
+
+	uint8_t cdrom_r(offs_t offset);
+	void cdrom_w(offs_t offset, uint8_t data);
 };
 
 #endif // MAME_INCLUDES_PC8801_H
