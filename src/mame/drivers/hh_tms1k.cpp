@@ -12326,7 +12326,8 @@ ROM_END
   "Playmaker" is actually Tiger's trademark for the d-pad controller, this
   controller term was also used in for example Deluxe Football, and 7 in 1 Sports
   Stadium. The d-pad has a ball shape at the bottom that sits on a concave base.
-  Note that this was 2 years before Nintendo's d-pad invention.
+  It is patented under US4256931 (mid-1979, a couple of years before Nintendo's
+  Game & Watch d-pad with US4687200).
 
 ***************************************************************************/
 

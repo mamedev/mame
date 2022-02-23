@@ -25,15 +25,18 @@ daughterboard, the housing is the same as model 6100, except for button labels.
 Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
 and 2 leds to mimick eyes, and the housing color theme is green instead of beige.
 
-To play, wait until the motor is finished before making a move. At boot-up, the
-computer will do a self-test.
-After the player captures a piece, select the captured piece from the MAME sensorboard
-spawn block and place it at the designated box at the edge of the chessboard.
+At boot-up, the computer will do a self-test, the user can start playing after the
+motor has moved to the upper-right corner. The computer will continue positioning
+pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
+while to speed up MAME before starting a new game.
+
+After the user captures a piece, select the captured piece from the MAME sensorboard
+spawn block and place it anywhere on a free spot at the designated box at the
+edge of the chessboard.
 
 TODO:
 - sensorboard undo buffer goes out of control, probably not worth solving this issue
 - cphantom artwork should be green instead of beige
-- motor position in artwork?
 
 BTANB:
 - cphantom: As the manual suggests, the computer's move should be displayed on the
@@ -73,7 +76,9 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0),
-		m_out_motor(*this, "motor.%u", 0U)
+		m_out_motor(*this, "motor.%u", 0U),
+		m_out_motorx(*this, "motorx%u", 0U),
+		m_out_motory(*this, "motory")
 	{ }
 
 	void phantom(machine_config &config);
@@ -91,6 +96,8 @@ protected:
 	required_device<pwm_display_device> m_display;
 	optional_ioport_array<2> m_inputs;
 	output_finder<5> m_out_motor;
+	output_finder<2> m_out_motorx;
+	output_finder<> m_out_motory;
 
 	// address maps
 	virtual void main_map(address_map &map);
@@ -123,13 +130,14 @@ protected:
 	bool m_hmotor_sensor0_ff;
 	bool m_hmotor_sensor1_ff;
 	int m_piece;
-	bool m_piece_collision;
 	u8 m_pieces_map[0x40][0x40];
 };
 
 void phantom_state::machine_start()
 {
 	m_out_motor.resolve();
+	m_out_motorx.resolve();
+	m_out_motory.resolve();
 
 	// register for savestates
 	save_item(NAME(m_mux));
@@ -143,7 +151,6 @@ void phantom_state::machine_start()
 	save_item(NAME(m_hmotor_sensor0_ff));
 	save_item(NAME(m_hmotor_sensor1_ff));
 	save_item(NAME(m_piece));
-	save_item(NAME(m_piece_collision));
 	save_item(NAME(m_pieces_map));
 }
 
@@ -215,7 +222,6 @@ void phantom_state::init_motors()
 	m_hmotor_sensor0_ff = false;
 	m_hmotor_sensor1_ff = false;
 	m_piece = 0;
-	m_piece_collision = false;
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));
 }
 
@@ -244,6 +250,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xc0) m_hmotor_pos++;
 
 	check_rotation();
+
+	// output motor position
+	int magnet = BIT(m_motors_ctrl, 4);
+	m_out_motorx[magnet ^ 1] = 0xd0; // hide
+	m_out_motorx[magnet] = m_hmotor_pos;
+	m_out_motory = m_vmotor_pos;
 }
 
 void phantom_state::update_pieces_position(int state)
@@ -260,26 +272,30 @@ void phantom_state::update_pieces_position(int state)
 
 	if (state)
 	{
-		if (m_piece_collision)
-			m_piece_collision = valid_pos = false;
-
 		if (valid_pos)
 		{
-			m_piece = m_board->read_piece(x, y);
-			m_board->write_piece(x, y, 0);
+			// check if piece was picked up by user
+			int pos = (y << 4 & 0xf0) | (x & 0x0f);
+			if (pos == m_board->get_handpos())
+				m_piece = 0;
+			else
+				m_piece = m_board->read_piece(x, y);
+
+			if (m_piece != 0)
+				m_board->write_piece(x, y, 0);
 		}
 		else
 			m_piece = m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4];
 
 		m_pieces_map[m_vmotor_pos / 4][m_hmotor_pos / 4] = 0;
 	}
-	else
+	else if (m_piece != 0)
 	{
 		// check for pieces collisions
 		if (valid_pos && m_board->read_piece(x, y) != 0)
 		{
 			valid_pos = false;
-			m_piece_collision = true;
+			logerror("Chesspiece collision at %C%d\n", x + 'A', y + 1);
 		}
 
 		if (valid_pos)
@@ -551,7 +567,7 @@ void phantom_state::phantom(machine_config &config)
 	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000); // 4060, 600Hz
 	m_maincpu->set_periodic_int(FUNC(phantom_state::irq0_line_assert), irq_period);
 
-	TIMER(config, "motors_timer").configure_periodic(FUNC(phantom_state::motors_timer), irq_period * 5);
+	TIMER(config, "motors_timer").configure_periodic(FUNC(phantom_state::motors_timer), irq_period * 9);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_size(12, 8);
