@@ -220,7 +220,7 @@ private:
 	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_init(palette_device &palette) const;
+	void palette_reset();
 
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);

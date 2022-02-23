@@ -12,9 +12,9 @@
 
     - pinpoint how much of pc8001/pc8801 drawing functions should actually be inherited
       here;
-    - N interrupt (special control character)
-    - light pen
-    - reset counters
+    - N interrupt (special control character);
+    - light pen;
+    - reset counters;
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
     - DMA burst mode;
@@ -573,7 +573,7 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 	const u8 attr_max_size = 80;
 	std::array<u16, attr_max_size> attr_extend_info;
 
-	// TODO: uPD3301 may actually fetch in LIFO order
+	// TODO: may actually fetch in LIFO order
 	for (int ex = 0; ex < attr_fifo_size; ex+=2)
 	{
 		u8 attr_start = std::min(attr_row[ex], attr_max_size);

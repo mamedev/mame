@@ -298,10 +298,20 @@ void pc8801_state::video_start()
 {
 }
 
-void pc8801_state::palette_init(palette_device &palette) const
+void pc8801_state::palette_reset()
 {
-	for(int i = 0; i< 0x10; i++) //text + bitmap
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	int i;
+
+	for (i = 0; i < 8; i ++)
+	{
+		m_palram[i].b = i & 1 ? 7 : 0;
+		m_palram[i].r = i & 2 ? 7 : 0;
+		m_palram[i].g = i & 4 ? 7 : 0;
+	}
+
+	// text + bitmap
+	for(i = 0; i < 0x10; i++)
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -311,11 +321,11 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	uint16_t y_double = pixel_clock();
 	uint16_t y_size = (y_double+1) * 200;
 
-	for(int y=0;y<y_size;y+=(y_double+1))
+	for(int y = 0; y < y_size; y+=(y_double + 1))
 	{
-		for(int x=0;x<640;x+=8)
+		for(int x = 0; x < 640; x+=8)
 		{
-			for(int xi=0;xi<8;xi++)
+			for(int xi = 0; xi < 8; xi++)
 			{
 				int pen = 0;
 
@@ -354,14 +364,14 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
 	uint8_t is_cursor = 0;
 
-	for(int y=0;y<200;y++)
+	for(int y = 0; y < 200; y++)
 	{
-		for(int x=0;x<640;x+=8)
+		for(int x = 0; x < 640; x+=8)
 		{
 			if(!(m_gfx_ctrl & 1))
-				is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
+				is_cursor = calc_cursor_pos(x / 8, y / lines_per_char, y & (lines_per_char-1));
 
-			for(int xi=0;xi<8;xi++)
+			for(int xi = 0; xi < 8; xi++)
 			{
 				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
 				if(is_cursor)
@@ -390,14 +400,14 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		count = 0;
 
-		for(int y=200;y<400;y++)
+		for(int y = 200; y < 400; y++)
 		{
-			for(int x=0;x<640;x+=8)
+			for(int x = 0; x < 640; x+=8)
 			{
 				if(!(m_gfx_ctrl & 1))
 					is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
 
-				for(int xi=0;xi<8;xi++)
+				for(int xi = 0; xi < 8; xi++)
 				{
 					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
 					if(is_cursor)
@@ -461,10 +471,10 @@ uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t wid
 		return (text_color_flag) ? 0xe8 : 0;
 	}
 
-	/* TODO: correct or hack-ish? Certainly having 0 as a attribute X is weird in any case. */
+	// NB: We offset here as a side effect of how PC8801 really handles uPD3301 attribute fetch
 	offset = (vram[address] == 0) ? 2 : 0;
 
-	for(i=0;i<fifo_size;i++)
+	for(i = 0; i < fifo_size; i++)
 	{
 		if(x < vram[address+offset])
 		{
@@ -483,15 +493,16 @@ void pc8801_state::draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gf
 
 	uint8_t y_height = lines_per_char;
 	uint8_t y_double = pixel_clock();
-	uint8_t y_step = (non_special) ? 80 : 120; // trusted by Elthlead
+	// elthlead uses latter
+	uint8_t y_step = (non_special) ? 80 : 120;
 	uint8_t is_cursor = 0;
 
-	for(int yi=0;yi<y_height;yi++)
+	for(int yi = 0; yi < y_height; yi++)
 	{
 		if(m_gfx_ctrl & 1)
 			is_cursor = calc_cursor_pos(x,y,yi);
 
-		for(int xi=0;xi<8;xi++)
+		for(int xi = 0; xi < 8; xi++)
 		{
 			int tile = vram[x+(y*y_step)+m_dma_address[2]];
 
@@ -565,9 +576,9 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 	int pal;
 	uint8_t non_special;
 
-	for(y=0;y<y_size;y++)
+	for(y = 0; y < y_size; y++)
 	{
-		for(x=0;x<80;x++)
+		for(x = 0; x < 80; x++)
 		{
 			if(x & 1 && !width)
 				continue;
@@ -583,7 +594,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 				upper = 0;
 				lower = 0;
 				blink = 0;
-				pal|=8; //text pal bank
+				pal |= 8; //text PAL bank
 			}
 			else // monochrome
 			{
@@ -594,7 +605,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 				upper = (attr & 0x10) >> 4;
 				lower = (attr & 0x20) >> 5;
 				blink = (attr & 2) >> 1;
-				pal|=8; //text pal bank
+				pal |= 8; //text PAL bank
 				reverse ^= m_crtc.inverse;
 
 				if(attr & 0x80)
@@ -607,7 +618,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 	}
 }
 
-uint32_t pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -635,11 +646,10 @@ uint32_t pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 
 uint8_t pc8801_state::alu_r(offs_t offset)
 {
-	int i;
-	uint8_t b,r,g;
+	uint8_t b, r, g;
 
 	/* store data to ALU regs */
-	for(i=0;i<3;i++)
+	for(int i = 0; i < 3; i++)
 		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
 
 	b = m_gvram[offset + 0x0000];
@@ -656,13 +666,15 @@ void pc8801_state::alu_w(offs_t offset, uint8_t data)
 {
 	int i;
 
-	switch(m_alu_ctrl2 & 0x30) // alu write mode
+	// ALU write mode
+	switch(m_alu_ctrl2 & 0x30)
 	{
-		case 0x00: //logic operation
+		// logic operation
+		case 0x00:
 		{
 			uint8_t logic_op;
 
-			for(i=0;i<3;i++)
+			for(i = 0; i < 3; i++)
 			{
 				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
 
@@ -677,18 +689,21 @@ void pc8801_state::alu_w(offs_t offset, uint8_t data)
 		}
 		break;
 
-		case 0x10: // restore data from ALU regs
+		// restore data from ALU regs
+		case 0x10:
 		{
-			for(i=0;i<3;i++)
+			for(i = 0; i < 3; i++)
 				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
 		}
 		break;
 
-		case 0x20: // swap ALU reg 1 into R GVRAM
+		// swap ALU reg 1 into R GVRAM
+		case 0x20:
 			m_gvram[0x0000 + offset] = m_alu_reg[1];
 			break;
 
-		case 0x30: // swap ALU reg 0 into B GVRAM
+		// swap ALU reg 0 into B GVRAM
+		case 0x30:
 			m_gvram[0x4000 + offset] = m_alu_reg[0];
 			break;
 	}
@@ -797,12 +812,14 @@ uint8_t pc8801_state::mem_r(offs_t offset)
 	{
 		uint32_t window_offset;
 
-		if(m_gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+		// work RAM read select or N-Basic select always banks this as normal work RAM
+		if(m_gfx_ctrl & 6)
 			return wram_r(offset);
 
 		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 		// castlex and imenes accesses this
+		// TODO: high TVRAM even
 		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 			return high_wram_r(window_offset & 0xfff);
 
@@ -853,7 +870,8 @@ void pc8801_state::mem_w(offs_t offset, uint8_t data)
 	}
 	else if(offset >= 0x8000 && offset <= 0x83ff)
 	{
-		if(m_gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+		// work RAM read select or N-Basic select always banks this as normal work RAM
+		if(m_gfx_ctrl & 6)
 			wram_w(offset,data);
 		else
 		{
@@ -863,7 +881,8 @@ void pc8801_state::mem_w(offs_t offset, uint8_t data)
 
 			// castlex and imenes accesses this
 			// TODO: high TVRAM even
-			// (uPD3301 reads from this instead of the regular work RAM)
+			// μPD3301 DMAs from this instead of the regular work RAM in later models
+			// to resolve a bus bottleneck.
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				high_wram_w(window_offset & 0xfff,data);
 			else
@@ -1599,8 +1618,8 @@ void pc8801_state::main_io(address_map &map)
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
 	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
 	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
-//	map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
-//	map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
+//  map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
+//  map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
@@ -2171,7 +2190,7 @@ void pc8801_state::machine_reset()
 	{
 		int i;
 
-		for(i=0;i<3;i++)
+		for(i = 0; i < 3; i++)
 			m_alu_reg[i] = 0x00;
 	}
 
@@ -2211,12 +2230,7 @@ void pc8801_state::machine_reset()
 		m_extram_mode = 0;
 	}
 
-	{
-		int i;
-
-		for(i=0;i<0x10;i++) //text + bitmap
-			m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	}
+	palette_reset();
 
 	m_extram_size = extram_type[ioport("MEM")->read() & 0x0f];
 	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
@@ -2249,7 +2263,7 @@ void pc8801mc_state::machine_reset()
 	{
 		int i;
 
-		for(i=0;i<0x10;i++)
+		for(i = 0; i < 0x10; i++)
 			m_cdrom_reg[i] = 0;
 	}
 
@@ -2328,7 +2342,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
-	PALETTE(config, m_palette, FUNC(pc8801_state::palette_init), 0x10);
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10);
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
