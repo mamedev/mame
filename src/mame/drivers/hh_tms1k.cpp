@@ -9959,7 +9959,7 @@ ROM_END
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
-  * 2x2-digit 7seg LED display + 45 other LEDs, 1-bit sound
+  * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
   For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
   This version is very similar to ssports4 released a few years earlier.

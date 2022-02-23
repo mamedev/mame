@@ -54,5 +54,8 @@ license:CC0
 
 		<group ref="display1"><bounds x="10" y="0" width="13" height="25" /><orientation rotate="270" /></group>
 		<group ref="display2"><bounds x="6" y="9" width="2" height="7" /><orientation rotate="270" /></group>
+
+		<element name="0.8" ref="led"><bounds x="6.8" y="18.33" width="0.33" height="0.33" /></element>
+		<element name="1.8" ref="led"><bounds x="6.8" y="6.33" width="0.33" height="0.33" /></element>
 	</view>
 </mamelayout>
