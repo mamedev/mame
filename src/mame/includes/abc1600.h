@@ -155,7 +155,7 @@ public:
 	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
-	
+
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected

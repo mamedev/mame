@@ -2441,6 +2441,7 @@ magibombb                       // (c) 2002  Astro Corp.
 magibombc                       // (c) 2001  Astro Corp.
 magibombd                       // (c) 2005  Astro Corp.
 magibombe                       // (c) 2001? Astro Corp.
+magibombf                       // (c) 2002  Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -3420,6 +3421,7 @@ bbca                            // 1981 BBC Micro Model A
 bbcb                            // 1981 BBC Micro Model B
 bbcb_de                         // 1982 BBC Micro Model B (German)
 bbcb_us                         // 1983 BBC Micro Model B (US)
+bbcb_no                         // 1984 BBC Micro Model B (Norway)
 bbcbp                           // 1985 BBC Micro Model B+ 64K
 bbcbp128                        // 1985 BBC Micro Model B+ 128K
 bbcm                            // 1986 BBC Master 128
@@ -3444,6 +3446,7 @@ ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
 autoc15                         // 1988 Autocue 1500
 reutapm                         // 1985 Reuters APM Board
+sist1                           // 198? Cisco SIST1 Terminal
 torchf                          // 1982 Torch CF240
 torchh                          // 1982 Torch CH240
 torch301                        // 1984 Torch Model 301
@@ -14023,6 +14026,7 @@ granits                         // RCS
 miniscco
 
 @source:fidel_phantom.cpp
+cphantom                        //
 fphantom                        //
 
 @source:fidel_sc12.cpp
@@ -14656,6 +14660,7 @@ mandinga                        // bootleg (Artemi)
 mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
+mandinka                        // bootleg
 meteora                         // bootleg (Alca)
 mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonsco                        // (c) 1982 bootleg
@@ -16687,6 +16692,7 @@ copycatm2                       // Tiger Electronics
 cqback                          // Coleco
 dataman                         // Texas Instruments
 ditto                           // Tiger Electronics
+dxfootb                         // Tiger Electronics
 ebaskb2                         // Entex
 ebball                          // Entex
 ebball2                         // Entex
@@ -16727,6 +16733,7 @@ palmf31                         // Canon
 palmmd8                         // Canon
 pbmastm                         // Parker Bros
 phpball                         // Tomy
+playmaker                       // Tiger Electronics
 qfire                           // Electroplay
 quizwizc                        // Coleco
 raisedvl                        // Entex
@@ -33510,6 +33517,7 @@ noki8890                        //
 bjpoker                         // (c) M. Kramer Inc.
 cdrawpkr                        // (c) 1984, Coinmaster
 cgip23b                         // (c) 1998, CGI
+cgip30b                         // (c) 1999, CGI
 cgip30cs                        // (c) 1999, CGI
 cgidjp                          // (c) 1999, CGI
 df_djpkr                        // (c) DellFern Ltd.
@@ -36415,6 +36423,7 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 magslot                         // (c) 2003 GMS
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
+sc2in1                          // (c) 2001 GMS
 
 @source:rbowlorama.cpp
 rbowlorama                      // (c) 2008 Cosmodog / Namco
@@ -39599,6 +39608,7 @@ spk115it                        // (c) 199? IGS
 spk116it                        // (c) 199? IGS
 spk116itmx                      // (c) 199? IGS
 spk200ua                        // (c) 1996 IGS
+spk201ua                        // (c) 1996 IGS
 spk203us                        // (c) 1996 IGS
 spk205us                        // (c) 1996 IGS
 spk306us                        // (c) 1996 IGS
@@ -40023,6 +40033,8 @@ subs                            // 033714           1979/05 [6502]
 
 @source:subsino.cpp
 crsbingo                        // (c) 1991 Subsino
+dinofmly                        // (c) 1994 Subsino
+dinofmlya                       // (c) 1995 Subsino (Tangasoft license or hack?)
 mtrainnv                        // (c) 1996 Subsino
 sharkpy                         // (c) 1996 Subsino
 sharkpya                        // (c) 1996 Subsino
@@ -43742,6 +43754,7 @@ wy75                            // WY-75
 
 @source:wy55.cpp
 wy55                            // WY-55
+wy65                            // WY-65
 
 @source:wy60.cpp
 wy60                            // WY-60

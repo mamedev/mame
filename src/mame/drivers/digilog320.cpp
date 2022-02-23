@@ -41,7 +41,7 @@
     - XTAL 3.6864 MHz
 
     TODO:
-	- Finish floppy hookup
+    - Finish floppy hookup
     - SCC interrupts
     - Unknown DUART inputs/outputs
     - RS232

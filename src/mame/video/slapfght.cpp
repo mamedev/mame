@@ -136,9 +136,9 @@ WRITE_LINE_MEMBER(slapfght_state::palette_bank_w)
 
 void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
-	uint8_t *src = m_spriteram->buffer();
+	const uint8_t *src = m_spriteram;
 
-	for (int offs = 0; offs < m_spriteram->bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		/*
 		    0: xxxxxxxx - code
@@ -186,9 +186,9 @@ uint32_t slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_in
 
 void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *src = m_spriteram->buffer();
+	const uint8_t *src = m_spriteram;
 
-	for (int offs = 0; offs < m_spriteram->bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		/*
 		    0: xxxxxxxx - code low
@@ -201,8 +201,8 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 		*/
 
 		int code = src[offs + 0] | ((src[offs + 2] & 0xc0) << 2);
-		int sy = src[offs + 3];
-		int sx = (src[offs + 1] | (src[offs + 2] << 8 & 0x100)) - 13;
+		int sy = src[offs + 3] + 2;
+		int sx = (src[offs + 1] | (src[offs + 2] << 8 & 0x100)) - 17;
 		int color = src[offs + 2] >> 1 & 0xf;
 		int fx = 0, fy = 0;
 
@@ -212,6 +212,9 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 			sx = 284 - sx;
 			fx = fy = 1;
 		}
+
+		if (sy > 256-8)
+			sy -= 256;
 
 		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, fx, fy, sx, sy, 0);
 	}

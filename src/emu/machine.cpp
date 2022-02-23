@@ -10,27 +10,29 @@
 
 #include "emu.h"
 
-#include "emuopts.h"
-#include "osdepend.h"
 #include "config.h"
-#include "debugger.h"
-#include "render.h"
-#include "uiinput.h"
 #include "crsshair.h"
-#include "debug/debugvw.h"
 #include "debug/debugcpu.h"
+#include "debug/debugvw.h"
+#include "debugger.h"
 #include "dirtc.h"
+#include "emuopts.h"
 #include "fileio.h"
+#include "http.h"
 #include "image.h"
+#include "natkeyboard.h"
 #include "network.h"
+#include "render.h"
 #include "romload.h"
 #include "tilemap.h"
-#include "natkeyboard.h"
+#include "uiinput.h"
+
 #include "ui/uimain.h"
-#include "http.h"
 
 #include "corestr.h"
 #include "unzip.h"
+
+#include "osdepend.h"
 
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>

@@ -59,6 +59,7 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	int get_handpos() { return m_handpos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 

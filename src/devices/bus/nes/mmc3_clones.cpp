@@ -192,23 +192,23 @@ nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char
 {
 }
 
-nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board(type == NES_8237A)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }
 
 nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_8237_device(mconfig, NES_8237, tag, owner, clock)
+	: nes_8237_device(mconfig, NES_8237, tag, owner, clock, 0)
 {
 }
 
 nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock)
+	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock, 1)
 {
 }
 
 nes_158b_device::nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_8237_device(mconfig, NES_158B, tag, owner, clock)
+	: nes_8237_device(mconfig, NES_158B, tag, owner, clock, 0)
 {
 }
 
@@ -222,18 +222,18 @@ nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_kasing_device(mconfig, type, tag, owner, clock), m_board(type == NES_SG_BOOG)
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
+	: nes_kasing_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }
 
 nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock)
+	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock, 0)
 {
 }
 
 nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock)
+	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock, 1)
 {
 }
 

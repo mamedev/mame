@@ -196,6 +196,7 @@ public:
 	void bbcb(machine_config &config);
 	void bbcb_de(machine_config &config);
 	void bbcb_us(machine_config &config);
+	void sist1(machine_config &config);
 
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
@@ -437,9 +438,9 @@ public:
 	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
-	void mpc800(machine_config& config);
-	void mpc900(machine_config& config);
-	void mpc900gx(machine_config& config);
+	void mpc800(machine_config &config);
+	void mpc900(machine_config &config);
+	void mpc900gx(machine_config &config);
 	void bbcmc(machine_config &config);
 	void pro128s(machine_config &config);
 	void autoc15(machine_config &config);

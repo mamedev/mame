@@ -44,11 +44,11 @@ void abc1600_mac_device::mac_map(address_map &map)
 {
 	map(0x80000, 0x80000).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mac_device::page_hi_r), FUNC(abc1600_mac_device::page_hi_w));
 	map(0x80001, 0x80001).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mac_device::page_lo_r), FUNC(abc1600_mac_device::page_lo_w));
-    map(0x80002, 0x80002).mirror(0x7fff8).noprw();
+	map(0x80002, 0x80002).mirror(0x7fff8).noprw();
 	map(0x80003, 0x80003).mirror(0x07ef8).select(0x78100).rw(FUNC(abc1600_mac_device::segment_r), FUNC(abc1600_mac_device::segment_w));
-    map(0x80004, 0x80004).mirror(0x7fff8).noprw();
+	map(0x80004, 0x80004).mirror(0x7fff8).noprw();
 	map(0x80005, 0x80005).mirror(0x7fff8).nopr().w(FUNC(abc1600_mac_device::task_w));
-    map(0x80006, 0x80006).mirror(0x7fff8).noprw();
+	map(0x80006, 0x80006).mirror(0x7fff8).noprw();
 	map(0x80007, 0x80007).mirror(0x7fff8).r(FUNC(abc1600_mac_device::cause_r)).nopw();
 }
 
@@ -179,7 +179,7 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
-	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n", 
+	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_read_fc(), m_magic);
 
 	return virtual_offset;
@@ -196,7 +196,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 	{
 		return m_rom->base()[offset & 0x3fff];
 	}
-	
+
 	uint8_t fc = m_read_fc();
 	int task = m_task;
 
@@ -342,7 +342,7 @@ void abc1600_mac_device::task_w(offs_t offset, uint8_t data)
 	m_boote = !BIT(data, 6);
 	m_magic = !BIT(data, 7);
 
-	if (LOG_MAC) logerror("%s TASK W %02x (TASK %u BOOTE %u MAGIC %u)\n", 
+	if (LOG_MAC) logerror("%s TASK W %02x (TASK %u BOOTE %u MAGIC %u)\n",
 		machine().describe_context(), data, m_task, m_boote, m_magic);
 }
 
@@ -399,7 +399,7 @@ void abc1600_mac_device::segment_w(offs_t offset, uint8_t data)
 	offs_t sega = (m_task << 5) | A8 << 4 | ((offset >> 15) & 0xf);
 	m_segment_ram[sega] = data & 0x7f;
 
-	if (LOG_MAC) logerror("%s SEG W %05x:%02x SEGA %03x SEGD %02x TASK %u\n", 
+	if (LOG_MAC) logerror("%s SEG W %05x:%02x SEGA %03x SEGD %02x TASK %u\n",
 		machine().describe_context(), offset, data,
 		sega, m_segment_ram[sega], m_task);
 }
@@ -502,8 +502,8 @@ void abc1600_mac_device::page_lo_w(offs_t offset, uint8_t data)
 	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
 	m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
 
-	if (LOG_MAC) logerror("%s PAGE W %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x TASK %u)\n", 
-		machine().describe_context(), offset, data, 
+	if (LOG_MAC) logerror("%s PAGE W %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x TASK %u)\n",
+		machine().describe_context(), offset, data,
 		sega, segd, pga, m_page_ram[pga], m_task);
 }
 
@@ -520,10 +520,10 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 
 	    0       X19
 	    1       X20
-	    2       
-	    3       
-	    4       
-	    5       
+	    2
+	    3
+	    4
+	    5
 	    6       _WP
 	    7       NONX
 
@@ -651,10 +651,10 @@ void abc1600_mac_device::dump()
 
 				offs_t sega = (task << 5) | seg;
 				uint8_t segd = m_segment_ram[sega];
-				
+
 				offs_t pga = ((segd & 0x3f) << 4) | page;
 				uint16_t page_data = m_page_ram[pga];
-				
+
 				offs_t physical = (page_data & 0x3ff) << 11;
 				bool nonx = PAGE_NONX;
 				bool wp = PAGE_WP;

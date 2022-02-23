@@ -20,6 +20,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
 #include "machine/amigafdc.h"
+#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
@@ -94,7 +95,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BLTCDAT     (0x070/2)   /* W  A      Blitter source C data register */
 #define REG_BLTBDAT     (0x072/2)   /* W  A      Blitter source B data reglster */
 #define REG_BLTADAT     (0x074/2)   /* W  A      Blitter source A data register */
-#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = 0xFF, ECS = 0xFC, AGA = 0xF8 */
+#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = <open bus>, ECS = 0xFC, AGA = 0xF8 */
 #define REG_DSKSYNC     (0x07E/2)   /* W      P  Disk sync pattern register for disk read */
 #define REG_COP1LCH     (0x080/2)   /* W  A      Coprocessor first location register (high 3 bits) */
 #define REG_COP1LCL     (0x082/2)   /* W  A      Coprocessor first location register (low 15 bits) */
@@ -307,51 +308,56 @@ Ernesto Corvi & Mariusz Wojcieszek
 class amiga_state : public driver_device
 {
 public:
-	amiga_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_agnus_id(AGNUS_NTSC),
-		m_denise_id(DENISE),
-		m_maincpu(*this, "maincpu"),
-		m_cia_0(*this, "cia_0"),
-		m_cia_1(*this, "cia_1"),
-		m_rs232(*this, "rs232"),
-		m_centronics(*this, "centronics"),
-		m_paula(*this, "amiga"),
-		m_fdc(*this, "fdc"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_overlay(*this, "overlay"),
-		m_input_device(*this, "input"),
-		m_joy0dat_port(*this, "joy_0_dat"),
-		m_joy1dat_port(*this, "joy_1_dat"),
-		m_potgo_port(*this, "potgo"),
-		m_pot0dat_port(*this, "POT0DAT"),
-		m_pot1dat_port(*this, "POT1DAT"),
-		m_joy_ports(*this, "p%u_joy", 1),
-		m_p1_mouse_x(*this, "p1_mouse_x"),
-		m_p1_mouse_y(*this, "p1_mouse_y"),
-		m_p2_mouse_x(*this, "p2_mouse_x"),
-		m_p2_mouse_y(*this, "p2_mouse_y"),
-		m_hvpos(*this, "HVPOS"),
-		m_power_led(*this, "power_led"),
-		m_chip_ram_mask(0),
-		m_cia_0_irq(0),
-		m_cia_1_irq(0),
-		m_pot0x(0), m_pot1x(0), m_pot0y(0), m_pot1y(0),
-		m_pot0dat(0x0000),
-		m_pot1dat(0x0000),
-		m_centronics_busy(0),
-		m_centronics_perror(0),
-		m_centronics_select(0),
-		m_gayle_reset(false),
-		m_diw(),
-		m_diwhigh_valid(false),
-		m_previous_lof(true),
-		m_rx_shift(0),
-		m_tx_shift(0),
-		m_rx_state(0),
-		m_tx_state(0),
-		m_rx_previous(1)
+	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_agnus_id(AGNUS_NTSC)
+		, m_denise_id(DENISE)
+		, m_maincpu(*this, "maincpu")
+		, m_cia_0(*this, "cia_0")
+		, m_cia_1(*this, "cia_1")
+		, m_rs232(*this, "rs232")
+		, m_centronics(*this, "centronics")
+// 		, m_agnus(*this, "agnus")
+//		, m_denise(*this, "denise")
+		, m_copper(*this, "copper")
+//		, m_blitter(*this, "blitter")
+		, m_paula(*this, "paula")
+		, m_fdc(*this, "fdc")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_overlay(*this, "overlay")
+		, m_chipset(*this, "chipset")
+		, m_input_device(*this, "input")
+		, m_joy0dat_port(*this, "joy_0_dat")
+		, m_joy1dat_port(*this, "joy_1_dat")
+		, m_potgo_port(*this, "potgo")
+		, m_pot0dat_port(*this, "POT0DAT")
+		, m_pot1dat_port(*this, "POT1DAT")
+		, m_joy_ports(*this, "p%u_joy", 1)
+		, m_p1_mouse_x(*this, "p1_mouse_x")
+		, m_p1_mouse_y(*this, "p1_mouse_y")
+		, m_p2_mouse_x(*this, "p2_mouse_x")
+		, m_p2_mouse_y(*this, "p2_mouse_y")
+		, m_hvpos(*this, "HVPOS")
+		, m_power_led(*this, "power_led")
+		, m_chip_ram_mask(0)
+		, m_cia_0_irq(0)
+		, m_cia_1_irq(0)
+		, m_pot0x(0), m_pot1x(0), m_pot0y(0), m_pot1y(0)
+		, m_pot0dat(0x0000)
+		, m_pot1dat(0x0000)
+		, m_centronics_busy(0)
+		, m_centronics_perror(0)
+		, m_centronics_select(0)
+		, m_gayle_reset(false)
+		, m_diw()
+		, m_diwhigh_valid(false)
+		, m_previous_lof(true)
+		, m_rx_shift(0)
+		, m_tx_shift(0)
+		, m_rx_state(0)
+		, m_tx_state(0)
+		, m_rx_previous(1)
 	{
 		std::fill(std::begin(m_custom_regs), std::end(m_custom_regs), 0);
 	}
@@ -359,7 +365,10 @@ public:
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)
 	{
-		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : 0xffff;
+		// We use rand() here so that an attempt to go beyond the allocated chip RAM 
+		// (hopefully) doesn't go unnoticed.
+		// FIXME: most likely open bus instead.
+		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : machine().rand();
 	}
 
 	void write_chip_ram(offs_t byteoffs, uint16_t data)
@@ -405,11 +414,13 @@ public:
 	uint16_t m_genlock_color;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	uint8_t m_separate_bitplanes[2][64];
+	// FIXME: we instantiate 256 entries so that it pleases AGA
+	uint8_t m_separate_bitplanes[2][256];
 
 	/* aga */
 	int m_aga_diwhigh_written;
 	rgb_t m_aga_palette[256];
+	rgb_t m_aga_ehb_palette[32 + 32];
 	uint64_t m_aga_bpldat[8];
 	uint16_t m_aga_sprdata[8][4];
 	uint16_t m_aga_sprdatb[8][4];
@@ -536,7 +547,7 @@ protected:
 	};
 
 	// chipset
-	bool IS_OCS() const { return m_denise_id == 0xff; }
+	bool IS_OCS() const { return m_denise_id == 0xffff; }
 	bool IS_ECS() const { return m_denise_id == 0xfc; }
 	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
@@ -573,12 +584,13 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
+	required_device<amiga_copper_device> m_copper;
 	required_device<paula_8364_device> m_paula;
 	optional_device<amiga_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
-
+	required_device<address_map_bank_device> m_chipset;
 
 	// i/o ports
 	optional_ioport m_input_device;
@@ -604,6 +616,16 @@ protected:
 	uint16_t m_custom_regs[256];
 	static const char *const s_custom_reg_names[0x100];
 
+	void ocs_map(address_map &map);
+	void ecs_map(address_map &map);
+	void aga_map(address_map &map);
+
+	// TODO: move to Agnus/Alice
+	u16 vposr_r();
+	void vposw_w(u16 data);
+	void bplcon0_w(u16 data);
+	void aga_bplcon0_w(u16 data);
+
 private:
 	// blitter helpers
 	uint32_t blit_ascending();
@@ -614,8 +636,6 @@ private:
 protected:
 	void set_genlock_color(uint16_t color);
 private:
-	void copper_setpc(uint32_t pc);
-	int copper_execute_next(int xpos);
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);
@@ -637,8 +657,8 @@ private:
 	int aga_get_sprite_pixel(int x);
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);
-	void aga_fetch_bitplane_data(int plane);
-	rgb_t aga_update_ham(int newpix);
+	void aga_fetch_bitplane_data(int plane, u8 bitplane_fmode);
+	rgb_t aga_update_ham(int newpix, int plane);
 
 	enum
 	{
