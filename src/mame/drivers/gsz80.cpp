@@ -4,6 +4,9 @@
 // MAME Reference driver for Grant Searle's Simple Z80 Computer
 // http://www.searle.wales/
 
+// RC2014 Mini added by Chris Swan
+// https://rc2014.co.uk/full-kits/rc2014-mini/
+
 // All the common emulator stuff is here
 #include "emu.h"
 
@@ -38,6 +41,28 @@ private:
 	required_device<acia6850_device> m_acia;
 };
 
+class rc2014mini_state : public gsz80_state
+{
+public:
+	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gsz80_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")   // Tag name for Z80 is "maincpu"
+		, m_acia(*this, "acia")         // Tag name for UART is "acia"
+	{ }
+
+	// This function sets up the machine configuration
+	void rc2014mini(machine_config &config);
+
+private:
+	// address maps for program memory and io memory
+	void rc2014mini_mem(address_map &map);
+	void rc2014mini_io(address_map &map);
+
+	// two member devices required here
+	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia;
+};
+
 // Trivial memory map for program memory
 void gsz80_state::gsz80_mem(address_map &map)
 {
@@ -45,7 +70,20 @@ void gsz80_state::gsz80_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
+void rc2014mini_state::rc2014mini_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0xffff).ram();
+}
+
 void gsz80_state::gsz80_io(address_map &map)
+{
+	map.global_mask(0xff);  // use 8-bit ports
+	map.unmap_value_high(); // unmapped addresses return 0xff
+	map(0x80, 0xbf).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+}
+
+void rc2014mini_state::rc2014mini_io(address_map &map)
 {
 	map.global_mask(0xff);  // use 8-bit ports
 	map.unmap_value_high(); // unmapped addresses return 0xff
@@ -89,12 +127,50 @@ void gsz80_state::gsz80(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
 }
 
+void rc2014mini_state::rc2014mini(machine_config &config)
+{
+	// Configure member Z80 (via m_maincpu)
+	Z80(config, m_maincpu, XTAL(7'372'800));
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc2014mini_state::rc2014mini_mem);
+	m_maincpu->set_addrmap(AS_IO, &rc2014mini_state::rc2014mini_io);
+
+	// Configure UART (via m_acia)
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
+
+	// Create a clock device to connect to the transmit and receive clock on the 6850
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 7'372'800));
+	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+
+	// Configure a "default terminal" to connect to the 6850, so we have a console
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
+}
+
 // ROM mapping is trivial, this binary was created from the HEX file on Grant's website
 ROM_START(gsz80)
 	ROM_REGION(0x2000, "maincpu",0)
 	ROM_LOAD("gsz80.bin",   0x0000, 0x2000, CRC(6f4bc7e5) SHA1(9008fe3b9754ec5537b3ad90f748096602ba008e))
 ROM_END
 
+// from https://github.com/RC2014Z80/RC2014/tree/master/ROMs/Factory
+// `dd skip=56 count=8 if=R0000009.BIN of=rc2014mini_scm.bin bs=1024`
+// `dd count=8 if=R0000009.BIN of=rc2014mini_32k.bin bs=1024`
+ROM_START(rc2014mini)
+	ROM_REGION(0x2000, "maincpu",0)
+	ROM_SYSTEM_BIOS( 0, "scm", "Small Computer Monitor")
+	ROMX_LOAD("rc2014mini_scm.bin",  0x0000, 0x2000, CRC(e8745176) SHA1(d71afa985c4dcc25536b6597a099dabc815a8eb2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "32k", "32K BASIC")
+	ROMX_LOAD("rc2014mini_32k.bin",  0x0000, 0x2000, CRC(850e3ec7) SHA1(7c9613e160b324ee1ed42fc48d98bbc215791e81), ROM_BIOS(1))
+ROM_END
+
 // This ties everything together
-//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gsz80,       0,        0,      gsz80,    0,       gsz80_state, empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT    CLASS             INIT           COMPANY           FULLNAME                FLAGS
+COMP( 201?, gsz80,          0,        0,        gsz80,         0,       gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+COMP( 2015, rc2014mini,     gsz80,    0,        rc2014mini,    0,       rc2014mini_state, empty_init,    "Z80Kits",        "RC2014 Mini",          MACHINE_NO_SOUND_HW )
