@@ -89,12 +89,13 @@ void rc2014mini_state::rc2014mini(machine_config &config)
 
 // ROM mapping is trivial, this binary was created from the K0000000.hex file
 // from https://github.com/RC2014Z80/RC2014/tree/master/ROMs/Factory
-// `objcopy --input-target=ihex --output-target=binary K0000000.hex rc2014mini.bin`
+// `dd skip=56 count=8 if=R0000009.BIN of=rc2014mini_scm.bin bs=1024`
+
 ROM_START(rc2014mini)
 	ROM_REGION(0x2000, "maincpu",0)
-	ROM_LOAD("rc2014mini.bin",   0x0000, 0x2000, CRC(6f4bc7e5) SHA1(9008fe3b9754ec5537b3ad90f748096602ba008e))
+	ROM_LOAD("rc2014mini_scm.bin",   0x0000, 0x2000, CRC(e8745176) SHA1(d71afa985c4dcc25536b6597a099dabc815a8eb2))
 ROM_END
 
 // This ties everything together
-//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 2015, rc2014mini,       0,        0,      rc2014mini,    0,       rc2014mini_state, empty_init,    "Z80Kits",   "RC2014 Mini",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT    CLASS             INIT           COMPANY      FULLNAME                  FLAGS
+COMP( 2015, rc2014mini,     0,        0,        rc2014mini,    0,       rc2014mini_state, empty_init,    "Z80Kits",   "RC2014 Mini SCM",        MACHINE_NO_SOUND_HW )
