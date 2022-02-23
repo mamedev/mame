@@ -38,6 +38,7 @@ private:
 	
 	u8 clock_r();
 	void volume_control_w(u8 data);
+	u8 id_r();
 	void rom_bank_w(u8 data);
 
 	bool m_clock_hb;

@@ -86,8 +86,14 @@ void pc8801_31_device::device_reset()
 
 void pc8801_31_device::amap(address_map &map)
 {
+//	map(0x00, 0x00).rw SCSI comms
+//	map(0x01, 0x01).rw SCSI data
+//	map(0x04, 0x04).w bit 7 SCSI RST
 	map(0x08, 0x08).rw(FUNC(pc8801_31_device::clock_r), FUNC(pc8801_31_device::volume_control_w));
-	map(0x09, 0x09).w(FUNC(pc8801_31_device::rom_bank_w));
+	map(0x09, 0x09).rw(FUNC(pc8801_31_device::id_r), FUNC(pc8801_31_device::rom_bank_w));
+//	map(0x0b, 0x0b).r unknown (0x3c in M88)
+//	map(0x0d, 0x0d).r unknown (0x3c in M88)
+//	map(0x0f, 0x0f).w bit 0 enables CD-ROM drive
 }
 
 /*
@@ -124,7 +130,16 @@ void pc8801_31_device::volume_control_w(u8 data)
  *
  * ---x ---- CD-ROM BIOS bank
  * ---- ---x CD-ROM E-ROM bank (?)
+ *
  */
+u8 pc8801_31_device::id_r()
+{
+	// PC=A9AA CD-Player checks this against 0xcd, branches with $71 bit 0 set (N88 extended ROM bank)
+	// Identifier for a 8801MC?
+	logerror("%s: id_r %02x\n", machine().describe_context());
+	return 0xcd;
+}
+
 void pc8801_31_device::rom_bank_w(u8 data)
 {
 	m_rom_bank_cb(bool(BIT(data, 4)));

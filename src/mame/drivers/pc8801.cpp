@@ -1611,7 +1611,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xc2, 0xcf) "music" (?)
 //  map(0xd0, 0xd7) "music" or GP-IB
 //  map(0xd8, 0xd8) GP-IB
-//  map(0xdc, 0xdf) MODEM 
+//  map(0xdc, 0xdf) MODEM
 	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w)); /* expand RAM mode */
 	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w)); /* expand RAM bank */
 #if USE_PROPER_I8214
