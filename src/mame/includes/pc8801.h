@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/i8214.h"
@@ -23,6 +22,8 @@
 #include "machine/pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/pc8801/pc8801_31.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -291,7 +292,8 @@ class pc8801mc_state : public pc8801ma_state
 public:
 	pc8801mc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8801ma_state(mconfig, type, tag)
-		, m_cdrom_bios(*this, "cdrom")
+		, m_cdrom_if(*this, "cdrom_if")
+		, m_cdrom_bios(*this, "cdrom_bios")
 	{ }
 
 	void pc8801mc(machine_config &config);
@@ -305,12 +307,10 @@ private:
 	virtual uint8_t cdbios_rom_r(offs_t offset) override;
 	virtual bool cdbios_rom_enable() override;
 
+	required_device<pc8801_31_device> m_cdrom_if;
 	required_region_ptr<u8> m_cdrom_bios;
 
-	uint8_t m_cdrom_reg[0x10];
-
-	uint8_t cdrom_r(offs_t offset);
-	void cdrom_w(offs_t offset, uint8_t data);
+	bool m_cdrom_bank;
 };
 
 #endif // MAME_INCLUDES_PC8801_H

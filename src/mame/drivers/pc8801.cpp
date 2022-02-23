@@ -1556,26 +1556,7 @@ inline uint8_t pc8801mc_state::cdbios_rom_r(offs_t offset)
 
 inline bool pc8801mc_state::cdbios_rom_enable()
 {
-	return m_cdrom_reg[9] & 0x10;
-}
-
-/*
- * [8] xxxx xxxx CD data
- *               ^ if bit 7 is held then system will bring to a
- *               "CD-System initialize\n[Space]->CD player" screen.
- */
-uint8_t pc8801mc_state::cdrom_r(offs_t offset)
-{
-	return m_cdrom_reg[offset];
-}
-
-/*
- * [9] ---x ---- CD-ROM BIOS bank
- *     ---- ---x CD-ROM E-ROM bank (?)
- */
-void pc8801mc_state::cdrom_w(offs_t offset, uint8_t data)
-{
-	m_cdrom_reg[offset] = data;
+	return m_cdrom_bank;
 }
 
 void pc8801_state::main_io(address_map &map)
@@ -1618,21 +1599,21 @@ void pc8801_state::main_io(address_map &map)
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
 	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
 	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
-//  map(0x6e, 0x6e).r(FUNC(pc8801_state::cpuclock_r));
-//  map(0x6f, 0x6f).rw(FUNC(pc8801_state::baudrate_r), FUNC(pc8801_state::baudrate_w));
+//  map(0x6e, 0x6f) clock settings (8801FH and later)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-//  map(0xa0, 0xa3).noprw();                                     /* music & network */
-	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  /* second sound board */
-//  map(0xb4, 0xb5).noprw();                                     /* Video art board */
-//  map(0xc1, 0xc1).noprw();                                     /* (unknown) */
-//  map(0xc2, 0xcf).noprw();                                     /* music */
-//  map(0xd0, 0xd7).noprw();                                     /* music & GP-IB */
-//  map(0xd8, 0xd8).noprw();                                     /* GP-IB */
-//  map(0xdc, 0xdf).noprw();                                     /* MODEM */
-	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w));            /* expand RAM mode */
-	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w));            /* expand RAM bank */
+//	map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
+//  map(0xa0, 0xa3) GSX-8800 or network board
+	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  // Sound Board II
+//  map(0xb4, 0xb5) Video art board (?)
+//  map(0xc1, 0xc1) (unknown)
+//  map(0xc2, 0xcf) "music" (?)
+//  map(0xd0, 0xd7) "music" or GP-IB
+//  map(0xd8, 0xd8) GP-IB
+//  map(0xdc, 0xdf) MODEM 
+	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w)); /* expand RAM mode */
+	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w)); /* expand RAM bank */
 #if USE_PROPER_I8214
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::i8214_irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::i8214_irq_mask_w));
@@ -1640,12 +1621,13 @@ void pc8801_state::main_io(address_map &map)
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
 #endif
-//  map(0xe7, 0xe7).noprw();                                     /* Arcus writes here, almost likely to be a mirror of above */
+//  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r), FUNC(pc8801_state::kanji_w));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_lv2_r), FUNC(pc8801_state::kanji_lv2_w));
-//  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
-//  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
-//  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
+//	map(0xf0, 0xf1) dictionary bank (8801MA and later)
+//  map(0xf3, 0xf3) DMA floppy (unknown)
+//  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
+//  map(0xf8, 0xfb) DMA 8-inch floppy (?)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
@@ -1666,7 +1648,7 @@ void pc8801ma_state::main_io(address_map &map)
 void pc8801mc_state::main_io(address_map &map)
 {
 	pc8801ma_state::main_io(map);
-	map(0x90, 0x9f).rw(FUNC(pc8801mc_state::cdrom_r), FUNC(pc8801mc_state::cdrom_w));
+	map(0x90, 0x9f).m(m_cdrom_if, FUNC(pc8801_31_device::amap));
 }
 
 void pc8801_state::opna_map(address_map &map)
@@ -2260,13 +2242,8 @@ void pc8801mc_state::machine_reset()
 {
 	pc8801ma_state::machine_reset();
 
-	{
-		for(int i = 0; i < 0x10; i++)
-			m_cdrom_reg[i] = 0;
-	}
-
 	// Hold STOP during boot to bypass CDROM BIOS at POST (PC=0x10)
-	m_cdrom_reg[9] = 0x10;
+	m_cdrom_bank = true;
 }
 
 /* YM2203 Interface */
@@ -2393,15 +2370,16 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 void pc8801ma_state::pc8801ma(machine_config &config)
 {
 	pc8801fh(config);
-	// TODO: option slot for optional CD-ROM bus
+	// TODO: option slot for CD-ROM bus
 	// ...
 }
 
 void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
-	// TODO: required CD-ROM bus device
-	// ...
+
+	PC8801_31(config, m_cdrom_if, 0);
+	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
 }
 
 ROM_START( pc8801 )
@@ -2585,7 +2563,7 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_n88_2.rom", 0xc000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
 	ROM_LOAD( "mc_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
-	ROM_REGION( 0x10000, "cdrom", 0 )
+	ROM_REGION( 0x10000, "cdrom_bios", 0 )
 	ROM_LOAD( "cdbios.rom", 0x0000, 0x10000, CRC(5c230221) SHA1(6394a8a23f44ea35fcfc3e974cf940bc8f84d62a) )
 
 	ROM_REGION( 0x40000, "kanji", 0 )

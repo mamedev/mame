@@ -4783,3 +4783,15 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc8801/pc8801_31.h,BUSES["PC8801"] = true
+---------------------------------------------------
+
+if (BUSES["PC8801"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.h",
+	}
+end
