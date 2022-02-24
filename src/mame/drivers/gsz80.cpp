@@ -31,7 +31,7 @@ public:
 	// This function sets up the machine configuration
 	void gsz80(machine_config &config);
 
-private:
+protected:
 	// address maps for program memory and io memory
 	void gsz80_mem(address_map &map);
 	void gsz80_io(address_map &map);
@@ -46,21 +46,14 @@ class rc2014mini_state : public gsz80_state
 public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")   // Tag name for Z80 is "maincpu"
-		, m_acia(*this, "acia")         // Tag name for UART is "acia"
 	{ }
 
 	// This function sets up the machine configuration
 	void rc2014mini(machine_config &config);
 
-private:
+protected:
 	// address maps for program memory and io memory
 	void rc2014mini_mem(address_map &map);
-	void rc2014mini_io(address_map &map);
-
-	// two member devices required here
-	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
 };
 
 // Trivial memory map for program memory
@@ -70,6 +63,7 @@ void gsz80_state::gsz80_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
+// RC2014 Mini only has 32K RAM
 void rc2014mini_state::rc2014mini_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
@@ -77,13 +71,6 @@ void rc2014mini_state::rc2014mini_mem(address_map &map)
 }
 
 void gsz80_state::gsz80_io(address_map &map)
-{
-	map.global_mask(0xff);  // use 8-bit ports
-	map.unmap_value_high(); // unmapped addresses return 0xff
-	map(0x80, 0xbf).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-}
-
-void rc2014mini_state::rc2014mini_io(address_map &map)
 {
 	map.global_mask(0xff);  // use 8-bit ports
 	map.unmap_value_high(); // unmapped addresses return 0xff
@@ -129,28 +116,8 @@ void gsz80_state::gsz80(machine_config &config)
 
 void rc2014mini_state::rc2014mini(machine_config &config)
 {
-	// Configure member Z80 (via m_maincpu)
-	Z80(config, m_maincpu, XTAL(7'372'800));
+	gsz80(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc2014mini_state::rc2014mini_mem);
-	m_maincpu->set_addrmap(AS_IO, &rc2014mini_state::rc2014mini_io);
-
-	// Configure UART (via m_acia)
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
-
-	// Create a clock device to connect to the transmit and receive clock on the 6850
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 7'372'800));
-	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
-
-	// Configure a "default terminal" to connect to the 6850, so we have a console
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
-	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
 }
 
 // ROM mapping is trivial, this binary was created from the HEX file on Grant's website
