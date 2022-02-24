@@ -1040,6 +1040,8 @@ end
 				"-fdiagnostics-show-note-include-stack",
 				"-Wno-cast-align",
 				"-Wno-constant-logical-operand",
+				"-Wno-extern-c-compat",
+				"-Wno-ignored-qualifiers",
 				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
 				"-Wno-tautological-compare",
 				"-Wno-unknown-attributes",
