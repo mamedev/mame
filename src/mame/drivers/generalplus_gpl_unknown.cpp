@@ -61,6 +61,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint16_t> m_spirom;
 
+	uint16_t reg3004_r(offs_t offset);
+
+	void reg3034_w(offs_t offset, uint16_t data);
 	void reg3051_w(offs_t offset, uint16_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -77,10 +80,25 @@ uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bit
 static INPUT_PORTS_START( generalplus_gpl_unknown )
 INPUT_PORTS_END
 
+uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
+{
+	return machine().rand();
+}
+
+void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
+{
+	// writes a lot of 0x5555 here in a block
+	//logerror("%s: reg3034_w %04x\n", machine().describe_context(), data);
+}
+
 void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
 {
 	if (data & 0x2000)
 		m_maincpu->set_input_line(UNSP_IRQ2_LINE, CLEAR_LINE);
+
+	if (data & 0x0100)
+		m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
+
 
 	logerror("%s: reg3051_w %04x (IRQ Ack?)\n", machine().describe_context(), data);
 }
@@ -92,6 +110,10 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	//map(0x001000, 0x0017ff).ram(); // acts like open bus?
 
 	//map(0x003000, 0x003fff).ram(); // system regs
+	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r));
+
+	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w));
+
 	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w));
 
 	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000);
@@ -114,9 +136,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl_unknown_state::scanline)
 {
 	int scanline = param;
 
-	if (scanline == 126)
+	if (scanline == 50)
 	{
 		m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
+	}
+
+	if (scanline == 126)
+	{
+		m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
 }
 
