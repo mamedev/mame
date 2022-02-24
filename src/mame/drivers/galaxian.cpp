@@ -13748,11 +13748,11 @@ ROM_START( mandinka )
 	ROM_LOAD( "2b_sonido.bin", 0x1000, 0x1000, BAD_DUMP CRC(e8af1d77) SHA1(d05d7c015962989651a90f4bf9e64cd98c2ddd38) ) // FIXED BITS (xxx1xxxx)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "9.bin",  0x0000, 0x0800, BAD_DUMP CRC(cba03b26) SHA1(9aa307db69bac1f7b14194b68ea969a547e6f92f) ) // bitrot
-	ROM_LOAD( "10.bin", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+	ROM_LOAD( "9.bin",         0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) )
+	ROM_LOAD( "10.bin",        0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6e.bin", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // Not dumped on this set
+	ROM_LOAD( "7603-5.bin",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
 ROM_START( olmandingo )
