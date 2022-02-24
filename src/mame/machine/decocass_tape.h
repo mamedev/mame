@@ -67,7 +67,7 @@ private:
 	uint16_t              m_crc16[256];         /* CRC16 for each block */
 	optional_region_ptr<uint8_t> m_tape_data;
 
-	const char *describe_state();
+	std::string describe_state();
 	TIMER_CALLBACK_MEMBER( tape_clock_callback );
 };
 
