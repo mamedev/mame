@@ -23,6 +23,7 @@
 #include "emu.h"
 
 #include "cpu/unsp/unsp.h"
+#include "machine/timer.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -60,6 +61,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint16_t> m_spirom;
 
+	void reg3051_w(offs_t offset, uint16_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
 	void map(address_map &map);
 };
 
@@ -72,6 +77,14 @@ uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bit
 static INPUT_PORTS_START( generalplus_gpl_unknown )
 INPUT_PORTS_END
 
+void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
+{
+	if (data & 0x2000)
+		m_maincpu->set_input_line(UNSP_IRQ2_LINE, CLEAR_LINE);
+
+	logerror("%s: reg3051_w %04x (IRQ Ack?)\n", machine().describe_context(), data);
+}
+
 
 void generalplus_gpl_unknown_state::map(address_map &map)
 {
@@ -79,6 +92,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	//map(0x001000, 0x0017ff).ram(); // acts like open bus?
 
 	//map(0x003000, 0x003fff).ram(); // system regs
+	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w));
 
 	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000);
 	map(0x00c000, 0x00ffff).rom().region("maincpu", 0x0000);
@@ -95,12 +109,23 @@ void generalplus_gpl_unknown_state::machine_reset()
 {
 }
 
+// hack just so we can trigger some IRQs until sources are known
+TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl_unknown_state::scanline)
+{
+	int scanline = param;
+
+	if (scanline == 126)
+	{
+		m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
+	}
+}
+
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
 {
-
 	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
 	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
+	TIMER(config, "scantimer").configure_scanline(FUNC(generalplus_gpl_unknown_state::scanline), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
