@@ -21,8 +21,6 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 /* Each driver will use ROM or RAM for CHR, never both, and RAM is never banked */
 /* This leads to the memory system being an optimal place to perform banking */
 
-/* Prototypes for mapping board components to PPU bus */
-
 
 /*************************************
  *
@@ -110,171 +108,13 @@ uint8_t vsnes_state::vsnes_in1_1_r()
 	return ret;
 }
 
-/*************************************
- *
- *  Init machine
- *
- *************************************/
-
-MACHINE_RESET_MEMBER(vsnes_state,vsnes)
+// all gun games except Freedom Force add VROM banking on top of this
+void vsnes_state::gun_in0_w(u8 data)
 {
-	m_input_latch[0] = m_input_latch[1] = 0;
-	m_input_latch[2] = m_input_latch[3] = 0;
-	m_input_strobe[0] = m_input_strobe[1] = 0;
-}
-
-/*************************************
- *
- *  Machine start functions
- *
- *************************************/
-
-void vsnes_state::v_set_videorom_bank(int start, int count, int vrom_start_bank)
-{
-	assert(start + count <= 8);
-
-	vrom_start_bank &= (m_vrom_banks - 1);
-	assert(vrom_start_bank + count <= m_vrom_banks);
-
-	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
-	/* count determines the size of the area mapped */
-	for (int i = 0; i < count; i++)
-	{
-		m_chr_banks[i + start]->set_entry(vrom_start_bank + i);
-	}
-}
-
-MACHINE_START_MEMBER(vsnes_state,vsnes)
-{
-	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
-
-	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
-
-	ppu1_space.install_ram(0x2000, 0x2fff, m_nt_ram[0].get());
-	ppu1_space.install_ram(0x3000, 0x3eff, m_nt_ram[0].get());
-
-	if (m_gfx1_rom != nullptr)
-	{
-		m_vrom[0] = memregion("gfx1")->base();
-		m_vrom_size[0] = memregion("gfx1")->bytes();
-		m_vrom_banks = m_vrom_size[0] / 0x400;
-	}
-	else
-	{
-		m_vrom[0] = nullptr;
-		m_vrom_size[0] = 0;
-		m_vrom_banks = 0;
-	}
-
-	/* establish chr banks */
-	/* bank 1 is used already! */
-	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
-	if (m_vrom[0] != nullptr)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			ppu1_space.install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, m_chr_banks[i]);
-			m_chr_banks[i]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
-		}
-		v_set_videorom_bank(0, 8, 0);
-	}
-	else
-	{
-		ppu1_space.install_ram(0x0000, 0x1fff, m_vram.get());
-	}
-}
-
-MACHINE_START_MEMBER(vsnes_state,vsdual)
-{
-	m_vrom[0] = memregion("gfx1")->base();
-	m_vrom[1] = memregion("gfx2")->base();
-	m_vrom_size[0] = memregion("gfx1")->bytes();
-	m_vrom_size[1] = memregion("gfx2")->bytes();
-
-	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
-	m_nt_ram[1] = std::make_unique<uint8_t[]>(0x1000);
-
-	m_ppu1->space(AS_PROGRAM).install_ram(0x2000, 0x2fff, m_nt_ram[0].get());
-	m_ppu1->space(AS_PROGRAM).install_ram(0x3000, 0x3eff, m_nt_ram[0].get());
-	m_ppu2->space(AS_PROGRAM).install_ram(0x2000, 0x2fff, m_nt_ram[1].get());
-	m_ppu2->space(AS_PROGRAM).install_ram(0x3000, 0x3eff, m_nt_ram[1].get());
-
-	// read only!
-	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_vrom[0]);
-	// read only!
-	m_ppu2->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_vrom[1]);
-	m_bank_vrom[0]->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
-	m_bank_vrom[1]->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
-	m_bank_vrom[0]->set_entry(0);
-	m_bank_vrom[1]->set_entry(0);
-}
-
-MACHINE_START_MEMBER(vsnes_state, bootleg)
-{
-	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
-
-	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x800);
-
-	ppu1_space.install_ram(0x2000, 0x27ff, 0x800, m_nt_ram[0].get());
-	ppu1_space.install_ram(0x3000, 0x37ff, m_nt_ram[0].get());
-	ppu1_space.install_ram(0x3800, 0x3eff, m_nt_ram[0].get());
-
-	m_vrom[0] = m_gfx1_rom->base();
-	m_vrom_size[0] = m_gfx1_rom->bytes();
-	m_vrom_banks = m_vrom_size[0] / 0x2000;
-
-	/* establish chr banks */
-	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_vrom[0]);
-	m_bank_vrom[0]->configure_entries(0, m_vrom_banks, m_vrom[0], 0x2000);
-	m_bank_vrom[0]->set_entry(0);
-}
-
-/**********************************************************************************
- *
- *  Game and Board-specific initialization
- *
- **********************************************************************************/
-
-/**********************************************************************************/
-/* Most games: VROM Banking in controller 0 write */
-
-void vsnes_state::vsnormal_vrom_banking(uint8_t data)
-{
-	/* switch vrom */
-	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
-
-	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
-
-	/* move along */
-	vsnes_in0_w(data);
-}
-
-void vsnes_state::init_vsnormal()
-{
-	/* vrom switching is enabled with bit 2 of $4016 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnormal_vrom_banking)));
-}
-
-/**********************************************************************************/
-// Gun games: VROM Banking in controller 0 write
-
-void vsnes_state::gun_in0_w(uint8_t data)
-{
-	if (m_do_vrom_bank)
-	{
-		// switch vrom
-		v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
-	}
-
-	// here we do things a little different
 	if (m_input_strobe[0] & ~data & 1)
 	{
-		// load up the latches
+		// load up the latch
 		m_input_latch[0] = ioport("IN0")->read();
-		m_input_latch[1] = ioport("IN1")->read();
 
 		// do the gun thing
 		int x = ioport("GUNX")->read();
@@ -321,11 +161,118 @@ void vsnes_state::gun_in0_w(uint8_t data)
 	m_input_strobe[0] = data;
 }
 
+/*************************************
+ *
+ *  Init machine
+ *
+ *************************************/
+
+MACHINE_RESET_MEMBER(vsnes_state,vsnes)
+{
+	m_input_latch[0] = m_input_latch[1] = 0;
+	m_input_latch[2] = m_input_latch[3] = 0;
+	m_input_strobe[0] = m_input_strobe[1] = 0;
+}
+
+/*************************************
+ *
+ *  Machine start functions
+ *
+ *************************************/
+
+void vsnes_state::v_set_videorom_bank(int start, int count, int vrom_start_bank)
+{
+	assert(start + count <= 8);
+
+	vrom_start_bank &= m_chr_chunks - 1;
+	assert(vrom_start_bank + count <= m_chr_chunks);
+
+	// count determines the size of the area mapped
+	for (int i = 0; i < count; i++)
+		m_chr_banks[i + start]->set_entry(vrom_start_bank + i);
+}
+
+MACHINE_START_MEMBER(vsnes_state, vsnes)
+{
+	// establish chr banks
+	// DRIVER_INIT is called first - means we can handle this different for VRAM games!
+	if (m_gfx1_rom != nullptr)
+	{
+		u8 *base = m_gfx1_rom->base();
+		m_chr_chunks = m_gfx1_rom->bytes() / 0x400;
+
+		for (int i = 0; i < 8; i++)
+		{
+			m_ppu1->space(AS_PROGRAM).install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, m_chr_banks[i]);
+			m_chr_banks[i]->configure_entries(0, m_chr_chunks, base, 0x400);
+		}
+		v_set_videorom_bank(0, 8, 0);
+	}
+	else
+		m_chr_view.select(0);
+}
+
+MACHINE_START_MEMBER(vsnes_state, vsdual)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const char *region = i ? "gfx2" : "gfx1";
+		u8 *base = memregion(region)->base();
+		int entries = memregion(region)->bytes() / 0x2000;
+		m_chr_banks[i]->configure_entries(0, entries, base, 0x2000);
+		m_chr_banks[i]->set_entry(0);
+	}
+}
+
+MACHINE_START_MEMBER(vsnes_state, bootleg)
+{
+	u8 *base = m_gfx1_rom->base();
+	int entries = m_gfx1_rom->bytes() / 0x2000;
+	m_chr_banks[0]->configure_entries(0, entries, base, 0x2000);
+	m_chr_banks[0]->set_entry(0);
+}
+
+/**********************************************************************************
+ *
+ *  Game and Board-specific initialization
+ *
+ **********************************************************************************/
+
+/**********************************************************************************/
+/* Most games: VROM Banking in controller 0 write */
+
+void vsnes_state::vsnormal_vrom_banking(uint8_t data)
+{
+	/* switch vrom */
+	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
+
+	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
+
+	/* move along */
+	vsnes_in0_w(data);
+}
+
+void vsnes_state::init_vsnormal()
+{
+	/* vrom switching is enabled with bit 2 of $4016 */
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnormal_vrom_banking)));
+}
+
+/**********************************************************************************/
+// Gun games: VROM Banking in controller 0 write
+
+void vsnes_state::vsnes_gun_in0_w(uint8_t data)
+{
+	// switch vrom
+	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
+
+	gun_in0_w(data);
+}
+
 void vsnes_state::init_vsgun()
 {
-	/* VROM switching is enabled with bit 2 of $4016 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::gun_in0_w)));
-	m_do_vrom_bank = 1;
+	// VROM switching is enabled with bit 2 of $4016
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnes_gun_in0_w)));
 }
 
 /**********************************************************************************/
@@ -373,16 +320,15 @@ void vsnes_state::init_vskonami()
 
 void vsnes_state::vsgshoe_gun_in0_w(uint8_t data)
 {
-	int addr;
-	if((data & 0x04) != m_old_bank)
+	if ((data & 0x04) != m_old_bank)
 	{
 		uint8_t *prg = memregion("maincpu")->base();
 		m_old_bank = data & 0x04;
-		addr = m_old_bank ? 0x12000: 0x10000;
+		int addr = m_old_bank ? 0x12000: 0x10000;
 		memcpy(&prg[0x08000], &prg[addr], 0x2000);
 	}
 
-	gun_in0_w(data);
+	vsnes_gun_in0_w(data);
 }
 
 void vsnes_state::init_vsgshoe()
@@ -393,8 +339,6 @@ void vsnes_state::init_vsgshoe()
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsgshoe_gun_in0_w)));
-
-	m_do_vrom_bank = 1;
 }
 
 /**********************************************************************************/
@@ -447,12 +391,11 @@ void vsnes_state::drmario_rom_banking(offs_t offset, uint8_t data)
 			break;
 
 			case 1: /* video rom banking - bank 0 - 4k or 8k */
-				if (!m_vram)
-					v_set_videorom_bank(0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
+				v_set_videorom_bank(0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
-				if (m_vrom4k && !m_vram)
+				if (m_vrom4k)
 					v_set_videorom_bank(4, 4, m_drmario_shiftreg * 4);
 			break;
 
@@ -522,9 +465,6 @@ void vsnes_state::init_vsvram()
 
 	/* banking is done with writes to the $8000-$ffff area */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(vsnes_state::vsvram_rom_banking)));
-
-	/* allocate m_vram */
-	m_vram = std::make_unique<uint8_t[]>(0x2000);
 }
 
 /**********************************************************************************/
@@ -707,8 +647,6 @@ void vsnes_state::init_vsfdf()
 	init_vs108();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::gun_in0_w)));
-
-	m_do_vrom_bank = 0;
 }
 
 /**********************************************************************************/
@@ -780,7 +718,7 @@ void vsnes_state::init_bnglngby()
 void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 {
 	/* switch vrom */
-	m_bank_vrom[0]->set_entry(BIT(data, 2));
+	m_chr_banks[0]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -792,7 +730,7 @@ void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
 void vsnes_state::vsdual_vrom_banking_sub(uint8_t data)
 {
 	/* switch vrom */
-	m_bank_vrom[1]->set_entry(BIT(data, 2));
+	m_chr_banks[1]->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
@@ -825,9 +763,9 @@ void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
 uint8_t vsnes_state::vsnes_bootleg_ppudata()
 {
 	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
-	m_bank_vrom[0]->set_entry(1);
+	m_chr_banks[0]->set_entry(1);
 	uint8_t data = m_ppu1->read(0x2007);
-	m_bank_vrom[0]->set_entry(0);
+	m_chr_banks[0]->set_entry(0);
 
 	return data;
 }
