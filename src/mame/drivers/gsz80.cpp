@@ -48,11 +48,11 @@ public:
 		: gsz80_state(mconfig, type, tag)
 	{ }
 
-	// This function sets up the machine configuration
+	// Different machine config due to different RAM
 	void rc2014mini(machine_config &config);
 
 protected:
-	// address maps for program memory and io memory
+	// RC2014 Mini only has 32K RAM, so memory map is different
 	void rc2014mini_mem(address_map &map);
 };
 
