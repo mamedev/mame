@@ -469,8 +469,8 @@ ROM_END
 } // Anonymous namespace
 
 // MAC S.A. pinballs
-GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, macgalxyb, macgalxy, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version, M.6)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxyb, macgalxy, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version, M.042)",  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, macjungl,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctrain,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctraino, spctrain, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_IS_SKELETON_MECHANICAL )
