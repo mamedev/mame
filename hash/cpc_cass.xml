@@ -3730,8 +3730,8 @@ Please stick to using the floppy versions for the time being...
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="72360">
-				<rom name="back to the future ii (uk) (face a) (1990) [original] [tape].cdt" size="72360" crc="c2b3d27f" sha1="e7340d4890d3c950bdc5dcc557e8a839a6c80bb1"/>
+			<dataarea name="cass" size="208301">
+				<rom name="back to the future ii (uk) (face b) (1990) [original] [tape].cdt" size="208301" crc="6cb818fa" sha1="888101480873b6d4ff9bf0d720268b0fe9b5fde1"/>
 			</dataarea>
 		</part>
 	</software>
