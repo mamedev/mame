@@ -14931,7 +14931,8 @@ gamekin3                        //
 gameking                        //
 
 @source:gamemachine.cpp
-2001tgm                         //
+gamemach                        //
+v4in1eg                         //
 
 @source:gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
