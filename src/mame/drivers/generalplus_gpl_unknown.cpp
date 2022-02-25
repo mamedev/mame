@@ -356,7 +356,7 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(65536*2)); // draw timer (pushes pixels to the display in the IRQ)
 	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(600)); // game speed?
-	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(100));
+	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(30));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
