@@ -10799,6 +10799,9 @@ concept                         // 1982 Corvus Concept
 @source:conic_cchess2.cpp
 cncchess2
 
+@source:conic_cchess3.cpp
+cncchess3
+
 @source:consola_emt.cpp
 consoemt                        //
 

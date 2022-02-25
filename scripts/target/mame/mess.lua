@@ -2176,6 +2176,7 @@ files {
 createMESSProjects(_target, _subtarget, "conic")
 files {
 	MAME_DIR .. "src/mame/drivers/conic_cchess2.cpp",
+	MAME_DIR .. "src/mame/drivers/conic_cchess3.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "consumenta")
