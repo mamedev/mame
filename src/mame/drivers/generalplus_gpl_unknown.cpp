@@ -51,7 +51,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<unsp_12_device> m_maincpu;
 	//required_region_ptr<uint16_t> m_mainrom;
@@ -87,12 +87,33 @@ private:
 	uint16_t reg30e5_r(offs_t offset);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+
+	uint16_t m_display[128*2 * 128];
+	int m_displayposx;
+	int m_displayposy;
+	uint16_t m_3050;
 
 	void map(address_map &map);
 };
 
-uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int count = 0;
+	for (int y = 0; y < 128; y++)
+	{
+		u16* dst = &bitmap.pix(y);
+
+		for (int x = 0; x < 128; x++)
+		{
+			uint8_t pix1 = m_display[count++];
+			uint8_t pix2 = m_display[count++];
+
+			uint16_t pal = (pix2 | (pix1 << 8)) & 0x7fff;
+
+			dst[x] = pal;
+		}
+	}
 	return 0;
 }
 
@@ -102,7 +123,7 @@ INPUT_PORTS_END
 
 uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
 {
-	return machine().rand();
+	return 0xffff;
 }
 
 void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
@@ -112,7 +133,7 @@ void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3002_r(offs_t offset)
 {
-	return machine().rand();
+	return 0xffff;
 }
 
 void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
@@ -122,7 +143,7 @@ void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3003_r(offs_t offset)
 {
-	return machine().rand();
+	return 0xffff;
 }
 
 void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
@@ -149,7 +170,7 @@ void generalplus_gpl_unknown_state::reg3005_w(offs_t offset, uint16_t data)
 void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
 {
 	// writes a lot of 0x5555 here in a block
-	//logerror("%s: reg3034_w %04x\n", machine().describe_context(), data);
+	logerror("%s: reg3034_w %04x\n", machine().describe_context(), data);
 }
 
 void generalplus_gpl_unknown_state::reg3041_w(offs_t offset, uint16_t data)
@@ -159,11 +180,22 @@ void generalplus_gpl_unknown_state::reg3041_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3050_r(offs_t offset)
 {
-	return machine().rand();
+	return m_3050;
 }
 
 void generalplus_gpl_unknown_state::reg3050_w(offs_t offset, uint16_t data)
 {
+	uint16_t old = m_3050;
+	m_3050 = data;
+
+	// probably not, but does happen at the end of a line
+	if ((old & 0x0100) != (m_3050 & 0x0100))
+	{
+		if ((m_3050 & 0x0100) == 0x0000)
+			m_displayposx = 0;
+	}
+
+	//m_displaypos = 0;
 	//logerror("%s: reg3050_w %04x\n", machine().describe_context(), data);
 }
 
@@ -211,11 +243,26 @@ void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
 void generalplus_gpl_unknown_state::reg3092_w(offs_t offset, uint16_t data)
 {
 	//logerror("%s: reg3092_w %04x (Video?)\n", machine().describe_context(), data);
+	m_display[(m_displayposy*256)+m_displayposx] = data;
+
+	m_displayposx++;
+	if (m_displayposx == 256)
+	{
+		m_displayposy++;
+		m_displayposx = 0;
+	}
+
+	if (m_displayposy == 128)
+	{
+		m_displayposy = 0;
+		m_displayposx = 0;
+	}
+
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3094_r(offs_t offset)
 {
-	return machine().rand();
+	return 0xffff;
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
@@ -259,31 +306,43 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 
 void generalplus_gpl_unknown_state::machine_start()
 {
+	for (int color = 0; color < 0x10000; color++)
+	{
+		const u8 r = pal5bit(color >> 10);
+		const u8 g = pal5bit(color >> 5);
+		const u8 b = pal5bit(color & 0x1f);
+		m_palette->set_pen_color(color, rgb_t(r, g, b));
+	}
 }
 
 void generalplus_gpl_unknown_state::machine_reset()
 {
+	m_displayposx = 0;
+	m_displayposy = 0;
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer )
+{
+	m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
+}
+
 
 // hack just so we can trigger some IRQs until sources are known
 TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl_unknown_state::scanline)
 {
 	int scanline = param;
 
-	if (scanline == 50)
+	if (scanline%3 == 0)
 	{
 		m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
 
-	if (scanline == 90)
+	if (scanline%3 == 1)
 	{
 		m_maincpu->set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
 	}
 
-	if (scanline == 126)
-	{
-		m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
-	}
+
 }
 
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
@@ -300,8 +359,11 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	m_screen->set_visarea(0, 128-1, 0, 128-1); // not the correct resolution
 	m_screen->set_screen_update(FUNC(generalplus_gpl_unknown_state::screen_update));
 	//m_screen->screen_vblank().set(FUNC(generalplus_gpl_unknown_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(65536*2));
+
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
 
 
