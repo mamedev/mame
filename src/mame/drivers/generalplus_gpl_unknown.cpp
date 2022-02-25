@@ -86,8 +86,9 @@ private:
 	uint16_t reg30e4_r(offs_t offset);
 	uint16_t reg30e5_r(offs_t offset);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer2);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer3);
 
 	uint16_t m_display[128*2 * 128];
 	int m_displayposx;
@@ -326,31 +327,23 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer )
 	m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 }
 
-
-// hack just so we can trigger some IRQs until sources are known
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl_unknown_state::scanline)
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer2 )
 {
-	int scanline = param;
-
-	if (scanline%3 == 0)
-	{
-		m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
-	}
-
-	if (scanline%3 == 1)
-	{
-		m_maincpu->set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
-	}
-
-
+	m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer3 )
+{
+	m_maincpu->set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
+}
+
+
 
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
 {
 	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
 	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
-	TIMER(config, "scantimer").configure_scanline(FUNC(generalplus_gpl_unknown_state::scanline), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
@@ -361,7 +354,9 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	//m_screen->screen_vblank().set(FUNC(generalplus_gpl_unknown_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(65536*2));
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(65536*2)); // draw timer (pushes pixels to the display in the IRQ)
+	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(600)); // game speed?
+	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(100));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
