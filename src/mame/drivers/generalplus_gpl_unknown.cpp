@@ -70,6 +70,10 @@ private:
 	uint16_t reg3004_r(offs_t offset);
 	uint16_t reg3005_r(offs_t offset);
 	void reg3005_w(offs_t offset, uint16_t data);
+	uint16_t reg3006_r(offs_t offset);
+	uint16_t reg3007_r(offs_t offset);
+
+	uint16_t reg3016_r(offs_t offset);
 
 	void reg3034_w(offs_t offset, uint16_t data);
 	void reg3041_w(offs_t offset, uint16_t data);
@@ -78,8 +82,10 @@ private:
 	void reg3050_w(offs_t offset, uint16_t data);
 
 	void reg3051_w(offs_t offset, uint16_t data);
-	void reg3092_w(offs_t offset, uint16_t data);
 
+	uint16_t reg3090_r(offs_t offset);
+	uint16_t reg3091_r(offs_t offset);
+	void reg3092_w(offs_t offset, uint16_t data);
 	uint16_t reg3094_r(offs_t offset);
 	uint16_t reg3095_r(offs_t offset);
 
@@ -124,7 +130,7 @@ INPUT_PORTS_END
 
 uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
 {
-	return 0xffff;
+	return machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
@@ -134,7 +140,7 @@ void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3002_r(offs_t offset)
 {
-	return 0xffff;
+	return machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
@@ -144,7 +150,7 @@ void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3003_r(offs_t offset)
 {
-	return 0xffff;
+	return machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
@@ -158,6 +164,21 @@ uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3005_r(offs_t offset)
+{
+	return machine().rand();
+}
+
+uint16_t generalplus_gpl_unknown_state::reg3006_r(offs_t offset)
+{
+	return machine().rand();
+}
+
+uint16_t generalplus_gpl_unknown_state::reg3007_r(offs_t offset)
+{
+	return machine().rand();
+}
+
+uint16_t generalplus_gpl_unknown_state::reg3016_r(offs_t offset)
 {
 	return machine().rand();
 }
@@ -193,7 +214,14 @@ void generalplus_gpl_unknown_state::reg3050_w(offs_t offset, uint16_t data)
 	if ((old & 0x0100) != (m_3050 & 0x0100))
 	{
 		if ((m_3050 & 0x0100) == 0x0000)
+		{
 			m_displayposx = 0;
+			m_displayposy++;
+			if (m_displayposy == 128)
+			{
+				m_displayposy = 0;
+			}
+		}
 	}
 
 	//m_displaypos = 0;
@@ -241,29 +269,46 @@ void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
 	logerror("%s: reg3051_w %04x (IRQ Ack?)\n", machine().describe_context(), data);
 }
 
+uint16_t generalplus_gpl_unknown_state::reg3090_r(offs_t offset)
+{
+	return machine().rand();
+}
+
+uint16_t generalplus_gpl_unknown_state::reg3091_r(offs_t offset)
+{
+	return machine().rand();
+}
+
 void generalplus_gpl_unknown_state::reg3092_w(offs_t offset, uint16_t data)
 {
 	//logerror("%s: reg3092_w %04x (Video?)\n", machine().describe_context(), data);
+	if ((m_displayposx < 256) &&  (m_displayposy < 256))
 	m_display[(m_displayposy*256)+m_displayposx] = data;
 
+	if (data & 0xff00)
+		fatalerror("upper data bits set?\n");
+
 	m_displayposx++;
+
+	/*
 	if (m_displayposx == 256)
 	{
 		m_displayposy++;
 		m_displayposx = 0;
 	}
-
+	*/
+	/*
 	if (m_displayposy == 128)
 	{
 		m_displayposy = 0;
 		m_displayposx = 0;
 	}
-
+	*/
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3094_r(offs_t offset)
 {
-	return 0xffff;
+	return machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
@@ -283,6 +328,10 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	map(0x003003, 0x003003).rw(FUNC(generalplus_gpl_unknown_state::reg3003_r), FUNC(generalplus_gpl_unknown_state::reg3003_w));
 	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r));
 	map(0x003005, 0x003005).rw(FUNC(generalplus_gpl_unknown_state::reg3005_r), FUNC(generalplus_gpl_unknown_state::reg3005_w));
+	map(0x003006, 0x003006).r(FUNC(generalplus_gpl_unknown_state::reg3006_r));
+	map(0x003007, 0x003007).r(FUNC(generalplus_gpl_unknown_state::reg3007_r));
+
+	map(0x003016, 0x003016).r(FUNC(generalplus_gpl_unknown_state::reg3016_r));
 
 	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w));
 
@@ -291,6 +340,8 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w));
 	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w));
 
+	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r));
+	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r));
 	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_w));
 	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r));
 	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r));
