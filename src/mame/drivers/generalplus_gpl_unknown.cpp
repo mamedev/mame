@@ -123,7 +123,7 @@ uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bit
 			uint8_t pix1 = m_display[count++];
 			uint8_t pix2 = m_display[count++];
 
-			uint16_t pal = (pix2 | (pix1 << 8)) & 0x7fff;
+			uint16_t pal = ((pix1<<8) | pix2);
 
 			dst[x] = pal;
 		}
@@ -137,7 +137,7 @@ INPUT_PORTS_END
 
 uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
@@ -147,7 +147,7 @@ void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3002_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
@@ -157,7 +157,7 @@ void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3003_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
@@ -167,32 +167,32 @@ void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
 {
-	return machine().rand();
+	return  0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3005_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3006_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3007_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg300f_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3016_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3005_w(offs_t offset, uint16_t data)
@@ -242,12 +242,12 @@ void generalplus_gpl_unknown_state::reg3050_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3052_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3053_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg30e0_w(offs_t offset, uint16_t data)
@@ -313,12 +313,12 @@ void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3090_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3091_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 void generalplus_gpl_unknown_state::reg3092_w(offs_t offset, uint16_t data)
@@ -350,7 +350,7 @@ void generalplus_gpl_unknown_state::reg3092_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3094_r(offs_t offset)
 {
-	return machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
@@ -368,7 +368,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	map(0x003001, 0x003001).rw(FUNC(generalplus_gpl_unknown_state::reg3001_r), FUNC(generalplus_gpl_unknown_state::reg3001_w));
 	map(0x003002, 0x003002).rw(FUNC(generalplus_gpl_unknown_state::reg3002_r), FUNC(generalplus_gpl_unknown_state::reg3002_w));
 	map(0x003003, 0x003003).rw(FUNC(generalplus_gpl_unknown_state::reg3003_r), FUNC(generalplus_gpl_unknown_state::reg3003_w));
-	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r));
+	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r));  // input from here is acted upon
 	map(0x003005, 0x003005).rw(FUNC(generalplus_gpl_unknown_state::reg3005_r), FUNC(generalplus_gpl_unknown_state::reg3005_w));
 	map(0x003006, 0x003006).r(FUNC(generalplus_gpl_unknown_state::reg3006_r));
 	map(0x003007, 0x003007).r(FUNC(generalplus_gpl_unknown_state::reg3007_r));
@@ -389,15 +389,15 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r));
 	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r));
 	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_w));
-	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r));
-	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r));
+	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r));  // potential interesting
+	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r));  // mostly a status flag
 
 	map(0x0030e0, 0x0030e0).w(FUNC(generalplus_gpl_unknown_state::reg30e0_w));
 	map(0x0030e1, 0x0030e1).w(FUNC(generalplus_gpl_unknown_state::reg30e1_w));
 	map(0x0030e2, 0x0030e2).w(FUNC(generalplus_gpl_unknown_state::reg30e2_w));
 	map(0x0030e3, 0x0030e3).w(FUNC(generalplus_gpl_unknown_state::reg30e3_w));
-	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpl_unknown_state::reg30e4_r));
-	map(0x0030e5, 0x0030e5).r(FUNC(generalplus_gpl_unknown_state::reg30e5_r));
+	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpl_unknown_state::reg30e4_r));  // potentially interesting (must not return 0x0000 or 'flash error')
+	map(0x0030e5, 0x0030e5).r(FUNC(generalplus_gpl_unknown_state::reg30e5_r));  // potentially interesting (also status flag)
 
 	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000);
 	map(0x00c000, 0x00ffff).rom().region("maincpu", 0x0000);
@@ -410,8 +410,8 @@ void generalplus_gpl_unknown_state::machine_start()
 {
 	for (int color = 0; color < 0x10000; color++)
 	{
-		const u8 r = pal5bit(color >> 10);
-		const u8 g = pal5bit(color >> 5);
+		const u8 r = pal5bit(color >> 11);
+		const u8 g = pal6bit(color >> 5);
 		const u8 b = pal5bit(color & 0x1f);
 		m_palette->set_pen_color(color, rgb_t(r, g, b));
 	}
