@@ -42,7 +42,8 @@ public:
 		//m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_spirom(*this, "spi")
+		m_spirom(*this, "spi"),
+		m_testio(*this, "TEST")
 	{ }
 
 	void generalplus_gpl_unknown(machine_config &config);
@@ -60,6 +61,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint16_t> m_spirom;
+	required_ioport m_testio;
 
 	uint16_t reg3001_r(offs_t offset);
 	void reg3001_w(offs_t offset, uint16_t data);
@@ -133,6 +135,45 @@ uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bit
 
 
 static INPUT_PORTS_START( generalplus_gpl_unknown )
+	PORT_START("TEST")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
@@ -167,7 +208,7 @@ void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
 {
-	return  0x0000;//machine().rand();
+	return m_testio->read();
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3005_r(offs_t offset)
@@ -272,6 +313,7 @@ void generalplus_gpl_unknown_state::reg30e3_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg30e4_r(offs_t offset)
 {
+	logerror("%s: reg30e4_r\n", machine().describe_context());
 	return machine().rand();
 }
 
