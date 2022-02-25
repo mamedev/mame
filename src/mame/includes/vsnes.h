@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 
+#include "bus/nes_ctrl/zapper_sensor.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "video/ppu2c0x.h"
@@ -16,6 +17,7 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
+		, m_sensor(*this, "sensor")
 		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
 		, m_chr_banks(*this, "chr%u", 0U)
@@ -56,6 +58,7 @@ private:
 	optional_device<sn76489_device> m_sn1;
 	optional_device<sn76489_device> m_sn2;
 
+	optional_device<nes_zapper_sensor_device> m_sensor;
 	optional_device<nvram_device> m_nvram;
 
 	optional_memory_region m_gfx1_rom;
