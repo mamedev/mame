@@ -1013,7 +1013,8 @@ void pc8801_state::ext_rom_bank_w(uint8_t data)
 
 uint8_t pc8801_state::pixel_clock(void)
 {
-	int ysize = m_screen->height(); /* TODO: correct condition*/
+	// TODO: pinpoint exact condition
+	int ysize = m_screen->height();
 
 	return (ysize >= 400);
 }
@@ -1936,7 +1937,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_CONFSETTING(    0x02, "Mouse" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc8801ma )
+static INPUT_PORTS_START( pc8801fh )
 	PORT_INCLUDE( pc8801 )
 
 	PORT_MODIFY("CFG")
@@ -2588,14 +2589,14 @@ COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801,      pc8801, pc8801_state, empt
 COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
 COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc8801, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc8801, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc8801, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc8801ma, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc8801ma, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc8801ma, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc8801ma, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc8801ma, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
+COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
+COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
+COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 //COMP( 1989, pc98do,      0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )

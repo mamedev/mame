@@ -1543,9 +1543,10 @@ References:
 	</software>
 
 	<software name="normandy">
-		<description>Normandy Joriku Sakusen</description>
+		<description>Normandy Jouriku Sakusen</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="ノルマンディー上陸作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="normandy joriku sakusen(normandy landings).d88" size="348848" crc="ccf1b638" sha1="735bb5e47713eee3bc6763f4b92cf39aca505a0a"/>
@@ -1557,6 +1558,7 @@ References:
 		<description>Normandy Jouriku Sakusen (alt)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="ノルマンディー上陸作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="normandy jouriku sakusen.d88" size="31424" crc="f3cdf540" sha1="f76776ca7271166cac303caec64ac73fab4807d4"/>
@@ -1568,6 +1570,7 @@ References:
 		<description>Normandy Jouriku Sakusen (alt 2)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="ノルマンディー上陸作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="normandy jouriku sakusen [set 1].d88" size="348848" crc="fc2f7a0e" sha1="379181a0d47219bdb9f99a30d82b8debd1ead93e"/>
