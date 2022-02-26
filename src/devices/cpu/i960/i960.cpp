@@ -1455,62 +1455,6 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				}
 				break;
 
-			case 0x2:   // daddc
-				/*
-					Adds bits 0 through 3 of src2 and src1 and bit 1 of the condition code (used
-					here: as a carry bit). The result is stored in bits 0 through 3 of dst. If the
-					addition results in a carry, bit 1 of the condition code is set. Bits 4 through
-					31 of src are copied to dst unchanged.
-
-					This instruction is intended to be used iteratively to add binary-coded decimal
-					(BCD) values in which the least-significant four bits of the operands
-					represent the decimal numbers 0 to 9. The instruction asssumes that the least
-					significant 4 bits of both operands are valid BCD numbers. If these bits are
-					not valid BCD numbers, the resulting value in dst is unpredictable.
-				*/
-				{
-					uint64_t res;
-
-					m_icount -= 2;
-					t1 = get_1_ri(opcode) & 0x0000000f;
-					t2 = get_2_ri(opcode) & 0x0000000f;
-					res = t2+(t1+((m_AC>>1)&1));
-					set_ri(opcode, res&0xffffffff);
-
-					m_AC &= ~0x2;   // clear C
-					// set carry
-					m_AC |= ((res) & (((uint64_t)1) << 32)) ? 0x2 : 0;
-				}
-				break;
-
-			case 0x3:   // dsubc
-				/*
-					Subtracts bits 0 through 3 of src2 and srcl and bit I of the condition code
-					(used here as a carry bit). The result is stored in bits 0 through 3 of dst. If
-					the subtraction results in a carry, bit 1 of the condition code is set. Bits 4
-					through 31 of src are copied to dst unchanged. 
-					
-					This instruction is intended to be used iteratively to add binary-coded decimal
-					(BCD) values in which the least-significant four bits of the operands
-					represent the decimal numbers 0 to 9. The instruction asssumes that the least
-					significant 4 bits of both operands are valid BCD numbers. If these bits are
-					not valid BCD numbers, the resulting value in dst is unpredictable.
-				*/
-				{
-					uint64_t res;
-
-					m_icount -= 2;
-					t1 = get_1_ri(opcode) & 0x0000000f;
-					t2 = get_2_ri(opcode) & 0x0000000f;
-					res = t2-(t1+((m_AC>>1)&1));
-					set_ri(opcode, res&0xffffffff);
-
-					m_AC &= ~0x2;   // clear C
-					// set carry
-					m_AC |= ((res) & (((uint64_t)1) << 32)) ? 0x2 : 0;
-				}
-				break;
-
 			case 0x4: // dmovt
 				/*
 					The dmovt instruction moves a 32-bit word from one register to another
