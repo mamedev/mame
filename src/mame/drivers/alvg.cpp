@@ -22,31 +22,33 @@ Other games:
 - A G Soccer-ball (1991, head to head)
 - Dinosaur Eggs (1993, redemption)
 - The Death Dealing Adventure of Maxx Badazz Champion Kickboxer (1993, unreleased)
-- USA Football (1992, redemption)
+- USA Football (1994, redemption)
 - USA Football (1992, head to head)
 
 Here are the key codes to enable play:
 
 Game                                     NUM    Start game                          End ball
 -------------------------------------------------------------------------------------------------
-A G Soccer-Ball                         AG01    Hold N, hit 8                       (timed game)
-Al's Garage Band Goes On A World Tour   AG03    (mnw)
-USA Football (head to head)             AG05    Hold N and Quote, hit 8             (timed game)
-Mystery Castle                          AG08    (mnw)
-Pistol Poker                            AG10    (mnw)
-Punchy the Clown                       EPC061   (mnw)
-Dinosaur Eggs                          EPC071   (mnw)
-USA Football (redemption)              EPC111   (mnw)
+A G Soccer-Ball                           01    Hold N, hit 8                       (timed game)
+Al's Garage Band Goes On A World Tour     03    (mnw)
+USA Football (head to head)               05    Hold N and Quote, hit 8             (timed game)
+Punchy the Clown                          06    (mnw)
+Dinosaur Eggs                             07    (mnw)
+Mystery Castle                            08    (mnw)
+Pistol Poker                              10    (mnw)
+USA Football (redemption)                 11    (mnw)
 
 Status:
-- A G Soccer, USA Football: Playable.
+- A G Soccer, USA Football (head to head): Playable.
+- USA Football (redemption): partially working, no sound, goes a bit weird now and then.
 - Others: Skeletons
 
 ToDo:
 - Add bsmt-based sound card
 - DMD Display
 - Mechanical sound
-- Most of the non-working games run into the weeds after a short while.
+- Most of the non-working games run into the weeds after a short while. It's as if
+    the roms or cpu were bad.
 
 ****************************************************************************************************/
 #include "emu.h"
@@ -121,20 +123,22 @@ private:
 	u8 via0_pb_r() { return m_io_keyboard[12]->read(); }
 	void via1_pa_w(u8 data);
 	void via1_pb_w(u8 data);
-	u8 rdstat_r() { return 0xc0; }
+	u8 rdstat_r() { return m_bsmt_rdcode; }
 	u8 rdcode_r() { m_audiocpu->set_input_line(0, CLEAR_LINE); return m_cpu_to_bsmt; }
 	void wrcode_w(u8 data) { m_bsmt_to_cpu = data; 	m_via1->write_ca1(BIT(data, 0)); }
-	void bsmtdl_w(u8 data) { m_bsmt_data = (m_bsmt_data & 0xff00) | data; }
-	void bsmtdh_w(offs_t offset, u8 data) { m_bsmt_reg = offset >> 1; m_bsmt_data = (m_bsmt_data & 0xff) | (data << 8); }
-	DECLARE_WRITE_LINE_MEMBER(test_w) { printf("%d ",state); }
+	void bsmt_w(offs_t offset, u8 data);
+	void watch_w(u8 data) { if (!BIT(data, 6)) m_bsmt->reset(); }
+	void bsmt_ready_w() { m_bsmt_rdcode |= 0x80; }
+	//DECLARE_WRITE_LINE_MEMBER(test_w) { printf("%d ",state); }
 
 	u16 m_row = 0U;
 	u16 m_lamp_data = 0U;
 	u8 m_strobe = 0U;
-	u16 m_bsmt_reg = 0U;
-	u16 m_bsmt_data = 0U;
+	u8 m_bsmt_addr = 0U;
+	u8 m_bsmt_data = 0U;
 	u8 m_bsmt_to_cpu = 0U;
 	u8 m_cpu_to_bsmt = 0U;
+	u8 m_bsmt_rdcode = 0xFFU;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -183,10 +187,9 @@ void alvg_state::pca002_map(address_map &map)
 void alvg_state::pca008_map(address_map &map) // mapping done by U104
 {
 	map(0x0000, 0xffff).rom();
-	map(0x0100, 0x0100).r(FUNC(alvg_state::rdstat_r)).nopw();
+	map(0x0100, 0x0100).rw(FUNC(alvg_state::rdstat_r),FUNC(alvg_state::watch_w));
 	map(0x0800, 0x0800).rw(FUNC(alvg_state::rdcode_r),FUNC(alvg_state::wrcode_w));
-	map(0x1000, 0x10fe).w(FUNC(alvg_state::bsmtdh_w));
-	map(0x1001, 0x1001).w(FUNC(alvg_state::bsmtdl_w));
+	map(0x1000, 0x10ff).w(FUNC(alvg_state::bsmt_w));
 	map(0x2000, 0x3fff).ram();
 }
 
@@ -373,6 +376,21 @@ u8 alvg_state::via0_pa_r()
 	return data;
 }
 
+void alvg_state::bsmt_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+	{
+		m_bsmt->write_reg(m_bsmt_addr);
+		m_bsmt->write_data((m_bsmt_data << 8) | data);
+		m_bsmt_rdcode &= 0x7f;
+	}
+	else
+	{
+		m_bsmt_addr = offset >> 1;
+		m_bsmt_data = data;
+	}
+}
+
 void alvg_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -436,6 +454,7 @@ void alvg_state::pca008(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
+	m_bsmt->set_ready_callback(FUNC(alvg_state::bsmt_ready_w));
 	m_bsmt->add_route(0, "lspeaker", 1.2);
 	m_bsmt->add_route(1, "rspeaker", 1.2);
 
@@ -867,16 +886,16 @@ ROM_END
 GAME( 1991, agsoccer,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1991, agsoccera,  agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1991, agsoccer07, agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R01c)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1992, wrldtour2,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1992, wrldtour3,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootb,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootb,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R06u)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, usafootba,  usafootb, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootf,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (redemption)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1994, usafootf,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (P08, redemption)",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, mystcast,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, mystcasta,  mystcast, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, pstlpkr,    0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, pstlpkr1,   pstlpkr,  group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, punchy,     0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1993, punchy3,    punchy,   group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, dinoeggs,   0,        group2, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, dinoeggs,   0,        group2, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs (R02)",                          MACHINE_IS_SKELETON_MECHANICAL)
