@@ -517,21 +517,6 @@ text
     be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
     2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
     will be centred.
-dotmatrix
-    Draws an eight-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element’s state
-    determine which pixels are lit, with the least significant bit corresponding
-    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
-dotmatrix5dot
-    Draws a five-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element’s state
-    determine which pixels are lit, with the least significant bit corresponding
-    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
-dotmatrixdot
-    Draws a single element of a dot matrix display as a circular pixels in the
-    specified colour.  The least significant bit of the element’s state
-    determines whether the pixel is lit.  An unlit pixel is drawn at low
-    intensity (0x20/0xff).
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
