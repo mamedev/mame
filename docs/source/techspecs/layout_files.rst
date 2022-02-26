@@ -524,14 +524,6 @@ led7seg
     the bits correspond to the top segment, the upper right-hand segment,
     continuing clockwise to the upper left segment, the middle bar, and the
     decimal point.  Unlit segments are drawn at low intensity (0x20/0xff).
-led8seg_gts1
-    Draws an eight-segment digital fluorescent display of the type used in
-    Gottlieb System 1 pinball machines (actually a Futaba part).  Compared to
-    standard seven-segment displays, these displays have no decimal point, the
-    horizontal middle bar is broken in the centre, and there is a broken
-    vertical middle bar controlled by the bit that would control the decimal
-    point in a standard seven-segment display.  Unlit segments are drawn at low
-    intensity (0x20/0xff).
 led14seg
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display in
     the specified colour.  The low fourteen bits of the element’s state control
