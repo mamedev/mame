@@ -11,7 +11,7 @@
 #ifndef MAME_BUS_COCO_COCO_FDC_H
 #define MAME_BUS_COCO_COCO_FDC_H
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 #include "imagedev/floppy.h"
 
 

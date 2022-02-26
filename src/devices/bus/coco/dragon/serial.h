@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 #include "machine/6850acia.h"
 
 //**************************************************************************

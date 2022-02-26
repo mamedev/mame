@@ -56,7 +56,7 @@
 #include "emu.h"
 #include "multi.h"
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"

@@ -3,7 +3,7 @@
 #ifndef MAME_BUS_COCO_COCO_SSC_H
 #define MAME_BUS_COCO_COCO_SSC_H
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 
 #pragma once
 

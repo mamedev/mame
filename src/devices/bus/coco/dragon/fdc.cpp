@@ -68,7 +68,7 @@
 #include "emu.h"
 #include "fdc.h"
 
-#include "../coco/fdc.h"
+#include "bus/coco/coco/fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"

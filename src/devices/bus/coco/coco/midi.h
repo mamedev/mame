@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 
 // device type definition
 DECLARE_DEVICE_TYPE(COCO_MIDI, device_cococart_interface)

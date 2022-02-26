@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
 #include "video/v9938.h"

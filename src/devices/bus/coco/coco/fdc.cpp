@@ -69,7 +69,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "../cococart.h"
+#include "bus/coco/cococart.h"
 #include "fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/msm6242.h"
