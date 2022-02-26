@@ -46,6 +46,10 @@ class rc2014mini_state : public gsz80_state
 public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
+		, m_bank1_status(0)
+		, m_region_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
+		, m_jump_rom(*this, "A13-15")
 	{ }
 
 	// Different machine config due to different RAM
@@ -54,6 +58,17 @@ public:
 protected:
 	// RC2014 Mini only has 32K RAM, so memory map is different
 	void rc2014mini_mem(address_map &map);
+	void bank_w(uint8_t data);
+	void ram_w(offs_t offset, uint8_t data);
+
+	void update_banks();
+
+	virtual void machine_reset() override;
+
+	uint8_t m_bank1_status;
+	required_memory_region m_region_maincpu;
+	required_memory_bank m_bank1;
+	optional_ioport m_jump_rom;
 };
 
 // Trivial memory map for program memory
@@ -63,10 +78,42 @@ void gsz80_state::gsz80_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
+void rc2014mini_state::bank_w(uint8_t data)
+{
+	m_bank1_status = (m_bank1_status==1) ? 0 : 1;
+	update_banks();
+}
+
+void rc2014mini_state::ram_w(offs_t offset, uint8_t data)
+{
+	uint8_t *mem = m_region_maincpu->base();
+	mem[offset] = data;
+}
+
+void rc2014mini_state::update_banks()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint8_t *mem = m_region_maincpu->base();
+
+	if (m_bank1_status==0) {
+		space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
+		m_bank1->set_base(mem + 0x0000);
+	} else {
+		space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
+		m_bank1->set_base(mem + 0xE000);
+	}
+}
+
+void rc2014mini_state::machine_reset()
+{
+	m_bank1_status = m_jump_rom->read();
+	update_banks();
+}
+
 // RC2014 Mini only has 32K RAM
 void rc2014mini_state::rc2014mini_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x1fff).rom().bankrw("bank1");
 	map(0x8000, 0xffff).ram();
 }
 
@@ -120,6 +167,13 @@ void rc2014mini_state::rc2014mini(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc2014mini_state::rc2014mini_mem);
 }
 
+static INPUT_PORTS_START( rc2014mini )
+	PORT_START("A13-15")   /* jumpers to select ROM region */
+	PORT_DIPNAME( 0x7, 0, "ROM" )
+	PORT_DIPSETTING( 0, "BASIC" )
+	PORT_DIPSETTING( 0x7, "SCM" ) 
+INPUT_PORTS_END
+
 // ROM mapping is trivial, this binary was created from the HEX file on Grant's website
 ROM_START(gsz80)
 	ROM_REGION(0x2000, "maincpu",0)
@@ -127,17 +181,12 @@ ROM_START(gsz80)
 ROM_END
 
 // from https://github.com/RC2014Z80/RC2014/tree/master/ROMs/Factory
-// `dd skip=56 count=8 if=R0000009.BIN of=rc2014mini_scm.bin bs=1024`
-// `dd count=8 if=R0000009.BIN of=rc2014mini_32k.bin bs=1024`
 ROM_START(rc2014mini)
-	ROM_REGION(0x2000, "maincpu",0)
-	ROM_SYSTEM_BIOS( 0, "scm", "Small Computer Monitor")
-	ROMX_LOAD("rc2014mini_scm.bin",  0x0000, 0x2000, CRC(e8745176) SHA1(d71afa985c4dcc25536b6597a099dabc815a8eb2), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "32k", "32K BASIC")
-	ROMX_LOAD("rc2014mini_32k.bin",  0x0000, 0x2000, CRC(850e3ec7) SHA1(7c9613e160b324ee1ed42fc48d98bbc215791e81), ROM_BIOS(1))
+	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057))
 ROM_END
 
 // This ties everything together
-//    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT    CLASS             INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gsz80,          0,        0,        gsz80,         0,       gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
-COMP( 2015, rc2014mini,     gsz80,    0,        rc2014mini,    0,       rc2014mini_state, empty_init,    "Z80Kits",        "RC2014 Mini",          MACHINE_NO_SOUND_HW )
+//    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT          CLASS             INIT           COMPANY           FULLNAME                FLAGS
+COMP( 201?, gsz80,          0,        0,        gsz80,         0,             gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+COMP( 2015, rc2014mini,     gsz80,    0,        rc2014mini,    rc2014mini,    rc2014mini_state, empty_init,    "Z80Kits",        "RC2014 Mini",          MACHINE_NO_SOUND_HW )
