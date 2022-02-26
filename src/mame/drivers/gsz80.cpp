@@ -46,7 +46,6 @@ class rc2014mini_state : public gsz80_state
 public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
-		, m_region_maincpu(*this, "maincpu")
 		, m_rombank(*this, "bank")
 		, m_jump_rom(*this, "A13-15")
 	{ }
@@ -57,15 +56,12 @@ public:
 protected:
 	// RC2014 Mini only has 32K RAM, so memory map is different
 	void rc2014mini_mem(address_map &map);
-	
-	void update_banks();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_memory_region m_region_maincpu;
 	required_memory_bank m_rombank;
-	optional_ioport m_jump_rom;
+	required_ioport m_jump_rom;
 };
 
 // Trivial memory map for program memory
@@ -145,7 +141,7 @@ void rc2014mini_state::rc2014mini(machine_config &config)
 
 static INPUT_PORTS_START( rc2014mini )
 	PORT_START("A13-15")   /* jumpers to select ROM region */
-	PORT_CONFNAME( 0x7, 0x0, "ROM" )
+	PORT_CONFNAME( 0x7, 0x0, "ROM Bank" )
 	PORT_CONFSETTING( 0x0, "BASIC" )
 	PORT_CONFSETTING( 0x1, "EMPTY1" )
 	PORT_CONFSETTING( 0x2, "EMPTY2" )
@@ -162,7 +158,6 @@ ROM_START(gsz80)
 	ROM_LOAD("gsz80.bin",   0x0000, 0x2000, CRC(6f4bc7e5) SHA1(9008fe3b9754ec5537b3ad90f748096602ba008e))
 ROM_END
 
-// from https://github.com/RC2014Z80/RC2014/tree/master/ROMs/Factory
 ROM_START(rc2014mini)
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057))
