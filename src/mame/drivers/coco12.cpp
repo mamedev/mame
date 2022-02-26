@@ -27,7 +27,7 @@
 #include "includes/coco12.h"
 
 #include "bus/coco/cococart.h"
-#include "bus/coco/coco_t4426.h"
+#include "bus/coco/coco/t4426.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
