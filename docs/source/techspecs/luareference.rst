@@ -1975,8 +1975,8 @@ field:set_value(value)
     compared to zero to determine whether the field should be active; for
     analog fields, the value must be right-aligned and in the correct range.
 field:clear_value()
-    Clear programmatic override from the value and restore it to its original
-    state.
+    Clear programmatically overridden value and restore the field's regular
+    behaviour.
 field:set_input_seq(seqtype, seq)
     Set the :ref:`input sequence <luareference-input-iptseq>` for the
     specified sequence type.  This is used to configure per-machine input
@@ -2023,9 +2023,11 @@ field.mask (read-only)
 field.defvalue (read-only)
     The field’s default value
 field.minvalue (read-only)
-    The field’s minimal allowed value
+    For analog fields, the field’s minimal allowed value; for digital fields,
+    nil.
 field.maxvalue (read-only)
-    The field’s maximal allowed value
+    For analog fields, the field’s maximal allowed value; for digital fields,
+    nil.
 field.sensitivity (read-only)
     The sensitivity or gain for analog fields
 field.way (read-only)
