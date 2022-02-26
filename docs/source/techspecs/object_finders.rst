@@ -238,8 +238,8 @@ the object finders in the device class (with all distractions removed):
             set_type1space(std::forward<U>(space_tag), space_num);
         }
 
-        sbus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-            device_t(mconfig, tag, owner, clock),
+        sbus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+            device_t(mconfig, type, tag, owner, clock),
             device_memory_interface(mconfig, *this),
             m_maincpu(*this, finder_base::DUMMY_TAG),
             m_type1space(*this, finder_base::DUMMY_TAG, -1)
