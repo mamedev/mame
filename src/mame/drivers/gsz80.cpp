@@ -47,7 +47,7 @@ public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
 		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
+		, m_bank(*this, "bank")
 		, m_jump_rom(*this, "A13-15")
 	{ }
 
@@ -63,7 +63,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_memory_region m_region_maincpu;
-	required_memory_bank m_bank1;
+	required_memory_bank m_bank;
 	optional_ioport m_jump_rom;
 };
 
@@ -74,20 +74,18 @@ void gsz80_state::gsz80_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
-
+// Set ROM bank from machine CONF at Reset
 void rc2014mini_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *mem = m_region_maincpu->base();
 	
-	space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
-	m_bank1->set_base(mem + m_jump_rom->read() * 0x2000);
+	m_bank->set_base(mem + m_jump_rom->read() * 0x2000);
 }
 
 // RC2014 Mini only has 32K RAM
 void rc2014mini_state::rc2014mini_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().bankrw("bank1");
+	map(0x0000, 0x1fff).rom().bankr("bank");
 	map(0x8000, 0xffff).ram();
 }
 
