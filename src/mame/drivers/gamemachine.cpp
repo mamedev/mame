@@ -4,7 +4,7 @@
 /******************************************************************************
 
 VTech Game Machine tabletop/handheld
-It's a an electronic game machine + calculator.
+It's an electronic game machine + calculator.
 
 Hardware notes:
 - Mostek MK3870 MCU (2KB internal ROM)

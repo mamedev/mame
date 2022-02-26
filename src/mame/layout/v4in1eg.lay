@@ -8,12 +8,12 @@ license:CC0
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.15" green="0.015" blue="0.0225" /></disk>
-		<disk state="1"><color red="0.6" green="0.06" blue="0.09" /></disk>
+		<disk state="1"><color red="0.65" green="0.07" blue="0.1" /></disk>
 		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg alpha="0.08"><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+		<led7seg><color red="0.65" green="0.07" blue="0.1" /></led7seg>
 	</element>
 
 	<element name="text_l1"><text string="Speedway"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -45,8 +45,8 @@ license:CC0
 			<param name="x" start="10" increment="2.5" />
 			<param name="i" start="11" increment="-1" />
 
-			<element name="multi~i~.1" ref="digit"><bounds x="~x~" y="7.1" width="2" height="2.9" /><color alpha="0.65" /></element>
-			<element name="multi~i~.2" ref="digit"><bounds x="~x~" y="7.1" width="2" height="2.9" /></element>
+			<element name="digit~i~" ref="digit"><bounds x="~x~" y="7.1" width="2" height="2.9" /></element>
+			<element name="multi~i~.2" ref="digit" blend="add"><bounds x="~x~" y="7.1" width="2" height="2.9" /></element>
 		</repeat>
 
 	</view>
