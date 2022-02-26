@@ -423,6 +423,37 @@ ROM_START(photoply2k1it)
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k1it", 0, BAD_DUMP SHA1(274ea0ebc051d0f4846bc58a039d342241b4cc28) ) // Manually rebuilded by adding the resources for the folder C:\QP_MSTR from the 2001_NL version
+
+	// Recovery discs for Photo Play 2001
+
+	/* UPDATE 2001 - Disc 1
+	   Info on the CD ring:
+	     A0100344917-0102  35  A1
+	     IFPI L555
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94Z5
+	*/
+	DISK_REGION( "recover_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "update_2001_cd1", 0, SHA1(c271c03ba8118203b9790dd924aac77ad68c2b17) )
+
+	/* UPDATE 2001 - Disc 2
+	   Info on the CD ring:
+	     A0100344917-0202  13  B1
+	     IFPI L553
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94W6
+	*/
+	DISK_REGION( "recover_upd2k1_d2" )
+	DISK_IMAGE_READONLY( "update_2001_cd2", 0, SHA1(c5797d6a342407136af49443401e83fe9578f5f2) )
+
+	/* SNAKE II Service Release Update 2001
+	   Info on the CD ring:
+	     A0100360706-0101  15  A3
+	     IFPI L555
+	     Sony DADC
+	*/
+	DISK_REGION( "recover_snake2_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "nokia_snake_ii_service_release_update_2001", 0, SHA1(09286cb8b63d3cc771cbbf4b9b3de77e3d15bb7b) )
 ROM_END
 
 // BIOS not provided, might be different
