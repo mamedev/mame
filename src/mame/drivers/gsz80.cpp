@@ -79,6 +79,7 @@ void rc2014mini_state::machine_start()
 {
 	m_rombank->configure_entries(0, 8, memregion("maincpu")->base(), 0x2000);
 }
+
 // Set ROM bank from machine CONF at Reset
 void rc2014mini_state::machine_reset()
 {
