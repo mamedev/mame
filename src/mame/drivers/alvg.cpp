@@ -96,7 +96,7 @@ public:
 	void pca002(machine_config &config);  // Gen 1 sound board
 	void pca003(machine_config &config);  // Alphanumeric display
 	void pca008(machine_config &config);  // Gen 2 sound board
-	void pca021(machine_config &config);  // DMD
+	void pca020(machine_config &config);  // DMD controller
 
 private:
 	void main_map(address_map &map);
@@ -461,7 +461,7 @@ void alvg_state::pca008(machine_config &config)
 	CLOCK(config, "fclock", 2'000'000 / 4096).signal_handler().set_inputline(m_audiocpu, 1);
 }
 
-void alvg_state::pca021(machine_config &config)
+void alvg_state::pca020(machine_config &config)
 {
 }
 
@@ -521,7 +521,7 @@ void alvg_state::group2(machine_config &config)
 void alvg_state::group3(machine_config &config)
 {
 	alvg(config);
-	pca021(config);  // DMD
+	pca020(config);  // DMD
 	pca008(config);  // Gen 2 sound
 }
 
