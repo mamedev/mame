@@ -46,7 +46,6 @@ class rc2014mini_state : public gsz80_state
 public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
-		, m_bank1_status(0)
 		, m_region_maincpu(*this, "maincpu")
 		, m_bank1(*this, "bank1")
 		, m_jump_rom(*this, "A13-15")
@@ -58,14 +57,11 @@ public:
 protected:
 	// RC2014 Mini only has 32K RAM, so memory map is different
 	void rc2014mini_mem(address_map &map);
-	void bank_w(uint8_t data);
-	void ram_w(offs_t offset, uint8_t data);
-
+	
 	void update_banks();
 
 	virtual void machine_reset() override;
 
-	uint8_t m_bank1_status;
 	required_memory_region m_region_maincpu;
 	required_memory_bank m_bank1;
 	optional_ioport m_jump_rom;
@@ -78,36 +74,14 @@ void gsz80_state::gsz80_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
-void rc2014mini_state::bank_w(uint8_t data)
-{
-	m_bank1_status = (m_bank1_status==1) ? 0 : 1;
-	update_banks();
-}
-
-void rc2014mini_state::ram_w(offs_t offset, uint8_t data)
-{
-	uint8_t *mem = m_region_maincpu->base();
-	mem[offset] = data;
-}
-
-void rc2014mini_state::update_banks()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t *mem = m_region_maincpu->base();
-
-	if (m_bank1_status==0) {
-		space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
-		m_bank1->set_base(mem + 0x0000);
-	} else {
-		space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
-		m_bank1->set_base(mem + 0xE000);
-	}
-}
 
 void rc2014mini_state::machine_reset()
 {
-	m_bank1_status = m_jump_rom->read();
-	update_banks();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint8_t *mem = m_region_maincpu->base();
+	
+	space.install_write_bank(0x0000, 0x1fff, membank("bank1"));
+	m_bank1->set_base(mem + m_jump_rom->read() * 0x2000);
 }
 
 // RC2014 Mini only has 32K RAM
@@ -169,8 +143,14 @@ void rc2014mini_state::rc2014mini(machine_config &config)
 
 static INPUT_PORTS_START( rc2014mini )
 	PORT_START("A13-15")   /* jumpers to select ROM region */
-	PORT_DIPNAME( 0x7, 0, "ROM" )
-	PORT_DIPSETTING( 0, "BASIC" )
+	PORT_DIPNAME( 0x7, 0x0, "ROM" )
+	PORT_DIPSETTING( 0x0, "BASIC" )
+	PORT_DIPSETTING( 0x1, "EMPTY1" )
+	PORT_DIPSETTING( 0x2, "EMPTY2" )
+	PORT_DIPSETTING( 0x3, "EMPTY3" )
+	PORT_DIPSETTING( 0x4, "EMPTY4" )
+	PORT_DIPSETTING( 0x5, "EMPTY5" )
+	PORT_DIPSETTING( 0x6, "EMPTY6" )
 	PORT_DIPSETTING( 0x7, "SCM" ) 
 INPUT_PORTS_END
 
