@@ -517,24 +517,36 @@ text
     be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
     2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
     will be centred.
+dotmatrix
+    Draws an eight-pixel horizontal segment of a dot matrix display, using
+    circular pixels in the specified colour.  The bits of the element’s state
+    determine which pixels are lit, with the least significant bit corresponding
+    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
+dotmatrix5dot
+    Draws a five-pixel horizontal segment of a dot matrix display, using
+    circular pixels in the specified colour.  The bits of the element’s state
+    determine which pixels are lit, with the least significant bit corresponding
+    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
+dotmatrixdot
+    Draws a single element of a dot matrix display as a circular pixels in the
+    specified colour.  The least significant bit of the element’s state
+    determines whether the pixel is lit.  An unlit pixel is drawn at low
+    intensity (0x20/0xff).
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
     control which segments are lit.  Starting from the least significant bit,
     the bits correspond to the top segment, the upper right-hand segment,
     continuing clockwise to the upper left segment, the middle bar, and the
-    decimal point.  An optional ``alpha`` attribute determines the opacity for
-    unlit segments.  It ranges from 0.0 to 1.0 as with ``color``, and when
-    omitted, it defaults to 0.125.
+    decimal point.  Unlit segments are drawn at low intensity (0x20/0xff).
 led8seg_gts1
     Draws an eight-segment digital fluorescent display of the type used in
     Gottlieb System 1 pinball machines (actually a Futaba part).  Compared to
     standard seven-segment displays, these displays have no decimal point, the
     horizontal middle bar is broken in the centre, and there is a broken
     vertical middle bar controlled by the bit that would control the decimal
-    point in a standard seven-segment display.  An optional ``alpha`` attribute
-    determines the opacity for unlit segments.  It ranges from 0.0 to 1.0 as
-    with ``color``, and when omitted, it defaults to 0.125.
+    point in a standard seven-segment display.  Unlit segments are drawn at low
+    intensity (0x20/0xff).
 led14seg
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display in
     the specified colour.  The low fourteen bits of the element’s state control
@@ -542,18 +554,15 @@ led14seg
     correspond to the top segment, the upper right-hand segment, continuing
     clockwise to the upper left segment, the left-hand and right-hand halves of
     the horizontal middle bar, the upper and lower halves of the vertical middle
-    bar, and the diagonal bars clockwise from lower left to lower right.  An
-    optional ``alpha`` attribute determines the opacity for unlit segments.  It
-    ranges from 0.0 to 1.0 as with ``color``, and when omitted, it defaults to
-    0.125.
+    bar, and the diagonal bars clockwise from lower left to lower right.  Unlit
+    segments are drawn at low intensity (0x20/0xff).
 led14segsc
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display with
     decimal point/comma in the specified colour.  The low sixteen bits of the
     element’s state control which segments are lit.  The low fourteen bits
     correspond to the same segments as in the ``led14seg`` component.  Two
-    additional bits correspond to the decimal point and comma tail.  An optional
-    ``alpha`` attribute determines the opacity for unlit segments.  It ranges
-    from 0.0 to 1.0 as with ``color``, and when omitted, it defaults to 0.125.
+    additional bits correspond to the decimal point and comma tail.  Unlit
+    segments are drawn at low intensity (0x20/0xff).
 led16seg
     Draws a standard sixteen-segment alphanumeric LED/fluorescent display in the
     specified colour.  The low sixteen bits of the element’s state control which
@@ -562,17 +571,14 @@ led16seg
     top bar, continuing clockwise to the upper left segment, the left-hand and
     right-hand halves of the horizontal middle bar, the upper and lower halves
     of the vertical middle bar, and the diagonal bars clockwise from lower left
-    to lower right.  An optional ``alpha`` attribute determines the opacity for
-    unlit segments.  It ranges from 0.0 to 1.0 as with ``color``, and when
-    omitted, it defaults to 0.125.
+    to lower right.  Unlit segments are drawn at low intensity (0x20/0xff).
 led16segsc
     Draws a standard sixteen-segment alphanumeric LED/fluorescent display with
     decimal point/comma in the specified colour.  The low eighteen bits of the
     element’s state control which segments are lit.  The low sixteen bits
     correspond to the same segments as in the ``led16seg`` component.  Two
-    additional bits correspond to the decimal point and comma tail.  An optional
-    ``alpha`` attribute determines the opacity for unlit segments.  It ranges
-    from 0.0 to 1.0 as with ``color``, and when omitted, it defaults to 0.125.
+    additional bits correspond to the decimal point and comma tail.  Unlit
+    segments are drawn at low intensity (0x20/0xff).
 simplecounter
     Displays the numeric value of the element’s state using the system font in
     the specified colour.  The value is formatted in decimal notation.  A
