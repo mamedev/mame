@@ -56,7 +56,6 @@ ToDo:
 - Mechanical sound
 - Find out why the random freezing (happens most of the time)
 - msystcasta: DMD CPU rom seems bad (rubbish 08FE-0B60)
-- wrldtour: attract mode guitars should have shading. Only wrldtour3 shows all the high scores.
 - wrldtour, wrldtour2: instructions fly past too fast to be read. wrldtour3 is ok.
 - pstlpkr, mystcast: no attract mode.
 - mystcast: Uses PCA-020A, a modified DMD controller, to be emulated (schematic hasn't been updated)
