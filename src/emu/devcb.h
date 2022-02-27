@@ -134,7 +134,7 @@ protected:
 			if (inherited_mask())
 				return trans;
 			else
-				return trans.mask(m_mask >> val);
+				return std::move(trans.mask(m_mask >> val));
 		}
 		auto lshift(unsigned val)
 		{
@@ -142,9 +142,9 @@ protected:
 			if (inherited_mask())
 				return trans;
 			else
-				return trans.mask(m_mask << val);
+				return std::move(trans.mask(m_mask << val));
 		}
-		auto bit(unsigned val) { return rshift(val).mask(T(1U)); }
+		auto bit(unsigned val) { return std::move(rshift(val).mask(T(1U))); }
 
 		constexpr std::make_unsigned_t<T> exor() const { return m_exor & m_mask; }
 		constexpr std::make_unsigned_t<T> mask() const { return m_mask; }
