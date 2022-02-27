@@ -257,6 +257,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_field_type = sol().registry().new_usertype<ioport_field>("ioport_field", sol::no_constructor);
 	ioport_field_type["set_value"] = &ioport_field::set_value;
+	ioport_field_type["clear_value"] = &ioport_field::clear_value;
 	ioport_field_type["set_input_seq"] =
 		[] (ioport_field &f, std::string const &seq_type_string, const input_seq &seq)
 		{
@@ -312,6 +313,16 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["player"] = sol::property(&ioport_field::player, &ioport_field::set_player);
 	ioport_field_type["mask"] = sol::property(&ioport_field::mask);
 	ioport_field_type["defvalue"] = sol::property(&ioport_field::defvalue);
+	ioport_field_type["minvalue"] = sol::property(
+			[] (ioport_field &f)
+			{
+				return f.is_analog() ? std::make_optional(f.minval()) : std::nullopt;
+			});
+	ioport_field_type["maxvalue"] = sol::property(
+			[] (ioport_field &f)
+			{
+				return f.is_analog() ? std::make_optional(f.maxval()) : std::nullopt;
+			});
 	ioport_field_type["sensitivity"] = sol::property(&ioport_field::sensitivity);
 	ioport_field_type["way"] = sol::property(&ioport_field::way);
 	ioport_field_type["type_class"] = sol::property(
