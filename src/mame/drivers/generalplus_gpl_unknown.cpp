@@ -112,6 +112,7 @@ private:
 	uint16_t m_display[128*2 * 128];
 	int m_displayposx;
 	int m_displayposy;
+	uint16_t m_3001;
 	uint16_t m_3003;
 	uint16_t m_3005;
 	uint16_t m_3050;
@@ -184,12 +185,13 @@ INPUT_PORTS_END
 
 uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
 {
-	return 0x0000;//machine().rand();
+	return m_3001;
 }
 
 void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg3001_w %04x\n", machine().describe_context(), data);
+	m_3001 = data;
+	logerror("%s: reg3001_w %04x\n", machine().describe_context(), data);
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3002_r(offs_t offset)
@@ -292,7 +294,7 @@ void generalplus_gpl_unknown_state::reg3050_w(offs_t offset, uint16_t data)
 	}
 
 	//m_displaypos = 0;
-	//logerror("%s: reg3050_w %04x\n", machine().describe_context(), data);
+	logerror("%s: reg3050_w %04x\n", machine().describe_context(), data);
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3052_r(offs_t offset)
@@ -317,7 +319,33 @@ void generalplus_gpl_unknown_state::reg30e1_w(offs_t offset, uint16_t data)
 
 void generalplus_gpl_unknown_state::reg30e2_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg30e2_w %04x\n", machine().describe_context(), data);
+	/* this appears to be querying the SPI Flash, eg.
+	   command 0xab = Read Electonic Signature
+	   command 0x9f = Read ID of the SPI Flash
+	
+	[:] ':maincpu' (0075DD): reg3001_w 1c00
+	[:] ':maincpu' (00769B): reg3001_w 0c00
+	[:] ':maincpu' (00769F): reg30e2_w 00ab (WITHOUT m_3001 & 0x1000)
+	[:] ':maincpu' (0076A5): reg3001_w 1c00
+	[:] ':maincpu' (0076A7): reg30e4_r
+	[:] ':maincpu' (0076AF): reg3001_w 0c00
+	[:] ':maincpu' (0076B3): reg30e2_w 009f (WITHOUT m_3001 & 0x1000)
+	[:] ':maincpu' (0076B6): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
+	[:] ':maincpu' (0076B8): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
+	[:] ':maincpu' (0076BA): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
+	[:] ':maincpu' (0076C0): reg30e4_r
+	[:] ':maincpu' (0076C2): reg30e4_r
+	[:] ':maincpu' (0076C4): reg30e4_r
+	[:] ':maincpu' (0076C6): reg30e4_r
+	*/
+	if (!(m_3001 & 0x1000))
+	{
+		logerror("%s: reg30e2_w %04x (WITHOUT m_3001 & 0x1000)\n", machine().describe_context(), data);
+	}
+	else
+	{
+		logerror("%s: reg30e2_w %04x (WITH m_3001 & 0x1000)\n", machine().describe_context(), data);
+	}
 }
 
 void generalplus_gpl_unknown_state::reg30e3_w(offs_t offset, uint16_t data)
@@ -491,6 +519,7 @@ void generalplus_gpl_unknown_state::machine_start()
 	save_item(NAME(m_display));
 	save_item(NAME(m_displayposx));
 	save_item(NAME(m_displayposy));
+	save_item(NAME(m_3001));
 	save_item(NAME(m_3003));
 	save_item(NAME(m_3005));
 	save_item(NAME(m_3050));
@@ -500,6 +529,10 @@ void generalplus_gpl_unknown_state::machine_reset()
 {
 	m_displayposx = 0;
 	m_displayposy = 0;
+	m_3001 = 0;
+	m_3003 = 0;
+	m_3005 = 0;
+	m_3050 = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer )
@@ -537,9 +570,9 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
-	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(120000)); // draw timer (pushes pixels to the display in the IRQ)
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(200000)); // draw timer (pushes pixels to the display in the IRQ)
 	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(1000)); // game speed?
-	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(40000)); // audio
+	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(20000)); // audio
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
