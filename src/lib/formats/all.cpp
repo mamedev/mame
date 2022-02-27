@@ -711,7 +711,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_MFI_FORMAT); // mfi_dsk.h
 	en.add(FLOPPY_DFI_FORMAT); // dfi_dsk.h
 #ifdef HAS_FORMATS_FS_FAT
-	en.add(fs::FAT);
+	en.add(fs::PC_FAT);
 #endif
 
 	en.category("Container FM/MFM");

@@ -25,12 +25,6 @@ class fat_image : public manager_t {
 public:
 	fat_image() = default;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-
-	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const override;
-	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;
-
 	virtual bool can_format() const override;
 	virtual bool can_read() const override;
 	virtual bool can_write() const override;
@@ -40,10 +34,27 @@ public:
 	virtual std::vector<meta_description> volume_meta_description() const override;
 	virtual std::vector<meta_description> file_meta_description() const override;
 	virtual std::vector<meta_description> directory_meta_description() const override;
+
+protected:
+	static std::unique_ptr<filesystem_t> mount_partition(fsblk_t &blockdev, u32 starting_sector, u32 sector_count, u8 bits_per_fat_entry);
 };
 
-extern const fat_image FAT;
+
+// ======================> fat_image
+
+class pc_fat_image : public fat_image {
+public:
+	pc_fat_image() = default;
+
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const override;
+	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;
+};
+
+
+extern const pc_fat_image PC_FAT;
 
 } // namespace fs
 
-#endif // MAME_FORMATS_FS_COCO_OS9_H
+#endif // MAME_FORMATS_FS_FAT_H

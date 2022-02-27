@@ -8,10 +8,7 @@
 
 	Current Limitations:
 	- Read only
-	- Only supports partitioned hard drives
-		- Always accesses first supported partition
-		- Floptool needs a way for partioning schemes to be indepenent of the
-		  file systems contained therein
+	- Only supports floppy disks
 	- No FAT32 support
 	- No Long Filenames Support
 
@@ -144,41 +141,20 @@
 ****************************************************************************/
 
 #include "fs_fat.h"
+#include "pc_dsk.h"
 #include "strformat.h"
 #include "util/corestr.h"
 #include "util/strformat.h"
 
 using namespace fs;
 
-const fs::fat_image fs::FAT;
+const fs::pc_fat_image fs::PC_FAT;
 
 //**************************************************************************
 //  TYPE DECLARATIONS
 //**************************************************************************
 
 namespace {
-
-// ======================> partition_type_t
-
-enum class partition_type_t
-{
-	UNKNOWN,
-	UNUSED,
-	FAT12,
-	FAT16,
-	FAT32
-};
-
-
-// ======================> partition_info_t
-
-struct partition_info_t
-{
-	partition_type_t	m_type;
-	u32					m_starting_sector;
-	u32					m_sector_count;
-};
-
 
 // ======================> directory_entry
 
@@ -329,51 +305,10 @@ private:
 //**************************************************************************
 
 //-------------------------------------------------
-//	decode_partition_info
-//-------------------------------------------------
-
-namespace {
-std::optional<partition_info_t> decode_partition_info(fsblk_t::block_t &block, int partition_number)
-{
-	assert(partition_number >= 0 && partition_number <= 3);
-	u32 offset = 446 + 16 * partition_number;
-
-	// check the active byte
-	if ((block.r8(offset + 0) & 0x80) == 0)
-		return { };
-
-	// for now we're ignoring the disk geometry because we already have a block device
-	partition_info_t result;
-	switch (block.r8(offset + 4) &0x0F)
-	{
-	case 0x00:
-		result.m_type = partition_type_t::UNUSED;
-		break;
-	case 0x01:
-		result.m_type = partition_type_t::FAT12;
-		break;
-	case 0x04:
-	case 0x06:
-		result.m_type = partition_type_t::FAT16;
-		break;
-	case 0x0B:
-	case 0x0C:
-		result.m_type = partition_type_t::FAT32;
-		break;
-	default:
-		result.m_type = partition_type_t::UNKNOWN;
-		break;
-	}
-	result.m_starting_sector = block.r32l(offset + 8);
-	result.m_sector_count = block.r32l(offset + 12);
-	return result;
-}
-
-
-//-------------------------------------------------
 //	validate_filename
 //-------------------------------------------------
 
+namespace {
 bool validate_filename(std::string_view name)
 {
 	auto is_invalid_filename_char = [](char ch)
@@ -406,36 +341,6 @@ util::arbitrary_datetime decode_fat_datetime(u32 dt)
 
 
 }
-
-//-------------------------------------------------
-//	fat_image::name
-//-------------------------------------------------
-
-const char *fs::fat_image::name() const
-{
-	return "fat";
-}
-
-
-//-------------------------------------------------
-//	fat_image::description
-//-------------------------------------------------
-
-const char *fs::fat_image::description() const
-{
-	return "FAT";
-}
-
-
-//-------------------------------------------------
-//	fat_image::enumerate_f
-//-------------------------------------------------
-
-void fs::fat_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
-{
-	// only supporting hard disks for now
-}
-
 
 //-------------------------------------------------
 //	fat_image::can_format
@@ -530,36 +435,13 @@ std::vector<meta_description> fs::fat_image::directory_meta_description() const
 
 
 //-------------------------------------------------
-//	fat_image::mount
+//	fat_image::mount_partition
 //-------------------------------------------------
 
-std::unique_ptr<filesystem_t> fs::fat_image::mount(fsblk_t &blockdev) const
+std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, u32 starting_sector, u32 sector_count, u8 bits_per_fat_entry)
 {
-	// read the header block
-	blockdev.set_block_size(512);
-	auto partition_info_block = blockdev.get(0);
-
-	// check the magic bytes
-	if (partition_info_block.r16l(510) != 0xAA55)
-		return { };
-
-	// find the first FAT partition and use that - we're going to ignore
-	// other file systems and other partitions for now
-	std::optional<partition_info_t> partition;
-	for (int i = 0; !partition && i < 4; i++)
-	{
-		partition = decode_partition_info(partition_info_block, i);
-		if (partition && partition->m_type != partition_type_t::FAT12 && partition->m_type != partition_type_t::FAT16)
-		{
-			// ignore partition types we can't handle
-			partition.reset();
-		}
-	}
-	if (!partition)
-		return { };
-
 	// load the boot sector block and get some basic info
-	fsblk_t::block_t boot_sector_block = blockdev.get(partition->m_starting_sector);
+	fsblk_t::block_t boot_sector_block = blockdev.get(starting_sector);
 	u16 reserved_sector_count = boot_sector_block.r16l(14);
 
 	// load all file allocation table sectors
@@ -569,29 +451,13 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount(fsblk_t &blockdev) const
 	fat_sectors.reserve(fat_count * sectors_per_fat);
 	for (auto i = 0; i < fat_count * sectors_per_fat; i++)
 	{
-		fsblk_t::block_t fatblk = blockdev.get(partition->m_starting_sector + reserved_sector_count + i);
+		fsblk_t::block_t fatblk = blockdev.get(starting_sector + reserved_sector_count + i);
 		fat_sectors.push_back(std::move(fatblk));
 	}
 
-	// determine how many bits per fat entry we have
-	u8 bits_per_fat_entry;
-	switch (partition->m_type)
-	{
-	case partition_type_t::FAT12:
-		bits_per_fat_entry = 12;
-		break;
-	case partition_type_t::FAT16:
-		bits_per_fat_entry = 16;
-		break;
-	case partition_type_t::FAT32:
-		bits_per_fat_entry = 32;
-		break;
-	default:
-		return { };
-	}
-
+	// and return the implementation
 	return std::make_unique<impl>(blockdev, std::move(boot_sector_block), std::move(fat_sectors),
-		partition->m_starting_sector, partition->m_sector_count, reserved_sector_count, bits_per_fat_entry);
+		starting_sector, sector_count, reserved_sector_count, bits_per_fat_entry);
 }
 
 
@@ -915,4 +781,56 @@ meta_data impl::subdirectory::metadata()
 std::vector<u32> impl::subdirectory::find_directory_entries()
 {
 	return m_fs.get_sectors_from_fat(m_dirent);
+}
+
+
+//**************************************************************************
+//  PC FAT SPECIFIC
+//**************************************************************************
+
+//-------------------------------------------------
+//	pc_fat_image::name
+//-------------------------------------------------
+
+const char *fs::pc_fat_image::name() const
+{
+	return "pc_fat";
+}
+
+
+//-------------------------------------------------
+//	pc_fat_image::description
+//-------------------------------------------------
+
+const char *fs::pc_fat_image::description() const
+{
+	return "PC FAT";
+}
+
+
+//-------------------------------------------------
+//	pc_fat_image::enumerate_f
+//-------------------------------------------------
+
+void pc_fat_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+{
+	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSSD))
+		fe.add(FLOPPY_PC_FORMAT, 368640, "pc_fat_dssd", "PC FAT 3.5\" dual-sided single density");
+	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSDD))
+		fe.add(FLOPPY_PC_FORMAT, 737280, "pc_fat_dsdd", "PC FAT 3.5\" dual-sided double density");
+	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSHD))
+		fe.add(FLOPPY_PC_FORMAT, 1474560, "pc_fat_dshd", "PC FAT 3.5\" dual-sided high density");
+	if (has(form_factor, variants, floppy_image::FF_35, floppy_image::DSED))
+		fe.add(FLOPPY_PC_FORMAT, 2949120, "pc_fat_dsed", "PC FAT 3.5\" dual-sided extra density");
+}
+
+
+//-------------------------------------------------
+//	pc_fat_image::mount
+//-------------------------------------------------
+
+std::unique_ptr<filesystem_t> pc_fat_image::mount(fsblk_t &blockdev) const
+{
+	blockdev.set_block_size(512);
+	return mount_partition(blockdev, 0, blockdev.block_count(), 12);
 }
