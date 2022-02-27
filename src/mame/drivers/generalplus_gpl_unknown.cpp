@@ -24,6 +24,7 @@
 
 #include "cpu/unsp/unsp.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,6 +43,7 @@ public:
 		//m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
+		m_dac(*this, "dac"),
 		m_spirom(*this, "spi"),
 		m_testio(*this, "TEST")
 	{ }
@@ -60,9 +62,11 @@ private:
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<dac_word_device_base> m_dac;
+
 	required_region_ptr<uint16_t> m_spirom;
 	required_ioport m_testio;
-
+	
 	uint16_t reg3001_r(offs_t offset);
 	void reg3001_w(offs_t offset, uint16_t data);
 	uint16_t reg3002_r(offs_t offset);
@@ -80,7 +84,7 @@ private:
 	uint16_t reg3016_r(offs_t offset);
 
 	void reg3034_w(offs_t offset, uint16_t data);
-	void reg3041_w(offs_t offset, uint16_t data);
+	void reg3041_audiodac_w(offs_t offset, uint16_t data);
 
 	uint16_t reg3050_r(offs_t offset);
 	void reg3050_w(offs_t offset, uint16_t data);
@@ -90,7 +94,7 @@ private:
 
 	uint16_t reg3090_r(offs_t offset);
 	uint16_t reg3091_r(offs_t offset);
-	void reg3092_w(offs_t offset, uint16_t data);
+	void reg3092_lcd_w(offs_t offset, uint16_t data);
 	uint16_t reg3094_r(offs_t offset);
 	uint16_t reg3095_r(offs_t offset);
 
@@ -248,9 +252,12 @@ void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
 	logerror("%s: reg3034_w %04x\n", machine().describe_context(), data);
 }
 
-void generalplus_gpl_unknown_state::reg3041_w(offs_t offset, uint16_t data)
+void generalplus_gpl_unknown_state::reg3041_audiodac_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg3041_w %04x\n", machine().describe_context(), data);
+//	logerror("%s: reg3041_audiodac_w %04x\n", machine().describe_context(), data);
+
+	// mapacman only writes 0000 / 7fff / 8000, but is known to have more limited sound than other units
+	m_dac->data_w(data);
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3050_r(offs_t offset)
@@ -363,11 +370,11 @@ uint16_t generalplus_gpl_unknown_state::reg3091_r(offs_t offset)
 	return 0x0000;//machine().rand();
 }
 
-void generalplus_gpl_unknown_state::reg3092_w(offs_t offset, uint16_t data)
+void generalplus_gpl_unknown_state::reg3092_lcd_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg3092_w %04x (Video?)\n", machine().describe_context(), data);
-	if ((m_displayposx < 256) &&  (m_displayposy < 256))
-	m_display[(m_displayposy*256)+m_displayposx] = data;
+	//logerror("%s: reg3092_lcd_w %04x (Video?)\n", machine().describe_context(), data);
+	if ((m_displayposx < 256) && (m_displayposy < 256))
+		m_display[(m_displayposy * 256) + m_displayposx] = data;
 
 	if (data & 0xff00)
 		fatalerror("upper data bits set?\n");
@@ -421,7 +428,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 
 	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w));
 
-	map(0x003041, 0x003041).w(FUNC(generalplus_gpl_unknown_state::reg3041_w));
+	map(0x003041, 0x003041).w(FUNC(generalplus_gpl_unknown_state::reg3041_audiodac_w));
 
 	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w));
 	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w));
@@ -430,7 +437,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 
 	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r));
 	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r));
-	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_w));
+	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_lcd_w));
 	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r));  // potential interesting
 	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r));  // mostly a status flag
 
@@ -457,6 +464,11 @@ void generalplus_gpl_unknown_state::machine_start()
 		const u8 b = pal5bit(color & 0x1f);
 		m_palette->set_pen_color(color, rgb_t(r, g, b));
 	}
+
+	save_item(NAME(m_display));
+	save_item(NAME(m_displayposx));
+	save_item(NAME(m_displayposy));
+	save_item(NAME(m_3050));
 }
 
 void generalplus_gpl_unknown_state::machine_reset()
@@ -497,9 +509,12 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	//m_screen->screen_vblank().set(FUNC(generalplus_gpl_unknown_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(65536*2)); // draw timer (pushes pixels to the display in the IRQ)
-	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(600)); // game speed?
-	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(30));
+	SPEAKER(config, "speaker").front_center();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(120000)); // draw timer (pushes pixels to the display in the IRQ)
+	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(1000)); // game speed?
+	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(40000)); // audio
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
