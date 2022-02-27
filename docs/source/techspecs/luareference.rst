@@ -2023,11 +2023,11 @@ field.mask (read-only)
 field.defvalue (read-only)
     The field’s default value.
 field.minvalue (read-only)
-    The minimum allowed value for analog fields, or nil for digital fields.
+    The minimum allowed value for analog fields, or ``nil`` for digital fields.
 field.maxvalue (read-only)
-    The maximum allowed value for analog fields, or nil for digital fields.
+    The maximum allowed value for analog fields, or ``nil`` for digital fields.
 field.sensitivity (read-only)
-    The sensitivity or gain for analog fields.
+    The sensitivity or gain for analog fields, or ``nil`` for digital fields.
 field.way (read-only)
     The number of directions allowed by the restrictor plate/gate for a digital
     joystick, or zero (0) for other inputs.
