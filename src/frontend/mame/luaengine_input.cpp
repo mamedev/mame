@@ -314,12 +314,12 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["mask"] = sol::property(&ioport_field::mask);
 	ioport_field_type["defvalue"] = sol::property(&ioport_field::defvalue);
 	ioport_field_type["minvalue"] = sol::property(
-			[](ioport_field& f)
+			[] (ioport_field &f)
 			{
 				return f.is_analog() ? std::make_optional(f.minval()) : std::nullopt;
 			});
 	ioport_field_type["maxvalue"] = sol::property(
-			[](ioport_field& f)
+			[] (ioport_field &f)
 			{
 				return f.is_analog() ? std::make_optional(f.maxval()) : std::nullopt;
 			});
