@@ -12,8 +12,6 @@
 #include "emu.h"
 #include "rampac2.h"
 
-#include "fileio.h"
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -88,9 +86,10 @@ void pasopia_rampac2_device::device_start()
 //  nvram_read - read NVRAM from the file
 //-------------------------------------------------
 
-void pasopia_rampac2_device::nvram_read(emu_file &file)
+bool pasopia_rampac2_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 
@@ -98,9 +97,10 @@ void pasopia_rampac2_device::nvram_read(emu_file &file)
 //  nvram_write - write NVRAM to the file
 //-------------------------------------------------
 
-void pasopia_rampac2_device::nvram_write(emu_file &file)
+bool pasopia_rampac2_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 

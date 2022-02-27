@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "ds2404.h"
 
-#include "fileio.h"
-
 #include <algorithm>
 #include <ctime> // FIXME: re-write in terms of device_rtc_interface and remove this
 
@@ -355,9 +353,10 @@ void ds2404_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_read(emu_file &file)
+bool ds2404_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_sram, sizeof(m_sram));
+	size_t actual;
+	return !file.read(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
 }
 
 
@@ -366,7 +365,8 @@ void ds2404_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_write(emu_file &file)
+bool ds2404_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_sram, sizeof(m_sram));
+	size_t actual;
+	return !file.write(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
 }

@@ -18,8 +18,6 @@
 #include "emu.h"
 #include "mccs1850.h"
 
-#include "fileio.h"
-
 //#define VERBOSE 0
 #include "logmacro.h"
 
@@ -396,9 +394,10 @@ void mccs1850_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void mccs1850_device::nvram_read(emu_file &file)
+bool mccs1850_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.read(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
@@ -407,9 +406,10 @@ void mccs1850_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void mccs1850_device::nvram_write(emu_file &file)
+bool mccs1850_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.write(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
