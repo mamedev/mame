@@ -1153,7 +1153,7 @@ public:
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 
-	// setters
+	// programmatic override (for script bindings)
 	void set_value(s32 value);
 	void clear_value();
 
