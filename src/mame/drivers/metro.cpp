@@ -100,9 +100,8 @@ driver modified by Hau
 #include "cpu/z8/z8.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
-#include "sound/ym2413.h"
-#include "sound/2610intf.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #include <algorithm>
@@ -129,7 +128,7 @@ void metro_state::cpu_space_map(address_map &map)
 }
 
 
-void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -3701,10 +3700,10 @@ ROM_START( blzntrnd )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 053936 gfx data */
 	ROM_LOAD( "rom9.bin", 0x000000, 0x200000, CRC(37ca3570) SHA1(3374c586bf84583fa33f2793c4e8f2f61a0cab1c) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Samples */
 	ROM_LOAD( "rom8.bin", 0x000000, 0x080000, CRC(565a4086) SHA1(bd5780acfa5affa8705acbfccb0af16bac8ed298) )
 
-	ROM_REGION( 0x400000, "ymsnd", 0 )  /* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  /* ? YRW801-M ? */
 	ROM_LOAD( "rom6.bin", 0x000000, 0x200000, CRC(8b8819fc) SHA1(5fd9d2b5088cb676c11d32cac7ba8c5c18e31b64) )
 	ROM_LOAD( "rom7.bin", 0x200000, 0x200000, CRC(0089a52b) SHA1(d643ac122d62557de27f06ba1413ef757a45a927) )
 ROM_END
@@ -3777,22 +3776,22 @@ ROM_START( gstrik2 )
 	ROM_LOAD64_WORD( "chr6.82", 0x0800004, 0x200000, CRC(32eb33b0) SHA1(2ea06484ca326b44a35ee470343147a9d91d5626) )
 	ROM_LOAD64_WORD( "chr7.81", 0x0800006, 0x200000, CRC(2d30a21e) SHA1(749e86b7935ef71556eaee4caf6f954634e9bcbf) )
 	/* not populated */
-//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, CRC() SHA1() )
+//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
-	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )   /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcmb", 0 )   /* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
-	ROM_REGION( 0x400000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
 	/* ROM7.27 not populated?  */
 ROM_END
@@ -3817,22 +3816,22 @@ ROM_START( gstrik2j )
 	ROM_LOAD64_WORD( "chr6.82", 0x0800004, 0x200000, CRC(32eb33b0) SHA1(2ea06484ca326b44a35ee470343147a9d91d5626) )
 	ROM_LOAD64_WORD( "chr7.81", 0x0800006, 0x200000, CRC(2d30a21e) SHA1(749e86b7935ef71556eaee4caf6f954634e9bcbf) )
 	/* not populated */
-//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, CRC() SHA1() )
-//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, CRC() SHA1() )
+//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, NO_DUMP )
+//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
-	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )   /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcmb", 0 )   /* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
-	ROM_REGION( 0x400000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
 	/* ROM7.27 not populated?  */
 ROM_END
@@ -5426,8 +5425,8 @@ void metro_state::init_lastfortg()
 ***************************************************************************/
 
 // VG420 / VG460
-GAME( 1992, karatour,  0,        karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "Chatan Yara Kuushanku - The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatour,  0,        karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "Chatan Yara Kuushanku - The Karate Tournament (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Nova",                                            "Pang Pom's (Nova)", MACHINE_SUPPORTS_SAVE )
