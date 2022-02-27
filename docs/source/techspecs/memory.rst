@@ -197,7 +197,7 @@ that the lookup can be expensive, prefer finders instead.
 
 .. code-block:: C++
 
-    class memory_bank {
+    class memory_region {
         u8 *base();
         u8 *end();
         u32 bytes() const;

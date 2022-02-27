@@ -22,7 +22,6 @@ public:
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
-		, m_work_ram(*this, "work_ram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vrom_region(*this, "gfx2")
 		, m_timedigits(*this, "digit_%u", 0U)
@@ -149,7 +148,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_ram_8w;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	optional_memory_region m_vrom_region;

@@ -26,11 +26,13 @@ White Water                     50018  Hold PGDN PGUP END hit 1           PGDN P
 Twilight Zone                   50020  Hold ABC hit 1                     ABC
 The Addams Family Special
              Collectors Edition 50038  Hold ABC hit 1                     ABC
+Rush                                   Hold A hit 1                       Jiggle A and B
 
 ToDo:
 - NVRAM
 - Outputs
 - Mechanical sounds
+- Rush: Sound roms
 
 *********************************************************************************************/
 #include "emu.h"
@@ -909,6 +911,21 @@ ROM_START(lc_11)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
 ROM_END
 
+/*------------------------------------
+/ Rush (homebrew)
+/------------------------------------*/
+ROM_START(rush)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("rush_10.rom", 0x00000, 0x40000, CRC(f4fb0f13) SHA1(fee2f48fa0eba35cbbe6b84d8d24710ed8454d2e) )
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_REGION(0x180000, "sound1", ROMREGION_ERASEFF)
+	// small program to stop the error log from filling up
+	ROM_FILL(0x17dddd,1,0x20)
+	ROM_FILL(0x17ddde,1,0xfe)
+	ROM_FILL(0x17fffe,2,0xdd)
+ROM_END
+
 
 GAME(1993,  br_l4,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  br_p17,     br_l4,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Black Rose (SP-1)",                                        MACHINE_IS_SKELETON_MECHANICAL)
@@ -962,3 +979,4 @@ GAME(1992,  ww_p8,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init
 GAME(1992,  ww_p1,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-1 sound)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  strik_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Strike Master (L-4) (Shuffle)",                            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  lc_11,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "League Champ (1.1) (Shuffle)",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(20??,  rush,       0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Dave Astill",     "Rush (1.0)",                                               MACHINE_IS_SKELETON_MECHANICAL)

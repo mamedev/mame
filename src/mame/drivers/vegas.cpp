@@ -272,6 +272,7 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "audio/dcs.h"
 
 #include "bus/ata/idehd.h"
@@ -279,14 +280,16 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/midwayic.h"
+#include "machine/pci-ide.h"
+#include "machine/pci.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
-#include "machine/pci.h"
 #include "machine/vrc5074.h"
-#include "machine/pci-ide.h"
 #include "video/voodoo_pci.h"
+
 #include "screen.h"
 
 #include "sf2049.lh"
@@ -301,7 +304,7 @@ namespace {
  *************************************/
 
 #define LOG_TIMEKEEPER      (0)
-#define LOG_SIO             (1)
+#define LOG_SIO             (0)
 
 /*************************************
  *
@@ -334,6 +337,7 @@ public:
 		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
+		m_system_led(*this, "system_led"),
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
@@ -405,6 +409,7 @@ private:
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
+	output_finder<> m_system_led;
 	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 
@@ -480,6 +485,7 @@ void vegas_state::machine_start()
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
+	m_system_led.resolve();
 	m_wheel_driver.resolve();
 	m_lamps.resolve();
 
@@ -873,34 +879,35 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 	switch (offset) {
 	case 0:
 	{
-		char digit = 'U';
-		switch (data & 0xff) {
-		case 0xc0: digit = '0'; break;
-		case 0xf9: digit = '1'; break;
-		case 0xa4: digit = '2'; break;
-		case 0xb0: digit = '3'; break;
-		case 0x99: digit = '4'; break;
-		case 0x92: digit = '5'; break;
-		case 0x82: digit = '6'; break;
-		case 0xf8: digit = '7'; break;
-		case 0x80: digit = '8'; break;
-		case 0x90: digit = '9'; break;
-		case 0x88: digit = 'A'; break;
-		case 0x83: digit = 'B'; break;
-		case 0xc6: digit = 'C'; break;
-		case 0xa7: digit = 'c'; break;
-		case 0xa1: digit = 'D'; break;
-		case 0x86: digit = 'E'; break;
-		case 0x87: digit = 'F'; break;
-		case 0x7f: digit = '.'; break;
-		case 0xf7: digit = '_'; break;
-		case 0xbf: digit = '|'; break;
-		case 0xfe: digit = '-'; break;
-		case 0xff: digit = 'Z'; break;
-		}
+		m_system_led = ~data & 0xff;
 		if (LOG_SIO) {
-			popmessage("System LED: %C", digit);
-			//logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
+			char digit = 'U';
+			switch (data & 0xff) {
+			case 0xc0: digit = '0'; break;
+			case 0xf9: digit = '1'; break;
+			case 0xa4: digit = '2'; break;
+			case 0xb0: digit = '3'; break;
+			case 0x99: digit = '4'; break;
+			case 0x92: digit = '5'; break;
+			case 0x82: digit = '6'; break;
+			case 0xf8: digit = '7'; break;
+			case 0x80: digit = '8'; break;
+			case 0x90: digit = '9'; break;
+			case 0x88: digit = 'A'; break;
+			case 0x83: digit = 'B'; break;
+			case 0xc6: digit = 'C'; break;
+			case 0xa7: digit = 'c'; break;
+			case 0xa1: digit = 'D'; break;
+			case 0x86: digit = 'E'; break;
+			case 0x87: digit = 'F'; break;
+			case 0x7f: digit = '.'; break;
+			case 0xf7: digit = '_'; break;
+			case 0xbf: digit = '|'; break;
+			case 0xfe: digit = '-'; break;
+			case 0xff: digit = 'Z'; break;
+			}
+			//popmessage("System LED: %C", digit);
+			logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
 		}
 	}
 		break;
@@ -2006,17 +2013,19 @@ void vegas_state::denver(machine_config &config)
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
+	INPUT_MERGER_ANY_HIGH(config, "duart_irq").output_handler().set(FUNC(vegas_state::duart_irq_cb));
+
 	NS16550(config, m_uart1, XTAL(1'843'200));
 	m_uart1->out_tx_callback().set("ttys01", FUNC(rs232_port_device::write_txd));
 	m_uart1->out_dtr_callback().set("ttys01", FUNC(rs232_port_device::write_dtr));
 	m_uart1->out_rts_callback().set("ttys01", FUNC(rs232_port_device::write_rts));
-	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
+	m_uart1->out_int_callback().set("duart_irq", FUNC(input_merger_device::in_w<0>));
 
 	NS16550(config, m_uart2, XTAL(1'843'200));
 	m_uart2->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
 	m_uart2->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
 	m_uart2->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
-	m_uart2->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
+	m_uart2->out_int_callback().set("duart_irq", FUNC(input_merger_device::in_w<1>));
 
 	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", 0));
 	ttys01.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));

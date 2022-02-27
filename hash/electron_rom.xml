@@ -369,6 +369,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ample">
+		<description>AMPLE Nucleus ID 60205</description>
+		<year>1986</year>
+		<publisher>Hybrid Technology</publisher>
+		<info name="usage" value="Requires Music 5000"/>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AMPLENucleus-1.10-60205.rom" size="16384" crc="b6417662" sha1="261eabfd72f2aa63d86c8ce3a94f5c822aca2d71"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arm100" cloneof="arm">
 		<description>Advanced ROM Manager v1.00</description>
 		<year>1986</year>
@@ -499,6 +511,17 @@ license:CC0
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="GoMMCTools-E1.03.rom" size="16384" crc="ab7cd089" sha1="f2b069f7b29ae699e55a9f3e7d187efce052582f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="i2c" supported="no">
+		<description>I2C (4 U) 3.1E</description>
+		<year>2018</year>
+		<publisher>Martin Barr</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="I2C-3.1E.rom" size="16384" crc="8e31ea35" sha1="749a877480561d78b546e9541e66f8d774e56dfe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -747,6 +770,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="stopress">
+		<description>AMX Stop Press</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<part name="rom1" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AMXStopPress-1.9.rom" size="16384" crc="900716e1" sha1="1d6d219c51e8a2be305e69b8fecaa76d992d5ba2"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AMXStopPressSupport-1.9.rom" size="16384" crc="21cb5808" sha1="8d2fd8b39492654fa32453c0936a70e15d97d736"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="t2c3">
 		<description>T2C3 v1.00</description>
 		<year>1985</year>
@@ -765,6 +804,17 @@ license:CC0
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="T2CU-1.01.rom" size="8192" crc="b04ac95f" sha1="495301b5df7857b9a4850c5f88b3047c620ac763"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t2cu200" cloneof="t2cu">
+		<description>T2CU v2.00</description>
+		<year>1987</year>
+		<publisher>Slogger</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="T2CU-2.00.rom" size="8192" crc="3d3be2a0" sha1="324abc8289c83f6b47933ccf842e6c3edc167015"/>
 			</dataarea>
 		</part>
 	</software>
@@ -973,12 +1023,12 @@ license:CC0
 	</software>
 
 	<software name="xbasic">
-		<description>XBasic</description>
+		<description>XBasic B.E</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>DEB</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Xbasic.rom" size="16384" crc="b1eb3e33" sha1="25d80112b789d72f739dccb54a86e1969f2eda0f"/>
+				<rom name="Xbasic-B.E.rom" size="16384" crc="b1eb3e33" sha1="25d80112b789d72f739dccb54a86e1969f2eda0f"/>
 			</dataarea>
 		</part>
 	</software>

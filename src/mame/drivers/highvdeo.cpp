@@ -1654,6 +1654,15 @@ ROM_START( unksmk ) // VIDEO/SMK-1 C PCB. V30 + OKI M6376. Feigns to be a NeoGeo
 	ROM_LOAD( "ng 1.ic25", 0x00000, 0x80000, CRC(89291fe6) SHA1(f729e6b90a98151ff64baa1d852137a86bd0ef93) ) // handwritten label
 ROM_END
 
+ROM_START( newtiger ) // New High Video TYPE 001/V0 PCB. N80C186XL25 + OKIM6376 + Lattice ispLSI1032E + Lattice ispLSI2032. Also found on PCB with no markings, otherwise almost identical. These have a big black box covering part of the PCB which isn't present on other PCBs for these driver
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "new tiger pt hnt 7 v.-1.0 h.video 9.a 8m.u7", 0x000000, 0x100000, CRC(57c68716) SHA1(d6c6d285b63809864b7868b5fdfef31519eb94bf) )
+	ROM_LOAD16_BYTE( "new tiger pt hnt 8 v.-1.0 h.video 9.a 8m.u8", 0x000001, 0x100000, CRC(e83bd175) SHA1(d454783f58038ca8938077fa6575b22494056f6f) )
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "new tiger sound v.-1 memory 2m.u16", 0x00000, 0x40000, CRC(aa8444ec) SHA1(3663c01a7cf2fe334eb6ea974d6a0c0b6bb88354) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -1676,3 +1685,4 @@ GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, R
 GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",                     0,                   layout_fashion )
 GAMEL( 2000, cuncino,   0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Capitan Uncino (High Video, version 2)", MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 200?, unksmk,    0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "unknown SMK game",                       MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs
+GAMEL( 200?, newtiger,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "New Tiger",                              MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected

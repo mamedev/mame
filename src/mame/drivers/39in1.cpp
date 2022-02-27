@@ -234,7 +234,7 @@ uint32_t _39in1_state::_39in1_prot_cheater_r()
 void _39in1_state::base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
-	map(0x00400000, 0x005fffff).rom().region("data", 0);
+	map(0x00400000, 0x007fffff).rom().region("data", 0);
 	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
 	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
 	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
@@ -393,7 +393,7 @@ ROM_START( 39in1 )
 	ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -407,7 +407,7 @@ ROM_START( 48in1 )
 	ROM_LOAD( "hph_ver309",   0x000000, 0x080000, CRC(27023186) SHA1(a2b3770c4b03d6026c6a0ff2e62ab17c3b359b12) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -422,7 +422,7 @@ ROM_START( 48in1b )
 	ROM_LOAD( "hph_ver309",   0x000000, 0x080000, CRC(27023186) SHA1(a2b3770c4b03d6026c6a0ff2e62ab17c3b359b12) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "48_flash.u19", 0x000000, 0x400000, CRC(a975db44) SHA1(5be6520b2ba7728e9e2de3c62ae7c3b88b25172a) )  // CGC-NP205 string
 
 	// EEPROM - contains security data
@@ -437,7 +437,7 @@ ROM_START( 48in1a )
 	ROM_LOAD( "ver302.u2",    0x000000, 0x080000, CRC(5ea25870) SHA1(66edc59a3d355bc3462e98d2062ada721c371af6) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -452,7 +452,7 @@ ROM_START( 48in1c )
 	ROM_LOAD( "48in1_hph_ver308.u2", 0x000000, 0x080000, CRC(5d42beb0) SHA1(f21d1923b588cca1a6cd48a8ea6f3b5b996ebc1a) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -467,7 +467,7 @@ ROM_START( 60in1 )
 	ROM_LOAD( "hph_ver300.u8",   0x000000, 0x080000, CRC(6fba84c4) SHA1(28881e51227e94a80c8449d9c00a1a675f008d64) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "flash.u19", 0x000000, 0x400000, CRC(0cfed2a0) SHA1(9aac23f5267af56255e6f8aefade9f00bc106325) )  // CGC-NP206 string
 
 	// EEPROM - contains security data
@@ -481,7 +481,7 @@ ROM_START( 4in1a )
 	ROM_LOAD( "plz-v014_ver300.bin", 0x000000, 0x080000, CRC(775f101d) SHA1(8a299a67b487518ba2e2cb5334347b93f8640190) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1,   CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -495,7 +495,7 @@ ROM_START( 4in1b )
 	ROM_LOAD( "pzv001-4.bin", 0x000000, 0x080000, CRC(7679a95f) SHA1(56c20fa7d086560b76477b42208cb43d42adba41) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )  // CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -511,7 +511,7 @@ ROM_START( 19in1 )
 	ROM_LOAD( "19in1.u8",    0x000000, 0x080000, CRC(87b0506c) SHA1(c43ae4b403864a28e56370685572fa02e7572e66) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // assuming same flash rom, CGC-NP203 string
 
 	// EEPROM - contains security data
@@ -523,7 +523,7 @@ ROM_START( rodent )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "exterminator.u2", 0x00000, 0x80000, CRC(23c1d21f) SHA1(349565b0f0a015196827707cabb8d9ce6560d2cc) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "m29w160db.u19", 0x000000, 0x200000, CRC(665ee79c) SHA1(35896b97378e8cd78e99d4527b9dc7392e545e17) )
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -537,30 +537,30 @@ ROM_START( fruitwld ) // PCB451 - FRUIT WORLD FP101 sticker on PCB outside the l
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "fruit world v111.u2", 0x00000, 0x80000, CRC(44092be5) SHA1(a579455c4581fc2f6be37979d651f3f685353e8e) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(8cc9799a) SHA1(5bec178d11c722e26bf380c19d99118e7223bcd7) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF, fruit-FPv101 string
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "at93c66a.u32", 0x000, 0x200, CRC(11245518) SHA1(6363568facbe12f7be95e994c551815e7c3682f4) )
 ROM_END
 
 ROM_START( fruitwlda ) // PCB383 - FRUIT WORLD FP101 sticker on PCB outside the lid, FRUIT WORLD V102 on another sticker on big FPGA
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "fruit world v110.u2", 0x00000, 0x80000, CRC(d81bdd3c) SHA1(79ec9d12bb94537655778ac1138d3611bda9179e) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(8cc9799a) SHA1(5bec178d11c722e26bf380c19d99118e7223bcd7) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF, fruit-FPv101 string
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "at93c66a.u32", 0x000, 0x200, CRC(9e2e676e) SHA1(c3bda9c63118e9efb41445d941be44d4499b694f) )
 ROM_END
 
 ROM_START( jumanji ) // PCB383 - CHZ FP100 sticker on RAM under the lid. Dump was presented as Jumanji but has CHZ both on stickers and in ROM strings.
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "u2", 0x00000, 0x80000, CRC(45bd43c7) SHA1(0da61fc1f5f17b2b9531ccfc69495a61aa272efd) ) // no label
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "flash.u19", 0x000000, 0x400000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
@@ -570,18 +570,18 @@ ROM_START( plutus ) // PCB451 - PLUTUS FP100 sticker on PCB outside the lid
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plutus v100.u2", 0x00000, 0x80000, CRC(3ac49895) SHA1(6de3dcac42afc4d9f927c9c9accf592b3d974fd3) )
 
-	ROM_REGION32_LE( 0x200000, "data", 0 )
-	ROM_LOAD( "flash.u19", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(352387e7) SHA1(24e2d98681791f42033a58721b5af9cc6a04ebe4) ) // PLUTUS-FP100 string
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "at93c66a.u32", 0x000, 0x200, CRC(625eb014) SHA1(f1fb0777ce8a12ee09d882cd843c07daea14145a) )
 ROM_END
 
 ROM_START( pokrwild ) // PCB451 - POKER'S WILD FP102 sticker on PCB outside the lid
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "pokers wild v117.u2", 0x00000, 0x80000, CRC(96e18540) SHA1(b8fbf0a78a496e4ebea3e4603f4e3a52823c1f31) )
 
-	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(824fd188) SHA1(38517a78e853a600abcb6256ff77482a250c6ee6) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF, PKWILD-FP103 string
 
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )

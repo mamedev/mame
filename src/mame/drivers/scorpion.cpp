@@ -52,6 +52,7 @@ private:
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 
+	uint8_t *m_ram_0000;
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void scorpion_update_memory();

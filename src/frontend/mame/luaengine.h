@@ -121,6 +121,8 @@ private:
 	template<typename T, size_t SIZE> class enum_parser;
 
 	struct addr_space;
+	class tap_helper;
+	class addr_space_change_notif;
 
 	struct save_item {
 		void *base;

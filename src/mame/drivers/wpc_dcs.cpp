@@ -5,7 +5,7 @@ PINBALL
 Williams WPC with DCS sound
 
 If it says FACTORY SETTINGS, press F3, and wait for the game attract mode to commence.
-The volume may be turned up by pressing NUM+ .
+To increase the volume, press NUM+.
 
 Here are the key codes to enable play:
 

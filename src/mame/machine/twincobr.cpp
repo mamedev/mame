@@ -18,19 +18,7 @@
 WRITE_LINE_MEMBER(twincobr_state::twincobr_vblank_irq)
 {
 	if (state && m_intenable)
-	{
-		m_intenable = 0;
-		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(twincobr_state::wardner_vblank_irq)
-{
-	if (state && m_intenable)
-	{
-		m_intenable = 0;
-		m_maincpu->set_input_line(0, HOLD_LINE);
-	}
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
 
@@ -189,6 +177,8 @@ READ_LINE_MEMBER(twincobr_state::twincobr_bio_r)
 WRITE_LINE_MEMBER(twincobr_state::int_enable_w)
 {
 	m_intenable = state;
+	if (!state)
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)

@@ -26,7 +26,7 @@ enum
 	STD_SXROM, STD_SOROM, STD_SZROM,
 	STD_TXROM, STD_TXSROM, STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
-	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
+	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT, STD_EVENT2,
 	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
@@ -97,7 +97,7 @@ enum
 	BMC_70IN1, BMC_500IN1, BMC_800IN1, BMC_1200IN1,
 	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_GN91B,
 	BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
-	BMC_CTC09, BMC_CTC_12IN1, BMC_60311C, BMC_80013B, BMC_810544C,
+	BMC_CTC09, BMC_CTC_12IN1, BMC_60311C, BMC_80013B, BMC_810544C, BMC_82AB,
 	BMC_830425C, BMC_830506C, BMC_830928C, BMC_850437C, BMC_891227, BMC_970630C,
 	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
 	BMC_EL860947C, BMC_EL861121C, BMC_FAM250, BMC_FK23C, BMC_FK23CA,
@@ -112,7 +112,7 @@ enum
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX40G, UNL_AX5705, UNL_KN42,
 	UNL_KOF97, UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
-	UNL_MK2, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
+	UNL_JY830623C, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_158B, UNL_2708,
 	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_43272, UNL_TF1201, UNL_TH21311,
@@ -170,7 +170,6 @@ enum
 #define CART_NTRAM 4
 
 
-#define PPU_MIRROR_NONE     0
 #define PPU_MIRROR_VERT     1
 #define PPU_MIRROR_HORZ     2
 #define PPU_MIRROR_HIGH     3
@@ -334,7 +333,6 @@ public:
 
 	// CHR
 	int m_chr_source;   // global source for the 8 VROM banks
-	inline void chr_sanity_check(int source);
 
 	//these were previously called chr_map. they are a quick banking structure,
 	//because some of these change multiple times per scanline!
@@ -346,24 +344,27 @@ public:
 	uint32_t m_vram_chunks;
 
 	// CHR helpers
-	void chr8(int bank, int source);
-	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
-	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
-	void chr2_x(int start, int bank, int source);
-	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
-	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
-	void chr2_4(int bank, int source) { chr2_x(4, bank, source); }
-	void chr2_6(int bank, int source) { chr2_x(6, bank, source); }
-	void chr1_x(int start, int bank, int source);
-	void chr1_0(int bank, int source) { chr1_x(0, bank, source); }
-	void chr1_1(int bank, int source) { chr1_x(1, bank, source); }
-	void chr1_2(int bank, int source) { chr1_x(2, bank, source); }
-	void chr1_3(int bank, int source) { chr1_x(3, bank, source); }
-	void chr1_4(int bank, int source) { chr1_x(4, bank, source); }
-	void chr1_5(int bank, int source) { chr1_x(5, bank, source); }
-	void chr1_6(int bank, int source) { chr1_x(6, bank, source); }
-	void chr1_7(int bank, int source) { chr1_x(7, bank, source); }
+private:
+	void bank_chr(int shift, int start, int bank, int source);
+public:
+	void chr8(int bank, int source) { bank_chr(3, 0, bank, source); }
+	void chr4_x(int start, int bank, int source) { bank_chr(2, start, bank, source); }
+	void chr4_0(int bank, int source) { bank_chr(2, 0, bank, source); }
+	void chr4_4(int bank, int source) { bank_chr(2, 4, bank, source); }
+	void chr2_x(int start, int bank, int source) { bank_chr(1, start, bank, source); }
+	void chr2_0(int bank, int source) { bank_chr(1, 0, bank, source); }
+	void chr2_2(int bank, int source) { bank_chr(1, 2, bank, source); }
+	void chr2_4(int bank, int source) { bank_chr(1, 4, bank, source); }
+	void chr2_6(int bank, int source) { bank_chr(1, 6, bank, source); }
+	void chr1_x(int start, int bank, int source) { bank_chr(0, start, bank, source); }
+	void chr1_0(int bank, int source) { bank_chr(0, 0, bank, source); }
+	void chr1_1(int bank, int source) { bank_chr(0, 1, bank, source); }
+	void chr1_2(int bank, int source) { bank_chr(0, 2, bank, source); }
+	void chr1_3(int bank, int source) { bank_chr(0, 3, bank, source); }
+	void chr1_4(int bank, int source) { bank_chr(0, 4, bank, source); }
+	void chr1_5(int bank, int source) { bank_chr(0, 5, bank, source); }
+	void chr1_6(int bank, int source) { bank_chr(0, 6, bank, source); }
+	void chr1_7(int bank, int source) { bank_chr(0, 7, bank, source); }
 
 
 	// NameTable & Mirroring

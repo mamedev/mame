@@ -10,7 +10,10 @@
 
 #include "emu.h"
 #include "rendfont.h"
+
 #include "emuopts.h"
+#include "fileio.h"
+
 #include "corestr.h"
 #include "coreutil.h"
 
@@ -121,13 +124,15 @@ public:
 	static constexpr unsigned MAJVERSION = 1;
 	static constexpr unsigned MINVERSION = 0;
 
-	bool read(emu_file &f)
+	bool read(util::read_stream &f)
 	{
-		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+		std::size_t actual(0);
+		return !f.read(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
 	}
-	bool write(emu_file &f)
+	bool write(util::write_stream &f)
 	{
-		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
+		std::size_t actual(0);
+		return !f.write(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
 	}
 
 	bool check_magic() const
@@ -593,10 +598,9 @@ render_font::render_font(render_manager &manager, const char *filename)
 	}
 
 	// load the compiled in data instead
-	emu_file ramfile(OPEN_FLAG_READ);
-	std::error_condition const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
-	if (!filerr)
-		load_cached(ramfile, 0, 0);
+	util::random_read::ptr ramfile = util::ram_read(font_uismall, sizeof(font_uismall));
+	if (ramfile)
+		load_cached(*ramfile, 0, 0);
 	render_font_command_glyph();
 }
 
@@ -906,11 +910,11 @@ float render_font::utf8string_width(float height, float aspect, std::string_view
 //  and create a new cached version
 //-------------------------------------------------
 
-bool render_font::load_cached_bdf(const char *filename)
+bool render_font::load_cached_bdf(std::string_view filename)
 {
 	std::error_condition filerr;
 	u32 chunk;
-	u64 bytes;
+	std::size_t bytes;
 
 	// first try to open the BDF itself
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
@@ -943,9 +947,7 @@ bool render_font::load_cached_bdf(const char *filename)
 	u32 const hash(core_crc32(0, reinterpret_cast<u8 const *>(&m_rawdata[0]), bytes));
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
-	std::string cachedname(filename);
-	if ((4U < cachedname.length()) && !core_stricmp(&cachedname[cachedname.length() - 4], ".bdf"))
-		cachedname.erase(cachedname.length() - 4);
+	std::string cachedname(filename, 0, filename.length() - ((4U < filename.length()) && core_filename_ends_with(filename, ".bdf") ? 4 : 0));
 	cachedname.append(".bdc");
 
 	// attempt to open the cached version of the font
@@ -978,11 +980,25 @@ bool render_font::load_cached_bdf(const char *filename)
 	m_rawdata[m_rawsize] = '\0';
 
 	// load the BDF
-	bool const result = load_bdf();
+	bool result = load_bdf();
 
 	// if we loaded okay, create a cached one
 	if (result)
-		save_cached(cachedname.c_str(), m_rawsize, hash);
+	{
+		osd_printf_info("Generating cached BDF font...\n");
+
+		// attempt to open the file
+		emu_file cachefile(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+		filerr = cachefile.open(cachedname);
+		if (filerr)
+			result = false;
+		else
+		{
+			result = save_cached(cachefile, m_rawsize, hash);
+			if (!result)
+				cachefile.remove_on_close();
+		}
+	}
 	else
 		m_rawdata.clear();
 
@@ -1324,7 +1340,7 @@ bool render_font::load_bdf()
 
 			// some progress for big fonts
 			if (0 == (++charcount % 256))
-				osd_printf_warning("Loading BDF font... (%d characters loaded)\n", charcount);
+				osd_printf_info("Loading BDF font... (%d characters loaded)\n", charcount);
 		}
 	}
 
@@ -1344,12 +1360,17 @@ bool render_font::load_bdf()
 //  load_cached - load a font in cached format
 //-------------------------------------------------
 
-bool render_font::load_cached(emu_file &file, u64 length, u32 hash)
+bool render_font::load_cached(util::random_read &file, u64 length, u32 hash)
 {
 	// get the file size, read the header, and check that it looks good
-	u64 const filesize(file.size());
+	u64 filesize;
 	bdc_header header;
-	if (!header.read(file))
+	if (file.length(filesize))
+	{
+		LOG("render_font::load_cached: error determining size of BDC file\n");
+		return false;
+	}
+	else if (!header.read(file))
 	{
 		osd_printf_warning("render_font::load_cached: error reading BDC header\n");
 		return false;
@@ -1371,14 +1392,20 @@ bool render_font::load_cached(emu_file &file, u64 length, u32 hash)
 	m_yoffs = header.get_y_offset();
 	m_defchar = header.get_default_character();
 	u32 const numchars(header.get_glyph_count());
-	if ((file.tell() + (u64(numchars) * bdc_table_entry::size())) > filesize)
+	u64 filepos;
+	if (file.tell(filepos))
+	{
+		LOG("render_font::load_cached: failed to determine position in BDC file\n");
+		return false;
+	}
+	else if ((filepos + (u64(numchars) * bdc_table_entry::size())) > filesize)
 	{
 		LOG("render_font::load_cached: BDC file is too small to hold glyph table\n");
 		return false;
 	}
 
 	// now read the rest of the data
-	u64 const remaining(filesize - file.tell());
+	u64 const remaining(filesize - filepos);
 	try
 	{
 		m_rawdata.resize(std::size_t(remaining));
@@ -1390,7 +1417,8 @@ bool render_font::load_cached(emu_file &file, u64 length, u32 hash)
 	for (u64 bytes_read = 0; remaining > bytes_read; )
 	{
 		u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-		if (file.read(&m_rawdata[bytes_read], chunk) != chunk)
+		std::size_t bytes(0);
+		if (file.read(&m_rawdata[bytes_read], chunk, bytes) || bytes != chunk)
 		{
 			osd_printf_error("render_font::load_cached: error reading BDC data\n");
 			m_rawdata.clear();
@@ -1450,16 +1478,8 @@ bool render_font::load_cached(emu_file &file, u64 length, u32 hash)
 //  save_cached - save a font in cached format
 //-------------------------------------------------
 
-bool render_font::save_cached(const char *filename, u64 length, u32 hash)
+bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 {
-	osd_printf_warning("Generating cached BDF font...\n");
-
-	// attempt to open the file
-	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	std::error_condition const filerr = file.open(filename);
-	if (filerr)
-		return false;
-
 	// count glyphs
 	unsigned numchars = 0;
 	for (glyph const *const page : m_glyphs)
@@ -1474,8 +1494,6 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 
 	try
 	{
-		u32 bytes_written;
-
 		{
 			LOG("render_font::save_cached: writing header\n");
 			bdc_header hdr;
@@ -1490,7 +1508,9 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 			if (!hdr.write(file))
 				throw emu_fatalerror("Error writing cached file");
 		}
-		u64 const table_offs(file.tell());
+		u64 table_offs;
+		if (file.tell(table_offs))
+			throw emu_fatalerror("Error writing cached file");
 
 		// allocate an array to hold the character data
 		std::vector<u8> chartable(std::size_t(numchars) * bdc_table_entry::size(), 0);
@@ -1499,8 +1519,8 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 		std::vector<u8> tempbuffer(65536);
 
 		// write the empty table to the beginning of the file
-		bytes_written = file.write(&chartable[0], chartable.size());
-		if (bytes_written != chartable.size())
+		std::size_t bytes_written(0);
+		if (file.write(&chartable[0], chartable.size(), bytes_written) || bytes_written != chartable.size())
 			throw emu_fatalerror("Error writing cached file");
 
 		// loop over all characters
@@ -1543,8 +1563,7 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 						*dest++ = accum;
 
 					// write the data
-					bytes_written = file.write(&tempbuffer[0], dest - &tempbuffer[0]);
-					if (bytes_written != dest - &tempbuffer[0])
+					if (file.write(&tempbuffer[0], dest - &tempbuffer[0], bytes_written) || bytes_written != dest - &tempbuffer[0])
 						throw emu_fatalerror("Error writing cached file");
 
 					// free the bitmap and texture
@@ -1568,13 +1587,13 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 		if (!chartable.empty())
 		{
 			LOG("render_font::save_cached: writing character table\n");
-			file.seek(table_offs, SEEK_SET);
+			if (file.seek(table_offs, SEEK_SET))
+				return false;
 			u8 const *bytes(&chartable[0]);
 			for (u64 remaining = chartable.size(); remaining; )
 			{
 				u32 const chunk((std::min<u64>)(std::numeric_limits<u32>::max(), remaining));
-				bytes_written = file.write(bytes, chunk);
-				if (chunk != bytes_written)
+				if (file.write(bytes, chunk, bytes_written) || chunk != bytes_written)
 					throw emu_fatalerror("Error writing cached file");
 				bytes += chunk;
 				remaining -= chunk;
@@ -1586,7 +1605,6 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 	}
 	catch (...)
 	{
-		file.remove_on_close();
 		return false;
 	}
 }
@@ -1595,13 +1613,13 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 void render_font::render_font_command_glyph()
 {
 	// FIXME: this is copy/pasta from the BDC loading, and it shouldn't be injected into every font
-	emu_file file(OPEN_FLAG_READ);
-	if (!file.open_ram(font_uicmd14, sizeof(font_uicmd14)))
+	util::random_read::ptr file = util::ram_read(font_uicmd14, sizeof(font_uicmd14));
+	if (file)
 	{
 		// get the file size, read the header, and check that it looks good
-		u64 const filesize(file.size());
+		u64 const filesize = sizeof(font_uicmd14);
 		bdc_header header;
-		if (!header.read(file))
+		if (!header.read(*file))
 		{
 			osd_printf_warning("render_font::render_font_command_glyph: error reading BDC header\n");
 			return;
@@ -1616,14 +1634,20 @@ void render_font::render_font_command_glyph()
 		m_height_cmd = header.get_height();
 		m_yoffs_cmd = header.get_y_offset();
 		u32 const numchars(header.get_glyph_count());
-		if ((file.tell() + (u64(numchars) * bdc_table_entry::size())) > filesize)
+		u64 filepos;
+		if (file->tell(filepos))
+		{
+			LOG("render_font::render_font_command_glyph: failed to determine position in BDC file\n");
+			return;
+		}
+		else if ((filepos + (u64(numchars) * bdc_table_entry::size())) > filesize)
 		{
 			LOG("render_font::render_font_command_glyph: BDC file is too small to hold glyph table\n");
 			return;
 		}
 
 		// now read the rest of the data
-		u64 const remaining(filesize - file.tell());
+		u64 const remaining(filesize - filepos);
 		try
 		{
 			m_rawdata_cmd.resize(std::size_t(remaining));
@@ -1635,7 +1659,8 @@ void render_font::render_font_command_glyph()
 		for (u64 bytes_read = 0; remaining > bytes_read; )
 		{
 			u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-			if (file.read(&m_rawdata_cmd[bytes_read], chunk) != chunk)
+			std::size_t bytes(0);
+			if (file->read(&m_rawdata_cmd[bytes_read], chunk, bytes) || bytes != chunk)
 			{
 				osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
 				m_rawdata_cmd.clear();

@@ -114,9 +114,10 @@ void at29x_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void at29x_device::nvram_read(emu_file &file)
+bool at29x_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_eememory.get(), m_memory_size+2);
+	size_t actual;
+	return !file.read(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
 }
 
 //-------------------------------------------------
@@ -124,12 +125,14 @@ void at29x_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void at29x_device::nvram_write(emu_file &file)
+bool at29x_device::nvram_write(util::write_stream &file)
 {
 	// If we don't write (because there were no changes), the file will be wiped
 	LOGMASKED(LOG_PRG, "Write to NVRAM file\n");
 	m_eememory[0] = m_version;
-	file.write(m_eememory.get(), m_memory_size+2);
+
+	size_t actual;
+	return !file.write(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
 }
 
 /*

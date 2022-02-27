@@ -351,7 +351,7 @@ protected:
 	bool write_one_bit(const attotime &limit);
 
 	virtual u8 get_drive_busy() const { return 0; }
-	virtual void clr_drive_busy() { };
+	virtual void clr_drive_busy() { }
 };
 
 class upd765a_device : public upd765_family_device {
@@ -419,8 +419,8 @@ protected:
 	virtual void execute_command(int cmd) override;
 	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
-	virtual u8 get_drive_busy() const override { return drive_busy; };
-	virtual void clr_drive_busy() override { drive_busy = 0; };
+	virtual u8 get_drive_busy() const override { return drive_busy; }
+	virtual void clr_drive_busy() override { drive_busy = 0; }
 
 	void motor_control(int fid, bool start_motor);
 

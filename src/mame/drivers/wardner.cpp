@@ -162,6 +162,9 @@ private:
 
 	void wardner_bank_w(uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+
 	void dsp_io_map(address_map &map);
 	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
@@ -170,6 +173,20 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
 };
+
+
+WRITE_LINE_MEMBER(wardner_state::wardner_vblank_irq)
+{
+	if (state && m_intenable)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(wardner_state::int_enable_w)
+{
+	m_intenable = state;
+	if (!state)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
 
 /***************************** Z80 Main Memory Map **************************/

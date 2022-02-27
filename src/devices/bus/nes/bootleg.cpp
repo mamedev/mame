@@ -113,18 +113,18 @@ nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(type == NES_SMB2JB ? 0x0f : 0x07), irq_timer(nullptr)
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bank67)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(bank67), irq_timer(nullptr)
 {
 }
 
 nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock)
+	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock, 0x0f)
 {
 }
 
 nes_n32_4in1_device::nes_n32_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock)
+	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock, 0x07)
 {
 }
 
@@ -1285,7 +1285,7 @@ void nes_smb2jb_device::write_l(offs_t offset, u8 data)
 u8 nes_smb2jb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[m_bank67 * 0x2000 + offset];
+	return m_prg[(m_bank67 * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 /*-------------------------------------------------

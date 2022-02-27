@@ -865,62 +865,62 @@ void address_space_installer::populate_map_entry(const address_map_entry &entry,
 
 
 
-memory_passthrough_handler *address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 8-bits wide bus read tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 16-bits wide bus read tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 32-bits wide bus read tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 64-bits wide bus read tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 8-bits wide bus write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 16-bits wide bus write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 32-bits wide bus write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 64-bits wide bus write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 8-bits wide bus read/write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 16-bits wide bus read/write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	fatalerror("Tryingw to install a 32-bits wide bus read/write tap in a %d-bits wide bus\n", data_width());
 }
 
-memory_passthrough_handler *address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph)
+memory_passthrough_handler address_space_installer::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	fatalerror("Trying to install a 64-bits wide bus read/write tap in a %d-bits wide bus\n", data_width());
 }

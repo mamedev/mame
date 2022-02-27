@@ -46,35 +46,35 @@ private:
 
 	devcb_write_line    m_irq_out;
 	void check_irqs();
-	void set_lines() { m_irq_out((m_core_status & ~m_debug & 2) ? ASSERT_LINE : CLEAR_LINE); }; // TODO FIQ
+	void set_lines() { m_irq_out((m_core_status & ~m_debug & 2) ? ASSERT_LINE : CLEAR_LINE); } // TODO FIQ
 
-	void push_level(int lvl) { m_level_stack[++m_lvlidx] = lvl; };
-	void pop_level() { if (m_lvlidx) --m_lvlidx; };
-	int get_level() { return m_level_stack[m_lvlidx]; };
+	void push_level(int lvl) { m_level_stack[++m_lvlidx] = lvl; }
+	void pop_level() { if (m_lvlidx) --m_lvlidx; }
+	int get_level() { return m_level_stack[m_lvlidx]; }
 
 	uint32_t irq_vector_r();
 	uint32_t firq_vector_r();
-	uint32_t aic_isr_r() { return m_status; };
-	uint32_t aic_cisr_r() { return m_core_status; };
-	uint32_t aic_ipr_r() { return m_irqs_pending; };
-	uint32_t aic_imr_r() { return m_irqs_enabled; };
-	uint32_t aic_ffsr_r() { return m_fast_irqs; };
+	uint32_t aic_isr_r() { return m_status; }
+	uint32_t aic_cisr_r() { return m_core_status; }
+	uint32_t aic_ipr_r() { return m_irqs_pending; }
+	uint32_t aic_imr_r() { return m_irqs_enabled; }
+	uint32_t aic_ffsr_r() { return m_fast_irqs; }
 
 	// can't use ram() and share() in device submaps
-	uint32_t aic_smr_r(offs_t offset) { return m_aic_smr[offset]; };
-	uint32_t aic_svr_r(offs_t offset) { return m_aic_svr[offset]; };
-	void aic_smr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_aic_smr[offset]); };
-	void aic_svr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_aic_svr[offset]); };
-	void aic_spu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_spurious_vector); };
-	void aic_dcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_debug); check_irqs(); };
-	void aic_ffer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_fast_irqs |= data & mem_mask; check_irqs(); };
-	void aic_ffdr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_fast_irqs &= ~(data & mem_mask) | 1; check_irqs(); };
+	uint32_t aic_smr_r(offs_t offset) { return m_aic_smr[offset]; }
+	uint32_t aic_svr_r(offs_t offset) { return m_aic_svr[offset]; }
+	void aic_smr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_aic_smr[offset]); }
+	void aic_svr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_aic_svr[offset]); }
+	void aic_spu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_spurious_vector); }
+	void aic_dcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { COMBINE_DATA(&m_debug); check_irqs(); }
+	void aic_ffer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_fast_irqs |= data & mem_mask; check_irqs(); }
+	void aic_ffdr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_fast_irqs &= ~(data & mem_mask) | 1; check_irqs(); }
 
-	void aic_iecr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_enabled |= data & mem_mask; check_irqs(); };
-	void aic_idcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_enabled &= ~(data & mem_mask); check_irqs(); };
-	void aic_iccr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_pending &= ~(data & mem_mask); check_irqs(); };
-	void aic_iscr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_pending |= data & mem_mask; check_irqs(); };
-	void aic_eoicr_w(uint32_t data) { m_status = 0; pop_level(); check_irqs(); };
+	void aic_iecr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_enabled |= data & mem_mask; check_irqs(); }
+	void aic_idcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_enabled &= ~(data & mem_mask); check_irqs(); }
+	void aic_iccr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_pending &= ~(data & mem_mask); check_irqs(); }
+	void aic_iscr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { m_irqs_pending |= data & mem_mask; check_irqs(); }
+	void aic_eoicr_w(uint32_t data) { m_status = 0; pop_level(); check_irqs(); }
 };
 
 #endif

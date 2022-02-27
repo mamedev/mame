@@ -48,6 +48,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<cops1_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -64,10 +68,6 @@ public:
 	int m_blk = false;
 
 	u8 read_inputs(int columns);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -152,17 +152,18 @@ public:
 		hh_cops1_state(mconfig, type, tag)
 	{ }
 
+	void mbaskb(machine_config &config);
+	void msoccer(machine_config &config);
+	void mhockey(machine_config &config);
+	void mhockeya(machine_config &config);
+
+private:
 	void update_display();
 	void write_do(u8 data);
 	void write_blk(int state);
 	void write_s(u8 data);
 	void write_f(u8 data);
 	u8 read_f();
-
-	void mbaskb(machine_config &config);
-	void msoccer(machine_config &config);
-	void mhockey(machine_config &config);
-	void mhockeya(machine_config &config);
 };
 
 // handlers
@@ -244,7 +245,7 @@ INPUT_PORTS_END
 
 void mbaskb_state::mbaskb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 370000); // approximation
 	m_maincpu->write_do().set(FUNC(mbaskb_state::write_do));
 	m_maincpu->write_blk().set(FUNC(mbaskb_state::write_blk));
@@ -254,13 +255,13 @@ void mbaskb_state::mbaskb(machine_config &config)
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->read_inb().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(3, 0x7f);
 	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mbaskb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -351,6 +352,9 @@ public:
 		m_ds8874(*this, "ds8874")
 	{ }
 
+	void qkracerm(machine_config &config);
+
+private:
 	required_device<ds8874_device> m_ds8874;
 	void ds8874_output_w(u16 data);
 
@@ -360,7 +364,6 @@ public:
 	u8 read_f();
 	u8 read_k();
 	int read_si();
-	void qkracerm(machine_config &config);
 };
 
 // handlers
@@ -450,7 +453,7 @@ INPUT_PORTS_END
 
 void qkracerm_state::qkracerm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
@@ -460,14 +463,14 @@ void qkracerm_state::qkracerm(machine_config &config)
 	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
 	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
 
-	/* video hardware */
+	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
 	config.set_default_layout(layout_qkracerm);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -508,13 +511,15 @@ public:
 		hh_cops1_state(mconfig, type, tag)
 	{ }
 
+	void qkspeller(machine_config &config);
+
+private:
 	void update_display();
 	void write_do(u8 data);
 	void write_s(u8 data);
 	void write_f(u8 data);
 	u8 read_f();
 	u8 read_k();
-	void qkspeller(machine_config &config);
 };
 
 // handlers
@@ -630,7 +635,7 @@ INPUT_PORTS_END
 
 void qkspeller_state::qkspeller(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->write_do().set(FUNC(qkspeller_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkspeller_state::write_s));
@@ -640,12 +645,12 @@ void qkspeller_state::qkspeller(machine_config &config)
 	m_maincpu->read_inb().set_ioport("TEST.0");
 	m_maincpu->read_do3().set_ioport("TEST.1");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_qkspeller);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -695,6 +700,9 @@ public:
 		m_ds8874(*this, "ds8874")
 	{ }
 
+	void cambrp(machine_config &config);
+
+private:
 	required_device<ds8874_device> m_ds8874;
 	void ds8874_output_w(u16 data);
 
@@ -703,7 +711,6 @@ public:
 	void write_s(u8 data);
 	u8 read_f();
 	u8 read_k();
-	void cambrp(machine_config &config);
 };
 
 // handlers
@@ -789,7 +796,7 @@ INPUT_PORTS_END
 
 void cambrp_state::cambrp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 200000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(4);
@@ -798,13 +805,13 @@ void cambrp_state::cambrp(machine_config &config)
 	m_maincpu->read_f().set(FUNC(cambrp_state::read_f));
 	m_maincpu->read_k().set(FUNC(cambrp_state::read_k));
 
-	/* video hardware */
+	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(cambrp_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_cambrp);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms

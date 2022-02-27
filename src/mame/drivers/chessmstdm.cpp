@@ -244,11 +244,11 @@ void chessmstdm_state::chessmstdm_io(address_map &map)
 
 INPUT_CHANGED_MEMBER(chessmstdm_state::monitor_button)
 {
+	view_button(field, param, oldval, newval);
+
 	// releasing monitor button clears reset
 	if (!newval && oldval)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-
-	view_button(field, param, oldval, newval);
 }
 
 INPUT_CHANGED_MEMBER(chessmstdm_state::view_button)

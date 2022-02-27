@@ -472,6 +472,35 @@ uint8_t duscc_device::modify_vector(uint8_t vec, int index, uint8_t src)
    7. General status register (GSR)
 */
 
+int duscc_device::interrupt_priority(int index, int state)
+{
+	int priority_level = 0;
+
+	switch (m_icr & REG_ICR_PRIO_MASK)
+	{
+	case REG_ICR_PRIO_AHI:  priority_level = state + (index == CHANNEL_A ? 0 : 4); break;
+	case REG_ICR_PRIO_BHI:  priority_level = state + (index == CHANNEL_A ? 4 : 0); break;
+	case REG_ICR_PRIO_AINT: priority_level = state * 2 + (index == CHANNEL_A ? 0 : 1); break;
+	case REG_ICR_PRIO_BINT: priority_level = state * 2 + (index == CHANNEL_A ? 1 : 0); break;
+	default: logerror("DUSCC Programming error, please report/fix\n"); // Will not happen
+	}
+
+	return priority_level;
+}
+
+void duscc_device::clear_interrupt(int index, int state)
+{
+	LOGINT("%s:%c %02x\n", FUNCNAME, 'A' + index, state);
+
+	m_int_state[interrupt_priority(index, state)] &= ~Z80_DAISY_INT;
+	if ((m_icr & (index == CHANNEL_A ? REG_ICR_CHA : REG_ICR_CHB)) == 0)
+	{
+		LOGINT("The Interrupt Control Register [%02x] bit for this channel is not set, blocking attempt to interrupt\n", m_icr);
+		return;
+	}
+	check_interrupts();
+}
+
 //-----------------------------------------------------------------------
 //  trigger_interrupt - called when a potential interrupt condition occurs and will only issue an interrupt if the DUSCC is
 //  programmed to do so.
@@ -493,14 +522,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 	}
 
 	// Modify priority level
-	switch (m_icr & REG_ICR_PRIO_MASK)
-	{
-	case REG_ICR_PRIO_AHI:  priority_level = state + (index == CHANNEL_A ? 0 : 4); break;
-	case REG_ICR_PRIO_BHI:  priority_level = state + (index == CHANNEL_A ? 4 : 0); break;
-	case REG_ICR_PRIO_AINT: priority_level = state * 2 + (index == CHANNEL_A ? 0 : 1); break;
-	case REG_ICR_PRIO_BINT: priority_level = state * 2 + (index == CHANNEL_A ? 1 : 0); break;
-	default: logerror("DUSCC Programming error, please report/fix\n"); // Will not happen
-	}
+	priority_level = interrupt_priority(index, state);
 
 	// Vector modification requested?
 	source = state + (index == CHANNEL_A ? 0 : 4); // bit in interrupt queue register of a certain priotiry level
@@ -1955,6 +1977,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 		m_tx_fifo_wp = m_tx_fifo_rp = 0;
 		m_trsr &= 0x0f;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->clear_interrupt(m_index, INT_TXREADY);
 		break;
 
 	/* Enable transmitter. Enables transmitter operation, conditioned by the state of
@@ -1975,6 +1998,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 		set_tra_rate(0);
 		m_tra = 0;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->clear_interrupt(m_index, INT_TXREADY);
 		break;
 
 	// RECEIVER COMMANDS
@@ -1989,6 +2013,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 		m_trsr &= 0xf0;
 		m_rsr = 0;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+		m_uart->clear_interrupt(m_index, INT_RXREADY);
 		break;
 
 	/* Enable receiver. Causes receiver operation to begin, conditioned by the state of the DCD
@@ -2004,6 +2029,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	case REG_CCR_DISABLE_RX: LOGINT("- Disable Rx\n");
 		m_rcv = 0;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+		m_uart->clear_interrupt(m_index, INT_RXREADY);
 		break;
 
 		// COUNTER/TIMER COMMANDS
@@ -2070,6 +2096,7 @@ void duscc_channel::do_dusccreg_txfifo_w(uint8_t data)
 	if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
 	{
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->clear_interrupt(m_index, INT_TXREADY);
 	}
 	else
 	{
@@ -2337,6 +2364,7 @@ void duscc_channel::m_rx_fifo_rp_step()
 			// no more characters available in the FIFO
 			LOGINT("Clear RXRDY in GSR because FIFO is emptied\n");
 			m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+			m_uart->clear_interrupt(m_index, INT_RXREADY);
 		}
 }
 
@@ -2418,6 +2446,7 @@ void duscc_channel::cts_w(int state)
 		if (m_tpr & REG_TPR_CTS && m_tra)
 		{
 			m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+			m_uart->trigger_interrupt(m_index, INT_TXREADY);
 		}
 
 		// set clear to send

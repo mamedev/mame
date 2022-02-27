@@ -459,6 +459,7 @@ private:
 	bool m_ramrd, m_ramwrt;
 	bool m_lcram, m_lcram2, m_lcprewrite, m_lcwriteenable;
 	bool m_ioudis;
+	bool m_rombank;
 
 	u8 m_shadow, m_speed, m_textcol;
 	u8 m_motors_active, m_slotromsel, m_intflag, m_vgcint, m_inten, m_newvideo;
@@ -1393,6 +1394,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_an2));
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
+	save_item(NAME(m_rombank));
 	save_item(NAME(m_80store));
 	save_item(NAME(m_slotc3rom));
 	save_item(NAME(m_altzp));
@@ -1494,6 +1496,7 @@ void apple2gs_state::machine_reset()
 	m_slotc3rom = false;
 	m_irqmask = 0;
 	m_intcxrom = false;
+	m_rombank = false;
 	m_80store = false;
 	m_video->m_80store = false;
 	m_altzp = false;
@@ -2611,6 +2614,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_ramwrt ? 0x10 : 0x00) |
 					(m_lcram ? 0x00 : 0x08) |
 					(m_lcram2 ? 0x04 : 0x00) |
+					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -3065,6 +3069,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
 			m_lcram2 = (data & 0x04);
+			m_rombank = (data & 0x02);
 			m_intcxrom = (data & 0x01);
 
 			// update the aux state

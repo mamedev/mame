@@ -118,6 +118,7 @@ private:
 	u8 gts1_switches_r(offs_t offset);
 	void gts1_switches_w(offs_t offset, u8 data);
 	void gts1_display_w(offs_t offset, u8 data);
+	u16 seg8to14(u16 data);
 	u8 gts1_lamp_apm_r(offs_t offset);
 	void gts1_lamp_apm_w(offs_t offset, u8 data);
 	u8 gts1_nvram_r(offs_t offset);
@@ -487,6 +488,12 @@ void gts1_state::gts1_switches_w(offs_t offset, u8 data) // WORKS
 	}
 }
 
+u16 gts1_state::seg8to14(u16 data)
+{
+	// convert custom 8seg digit to MAME 14seg digit
+	return bitswap<10>(data,7,7,6,6,5,4,3,2,1,0);
+}
+
 /**
  * @brief write a 8seg display value
  * @param offset digit number 0 .. 15
@@ -534,8 +541,8 @@ void gts1_state::gts1_display_w(offs_t offset, u8 data) // WORKS
 	// LOG("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b);
 	if ((offset % 8) < 6)
 	{
-		m_digit8[offset] = a;
-		m_digit8[offset + 16] = b;
+		m_digit8[offset] = seg8to14(a);
+		m_digit8[offset + 16] = seg8to14(b);
 	}
 	else
 	{

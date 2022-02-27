@@ -132,6 +132,7 @@ public:
 
 	void magibomb(machine_config &config);
 	void magibombb(machine_config &config);
+	void magibombf(machine_config &config);
 	void init_magibomb();
 
 private:
@@ -139,6 +140,7 @@ private:
 	void magibomb_base_map(address_map &map, u32 base_offs);
 	void magibomb_map(address_map &map);
 	void magibombb_map(address_map &map);
+	void magibombf_map(address_map &map);
 };
 
 class astoneage_state : public astrocorp_state
@@ -503,6 +505,25 @@ void magibomb_state::magibombb_map(address_map &map)
 	magibomb_base_map(map, 0x10000);
 }
 
+void magibomb_state::magibombf_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x060000, 0x063fff).ram().share("nvram");
+	map(0x070000, 0x070001).r(FUNC(magibomb_state::video_flags_r));
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x082000, 0x082001).w(FUNC(magibomb_state::draw_sprites_w));
+	map(0x084000, 0x084001).portr("INPUTS");
+	map(0x088001, 0x088001).w(FUNC(magibomb_state::eeprom_w));
+	map(0x08a000, 0x08a001).w(FUNC(magibomb_state::skilldrp_outputs_w));
+	map(0x08e000, 0x08e001).portr("EEPROMIN");
+	map(0x090000, 0x0901ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0a0000, 0x0a0000).w(FUNC(magibomb_state::screen_enable_w));
+	map(0x0b0001, 0x0b0001).w(FUNC(magibomb_state::oki_bank_w));
+	map(0x0c0001, 0x0c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa00000, 0xa005ff).ram(); // unknown
+	map(0xa0101a, 0xa0101b).r(FUNC(magibomb_state::unk_r));
+}
+
 void astoneage_state::astoneage_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM crc at mirror
@@ -781,6 +802,12 @@ void magibomb_state::magibombb(machine_config &config)
 {
 	magibomb(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &magibomb_state::magibombb_map);
+}
+
+void magibomb_state::magibombf(machine_config &config)
+{
+	magibomb(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &magibomb_state::magibombf_map);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(astoneage_state::astoneage_scanline_cb)
@@ -1177,6 +1204,21 @@ ROM_START( magibombe )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	// TODO: doesn't seem to initialize properly, set works with above eeprom
 	ROM_LOAD16_WORD_SWAP( "93c46p.u6", 0x00, 0x80, CRC(037f5f07) SHA1(d82145ebb94681841ec0c41724ef93857f50d8f0) )
+ROM_END
+
+ROM_START( magibombf )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom1.u21", 0x00000, 0x10000, CRC(bc9a9c68) SHA1(cee6d20322ba500f82321fa56ca71c8ec152b953) )
+	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(b52bfa4d) SHA1(e413536867148967f4ddbf1cf81c4cf45da41d1e) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, CRC(532b7aae) SHA1(cb93a3061a05a9741d01fcdc19b7319ad4792e49) )
 ROM_END
 
 /***************************************************************************
@@ -1883,6 +1925,7 @@ GAME( 2002,  magibomba, magibomb, magibomb,  magibomb, magibomb_state,  init_mag
 GAME( 2002,  magibombb, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2001,  magibombc, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2001?, magibombe, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  magibombf, magibomb, magibombf, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. NB4.5 061402)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
 GAME( 2005,  dinodino,  0,        dinodino,  skilldrp, astoneage_state, init_dinodino,  ROT0, "Astro Corp.",        "Dino Dino (Ver. A1.1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 13/01.2005 10:59

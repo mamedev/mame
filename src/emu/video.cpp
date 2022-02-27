@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "debugger.h"
+#include "fileio.h"
 #include "ui/uimain.h"
 #include "crsshair.h"
 #include "rendersw.hxx"
@@ -318,7 +319,7 @@ std::string video_manager::speed_text()
 //  file handle
 //-------------------------------------------------
 
-void video_manager::save_snapshot(screen_device *screen, emu_file &file)
+void video_manager::save_snapshot(screen_device *screen, util::core_file &file)
 {
 	// validate
 	assert(!m_snap_native || screen != nullptr);

@@ -15,7 +15,6 @@
 
 #pragma once
 
-#include "video/mc6847.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/ay31015.h"
@@ -23,6 +22,7 @@
 #include "machine/kr2376.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "video/mc6847.h"
 
 /***************************************************************************
     CONSTANTS
@@ -120,7 +120,7 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<ay31015_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<cpu_device> m_maincpu;

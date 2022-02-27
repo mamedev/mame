@@ -5,8 +5,8 @@ license:CC0
 -->
 <softwarelist name="vis" description="Tandy/Memorex Video Information System CD-ROM images">
 
-	<!-- Garbled text -->
-	<software name="amherit" supported="no">
+	<!-- Some images only fill half the screen -->
+	<software name="amherit" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="American Heritage - Illustrated Encyclopedic Dictionary (USA).bin" size="437163888" crc="4f245ee3" sha1="4b12b3686c109a82d86f76394f8f6c4513ce4911"/>

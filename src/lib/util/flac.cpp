@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    flac.c
+    flac.cpp
 
     FLAC compression wrappers
 
@@ -12,8 +12,10 @@
 
 #include "ioprocs.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
 #include <new>
 
 

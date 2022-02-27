@@ -151,6 +151,7 @@ Notes on floppy drive:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -181,7 +182,7 @@ Notes on floppy drive:
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -210,10 +211,12 @@ public:
 		, m_dma8257(*this, "dma8257")
 		, m_screen(*this, "screen")
 		, m_kbd(*this, "kbd")
-		, m_fdc(*this, UPD765_TAG)
-		, m_flop(*this, UPD765_TAG ":%u", 0U)
 		, m_p_chargen(*this, "chargen")
 		, m_leds(*this, "led%u", 5U)
+		, m_mcu(*this, "mcu")
+		, m_mcuppi(*this, "mcuppi")
+		, m_fdc(*this, UPD765_TAG)
+		, m_drive(*this, UPD765_TAG ":%u", 0U)
 	{ }
 
 	void ibm6580(machine_config &config);
@@ -248,8 +251,6 @@ private:
 	void floppy_w(offs_t offset, uint8_t data);
 	uint8_t floppy_r(offs_t offset);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(floppy_intrq);
-	DECLARE_WRITE_LINE_MEMBER(floppy_hdl);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -259,20 +260,27 @@ private:
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
 
+	void mcu_io(address_map &map);
+	void mcu_mem(address_map &map);
+
 	uint16_t m_gate;
-	uint8_t m_p40, m_p4a, m_p50, m_e000;
+	uint8_t m_dma0pg;
+	uint8_t m_p40, m_p4a, m_p50;
 	uint8_t m_kb_data, m_ppi_c, m_led_state;
+	bool m_e000;
 	bool m_kb_data_bit, m_kb_strobe, m_kb_clock;
 
-	util::fifo<uint8_t, 4> m_floppy_mcu_sr, m_floppy_mcu_cr;
-	int m_floppy_mcu_cr_fifo;
-	uint8_t m_floppy_sr;
-	floppy_image_device *m_floppies[2];
-	floppy_image_device *m_floppy;
-	bool m_floppy_intrq, m_floppy_hdl, m_floppy_idle;
-	uint8_t m_dma0pg;
-	uint8_t floppy_mcu_command();
-	bool floppy_mcu_cr_full();
+	uint8_t m_mcu_p1, m_mcu_p2;
+	uint8_t m_mcuppi_a, m_mcuppi_b, m_mcuppi_c;
+
+	void mcu_io_w(offs_t offset, uint8_t data);
+	uint8_t mcu_io_r(offs_t offset);
+
+	void mcuppi_c_w(uint8_t data);
+
+	bool m_floppy_intrq, m_floppy_idle;
+	uint8_t m_floppy_mcu_wrap;
+	struct { floppy_image_device *image; bool hdl; } m_floppy[2];
 
 	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<ram_device> m_ram;
@@ -283,10 +291,12 @@ private:
 	required_device<i8257_device> m_dma8257;
 	required_device<screen_device> m_screen;
 	required_device<dw_keyboard_device> m_kbd;
-	required_device<upd765a_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_flop;
 	required_region_ptr<u8> m_p_chargen;
 	output_finder<4> m_leds;
+	required_device<i8048_device> m_mcu;
+	required_device<i8255_device> m_mcuppi;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_drive;
 };
 
 
@@ -328,6 +338,9 @@ void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 
 	case 6:
 		m_dma0pg = data;
+		break;
+
+	case 7:
 		break;
 
 	case 8:
@@ -619,13 +632,6 @@ WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
 	m_ppi8255->pc4_w(m_kb_strobe);
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::floppy_intrq)
-{
-	m_floppy_intrq = state;
-	if (state)
-		m_floppy_idle = true;
-}
-
 WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -644,133 +650,71 @@ void ibm6580_state::memory_write_byte(offs_t offset, uint8_t data)
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
 }
 
-bool ibm6580_state::floppy_mcu_cr_full()
-{
-	uint8_t command = m_floppy_mcu_cr.peek();
+// floppy adapter board
 
-	if ((command & 1) && m_floppy_mcu_cr_fifo == 1)
-		return true;
-	if (command == 0x0c && m_floppy_mcu_cr_fifo == 4)
-		return true;
-	if (m_floppy_mcu_cr_fifo == 3)
-		return true;
-	else
-		return false;
+void ibm6580_state::mcu_io_w(offs_t offset, uint8_t data)
+{
+	LOGDBG("MCU IO %02x(%d) <- %02x\n", m_mcu_p1, m_mcu_p1 & 7, data);
+
+	switch (m_mcu_p1 & 7)
+	{
+	case 0: case 1: case 2: case 3:
+		m_mcuppi->write(m_mcu_p1, data);
+		break;
+	}
 }
 
-uint8_t ibm6580_state::floppy_mcu_command()
+uint8_t ibm6580_state::mcu_io_r(offs_t offset)
 {
-	uint8_t data = 0, command = m_floppy_mcu_cr.dequeue(), i;
+	uint8_t data = 0;
 
-	LOG("Floppy mcu_command %02x\n", command);
-
-	m_floppy_mcu_sr.clear();
-	m_floppy_idle = true;
-
-	switch (command)
+	switch (m_mcu_p1 & 7)
 	{
-	case 0:
-		m_fdc->soft_reset();
-		break;
-
-	// 3 bytes
-	case 4:
-		break;
-
-	// 1 byte -- get status?
-	case 5:
-		m_floppy_mcu_sr.enqueue(0x00);
-		if (m_flop[0]->get_device()->exists())
-			m_floppy_mcu_sr.enqueue( m_flop[0]->get_device()->idx_r() ? 0x08 : 0);
-		else
-			m_floppy_mcu_sr.enqueue(0x08);
-		break;
-
-	// 3 bytes, no return -- engage head
-	case 6:
-		m_floppy_mcu_cr.dequeue();
-		i = m_floppy_mcu_cr.dequeue();
-		m_floppy_hdl = i;
-		break;
-
-	// 1 byte -- read head engage signal
-	case 7:
-		m_floppy_mcu_sr.enqueue(0x00);
-		m_floppy_mcu_sr.enqueue(m_floppy_hdl);
-		break;
-
-	// 3 bytes
-	case 8:
-		break;
-
-	// 4 bytes -- used by cp/m.  drive select?
-	case 0xc:
-		break;
-
-	// 1 byte -- get drive ready status?
-	case 0xd:
-		m_floppy_mcu_sr.enqueue(0x00);
-		i = 0;
-		if (m_flop[0]->get_device()->exists())
-			i |= m_flop[0]->get_device()->ready_r() ? 0 : 0x40;
-		if (m_flop[1]->get_device()->exists())
-			i |= m_flop[1]->get_device()->ready_r() ? 0 : 0x80;
-		m_floppy_mcu_sr.enqueue(i);
-		break;
-
-	// 3 bytes, no return -- recalibrate?
-	case 0xe:
-		m_floppy_mcu_cr.dequeue();
-		i = m_floppy_mcu_cr.dequeue();
-#if 1
-		if (i & 1)
-			m_fdc->set_floppy(m_flop[0]->get_device());
-		else if (i & 2)
-			m_fdc->set_floppy(m_flop[1]->get_device());
-#endif
-		break;
-
-	// 1 byte
-	case 0x13:
-		break;
-
-	// 1 byte
-	case 0x15:
+	case 0: case 1: case 2: case 3:
+		data = m_mcuppi->read(m_mcu_p1);
 		break;
 	}
 
-	m_floppy_mcu_cr.clear();
-	m_floppy_mcu_cr_fifo = 0;
+	LOGDBG("MCU IO %02x(%d) == %02x at %s\n", m_mcu_p1, m_mcu_p1 & 7, data, machine().describe_context());
 
 	return data;
 }
 
+void ibm6580_state::mcuppi_c_w(uint8_t data)
+{
+	LOGDBG("MCU PPI PC <- %02x\n", data);
+	m_mcuppi_c = data;
+	m_mcu->set_input_line(MCS48_INPUT_IRQ, BIT(data, 3)); // invert?
+}
+
+// what happens on access to odd address ?
 void ibm6580_state::floppy_w(offs_t offset, uint8_t data)
 {
-	LOG("Floppy %02x <- %02x\n", 0x8150 + (offset << 1), data);
+	LOG("Floppy %s %02x <- %02x\n", machine().describe_context(), 0x8150 + (offset << 1), data);
 
 	switch (offset)
 	{
 	case 0: // 8150 -- mcu reset?
-		m_floppy_mcu_sr.enqueue(0x00);
-		m_floppy_mcu_sr.enqueue(0x00);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		break;
 
-	case 1: // 8152
-		m_fdc->soft_reset();
+	case 1: // 8152 -- fdc reset?  status not checked
+		// m_fdc->soft_reset();
+		break;
+
+	case 2: // 8154
+		if (BIT(m_gate, 14))
+			m_floppy_mcu_wrap = data;
 		break;
 
 	case 5: // 815A
 		m_fdc->fifo_w(data);
-		if (m_floppy_idle)
-			m_floppy_idle = false;
 		break;
 
 	case 6: // 815C
-		m_floppy_mcu_cr.enqueue(data);
-		m_floppy_mcu_cr_fifo++;
-		if (floppy_mcu_cr_full())
-			floppy_mcu_command();
+		m_mcuppi_a = data;
+		m_mcuppi->pc4_w(1);
+		m_mcuppi->pc4_w(0);
 		break;
 	}
 }
@@ -785,8 +729,12 @@ uint8_t ibm6580_state::floppy_r(offs_t offset)
 		// bit 4 -- ?? ready
 		// bit 5 -- mcu busy
 		// bit 6 -- ?? idle
-		if (m_floppy_mcu_sr.empty() && (m_floppy_idle || m_floppy_intrq))
-			data |= 0x40;
+		data = 8 | BIT(m_mcuppi_c, 7) << 6 | (m_mcuppi_c & 0x20);
+		break;
+
+	case 3: // 8156
+		if (BIT(m_gate, 14))
+			data = m_floppy_mcu_wrap << 2;
 		break;
 
 	case 4: // 8158
@@ -798,27 +746,11 @@ uint8_t ibm6580_state::floppy_r(offs_t offset)
 		break;
 
 	case 6: // 815c
-		if (!m_floppy_mcu_sr.empty())
-			data = m_floppy_mcu_sr.dequeue();
+		data = m_mcuppi->acka_r();
 		break;
 	}
 
-	if (offset)
-		LOG("Floppy %02x == %02x\n", 0x8150 + (offset << 1), data);
-	else {
-		floppy_image_device *f = m_flop[0]->get_device();
-
-		if (f)
-			LOG("Floppy %02x == %02x (empty %d hdl %d + idle %d irq %d drq %d + dskchg %d idx %d cyl %d)\n",
-				0x8150 + (offset << 1), data,
-				m_floppy_mcu_sr.empty(), m_floppy_hdl,
-				m_floppy_idle, m_fdc->get_irq(), m_fdc->get_drq(),
-				f->dskchg_r(), f->idx_r(), f->get_cyl());
-		else
-			LOG("Floppy %02x == %02x (idle %d irq %d drq %d)\n",
-				0x8150 + (offset << 1), data,
-				m_floppy_idle, m_fdc->get_irq(), m_fdc->get_drq());
-	}
+	LOG("Floppy %s %02x == %02x\n", machine().describe_context(), 0x8150 + (offset << 1), data);
 
 	return data;
 }
@@ -844,14 +776,25 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0140, 0x0143).rw("upd8251a", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0160, 0x0163).rw("upd8251b", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0x4000, 0x400f).unmaprw();
-	map(0x5000, 0x500f).unmaprw();
+	map(0x4000, 0x400f).unmaprw(); // bus error reporting?
+	map(0x5000, 0x500f).unmaprw(); // bus error reporting?
 	map(0x6000, 0x601f).unmaprw();
 	map(0x8060, 0x807f).w(FUNC(ibm6580_state::gate_close_w)).umask16(0xff);
 	map(0x8150, 0x815f).rw(FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
 	map(0x81a0, 0x81af).unmaprw();
 	map(0xc000, 0xc00f).unmaprw();
 	map(0xe000, 0xe02f).rw(FUNC(ibm6580_state::video_r), FUNC(ibm6580_state::video_w)).umask16(0x00ff);
+}
+
+void ibm6580_state::mcu_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x7ff).rom().region("mcu", 0);
+}
+
+void ibm6580_state::mcu_io(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(ibm6580_state::mcu_io_r), FUNC(ibm6580_state::mcu_io_w));
 }
 
 
@@ -970,6 +913,9 @@ void ibm6580_state::machine_start()
 
 	m_fdc->set_rate(500000); // FIXME: workaround
 
+	m_floppy[0].image = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	m_floppy[1].image = m_fdc->subdevice<floppy_connector>("1")->get_device();
+
 	m_leds.resolve();
 
 	memset(m_p_videoram, 0x0, 0x1000);
@@ -977,23 +923,22 @@ void ibm6580_state::machine_start()
 
 void ibm6580_state::machine_reset()
 {
-	m_p40 = m_p4a = m_p50 = m_gate = m_e000 = m_ppi_c = m_floppy_sr = m_led_state = 0;
+	m_p40 = m_p4a = m_p50 = m_gate = m_ppi_c = m_led_state = 0;
+	m_mcu_p1 = m_mcu_p2 = 0;
+	m_mcuppi_a = m_mcuppi_b = m_mcuppi_c = 0;
+	m_e000 = false;
 	m_kb_data_bit = false;
 	m_kb_clock = false;
 	m_kb_strobe = true;
 	m_kb_data = 0;
-	m_floppy_idle = true;
 
 	m_pit8253->set_clockin(0, 0.0);
 
 	m_p40 |= m_kbd->memory_record_r();
 
-	m_flop[0]->get_device()->mon_w(!m_flop[0]->get_device()->exists());
-	m_flop[1]->get_device()->mon_w(!m_flop[1]->get_device()->exists());
-	m_fdc->set_floppy(m_flop[0]->get_device());
-	m_floppy_mcu_sr.clear();
-	m_floppy_mcu_cr.clear();
-	m_floppy_mcu_cr_fifo = 0;
+	m_floppy[0].hdl = m_floppy[1].hdl = false;
+
+	m_fdc->set_floppy(m_drive[0]->get_device());
 }
 
 static void dw_floppies(device_slot_interface &device)
@@ -1049,13 +994,6 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 
-	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
-	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
-//  m_fdc->intrq_wr_callback().append(m_pic8259, FUNC(pic8259_device::ir4_w));
-	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
-
 	i8251_device &upd8251a(I8251(config, "upd8251a", 0));
 	upd8251a.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	upd8251a.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
@@ -1079,6 +1017,29 @@ void ibm6580_state::ibm6580(machine_config &config)
 	rs232b.rxd_handler().set("upd8251b", FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set("upd8251b", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("upd8251b", FUNC(i8251_device::write_cts));
+
+	// floppy adapter card (in the drive)
+
+	I8048(config, m_mcu, 24_MHz_XTAL / 6); // XTAL divisor unknown
+	m_mcu->set_addrmap(AS_PROGRAM, &ibm6580_state::mcu_mem);
+	m_mcu->set_addrmap(AS_IO, &ibm6580_state::mcu_io);
+	m_mcu->p1_in_cb().set([this] () {
+		return (m_mcu_p1 & ~0x18) | \
+			(!m_floppy[0].image->idx_r() << 3) | (!m_floppy[1].image->idx_r() << 4);
+	});
+	m_mcu->p1_out_cb().set([this] (uint8_t data) { m_mcu_p1 = data; });
+
+	I8255(config, m_mcuppi);
+	m_mcuppi->in_pa_callback().set([this] () { LOGDBG("MCU PPI read A: %02X\n", m_mcuppi_a); return m_mcuppi_a; });
+	m_mcuppi->out_pb_callback().set([this] (uint8_t data) { m_mcuppi_b = data; });
+	m_mcuppi->out_pc_callback().set(FUNC(ibm6580_state::mcuppi_c_w));
+
+	// NEC D765D.   READY and SELECT likely not connected.   SEEK, STEP and DIR likely connected to MCU.
+	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
+	m_fdc->intrq_wr_callback().set([this] (bool state) { m_floppy_intrq = state; });
+	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ibm6580");
 }
@@ -1111,6 +1072,9 @@ ROM_START( ibm6580 )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "8493383_chr.bin", 0x0000, 0x2000, CRC(779044df) SHA1(95ec46f9edf4d44c5dd3c955c73e00754d58e180))
+
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "4430030_flp_8041.bin", 0x0000, 0x0400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
 ROM_END
 
 /* Driver */

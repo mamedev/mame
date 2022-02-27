@@ -43,14 +43,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( famicom )
 	// input devices go through slot options
-	PORT_START("FLIPDISK") /* fake key */
+	PORT_START("FLIPDISK") // fake key
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Change Disk Side") PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
 
 
 void nes_state::nes(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
@@ -71,7 +71,7 @@ void nes_state::nes(machine_config &config)
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 
@@ -92,7 +92,7 @@ void nes_state::nespal(machine_config &config)
 {
 	nes(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(PAL_APU_CLOCK);
 
 	PPU_2C07(config.replace(), m_ppu);
@@ -101,7 +101,7 @@ void nes_state::nespal(machine_config &config)
 
 	m_cartslot->set_clock(PAL_APU_CLOCK);
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
@@ -131,14 +131,14 @@ void nes_state::nespalc(machine_config &config)
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
-	/* UMC 6538 and friends -- extends time for rendering dummy scanlines */
+	// UMC 6538 and friends -- extends time for rendering dummy scanlines
 	PPU_PALC(config.replace(), m_ppu);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	m_cartslot->set_clock(PALC_APU_CLOCK);
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)));
@@ -162,7 +162,7 @@ void nes_state::suborkbd(machine_config &config)
 {
 	famipalc(config);
 
-	/* TODO: emulate the parallel port bus! */
+	// TODO: emulate the parallel port bus!
 	m_exp->set_default_option("subor_keyboard");
 	m_exp->set_fixed(true);
 }
@@ -275,70 +275,70 @@ void nes_state::famitwin(machine_config &config)
 
 
 ROM_START( nes )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( nespal )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( famicom )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 #define rom_fds rom_famicom
 
 ROM_START( famitwin )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Main RAM
 	ROM_LOAD( "rp2c33a-02.bin", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) ) // "Famicom" logo instead of Nintendo logo
 ROM_END
 
 ROM_START( m82 )
-	ROM_REGION( 0x14000, "maincpu", 0 )  /* Main RAM + program banks */
-	/* Banks to be mapped at 0xe000? More investigations needed... */
+	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
+	// Banks to be mapped at 0xe000? More investigations needed...
 	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
 ROM_END
 
 ROM_START( m82p )
-	/* same as m82 */
-	ROM_REGION( 0x14000, "maincpu", 0 )  /* Main RAM + program banks */
-	/* Banks to be mapped at 0xe000? More investigations needed... */
+	// same as m82
+	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
+	// Banks to be mapped at 0xe000? More investigations needed...
 	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
 ROM_END
 
 // see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
 // and http://www.disgruntleddesigner.com/chrisc/drpcjr/DrPCJrMemMap.txt
 ROM_START( drpcjr )
-	ROM_REGION( 0x18000, "maincpu", 0 )  /* Main RAM + program banks */
-	/* 4 banks to be mapped in 0xe000-0xffff (or 8 banks to be mapped in 0xe000-0xefff & 0xf000-0xffff).
-	Banks selected by writing at 0x4180 */
+	ROM_REGION( 0x18000, "maincpu", 0 )  // Main RAM + program banks
+	// 4 banks to be mapped in 0xe000-0xffff (or 8 banks to be mapped in 0xe000-0xefff & 0xf000-0xffff).
+	// Banks selected by writing at 0x4180
 	ROM_LOAD("drpcjr_bios.bin", 0x10000, 0x8000, CRC(c8fbef89) SHA1(2cb0a817b31400cdf27817d09bae7e69f41b062b) ) // bios vers. 1.0a
 	// Not sure if we should support this: hacked version 1.5a by Chris Covell with bugfixes and GameGenie support
 //  ROM_LOAD("drpcjr_v1_5_gg.bin", 0x10000, 0x8000, CRC(98f2033b) SHA1(93c114da787a19279d1a46667c2f69b49e25d4f1) )
 ROM_END
 
 ROM_START( iq501 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( iq502 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( dendy )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( dendy2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( gchinatv )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 ROM_START( sb486 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
 /***************************************************************************

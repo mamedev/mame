@@ -2,18 +2,554 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+We currently mark all of these as supported=no because none works on the intended HW (CDTV)
+
+
+TODO:
+- verify if all of these are really CDTV as minimum requirement;
+- Substitute low grade anon dumps with redump.org, for proper serial identification;
+- Fill SKU for missing entries (CDT-*, from Commodore catalogues)
+- Discis disks all have Multi 5 help but book readings are English only.
+  Is there any way to make them use other languages for audio reads?
+- Most Discis releases:
+  "To preview other Discis books, press the ?/Escape button once the button has opened"
+  Test this when CDTV works, it may list undumped Discis releases.
 -->
 <softwarelist name="cdtv" description="Commodore Amiga CDTV CD-ROMs">
+	<!--
+	UNDUMPED:
 
-	<!-- Below titles were read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
+	12Centuries of Art - Palermo
+	17 Bit - The Continuation Disc (I-0363 release)
+	American Vista (USA-centric version of World Vista, 56588AOM 01 and 56264AOM 02)
+	Air Warrior
+	Amiga CD Football (Unreleased)
+	Amiga CDTV Sports Football (Unreleased)
+	Animated Coloring Book (CDT-1501)
+	B.A.T. "Bureau of Astral Troubleshooters" (Ubi Soft, CDTV release, CDT-3528)
+	Camel Racer
+	Caplex Multimedia Leksikon
+	Cinderella CDRM-575000 3 ('91 English-Spanish release)
+	Cover Girl Poker (different release than Cover Girl Strip Poker)
+	Cubulus (standalone version)
+	Dark Seed (v1.0, unofficial? Spanish release)
+	Defender Of The Crown II (and alt releases)
+	    - Défenseur De La Couronne II
+	    - El Defensor De La Corona II
+	    - Il Difensore della Corona
+	    - Verteidiger Der Krone II
+	Die Stadt Der Löwen
+	Deutschland Kompakt 2
+	Enciclopedia Italiana Grolier per CDTV
+	    (Italian release of The Grolier Electronic Encyclopedia?)
+	Fractal Engine Demo / Planetside (Unreleased)
+	Fremdsprachenrätsel Spanisch 1 ("Foreign Language Puzzle Spanish 1" for German market)
+	Fred Fish Collection (PD collection, CDTV/AmigaCD, various revisions)
+	Future Wars: Adventures in Time (Interplay, CDT-3511)
+	Gangster Pursuit
+	Gyldendals Fakta Leksikon
+	Holiday Maker
+	Historyline 1914-1918 (unofficial release?)
+	Humanum Corpus
+	    (Giunti Multimedia, proper title printed on CD,
+	     released in Multi 5 as "The Human Body" on front cover, "Giunti Multimedia" on spine)
+	Il Dizionario - Say it in English (Italian-English dictionary)
+	Indiana Jones and the Last Crusade: The Graphic Adventure (unofficial?)
+	Indiana Jones and the Fate of Atlantis: The Graphic Adventure (unofficial?)
+	Jack Nicklaus Golf
+	Jekyll and Hyde (Unreleased)
+	King's Quest VI - Heir Today, Gone Tomorrow (unofficial?)
+	Le Fils D'Astérix Disc 1 / Learn French with Astérix Disc 1
+	Le Fils D'Astérix Disc 2 / Learn French with Astérix Disc 2
+	Loom (German official release, unofficial French release?)
+	Lunar Rescue: The Colossus Incident (Unreleased)
+	Magic Serpent (standalone version)
+	Many Roads to Murder (CDTV Publishing, CDT-3003)
+	Mind Run
+	 (French release by Crealude, CFI MINDRUM 91148 and CFI MINDRUM 91137.
+	  Catalog serial number CDT-2517)
+	More! Lemmings (unofficial 2016 release)
+	Moving Gives Me A Stomach Ache CDRM-573800 3 ('91 English-Spanish release)
+	Mud Puddle CDRM-573600 3 ('91 English-Spanish release)
+	Multimedia Toolkit ('93 CDTV/CD32 release by Weird Science)
+	Murder Anyone? (CDTV Publishing, CDT-3002)
+	Murder Makes Strange Deadfellows
+	Music Maker (CDTV Publishing, MIDI compatible according to back cover, CDT-4001)
+	Network CD ('94 CDTV-CD32 from Weird Science)
+	Our House (CDT-1504)
+	Power Games
+	Prey: An Alien Encounter (AmigaCD)
+	Pro Tennis Tour II (Ubi Soft, CDTV release, CDT-3526)
+	Psycho Killer II
+	    (Announced in The Town with no Name "mystery option".
+	     Did it ever went beyond pre-production phase before D4i eventually went out of business?)
+	Read With Asterix: The Secret Weapon
+	    (Supposedly "Apprenez l'Anglais Avec Astérix - La Rose et le Glaive" for French market,
+	     assuming it has ever been released there)
+	Sherlock Holmes, Consulting Detective
+	    (Icom original version which the DOS/MegaCD/FM Towns/PCECD versions are based on.
+	     Catalog serial: CDT-3537
+	     Unrelated with the Animated Pixels "Illustrated Sherlock Holmes" (holmes) version
+	     and with "The Hound of the Baskervilles")
+	Stamps of France and Monaco / Timbres de France and Monaco
+	Strip Poker Live
+	Team Yankee (USA version published by ReadySoft)
+	The Paper Bag Princess CDRM-573500 2 ('91 English-Spanish release)
+	Time Table of History: Business, Politics & Media: 1991 Edition
+	    (earlier release of 1991a known to exist)
+	Time Table of the Arts
+	    (written on the back of Xiphias American Heritage,
+	    has this been released?)
+	The Complete Works of William Shakespeare
+	    (Animated Pixels, CDT-7502.
+	    Screenshot doesn't match illshake, WIP title?)
+	The Demo Collection for Amiga CDTV (Europe, Blue Disc)
+	The Grolier Electronic Encyclopedia (earlier release of newgroli)
+	Top Banana (CDTV conversion of OCS version, unless it's same as the Global Chaos version)
+	TV Sports Football 2 (Unreleased)
+	Unreal (Ubi Soft, CDTV release, CDT-3527)
+	Welcome to CDTV Multimedia (alt releases)
+	    - German CDRM-567400 1, CDRM-567400 2;
+	    - "Welcome Disk - Einfuehrung in die Multimedia-Welt von CDTV"
+	    - Italian;
+	    - "Benvenuti CDTV Multimedia"
+	    - Dutch;
+	    - English CDRM-519600 1, WELCOME DISC 3;
+	Winzer
+	Will Bridge (cfr. backcover for any English and French releases)
+	    - English releases:
+	        3. Advanced
+	        5. Advanced Competition
+	    - French releases:
+	        2. Perfectionnement
+	        4. Competition
+
+	-->
+
+	<software name="17bit" supported="no">
+		<description>17 Bit - Collection for Amiga CDTV (Euro)</description>
+		<year>1993</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+cd32: black screen
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS CD-ROM * G-9255 * C"/>
+		<info name="disc_matrix2" value="SONOPRESS CD-ROM * H-1530 * B"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/20857/ -->
+			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc A) (The Early Classics).cue" size="139" crc="7c63a156" md5="91d581fd2893068a621eb05c495f217f" sha1="651ee535011ddb36feb956334b4bcf8562b38719"/> -->
+			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc A) (The Early Classics).bin" size="526906800" crc="3b70fc1b" md5="b1c6f08b7f199283641e672cef13f89a" sha1="3d30e7117674698c5f6f401e59626c001ac14a98"/> -->
+			<diskarea name="cdrom">
+				<disk name="17 bit - collection for amiga cdtv (europe) (disc a) (the early classics)" sha1="697bc00b482bd4a5f1a11b44dbaf9662919a360b"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/20858/ -->
+			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc B) (The Latest Batch).cue" size="137" crc="0b75c7d0" md5="acbd34e3204d3e5b115218cbcbca8670" sha1="5b246cdc842396ca8e761262a48a72d65062abc8"/> -->
+			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc B) (The Latest Batch).bin" size="520027200" crc="d24d2746" md5="8d312fec9a3de6892c4ab44b8d0d267d" sha1="b3bafc74b2766c858599cc6e8f81deac9d0590e0"/> -->
+			<diskarea name="cdrom">
+				<disk name="17 bit - collection for amiga cdtv (europe) (disc b) (the latest batch)" sha1="7439e4a275e563ef26fa5797fca18148d88636c3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="17bitcon" supported="no">
+		<description>17 Bit - Continuation Disc (Euro)</description>
+		<year>1993</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+cd32: black screen
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-6083 * A DS2"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/20859/ -->
+			<!-- <rom name="17 Bit - Continuation Disc (Europe).cue" size="101" crc="d7d7dbbe" md5="a619ce89d1996ee4e0792616ed3f16a5" sha1="24908184c550ee4ee2363028bfa66ce8993688cb"/> -->
+			<!-- <rom name="17 Bit - Continuation Disc (Europe).bin" size="524512464" crc="64504039" md5="4cde0425b6dddb522e611b688744d81c" sha1="0c2ac57d774e4dc67f1e5580fa3840e7a1276fd9"/> -->
+			<diskarea name="cdrom">
+				<disk name="17 bit - continuation disc (europe)" sha1="692c90e4885c51638b1165a643d855c1cd355f44"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- A Bun for Barney -->
+	<software name="barneybu" supported="no">
+		<description>A Bun for Barney (USA)</description>
+		<year>1991</year>
+		<publisher>MultiMedia Corporation</publisher>
+		<notes><![CDATA[
+cd32: cursor is uncontrollable, [joytest] reset counter
+]]></notes>
+		<info name="sku" value="CDT-2502"/>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2RY010UB"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/16704/ -->
+			<!-- <rom name="Bun for Barney, A (USA).cue" size="193" crc="b188bdb7" md5="a0667c2ab8a02648bbf2cf3aa4297e00" sha1="3143e1211078a8e944db19eff45a953fe1a70e35"/> -->
+			<!-- <rom name="Bun for Barney, A (USA) (Track 1).bin" size="57769824" crc="fde78f74" md5="413076048144d9d6ebcad263ce1a27b9" sha1="dcc7099de1c33945e8ffd5eda10d3d70c3855dcd"/> -->
+			<!-- <rom name="Bun for Barney, A (USA) (Track 2).bin" size="376750416" crc="e5b93bdc" md5="b4b36d533cd6978e238649879a19f8e0" sha1="b08272eb3acf4bc8e41c04364dc838de5abb4076"/> -->
+			<diskarea name="cdrom">
+				<disk name="bun for barney, a (usa)" sha1="39bdb862ef00d3fa16b518ede5b3277484ac08be"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lngranch" supported="no">
+		<!-- https://hol.abime.net/5792 -->
+		<description>A Long, Hard Day at the Ranch (Eng, Spa)</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Audrey Nelson"/>
+		<info name="book_isbn" value="0-921974-45-0"/>
+		<info name="disc_matrix" value="CDRM-574000 4"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="a long hard day at the ranch (1991)(discis)(en-es)" sha1="0305d4ce28b7387199f37712fba679c3fad2c340" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="advmisys" supported="no">
 		<description>Advanced Military Systems</description>
 		<year>1991</year>
-		<publisher>Dominion</publisher>
+		<publisher>Dominion Software &amp; Design</publisher>
+		<notes><![CDATA[
+cd32: cuts off GFX display to the far right
+]]></notes>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="advmisysa" cloneof="advmisys" supported="no">
+		<description>Advanced Military Systems (Euro)</description>
+		<year>1991</year>
+		<publisher>Dominion Software &amp; Design</publisher>
+		<notes><![CDATA[
+cd32: cuts off GFX display to the far right
+]]></notes>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY   U2RW010UB"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/43650/ -->
+			<!-- <rom name="Advanced Military Systems (Europe).cue" size="146" crc="e8538205" md5="2cc667843bbddbc8332fb73a8825cca1" sha1="1cb8c1ccf411c2c0533849130592884f2e54c65f"/> -->
+			<!-- <rom name="Advanced Military Systems (Europe).bin" size="551607504" crc="8c6fb38b" md5="753f2ca1e417ae15fa9180a85c0534fc" sha1="2e8942920ef41040198a8b59cd87061f51fd1b5f"/> -->
+			<diskarea name="cdrom">
+				<disk name="advanced military systems (europe)" sha1="2346440660220d05abf7906a9c107e05eef0eb59"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- All Dogs Go To Heaven -->
+	<software name="dgheaven" supported="no">
+		<description>All Dogs Go to Heaven: Talking Electric Crayon</description>
+		<year>1991</year>
+		<publisher>Merit Software</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-3532"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="all dogs go to heaven (1991)(merit software)" sha1="7284563156b5b1d8035eae2108df85339b807cfa" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerdict" supported="no">
+		<!-- v910214 in main menu -->
+		<description>American Heritage Illustrated Encyclopedic Dictionary (USA, 1991a Edition)</description>
+		<year>1991</year>
+		<publisher>Xïphias</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="serial" value="CDRM 446200"/>
+		<info name="disc_matrix" value="CDRM-446200 1"/>
+		<info name="sku" value="CDT-7501"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/14908/ -->
+			<!-- <rom name="American Heritage - Illustrated Encyclopedic Dictionary - 1991a Edition (USA).cue" size="143" crc="c99c7100" md5="05b2d66e845485d00355354be95f5046" sha1="701803fcd760361bda062daca0f9264b1b81e860"/> -->
+			<!-- <rom name="American Heritage - Illustrated Encyclopedic Dictionary - 1991a Edition (USA).bin" size="523242384" crc="7b780ae0" md5="880f7e4540e0a25d96a8ee3a1312284d" sha1="b5f8db73a1f59d5aac690a598d0b66cc5b35729f"/> -->
+			<diskarea name="cdrom">
+				<disk name="american heritage - illustrated encyclopedic dictionary - 1991a edition (usa)" sha1="92ee48480e671c9cc9e4238a9a1170874df2dfd3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Animals in Motion - Eadweard Muybridge -->
+	<software name="animot" supported="no">
+		<description>Animals in Motion</description>
+		<year>1991</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+Requires CDTV controller to fully use (digit inputs)
+Has untested printer option
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="animals in motion - eadweard muybridge (1991)(on-line)" sha1="5e1860ee342226f0089ac88e0ff0a700dec8e94b" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Apprenez L'Anglais Avec Asterix - Asterix and Son - Disque 1 -->
+	<software name="asterix1" supported="no">
+		<!-- French release but still full English as title hints -->
+		<!-- https://hol.abime.net/4034 -->
+		<description>Apprenez l'Anglais Avec Astérix - Asterix and Son</description>
+		<year>1991</year>
+		<publisher>EuroTalk</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="apprenez l'anglais avec asterix - asterix and son - disque 1 (1991)(eurotalk)(fr)" sha1="71a9d4130ea8fb8d693befc8d3766df5befcced0" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Read with Asterix - Asterix and Son -->
+	<software name="asterix1a" cloneof="asterix1" supported="no">
+		<!-- Earlier revision, without "The interview" and "Recording" sub-menus -->
+		<description>Read with Asterix - Asterix and Son</description>
+		<year>1991</year>
+		<publisher>EuroTalk</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="read with asterix - asterix and son (1991)(eurotalk)" sha1="5357aadbd94ee9c7610f858bc8131b9b82e082fd" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Barney Bear Goes Camping -->
+	<software name="barneycp" supported="no">
+		<description>Barney Bear Goes Camping</description>
+		<year>1990</year>
+		<publisher>Free Spirit Software</publisher>
+		<notes><![CDATA[
+cd32: selecting tree option (games) has no GFXs on game select section (fixes the second time around)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="barney bear goes camping (1991)(free spirit software)" sha1="985517e4ec27d4b4a23f364652c2ac8ee9d4b319" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="barneysc" supported="no">
+		<description>Barney Bear Goes to School (USA)</description>
+		<year>1990</year>
+		<publisher>Free Spirit Software</publisher>
+		<notes><![CDATA[
+cd32: hangs on title screen
+]]></notes>
+		<info name="sku" value="CDT-2501"/>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U28Y050UA"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/16699/ -->
+			<!-- <rom name="Barney Bear Goes to School (USA).cue" size="10301" crc="ac37e95b" md5="37d1e3bf7439af1ac2d986150f525fc6" sha1="48d2d7269050249dc7a2e5881177778359a6345b"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 01).bin" size="2391984" crc="c2b0380c" md5="d660d7258e04b3de83248f488c58e47c" sha1="552497c13fc47fa14a7b626bf6b01de6020e091a"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 02).bin" size="712656" crc="c5a453dc" md5="ddcca5e6b1d05442505a935f1444c82d" sha1="d2bbb8e2d902bab9d2326c358da0f89076ba86ac"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 03).bin" size="717360" crc="ace9996c" md5="52fb246984bd4bab51571454d9501904" sha1="14c9d68301fd1116bf929d26119cf34c03889af3"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 04).bin" size="1239504" crc="6f40b0b0" md5="48e8a5b4813a942f1251aa9d013af83c" sha1="3d494d1975bd89a10e1f17dc5ac0a1f5827c32f2"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 05).bin" size="1241856" crc="8ac376dc" md5="b8b04a48f1dae3ff2994a7a15143f924" sha1="c80bae6ba28fc9e7c45ef3228903c0b3b06d384f"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 06).bin" size="2297904" crc="c645a24b" md5="7dfdb3a6718188c6230eef6c003b0a66" sha1="059bcbad79f1d3455f3bc75befebaad9ad3f9324"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 07).bin" size="1947456" crc="d94cf99c" md5="43dbf6509b694673c625c550d1583ab6" sha1="7960707b46957df2cabb8fa154bf033e31580b2c"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 08).bin" size="639744" crc="cbbd68c0" md5="870b67155c66d389833f7bdb4c226b78" sha1="452e78d923ac63e02b0b165a1e1c986734ebba61"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 09).bin" size="2293200" crc="f0fc14c8" md5="2146f79948f95394cd7bc8a92d8ffed3" sha1="cf189c32133d62df96c3ce0a36288113da823aa7"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 10).bin" size="893760" crc="acf0a9a5" md5="a95d931d28de5639e51d3ad02cdcaa0d" sha1="a1434029702c0b353d8306c7e9950819ba5267db"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 11).bin" size="893760" crc="5b331b57" md5="710b0c91d19db1e23eb0dff53c7e5b52" sha1="ce4fc5f66808d0fe367e68f880431498f6b478fb"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 12).bin" size="893760" crc="b9b64ec0" md5="92ce9aa1f3f1b6ed9be3dd601c2ff51d" sha1="3e80a154316a345fb127ca37ba6b8b72c750e4e6"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 13).bin" size="453936" crc="d6851dee" md5="83746c04b76586218074c2098d97e4ec" sha1="50ff9c0f8e9b0a87e5b36e2ecc0f3f1508784675"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 14).bin" size="799680" crc="037889d2" md5="ced4ec11d8c1be2e1148803f19cd1f42" sha1="0762ef8f6905f45acf8c4ae4054ab60a6cf7c073"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 15).bin" size="2474304" crc="f3d32cea" md5="09060e33785a50292eba201b0762de43" sha1="ad67f5ca5844d75c592fad8f12336d3133a183b4"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 16).bin" size="646800" crc="3ccd6a90" md5="5018feddca5aa792e78a3ab0faecfcce" sha1="0920f59fd541026fe4d0d795bc7b6c57a36ad91f"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 17).bin" size="536256" crc="feeb7b3e" md5="fabea432e2ec97f7920388877d3b2c96" sha1="3309dab66316e075faf4893f55ff0798ae2f88cc"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 18).bin" size="799680" crc="9400c912" md5="04e1ca138b7682022d44815771f7d610" sha1="3c69e6c6973218c427eb1a1e9a345f68e6b49fc6"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 19).bin" size="717360" crc="31b6478a" md5="3724b24f0f3db4e6dc5bf3719fd96159" sha1="4f5cf49b310c832252127b12cc2b0df229180359"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 20).bin" size="482160" crc="ed18d3d0" md5="712529d5c03be26bc61018e2a6d62231" sha1="7ab59b64684c10884fcf6c9ecc043dc7a5153841"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 21).bin" size="533904" crc="6aca0fd9" md5="416183742a8ec7c08595695a1d36f49e" sha1="3a278ff89146499e6a7e7e25909305d1cfa5fb80"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 22).bin" size="536256" crc="1f4c00d4" md5="3fdee94ba5e0d7e4a474f2a016d38d16" sha1="0b92f885a17fc0553927f9fa0cacf1da6b6b7b39"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 23).bin" size="533904" crc="ce9c3836" md5="3213aad3d108d80d1d530eca243877f3" sha1="8669634838d19a7032e8526e038bd399bfdf9b57"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 24).bin" size="1187760" crc="14a52799" md5="dc646e0e23fcc0112dda6dee7fc94048" sha1="6912d94ded87afb74bcca87806f3f72bf4702b9d"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 25).bin" size="364560" crc="b8735a03" md5="d49d329b62d952e14bd5629b103cc5b1" sha1="9ed5776b573c700ab26c32a459a0fd1a00485328"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 26).bin" size="536256" crc="f489cd1f" md5="a4c765c36e20e37993aedfaeed3b9dea" sha1="9efdff891f55eca95a02b348d66c35980ad968de"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 27).bin" size="717360" crc="bbb1166b" md5="81a413c1524ad483650317036b3d9687" sha1="d2a421fd7018b6eed013cbe61b8ee2070eb2aceb"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 28).bin" size="627984" crc="991e15c5" md5="f0291a33a245df7c38c0cea1ee4df9cc" sha1="90442878e2556a87b57c321641e708e8ad93a471"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 29).bin" size="1594656" crc="7649e2b4" md5="0db6fe455ecc9b1fbeb55a85358d58a9" sha1="e2fda0b201b406190a1917ed7efd00e79d272efb"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 30).bin" size="1528800" crc="6902b486" md5="f57d4d0cca4e1a1dbbc6d34dac28aee3" sha1="76cb82eb26e66fa432e268fe43911fc708cbb6ee"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 31).bin" size="980784" crc="f154b6a4" md5="18b018bb693b22530fa1e087a79bf2da" sha1="b69ef59ca3a9826c4137c59a5eb30f3e305f9b30"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 32).bin" size="893760" crc="58dbf520" md5="1bccdfc3c0f7bc0bf63b75c703d2849d" sha1="2bde2c5a8f0d74c6bd083dd1cb5377be2070524d"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 33).bin" size="712656" crc="8ff80802" md5="d13b18473053b6f93a931acdef2ac9ff" sha1="54d4a3f7869786899393d4fb67fbe03e40626330"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 34).bin" size="4245360" crc="8b54c487" md5="f106712d1ebb1c07fa2408efff0cbe53" sha1="9e52d519d4579ebac2d3da9c5ce0669eddb19cfe"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 35).bin" size="364560" crc="c8de569a" md5="13aea576e33afc7923d0ab977d2470b5" sha1="ee811b8c5f8f60e3398148a79d195ae2848d8e4c"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 36).bin" size="369264" crc="7cdecfde" md5="c1392dbb1c8e820f80c447ebb50ca10f" sha1="e27350c280c69b7c11bd44267a539073fb0b77fc"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 37).bin" size="364560" crc="601727ad" md5="83923ea897d5284536257c85e9d468c4" sha1="d5089422ddfce443abf69ec23befb210c9062077"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 38).bin" size="371616" crc="807f518e" md5="416d19d1a4471c06a6fab9cafd270541" sha1="835924566f39f4d8c64094d1ed863937917e0707"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 39).bin" size="364560" crc="e5048ba4" md5="de980b883d382e7159848f2264d11905" sha1="4abf1743a011b3183f0b057ebeccc163fa0f3045"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 40).bin" size="364560" crc="de2bcb80" md5="7f01aabfae9776414f4029798921f3f1" sha1="c150b686dda96233048b0f1d29ccea071daf9f01"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 41).bin" size="369264" crc="9025a637" md5="43cfd6bb7f9f4e5add2b1119f78d4569" sha1="640d9918d448bce59be2e1ef52e5b82587613b23"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 42).bin" size="364560" crc="df40bb50" md5="59ca076d2fdc665f701e7467a3d2b180" sha1="ce62fdb5a9f32b9292b787ac51e04d7498f11964"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 43).bin" size="1147776" crc="01f0c4b3" md5="88ec47b4e372a1bfc9eb5b63a3ef2353" sha1="23d147665661a130d1f073467cf6f6f0704f4d7b"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 44).bin" size="1152480" crc="8b4242b2" md5="a14c7b0d159dd11f65fb82c8c7299938" sha1="6b4349b5279a92f428e349abebce438cd965810c"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 45).bin" size="1145424" crc="7876d09b" md5="9381f3af88a86a453167a6079a17c1aa" sha1="85b3d934c062498f3090538d6da6a3c63d089508"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 46).bin" size="1241856" crc="9428abad" md5="7d607ede892bb6f012467cfc07fab285" sha1="302edc1ad287fa0df75b4c86307ac747f8df4a24"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 47).bin" size="1239504" crc="9d893258" md5="f737f25818598092c3c483732ac2ca8f" sha1="2de127469e98e4fa7bfe00bbb882007fcdb12856"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 48).bin" size="1241856" crc="51aac16b" md5="3454bf5eac48968e920d78e083be5aab" sha1="e6b1ae9d4e5f281afe8b6c3defed0431dcb99b91"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 49).bin" size="1246560" crc="362fa379" md5="f20cf6292d3dd47d77efa1102e43e530" sha1="893cb6ade428f689b38a125d275379bf31aee8d3"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 50).bin" size="1145424" crc="e4d8ecaa" md5="c5616328576e7b94cc54f3a39d035caf" sha1="8358d5170b00b4d09c56b8a28c828ebba1d5adf7"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 51).bin" size="1147776" crc="f08992b3" md5="4c8a8712674e4c8a98f00a5dee8053d8" sha1="2b423bf03c9c49dc0be0175c8c3299012d364200"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 52).bin" size="1239504" crc="3c8d4367" md5="861e523b14ae06b1acfd0ae37654eedb" sha1="12a6097937de5d869b27d7a8238da8340f438ade"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 53).bin" size="1077216" crc="87954cbc" md5="c0023a8fe8cf1683277c8fd61552eec5" sha1="84698a6f846de2a779a81a8b93cbbcbc9036a8dc"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 54).bin" size="976080" crc="ec086f32" md5="4551ef330c5a5e8ebabd3dc7367d0997" sha1="4061e1f7258a0c87cb23336e4f64cbaf4cdd254d"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 55).bin" size="1145424" crc="c394fa0f" md5="6a1b8cab8ffc7f8ba0e398d06d6d6a3c" sha1="cc8f53b24f138fc21a23b019a437368289a4c265"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 56).bin" size="1077216" crc="3ad4671d" md5="5da6fcdc3f19652cecd96bd45211f0b3" sha1="7b763ba759342e15eb2ccc4d98acbc01cca3ca39"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 57).bin" size="1070160" crc="333cacef" md5="5d56d449922dac2fb60888bcc8b65e84" sha1="f630af7d1e49a95ab428bdb74126f81b62730912"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 58).bin" size="1145424" crc="cbfcb5d7" md5="1cb6a16bfb96ddbff6981df77597ea5a" sha1="17e48a7e1a32b85977eb7b8ad4fae85d8c42bf86"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 59).bin" size="1077216" crc="504777c6" md5="fee45f55442782a1d97c06c4caea3b94" sha1="10d5b198c8499ebfd41d68eb6c8de18b2e69e65f"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 60).bin" size="1070160" crc="1fa823d3" md5="1012b41b1077cb5ab2d687049c229b1a" sha1="47185af038c1d83ab89317010050afa512bc2886"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 61).bin" size="1239504" crc="24ee30bb" md5="6ac86f3c17074d42a9f098d8ff957e25" sha1="f5bd27601429f2f716e65ab2f897d5197717ede8"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 62).bin" size="1077216" crc="660b6ef0" md5="0aadb961334bec4cace74b17c40d24aa" sha1="199f76e7ed30f85009e05a5525b23f0e89995a91"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 63).bin" size="1070160" crc="f666dcd5" md5="aa3616d2742a44dd8cbeada00657607d" sha1="0cab20ff575958d3c81728c90c891e10f715e0af"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 64).bin" size="1145424" crc="e32633c6" md5="3c9a490073e319936bae51981132c955" sha1="e335f003aea9e9e813cf5e426bc72f07ec768b17"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 65).bin" size="1241856" crc="2188de3b" md5="7e698663d98466bd2000a882bbe5b8cb" sha1="e99995125809473a9a3bfcefcec7e4da1d4f797b"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 66).bin" size="1074864" crc="f91dd564" md5="18f8511fe266d9538ade3216ea1661c5" sha1="97afb5a41008b20e1bcccdac76936f49d9a749eb"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 67).bin" size="1241856" crc="37bf5c5b" md5="b9f7c67c8581229fad348445f50c6371" sha1="53be03dfca426ac80378b10d0e36a33e9c11d776"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 68).bin" size="1422960" crc="668ed023" md5="70b9006b57fa5ee625259694f8cb47a0" sha1="3d9a3eaa86603918ebe477ae28bacfc304fe5425"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 69).bin" size="1239504" crc="5518673c" md5="01f3ec3d63c80e274887699198e75606" sha1="9da2fdf58468db4b780b57c5b2076e481d7698ed"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 70).bin" size="1418256" crc="e439b914" md5="7752af3ad4a3b8cea680e4b7e1bfeb4d" sha1="5e2855cf17f0d2030ea88aa95ce23caa210a3510"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 71).bin" size="1074864" crc="56ee347d" md5="bdef9ebec16c0cea78d2f4fecd48e688" sha1="d3b7ac10d5ad278d395c0728d93d83e731f93967"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 72).bin" size="893760" crc="4be41c59" md5="c8f3323905f892a046c979916fae514b" sha1="06af05085066a2d57fdf0bfd1426567e740372c7"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 73).bin" size="1418256" crc="5a115f81" md5="0a30fcd90e2839119e93ed7136a07097" sha1="52149d8d53a03d0cee85cc4e4df1b82e5ac88e10"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 74).bin" size="1422960" crc="11634540" md5="3a3edb3674bd30f7a61dc806b7562bf9" sha1="85f6ad48de39dfbc87aa4fa46ba016984aa8c679"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 75).bin" size="1422960" crc="476bb94b" md5="9014a8d1a3356b01dccd95fa460bc785" sha1="a2791067722c9b0f3da80ed06b264498dd98ff15"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 76).bin" size="1415904" crc="6826e507" md5="d0e58f8d6a734b20777f244edc1a45c7" sha1="c7313b864bc7d8577bfb9f51fc3c78d21f531816"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 77).bin" size="1422960" crc="305f858f" md5="e4619f010e4af80f7a8770fb8b223cf7" sha1="4213b728f776ce2c9794249f0e606e374d8360a9"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 78).bin" size="1070160" crc="08502ef6" md5="1215b28b90fec2fc1fddc6fbe3a63e87" sha1="c820dff0bb7701b713e23349b0fd7f7ab4665fdd"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 79).bin" size="983136" crc="a8aa910e" md5="1c855c082e2185d7566681d63db741dc" sha1="3d9e1093945b295cb55cad9677670596f662795d"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 80).bin" size="710304" crc="e02d0ab2" md5="fddaab4f57e73c36dc1af52fc66bd58d" sha1="ae9a1f294ef937e5d55a879a1902aa8977363c14"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 81).bin" size="717360" crc="d49c10fa" md5="14dfd6e66c6754ea546b23c3e56d0a75" sha1="0d2590dfa441e56044b2a10a43a9db970874030f"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 82).bin" size="536256" crc="068d3b79" md5="44b0379a2278f84f7e7015ed8bf79c54" sha1="d60d6f2e180d66167eaf33263939b7955f86d5f5"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 83).bin" size="533904" crc="1e893985" md5="8089a558e9808640820fe624a32b3f8a" sha1="15cbcf935c605fdb99052b5d21733eeb77ddd72b"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 84).bin" size="536256" crc="f4a1fa93" md5="e862789c432b7e851d552e75e922716c" sha1="001f27aebd72128158b2d5b7a48d8f713dde7c95"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 85).bin" size="540960" crc="4602f294" md5="f7f27620f89bd7c7e19fd2d5a94e82c1" sha1="2a67600411c22a58f721b3da5a289957f9f52f65"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 86).bin" size="627984" crc="5a128907" md5="2829f242300b36fc233c8eff72000c4a" sha1="4e42e0e0adb78d3917bc38b5101e7a973d7238b6"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 87).bin" size="536256" crc="f07cd311" md5="342875d61f152a7da7d9143ebd0d767c" sha1="4a190ced3513bfce98e3c93dbdb774ecf8b1d6aa"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 88).bin" size="533904" crc="f05e95f7" md5="351f42129a3ca0212923c924ab028399" sha1="2325d30fe9ce608a5c6982c7c02185e6f97fab63"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 89).bin" size="1241856" crc="4a349918" md5="f0ab189b06da969784133ca81a51454e" sha1="7fc6e6263f54c245770ddb9a541e323036f67d2c"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 90).bin" size="893760" crc="86946adb" md5="e6ee817f6712a8150fa793baa1333796" sha1="b3e79071a649e2492a9f7937e062ad57454858a1"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 91).bin" size="1246560" crc="8cb842ec" md5="2a74a5b6b3a1225a4ff9b4b824fe5fe0" sha1="c2eab8f35e746dfd9335dfd67203dfeccb458de5"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 92).bin" size="1145424" crc="25a06f44" md5="c2c9ef8ce916c8bfd9cfad5da61c8bb3" sha1="6da8c81d445b0190ba0c11ef44dc181b48981eb3"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 93).bin" size="1418256" crc="103f23af" md5="1dab7e75dcee645759988fba5c5017cc" sha1="58c0f25bdc479a7c7ab63324fa8e5257aee4ec30"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 94).bin" size="369264" crc="37ab546f" md5="3a1abd4966bdc662bc9d9d51f6338942" sha1="ff55b21f3931d8f2a7685a207a95088445eb31cd"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 95).bin" size="536256" crc="96f61b43" md5="bd8e3e04f133b41b84fd5b84c13997b6" sha1="78497cb64ca43645e14a21129329982e7138f802"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 96).bin" size="533904" crc="3cf5c0a6" md5="fef61422100cc1a282250efb79a85292" sha1="6df2447ce0fd01e7db56a23942c0ae72200f3a97"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 97).bin" size="371616" crc="3f9148ea" md5="d087996d7f1e9856ddf833a697d2ea0b" sha1="13134fa895412372ba243b161965c978e23f6fd2"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 98).bin" size="533904" crc="4fd7ddae" md5="781edf7bd5b6be3ae60a8f0198120f15" sha1="360703189c7756f774ac4c26d4f381ae1d1b5b07"/> -->
+			<!-- <rom name="Barney Bear Goes to School (USA) (Track 99).bin" size="717360" crc="fab012e6" md5="bc206671819ac2b5b13e906fd27b89fd" sha1="43b2ab2a65d451f0527c1572f1308430148c96e3"/> -->
+			<diskarea name="cdrom">
+				<disk name="barney bear goes to school (usa)" sha1="12013b203e4b7e1280fd6c0819a8ac6013a0e947"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Battle Chess -->
+	<software name="btlchess" supported="no">
+		<description>Battle Chess</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<notes><![CDATA[
+cd32: tutorial mode has no [CDDA] redbook audio (sample repeats)
+cd32: game mode AI thinking is really slow after few moves
+]]></notes>
+		<info name="sku" value="CDT-3501"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle chess (1994)(interplay)" sha1="9b19451fb6a6b8a4cb50a64a2dbfcee50b852e9d" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Battlestorm -->
+	<software name="btlstorm" supported="no">
+		<description>Battlestorm</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<notes><![CDATA[
+cd32: game hangs if gameplay intro isn't skipped
+cd32: wrong background colors
+cd32: GFX score never updates (stuck at 0)
+]]></notes>
+		<info name="sku" value="CDT-3502"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battlestorm (1991)(titus)" sha1="0d4b1a414e3284e12f3002db11c30555227a3e66" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Black Viper -->
+	<software name="blkviper" supported="no">
+		<!-- TODO: Verify if this works on stock CDTV -->
+		<!-- Shouldn't and be just an CD32/AmigaCD release -->
+		<description>Black Viper (CDTV?)</description>
+		<year>1996</year>
+		<publisher>Neo</publisher>
+		<notes><![CDATA[
+cd32: boot OK, has stripe glitch during FMV
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="black viper (1996)(neo)" sha1="8fed0ebdf54f749d8099560ef2423fbc1493a054" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Casino Games CDTV -->
+	<software name="casigams" supported="no">
+		<!-- https://hol.abime.net/2943 -->
+		<description>Casino Games</description>
+		<!-- In-game reports '91, HoL says '92 -->
+		<year>1992</year>
+		<publisher>Saen Software</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="casino games cdtv" sha1="1f02c705e57aff330fc393696e6fae96ed8e61d2" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CD Remix - The D.J. in a box -->
+	<software name="cdremix" supported="no">
+		<description>CD Remix - The D.J. in a Box</description>
+		<year>1991</year>
+		<publisher>Microdeal</publisher>
+		<notes><![CDATA[
+cd32: black screen with mouse pointer after title screen (is it crashed?)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd remix - the d.j. in a box (1991)(microdeal)" sha1="96ef9c8b676b0c3a56760c27a3be61689d0e1a07" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -22,9 +558,29 @@ license:CC0
 		<description>CD Remix Version II</description>
 		<year>1991</year>
 		<publisher>Microdeal</publisher>
+		<notes><![CDATA[
+Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
+]]></notes>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CD Remix Version II -->
+	<software name="cdremix2a" cloneof="cdremix2" supported="no">
+		<description>CD Remix Version II (alt)</description>
+		<year>1991</year>
+		<publisher>Microdeal</publisher>
+		<notes><![CDATA[
+Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd remix version ii (1991)(microdeal)" sha1="cc625b863c8e60c1870f3ccd0b6b7e4eab43f242" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -33,9 +589,133 @@ license:CC0
 		<description>Chaos in Andromeda - Eyes of the Eagle</description>
 		<year>1992</year>
 		<publisher>On-Line</publisher>
+		<notes><![CDATA[
+cd32: black screen (PC=32114, PC=332a4 $35180)
+Requires a CDTV controller to play (digit options in main menu)
+Fills log with [DDFSTRT]=0xc underruns
+]]></notes>
+		<info name="developer" value="KirkMoreno Multimedia"/>
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Chaos in Andromeda - Eyes of the Eagle -->
+	<software name="chaosanda" cloneof="chaosand" supported="no">
+		<description>Chaos in Andromeda - Eyes of the Eagle (alt)</description>
+		<year>1992</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+cd32: black screen
+Requires a CDTV controller to play (digit options in main menu)
+Fills log with [DDFSTRT]=0xc underruns
+]]></notes>
+		<info name="developer" value="KirkMoreno Multimedia"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chaos in andromeda - eyes of the eagle (1992)(on-line)[1122-094-0321]" sha1="a16daf7f0fb59983246eb5a72353d5c2a016a176" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Cinderella - The Original Fairy Tale -->
+	<software name="cinderel" supported="no">
+		<!-- https://hol.abime.net/5793 -->
+		<description>Cinderella - The Original Fairy Tale (USA)</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_isbn" value="0-921974-41-8"/>
+		<info name="serial" value="CDRM 735100"/>
+		<info name="sku" value="CDT-2523"/>
+		<!-- "CDRM-735100 1" ? -->
+		<info name="disc_matrix" value="CDRM-735100"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/16293/ -->
+			<!-- <rom name="Cinderella - The Original Fairy Tale (USA) (En,Fr,De,Es,It).cue" size="125" crc="d02e7014" md5="6132a245d2e0c7b8ed7bfa7ceefd8589" sha1="f575fc5a5bcc4affa4668bae16ed071d216d0af8"/> -->
+			<!-- <rom name="Cinderella - The Original Fairy Tale (USA) (En,Fr,De,Es,It).bin" size="608222496" crc="9483d665" md5="9a6f8e3ab8560b1efa1b1e7ae6e6548f" sha1="6c848eb2c47a2076fd3e820fee1b72130fe051c3"/> -->
+			<diskarea name="cdrom">
+				<disk name="cinderella - the original fairy tale (usa) (en,fr,de,es,it)" sha1="3c62af0cb40c98f54a935de70d4fe52f2fedd62c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Classic Board Games -->
+	<software name="clsbg" supported="no">
+		<description>Classic Board Games</description>
+		<year>1991</year>
+		<publisher>Merit Software</publisher>
+		<notes><![CDATA[
+cd32: boot OK, status bar selection boxes draws an extra filled grey box to their right (cfr. "Language" in main menu) [Copper]?
+]]></notes>
+		<info name="barcode" value="7 22301 66115 4"/>
+		<info name="sku" value="CDT-3506"/>
+		<part name="cdrom" interface="cdrom">
+			  <!-- <category>Games</category> -->
+			  <!-- http://redump.org/disc/18531/ -->
+			  <!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).cue" size="114" crc="2a14355f" md5="cb64d8efa755b6dae5634b4a4fd71053" sha1="28d8e8e1ee93cff118663a3bfa00ebc331e70868"/> -->
+			  <!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).bin" size="113926176" crc="5540a1d9" md5="343851d323c2d708ceb39208f98d712d" sha1="3080a6870e2f574672d8349562df52b4014b8427"/> -->
+			<diskarea name="cdrom">
+				<disk name="classic board games (europe) (en,ja,fr,de,es,it)" sha1="030e99b691f38279c83dae1a4256bb9dcf9c0081"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc -->
+	<software name="cdtvd1" supported="no">
+		<description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 1</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: Throws a pos software failure #80000004 at boot
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="commodore amiga cdtv, amiga 600, amiga 600hd demo disc (1992)(commodore)" sha1="34a84c121ea7ea622f863e0325a4f19206df644e" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- same as cdtvdemo:cdrom2? -->
+	<software name="cdtvd2" supported="no">
+		<description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 2</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: Throws an AMOS software failure #8000000A at boot
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="commodore amiga cdtv, amiga 600, amiga 600hd demo disc 2 (1992)(commodore)" sha1="e66302b72b31d28328d669ebd70424ac0f04b5cb" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CoverGirlStripPoker -->
+	<software name="covgrlsp" supported="no">
+		<!-- https://hol.abime.net/3106 (requires login) -->
+		<!-- https://www.mobygames.com/game/cover-girl-strip-poker -->
+		<description>Cover Girl Strip Poker</description>
+		<year>1991</year>
+		<!-- in-game and Moby Games claims being published by Emotional Pictures -->
+		<!-- HoL and C=64 back cover claims being distributed by On-line / The Sales Curve -->
+		<!-- Is latter referring to the '92 rerelease? -->
+		<publisher>Emotional Pictures</publisher>
+		<notes><![CDATA[
+Dump cuesheet has multiple tracks with indexes, in ccd/cue/img format
+cd32: [CDDA] redbook audio is very offset cfr. intro announcer speech is cut off no matter the language
+cd32: inputs are quite uncontrollable, most notably with raising bets (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="covergirlstrippoker" sha1="773d750c9d580e17a1f40c1ed05fe3daadeae919" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -44,9 +724,700 @@ license:CC0
 		<description>Cubulus &amp; Magic Serpent</description>
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+Magic Serpent needs CDTV input device
+cd32: Cubulus boot OK
+]]></notes>
+		<!-- cfr. shiftrix -->
+		<info name="alt_title" value="Magic Serpent &amp; Cubulus"/>
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Cubulus &amp; Magic Serpent -->
+	<software name="cubulusa" cloneof="cubulus" supported="no">
+		<description>Cubulus &amp; Magic Serpent (alt)</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+Magic Serpent needs CDTV input device
+cd32: Cubulus boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cubulus &amp; magic serpent (1991)(software 2000)(de)(en)[compilation]" sha1="1451b1fc9f3a36208c5ed87d70469f810126d01f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="defcrown" supported="no">
+		<description>Defender of the Crown CDTV (Euro)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK but random crashes (happened once while raiding a castle)
+]]></notes>
+		<info name="developer" value="Cinemaware"/>
+		<info name="sku" value="CDT-3001"/>
+		<info name="disc_matrix" value="CDAC-007900   1"/>
+		<info name="barcode" value="0 43467 53001 7"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/24518/ -->
+			<!-- <rom name="Defender of the Crown (Europe).cue" size="230" crc="ee8b8985" md5="c10783a113cccba70286675709e39926" sha1="f41a5d3c09a51956901ed96ed0593cf2e882cd42"/> -->
+			<!-- <rom name="Defender of the Crown (Europe) (Track 1).bin" size="9878400" crc="104f29d5" md5="937a65f3cbecc340e006234e811f9386" sha1="b481c4a1645bd946c4e9643d55a105e6fa747526"/> -->
+			<!-- <rom name="Defender of the Crown (Europe) (Track 2).bin" size="260961456" crc="c387dbaf" md5="97272f12a36df7867ab5424b9dcff8e8" sha1="1f582a800fa371d0ac39f446e47f7c95776ec6b8"/> -->
+			<diskarea name="cdrom">
+				<disk name="defender of the crown (europe)" sha1="61e5ac7f19c4569443e1c2f28bbc274d637173f3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Demo II - Amiga Public Domain Collection -->
+	<software name="demo2pd" supported="no">
+		<description>Demo II - Amiga Public Domain Collection</description>
+		<year>1993</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: Extreme Violence has GFX scrolling corruption when gameplay screen isn't vertically split
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="demo ii - amiga public domain collection (1993)(almathera)[amiga-cd32-cdtv][80034 demo cd ii cd tv 01]" sha1="991491977f9c3f110204f330f572cf45d1cdec6a" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="deukomp1" supported="no">
+		<description>Deutschland Kompakt (Ger)</description>
+		<year>1991</year>
+		<!-- MSPI -->
+		<publisher>M&amp;T Software Partner International</publisher>
+		<notes><![CDATA[
+Requires CDTV input device
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="CD-Soft"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/3196/ -->
+			<!-- <rom name="Deutschland Kompakt (Germany).cue" size="95" crc="b5141aa4" md5="82a1b76c21bb7ffbce31f8bb4d334fd9" sha1="14f3b61e99f96cd3a8458c29899c2353db2c28d2"/> -->
+			<!-- <rom name="Deutschland Kompakt (Germany).bin" size="435531600" crc="a68713ab" md5="1003357013af7251e5704f7cc15487da" sha1="922a86de11fd54fdf153e5f2cc808cb6198d1356"/> -->
+			<diskarea name="cdrom">
+				 <disk name="deutschland kompakt (germany)" sha1="3c203d8e3dcbf1dbbf6bd951c92de0e8fe03c2a0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Dinosaurs for Hire -->
+	<software name="dinohire" supported="no">
+		<description>Dinosaurs for Hire</description>
+		<year>1991</year>
+		<publisher>Wright Works III</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dinosaurs for hire (1992)(wright works iii)" sha1="7cd03f4e0b33462ac5c9358be7dca46481e95a9b" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Dr. Wellman - A Guide to Good Health for You &amp; Your Family -->
+	<software name="drwellm" supported="no">
+		<description>Dr. Wellman - A Guide to Good Health for You and Your Family</description>
+		<year>1991</year>
+		<!-- "Digita Multimedia" -->
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-7001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dr. wellman - a guide to good health for you &amp; your family (1991)(cdtv publishing)" sha1="13e6ab09a6ca7bde28d2f1af1b77ee3d4fbb7b0c" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DuneCDTV (ONLY REAL CDTV) -->
+	<software name="dunep" supported="no">
+		<!-- No mention neither on HoL nor Lemon Amiga -->
+		<!-- Is it truly a prototype? -->
+		<description>Dune (Prototype?)</description>
+		<year>1992</year>
+		<publisher>Virgin Multimedia</publisher>
+		<notes><![CDATA[
+cd32: doesn't boot
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dunecdtv (only real cdtv)" sha1="7ca35c174377b0110045450c0999ea0b75213999" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- E.S.S. Mega -->
+	<software name="essmega" supported="no">
+		<description>E.S.S. Mega</description>
+		<year>1991</year>
+		<publisher>Coktel</publisher>
+		<notes><![CDATA[
+cd32: crashes in-game when accessing "3d mod" option
+]]></notes>
+		<info name="developer" value="Tomahawk"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="e.s.s. mega" sha1="dfd5d80325c4fadf7deee11b33d24fa42189e325" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- FALCON -->
+	<software name="falcon" supported="no">
+		<!-- https://hol.abime.net/488 -->
+		<description>Falcon</description>
+		<year>1991</year>
+		<!-- Mirrorsoft (Europe), Spectrum HoloByte (rest of World) -->
+		<publisher>Mirrorsoft?</publisher>
+		<notes><![CDATA[
+Needs CDTV input device
+]]></notes>
+		<info name="sku" value="CDT-3510"/>
+		<info name="developer" value="Rowan"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="falcon" sha1="bc359735a14b1d2c561fca5800346f81cefe0e24" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fantvoya" supported="no">
+		<description>Fantastic Voyage (USA)</description>
+		<year>1992</year>
+		<publisher>Centaur</publisher>
+		<notes><![CDATA[
+cd32: title screen cuts off selection text in the middle
+cd32: gameplay audio outputs SFX even if user selects BGM
+]]></notes>
+		<info name="disc_matrix" value="DISC MFG., INC. (A) W.O.# 40834-3 CD-ROM (1)"/>
+		<!-- baddump: MCN unverified -->
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3193/ -->
+			<!-- <rom name="Fantastic Voyage (USA).cue" size="88" crc="f56848e3" md5="4966e2d46a73f488ea7f34a76f3800e0" sha1="c8a0929895e91b0f2830ec33c9e7aa6b7a0ec2ae"/> -->
+			<!-- <rom name="Fantastic Voyage (USA).bin" size="5244960" crc="019d4fcb" md5="eee20caf9b36a2f8830f7aeb9584d57c" sha1="e32aebdac017a3f19cdbaa746c829fc3c817dcfa"/> -->
+			<diskarea name="cdrom">
+				<disk name="fantastic voyage (usa)" sha1="c35cafd8639c9a19c63d19f2e6765106c83b9b8c" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fractal Universe -->
+	<software name="fractuni" supported="no">
+		<description>Fractal Universe</description>
+		<year>1992</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+cd32: cursor is uncontrollable in main menu, [joytest] reset counter
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fractal universe (1992)(almathera)" sha1="255787428bcc560a8e62c094007c9eec2aecbb3c" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fun School 3 - for the under 5s -->
+	<software name="funsch30" supported="no">
+		<description>Fun School 3 for the Under 5s</description>
+		<year>1991</year>
+		<publisher>Database Educational Software</publisher>
+		<notes><![CDATA[
+cd32: cursor is uncontrollable in most games, [joytest] reset counter
+]]></notes>
+		<info name="sku" value="CDT-2505"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fun school 3 - for the under 5s (1991)(database educational software)" sha1="55d4e3d5e73f4e7aada7ffb27bad2f2c60e3a9d6" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fun School 3 - for 5 to 7 year olds -->
+	<software name="funsch31" supported="no">
+		<description>Fun School 3 for 5 to 7 Year Olds</description>
+		<year>1991</year>
+		<publisher>Europress Software</publisher>
+		<notes><![CDATA[
+cd32: cursor is uncontrollable in most games, [joytest] reset counter
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fun school 3 - for 5 to 7 year olds (1991)(europress software)" sha1="b5aee2f21709bd372836ce25cc411271b49025a6" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fun School 3 - for the over 7s -->
+	<software name="funsch32" supported="no">
+		<description>Fun School 3 for the Over 7s</description>
+		<year>1991</year>
+		<publisher>Europress Software</publisher>
+		<notes><![CDATA[
+cd32: cursor is uncontrollable in most games, [joytest] reset counter
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fun school 3 - for the over 7s (1991)(europress software)" sha1="4d5806a120acbba0d837e95588a759a8901390e7" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Galaga_Deluxe_CDTV -->
+	<software name="dxgalaga" supported="no">
+		<description>Deluxe Galaga (v2.4)</description>
+		<year>1995</year>
+		<publisher>Edgar Vigdal</publisher>
+		<notes><![CDATA[
+cd32: has serious GFX pitch corruption when booted, [Copper] or [Blitter]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="galaga_deluxe_cdtv" sha1="03d6c459b152b45350629bb57edf78a01c6a36aa" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Gamers' Delight -->
+	<software name="gamerdel" supported="no">
+		<description>Gamers' Delight (Eng, Ger)</description>
+		<year>1994</year>
+		<publisher>GTI - Schatztruhe</publisher>
+		<notes><![CDATA[
+cd32: not extensively tested
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gamers' delight (1994)(gti - schatztruhe)(en-de)[amiga-cd32-cdtv]" sha1="3fa256584eed79c90ce7067dd29acf9e3df73878" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Garden Fax - Fruits, Vegetables &amp; Herbs -->
+	<software name="gardfaxf" supported="no">
+		<description>Garden Fax - Fruits, Vegetables, and Herbs (USA)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="Inter Search Systems"/>
+		<info name="sku" value="CDT-1004"/>
+		<info name="barcode" value="0 43467 51004 0"/>
+		<info name="disc_matrix" value="CDRM-508300 1"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- <rom name="Garden Fax - Fruits, Vegetables &amp; Herbs (USA).cue" size="111" crc="a416ffdd" md5="355e98031d39c40c6b8d191927426856" sha1="fd70102d0ba8a5a4ce72e66f23a1e09d86d3795e"/> -->
+			<!-- <rom name="Garden Fax - Fruits, Vegetables &amp; Herbs (USA).bin" size="57769824" crc="fd17702b" md5="f9f02b788f34b93e9579de83cd8bcaa9" sha1="81da12d518b0295c191a7d7667294a4763f39430"/> -->
+			<diskarea name="cdrom">
+				<disk name="garden fax - fruits, vegetables and herbs (usa)" sha1="23058efa5a7407cadc10f9aba483bb86f024907f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gardfaxg" supported="no">
+		<description>Garden Fax - Garden Plants (USA)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: punts to cd32 player
+]]></notes>
+		<info name="sku" value="CDT-1002"/>
+		<info name="disc_matrix" value="CDRM-486200 1"/>
+		<info name="barcode" value="0 43467 51002 6"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/14997/ -->
+			<!-- <rom name="Garden Fax - Garden Plants (USA).cue" size="98" crc="a85f1d8c" md5="6f10e3a9aecc49aaff4f89ceef454b79" sha1="66c8e715dae87fd72153f29e2dba94903de61105"/> -->
+			<!-- <rom name="Garden Fax - Garden Plants (USA).bin" size="57769824" crc="2b3cabdd" md5="561655a6444cc265217962822edbdabb" sha1="7dde3c9d4b9fb0057f9a118756021cc944a0ad79"/> -->
+			<diskarea name="cdrom">
+				<disk name="garden fax - garden plants (usa)" sha1="7083333adb31f8ed7d7eaf1c5092b30a3d8a5584"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Garden Fax - Indoor Plants -->
+	<software name="gardfaxi" supported="no">
+		<description>Garden Fax - Indoor Plants (USA)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="Inter Search Systems"/>
+		<info name="sku" value="CDT-1001"/>
+		<info name="disc_matrix" value="CDRM-486100 1"/>
+		<info name="barcode" value="0 43467 51001 9"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- <rom name="Garden Fax - Indoor Plants (USA).cue" size="98" crc="3a3201e8" md5="686a4763bab6ef063cc3d4f158a62784" sha1="fe7e9de608073c6abaf3d17e8c95f40b90116114"/> -->
+			<!-- <rom name="Garden Fax - Indoor Plants (USA).bin" size="57769824" crc="832fb520" md5="5a86d484111723436522a23dea3da5d6" sha1="ea0e901b07cb8ced9a033e1fa1c9cac7599901cd"/> -->
+			<diskarea name="cdrom">
+				<disk name="garden fax - indoor plants (usa)" sha1="2571fa8264f6b5d8f8cd02b195b27c52591b2668"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Garden Fax - Trees, Shrubs, Roses &amp; Conifers -->
+	<software name="gardfaxt" supported="no">
+		<description>Garden Fax - Trees, Shrubs, Roses, and Conifers (USA)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="Inter Search Systems"/>
+		<info name="sku" value="CDT-1003"/>
+		<info name="disc_matrix" value="CDRM-508400 1"/>
+		<info name="barcode" value="0 43467 51003 3"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3231/ -->
+			<!-- <rom name="Garden Fax - Trees, Shrubs, Roses &amp; Conifers (USA).cue" size="116" crc="f97173db" md5="776780af5559d263235ba29da9e7a4c8" sha1="08705572256b61bae0f6a89930c155a9349be46a"/> -->
+			<!-- <rom name="Garden Fax - Trees, Shrubs, Roses &amp; Conifers (USA).bin" size="115196256" crc="9004e8a6" md5="40b64c56656a3f634688368540a4c176" sha1="7abc58ae49c189f5b70f413d300052f9ece706d8"/> -->
+			<diskarea name="cdrom">
+				<disk name="garden fax - trees, shrubs, roses and conifers (usa)" sha1="5eccf33ae1585323f16551a6118753e137d53c34"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CDTV Genlock Demo v1.0 -->
+	<software name="genlockd" supported="no">
+		<description>Genlock Demo</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+Requires Genlock sources
+cd32: GFX overlays are a bit offsetted to the right
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdtv genlock demo v1.0 (1991)(commodore)" sha1="d52a2e17577beb091c093992842dc1852998f760" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Global Chaos -->
+	<software name="globalch" supported="no">
+		<!-- https://hol.abime.net/2728 -->
+		<!-- "Global Chaos" on title screen, spine adds the CDTV suffix -->
+		<!-- alt_title on front cover -->
+		<description>Global Chaos CDTV</description>
+		<year>1992</year>
+		<publisher>Hex</publisher>
+		<notes><![CDATA[
+cd32: main menu animations looks goofily fast
+cd32: eternal rave [Paula] music looks off (verify)
+cd32: Top Banana boot OK, but gives one life only then punts to main menu (verify)
+]]></notes>
+		<info name="alt_title" value="Global Chaos - Top Banana - Digital Love"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="global chaos (1992)(hex)" sha1="6cb32f1649ee415958392b8a3b748a83fa28f0b6" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Guy Spy and the Crystals of Armageddon v1.0 -->
+	<software name="guyspy" supported="no">
+		<description>Guy Spy and the Crystals of Armageddon (v1.0)</description>
+		<year>1992</year>
+		<publisher>ReadySoft</publisher>
+		<notes><![CDATA[
+cd32: doesn't boot
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="guy spy and the crystals of armageddon v1.0 (1992)(readysoft)[cdtv-pc]" sha1="210ae3c14d99ee64e1bc93fa7801343968f40eae" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Heather Hits Her First Home Run -->
+	<software name="heathr" supported="no">
+		<!-- unlisted on HoL -->
+		<description>Heather Hits Her First Home Run</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heather hits her first home run (1991)(discis)(en-es)" sha1="7c40e1b1b6c13f413da6b980bdcb36b6a39a587c" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Heroic Age of Spaceflight - NASA... The 25th Year -->
+	<software name="nasa25" supported="no">
+		<!-- Uses "CDXL" -->
+		<description>Heroic Age of Spaceflight - NASA... The 25th Year</description>
+		<year>1991</year>
+		<publisher>Troika Multimedia</publisher>
+		<notes><![CDATA[
+cd32: FMVs has audio-video desyncs (shows periodic black frames, audio is too fast)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heroic age of spaceflight - nasa... the 25th year (1991)(troika multimedia)" sha1="0cfd2f4ad2c502670fd16dc0374d5dd94f82ad44" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Insight Dinosaurs v1.0 -->
+	<software name="insidino" supported="no">
+		<description>Insight: Dinosaurs (Euro, v1.0)</description>
+		<year>1994</year>
+		<publisher>Optonica</publisher>
+		<notes><![CDATA[
+cd32: GFX pitch corruption on initial copyright screen (fmode=3)
+cd32: FMV video glitches out every other frame
+cd32: Pointer is very unstable if mouse is used
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="insight dinosaurs v1.0 (1994)(optonica)[cd32-cdtv]" sha1="460ea3865a821b47d51446acacf39e7aaee2cbb7" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Insight Technology -->
+	<software name="insitech" supported="no">
+		<description>Insight: Technology</description>
+		<year>1993</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: uncontrollable on main menu [joytest]?
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="insight technology (1993)(commodore)[cd32-cdtv]" sha1="f57c5302abe85c79be6812dba74a5afb767680c7" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- It Came from the Desert -->
+	<software name="itcame" supported="no">
+		<description>It Came from the Desert</description>
+		<year>1989</year>
+		<publisher>Cinemaware</publisher>
+		<notes><![CDATA[
+cd32: punts to cd32 player
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="it came from the desert (1989)(cinemaware)[m]" sha1="025f9b2f5d2e15bff135fd7c33ee95151697ae30" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Karaoke Hits 1 -->
+	<software name="karaoke1" supported="no">
+		<description>Karaoke Hits 1</description>
+		<year>1992</year>
+		<publisher>Music Machine Marketing</publisher>
+		<notes><![CDATA[
+cd32: inputs doesn't work, should require digit presses on a CDTV input device
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="karaoke hits 1 (1992)(music machine marketing)" sha1="9df8176ab0a47b475eae1ca32bfc3a100e8f2168" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Language TV - English -->
+	<software name="langtv" supported="no">
+		<description>Language TV - English (Fra)</description>
+		<year>1991</year>
+		<publisher>Jériko</publisher>
+		<notes><![CDATA[
+Requires CDTV input device (digits and ? keys)
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-2503"/>
+		<info name="disc_matrix" value="AREACEM DIGIPRESS JERIKO LTV ENGLISH 91364"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/3222/ -->
+			<!-- <rom name="Language TV - English (France).cue" size="96" crc="3c54b6e9" md5="c3e031a5de2069a839a5af3ba2303dcd" sha1="19390b51b2ae04383a5eb0d448667a7f6d1a5c24"/> -->
+			<!-- <rom name="Language TV - English (France).bin" size="399421344" crc="fd497b38" md5="f4cb8d1a72f86d5c7791be3c9069bea7" sha1="52d12aa51de2de874e30aa1889c14ba0c00802e7"/> -->
+			<diskarea name="cdrom">
+				<disk name="language tv - english (france)" sha1="454079ed073087278320a15b05262fa28328e9cb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lemmings" supported="no">
+		<description>Lemmings (Euro)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+cd32: lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo initial prompt (requires CDTV input device?)
+]]></notes>
+		<info name="disc_matrix" value="LEM CD   50163 021 02 /"/>
+		<info name="barcode" value="0 53203 00438 2"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/36259/ -->
+			<!-- <rom name="Lemmings (Europe).cue" size="83" crc="32fc8209" md5="1ce60d243301f7881ded33df38e1f7dc" sha1="b865b14cd6f5ae0a27a0b2599ccc7da45de61ef6"/> -->
+			<!-- <rom name="Lemmings (Europe).bin" size="69259344" crc="1659d12d" md5="1ee64a7b66aa58a94adefb98c412f622" sha1="ceaec027822c03a08e060b139908c0340c77bb20"/> -->
+			<!-- "Last sector is an empty audio track" -->
+			<diskarea name="cdrom">
+				<disk name="lemmings (europe)" sha1="49e5e8932f24c5e0845ce97663419b6892a185c5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Log!cal -->
+	<software name="logical" supported="no">
+		<description>Log!cal (Euro)</description>
+		<!-- title screen and build date says '91, multiple sources claims being '92 for CDTV -->
+		<year>1992</year>
+		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+cd32: crashes after title screen (68k goes to lalaland)
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS * F-7419- * CD-ROM A 3"/>
+		<info name="barcode" value="4 005209 007641"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3045/ -->
+			<!-- <rom name="Log!cal (Europe).cue" size="82" crc="fad771da" md5="ffde14e09e6466114b3b0f15f9a2e145" sha1="f7ec454633127a2547f4fd9017cfc29cc6c0b08c"/> -->
+			<!-- <rom name="Log!cal (Europe).bin" size="20815200" crc="9005c890" md5="cbe25fd3c5bcf9e6edcff7c9e940b864" sha1="200f812cb38236840c3189c71108c63d8bc41d24"/> -->
+			<diskarea name="cdrom">
+				<disk name="logical (europe)" sha1="1a7e3709d8fe8ef98fa0e11a124b8088194ccd7c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Monopoly -->
+	<software name="monopoly" supported="no">
+		<description>Monopoly</description>
+		<year>1994</year>
+		<publisher>Supervision</publisher>
+		<notes><![CDATA[
+cd32: inputs doesn't work
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="monopoly" sha1="8b62145a8f5ed6b9585250523f31b998d803f1af" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Moving Gives Me A Stomach Ache -->
+	<software name="movstoma" supported="no">
+		<!-- https://hol.abime.net/5794 -->
+		<description>Moving Gives Me a Stomach Ache</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Heather McKend"/>
+		<info name="book_isbn" value="0-921974-48-5"/>
+		<info name="disc_matrix" value="CDRM-734800 3"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="moving gives me a stomach ache (1992)(discis)(m5)[cdrm-734800 3]" sha1="0553e4da3a2afe545daf2999522f3c470fe9d9d6" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mudpuddl" supported="no">
+		<!-- https://hol.abime.net/5001 -->
+		<description>Mud Puddle (USA, Multi 5)</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<info name="book_isbn" value="0-921974-39-6"/>
+		<info name="sku" value="CDT-2515"/>
+		<info name="serial" value="CDRM 735000"/>
+		<info name="disc_matrix" value="CDRM-735000"/>
+		<info name="barcode" value="730122974841"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/16292/ -->
+			<!-- <rom name="Mud Puddle (USA) (En,Fr,De,Es,It).cue" size="99" crc="ad417b13" md5="c409611544dc299cb7c7ae4da415d442" sha1="368dee815e460cf098558754f3630722a63fca07"/> -->
+			<!-- <rom name="Mud Puddle (USA) (En,Fr,De,Es,It).bin" size="322557984" crc="1485937a" md5="dafe4aac6fd8ac341c1bb357bc3392be" sha1="b5b7c32c7e588cf9c67d80a2d4192cdb21dd1696"/> -->
+			<diskarea name="cdrom">
+				<disk name="mud puddle (usa) (en,fr,de,es,it)" sha1="69d622e3ae3e4c2994d194abb7d10b2e88fc4f0a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="musicolr" supported="no">
+		<description>Musicolor</description>
+		<year>1992</year>
+		<publisher>Virgin Multimedia</publisher>
+		<notes><![CDATA[
+Not extensively tested (requires music composition domain knowledge)
+Redbook audio is offset
+cd32: outputs a very quiet [CDDA] redbook if you move on main menu with an analog movement ("please insert the ?", related to above?)
+]]></notes>
+		<info name="developer" value="Binary Vision"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="musicolor cdtv (disc 1 of 2) cdtv" sha1="65a49c63d995c6761607670979059b39c1313428" status="baddump" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="musicolor cdtv (disc 2 of 2) cdtv" sha1="db332703aba92c10b118798d0d8a805dec406651" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- My Paint - The Paint Program Just for Kids! -->
+	<software name="mypaint" supported="no">
+		<description>My Paint CDTV - The Paint Program Just for Kids!</description>
+		<year>1990</year>
+		<publisher>Saddleback Graphics</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-2516"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my paint - the paint program just for kids (1991)(saddleback graphics)" sha1="8da1a3c8762e5f6c326e69dfb6c4c13fd79cf18d" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- North Polar Expedition -->
+	<software name="northpol" supported="no">
+		<description>North Polar Expedition (v1.01)</description>
+		<year>1992</year>
+		<publisher>Virgin Multimedia</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-2507"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="north polar expedition (1992)(virgin multimedia)" sha1="3373de60a4421058748616b90d5ec9a489b35045" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -55,6 +1426,11 @@ license:CC0
 		<description>Pandora's CD v1.0</description>
 		<year>1993</year>
 		<publisher>Optonica</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699" status="baddump" />
@@ -62,14 +1438,765 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Likely a good dump, gave the same result when reading multiple times -->
+	<!-- same as above? -->
+	<software name="pandoras" cloneof="pandora" supported="no">
+		<description>Pandora's CD v1.0 (alt)</description>
+		<year>1993</year>
+		<publisher>Optonica</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS CD-ROM * G-9273 * A 2"/>
+		<info name="barcode" value="5 025465 130012"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/17432/ -->
+			<!-- <rom name="Pandora's CD (Europe).cue" size="87" crc="b6889cfa" md5="d600373013fadd5f93de3002bef267ce" sha1="1b71844069379cb009b60b522845987f2a706870"/> -->
+			<!-- <rom name="Pandora's CD (Europe).bin" size="444351600" crc="af034f7f" md5="1cc8ca2a08fff2a6fba41945e5bb690f" sha1="a68fac9b872e436a0ea970b0dbcf347bc0a4a684"/> -->
+			<diskarea name="cdrom">
+				<disk name="pandora's cd (europe)" sha1="4a3b76e246bcc245053be1415ac26e7feab3c1aa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Pinocchio -->
+	<software name="pinoc" supported="no">
+		<description>Pinocchio</description>
+		<year>1993</year>
+		<publisher>Giunti Multimedia</publisher>
+		<notes><![CDATA[
+cd32: glitchy Giunti FMV opening (uses HAM)
+cd32: "the game" doesn't display main sprite
+cd32: "the movie" has scrolling glitches
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pinocchio (1993)(giunti multimedia)(m6)[amiga-cd32-cdtv]" sha1="1a512bc6e55433db8c5582901c7e21ef9a294e7f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Power Pinball -->
+	<software name="powerpin" supported="no">
+		<description>Power Pinball</description>
+		<year>1990</year>
+		<publisher>KarmaSoft</publisher>
+		<notes><![CDATA[
+cd32: black screen (68k accesses unmapped addresses)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="power pinball (1990)(karmasoft)" sha1="d39f2eaeabf3174f9b71fbed0b8dfc3a9df9ca4c" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Prehistorik -->
+	<software name="prehisto" supported="no">
+		<description>Prehistorik</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<notes><![CDATA[
+cd32: boot OK, [CDDA] redbook audio tracks doesn't repeat? (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="prehistorik (1991)(titus)" sha1="657061e0c27c4384860a2cf1f7a286a4a072b939" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psychoki" supported="no">
+		<description>Psycho Killer (U2A2030UB)</description>
+		<year>1992</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+cd32: hangs on acknowledge ending credits (i.e. when you die and have to start over)
+]]></notes>
+		<info name="developer" value="Delta 4 Interactive"/>
+		<info name="sku" value="CDT-3517"/>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2A2030UB"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="psycho killer (1992)(on-line)[u2a2030ub]" sha1="7a2c52133b9d3ed4164a90513b1722f7b9f55a27" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psychokia" cloneof="psychoki" supported="no">
+		<description>Psycho Killer (U2A2020UA)</description>
+		<year>1992</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+cd32: hangs on acknowledge ending credits (i.e. when you die and have to start over)
+]]></notes>
+		<info name="developer" value="Delta 4 Interactive"/>
+		<info name="sku" value="CDT-3517"/>
+		<info name="barcode" value="5 013893 013038"/>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2A2020UA"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3443/ -->
+			<!-- <rom name="Psycho Killer (Europe).cue" size="399" crc="0ac80308" md5="fc589e70df1d58cd85f5e9842a97c017" sha1="3f0ae24c2cf1082bb0f5f174f033003c843de460"/> -->
+			<!-- <rom name="Psycho Killer (Europe) (Track 1).bin" size="57769824" crc="f980487b" md5="4b19901c0a1d54a5b3072415d4c75269" sha1="b736e60d043783af98ff3ab4cd6857c8628c976e"/> -->
+			<!-- <rom name="Psycho Killer (Europe) (Track 2).bin" size="14648256" crc="c2901df2" md5="6e7593e6616a787d2b763794242d7eb0" sha1="156cb5dafc12c506cf8a55c00e1e30c2f66ed6ac"/> -->
+			<!-- <rom name="Psycho Killer (Europe) (Track 3).bin" size="12700800" crc="515f6db3" md5="4df215db241a60fbb54275d0b455a007" sha1="d6a164262167d3baf77e5765bc0d5e0e5f39d0c7"/> -->
+			<diskarea name="cdrom">
+				<disk name="psycho killer (europe)" sha1="86027a278c35312859e6c1ed778c7b366528f1a1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cdtvdemo" supported="no">
+		<!-- Point of sale demo discs -->
+		<!-- Disc 1 is an early video for unreleased Planetside -->
+		<description>CDTV Demo Disc (Euro)</description>
+		<year>1991</year>
+		<!-- TODO: arguably may be published by both companies -->
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: disc 1 boot OK
+cd32: disc 2 throws an AMOS software failure #8000000A at boot
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS * G-5664 * CD-ROM C 4"/>
+		<info name="disc_matrix2" value="SONOPRESS * G-4744 * CD-ROM A 2"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/4718/ -->
+			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 1) (Amiga CD Psygnosis Demo).cue" size="124" crc="d16bde19" md5="6031dd1d06497317ae04c16e83371ede" sha1="614dcdf2c32985d99c9b0b59ff81a63bf879be03"/> -->
+			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 1) (Amiga CD Psygnosis Demo).bin" size="35632800" crc="3915bf02" md5="cc567b2f5973d34527abe5b16971d1e3" sha1="eccbbe05cb3cd3329950b873f4da4a7f74b659fe"/> -->
+			<diskarea name="cdrom">
+				<disk name="cdtv demo disc (europe) (disc 1) (amiga cd psygnosis demo)" sha1="366bd22505dccf00fbb30bbee02d7e33a94e0b76"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom2" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/4719/ -->
+			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 2) (Amiga CDTV - Amiga 600 - Amiga 600 HD).cue" size="138" crc="444bae45" md5="54e0dbcf821780c8d5ce91646e5194f0" sha1="97e42a7e2bd4f621510cdb11d915051079834acf"/> -->
+			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 2) (Amiga CDTV - Amiga 600 - Amiga 600 HD).bin" size="81144000" crc="d8a48e3c" md5="fce0a1df485e9e5ac538fdc06e29b68b" sha1="c6b52e93fb7cae4048cf5c47c0ed54f8d6ddff82"/> -->
+			<diskarea name="cdrom">
+				<disk name="cdtv demo disc (europe) (disc 2) (amiga cdtv - amiga 600 - amiga 600 hd)" sha1="2041131e0070e36d206afdf2acab5ea9d9c0ec21"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="raffles" supported="no">
+		<description>Raffles (Swe)</description>
+		<year>1991</year>
+		<publisher>Edge</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="disc_matrix" value="40908 THE EDGE 17172 W.O.# 40908-2 CD-ROM (1)"/>
+		<info name="barcode" value="7 33673 17172 1"/>
+		<!-- baddump: "MCN unverified" -->
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3047/ -->
+			<!-- <rom name="Raffles (Sweden).cue" size="82" crc="8cad43b6" md5="8871b6a25d864903e7184f3a1fc7c7c6" sha1="c5929c303cd9977fa29554b57edaa4c0d7aa1495"/> -->
+			<!-- <rom name="Raffles (Sweden).bin" size="23320080" crc="563c7008" md5="7eb24c2032d3b083b59f987198415491" sha1="f35b8960889e34f9cd7cbb539336a33b48752aee"/> -->
+			<diskarea name="cdrom">
+				<disk name="raffles (sweden)" sha1="17a3c1ea794658e5ea08e321ee0800466ad0c1a0" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- RiseOfTheDragon(CDTV) -->
+	<software name="rotd" supported="no">
+		<!-- TODO: No info over the net, is this official? -->
+		<description>Rise of the Dragon</description>
+		<year>1991?</year>
+		<publisher>Dynamix</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="riseofthedragon(cdtv)" sha1="deb6de7f1b3cd9b97c563e8f2d8ab717191cb101" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Scary Poems for Rotten Kids -->
+	<software name="scarpoem" supported="no">
+		<!-- https://hol.abime.net/5796 -->
+		<description>Scary Poems for Rotten Kids</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Sean O Huigin"/>
+		<info name="book_isbn" value="0-921974-37-X"/>
+		<info name="sku" value="CDT-2514"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="scary poems for rotten kids (1991)(discis)(en-es)" sha1="84673e933254b0cd6f2b1d8af154e26616666aa2" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Sherlock Holmes on a Disc - Illustrated Sherlock Holmes -->
+	<software name="holmes" supported="no">
+		<!-- "The Illustrated Sherlock Holmes" on title screen, description is what is printed on boxart / spine -->
+		<description>Sherlock Holmes on a Disc</description>
+		<year>1991</year>
+		<publisher>Animated Pixels</publisher>
+		<notes><![CDATA[
+Compiled over the same engine as illbible
+cd32: offset hand cursor on main menu
+cd32: cannot move on multimedia section (hangs?)
+]]></notes>
+		<info name="sku" value="CDT-7503"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sherlock holmes on a disc - illustrated sherlock holmes (1991)(animated pixels)(cdtv-pc)" sha1="473239f89f5148db815ed0c73fb290da5861824d" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="shiftrix" supported="no">
 		<description>Shiftrix &amp; Lettrix</description>
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+cd32: Lettrix punts to CD32 disc screen
+cd32: Shiftrix boot OK
+]]></notes>
+		<!-- front/back cover order Shiftrix & Lettrix -->
+		<!-- In-game vertical stack is Lettrix & Shiftrix -->
+		<info name="alt_title" value="Lettrix &amp; Shiftrix"/>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
+		<!-- Likely a good dump, gave the same result when reading multiple times -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Shiftrix &amp; Lettrix -->
+	<software name="shiftrixa" cloneof="shiftrix" supported="no">
+		<description>Shiftrix &amp; Lettrix (alt)</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<notes><![CDATA[
+cd32: Lettrix punts to CD32 disc screen
+cd32: Shiftrix boot OK
+]]></notes>
+		<info name="alt_title" value="Lettrix &amp; Shiftrix"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiftrix &amp; lettrix (1991)(software 2000)(de)" sha1="dce97e3440cf678ad2a4fbd2fc4a927ca7989088" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simcity" supported="no">
+		<description>Sim City (Euro, Multi5)</description>
+		<year>1991</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Saving requires either a ramcard or a disk, [FDC] format
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-3518"/>
+		<info name="disc_matrix" value="AREACAM DIGIPRESS SIMCITY 91133 CDTD"/>
+		<!-- "The Language can be changed in the BIOS" -->
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It).cue" size="2414" crc="cfbbfe89" md5="80021fe8a73f42665f374f1cc9f33838" sha1="7fc3f9d83ad93320b1cf1d8dcc1ef56a91570a99"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="6091680" crc="287d124f" md5="aa9de61812285e908c3a111dff70758d" sha1="5a84eb2a945b50206da5e6dc3dd1172238a2ff8b"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="37930704" crc="ebf52a7d" md5="0dc904e1835b22e0f7403d41c2e2be9a" sha1="31b897c96fbd1c53fb1b2ccf3cb1968938500efc"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="9525600" crc="3ce9cfa5" md5="ba5e52edfe0befab44337c662f818918" sha1="8f7cb4e19306c3cfe5c38721c2cdb47ef7ecdb4f"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="23997456" crc="f6e4e1ed" md5="e49ae5cbe35b2ea885f1055e4d64caa9" sha1="60954af77bb90961f832381588560c50488095a3"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="28581504" crc="4b4b5e2a" md5="27e41f4e378fb3c749c27afbda81c1ac" sha1="f07eaaec1e5bb69a3a767bc07dcef4fe52e36154"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="6886656" crc="4a74afb3" md5="f0591b6dc1f08214f4e26b634bbf5314" sha1="7a1c5e4220de3b2a08a981cb684996f980115778"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="7413504" crc="0e7d7633" md5="c89cbdafb7de9e60471d9c4959ad077f" sha1="7230c1702d4ca32642115b299eca0119deae89b5"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="10231200" crc="b6d35220" md5="e7d5b39a7503ea8fae574c3be7e852f2" sha1="2604b65ef94d104e035fc3da4259d44a4f277dce"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="7063056" crc="99661fd6" md5="11d03ee3164d6cfb0b5009c03819826a" sha1="542b29eed6c08e44b1bc5ba98d9965070dadebc4"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="6009360" crc="f8b868a9" md5="a1040240e36e798dffee4e0d73f972b6" sha1="693682045069863e1ae0e7302198ba36c4db897f"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="11289600" crc="a3952254" md5="559f28e3aedd1c9933cd09f0be651730" sha1="239da6a94ad8bf8fc54166f587bb5fc046321ba3"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 12).bin" size="15527904" crc="360e392a" md5="c73d0fe9102c34607dc3fc59fd9289b7" sha1="e4d014ec31b91629458c37b01b181dd2672e36c8"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 13).bin" size="22057056" crc="5e58b7df" md5="9ad79d9d9608a23fddc7c9b6705984c8" sha1="18fc53e2bcee5eb6690c0ecad1692a50f73aa8a6"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 14).bin" size="14112000" crc="16c67cf3" md5="c45eb034a26356bd8a60e23177063ced" sha1="c8ab87a029b410f67187fa7da5342e64f90485a4"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 15).bin" size="7942704" crc="56df5b85" md5="66c1bda1978bb8cb7b7a006ca884a430" sha1="e9e5f66f3e7b4c890eba513aad086936785115dc"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 16).bin" size="9003456" crc="452c19d3" md5="0267fea677396bf2ba214fb18c504807" sha1="6e7a1acd2e00aabf1bd58f4a8e8c540b52f05bd1"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 17).bin" size="10066560" crc="a376e9ea" md5="d175d3fbd6df5384207bd5f418cfc5d5" sha1="322b9a8b7651bd8e214c65dcec5df988bb4f8946"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 18).bin" size="10231200" crc="8292e162" md5="e2ceb61bf0641fa97e1ff762ddff2abb" sha1="273d847d5cf25e72dfde7f5560724ea03286d386"/> -->
+			<!-- <rom name="SimCity (Europe) (En,Fr,De,Es,It) (Track 19).bin" size="8119104" crc="8b75cc6e" md5="88d22182ec667ac5357a5b97802e9791" sha1="cacafa1bdf008d9d756abe51ec72ffc065e9e487"/> -->
+			<diskarea name="cdrom">
+				<disk name="simcity (europe) (en,fr,de,es,it)" sha1="9b500eac8c4272f4bc04c00e967dbd8ca857d777"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="snoopy" supported="no">
+		<description>Snoopy - The Case of the Missing Blanket (Swe)</description>
+		<year>1991</year>
+		<publisher>Edge</publisher>
+		<notes><![CDATA[
+cd32: black screen
+]]></notes>
+		<info name="sku" value="CDT-3533"/>
+		<info name="disc_matrix" value="W.O.# 40493-5   THE EDGE   17171"/>
+		<info name="barcode" value="7 33673 17171 4"/>
+		<!-- baddump: "MCN unverified" -->
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/29268/ -->
+			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden).cue" size="268" crc="8550a103" md5="d375ccf0ba9499d5d180a7d8a37d7854" sha1="02a233f19ead9ebe7b275db95cf059cfb38fb68e"/> -->
+			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden) (Track 1).bin" size="11830560" crc="b0c9e975" md5="d5b0ee51db3a90d3ed793938e8258c4e" sha1="7bcb83f33a11ee2dc01921ddfe9e78c9ead7d828"/> -->
+			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden) (Track 2).bin" size="52214400" crc="7d1afcb2" md5="b21ca4b2844a73320452eda42b4b2a1e" sha1="9b3f3971827658b07bba4988cabba71c2f546a15"/> -->
+			<diskarea name="cdrom">
+				<disk name="snoopy - the case of the missing blanket (sweden)" sha1="a02bfb81dd9640b492451d53c6c0a387f5cbe577" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Space Wars CDTV -->
+	<software name="spacewar" supported="no">
+		<description>Space Wars</description>
+		<year>1992</year>
+		<publisher>Odyssey</publisher>
+		<notes><![CDATA[
+cd32: boot OK but too fast during gameplay
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="space wars cdtv" sha1="dd93fa052a9f8e0d717cbf3955a0b4d90baccce1" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Spirit of Excalibur -->
+	<software name="spirexa" supported="no">
+		<description>Spirit of Excalibur</description>
+		<year>1991</year>
+		<publisher>Virgin</publisher>
+		<notes><![CDATA[
+cd32: black screen
+]]></notes>
+		<info name="sku" value="CDT-3509"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="spirit of excalibur (1991)(virgin)[ntsc]" sha1="968a6929276ccf0cbd3f09e9115cdd8c83167028" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Super Games Pak -->
+	<software name="suprgams" supported="no">
+		<description>Super Games Pak</description>
+		<year>1991</year>
+		<publisher>Odyssey</publisher>
+		<notes><![CDATA[
+Not extensively tested (brief Jail Break play)
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="super games pak (1991)(odyssey)[compilation]" sha1="1266dc0c5dcfba4603e82ebd3c7b301e87f4ca81" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="teamyank" supported="no">
+		<!-- https://hol.abime.net/1325 -->
+		<description>Team Yankee (Euro)</description>
+		<year>1992</year>
+		<publisher>Empire</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="Oxford Digital Enterprises"/>
+		<info name="disc_matrix" value="CDRM-729600 3"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/24030/ -->
+			<!-- <rom name="Team Yankee (Europe).cue" size="86" crc="08deab09" md5="1f7f0657553fdb0697a6d54d35d66d20" sha1="284b5661257cd403430bca3a18240acc4ac86b14"/> -->
+			<!-- <rom name="Team Yankee (Europe).bin" size="6091680" crc="a500bad1" md5="807ed3b870edeae21752141dcabeeb58" sha1="845b51c3bf7ea9e0a3e94ac6af544dcab34b5f93"/> -->
+			<diskarea name="cdrom">
+				<disk name="team yankee (europe)" sha1="8050a55146950f32873237afb8cd814f3c21805c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Assassins -->
+	<software name="assass1" supported="no">
+		<description>The Assassins Ultimate CD Games Collection</description>
+		<year>19??</year>
+		<publisher>Weird Science</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="assassins" sha1="8d6d2d865c9e3b36c802b480ce8295695f2e47b9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Assassins 2 -->
+	<software name="assass2" supported="no">
+		<description>The Assassins Ultimate Games Volume 2</description>
+		<year>19??</year>
+		<publisher>Weird Science</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: draws title screen with a line of garbage at bottom
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="assassins 2" sha1="7387d976e96d04fc208493641c56fcfb0c3868ff" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Assassins 3 - The Ultimate Games CD -->
+	<software name="assass3" supported="no">
+		<description>The Assassins CD 3</description>
+		<year>1997</year>
+		<publisher>Weird Science</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: draws title screen with a line of garbage at bottom
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="assassins 3 - the ultimate games cd (1997)(weird science)[amiga-cd32-cdtv]" sha1="9324ddf7392421d3bb74cbc199c7cd148fd462c6" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Assassins 4 -->
+	<software name="assass4" supported="no">
+		<!-- TODO: this version doesn't have CDTV compatibility info -->
+		<!-- is it just AmigaCD? -->
+		<description>The Assassins CD 4</description>
+		<year>1999</year>
+		<publisher>Weird Science</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: draws title screen with a line of garbage at bottom
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="assassins 4 (1999)(weird science)" sha1="d096be854362bb7053ea9406ffb5f30bc685426e" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Case of the Cautious Condor, The -->
+	<software name="cautcond" supported="no">
+		<description>The Case of the Cautious Condor</description>
+		<year>1990</year>
+		<publisher>Tiger Media</publisher>
+		<notes><![CDATA[
+A few [CDDA] redbook speeches scratches at the end (dump?)
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-3507"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="case of the cautious condor, the (1990)(tiger media)" sha1="8b8a7476112b8632ef73be74350de430c34761cc" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CDTV Interactive Point of Sale Compact Disc, The -->
+	<software name="cdtvsale" supported="no">
+		<description>The CDTV Interactive Point of Sale Compact Disc</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: Grolier's Encyclopedia boot OK but resets to CD32 player menu at the end
+cd32: Lemmings demo shows OP with corrupted tile in the center then resets to CD32 player menu
+cd32: Animated Colored Book boot OK (screen offset is suspicious)
+cd32: Prehistorik boot OK
+cd32: Battlestorm demo crashes (sends 68k to lalaland)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdtv interactive point of sale compact disc, the (1991)(commodore)(us)" sha1="03ae3eab31fdd7bc9e85551de56d00c532ff5b07" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Connoisseur, The - Fine Art Collection -->
+	<software name="connoiss" supported="no">
+		<description>The Connoisseur - Fine Art Collection</description>
+		<year>1992</year>
+		<publisher>Lascelles Productions</publisher>
+		<notes><![CDATA[
+cd32: boot OK, glitchy scroll up/down when artwork description is called when checking gallery (fixes when it stops)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="connoisseur, the - fine art collection (1992)(lascelles productions)" sha1="e49faf8b0fab8f06700e1caebe1522236eacd4c9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Curse of RA, The -->
+	<software name="cursera" supported="no">
+		<description>The Curse of Ra (Ger)</description>
+		<year>1992</year>
+		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+cd32: has serious sprite position issues (offset on demo, draws garbage from time to time)
+]]></notes>
+		<info name="developer" value="Cyberstyle"/>
+		<info name="disc_matrix" value="SONOPRESS * F-8946 * CD-ROM A"/>
+		<info name="barcode" value="4 005209 007634"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3046/ -->
+			<!-- <rom name="Curse of RA, The (Germany).cue" size="92" crc="968378d1" md5="aee161bbc24073b3336e77fc0539cde5" sha1="0892756ed637fa6a5f4f43fa31b21d5b88dc0075"/> -->
+			<!-- <rom name="Curse of RA, The (Germany).bin" size="20815200" crc="2ad9b4db" md5="cc713d8f30095f05172c5c4c19ac43fa" sha1="17cf59f01ee8a58a165498674b76dad13d6b265c"/> -->
+			<diskarea name="cdrom">
+				<disk name="curse of ra, the (germany)" sha1="49bffe73647ca8eaf2381e80a5fda5ec746cda7f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Demo Collection for Amiga CDTV, The -->
+	<software name="democdtv" supported="no">
+		<!-- bootable version of Ten On Ten disc #4 -->
+		<description>The Demo Collection for Amiga CDTV (Euro, Black Disc)</description>
+		<year>1992</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+Not extensively tested (requires mouse and keyboard)
+cd32: bottom GFX is corrupted on title screen
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-2059 * A   4"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/45850/ -->
+			<!-- <rom name="Demo Collection for Amiga CDTV, The (Europe) (Black Disc).cue" size="123" crc="a1f8ffd8" md5="e52b38bcec067e85623fc8c7f9476906" sha1="499b9e7736e94f57042fa2943188b806c2bbc88a"/> -->
+			<!-- <rom name="Demo Collection for Amiga CDTV, The (Europe) (Black Disc).bin" size="712656000" crc="563ed322" md5="0e1a3760f4b3141c0462afe267f96903" sha1="796c40e4f404a75ff437ae554bf210b553d32721"/> -->
+			<diskarea name="cdrom">
+				<disk name="demo collection for amiga cdtv, the (europe) (black disc)" sha1="cf8bb5f1da7dae035d93c4e57d840d065fab6047"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Guinness CDTV Disc of Records, The - 1991 Edition -->
+	<software name="guinness" supported="no">
+		<!-- looks USA-centric (cfr. Soccer) but New Media was based in London according to title/credits -->
+		<description>The Guinness CDTV Disc of Records (1991 Edition)</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK, has a bit of left side corruption on HAM tour videos
+]]></notes>
+		<info name="developer" value="New Media Productions"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="guinness cdtv disc of records, the - 1991 edition (1991)(cdtv publishing)" sha1="70f0d929c2510f077aec81b901995e7be3ff6002" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hound of the Baskervilles, The -->
+	<software name="houndbas" supported="no">
+		<!-- A Sherlock Holmes Murder Mystery on front cover -->
+		<!-- Prefixed with The in title -->
+		<description>The Hound of the Baskervilles</description>
+		<year>1991</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="Solid State Systems"/>
+		<info name="sku" value="CDT-3513"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hound of the baskervilles, the (1991)(on-line)" sha1="c31e68bd565f7c9b6407757486e5cc83a07a65bd" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hutchinson Encyclopedia, The - PAL Version -->
+	<software name="hutchins" supported="no">
+		<description>The Hutchinson Encyclopedia (Euro)</description>
+		<year>1991</year>
+		<publisher>Attica Cybernetics</publisher>
+		<notes><![CDATA[
+cd32: boot OK, vertical scrolling glitches a bit in Pictures sub menu [Copper]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18532/ -->
+			<!-- <rom name="Hutchinson Encyclopedia, The (Europe).cue" size="103" crc="b2dc3bc3" md5="1ae138576a59a0efa27fbe90aa52663c" sha1="3cf7a3e6774d46a78b17b5da897d527d4d903495"/> -->
+			<!-- <rom name="Hutchinson Encyclopedia, The (Europe).bin" size="767163600" crc="45a05376" md5="79ec5274dd664993cc988cf9ff278d9c" sha1="12b0b32c314d419a252723be7af8146372c7444a"/> -->
+			<diskarea name="cdrom">
+				<disk name="hutchinson encyclopedia, the (europe)" sha1="46479f2422dba9d70c5ed2a97d2c6967e30322aa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Illustrated Holy Bible, The -->
+	<software name="illbible" supported="no">
+		<description>The Illustrated Holy Bible</description>
+		<year>1991</year>
+		<publisher>Animated Pixels</publisher>
+		<notes><![CDATA[
+cd32: keeps beeping, uncontrollable (not compatible with cd32 input device?)
+cd32: jerky scrolling for user portion in multimedia section
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="illustrated holy bible, the (1991)(animated pixels)[cdtv-pc]" sha1="5a593d17bcdb3b47f7c2db7f38030e523b247b50" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Illustrated Works of Shakespeare, The -->
+	<software name="illshake" supported="no">
+		<description>The Illustrated Works of Shakespeare</description>
+		<year>1990</year>
+		<publisher>Animated Pixels</publisher>
+		<notes><![CDATA[
+cd32: keeps beeping, uncontrollable (not compatible with cd32 input device?)
+cd32: jerky scrolling for user portion in multimedia section
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="illustrated works of shakespeare, the (1990)(animated pixels)[cdtv-pc]" sha1="7e88243ab23ece0c50a20ab16c2923e9a8c3906a" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Labyrinth of Time, The -->
+	<software name="labytime" supported="no">
+		<description>The Labyrinth of Time</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Not extensively tested
+cd32: GFX pitch corruption for intro screens, EA logo is offset to the left [ddfstrt]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="labyrinth of time, the (1994)(electronic arts)[amiga-cd32-cdtv]" sha1="82003a6e2d5bfd2b0a9e6573dc89d526849395b8" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- New Basics Electronic Cookbook, The - 1991a Edition -->
+	<software name="newbasic" supported="no">
+		<description>The New Basics Electronic Cookbook (USA, 1991a Edition)</description>
+		<year>1991</year>
+		<publisher>Xïphias</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="serial" value="CDRM-445900"/>
+		<info name="disc_matrix" value="CDRM-445900 2"/>
+		<info name="barcode" value="728795111120"/>
+		<info name="sku" value="CDT-7507"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/16957/ -->
+			<!-- <rom name="New Basics Electronic Cookbook, The - 1991a Edition (USA).cue" size="123" crc="5daa7ae0" md5="4fccc521086a48b67db1f272bd93150d" sha1="19cf0718ff14676bc92ef7388df247506ad94acc"/> -->
+			<!-- <rom name="New Basics Electronic Cookbook, The - 1991a Edition (USA).bin" size="95317152" crc="c8d7ef3d" md5="59bf30dd84e33e6435de31c256749169" sha1="5e66985095280f9829bc8845955391a9e177c73e"/> -->
+			<diskarea name="cdrom">
+				<disk name="new basics electronic cookbook, the - 1991a edition (usa)" sha1="d64cbb09b28cf2b32102c0f71adb6003a9b61b41"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- New Grolier Electronic Encyclopedia, The -->
+	<software name="newgroli" supported="no">
+		<description>The New Grolier Electronic Encyclopedia</description>
+		<year>1991</year>
+		<publisher>CDTV Publishing</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="sku" value="CDT-7002"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="new grolier electronic encyclopedia, the (1991)(cdtv publishing)" sha1="5316ab2211c731e6af7f735593a35c85c5719da5" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Night Before Christmas, The -->
+	<software name="nbxmas" supported="no">
+		<!-- unlisted on HoL -->
+		<description>The Night Before Christmas</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="night before christmas, the (1991)(discis)(en-es)" sha1="16fa7fdcb8dab59b8ab7b5acb17be786fc47443f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Paper Bag Princess, The -->
+	<software name="paperbag" supported="no">
+		<!-- https://hol.abime.net/5795 -->
+		<description>The Paper Bag Princess</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<info name="book_isbn" value="0-921974-33-7"/>
+		<info name="disc_matrix" value="CDRM-734700 3"/>
+		<info name="sku" value="CDT-2511"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="paper bag princess, the (1992)(discis)(m5)[cdrm-734700 3]" sha1="8c6a7cb96f8edaf7aee912c131ed57caee37d6cd" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Tale of Benjamin Bunny, The -->
+	<software name="talbenjb" supported="no">
+		<!-- unlisted on HoL -->
+		<description>The Tale of Benjamin Bunny</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tale of benjamin bunny, the (1991)(discis)(en-es)" sha1="453aec25e283a30a9493d34db1a914f9c248e818" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Tale of Peter Rabbit, The -->
+	<software name="talpeter" supported="no">
+		<!-- https://hol.abime.net/5797 -->
+		<description>The Tale of Peter Rabbit</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Beatrix Potter"/>
+		<info name="book_isbn" value="0-921974-31-0"/>
+		<info name="disc_matrix" value="CDRM-734900 1"/>
+		<info name="sku" value="CDT-2513"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tale of peter rabbit, the (1992)(discis)(m5)[cdrm-734900 1]" sha1="94c7cfe32a3fa78e0cd2e7d8d0f8256708b9ac8d" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -78,6 +2205,15 @@ license:CC0
 		<description>Town With No Name</description>
 		<year>1992</year>
 		<publisher>On-Line</publisher>
+		<notes><![CDATA[
+cd32: cuts off/offset [CDDA] redbook audio (starts too late)
+cd32: doesn't mask bottom part of bitmap when returning from main menu
+cd32: hangs when explaining the hourglass icon in tutorial
+]]></notes>
+		<!-- D4i -->
+		<info name="developer" value="Delta 4 Interactive"/>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861" status="baddump" />
@@ -85,11 +2221,139 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controls are a bit odd to figure out, but these both appear to work -->
+	<!-- Town With No Name -->
+	<software name="townonaa" cloneof="townona" supported="no">
+		<description>The Town with No Name (alt)</description>
+		<year>1992</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+cd32: cuts off/offset [CDDA] redbook audio (starts too late)
+cd32: doesn't mask bottom part of bitmap when returning from main menu
+cd32: hangs when explaining the hourglass icon in tutorial
+]]></notes>
+		<!-- D4i -->
+		<info name="developer" value="Delta 4 Interactive"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="town with no name (1992)(on-line)(m6)[cdtv-towns]" sha1="ac3ffe88d88300277e4edf7aa217b54fa7a6c777" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Thomas' Snowsuit -->
+	<software name="thomsnow" supported="no">
+		<!-- https://hol.abime.net/5798 -->
+		<description>Thomas' Snowsuit</description>
+		<year>1991</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<info name="book_isbn" value="0-921974-35-3"/>
+		<info name="sku" value="CDT-2512"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="thomas' snowsuit (1991)(discis)(en-es)" sha1="605b89e18d745235d09fabcf7f7d11cfc1924aa5" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Tie Break -->
+	<software name="tiebreak" supported="no">
+		<description>Tie Break</description>
+		<year>1991</year>
+		<publisher>Starbyte</publisher>
+		<notes><![CDATA[
+cd32: black screen
+Unsupported 4-players parallel interface
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tie break (1991)(starbyte)" sha1="e61de9dceb6be3af0dd81a13d5b9a8d1e58bb69f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ttohbusi" supported="no">
+		<description>Time Table of History - Business, Politics &amp; Media (USA, 1991a Edition)</description>
+		<year>1991</year>
+		<publisher>Xïphias</publisher>
+		<notes><![CDATA[
+cd32: bottom GFX section for "World" icon screens have offset text (starts from right edge)
+]]></notes>
+		<info name="sku" value="CDT-7504"/>
+		<info name="disc_matrix" value="CDRM-446100 1"/>
+		<info name="barcode" value="7 28795 02112 2"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/3078/ -->
+			<!-- <rom name="Time Table of History - Business, Politics &amp; Media - 1991a Edition (USA).cue" size="138" crc="84beda6f" md5="2db68130f47e0ca7a5a6304d12d36b73" sha1="ddaa8fed119e0d63bd333234799905de2ebf3cbb"/> -->
+			<!-- <rom name="Time Table of History - Business, Politics &amp; Media - 1991a Edition (USA).bin" size="182642208" crc="e1c53227" md5="006f3f3288136cb0f1c7b3986388615d" sha1="97fccd3602f006cf4956209f2421afe004acc0cc"/> -->
+			<diskarea name="cdrom">
+				<disk name="time table of history - business, politics and media - 1991a edition (usa)" sha1="63da7a2eccc43982e0571063b6e015292995ca9b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Time Table of History - Science and Innovation - 1991a Edition -->
+	<software name="ttohsci" supported="no">
+		<description>Time Table of History - Science and Innovation (USA, 1991a Edition)</description>
+		<year>1991</year>
+		<publisher>Xïphias</publisher>
+		<notes><![CDATA[
+cd32: bottom GFX section for "World" icon screens have offset text (starts from right edge)
+]]></notes>
+		<info name="sku" value="CDT-7505"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="time table of history - science and innovation - 1991a edition (1991)(xiphias)" sha1="17b7c982a74fd4b58aaafd0411170652e17a4771" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="trivcdtv" supported="no">
+		<!-- v1.0a E02PAL printed on title screen -->
+		<description>Trivial Pursuit - The CDTV Edition (Euro, v1.0a)</description>
+		<year>1992</year>
+		<publisher>Domark</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="The Kremlin"/>
+		<info name="disc_matrix" value="TRIVIAL PURSUIT 1 50246 426 02 >"/>
+		<info name="disc_matrix2" value="TRIVIAL PURSUIT 2 50246 429 01 >"/>
+		<info name="barcode" value="5 022231 036189"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/14963/ -->
+			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 1).cue" size="118" crc="7564a5ff" md5="ab9214b9ca49398815cd45521843e50c" sha1="62679bc5c37d8cbc4503eef3a7bfaef055aba8e5"/> -->
+			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 1).bin" size="270562320" crc="48b01ac5" md5="5b43f79ea4f4419e77024bee6a95461a" sha1="ceda26140d4ae1f7cef6763f396d9863d0a421b9"/> -->
+			<diskarea name="cdrom">
+				<disk name="trivial pursuit - the cdtv edition (europe) (disc 1)" sha1="adb6491aa448da224883c294d9a021d36425e91f"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/14962/ -->
+			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 2).cue" size="118" crc="7439832e" md5="9feb7538e24fd218af9fe3799db6775e" sha1="ea1004f64de951b7aeed370b9f95129b0df752c7"/> -->
+			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 2).bin" size="269873184" crc="ee29ff98" md5="474bc93345bf2503ae2a11a1d0148966" sha1="d49eae1588d08a51cca075d8ab3ffe23fd5e8e21"/> -->
+			<diskarea name="cdrom">
+				<disk name="trivial pursuit - the cdtv edition (europe) (disc 2)" sha1="9f61d019f3d0ba4b876f880d26eed8b0c3325a9c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="turrican">
 		<description>Turrican</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Controls are a bit odd to figure out, but this appear to work (update: on cdtv?)
+cd32: black screen with unmapped accesses (reads DSKDAT R too)
+]]></notes>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3" status="baddump" />
@@ -97,13 +2361,430 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Turrican -->
+	<software name="turricana" cloneof="turrican" supported="no">
+		<description>Turrican (Ger, alt)</description>
+		<year>1992</year>
+		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+cd32: black screen with unmapped accesses (reads DSKDAT R too)
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS * F-7897 * CD-ROM A"/>
+		<info name="barcode" value="4 005209 007689"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3170/ -->
+			<!-- <rom name="Turrican (Germany).cue" size="84" crc="1866b06a" md5="f0930bf7365a315fc031ac8c186e5627" sha1="fbccefef984ca61199f782838f54d5de145cb4b1"/> -->
+			<!-- <rom name="Turrican (Germany).bin" size="20815200" crc="d9d2a700" md5="2c5ac366851ae22038a876a0b1e8e579" sha1="ccfb408204450abe929b402bbd3c0b4367376f2f"/> -->
+			<diskarea name="cdrom">
+				<disk name="turrican (germany)" sha1="48c9423f28ed9b0bae866844c8647321612450e0"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="turricn2">
-		<description>Turrican II</description>
+		<description>Turrican II: The Final Fight</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+cd32: black screen with unmapped accesses (reads DSKDAT R too)
+]]></notes>
+
+		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Turrican 2 CDTV -->
+	<software name="turricn2a" cloneof="turricn2" supported="no">
+		<description>Turrican II: The Final Fight (Ger, alt)</description>
+		<year>1991</year>
+		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+cd32: black screen with unmapped accesses (reads DSKDAT R too)
+]]></notes>
+		<info name="disc_matrix" value="SONOPRESS * F-8339 * CD-ROM A"/>
+		<info name="barcode" value="4 005209 007696"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/3183/ -->
+			<!-- <rom name="Turrican II - The Final Fight (Germany).cue" size="105" crc="0df13f9a" md5="98456a1b4b6861aeb0e3350dc60db3c1" sha1="107929d352a5a016faa3b80d7d297485a052d881"/> -->
+			<!-- <rom name="Turrican II - The Final Fight (Germany).bin" size="20815200" crc="7c2e3f0a" md5="87a97d7d2c7981b218e6ffa65f869e7b" sha1="715a958452c084db614447c7f3da73dadb0b46db"/> -->
+			<diskarea name="cdrom">
+				<disk name="turrican ii - the final fight (germany)" sha1="940d854e943f3c0db3a61168f12b52a029056047"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Ultimate Basketball! -->
+	<software name="ultbball" supported="no">
+		<description>Ultimate Basketball</description>
+		<year>1991</year>
+		<publisher>Context Systems</publisher>
+		<notes><![CDATA[
+cd32: Most GFXs are pitch corrupted
+cd32: sprite layer is glitched in the middle during gameplay, and cuts off names on status bar [Copper]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultimate basketball (1991)(context systems)" sha1="460ebb7f1ad5322778c34eb227f71e8d2cf0904b" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="welcdtvm" supported="no">
+		<description>Welcome to CDTV Multimedia (USA, CDRM-499000)</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: black screen with BGM playing
+]]></notes>
+		<info name="disc_matrix" value="CDRM-499000 1"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Demos</category> -->
+			<!-- http://redump.org/disc/3098/ -->
+			<!-- <rom name="Welcome to CDTV Multimedia (USA).cue" size="98" crc="4510c44d" md5="0146b734a6e7f578dc8445ee534b02cb" sha1="0b0d40551d3bf9197aa8684c22fcc279b689fc3b"/> -->
+			<!-- <rom name="Welcome to CDTV Multimedia (USA).bin" size="62069280" crc="d76ddb22" md5="068fe7f30136c68504fe124a2417e454" sha1="11284bb7da00456a538565484344c5a88bd82906"/> -->
+			<diskarea name="cdrom">
+				<disk name="welcome to cdtv multimedia (usa)" sha1="797b6e6b42b7b5359bfa7b518bdf3a5b39acd6b2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="welcdtvma" cloneof="welcdtvm" supported="no">
+		<description>Welcome to CDTV Multimedia (367808-01 33)</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+cd32: black screen with BGM playing
+]]></notes>
+		<info name="disc_matrix" value="367808-01 33"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="welcome to cdtv multimedia (1991)(commodore)[367808-01 33]" sha1="bc1a0ea3f0b776f5e73fadd434eb96b8ccf306e9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- According to Hall of Light following Will Bridge CD-ROMs are all standalone -->
+	<!-- Our description is based off the spine printouts -->
+
+	<software name="willbdg1" supported="no">
+		<!-- https://hol.abime.net/5801 -->
+		<description>Will Bridge 1 - Introduction to Bidding (Eng)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="will bridge - practice 1 - introduction to bidding (1991)(will bridge)" sha1="1f0fd9443b3c5215a60ab8fded04e94b56a38e0f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="willbdg1f" cloneof="willbdg1" supported="no">
+		<description>Will Bridge 1 - Initiation aux Encheres (Fra)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- <rom name="Will Bridge Vol. 1 - Initiation aux Encheres - Practice (France).cue" size="130" crc="5138331a" md5="27c9ee3e3c8a3d47994025a5e7236077" sha1="7554804ce9a5fe74042811d037f7634bd419a425"/> -->
+			<!-- <rom name="Will Bridge Vol. 1 - Initiation aux Encheres - Practice (France).bin" size="25401600" crc="d5fb39ce" md5="1d094697cd68269ece9824d5148d9f70" sha1="c9a4d93361c0d5a989c2b2077879c53224eb8cac"/> -->
+			<diskarea name="cdrom">
+				<disk name="will bridge vol. 1 - initiation aux encheres - practice (france)" sha1="565c00a36bf7c39a0d8202280e1c6d56cf9443cf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="willbdg2" supported="no">
+		<!-- https://hol.abime.net/4346 -->
+		<description>Will Bridge 2 - Intermediate (Eng)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="will bridge - practice 2 - intermediate (1991)(will bridge)" sha1="285dff0e4595efee49a44bcdfd6d516e0a9afc81" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- <software name="willbdg3f" cloneof="willbdg3" supported="no"> -->
+	<software name="willbdg3f" supported="no">
+		<!-- https://hol.abime.net/5803 -->
+		<description>Will Bridge 3 - Standard (Fra)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="will bridge - practice 3 - standard (1991)(will bridge)(fr)" sha1="b011272893cf8c1e703d8e210ae1684a5466c882" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="willbdg4" supported="no">
+		<!-- https://hol.abime.net/1716 -->
+		<description>Will Bridge 4 - Competition (Eng)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="will bridge - practice 4 - competition (1991)(will bridge)" sha1="56fb85419b20d7940227e8fc167aeeec605cc425" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- <software name="willbdg5f" cloneof="willbdg5" supported="no"> -->
+	<software name="willbdg5f" supported="no">
+		<!-- https://hol.abime.net/4346 -->
+		<!-- "Advanced Competition" -->
+		<description>Will Bridge 5 - Haute Competition (Fra)</description>
+		<year>1991</year>
+		<publisher>Will Bridge</publisher>
+		<notes><![CDATA[
+cd32: crashes often with black screens
+cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical scrolling)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="will bridge - practice 5 - haute competition (1991)(will bridge)(fr)" sha1="efa6a451b520ee334c20b74a58a11cf2bf1119ee" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Women in Motion - Eadweard Muybridge -->
+	<software name="womenmot" supported="no">
+		<description>Eadweard Muybridge's Women in Motion</description>
+		<year>1991</year>
+		<publisher>On-line</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+Has untested printer option
+]]></notes>
+		<info name="sku" value="CDT-1503"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="women in motion - eadweard muybridge (1991)(on-line)[u29y010ua]" sha1="6919ffc83496fce3c3f820f8cafe8ee33c5046e4" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- World Vista -->
+	<software name="worldvis" supported="no">
+		<description>World Vista</description>
+		<year>1991</year>
+		<publisher>Applied Optical Media Corporation</publisher>
+		<notes><![CDATA[
+cd32: beeps when selecting any option in main menu, likely it requires a CDTV input device
+]]></notes>
+		<info name="sku" value="CDT-7506"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="world vista (1991)(applied optical media corporation)" sha1="7619ea13c744eebe6a2d6dbe32cf605f88da67ca" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wrdemon" supported="no">
+		<description>Wrath of the Demon (USA)</description>
+		<year>1990</year>
+		<publisher>ReadySoft</publisher>
+		<notes><![CDATA[
+cd32: hangs at ReadySoft logo
+]]></notes>
+		<info name="sku" value="CDT-3522"/>
+		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U26Y0100B"/>
+		<info name="barcode" value="0 92667 11000 0"/>
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/37784/ -->
+			<!-- <rom name="Wrath of the Demon (USA).cue" size="90" crc="0d833f61" md5="69a72804ea8794a89a1d30dad1a01648" sha1="1e7b9d5efb813a0bce13407eb1a7db57e51fd05a"/> -->
+			<!-- <rom name="Wrath of the Demon (USA).bin" size="7756896" crc="5397eb5c" md5="e92c37712b3bc5ab3d339a9e548e4710" sha1="5ad8d5b13cdd5bbbe5ea03c508804888f5fa344a"/> -->
+			<diskarea name="cdrom">
+				<disk name="wrath of the demon (usa)" sha1="8175074606c087b7c15a317a96eb65ae187ab8b5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Xenon2Megablast -->
+	<software name="xenon2" supported="no">
+		<!-- Also has "wnazennjn" language option, which is a pseudo-Polish joke -->
+		<description>Xenon 2 - Megablast (Eng, Fra, Ger, Ita)</description>
+		<year>1992</year>
+		<publisher>Image Works</publisher>
+		<notes><![CDATA[
+cd32: boot OK
+]]></notes>
+		<info name="developer" value="The Assembly Line"/>
+		<info name="sku" value="CDT-3523"/>
+		<info name="disc_matrix" value="EXNON 2 CDTV (V) : MASTERED BY NIMBUS"/>
+		<!-- Barcode Sticker: Xenon II CDTV CD1X-XEN7 5 020026 900998 -->
+
+		<part name="cdrom" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/4012/ -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It).cue" size="1763" crc="a51efa14" md5="bf30ad9d39af11048b52362dfc2adc73" sha1="ebce78861572a303853ad872fcc8ee41f8a40010"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 01).bin" size="14123760" crc="74f0388c" md5="c6d86451da6881150267b20a9ed625ec" sha1="a1cd9d031308295f76927c660aa37e4c7ff4e9ca"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 02).bin" size="48921600" crc="b4614563" md5="6b028111a6d69689c2d3270dacbad392" sha1="331fb27fe3b2b76c501a8e62c717b4c585b0f309"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 03).bin" size="75205200" crc="defc133a" md5="c6905e204542c54bf9da039ee3a92aeb" sha1="96e8fe0c4f0d1c289a0dd5c3bdf1230853d761a1"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 04).bin" size="65884224" crc="3ab4a0f9" md5="92dfede47d576562f67088ff9df79beb" sha1="b4719f61e460c7ff330dcf3e3f0b12a8d856ee87"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 05).bin" size="56330400" crc="4b560cf8" md5="bf5a59f6577c615d58da9ad770028cd3" sha1="38e8d775b3f9b22f129ac639a8a30ee32abf03fd"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 06).bin" size="54860400" crc="3099b68e" md5="4bf0f3c127446a9805afd961c3099549" sha1="15346d2fde55d3e848675ef572565ff72006e504"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 07).bin" size="72500400" crc="85dc22fe" md5="e1a5ee468df29065f503797eb90e9d34" sha1="9a04ad6453825169af952619e3200e88e6389261"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 08).bin" size="47804400" crc="48ede2fc" md5="b6d18097c3246f9bbcd80ae12ab4106a" sha1="5d42c26eaa06509813001b5929bc6354b38472c6"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 09).bin" size="59623200" crc="5ba4b786" md5="b7e7a982808837f11b785873fbd4e24f" sha1="51b7c5761e6fd28ccafb5000d1166fc2575387f4"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 10).bin" size="62974800" crc="95895ff1" md5="d2a914adc1807e51158c8decc1f4bc9b" sha1="053f4134fdf75eb2e542e07c872f08cfcbf24b43"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 11).bin" size="71354976" crc="3c53724a" md5="fd45bd0e2f6bcad889a2bc7a85c271f8" sha1="888e44da5728c30202e0dc3b8c1aea546da48154"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 12).bin" size="35691600" crc="3d9f5590" md5="65cc971eb2443e145e10ed40e2fc9278" sha1="de5b2de9c8dcda755213a1e086e551f6c9bb02a3"/> -->
+			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 13).bin" size="60975600" crc="765df8df" md5="31df16fc7429ffec552ce01f73bcf331" sha1="6e5d4fca1812beeb9276793566159fa62650e9b4"/> -->
+			<diskarea name="cdrom">
+				<disk name="xenon 2 - megablast (europe) (en,fr,de,it)" sha1="609c31fe3d6ff992594d07fcdb8c1b3bdbe36a4d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Collections -->
+
+	<!-- Collection of ten discs -->
+	<!-- TODO: More likely AmigaCD rather than CDTV? -->
+	<software name="10on10" supported="no">
+		<description>Ten on Ten Compilation (Euro)</description>
+		<year>1995</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+Disc 1 has various unsupported collection of Amiga ParNet and SerNet tools
+cd32: disc 1 AmigaKicks\chess has GFX pitch corruption and uncontrollable pointer, [joytest] reset
+cd32: disc 10 black screen
+]]></notes>
+		<info name="usage" value="In order to load any other disc in this collection: insert disc 1 then hold right mouse button at startup for being prompted to disc swap with any other CD in this collection, then soft reset machine"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/18550/ -->
+			<!-- <rom name="Almathera Comms &amp; Networking CD (Europe).cue" size="106" crc="803a023b" md5="3dd92c3d34ed3cda877dfa31ce492fa6" sha1="fea81c0d76b0f7c84798b9de72d9acc678226530"/> -->
+			<!-- <rom name="Almathera Comms &amp; Networking CD (Europe).bin" size="248571120" crc="f9991efe" md5="cca00b0125a0f164b6bc73fb6339ee11" sha1="b4520eb166407bd00e54b9cbaf31212b3f54bc7a"/> -->
+			<feature name="part_id" value="Almathera Comms &amp; Networking CD"/>
+			<diskarea name="cdrom">
+				<disk name="almathera comms &amp; networking cd (europe)" sha1="9996f33406c3c26b4e2be9d7f86d59156fdd48d0"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom2" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/18548/ -->
+			<!-- <rom name="CDPD 1 (Europe).cue" size="81" crc="7e261a25" md5="961b2e9c6f18b5167fe713c0545ca9a2" sha1="f0e60c1c6f0b3a86494a7f46c676a36b363f9bcc"/> -->
+			<!-- <rom name="CDPD 1 (Europe).bin" size="746776464" crc="30c57806" md5="43b45e0afd4a960359d0ed1ba9120ae7" sha1="4a743f0feba8e20040e3b1ff77c051e57f9222ff"/> -->
+			<feature name="part_id" value="CDPD 1"/>
+			<diskarea name="cdrom">
+				<disk name="cdpd 1 (europe)" sha1="dcb79ff4d466778cc92d5ccd177f2c97ef7f1d02"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom3" interface="cdrom">
+			<!-- <category>Applications</category> -->
+			<!-- http://redump.org/disc/18548/ -->
+			<!-- <rom name="CDPD 2 (Europe).cue" size="81" crc="958c5298" md5="1f456742c84b59639360e5105b0a2205" sha1="9f8e7a02a6369833885d6bfdc75c9714378e1551"/> -->
+			<!-- <rom name="CDPD 2 (Europe).bin" size="658442400" crc="a94c14cc" md5="73e3a9b78888aee9e9754793d797bfd1" sha1="57b63e986dd15ba49362e1ff02eabe4a754b412f"/> -->
+			<feature name="part_id" value="CDPD 2"/>
+			<diskarea name="cdrom">
+				<disk name="cdpd 2 (europe)" sha1="9c3f2a0cb7933fd10694d80f75bb93fbab5c755e"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom4" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18551/ -->
+			<!-- <rom name="Demo 1 (Europe).cue" size="81" crc="0f256c23" md5="23d4594e745f3174e8b9b8ecfcac1f34" sha1="73317088554a3c8aa8b3ca5feaeb3ff63b062585"/> -->
+			<!-- <rom name="Demo 1 (Europe).bin" size="708610560" crc="9ee5043f" md5="30d0e664799138e2c8d641b48d4192c0" sha1="42966b2d2f0ffd5540ec795861eb8b15f7076899"/> -->
+			<feature name="part_id" value="Demo 1"/>
+			<diskarea name="cdrom">
+				<disk name="demo 1 (europe)" sha1="ef7c7c992fd7bc7fea080ec43357314999e6785b"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom5" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18523/ -->
+			<!-- <rom name="World Vista (Europe).cue" size="86" crc="74387a47" md5="2194ac62bf9b48f0608aac799428e47e" sha1="705c4eb8cdfadc98b66a924c0aadc15046b77875"/> -->
+			<!-- <rom name="World Vista (Europe).bin" size="502789392" crc="b2113b15" md5="8ec646ed17c575139d644efcf1566fbd" sha1="5b71c5976c388dd7a6e870ca36840c7accd50701"/> -->
+			<feature name="part_id" value="World Vista"/>
+			<diskarea name="cdrom">
+				<disk name="world vista (europe)" sha1="7b73c1ac1a25cc7b10b2a91b118dde3684128482"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom6" interface="cdrom">
+			<!-- <category>Educational</category> -->
+			<!-- http://redump.org/disc/18522/ -->
+			<!-- <rom name="Illustrated Works of Shakespeare (Europe).cue" size="107" crc="abb7e3a0" md5="0f3e783ca41909d10a74c9d45191f3d3" sha1="b2438bd35b8e60b2ebd2d3ef501e6b1d28eab6ef"/> -->
+			<!-- <rom name="Illustrated Works of Shakespeare (Europe).bin" size="53214000" crc="29c9634c" md5="a6984256d64d0daad5423575a805b41e" sha1="bab8b78ce7c95da36b650394cfbc285af7726da0"/> -->
+			<feature name="part_id" value="Illustrated Works of Shakespeare"/>
+			<diskarea name="cdrom">
+				<disk name="illustrated works of shakespeare (europe)" sha1="5e54c12eda0c560b48f96df7dfba53990a6cdeea"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom7" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18521/ -->
+			<!-- <rom name="Pandora's CD (Europe) (Alt).cue" size="93" crc="6685c80c" md5="8147396f05b2b7b17b55821d9678c982" sha1="620f0c1437e2ea13adf14baf3895fc55b5c988e5"/> -->
+			<!-- <rom name="Pandora's CD (Europe) (Alt).bin" size="458738784" crc="ddb7e392" md5="e7740666bced9f7a96da85ad9b4d113f" sha1="adac7c881f641bfc4667fcf8e7469886906548ea"/> -->
+			<feature name="part_id" value="Pandora's CD"/>
+			<diskarea name="cdrom">
+				<disk name="pandora's cd (europe) (alt)" sha1="488241b997f026533444b05e60357be3b5d78f41"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom8" interface="cdrom">
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/18520/ -->
+			<!-- <rom name="Team Yankee (Europe) (Ten on Ten).cue" size="99" crc="606f0162" md5="8c173ad5d43a8447e924ce5075a7471c" sha1="62e5d539082c8d4796a8057577e6e59906193298"/> -->
+			<!-- <rom name="Team Yankee (Europe) (Ten on Ten).bin" size="7079520" crc="de95d6f2" md5="efc8a6b9face11df7a53ba32c74bbb2a" sha1="713bd1aaefe59e15af61771abffde3c89b5b9d2c"/> -->
+			<feature name="part_id" value="Team Yankee"/>
+			<diskarea name="cdrom">
+				<disk name="team yankee (europe) (ten on ten)" sha1="70e8946f4b161ca3011c523cb007180196762d8c"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom9" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18519/ -->
+			<!-- <rom name="Almathera Photo Library CD, The (Europe).cue" size="106" crc="68b31c99" md5="ea8423140d0209f04755a2505bef109f" sha1="1941996df3ce012770172fbc7f6552bd34b9503e"/> -->
+			<!-- <rom name="Almathera Photo Library CD, The (Europe).bin" size="636801648" crc="75ecfbe4" md5="c1957cc3701c16379261420285f11677" sha1="dc1f8e27a0831476d694548fe1021c73974523c6"/> -->
+			<feature name="part_id" value="The Almathera Photo Library CD"/>
+			<diskarea name="cdrom">
+				<disk name="almathera photo library cd, the (europe)" sha1="abcba2861161369b3394344792d491c85f6cb24d"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom10" interface="cdrom">
+			<!-- <category>Multimedia</category> -->
+			<!-- http://redump.org/disc/18518/ -->
+			<!-- <rom name="Almathera Clipart &amp; Fonts CD, The (Europe).cue" size="108" crc="78acde0b" md5="0440ed5c13780246105b0ea4b76ed7ca" sha1="d644a15e06b84a308dfee8e543d214d2ebadc0ea"/> -->
+			<!-- <rom name="Almathera Clipart &amp; Fonts CD, The (Europe).bin" size="230662992" crc="89ab1b59" md5="efcc9acae92fe1cf7975c41c38ad30a1" sha1="039ab9c11793fd66ac74e34fbc44d138babfb666"/> -->
+			<feature name="part_id" value="The Almathera Clipart &amp; Fonts CD"/>
+			<diskarea name="cdrom">
+				<disk name="almathera clipart &amp; fonts cd, the (europe)" sha1="dba531dac0190bd355b8a7cd4128355c3b077641"/>
 			</diskarea>
 		</part>
 	</software>

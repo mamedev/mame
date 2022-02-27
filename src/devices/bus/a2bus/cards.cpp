@@ -33,6 +33,7 @@
 #include "bus/a2bus/a2scsi.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2ssc.h"
+#include "bus/a2bus/a2superdrive.h"
 #include "bus/a2bus/a2swyft.h"
 #include "bus/a2bus/a2themill.h"
 #include "bus/a2bus/a2thunderclock.h"
@@ -68,6 +69,7 @@
 #include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/titan3plus2.h"
 #include "bus/a2bus/softcard3.h"
+
 
 void apple2_slot0_cards(device_slot_interface &device)
 {
@@ -217,6 +219,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("a2sd", A2BUS_A2SD);                     // Florian Reitz AppleIISD
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
+	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -288,6 +291,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("q68plus", A2BUS_Q68PLUS);               // Stellation Q68 Plus 68000 card
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
+	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 }
 
 void apple3_cards(device_slot_interface &device)

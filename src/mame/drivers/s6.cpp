@@ -9,6 +9,7 @@ Differences to system 4:
 - Some machines have speech (blkou, grgar, frpwr).
 - Some machines have multiball (scrpn, frpwr).
 - New soundcard.
+- Algar, Alien Poker have 7-digit displays
 
 Games:
 - Laserball (#493)
@@ -16,6 +17,8 @@ Games:
 - Blackout (#495)
 - Gorgar (#496)
 - Firepower (#497)
+- Algar (#499)
+- Alien Poker (#501)
 
 The first time run, the display will show the model number. Press F3 to clear this.
 
@@ -23,11 +26,11 @@ Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
 
-- Setup: NUM-6 must be in auto/up position. Press NUM-1 to enter setup mode, press
-   NUM-6 to change direction.
+- Setup: NUM-2 must be in auto/up position. Press NUM-1 to enter setup mode, press
+   NUM-2 to change direction.
 
-- Tests: NUM-6 must be in manual/down position. Press NUM-1 twice and tests will
-   begin. Press NUM-1 and NUM-6 together to get from test 1 to test 2. Press NUM-6
+- Tests: NUM-2 must be in manual/down position. Press NUM-1 twice and tests will
+   begin. Press NUM-1 and NUM-2 together to get from test 1 to test 2. Press NUM-2
    to switch between auto/manual stepping.
 
 - Auto Diag Test: Set Dips to SW6. Press NUM-0. Press NUM-ENTER. Press NUM-1. Tests
@@ -62,7 +65,7 @@ ToDo:
 #include "speaker.h"
 
 #include "s6.lh"
-
+#include "s6a.lh"
 
 namespace {
 
@@ -85,6 +88,7 @@ public:
 	{ }
 
 	void s6(machine_config &config);
+	void s6a(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
@@ -225,7 +229,7 @@ static INPUT_PORTS_START( s6 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("DS1") // DS1 only 3 switches do anything
@@ -302,6 +306,26 @@ static INPUT_PORTS_START( frpwr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP57")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP58")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( alpok )
+	PORT_INCLUDE(s6)
+	PORT_MODIFY("X3")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // Playfield tilt
+	PORT_MODIFY("X5")
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("X6")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("X7")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( algar )
+	PORT_INCLUDE(s6)
+	PORT_MODIFY("X6")
+	PORT_BIT( 0xe4, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("X7")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( s6_state::main_nmi )
@@ -505,6 +529,11 @@ void s6_state::s6(machine_config &config)
 	WILLIAMS_S6_SOUND(config, m_s6sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void s6_state::s6a(machine_config &config)
+{
+	s6(config);
+	config.set_default_layout(layout_s6a);
+}
 
 /*--------------------------------
 / Laser Ball - Sys.6 (Game #493)
@@ -687,19 +716,79 @@ ROM_START(frpwr_l2)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
+/*--------------------------
+/ Algar - Sys.6a (Game #499)
+/-------------------------*/
+ROM_START(algar_l1)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gamerom.716", 0x0000, 0x0800, CRC(6711da23) SHA1(80a46f5a2630977bc1c6e17466e8865083eb9a18))
+	ROM_LOAD("green1.716",  0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",  0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("sound4.716",  0x4800, 0x0800, CRC(67ea12e7) SHA1(f81e97183442736d5766a7e5e074bc6539e8ced0))
+ROM_END
+
+/*-------------------------------
+/ Alien Poker - Sys.6a (Game #501)
+/-------------------------------*/
+ROM_START(alpok_l6)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gamerom6.716", 0x0000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("v_ic7.532",    0x0000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
+	ROM_LOAD("v_ic5.532",    0x1000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
+	ROM_LOAD("v_ic6.532",    0x2000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+ROM_END
+
+ROM_START(alpok_l2)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(79c07603) SHA1(526a45b139394e475fc052636e98d880a8908168))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("v_ic7.532",    0x0000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
+	ROM_LOAD("v_ic5.532",    0x1000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
+	ROM_LOAD("v_ic6.532",    0x2000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+ROM_END
+
+ROM_START(alpok_f6)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gamerom6.716", 0x0000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("5t5014fr.dat", 0x0000, 0x1000, CRC(1d961517) SHA1(c71ee324becfc8cdbecabd1e64b11b5a39ff2483))
+	ROM_LOAD("5t5015fr.dat", 0x1000, 0x1000, CRC(8d065f80) SHA1(0ab22c9b20ab6fe41abab620435ad03652db7a8e))
+	ROM_LOAD("5t5016fr.dat", 0x2000, 0x1000, CRC(0ddf91e9) SHA1(48f5fdfc0c5a66dd318fecb7c90e5f5a684a3876))
+	ROM_LOAD("5t5017fr.dat", 0x3000, 0x1000, CRC(7e546dc1) SHA1(58f8286403978b0d929987189089881d754a9a83))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1979, lzbal_l2,   0,        s6, lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, lzbal_l2sp, lzbal_l2, s6, lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2, PROM sound)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, lzbal_t2,   lzbal_l2, s6, lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, scrpn_l1,   0,        s6, scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, scrpn_t1,   scrpn_l1, s6, scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, blkou_l1,   0,        s6, blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, blkou_t1,   blkou_l1, s6, blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (T-1)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, blkou_f1,   blkou_l1, s6, blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, grgar_l1,   0,        s6, grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, grgar_t1,   grgar_l1, s6, grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, frpwr_l6,   0,        s6, frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-6)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, frpwr_t6,   frpwr_l6, s6, frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (T-6)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, frpwr_l2,   frpwr_l6, s6, frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-2)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lzbal_l2,   0,        s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lzbal_l2sp, lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2, PROM sound)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, lzbal_t2,   lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, scrpn_l1,   0,        s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, scrpn_t1,   scrpn_l1, s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, blkou_l1,   0,        s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, blkou_t1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (T-1)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, blkou_f1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, grgar_l1,   0,        s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, grgar_t1,   grgar_l1, s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, frpwr_l6,   0,        s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-6)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, frpwr_t6,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (T-6)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, frpwr_l2,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-2)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, algar_l1,   0,        s6a, algar, s6_state, empty_init, ROT0, "Williams", "Algar (L-1)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, alpok_l6,   0,        s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, alpok_l2,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, alpok_f6,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_IS_SKELETON_MECHANICAL )
