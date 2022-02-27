@@ -1975,7 +1975,7 @@ field:set_value(value)
     compared to zero to determine whether the field should be active; for
     analog fields, the value must be right-aligned and in the correct range.
 field:clear_value()
-    Clear programmatically overridden value and restore the field's regular
+    Clear programmatically overridden value and restore the field’s regular
     behaviour.
 field:set_input_seq(seqtype, seq)
     Set the :ref:`input sequence <luareference-input-iptseq>` for the
@@ -2021,15 +2021,13 @@ field.player (read-only)
 field.mask (read-only)
     Bits in the I/O port corresponding to this field.
 field.defvalue (read-only)
-    The field’s default value
+    The field’s default value.
 field.minvalue (read-only)
-    For analog fields, the field’s minimal allowed value; for digital fields,
-    nil.
+    The minimum allowed value for analog fields, or nil for digital fields.
 field.maxvalue (read-only)
-    For analog fields, the field’s maximal allowed value; for digital fields,
-    nil.
+    The maximum allowed value for analog fields, or nil for digital fields.
 field.sensitivity (read-only)
-    The sensitivity or gain for analog fields
+    The sensitivity or gain for analog fields.
 field.way (read-only)
     The number of directions allowed by the restrictor plate/gate for a digital
     joystick, or zero (0) for other inputs.
