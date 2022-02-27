@@ -2020,6 +2020,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pc8801fh )
 	PORT_INCLUDE( pc8801 )
 
+	// TODO: KEY12, KEY13 and KEY14 have extended meaning
+	// "KEY12" F6 - F10, BS, INS, DEL
+	// "KEY13" kanji control (lower 4 bits)
+	// "KEY14" Normal & Numpad RETURN, Left Shift, Right Shift.
+	//         bit 7 acts as extension identifier (0 for FH+ keyboards).
+
 	PORT_MODIFY("CFG")
 	PORT_DIPNAME( 0x80, 0x80, "Main CPU clock" )
 	PORT_DIPSETTING(    0x80, "4MHz" )
