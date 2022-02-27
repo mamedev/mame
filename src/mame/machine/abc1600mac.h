@@ -51,15 +51,17 @@ public:
 	void page_hi_w(offs_t offset, uint8_t data);
 	void dmamap_w(offs_t offset, uint8_t data);
 
-	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
+	uint8_t dma0_mreq_r(offs_t offset, uint8_t data) { return dma_mreq_r(DMAMAP_R0_LO, offset, data); }
 	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
 	uint8_t dma0_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
 	void dma0_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
-	uint8_t dma1_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
+	
+	uint8_t dma1_mreq_r(offs_t offset, uint8_t data) { return dma_mreq_r(DMAMAP_R1_LO, offset, data); }
 	void dma1_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
 	uint8_t dma1_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
 	void dma1_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
-	uint8_t dma2_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
+	
+	uint8_t dma2_mreq_r(offs_t offset, uint8_t data) { return dma_mreq_r(DMAMAP_R2_LO, offset, data); }
 	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
 	uint8_t dma2_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
 	void dma2_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
@@ -91,11 +93,11 @@ private:
 
 	offs_t get_physical_offset(offs_t offset, int task, bool &nonx, bool &wp);
 
-	offs_t get_dma_address(int index, uint16_t offset);
-	uint8_t dma_mreq_r(int index, uint16_t offset);
-	void dma_mreq_w(int index, uint16_t offset, uint8_t data);
-	uint8_t dma_iorq_r(int index, uint16_t offset);
-	void dma_iorq_w(int index, uint16_t offset, uint8_t data);
+	offs_t get_dma_address(int index, offs_t offset, bool &rw);
+	uint8_t dma_mreq_r(int index, offs_t offset, uint8_t data);
+	void dma_mreq_w(int index, offs_t offset, uint8_t data);
+	uint8_t dma_iorq_r(int index, offs_t offset);
+	void dma_iorq_w(int index, offs_t offset, uint8_t data);
 
 	void program_map(address_map &map);
 	void mac_map(address_map &map);
