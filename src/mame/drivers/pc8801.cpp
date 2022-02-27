@@ -12,19 +12,49 @@
     - Add limits for extend work RAM;
     - waitstates;
     - clean-ups:
-      - better state machine isolation of features between various models (currently pretty cheaty);
+      - better state machine isolation of features between various models.
+        Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
+        (uses external minidisk), other misc banking bits.
       - refactor memory banking to use address maps;
-      - video;
       - double check dipswitches;
-      - move PC80S31K to device, needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. (in progress)
+      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. (in progress)
         Also notice that there are common points with SPC-1000 and TF-20 FDDs;
       - backport/merge what is portable to PC-8001;
-    - implement bus slot mechanism for NEC boards ("PC-8800-**"), HAL PCG-8100 & GSX8800,
-      probably others (does bus have an actual codename or just "PC-8801 bus"?);
-    - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
-      the floppy ports. Wrong info or check for external board anyway?
-    - fix "jumps" in PC-8872 mouse pointer (noticeable in balpower);
-    - pc8801mc: implement proper CD-ROM i/f (subset of PC Engine and PCFX);
+    - implement proper joypad / mouse (PC-8872) port connector;
+    - implement bus slot mechanism for NEC boards
+      (does it have an actual codename or just "PC-8801 EXPansion bus"?);
+      \- NEC PC-8801-10
+            (MIDI interface);
+      \- NEC PC-8801-11
+            ("Sound Board", single YM2203C OPN, single joy port, mono out);
+      \- NEC PC-8801-12
+            (Modem board, full duplex 300bps);
+      \- NEC PC-8801-13
+            (Parallel I/F board);
+      \- NEC PC-8801-17 / -18
+            (VTR capture card, 16-bit color);
+      \- NEC PC-8801-21
+            (CMT i/f board);
+      \- NEC PC-8801-22
+            ("Multi board B", upgrades a FH to MH and FA to MA (?));
+      \- NEC PC-8801-23 & -24 & -25
+            ("Sound Board 2", single YM2608 OPNA, single joy port, stereo out.
+            -24 is the internal FH / MH version, -25 is the internal FE / FE2 with YM2608B.
+            Standard and on main board instead for FA / MA and onward);
+      \- NEC PC-8801-30 & -31
+            (CD-ROM SCSI i/f, subset of PC Engine and PCFX) **in progress**
+      \- HAL PCG-8100
+            (PCG and 3x DAC_1BIT at I/O $01, $02. PIT at $0c-$0f)
+      \- HAL GSX-8800
+            (2x PSG at I/O $a0-$a3, mono out. Has goofy extra connector on top and a couple jumpers,
+             guess it may cascade with another board for 2x extra PSGs at $a4-$a7);
+      \- HIBIKI-8800
+            (YM2151 OPM + YM3802-X MIDI controller, stereo out, has own internal XTAL @ 4MHz.
+             Has an undumped PAL/PROM labeled "HAL-881");
+      \- HAL HMB-20
+            (same as HIBIKI-8800 board?)
+      \- JMB-X1
+            ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
 
     per-game specific TODO (move to XML):
     - Belloncho Shintai Kensa: hangs
@@ -1041,6 +1071,16 @@ uint8_t pc8801_state::port40_r()
 	return ioport("CTRL")->read();
 }
 
+inline attotime pc8801_state::mouse_limit_hz()
+{
+	return attotime::from_hz(900);
+}
+
+inline attotime pc8801fh_state::mouse_limit_hz()
+{
+	return attotime::from_hz(m_clock_setting ? 900 : 1800);
+}
+
 /*
  * I/O Port $40 writes "Strobe Port"
  * N88-BASIC buffer port $e6c1
@@ -1071,20 +1111,26 @@ void pc8801_state::port40_w(uint8_t data)
 	{
 		attotime new_time = machine().time();
 
-		if(m_mouse.phase == 0)
-		{
-			m_mouse.x = ioport("MOUSEX")->read();
-			m_mouse.y = ioport("MOUSEY")->read();
-		}
-
-		if(data & 0x40 && (new_time - m_mouse.time) > attotime::from_hz(900))
+		if(data & 0x40 && (new_time - m_mouse.time) > mouse_limit_hz())
 		{
 			m_mouse.phase = 0;
 		}
 		else
 		{
-			m_mouse.phase++;
+			m_mouse.phase ++;
 			m_mouse.phase &= 3;
+		}
+
+		if(m_mouse.phase == 0)
+		{
+			const u8 mouse_x = ioport("MOUSEX")->read();
+			const u8 mouse_y = ioport("MOUSEY")->read();
+
+			m_mouse.lx = (mouse_x - m_mouse.prev_dx) & 0xff;
+			m_mouse.ly = (mouse_y - m_mouse.prev_dy) & 0xff;
+
+			m_mouse.prev_dx = mouse_x;
+			m_mouse.prev_dy = mouse_y;
 		}
 
 		m_mouse.time = machine().time();
@@ -1620,7 +1666,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 	map(0x44, 0x47).rw(FUNC(pc8801_state::sound_board_r), FUNC(pc8801_state::sound_board_w)); /* OPN / OPNA ports */
-//	uPD3301
+//  uPD3301
 	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::crtc_param_w));
 	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::crtc_cmd_w));
 
@@ -1629,7 +1675,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x54, 0x5b).w(FUNC(pc8801_state::palram_w));
 	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
-//	i8257
+//  i8257
 	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
 	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
 
@@ -1637,7 +1683,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-//	map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
+//  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  // Sound Board II
 //  map(0xb4, 0xb5) Video art board (?)
@@ -1658,7 +1704,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r), FUNC(pc8801_state::kanji_w));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_lv2_r), FUNC(pc8801_state::kanji_lv2_w));
-//	map(0xf0, 0xf1) dictionary bank (8801MA and later)
+//  map(0xf0, 0xf1) dictionary bank (8801MA and later)
 //  map(0xf3, 0xf3) DMA floppy (unknown)
 //  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
 //  map(0xf8, 0xfb) DMA 8-inch floppy (?)
@@ -1939,10 +1985,10 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -2274,10 +2320,10 @@ uint8_t pc8801_state::opn_porta_r()
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
-		uint8_t shift,res;
+		uint8_t shift, res;
 
 		shift = (m_mouse.phase & 1) ? 0 : 4;
-		res = (m_mouse.phase & 2) ? m_mouse.y : m_mouse.x;
+		res = (m_mouse.phase & 2) ? m_mouse.ly : m_mouse.lx;
 
 //      logerror("%d\n",m_mouse.phase);
 

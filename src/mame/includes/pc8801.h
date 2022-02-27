@@ -63,6 +63,8 @@ protected:
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
 
+	virtual attotime mouse_limit_hz();
+
 	virtual uint8_t dictionary_rom_r(offs_t offset);
 	virtual bool dictionary_rom_enable();
 
@@ -96,9 +98,11 @@ private:
 	struct mouse_t
 	{
 		uint8_t phase;
-		uint8_t x,y;
+		int8_t prev_dx, prev_dy;
+		uint8_t lx, ly;
 		attotime time;
 	};
+
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
@@ -163,12 +167,12 @@ private:
 	void gvram_w(offs_t offset, uint8_t data);
 	uint8_t high_wram_r(offs_t offset);
 	void high_wram_w(offs_t offset, uint8_t data);
-	uint8_t port40_r();
-	void port40_w(uint8_t data);
 	uint8_t ext_rom_bank_r();
 	void ext_rom_bank_w(uint8_t data);
 	void port30_w(uint8_t data);
 	void port31_w(uint8_t data);
+	uint8_t port40_r();
+	void port40_w(uint8_t data);
 	uint8_t vram_select_r();
 	void vram_select_w(offs_t offset, uint8_t data);
 	void irq_level_w(uint8_t data);
@@ -250,6 +254,8 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void main_io(address_map &map) override;
+
+	virtual attotime mouse_limit_hz() override;
 
 private:
 	uint8_t cpuclock_r();
