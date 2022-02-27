@@ -10,7 +10,7 @@
 
 class ns32081_device
 	: public device_t
-	, public ns32000_slave_interface
+	, public ns32000_slow_slave_interface
 {
 public:
 	ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -29,7 +29,7 @@ protected:
 	virtual void device_reset() override;
 
 	void execute();
-	void complete(void *buf, s32 param);
+	void complete(s32 param);
 
 private:
 	emu_timer *m_complete;

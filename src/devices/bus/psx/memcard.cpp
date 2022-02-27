@@ -360,7 +360,7 @@ void psxcard_device::do_card()
 	}
 }
 
-void psxcard_device::ack_timer(void *ptr, int param)
+void psxcard_device::ack_timer(int32_t param)
 {
 	m_ack = param;
 	m_owner->ack();

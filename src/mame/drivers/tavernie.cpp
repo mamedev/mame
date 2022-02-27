@@ -70,6 +70,8 @@ Z - more scan lines per row (cursor is bigger)
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
 class cpu09_state : public driver_device
 {
 public:
@@ -132,9 +134,9 @@ private:
 	void kbd_put(u8 data);
 	void ds_w(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	u8 m_term_data;
-	u8 m_ivg_pa;
-	u8 m_flashcnt;
+	u8 m_term_data = 0U;
+	u8 m_ivg_pa = 0U;
+	u8 m_flashcnt = 0U;
 	std::unique_ptr<u16[]> m_vram; // 12x 4044
 	required_device<pia6821_device> m_pia1;
 	required_device<mc6845_device> m_crtc;
@@ -492,7 +494,7 @@ ROM_START( ivg09 )
 	ROM_LOAD( "small.bin", 0x1000, 0x1000, CRC(16e25eed) SHA1(5d31f127fe635be4bca06840b15a1bd77f971492)) // small
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY         FULLNAME                      FLAGS
 COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, cpu09_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )

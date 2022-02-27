@@ -14,6 +14,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
+#include "debug/express.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debugger.h"
@@ -26,6 +27,78 @@ struct wrap_textbuf
 	wrap_textbuf(text_buffer const &buf) : textbuf(buf) { }
 
 	std::reference_wrapper<const text_buffer> textbuf;
+};
+
+
+class symbol_table_wrapper
+{
+public:
+	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
+
+	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+		: m_table(machine, parent ? &parent->table() : nullptr, device)
+		, m_parent(parent)
+	{
+	}
+
+	symbol_table &table() { return m_table; }
+	symbol_table const &table() const { return m_table; }
+	std::shared_ptr<symbol_table_wrapper> const &parent() { return m_parent; }
+
+	symbol_entry &add(char const *name) { return m_table.add(name, symbol_table::READ_WRITE); }
+	symbol_entry &add(char const *name, u64 value) { return m_table.add(name, value); }
+	symbol_entry *find(char const *name) const { return m_table.find(name); }
+	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
+
+	u64 value(const char *symbol) { return m_table.value(symbol); }
+	void set_value(const char *symbol, u64 value) { m_table.set_value(symbol, value); }
+
+private:
+	symbol_table m_table;
+	std::shared_ptr<symbol_table_wrapper> const m_parent;
+};
+
+
+class expression_wrapper
+{
+public:
+	expression_wrapper(expression_wrapper const &) = delete;
+	expression_wrapper &operator=(expression_wrapper const &) = delete;
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable)
+		: m_expression(symtable->table())
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
+		: m_expression(symtable->table(), expression, default_base)
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
+		: m_expression(symtable->table(), expression)
+		, m_symbols(symtable)
+	{
+	}
+
+	void set_default_base(int base) { m_expression.set_default_base(base); }
+	void parse(char const *string) { m_expression.parse(string); }
+	u64 execute() { return m_expression.execute(); }
+	bool is_empty() const { return m_expression.is_empty(); }
+	char const *original_string() const { return m_expression.original_string(); }
+	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
+
+	void set_symbols(std::shared_ptr<symbol_table_wrapper> const &symtable)
+	{
+		m_expression.set_symbols(symtable->table());
+		m_symbols = symtable;
+	}
+
+private:
+	parsed_expression m_expression;
+	std::shared_ptr<symbol_table_wrapper> m_symbols;
 };
 
 
@@ -94,6 +167,143 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "wr", read_or_write::READWRITE }
 	};
 
+	static const enum_parser<expression_space, 15> s_expression_space_parser =
+	{
+		{ "p", EXPSPACE_PROGRAM_LOGICAL }, { "lp", EXPSPACE_PROGRAM_LOGICAL }, { "pp", EXPSPACE_PROGRAM_PHYSICAL },
+		{ "d", EXPSPACE_DATA_LOGICAL },    { "ld", EXPSPACE_DATA_LOGICAL },    { "pd", EXPSPACE_DATA_PHYSICAL },
+		{ "i", EXPSPACE_IO_LOGICAL },      { "li", EXPSPACE_IO_LOGICAL },      { "pi", EXPSPACE_IO_PHYSICAL },
+		{ "3", EXPSPACE_OPCODE_LOGICAL },  { "l3", EXPSPACE_OPCODE_LOGICAL },  { "p3", EXPSPACE_OPCODE_PHYSICAL },
+		{ "r", EXPSPACE_PRGDIRECT },
+		{ "o", EXPSPACE_OPDIRECT },
+		{ "m", EXPSPACE_REGION }
+	};
+
+	auto const do_add_symbol = [this] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format) -> symbol_entry &
+	{
+		symbol_table::setter_func setfun;
+		if (setter)
+			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+		return st.table().add(
+				name,
+				[this, cbfunc = std::move(getter)] () -> u64
+				{
+					auto result = invoke(cbfunc).get<sol::optional<u64> >();
+					if (result)
+					{
+						return *result;
+					}
+					else
+					{
+						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
+						return 0;
+					}
+				},
+				std::move(setfun),
+				(format && *format) ? *format : "");
+	};
+
+	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
+			"symbol_table",
+			sol::call_constructor, sol::factories(
+				[] (running_machine &machine)
+				{ return std::make_shared<symbol_table_wrapper>(machine, nullptr, nullptr); },
+				[] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, device); },
+				[] (std::shared_ptr<symbol_table_wrapper> const &parent)
+				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, nullptr); },
+				[] (device_t &device)
+				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
+	symbol_table_type["set_memory_modified_func"] =
+			[this] (symbol_table_wrapper &st, sol::object cb)
+			{
+				if (cb == sol::lua_nil)
+					st.table().set_memory_modified_func(nullptr);
+				else if (cb.is<sol::protected_function>())
+					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+				else
+					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
+			};
+	symbol_table_type["add"] = sol::overload(
+			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *)>(&symbol_table_wrapper::add),
+			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *, u64)>(&symbol_table_wrapper::add),
+			do_add_symbol,
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format) -> symbol_entry &
+			{
+				return do_add_symbol(st, name, getter, std::nullopt, format);
+			},
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter) -> symbol_entry &
+			{
+				return do_add_symbol(st, name, getter, setter, nullptr);
+			},
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, char const *format) -> symbol_entry &
+			{
+				return do_add_symbol(st, name, getter, std::nullopt, format);
+			},
+			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter) -> symbol_entry &
+			{
+				return do_add_symbol(st, name, getter, std::nullopt, nullptr);
+			},
+			[this] (symbol_table_wrapper &st, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
+			{
+				return st.table().add(
+						name,
+						minparams,
+						maxparams,
+						[this, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
+						{
+							sol::stack_reference traceback(m_lua_state, -sol::stack::push(m_lua_state, sol::default_traceback_error_handler));
+							cbref.push();
+							sol::stack_aligned_stack_handler_function func(m_lua_state, -1, traceback);
+							for (int i = 0; numparams > i; ++i)
+								lua_pushinteger(m_lua_state, paramlist[i]);
+							auto result = func(sol::stack_count(numparams)).get<sol::optional<u64> >();
+							traceback.pop();
+							return result ? *result : 0;
+						});
+			});
+	symbol_table_type["find"] = &symbol_table_wrapper::find;
+	symbol_table_type["find_deep"] = &symbol_table_wrapper::find_deep;
+	symbol_table_type["value"] = &symbol_table_wrapper::value;
+	symbol_table_type["set_value"] = &symbol_table_wrapper::set_value;
+	symbol_table_type["memory_value"] =
+			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, bool disable_se)
+			{
+				expression_space const es = s_expression_space_parser(space);
+				return st.table().memory_value(name, es, offset, size, disable_se);
+			};
+	symbol_table_type["set_memory_value"] =
+			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, u64 value, bool disable_se)
+			{
+				expression_space const es = s_expression_space_parser(space);
+				st.table().set_memory_value(name, es, offset, size, value, disable_se);
+			};
+	//symbol_table_type["read_memory"] = &symbol_table::read_memory; crashes if you try to use it, need to work out why
+	//symbol_table_type["write_memory"] = &symbol_table::write_memory; crashes if you try to use it, need to work out why
+	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
+	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
+
+
+	auto parsed_expression_type = emu.new_usertype<expression_wrapper>(
+			"parsed_expression",
+			sol::call_constructor, sol::constructors<
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &),
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *, int),
+				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *)>());
+	parsed_expression_type["set_default_base"] = &expression_wrapper::set_default_base;
+	parsed_expression_type["parse"] = &expression_wrapper::parse;
+	parsed_expression_type["execute"] = &expression_wrapper::execute;
+	parsed_expression_type["is_empty"] = sol::property(&expression_wrapper::is_empty);
+	parsed_expression_type["original_string"] = sol::property(&expression_wrapper::original_string);
+	parsed_expression_type["symbols"] = sol::property(&expression_wrapper::symbols, &expression_wrapper::set_symbols);
+
+
+	auto symbol_entry_type = sol().registry().new_usertype<symbol_entry>("symbol_entry", sol::no_constructor);
+	symbol_entry_type["name"] = sol::property(&symbol_entry::name);
+	symbol_entry_type["format"] = sol::property(&symbol_entry::format);
+	symbol_entry_type["is_function"] = sol::property(&symbol_entry::is_function);
+	symbol_entry_type["is_lval"] = sol::property(&symbol_entry::is_lval);
+	symbol_entry_type["value"] = sol::property(&symbol_entry::value, &symbol_entry::set_value);
+
 
 	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", sol::no_constructor);
 	debugger_type["command"] = [] (debugger_manager &debug, std::string const &cmd) { debug.console().execute_command(cmd, false); };
@@ -131,22 +341,22 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", sol::no_constructor);
 	device_debug_type["step"] =
-		[] (device_debug &dev, sol::object num)
-		{
-			int steps = 1;
-			if (num.is<int>())
-				steps = num.as<int>();
-			dev.single_step(steps);
-		};
+			[] (device_debug &dev, sol::object num)
+			{
+				int steps = 1;
+				if (num.is<int>())
+					steps = num.as<int>();
+				dev.single_step(steps);
+			};
 	device_debug_type["go"] = &device_debug::go;
 	device_debug_type["bpset"] =
-		[] (device_debug &dev, offs_t address, char const *cond, char const *act)
-		{
-			int result(dev.breakpoint_set(address, cond, act));
-			dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
-			dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
-			return result;
-		};
+			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
+			{
+				int result(dev.breakpoint_set(address, cond, act));
+				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
+				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
+				return result;
+			};
 	device_debug_type["bpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -167,21 +377,21 @@ void lua_engine::initialize_debug(sol::table &emu)
 	device_debug_type["bpenable"] = &do_breakpoint_enable<true>;
 	device_debug_type["bpdisable"] = &do_breakpoint_enable<false>;
 	device_debug_type["bplist"] =
-		[this] (device_debug &dev)
-		{
-			sol::table table = sol().create_table();
-			for (auto const &bpp : dev.breakpoint_list())
-				table[bpp.second->index()] = sol::make_reference(sol(), *bpp.second);
-			return table;
-		};
+			[this] (device_debug &dev)
+			{
+				sol::table table = sol().create_table();
+				for (auto const &bpp : dev.breakpoint_list())
+					table[bpp.second->index()] = sol::make_reference(sol(), bpp.second.get());
+				return table;
+			};
 	device_debug_type["wpset"] =
-		[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
-		{
-			read_or_write wptype = s_read_or_write_parser(type);
-			int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
-			dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
-			return result;
-		};
+			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
+			{
+				read_or_write const wptype = s_read_or_write_parser(type);
+				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
+				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
+				return result;
+			};
 	device_debug_type["wpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -198,18 +408,28 @@ void lua_engine::initialize_debug(sol::table &emu)
 	device_debug_type["wpenable"] = &do_watchpoint_enable<true>;
 	device_debug_type["wpdisable"] = &do_watchpoint_enable<false>;
 	device_debug_type["wplist"] =
-		[this] (device_debug &dev, addr_space &sp)
-		{
-			sol::table table = sol().create_table();
-			for (auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
-				table[wpp->index()] = sol::make_reference(sol(), *wpp);
-			return table;
-		};
+			[this] (device_debug &dev, addr_space &sp)
+			{
+				sol::table table = sol().create_table();
+				for (auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
+					table[wpp->index()] = sol::make_reference(sol(), wpp.get());
+				return table;
+			};
 
 
 	auto breakpoint_type = sol().registry().new_usertype<debug_breakpoint>("breakpoint", sol::no_constructor);
 	breakpoint_type["index"] = sol::property(&debug_breakpoint::index);
-	breakpoint_type["enabled"] = sol::property(&debug_breakpoint::enabled);
+	breakpoint_type["enabled"] = sol::property(
+			&debug_breakpoint::enabled,
+			[] (debug_breakpoint &bp, bool val)
+			{
+				if (bp.enabled() != val)
+				{
+					bp.setEnabled(val);
+					bp.debugInterface()->device().machine().debug_view().update_all(DVT_DISASSEMBLY);
+					bp.debugInterface()->device().machine().debug_view().update_all(DVT_BREAK_POINTS);
+				}
+			});
 	breakpoint_type["address"] = sol::property(&debug_breakpoint::address);
 	breakpoint_type["condition"] = sol::property(&debug_breakpoint::condition);
 	breakpoint_type["action"] = sol::property(&debug_breakpoint::action);
@@ -217,7 +437,16 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto watchpoint_type = sol().registry().new_usertype<debug_watchpoint>("watchpoint", sol::no_constructor);
 	watchpoint_type["index"] = sol::property(&debug_watchpoint::index);
-	watchpoint_type["enabled"] = sol::property(&debug_watchpoint::enabled);
+	watchpoint_type["enabled"] = sol::property(
+			&debug_watchpoint::enabled,
+			[] (debug_watchpoint &wp, bool val)
+			{
+				if (wp.enabled() != val)
+				{
+					wp.setEnabled(val);
+					wp.debugInterface()->device().machine().debug_view().update_all(DVT_WATCH_POINTS);
+				}
+			});
 	watchpoint_type["type"] = sol::property(
 			[] (debug_watchpoint &wp) -> char const *
 			{

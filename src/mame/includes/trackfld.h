@@ -66,8 +66,8 @@ private:
 	uint8_t trackfld_SN76496_r();
 	uint8_t trackfld_speech_r();
 	void trackfld_VLM5030_control_w(uint8_t data);
-	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
-	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
 	void hyprolyb_sound_map(address_map &map);
 	void main_map(address_map &map);

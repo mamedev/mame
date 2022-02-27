@@ -21,6 +21,7 @@
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "screen.h"
@@ -28,6 +29,7 @@
 #include "uiinput.h"
 
 #include "corestr.h"
+#include "notifier.h"
 
 #include <cstring>
 #include <thread>
@@ -710,7 +712,7 @@ void lua_engine::initialize()
 				if (ret == 1)
 					return luaL_error(L, "cannot wait from outside coroutine");
 				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
+				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref);
 				return lua_yield(L, 0);
 			});
 	emu["lang_translate"] = sol::overload(
@@ -740,6 +742,10 @@ void lua_engine::initialize()
 			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
 
+
+	auto notifier_subscription_type = sol().registry().new_usertype<util::notifier_subscription>("notifier_subscription", sol::no_constructor);
+	notifier_subscription_type["unsubscribe"] = &util::notifier_subscription::reset;
+	notifier_subscription_type["is_active"] = sol::property(&util::notifier_subscription::operator bool);
 
 	auto attotime_type = emu.new_usertype<attotime>(
 			"attotime",
@@ -1894,7 +1900,7 @@ void lua_engine::close()
 	}
 }
 
-void lua_engine::resume(void *ptr, int nparam)
+void lua_engine::resume(int nparam)
 {
 	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
 	lua_State *L = lua_tothread(m_lua_state, -1);

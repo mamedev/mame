@@ -17,6 +17,7 @@
 #include "audit.h"
 
 #include "drivenum.h"
+#include "fileio.h"
 #include "uiinput.h"
 
 #include "util/corestr.h"

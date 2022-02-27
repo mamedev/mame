@@ -28,6 +28,7 @@
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
@@ -93,12 +94,9 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 			fake_ini = util::string_format(u8"\uFEFF%s = %s\n", tmp, sub_filter);
 		}
 
-		emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-		if (!file.open_ram(fake_ini.c_str(), fake_ini.size()))
-		{
-			m_persistent_data.filter_data().load_ini(file);
-			file.close();
-		}
+		util::core_file::ptr file;
+		if (!util::core_file::open_ram(fake_ini.c_str(), fake_ini.size(), OPEN_FLAG_READ, file))
+			m_persistent_data.filter_data().load_ini(*file);
 	}
 
 	// do this after processing the last used filter setting so it overwrites the placeholder

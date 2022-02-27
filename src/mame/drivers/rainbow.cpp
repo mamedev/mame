@@ -508,7 +508,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void rainbow8088_base_map(address_map &map);
 	void rainbow8088_base_io(address_map &map);
@@ -1280,7 +1280,7 @@ void rainbow_modelb_state::machine_reset()
 }
 
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
-void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "intelfsh.h"
 
+#include "fileio.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -543,7 +545,7 @@ void intelfsh_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch( m_flash_mode )
 	{

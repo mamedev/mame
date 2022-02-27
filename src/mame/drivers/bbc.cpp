@@ -11,8 +11,9 @@
     ANB03 - Model B with Disc interface
     ANB04 - Model B with Disc and Econet interfaces
 
-    GNB14 - Model B with Disc, Econet & Speech (German model)
-    UNB09 - Model B with Disc, Econet & Speech (US model)
+    GNB14 - Model B with Disc, Econet & Speech (German export)
+    UNB09 - Model B with Disc, Econet & Speech (US export)
+            Model B with Disc (Norway dealer import)
 
     BBC Model B+
 
@@ -471,6 +472,22 @@ static INPUT_PORTS_START(bbc_keyboard)
 	/* Keyboard column 15 not known to be used */
 	PORT_START("COL15")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(bbc_keyboard_no)
+	PORT_INCLUDE(bbc_keyboard)
+
+	PORT_MODIFY("COL7")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Å")                PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR(0xc5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Ø")                PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0xd8)
+
+	PORT_MODIFY("COL8")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Æ")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0xc6)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; +")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(';') PORT_CHAR('+')
+
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@")                  PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('@')
 INPUT_PORTS_END
 
 
@@ -970,6 +987,13 @@ static INPUT_PORTS_START(bbcb)
 	PORT_INCLUDE(bbcb_links)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(bbcb_no)
+	PORT_INCLUDE(bbc_config)
+	PORT_INCLUDE(bbc_keyboard_no)
+	PORT_INCLUDE(bbc_dipswitch)
+	PORT_INCLUDE(bbcb_links)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(bbcbp)
 	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
@@ -1271,6 +1295,22 @@ void bbc_state::bbcb_us(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_flop_us");
+}
+
+
+/***************************************************************************
+
+    Cisco Systems
+
+****************************************************************************/
+
+
+void bbc_state::sist1(machine_config &config)
+{
+	bbcb(config);
+
+	m_1mhzbus->set_default_option("cisco");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -2180,6 +2220,43 @@ ROM_START(bbcb_us)
 ROM_END
 
 
+ROM_START(bbcb_no)
+	ROM_REGION(0x40000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	/* rom page 0 00000 IC72 DFS */
+	/* rom page 1 04000 IC73 VIEW2.1 */
+	/* rom page 2 08000 IC74 SPARE SOCKET */
+	/* rom page 3 0c000 IC75 BASIC */
+	ROM_LOAD("dfs0.9h.rom",  0x0000, 0x2000, CRC(af2fa873) SHA1(dbbec4d2540a854c120be3194c7566a2b79d153b))
+	ROM_LOAD("viewa210.rom", 0x4000, 0x4000, CRC(4345359f) SHA1(88c93df1854f5fbe6cd6e5f0e29a8bf4ea3b5614))
+	ROM_LOAD("basic2.rom",   0xc000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_LOAD("nos12.rom", 0x0000, 0x4000, CRC(49859294) SHA1(2b6aecd33a43f296c20832524e47cc7e3a9c3b17))
+
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
+ROM_END
+
+
+ROM_START(sist1)
+	ROM_REGION(0x40000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	/* rom page 0 00000 IC52  DFS */
+	/* rom page 1 04000 IC88  PROGS */
+	/* rom page 2 08000 IC100 BASIC */
+	/* rom page 3 0c000 IC101 STARTUP */
+	ROM_LOAD("dnfs120-201666.rom", 0x0000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+	ROM_LOAD("sist1_progs.bin",    0x4000, 0x4000, CRC(aea21243) SHA1(4398ba29c871fa397654aa182c63ccdcad597625))
+	ROM_LOAD("basic2.rom",         0x8000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+	ROM_LOAD("sist1_startup.bin",  0xc000, 0x4000, CRC(9cd1602c) SHA1(5ea266f47ff83821ccdbec006b8506b2e892b115))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_LOAD("os12.rom", 0x0000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
+
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("cm62024.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
+ROM_END
+
+
 ROM_START(torchf)
 	ROM_REGION(0x40000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
 	/* rom page 0 00000 IC52  BASIC */
@@ -2993,6 +3070,7 @@ COMP( 1981, bbcb,       0,      bbca,  bbcb,       bbcb,   bbc_state,    init_bb
 COMP( 1981, bbca,       bbcb,   0,     bbca,       bbca,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1982, bbcb_de,    bbcb,   0,     bbcb_de,    bbcb,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1983, bbcb_us,    bbcb,   0,     bbcb_us,    bbcb,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, bbcb_no,    bbcb,   0,     bbcb_de,    bbcb_no, bbc_state,   init_bbc,  "Acorn Computers",             "BBC Micro Model B (Norway)",         MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1985, bbcbp,      0,      bbcb,  bbcbp,      bbcbp,  bbcbp_state,  init_bbc,  "Acorn Computers",             "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1985, bbcbp128,   bbcbp,  0,     bbcbp128,   bbcbp,  bbcbp_state,  init_bbc,  "Acorn Computers",             "BBC Micro Model B+ 128K",            MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1985, abc110,     bbcbp,  0,     abc110,     abc,    bbcbp_state,  init_bbc,  "Acorn Computers",             "ABC 110",                            MACHINE_NOT_WORKING )
@@ -3028,6 +3106,7 @@ COMP( 1988, discmate,   bbcm,   0,     discmate,   bbcm,   bbcm_state,   init_bb
 //COMP( 1988, discmast,   bbcm,   0,     discmast,   bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING )
 
 /* Industrial */
+COMP( 198?, sist1,      bbcb,   0,     sist1,      bbcb,   bbc_state,    init_bbc,  "Cisco Systems",               "Cisco SIST1 Terminal",               MACHINE_NOT_WORKING )
 COMP( 1985, ltmpbp,     bbcbp,  0,     bbcbp,      ltmpbp, bbcbp_state,  init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (B+)",                  MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1986, ltmpm,      bbcm,   0,     bbcm,       ltmpm,  bbcm_state,   init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (Master)",              MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1987, daisy,      bbcm,   0,     daisy,      bbcm,   bbcm_state,   init_bbc,  "Comus Instruments Ltd.",      "Comus Daisy",                        MACHINE_NOT_WORKING )

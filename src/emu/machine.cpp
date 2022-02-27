@@ -10,25 +10,29 @@
 
 #include "emu.h"
 
-#include "emuopts.h"
-#include "osdepend.h"
 #include "config.h"
-#include "debugger.h"
-#include "render.h"
-#include "uiinput.h"
 #include "crsshair.h"
-#include "debug/debugvw.h"
 #include "debug/debugcpu.h"
+#include "debug/debugvw.h"
+#include "debugger.h"
 #include "dirtc.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "http.h"
 #include "image.h"
+#include "natkeyboard.h"
 #include "network.h"
+#include "render.h"
 #include "romload.h"
 #include "tilemap.h"
-#include "natkeyboard.h"
+#include "uiinput.h"
+
 #include "ui/uimain.h"
 
 #include "corestr.h"
 #include "unzip.h"
+
+#include "osdepend.h"
 
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -589,10 +593,10 @@ void running_machine::schedule_save(std::string &&filename)
 //  immediate_save - save state.
 //-------------------------------------------------
 
-void running_machine::immediate_save(const char *filename)
+void running_machine::immediate_save(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::SAVE;
@@ -626,10 +630,10 @@ void running_machine::schedule_load(std::string &&filename)
 //  immediate_load - load state.
 //-------------------------------------------------
 
-void running_machine::immediate_load(const char *filename)
+void running_machine::immediate_load(std::string_view filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::string(filename));
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::LOAD;
@@ -941,7 +945,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, s32 param)
+void running_machine::soft_reset(s32 param)
 {
 	logerror("Soft reset\n");
 
@@ -968,6 +972,17 @@ void running_machine::logfile_callback(const char *buffer)
 		m_logfile->puts(buffer);
 		m_logfile->flush();
 	}
+}
+
+
+//-------------------------------------------------
+//  steal_debuglogfile - relinquish ownership of
+//  the debug.log file
+//-------------------------------------------------
+
+std::unique_ptr<emu_file> running_machine::steal_debuglogfile()
+{
+	return std::move(m_debuglogfile);
 }
 
 
@@ -1120,6 +1135,7 @@ void running_machine::nvram_load()
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (!file.open(nvram_filename(nvram.device())))
 		{
+			// FIXME: don't swallow errors
 			nvram.nvram_load(file);
 			file.close();
 		}
@@ -1142,6 +1158,7 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				// FIXME: don't swallow errors
 				nvram.nvram_save(file);
 				file.close();
 			}

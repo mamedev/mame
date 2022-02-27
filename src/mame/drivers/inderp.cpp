@@ -65,6 +65,7 @@ private:
 	void sound_w(u8);
 	void lamps_w(offs_t, u8);
 	void display_w(offs_t, u8);
+	u16 seg8to14(u16 data);
 	void mem_map(address_map &map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -282,9 +283,18 @@ void inderp_state::display_w(offs_t offset, u8 data)
 				m_digits[digit+38] = m_segment[2];
 		}
 		else
-		for (u8 i = 0; i < 5; i++)
-			m_digits[digit+i*10] = m_segment[i];
+		{
+			for (u8 i = 0; i < 4; i++)
+				m_digits[digit+i*10] = seg8to14(m_segment[i]);
+			m_digits[digit+40] = m_segment[4];
+		}
 	}
+}
+
+u16 inderp_state::seg8to14(u16 data)
+{
+	// convert custom 8seg digit to MAME 14seg digit
+	return bitswap<10>(data,7,7,6,6,5,4,3,2,1,0);
 }
 
 WRITE_LINE_MEMBER( inderp_state::clock_tick )

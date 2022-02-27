@@ -26,7 +26,7 @@ TODO:
 - Inputs (switches, dips)
 - Display needs to be done properly, SDA2131 to be a device.
 - How to trigger sounds?
-- Does speech work? DAC works by poking $5D in audio cpu.
+- Does speech work? DAC works if you poke data into $5D in audio cpu.
 - Manuals are difficult to read, and don't show everything we need.
 
 **************************************************************************************************************/
@@ -41,6 +41,8 @@ TODO:
 #include "sound/dac.h"
 #include "speaker.h"
 #include "barni.lh"
+
+namespace {
 
 class barni_state : public genpin_class
 {
@@ -301,6 +303,7 @@ ROM_START(redbarnp)
 	ROM_LOAD("rbsnd4.732", 0x0000, 0x1000, CRC(fd8db899) SHA1(0978213f14f73ccc4a24eb42a39db00d9299c5d0))
 ROM_END
 
+} // Anonymous namespace
 
 GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

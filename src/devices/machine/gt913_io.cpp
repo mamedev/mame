@@ -54,7 +54,7 @@ void gt913_io_hle_device::device_reset()
 	m_adc_data[0] = m_adc_data[1] = 0;
 }
 
-void gt913_io_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gt913_io_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_timer_irq_pending[id] = true;
 	timer_check_irq(id);

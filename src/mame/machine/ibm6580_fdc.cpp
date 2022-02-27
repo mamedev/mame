@@ -69,7 +69,7 @@ void dw_fdc_device::device_reset()
 	m_p1 = m_p2 = m_t0 = m_t1 = 0;
 }
 
-void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

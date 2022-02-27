@@ -24,7 +24,7 @@ public:
 	virtual ~bgfx_window_parameter() { }
 
 	virtual float value() override { return float(m_index); }
-	virtual void tick(double delta) override { };
+	virtual void tick(double delta) override { }
 
 private:
 	uint32_t    m_index;

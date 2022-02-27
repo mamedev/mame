@@ -223,7 +223,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 	m_mouse.received = 0;
 }
 
-void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_UPDATE)
 	{

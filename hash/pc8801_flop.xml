@@ -6230,8 +6230,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="raizer">
-		<description>Chikyuu Senshi Raizer</description>
+	<software name="rayieza">
+		<description>The Earth Fighter Rayieza</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -6244,8 +6244,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="raizera" cloneof="raizer">
-		<description>Chikyuu Senshi Raizer (alt)</description>
+	<software name="rayiezaa" cloneof="rayieza">
+		<description>The Earth Fighter Rayieza (alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->

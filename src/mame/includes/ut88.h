@@ -11,11 +11,13 @@
 #pragma once
 
 #include "cpu/i8085/i8085.h"
-#include "sound/dac.h"
-#include "machine/i8255.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
+
 #include "emupal.h"
+
 
 class ut88_common : public driver_device
 {
@@ -79,7 +81,7 @@ private:
 
 	int m_keyboard_mask;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8255_device> m_ppi;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_vram;

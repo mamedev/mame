@@ -21,6 +21,7 @@
 
 #include "debugger.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "natkeyboard.h"
 #include "render.h"
 #include "screen.h"
@@ -2191,8 +2192,7 @@ void debugger_commands::execute_rplist(const std::vector<std::string> &params)
 
 void debugger_commands::execute_statesave(const std::vector<std::string> &params)
 {
-	const std::string &filename(params[0]);
-	m_machine.immediate_save(filename.c_str());
+	m_machine.immediate_save(params[0]);
 	m_console.printf("State save attempted.  Please refer to window message popup for results.\n");
 }
 
@@ -2203,8 +2203,7 @@ void debugger_commands::execute_statesave(const std::vector<std::string> &params
 
 void debugger_commands::execute_stateload(const std::vector<std::string> &params)
 {
-	const std::string &filename(params[0]);
-	m_machine.immediate_load(filename.c_str());
+	m_machine.immediate_load(params[0]);
 
 	// clear all PC & memory tracks
 	for (device_t &device : device_enumerator(m_machine.root_device()))
@@ -4259,7 +4258,7 @@ void debugger_commands::execute_unmount(const std::vector<std::string> &params)
 
 void debugger_commands::execute_input(const std::vector<std::string> &params)
 {
-	m_machine.natkeyboard().post_coded(params[0].c_str());
+	m_machine.natkeyboard().post_coded(params[0]);
 }
 
 

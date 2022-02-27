@@ -639,6 +639,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cc500.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cc500.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cisco.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cisco.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/datacentre.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/datacentre.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/emrmidi.cpp",
@@ -2529,6 +2531,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2softcard.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2ssc.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2ssc.h",
+		MAME_DIR .. "src/devices/bus/a2bus/a2superdrive.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/a2superdrive.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2swyft.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2swyft.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2themill.cpp",
@@ -3626,6 +3630,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_ide.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_ide.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_max.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_max.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_midi.cpp",
@@ -3730,6 +3736,17 @@ if (BUSES["EPSON_SIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/epson_sio/pf10.h",
 		MAME_DIR .. "src/devices/bus/epson_sio/tf20.cpp",
 		MAME_DIR .. "src/devices/bus/epson_sio/tf20.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/epson_qx/option.h,BUSES["EPSON_QX"] = true
+---------------------------------------------------
+if (BUSES["EPSON_QX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
 	}
 end
 
@@ -4114,6 +4131,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/mgt.h",
 		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/mpoker.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/mpoker.h",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/plus2test.cpp",
@@ -4128,6 +4147,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/speccydos.h",
 		MAME_DIR .. "src/devices/bus/spectrum/specdrum.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/specdrum.h",
+		MAME_DIR .. "src/devices/bus/spectrum/specmate.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/specmate.h",
 		MAME_DIR .. "src/devices/bus/spectrum/uslot.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/uslot.h",
 		MAME_DIR .. "src/devices/bus/spectrum/usource.cpp",

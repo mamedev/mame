@@ -70,7 +70,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }
@@ -235,7 +235,7 @@ void es5503_device::device_start()
 	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 void es5503_device::device_clock_changed()
@@ -326,7 +326,7 @@ u8 es5503_device::read(offs_t offset)
 				m_irq_func(0);
 
 				// scan all oscillators
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -342,7 +342,7 @@ u8 es5503_device::read(offs_t offset)
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -354,7 +354,7 @@ u8 es5503_device::read(offs_t offset)
 				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
-				return oscsenabled<<1;
+				return (oscsenabled - 1) << 1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();
@@ -430,7 +430,7 @@ void es5503_device::write(offs_t offset, u8 data)
 			case 0xe1:  // oscillator enable
 				// The number here is the number of oscillators to enable -1 times 2.  You can never
 				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
-				oscsenabled = ((data>>1) & 0x3f) + 1;
+				oscsenabled = ((data>>1) & 0x1f) + 1;
 				notify_clock_changed();
 				break;
 

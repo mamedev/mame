@@ -10,7 +10,7 @@
     - Both POST screens are X offset by a large margin,
       i.e. paddlema draws a middle line there, which isn't shown on real HW reference instead.
     - paddlema: ranking screen is unreadable on 9th/10th positions during attract,
-	  maybe the underlying background is supposed to be disabled somehow?
+      maybe the underlying background is supposed to be disabled somehow?
 
 ===================================================================================================
 

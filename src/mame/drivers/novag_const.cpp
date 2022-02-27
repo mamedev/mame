@@ -56,7 +56,6 @@ Super Constellation:
 
 TODO:
 - is Dynamic S a program update of ssensor4 or identical?
-- verify IRQ active time for ssensor4
 
 ******************************************************************************/
 
@@ -379,6 +378,8 @@ void const_state::ssensor4(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
+
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);

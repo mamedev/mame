@@ -154,7 +154,13 @@ Acorn BBC Micro - 6502 2nd Processor Discs
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="P-System (1)"/>
 			<dataarea name="flop" size="204800">
-				<rom name="Acornsoft p-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536"/>
+				<rom name="Acornsoft P-System(1).ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="P-System (2)"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Acornsoft P-System(2).ssd" size="204800" crc="c3fe04cc" sha1="cc6b0f42bcd66bafd225b1f2faaefd758266922d"/>
 			</dataarea>
 		</part>
 	</software>

@@ -16,6 +16,7 @@
 #include "ui/optsmenu.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "mame.h"
 
 #include "util/corestr.h"
@@ -182,7 +183,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 	path_iterator path(m_searchpath);
 	std::string curpath;
 	m_folders.clear();
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 
 	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), 0, (void *)ADD_CHANGE);
@@ -237,7 +238,7 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 
 	path_iterator path(searchpath);
 	std::string curpath;
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 }
 
@@ -463,7 +464,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 
 	path_iterator path(m_searchpath);
 	std::string curpath;
-	while (path.next(curpath, nullptr))
+	while (path.next(curpath))
 		m_folders.push_back(curpath);
 }
 

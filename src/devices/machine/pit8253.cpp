@@ -507,7 +507,7 @@ void pit_counter_device::simulate(int64_t elapsed_cycles)
 					}
 				}
 
-				if (elapsed_cycles > 0 && m_phase == 3)
+				if (elapsed_cycles >= adjusted_value && m_phase == 3)
 				{
 					/* Reload counter, output goes high */
 					elapsed_cycles -= adjusted_value;
@@ -972,7 +972,7 @@ void pit8254_device::readback_command(uint8_t data)
 			m_counter[timer]->readback(read_command);
 }
 
-void pit_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pit_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update();
 	switch (id)

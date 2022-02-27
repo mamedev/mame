@@ -135,15 +135,15 @@ void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 	m_timerrun[offset] = 1;
 }
 
+template <int TNum>
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 {
-	int tnum = (int)(uintptr_t)ptr;
-	int bit = tnum + 2;
+	int bit = TNum + 2;
 
-	if(m_timerrun[tnum] == 0)
+	if(m_timerrun[TNum] == 0)
 		return;
 
-	m_timers[tnum]->reset();
+	m_timers[TNum]->reset();
 
 	m_intreq |= (1<<bit);
 	if(m_intena & 1<<bit)
@@ -151,8 +151,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
 	model2_check_irq_state();
 
-	m_timervals[tnum] = 0xfffff;
-	m_timerrun[tnum] = 0;
+	m_timervals[TNum] = 0xfffff;
+	m_timerrun[TNum] = 0;
 }
 
 void model2_state::machine_start()
@@ -2459,17 +2459,13 @@ void model2_state::scsp_irq(offs_t offset, u8 data)
 void model2_state::model2_timers(machine_config &config)
 {
 	timer_device &timer0(TIMER(config, "timer0"));
-	timer0.configure_generic(FUNC(model2_state::model2_timer_cb));
-	timer0.set_ptr((void *)(uintptr_t)0);
+	timer0.configure_generic(FUNC(model2_state::model2_timer_cb<0>));
 	timer_device &timer1(TIMER(config, "timer1"));
-	timer1.configure_generic(FUNC(model2_state::model2_timer_cb));
-	timer1.set_ptr((void *)(uintptr_t)1);
+	timer1.configure_generic(FUNC(model2_state::model2_timer_cb<1>));
 	timer_device &timer2(TIMER(config, "timer2"));
-	timer2.configure_generic(FUNC(model2_state::model2_timer_cb));
-	timer2.set_ptr((void *)(uintptr_t)2);
+	timer2.configure_generic(FUNC(model2_state::model2_timer_cb<2>));
 	timer_device &timer3(TIMER(config, "timer3"));
-	timer3.configure_generic(FUNC(model2_state::model2_timer_cb));
-	timer3.set_ptr((void *)(uintptr_t)3);
+	timer3.configure_generic(FUNC(model2_state::model2_timer_cb<3>));
 }
 
 void model2_state::model2_screen(machine_config &config)

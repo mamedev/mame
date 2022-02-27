@@ -11,7 +11,7 @@
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-void am9519_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am9519_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!BIT(m_mode, 7)) // chip disabled
 		return;

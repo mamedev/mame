@@ -24,6 +24,8 @@
 #include "emu.h"
 #include "machine/er1400.h"
 
+#include "fileio.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -295,7 +297,7 @@ WRITE_LINE_MEMBER(er1400_device::c3_w)
 //  fires
 //-------------------------------------------------
 
-void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

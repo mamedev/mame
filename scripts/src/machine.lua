@@ -162,6 +162,18 @@ if (MACHINES["AM2901B"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/amiga_copper.h,MACHINES["AMIGA_COPPER"] = true
+---------------------------------------------------
+
+if (MACHINES["AMIGA_COPPER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/amiga_copper.cpp",
+		MAME_DIR .. "src/devices/machine/amiga_copper.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
@@ -4909,5 +4921,16 @@ if (MACHINES["GLUKRS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/glukrs.cpp",
 		MAME_DIR .. "src/devices/machine/glukrs.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/bitmap_printer.h,MACHINES["BITMAP_PRINTER"] = true
+---------------------------------------------------
+if (MACHINES["BITMAP_PRINTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
+		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
 	}
 end

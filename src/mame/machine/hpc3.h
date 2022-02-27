@@ -71,7 +71,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -119,7 +119,7 @@ protected:
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
-	void enet_transmit(void *ptr = nullptr, int param = 0);
+	void enet_transmit(int param = 0);
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
 

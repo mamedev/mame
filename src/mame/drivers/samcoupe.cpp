@@ -88,7 +88,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -510,15 +510,15 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 //  MACHINE EMULATION
 //**************************************************************************
 
-void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(param);
 		break;
 	case TIMER_VIDEO_UPDATE:
-		sam_video_update_callback(ptr, param);
+		sam_video_update_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in samcoupe_state::device_timer");

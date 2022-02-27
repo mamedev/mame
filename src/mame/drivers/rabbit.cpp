@@ -135,7 +135,7 @@ private:
 	void rabbit_map(address_map &map);
 
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -570,7 +570,7 @@ void rabbit_state::rombank_w(uint32_t data)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

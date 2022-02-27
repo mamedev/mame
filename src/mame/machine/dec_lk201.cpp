@@ -572,7 +572,7 @@ void lk201_device::device_reset()
 	m_led_hold = 0;    // led11
 }
 
-void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

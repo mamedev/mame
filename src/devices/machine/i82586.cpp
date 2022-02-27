@@ -162,7 +162,7 @@ void i82586_base_device::device_start()
 {
 	m_space = &space(0);
 
-	m_out_irq.resolve();
+	m_out_irq.resolve_safe();
 
 	m_cu_timer = timer_alloc(CU_TIMER);
 	m_cu_timer->enable(false);
@@ -204,7 +204,7 @@ void i82586_base_device::device_reset()
 	m_mac_multi = 0;
 }
 
-void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

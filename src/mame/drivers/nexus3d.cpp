@@ -290,7 +290,7 @@ INPUT_PORTS_END
 
 void nexus3d_state::machine_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nexus3d_state::timercb),this), 0);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nexus3d_state::timercb),this));
 
 }
 

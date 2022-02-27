@@ -68,7 +68,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cp1610_cpu_device> m_maincpu;
@@ -138,7 +138,7 @@ static INPUT_PORTS_START( unichamp )
 INPUT_PORTS_END
 
 
-void unichamp_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void unichamp_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	//TODO should we add an explicit Reset button in there just like the controller?
 }

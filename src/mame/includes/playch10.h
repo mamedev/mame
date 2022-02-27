@@ -22,7 +22,6 @@ public:
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
-		, m_work_ram(*this, "work_ram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vrom_region(*this, "gfx2")
 		, m_timedigits(*this, "digit_%u", 0U)
@@ -94,8 +93,8 @@ private:
 	void cboard_vrom_switch_w(uint8_t data);
 	void eboard_rom_switch_w(offs_t offset, uint8_t data);
 	void gboard_rom_switch_w(offs_t offset, uint8_t data);
-	void iboard_rom_switch_w(uint8_t data);
 	void hboard_rom_switch_w(offs_t offset, uint8_t data);
+	void iboard_rom_switch_w(uint8_t data);
 	void playch10_videoram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -149,7 +148,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_ram_8w;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	optional_memory_region m_vrom_region;
@@ -180,8 +178,6 @@ private:
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
 	int m_mmc1_rom_mask;
-	int m_gboard_scanline_counter;
-	int m_gboard_scanline_latch;
 	int m_gboard_banks[2];
 	int m_gboard_4screen;
 	int m_gboard_last_bank;

@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(I8008, i8008_device, "i8008", "Intel 8008")
 i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I8008, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16)
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -509,11 +509,11 @@ inline void i8008_device::execute_one(int opcode)
 							if (((opcode>>4)&3)==0) {
 								// INP
 								m_icount -= 8;
-								m_A = m_io.read_byte((opcode >> 1) & 0x1f);
+								m_A = m_io.read_byte((m_A << 8) + ((opcode >> 1) & 0x1f));
 							} else {
 								// OUT
 								m_icount -= 6;
-								m_io.write_byte((opcode >> 1) & 0x1f, m_A);
+								m_io.write_byte((m_A << 8) + ((opcode >> 1) & 0x1f), m_A);
 							}
 							break;
 					}

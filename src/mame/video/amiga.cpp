@@ -19,21 +19,7 @@
  *
  *************************************/
 
-#define LOG_COPPER          0
-#define GUESS_COPPER_OFFSET 0
 #define LOG_SPRITE_DMA      0
-
-
-
-/*************************************
- *
- *  Macros
- *
- *************************************/
-
-#define COPPER_CYCLES_TO_PIXELS(x)      (4 * (x))
-
-
 
 /*************************************
  *
@@ -79,29 +65,6 @@ const uint16_t amiga_state::s_expand_byte[256] =
 	0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
 };
 
-const uint16_t delay[256] =
-{
-	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,    /* 0x000 - 0x03e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x040 - 0x05e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x060 - 0x07e */
-	0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,                        /* 0x080 - 0x09e */
-	1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,    /* 0x0a0 - 0x0de */
-	/* BPLxPTH/BPLxPTL */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x0e0 - 0x0fe */
-	/* BPLCON0-3,BPLMOD1-2 */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x100 - 0x11e */
-	/* SPRxPTH/SPRxPTL */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,                        /* 0x120 - 0x13e */
-	/* SPRxPOS/SPRxCTL/SPRxDATA/SPRxDATB */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,    /* 0x140 - 0x17e */
-	/* COLORxx */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,    /* 0x180 - 0x1be */
-	/* RESERVED */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* 0x1c0 - 0x1fe */
-};
-
-
-
 /*************************************
  *
  *  4-4-4 palette init
@@ -124,10 +87,8 @@ void amiga_state::amiga_palette(palette_device &palette) const
 
 VIDEO_START_MEMBER( amiga_state, amiga )
 {
-	int j;
-
 	/* generate tables that produce the correct playfield color for dual playfield mode */
-	for (j = 0; j < 64; j++)
+	for (int j = 0; j < 64; j++)
 	{
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
 		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4);
@@ -135,12 +96,8 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
 		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
-
-#if GUESS_COPPER_OFFSET
-	m_wait_offset = 3;
-#else
-	(void)m_wait_offset;
-#endif
+	// TODO: verify usage of values in the 64-255 range
+	// (should black out pf1 if j & 0x40, pf2 if j & 0x80)
 
 	/* reset the genlock color */
 	m_genlock_color = 0xffff;
@@ -158,6 +115,12 @@ VIDEO_START_MEMBER( amiga_state, amiga )
  *
  *************************************/
 
+// TODO: sync writes (VPOSW, VHPOSW), strobe beams (STR* class regs at 0x38-0x3e), ECS/AGA BEAMCON0
+// A good chunk of copy protected games uses this timing as RNG seed,
+// optionally syncing the beam to a known state (TBD find examples of this).
+// In case of pbprel_a (AGA), it uses this to check if system has AGA equipped chipset.
+// We may also need a "temporary" screen beam disable until a VBLANK occurs:
+// for instance is dubious that beams are in a known state if a strobe happens ...
 uint32_t amiga_state::amiga_gethvpos()
 {
 	uint32_t hvpos = (m_last_scanline << 8) | (m_screen->hpos() >> 2);
@@ -168,7 +131,7 @@ uint32_t amiga_state::amiga_gethvpos()
 	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (m_last_scanline >= 20 && hvpos < latchedpos))
 		return hvpos;
 
-	/* otherwise, return the latched position */
+	/* otherwise, return the latched position (cfr. lightgun input in alg.cpp, lightpen) */
 	return latchedpos;
 }
 
@@ -184,167 +147,6 @@ void amiga_state::set_genlock_color(uint16_t color)
 {
 	m_genlock_color = color;
 }
-
-
-
-/*************************************
- *
- *  Copper emulation
- *
- *************************************/
-
-void amiga_state::copper_setpc(uint32_t pc)
-{
-	if (LOG_COPPER)
-		logerror("copper_setpc(%06x)\n", pc);
-
-	m_copper_pc = pc;
-	m_copper_waiting = false;
-}
-
-
-int amiga_state::copper_execute_next(int xpos)
-{
-	uint8_t ypos = m_last_scanline & 0xff;
-	int word0, word1;
-
-	/* bail if not enabled */
-	if ((CUSTOM_REG(REG_DMACON) & (DMACON_COPEN | DMACON_DMAEN)) != (DMACON_COPEN | DMACON_DMAEN))
-		return 511;
-
-	/* flush any pending writes */
-	if (m_copper_pending_offset)
-	{
-		if (LOG_COPPER)
-			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		custom_chip_w(m_copper_pending_offset, m_copper_pending_data);
-		m_copper_pending_offset = 0;
-	}
-
-	/* if we're waiting, check for a breakthrough */
-	if (m_copper_waiting)
-	{
-		int curpos = (ypos << 8) | (xpos >> 1);
-
-		/* if we're past the wait time, stop it and hold up 2 cycles */
-		if ((curpos & m_copper_waitmask) >= (m_copper_waitval & m_copper_waitmask) &&
-			(!m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
-		{
-			m_copper_waiting = false;
-#if GUESS_COPPER_OFFSET
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
-#else
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
-#endif
-		}
-
-		/* otherwise, see if this line is even a possibility; if not, punt */
-		if (((curpos | 0xff) & m_copper_waitmask) < (m_copper_waitval & m_copper_waitmask))
-			return 511;
-
-		/* else just advance another pixel */
-		xpos += COPPER_CYCLES_TO_PIXELS(1);
-		return xpos;
-	}
-
-	/* fetch the first data word */
-	word0 = read_chip_ram(m_copper_pc);
-	m_copper_pc += 2;
-	xpos += COPPER_CYCLES_TO_PIXELS(1);
-
-	/* fetch the second data word */
-	word1 = read_chip_ram(m_copper_pc);
-	m_copper_pc += 2;
-	xpos += COPPER_CYCLES_TO_PIXELS(1);
-
-	if (LOG_COPPER)
-		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", m_last_scanline, xpos / 2, m_copper_pc, word0, word1);
-
-	/* handle a move */
-	if ((word0 & 1) == 0)
-	{
-		int min = (CUSTOM_REG(REG_COPCON) & 2) ? 0x20 : 0x40;
-
-		/* do the write if we're allowed */
-		word0 = (word0 >> 1) & 0xff;
-		if (word0 >= min)
-		{
-			if (delay[word0] == 0)
-			{
-				if (LOG_COPPER)
-					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				custom_chip_w(word0, word1);
-			}
-			else    // additional 2 cycles needed for non-Agnus registers
-			{
-				m_copper_pending_offset = word0;
-				m_copper_pending_data = word1;
-			}
-		}
-
-		/* illegal writes suspend until next frame */
-		else
-		{
-			if (LOG_COPPER)
-				logerror("%02X.%02X: Aborting copper on illegal write\n", m_last_scanline, xpos / 2);
-
-			m_copper_waitval = 0xffff;
-			m_copper_waitmask = 0xffff;
-			m_copper_waitblit = false;
-			m_copper_waiting = true;
-
-			return 511;
-		}
-	}
-	else
-	{
-		/* extract common wait/skip values */
-		m_copper_waitval = word0 & 0xfffe;
-
-#if 0
-		if (m_copper_waitval != 0xfffe)
-			m_copper_waitval = (word0 & 0x00fe) | ((((word0 >> 8) & 0xff) + 1) << 8);
-#endif
-
-		m_copper_waitmask = word1 | 0x8001;
-		m_copper_waitblit = (~word1 >> 15) & 1;
-
-		/* handle a wait */
-		if ((word1 & 1) == 0)
-		{
-			if (LOG_COPPER)
-				logerror("  Waiting for %04x & %04x (currently %04x)\n", m_copper_waitval, m_copper_waitmask, (m_last_scanline << 8) | (xpos >> 1));
-
-			m_copper_waiting = true;
-		}
-
-		/* handle a skip */
-		else
-		{
-			int curpos = (ypos << 8) | (xpos >> 1);
-
-			if (LOG_COPPER)
-				logerror("  Skipping if %04x & %04x (currently %04x)\n", m_copper_waitval, m_copper_waitmask, (m_last_scanline << 8) | (xpos >> 1));
-
-			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & m_copper_waitmask) >= (m_copper_waitval & m_copper_waitmask) &&
-				(!m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
-			{
-				if (LOG_COPPER)
-					logerror("  Skipped\n");
-
-				/* count the cycles it out have taken to fetch the next instruction */
-				m_copper_pc += 4;
-				xpos += COPPER_CYCLES_TO_PIXELS(2);
-			}
-		}
-	}
-
-	/* advance and consume 8 cycles */
-	return xpos;
-}
-
-
 
 /*************************************
  *
@@ -693,7 +495,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
-		copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+		m_copper->vblank_sync();
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -736,7 +538,14 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	next_copper_x = 0;
-	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
+	// FIXME: without the add this increment will skip bitplane ops
+	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
+	// (*) because there's a comparison with <= in the bitplane code.
+	// There are various root causes about why this happens:
+	// - no separation of video and logic models;
+	// - the offsets we are applying to DDFSTRT and DDFSTOP, they mustn't be right (copper timings?);
+	// - ditto for DIW related values, they are offset in far too many places;
+	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + 10; x++)
 	{
 		int sprpix;
 
@@ -745,7 +554,11 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(x);
+			next_copper_x = m_copper->execute_next(
+				x,
+				m_last_scanline & 0xff,
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
@@ -757,12 +570,19 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
 
 			/* compute the pixel fetch parameters */
-			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+			// lastbtle sets 0x34-0xd0, lores
+			// swordsod sets 0x38-0xd6 (on gameplay), lores
+			// TODO: verify hires, fix mask for ECS (which can set bit 1 too)
+//          ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & 0xfc) * 2;
 			ddf_start_pixel += hires ? 9 : 17;
-			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+//          ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & 0xfc) * 2;
 			ddf_stop_pixel += hires ? (9 + defbitoffs) : (17 + defbitoffs);
 
-			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
+			// TODO: verify this one on actual hires mode
+			// lastbtle definitely don't need this (enables bit 2 of ddfstrt while in lores mode)
+			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 && hires )
 				ddf_stop_pixel += 8;
 
 			// display window
@@ -934,6 +754,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
+					// TODO: verify if PF2Px priority applies to HAM too
+					// (technically it's a non-dual too?)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
@@ -992,7 +814,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
-					if (sprpix && pf1pri > pri)
+					// alfred OCS won't draw player sprite if PF1Px is used here
+					// (writes $0038 to bplcon2)
+					// According to HRM PF2Px is used there for non-dual playfield
+					if (sprpix && pf2pri > pri)
 					{
 						dst[x*2+0] =
 						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
@@ -1001,6 +826,9 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					/* playfield has priority */
 					else
 					{
+						// TODO: fix SWIV wrong colors for text layer
+						// Abuses of an undocumented OCS/ECS HW bug where priority >= 5 (7 in the specific case)
+						// makes the bitplanes to only output bit 4 discarding the other pixels
 						dst[x*2+0] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix0));
 						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix1));
 					}
@@ -1027,16 +855,6 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// save
 	if (dst != nullptr)
 		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix(save_scanline));
-
-#if GUESS_COPPER_OFFSET
-	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
-	{
-		if (machine().input().code_pressed(KEYCODE_Q))
-			popmessage("%d", m_wait_offset -= 1);
-		if (machine().input().code_pressed(KEYCODE_W))
-			popmessage("%d", m_wait_offset += 1);
-	}
-#endif
 }
 
 

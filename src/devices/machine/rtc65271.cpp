@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "rtc65271.h"
 
+#include "fileio.h"
+
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
 #define UPDATE_CYCLE_TIME attotime::from_usec(1984)

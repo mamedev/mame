@@ -80,6 +80,7 @@ public:
 	void unkpacg(machine_config &config);
 	void unkpacga(machine_config &config);
 	void tourpgum(machine_config &config);
+	void chicgum(machine_config &config);
 
 private:
 	void unkpacg_main_map(address_map &map);

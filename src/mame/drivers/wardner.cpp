@@ -2,7 +2,7 @@
 // copyright-holders:Quench
 /***************************************************************************
 
-        ToaPlan game hardware from 1987
+        Toaplan game hardware from 1987
         --------------------------------
         Driver by: Quench
 
@@ -25,6 +25,7 @@ Notes:
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
+
 Z80:(0)  Main CPU
 0000-6fff Main ROM
 7000-7fff Main RAM
@@ -122,7 +123,6 @@ out:
 01      data to write to addressed Z80:(0) address space (Main RAM/Sprite RAM)
 03      bit 15 goes to BIO line of TMS320C10. BIO is a polled input line.
 
-
 ***************************************************************************/
 
 
@@ -162,6 +162,9 @@ private:
 
 	void wardner_bank_w(uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+
 	void dsp_io_map(address_map &map);
 	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
@@ -170,6 +173,20 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
 };
+
+
+WRITE_LINE_MEMBER(wardner_state::wardner_vblank_irq)
+{
+	if (state && m_intenable)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(wardner_state::int_enable_w)
+{
+	m_intenable = state;
+	if (!state)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
 
 /***************************** Z80 Main Memory Map **************************/
@@ -241,8 +258,6 @@ void wardner_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x5ff).rom();
 }
-
-	// $000 - 08F  TMS32010 Internal Data RAM in Data Address Space
 
 void wardner_state::dsp_io_map(address_map &map)
 {
@@ -398,7 +413,6 @@ void wardner_state::wardner(machine_config &config)
 
 	TMS32010(config, m_dsp, XTAL(14'000'000));       // 14MHz Crystal CLKin
 	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
-	// Data Map is internal to the CPU
 	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 

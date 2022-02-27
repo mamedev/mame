@@ -746,7 +746,7 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 
 void dcs_audio_device::device_reset()
 {
-	dcs_reset(nullptr, 0);
+	dcs_reset(0);
 }
 
 void dcs_audio_device::device_start()
@@ -795,7 +795,7 @@ void dcs_audio_device::device_start()
 	/* register for save states */
 	dcs_register_state();
 	/* reset the system */
-	dcs_reset(nullptr, 0);
+	dcs_reset(0);
 }
 
 
@@ -893,7 +893,7 @@ void dcs2_audio_device::device_start()
 	dcs_register_state();
 
 	/* reset the system */
-	dcs_reset(nullptr, 0);
+	dcs_reset(0);
 }
 
 

@@ -123,7 +123,7 @@ protected:
 
 	u32 bus_error();
 	void itimer_w(u8 data);
-	void itimer(void *ptr, s32 param);
+	void itimer(s32 param);
 	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
 
@@ -360,7 +360,7 @@ void news_r3k_state::itimer_w(u8 data)
 	m_itimer->adjust(attotime::from_ticks(ticks, 800), 0, attotime::from_ticks(ticks, 800));
 }
 
-void news_r3k_state::itimer(void *ptr, s32 param)
+void news_r3k_state::itimer(s32 param)
 {
 	irq_w<TIMER>(ASSERT_LINE);
 }

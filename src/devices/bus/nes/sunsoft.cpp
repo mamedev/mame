@@ -168,9 +168,7 @@ void nes_sunsoft_fme7_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	// this has to be hardcoded because some some scanline code only suits NTSC... it will be fixed with PPU rewrite
-	irq_timer->adjust(attotime::zero, 0, attotime::from_hz((21477272.724 / 12)));
-//  irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));
@@ -263,7 +261,7 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -441,20 +439,17 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
-		if ((m_irq_enable & 0x80)) // bit7, counter decrement
+		if (BIT(m_irq_enable, 7)) // counter decrement enabled
 		{
-			if (!m_irq_count)
+			if (--m_irq_count == 0xffff)
 			{
-				m_irq_count = 0xffff;
-				if (m_irq_enable & 0x01) // bit0, trigger enable
+				if (BIT(m_irq_enable, 0)) // IRQs enabled
 					set_irq_line(ASSERT_LINE);
 			}
-			else
-				m_irq_count--;
 		}
 	}
 }
@@ -499,8 +494,7 @@ void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 					break;
 				case 0x0d:
 					m_irq_enable = data;
-					if (!(m_irq_enable & 1))
-						set_irq_line(CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 				case 0x0e:
 					m_irq_count = (m_irq_count & 0xff00) | data;

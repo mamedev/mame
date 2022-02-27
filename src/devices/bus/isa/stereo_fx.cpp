@@ -232,7 +232,7 @@ void stereo_fx_device::device_reset()
 	m_t0 = CLEAR_LINE;
 }
 
-void stereo_fx_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void stereo_fx_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_t0 = !m_t0;
 	m_cpu->set_input_line(MCS51_T0_LINE, m_t0);

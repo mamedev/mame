@@ -133,7 +133,7 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 			}
 		}
 	}
-	else if (core_filename_ends_with(path, ".7z") || core_filename_ends_with(path, ".zip"))
+	else if (core_filename_ends_with(path, ".7z") || core_filename_ends_with(path, ".zip") || core_filename_ends_with(path, ".imz"))
 	{
 		// first attempt to examine it as a valid zip/7z file
 		util::archive_file::ptr archive;

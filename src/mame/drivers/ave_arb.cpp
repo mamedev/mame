@@ -42,7 +42,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "machine/6522via.h"
@@ -289,7 +289,7 @@ INPUT_PORTS_END
 void arb_state::v2(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 16_MHz_XTAL); // W65C02S6TPG-14
+	W65C02S(config, m_maincpu, 16_MHz_XTAL); // W65C02S6TPG-14
 	m_maincpu->set_addrmap(AS_PROGRAM, &arb_state::v2_map);
 
 	W65C22S(config, m_via, 16_MHz_XTAL); // W65C22S6TPG-14
