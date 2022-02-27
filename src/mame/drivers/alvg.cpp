@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Robbbert
 /******************************************************************************************************
 PINBALL
 Alvin G pinball machines.
@@ -22,7 +22,7 @@ Other games:
 - A G Soccer-ball (1991, head to head)
 - Dinosaur Eggs (1993, redemption)
 - The Death Dealing Adventure of Maxx Badazz Champion Kickboxer (1993, unreleased)
-- USA Football (1994, redemption)
+- USA Football (1994, redemption) No flippers, 12 gobble holes, need to get the ball in a lit hole, or into the outhole.
 - USA Football (1992, head to head)
 
 Here are the key codes to enable play:
@@ -30,31 +30,44 @@ Here are the key codes to enable play:
 Game                                     NUM    Start game                          End ball
 -------------------------------------------------------------------------------------------------
 A G Soccer-Ball                           01    Hold N, hit 8                       (timed game)
-Al's Garage Band Goes On A World Tour     03    (mnw)
+Al's Garage Band Goes On A World Tour     03    Hold ABC, hit 1                     ABC
 USA Football (head to head)               05    Hold N and Quote, hit 8             (timed game)
-Punchy the Clown                          06    (mnw)
+Punchy the Clown                          06    Hold EF, hit 1                      (mnw)
 Dinosaur Eggs                             07    (mnw)
-Mystery Castle                            08    (mnw)
-Pistol Poker                              10    (mnw)
-USA Football (redemption)                 11    (mnw)
+Mystery Castle                            08    Hold CDE, hit 1                     (mnw)
+Pistol Poker                              10    Hold CDE, hit 1                     (mnw)
+USA Football (redemption)                 11    Hold A, hit 1                       (mnw)
 
 Status:
 - A G Soccer, USA Football (head to head): Playable.
-- USA Football (redemption): partially working, no sound, goes a bit weird now and then.
-- Others: Skeletons
+- Other machines are sometimes workable, but will sooner or later run into the weeds and fail.
+- punchy: display gets corrupt, can't be started
+- punchy3: can sometimes run, but soon goes berserk
+- dinoeggs: usually goes berzerk at start
+- usafootf: sometimes can work, sometimes corrupt display and freeze at start
+- dmd column and row offsets obtained from dmdcpu are wrong, even though it's coded from schematics
+- wrldtour: mostly playable, but random key pressing can freeze it. End of game can freeze too.
+- pstlpkr: sometimes can start a game, but can't end the ball. In the end it freezes.
+- mystcast: usually can't even start up. Randomly can start a game, but then nothing.
+- pstlpkr, mystcast: show 0 credits at startup, even if there's some from last run.
+- usafootf: loses all saved credits at start.
 
 ToDo:
-- Add bsmt-based sound card
-- DMD Display
 - Mechanical sound
-- Most of the non-working games run into the weeds after a short while. It's as if
-    the roms or cpu were bad.
+- Find out why the random freezing (happens most of the time)
+- msystcasta: DMD CPU rom seems bad (rubbish 08FE-0B60)
+- wrldtour: attract mode guitars should have shading. Only wrldtour3 shows all the high scores.
+- wrldtour, wrldtour2: instructions fly past too fast to be read. wrldtour3 is ok.
+- pstlpkr, mystcast: no attract mode.
+- mystcast: Uses PCA-020A, a modified DMD controller, to be emulated (schematic hasn't been updated)
+- The schematic of PCA-021 (DMD display board) does not appear in any manual.
 
 ****************************************************************************************************/
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/6522via.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
@@ -62,7 +75,9 @@ ToDo:
 #include "sound/bsmt2000.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+#include "emupal.h"
 #include "speaker.h"
+#include "screen.h"
 #include "alvg.lh"
 
 
@@ -87,6 +102,9 @@ public:
 		, m_oki(*this, "oki")
 		, m_bsmt(*this, "bsmt")
 		, m_vias(*this, "vias")
+		, m_dmdcpu(*this, "dmdcpu")
+		, m_dmd(*this, "dmd")
+		, m_vram(*this, "vram")
 	{ }
 
 	void alvg(machine_config &config);
@@ -103,6 +121,8 @@ private:
 	void pca002_map(address_map &map);
 	void pca003_map(address_map &map);
 	void pca008_map(address_map &map);
+	void pca020_io_map(address_map &map);
+	void pca020_mem_map(address_map &map);
 	void machine_start() override;
 	void machine_reset() override;
 	void display_w(offs_t, u8);
@@ -120,25 +140,44 @@ private:
 	void ppi3_pc_w(u8 data);
 	void vias_pb_w(u8 data);
 	u8 via0_pa_r();
-	u8 via0_pb_r() { return m_io_keyboard[12]->read(); }
+	u8 via0_pb_r() { return m_io_keyboard[12]->read() | (BIT(m_dmd_stat, 0) << 7); }
 	void via1_pa_w(u8 data);
 	void via1_pb_w(u8 data);
+	u16 m_row = 0U;
+	u16 m_lamp_data = 0U;
+	u8 m_strobe = 0U;
+
+	// bsmt
 	u8 rdstat_r() { return m_bsmt_rdcode; }
 	u8 rdcode_r() { m_audiocpu->set_input_line(0, CLEAR_LINE); return m_cpu_to_bsmt; }
 	void wrcode_w(u8 data) { m_bsmt_to_cpu = data; 	m_via1->write_ca1(BIT(data, 0)); }
 	void bsmt_w(offs_t offset, u8 data);
 	void watch_w(u8 data) { if (!BIT(data, 6)) m_bsmt->reset(); }
 	void bsmt_ready_w() { m_bsmt_rdcode |= 0x80; }
-	//DECLARE_WRITE_LINE_MEMBER(test_w) { printf("%d ",state); }
-
-	u16 m_row = 0U;
-	u16 m_lamp_data = 0U;
-	u8 m_strobe = 0U;
 	u8 m_bsmt_addr = 0U;
 	u8 m_bsmt_data = 0U;
 	u8 m_bsmt_to_cpu = 0U;
 	u8 m_cpu_to_bsmt = 0U;
-	u8 m_bsmt_rdcode = 0xFFU;
+	u8 m_bsmt_rdcode = 0xffU;
+
+	// dmd
+	u8 dmd_portin_r() { m_dmdcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE); return m_dmd_cmd; }
+	void dmd_portout_w(u8 data) { m_dmd_stat = data & 15; m_via1->write_pb(bitswap<8>(data, 7, 7, 1, 2, 3, 7, 7, 7)); }
+	void dmd_codepage_w(u8 data) { m_dmd->set_entry(data & 15); }
+	void dmd_rowstart_w(u8 data) { m_dmd_row = data; } // not working - always FF
+	void dmd_colstart_w(u8 data) { m_dmd_col = data; } // not working - always 0
+	void dmd_w(u8 data) { m_dmd_cmd = data; if (m_dmdcpu) m_dmdcpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE); }
+	void dmd_port1_w(u8 data) { m_dmd_page = data & 15; }
+	u8 dmd_port1_r() { return m_dmd_page; }
+	void dmd_port3_w(u8 data) { m_dmd_plan = BIT(data, 0); }
+	u8 m_dmd_cmd = 0xffU;
+	u8 m_dmd_stat = 0xffU;
+	u8 m_dmd_page = 0U;
+	u8 m_dmd_row = 0U;
+	u8 m_dmd_col = 0U;
+	bool m_dmd_plan = 0;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -153,6 +192,9 @@ private:
 	optional_device<okim6295_device> m_oki;
 	optional_device<bsmt2000_device> m_bsmt;
 	optional_device<via6522_device> m_vias;
+	optional_device<mcs51_cpu_device> m_dmdcpu;
+	optional_memory_bank m_dmd;
+	optional_shared_ptr<u8> m_vram;
 };
 
 
@@ -163,6 +205,7 @@ void alvg_state::main_map(address_map &map)
 	map(0x2000, 0x2003).mirror(0x3f0).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U12
 	map(0x2400, 0x2403).mirror(0x3f0).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U13
 	map(0x2800, 0x2803).mirror(0x3f0).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)); // U14
+	map(0x2c00, 0x2fff).w(FUNC(alvg_state::dmd_w));
 	map(0x3800, 0x380f).mirror(0x3f0).m("via1", FUNC(via6522_device::map)); // U8
 	map(0x3c00, 0x3c0f).mirror(0x3f0).m("via0", FUNC(via6522_device::map)); // U7
 }
@@ -191,6 +234,24 @@ void alvg_state::pca008_map(address_map &map) // mapping done by U104
 	map(0x0800, 0x0800).rw(FUNC(alvg_state::rdcode_r),FUNC(alvg_state::wrcode_w));
 	map(0x1000, 0x10ff).w(FUNC(alvg_state::bsmt_w));
 	map(0x2000, 0x3fff).ram();
+}
+
+void alvg_state::pca020_mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).bankr("dmd");
+}
+
+void alvg_state::pca020_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram().share("vram");
+	map(0x8000, 0x8fff).r(FUNC(alvg_state::dmd_portin_r));
+	map(0x9000, 0x9fff).w(FUNC(alvg_state::dmd_portout_w));
+	map(0xa000, 0xafff).w(FUNC(alvg_state::dmd_codepage_w));
+	map(0xb000, 0xbfff).w(FUNC(alvg_state::dmd_rowstart_w));
+	map(0xc000, 0xcfff).w(FUNC(alvg_state::dmd_colstart_w));
 }
 
 static INPUT_PORTS_START( alvg )
@@ -391,6 +452,38 @@ void alvg_state::bsmt_w(offs_t offset, u8 data)
 	}
 }
 
+u32 alvg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u16 sy = 0;
+	u16 ma = m_dmd_page << 11;
+	//if (m_dmd_plan)
+		//ma += BIT(m_dmd_row, 5, 2) << 9;
+	// m_dmd_row and m_dmd_col should give finer tuning, but getting bad data
+	//ma += ((m_dmd_row & 0x1f) << 4) | BIT(m_dmd_col, 3, 4);
+
+	for (u16 y = 0; y < 32; y++)
+	{
+		u16 *p = &bitmap.pix(sy++);
+
+		for (u8 x = 0; x < 16; x++) // 128 dots across
+		{
+			// mystcast has 5-level brightness from 0,0x200,0x400,0x600 which need to be combined
+			u8 gfx = m_vram[ma];
+
+			*p++ = BIT(gfx, 7);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 0);
+			ma++;
+		}
+	}
+	return 0;
+}
+
 void alvg_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -400,6 +493,21 @@ void alvg_state::machine_start()
 
 	save_item(NAME(m_row));
 	save_item(NAME(m_lamp_data));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_bsmt_addr));
+	save_item(NAME(m_bsmt_data));
+	save_item(NAME(m_bsmt_to_cpu));
+	save_item(NAME(m_cpu_to_bsmt));
+	save_item(NAME(m_bsmt_rdcode));
+	save_item(NAME(m_dmd_cmd));
+	save_item(NAME(m_dmd_stat));
+	save_item(NAME(m_dmd_page));
+	save_item(NAME(m_dmd_row));
+	save_item(NAME(m_dmd_col));
+	save_item(NAME(m_dmd_plan));
+
+	if (m_dmd)
+		m_dmd->configure_entries(0, 16, memregion("dmd")->base(), 0x8000);
 }
 
 void alvg_state::machine_reset()
@@ -408,6 +516,8 @@ void alvg_state::machine_reset()
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 	m_strobe = 0U;
+	if (m_dmd)
+		m_dmd->set_entry(0);
 }
 
 void alvg_state::pca002(machine_config &config)
@@ -463,6 +573,25 @@ void alvg_state::pca008(machine_config &config)
 
 void alvg_state::pca020(machine_config &config)
 {
+	/* basic machine hardware */
+	I8031(config, m_dmdcpu, XTAL(12'000'000));
+	m_dmdcpu->set_addrmap(AS_PROGRAM, &alvg_state::pca020_mem_map);
+	m_dmdcpu->set_addrmap(AS_IO, &alvg_state::pca020_io_map);
+	m_dmdcpu->port_out_cb<1>().set(FUNC(alvg_state::dmd_port1_w));
+	m_dmdcpu->port_in_cb<1>().set(FUNC(alvg_state::dmd_port1_r));
+	m_dmdcpu->port_out_cb<3>().set(FUNC(alvg_state::dmd_port3_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::amber()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 127, 0, 31);
+	screen.set_screen_update(FUNC(alvg_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	CLOCK(config, "dclock", 100).signal_handler().set_inputline(m_dmdcpu, MCS51_INT1_LINE); // unknown frequency, need to be measured.
 }
 
 void alvg_state::alvg(machine_config &config)
@@ -531,8 +660,10 @@ void alvg_state::group3(machine_config &config)
 ROM_START(agsoccer)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v24", 0x0000, 0x10000, CRC(4ba36e8d) SHA1(330dcb1eea8c311df0e57a3b74146601c26d63c0)) // label says 2.4, inside the ROM it says 2.5L though
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -543,8 +674,10 @@ ROM_END
 ROM_START(agsoccera)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("agscpu1r.18u", 0x0000, 0x10000, CRC(37affcf4) SHA1(017d47f54d5b34a4b71c2f5b84ba9bdb1c924299))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v21", 0x0000, 0x10000, CRC(aa30bfe4) SHA1(518f7019639a0284461e83ad849bee0be5371580))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -555,8 +688,10 @@ ROM_END
 ROM_START(agsoccer07)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ags_cpu_r07u", 0x0000, 0x10000, CRC(009ef717) SHA1(d770ce8fd032f4f1d96b9792509cceebbfaebbd9))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("ags_snd.v14", 0x0000, 0x10000, CRC(2544e468) SHA1(d49e2fc91cbb80fdf96f436c614c6f305efafb6f))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("ags_voic.v12", 0x000000, 0x40000, CRC(bac70b18) SHA1(0a699eb95d7d6b071b2cd9d0bf73df355e2ffce8))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -570,8 +705,10 @@ ROM_END
 ROM_START(wrldtour)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu27c.512", 0x0000, 0x10000, CRC(c9572fb5) SHA1(47a3e8943ef4207011a33f4a03a6e722c937cc48))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -589,21 +726,23 @@ ROM_START(wrldtour)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x110000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("dot27c.512", 0x0000, 0x8000, CRC(c8bd48e7) SHA1(e2dc513dd42c05c2018e6d8c0b6f0b2c56e6e059))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("romdef1.c20", 0x00000, 0x40000, CRC(045b21c1) SHA1(134b7eb0f71506d12d9ded24999d530126c558fc))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
-	ROM_RELOAD( 0xc0000, 0x40000)
-	ROM_LOAD("dot27c.512", 0x100000, 0x10000, CRC(c8bd48e7) SHA1(e2dc513dd42c05c2018e6d8c0b6f0b2c56e6e059))
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
 ROM_START(wrldtour2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu02b.512", 0x0000, 0x10000, CRC(1658bf40) SHA1(7af9eedab4e7d0cedaf8bfdbc1f27b989a7171cd))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -621,21 +760,23 @@ ROM_START(wrldtour2)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x110000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("dot02b.512", 0x0000, 0x8000, CRC(50e3d59d) SHA1(db6df3482fc485af6bde341750bf8072a296b8da))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("romdef1.c20", 0x00000, 0x40000, CRC(045b21c1) SHA1(134b7eb0f71506d12d9ded24999d530126c558fc))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
-	ROM_RELOAD( 0xc0000, 0x40000)
-	ROM_LOAD("dot02b.512", 0x100000, 0x10000, CRC(50e3d59d) SHA1(db6df3482fc485af6bde341750bf8072a296b8da))
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
 ROM_START(wrldtour3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu03.512", 0x0000, 0x10000, CRC(56dee967) SHA1(f7b1f69d96c72b0cf738bdf45701502f7306a4a0))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundc.512", 0x0000, 0x10000, CRC(b44bee01) SHA1(795d8500e5bd73ce23756bf1f5c96db1a3621a70))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("samp_0.c21", 0x000000, 0x40000, CRC(37beb831) SHA1(2b90d2be0a1bd7c59469846631d2b44bdf9f5f9d))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -653,14 +794,14 @@ ROM_START(wrldtour3)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x110000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("dot03.512", 0x0000, 0x8000, CRC(f8a084bb) SHA1(30eb344ad96b5605693d3a7c703c9ed5c1770ca4)) // empty
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("romdef1.c20", 0x00000, 0x40000, CRC(045b21c1) SHA1(134b7eb0f71506d12d9ded24999d530126c558fc))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("romdef2.c20", 0x40000, 0x40000, CRC(23c32ee5) SHA1(429b3b069251bb8b681bbc6382ceb6b85125eb79))
-	ROM_RELOAD( 0xc0000, 0x40000)
-	ROM_LOAD("dot03.512", 0x100000, 0x10000, CRC(f8a084bb) SHA1(30eb344ad96b5605693d3a7c703c9ed5c1770ca4))
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -671,8 +812,10 @@ ROM_START(dinoeggs)
 	ROM_LOAD("dinoeggs.512", 0x0000, 0x10000, CRC(4712f97f) SHA1(593351dcfd475e685c1e5eb2c1006769d3325c8b))
 	//ROM_FILL(0x8119,1,0x0d) // stop jump into the weeds
 	//ROM_FILL(0x40bd,1,0x80) // disable rom check
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps071.r02", 0x0000, 0x10000, CRC(288f116c) SHA1(5d03ce66bffe39ec02173525078ff07c5005ef18))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("eps072.r02", 0x000000, 0x40000, CRC(780a4364) SHA1(d8a972debee669f0fe66c7407fbed5ef9cd2ce01))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -686,8 +829,10 @@ ROM_END
 ROM_START(mystcast)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mcastle.cpu", 0x0000, 0x10000, CRC(936e6799) SHA1(aa29fb5f12f34c695d1556232744f65cd576a2b1))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("mcastle.102", 0x0000, 0x10000, CRC(752822d0) SHA1(36461ef03cac5aefa0c03dfdc63c3d294a3b9c09))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("mcastle.sr0", 0x000000, 0x40000, CRC(0855cc73) SHA1(c46e08432bcff24594c33171f20669ba63828931))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -705,20 +850,23 @@ ROM_START(mystcast)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_LOAD("mcastle.du4", 0x00000, 0x10000, CRC(686e253a) SHA1(28aff34c120c61e231e2111dc396df515bcbbb89))
-	ROM_REGION(0x100000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("mcastle.du4", 0x0000, 0x8000, CRC(686e253a) SHA1(28aff34c120c61e231e2111dc396df515bcbbb89))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("mcastle.du5", 0x00000, 0x40000, CRC(9095c367) SHA1(9d3e9416f662ee2aad891eef059278c530448fcc))
 	ROM_RELOAD( 0x40000, 0x40000)
-	ROM_RELOAD( 0x80000, 0x40000)
-	ROM_RELOAD( 0xc0000, 0x40000)
 ROM_END
 
 ROM_START(mystcasta)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu_103.bin", 0x0000, 0x10000, CRC(70ab8ece) SHA1(2bf8cd042450968b7500552419a9af5df2589c13))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("mcastle.103", 0x0000, 0x10000, CRC(bd4849ac) SHA1(f477ea369539a65c0960be1f1c3b4c5503dd6b75))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("mcastle.sr0", 0x000000, 0x40000, CRC(0855cc73) SHA1(c46e08432bcff24594c33171f20669ba63828931))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -736,13 +884,14 @@ ROM_START(mystcasta)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_LOAD("u4.bin", 0x00000, 0x10000, CRC(a6969efc) SHA1(82da976cb3d30d6fb1576e4c67febd7235f73f51))
-	ROM_REGION(0x100000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("u4.bin", 0x0000, 0x8000, CRC(a6969efc) SHA1(82da976cb3d30d6fb1576e4c67febd7235f73f51))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("u5.bin", 0x00000, 0x40000, CRC(e5126980) SHA1(2c6d412c87bf27098dae4351958d84e8f9348423))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("u6.bin", 0x40000, 0x40000, CRC(eb241633) SHA1(8e5db75b32ed2ea74088615bbe1403d4c8feafbd))
-	ROM_RELOAD( 0xc0000, 0x40000)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -751,8 +900,10 @@ ROM_END
 ROM_START(pstlpkr)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("p_peteu2.512", 0x0000, 0x10000, CRC(490a1e2d) SHA1(907dd858ed948681e7366a64a0e7537ebe301d6b))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("p_pu102.512", 0x0000, 0x10000, CRC(b8fb806e) SHA1(c2dc19820ea22bbcf5808db2fb4be76a4033d6ea))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("p_parom0.c20", 0x000000, 0x40000, CRC(99986af2) SHA1(52fa7d2979f7f2d6d65ab6d4f7bbfbed16303991))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -770,20 +921,23 @@ ROM_START(pstlpkr)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_LOAD("p_peteu4.512", 0x00000, 0x10000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
-	ROM_REGION(0x100000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("p_peteu4.512", 0x0000, 0x8000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("p_peteu5.c20", 0x00000, 0x40000, CRC(1d2cecd8) SHA1(6072a0f744fb9eef728fe7cf5e17d0007edbddd7))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("p_peteu6.c20", 0x40000, 0x40000, CRC(3a56376c) SHA1(69febc17b8416c03a58e651447bbe1e14ff27e50))
-	ROM_RELOAD( 0xc0000, 0x40000)
 ROM_END
 
 ROM_START(pstlpkr1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2-ddff.512", 0x0000, 0x10000, CRC(83fa0595) SHA1(d6ebb0e63fd964ccaee3979a7fc13b6adf7b837c))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("p_pu102.512", 0x0000, 0x10000, CRC(b8fb806e) SHA1(c2dc19820ea22bbcf5808db2fb4be76a4033d6ea))
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("p_parom0.c20", 0x000000, 0x40000, CRC(99986af2) SHA1(52fa7d2979f7f2d6d65ab6d4f7bbfbed16303991))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -801,13 +955,14 @@ ROM_START(pstlpkr1)
 	ROM_RELOAD(0x340000, 0x40000)
 	ROM_RELOAD(0x380000, 0x40000)
 	ROM_RELOAD(0x3c0000, 0x40000)
-	ROM_REGION(0x20000, "dmdcpu", 0)
-	ROM_LOAD("p_peteu4.512", 0x00000, 0x10000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
-	ROM_REGION(0x100000, "gfx3", 0)
+
+	ROM_REGION(0x8000, "dmdcpu", 0)
+	ROM_LOAD("p_peteu4.512", 0x0000, 0x8000, CRC(caa0cabd) SHA1(caff6ca4a9cce4e3d846502696c8838805673261))
+	ROM_CONTINUE(0x0000, 0x8000)
+
+	ROM_REGION(0x80000, "dmd", 0)
 	ROM_LOAD("p_peteu5.c20", 0x00000, 0x40000, CRC(1d2cecd8) SHA1(6072a0f744fb9eef728fe7cf5e17d0007edbddd7))
-	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("p_peteu6.c20", 0x40000, 0x40000, CRC(3a56376c) SHA1(69febc17b8416c03a58e651447bbe1e14ff27e50))
-	ROM_RELOAD( 0xc0000, 0x40000)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -816,8 +971,10 @@ ROM_END
 ROM_START(punchy)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("epc061.r02", 0x0000, 0x10000, CRC(732fca88) SHA1(dff0aa4b856bafb95b08dae675dd2ad59e1860e1))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps061.r02", 0x0000, 0x10000, CRC(cfde1b9a) SHA1(cbf9e67df6a6762843272493c2caa1413f70fb27))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("eps062.r02", 0x000000, 0x40000, CRC(7462a5cd) SHA1(05141bcc91b1a786444bff7fa8ba2a785dc0d376))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -828,8 +985,10 @@ ROM_END
 ROM_START(punchy3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("epc061.r03", 0x0000, 0x10000, CRC(8e91131c) SHA1(1bf1408e4e512b764048f4847cf8e4b7a0bf824d))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("eps061.r02", 0x0000, 0x10000, CRC(cfde1b9a) SHA1(cbf9e67df6a6762843272493c2caa1413f70fb27))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("eps062.r02", 0x000000, 0x40000, CRC(7462a5cd) SHA1(05141bcc91b1a786444bff7fa8ba2a785dc0d376))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -843,8 +1002,10 @@ ROM_END
 ROM_START(usafootb)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("usa_cpu.bin", 0x0000, 0x10000, CRC(53b00873) SHA1(96812c4722026554a830c62eca64f09d25a0de82))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("usa_snd.bin", 0x0000, 0x10000, CRC(9d509cbc) SHA1(0be629945b5102adf75e88661e0f956e32ca77da))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("usa_vox.bin", 0x000000, 0x40000, CRC(baae0aa3) SHA1(7933bffcf1509ceeea58a4449268c10c9fac554c))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -855,8 +1016,10 @@ ROM_END
 ROM_START(usafootba)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("usa_cpu1.bin", 0x0000, 0x10000, CRC(3b64a6e9) SHA1(65535bc17395416181bafddc61c0fac177eeba2f))
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("usa_snd.bin", 0x0000, 0x10000, CRC(9d509cbc) SHA1(0be629945b5102adf75e88661e0f956e32ca77da))
+
 	ROM_REGION(0x400000, "oki", 0)
 	ROM_LOAD("usa_vox.bin", 0x000000, 0x40000, CRC(baae0aa3) SHA1(7933bffcf1509ceeea58a4449268c10c9fac554c))
 	ROM_RELOAD(0x040000, 0x40000)
@@ -867,8 +1030,10 @@ ROM_END
 ROM_START(usafootf)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("usafootf_cpu1.u2", 0x0000, 0x10000, CRC(bdcee108) SHA1(5f241e3d56620cd7464889c9f0032416c190f0c8) )
+
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("usafootf_snd.u102", 0x0000, 0x10000, CRC(330a7974) SHA1(0fc041a826403167e9c05046304cb4be30e89aaa) )
+
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD("usafootf.arom0", 0x000000, 0x40000, CRC(577509bb) SHA1(2d7705aaa5cf42f4fcffa259a325cec2018d0085) )
 	ROM_RELOAD(0x040000, 0x40000)
