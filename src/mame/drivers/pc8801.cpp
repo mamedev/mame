@@ -292,7 +292,8 @@ CRTC command params:
 #define hretrace ((m_crtc.param[0][3] & 0x1f) + 2) * 8
 
 #define text_color_flag ((m_crtc.param[0][4] & 0xe0) == 0x40)
-//#define monitor_24KHz ((m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
+// TODO: not the right condition
+//#define monitor_24KHz ((m_gfx_ctrl & 0x19) == 0x08)
 
 void pc8801_state::video_start()
 {
@@ -598,7 +599,8 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 			}
 			else // monochrome
 			{
-				pal = 7; /* TODO: Bishoujo Baseball Gakuen Pasoket logo wants this to be black somehow ... */
+				// TODO: bishojbg Pasoket logo wants this to be black instead
+				pal = 7;
 				gfx_mode = (attr & 0x80) >> 7;
 				reverse = (attr & 4) >> 2;
 				secret = (attr & 1);
@@ -610,7 +612,6 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 
 				if(attr & 0x80)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
-
 			}
 
 			draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
@@ -932,75 +933,6 @@ void pc8801_state::main_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(pc8801_state::mem_r), FUNC(pc8801_state::mem_w));
 }
 
-/*
- * I/O Port $40 reads
- *
- * 11-- ----
- * --x- ---- vrtc
- * ---x ---- calendar CDO
- * ---- x--- fdc auto-boot DIP-SW
- * ---- -x-- (RS-232C related)
- * ---- --x- monitor refresh rate DIP-SW
- * ---- ---x (pbsy?)
- */
-uint8_t pc8801_state::ctrl_r()
-{
-	return ioport("CTRL")->read();
-}
-
-/*
- * I/O Port $40 writes
- *
- * x--- ---- SING (buzzer mask?)
- * -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
- * --x- ---- beeper
- * ---x ---- ghs mode
- * ---- x--- crtc i/f sync mode
- * ---- -x-- upd1990a clock bit
- * ---- --x- upd1990a strobe bit
- * ---- ---x printer strobe
- */
-void pc8801_state::ctrl_w(uint8_t data)
-{
-	m_rtc->stb_w((data & 2) >> 1);
-	m_rtc->clk_w((data & 4) >> 2);
-
-	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		m_beeper->set_state(1);
-
-	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
-		m_beeper->set_state(0);
-
-	if((m_device_ctrl_data & 0x40) != (data & 0x40))
-	{
-		attotime new_time = machine().time();
-
-		if(m_mouse.phase == 0)
-		{
-			m_mouse.x = ioport("MOUSEX")->read();
-			m_mouse.y = ioport("MOUSEY")->read();
-		}
-
-		if(data & 0x40 && (new_time - m_mouse.time) > attotime::from_hz(900))
-		{
-			m_mouse.phase = 0;
-		}
-		else
-		{
-			m_mouse.phase++;
-			m_mouse.phase &= 3;
-		}
-
-		m_mouse.time = machine().time();
-	}
-
-	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
-	if(m_device_ctrl_data & 0x80)
-		m_beeper->set_state(0);
-
-	m_device_ctrl_data = data;
-}
-
 uint8_t pc8801_state::ext_rom_bank_r()
 {
 	return m_ext_rom_bank;
@@ -1046,21 +978,123 @@ void pc8801_state::dynamic_res_change(void)
 }
 
 /*
- * I/O Port $31 (w/o)
+ * I/O Port $30 (w/o) "System Control Port (1)"
+ * N88-BASIC buffer port $e6c0
  *
- * --x- ---- ???
- * ---x ---- graphic color yes (1) / no (0)
- * ---- x--- graphic display yes (1) / no (0)
- * ---- -x-- RMODE: Basic N (1) / N88 (0)
- * ---- --x- RAM select yes (1) / no (0)
- * ---- ---x VRAM 200 lines (1) / 400 lines (0) in 1bpp mode
+ * Virtually same as the correlated PC-8001 port
+ *
+ * --xx ---- BS2, BS1: USART channel control
+ * --00 ----           CMT 600 bps
+ * --01 ----           CMT 1200 bps
+ * --10 ----           RS-232C async mode
+ * --11 ----           RS-232C sync mode
+ * ---- x--- MTON: CMT motor control (active high)
+ * ---- -x-- CDS: CMT carrier control (1) mark (0) space
+ * ---- --x- /COLOR: CRT display mode control (1) color mode (0) monochrome
+ * ---- ---x /40: CRT display format control (1) 80 chars per line (0) 40 chars
  *
  */
-void pc8801_state::gfx_ctrl_w(uint8_t data)
+void pc8801_state::port30_w(uint8_t data)
+{
+	m_txt_width = data & 1;
+	m_txt_color = data & 2;
+
+	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
+
+/*
+ * I/O Port $31 (w/o) "System Control Port (2)"
+ * N88-BASIC buffer port $e6c2
+ *
+ * --x- ---- 25LINE: line control in high speed CRT mode (1) 25 lines (0) 20 lines
+ * ---x ---- HCOLOR: color graphic display mode
+ * ---1 ----         color mode
+ * ---0 ----         monochrome mode
+ * ---- x--- GRPH: Graphic display mode yes (1) / no (0)
+ * ---- -x-- RMODE: ROM mode control N-BASIC (1, ROM 1 & 2) / N88-BASIC (0, ROM 3 & 4)
+ * ---- --x- MMODE: RAM mode control yes (1, full RAM) / no (0, ROM/RAM mixed)
+ * ---- ---x 200LINE: 200 lines (1) / 400 lines (0) in 1bpp mode
+ *
+ */
+void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
 
 	dynamic_res_change();
+}
+
+/*
+ * I/O Port $40 reads "Strobe Port"
+ *
+ * 1--- ---- UOP2: SW1-8
+ * -1-- ---- UOP1:
+ * --x- ---- VRTC: vblank signal (0) display (1) vblank
+ * ---x ---- CDI: upd1990a data read
+ * ---- x--- /EXTON: Minidisc unit connection signal (SW2-7)
+ * ---- -x-- DCD: SIO Data Carrier Detect signal (0) no carrier (1) with
+ * ---- --x- /SHG: monitor resolution mode (0) high res (1) normal res
+ * ---- ---x BUSY: printer (0) READY (1) BUSY
+ *
+ */
+uint8_t pc8801_state::port40_r()
+{
+	return ioport("CTRL")->read();
+}
+
+/*
+ * I/O Port $40 writes "Strobe Port"
+ * N88-BASIC buffer port $e6c1
+ *
+ * x--- ---- UOP2: general purpose output 2 / sound port
+ *                 SING (buzzer mask?)
+ * -x-- ---- UOP1: general purpose output 1
+ *                 generally used for mouse latch (JOP1, routes on OPN sound port A)
+ * --x- ---- BEEP: beeper enable
+ * ---x ---- FLASH: flash mode control (active high)
+ * ---- x--- /CLDS: "CRT I/F sync control" (init CRT and controller sync pulses?)
+ * ---- -x-- CCK: upd1990a clock bit
+ * ---- --x- CSTB: upd1990a strobe bit
+ * ---- ---x /PSTB: printer strobe (active low)
+ */
+void pc8801_state::port40_w(uint8_t data)
+{
+	m_rtc->stb_w((data & 2) >> 1);
+	m_rtc->clk_w((data & 4) >> 2);
+
+	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
+		m_beeper->set_state(1);
+
+	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+		m_beeper->set_state(0);
+
+	if((m_device_ctrl_data & 0x40) != (data & 0x40))
+	{
+		attotime new_time = machine().time();
+
+		if(m_mouse.phase == 0)
+		{
+			m_mouse.x = ioport("MOUSEX")->read();
+			m_mouse.y = ioport("MOUSEY")->read();
+		}
+
+		if(data & 0x40 && (new_time - m_mouse.time) > attotime::from_hz(900))
+		{
+			m_mouse.phase = 0;
+		}
+		else
+		{
+			m_mouse.phase++;
+			m_mouse.phase &= 3;
+		}
+
+		m_mouse.time = machine().time();
+	}
+
+	// TODO: is SING a buzzer mask? bastard leaves beeper to ON state otherwise
+	if(m_device_ctrl_data & 0x80)
+		m_beeper->set_state(0);
+
+	m_device_ctrl_data = data;
 }
 
 uint8_t pc8801_state::vram_select_r()
@@ -1135,8 +1169,8 @@ void pc8801_state::window_bank_w(uint8_t data)
 
 void pc8801_state::window_bank_inc_w(uint8_t data)
 {
-	m_window_offset_bank++;
-	m_window_offset_bank&=0xff;
+	m_window_offset_bank ++;
+	m_window_offset_bank &= 0xff;
 }
 
 /*
@@ -1184,15 +1218,17 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 }
 
 /*
- * I/O Port $52
+ * I/O Port $52 "Border and background color control"
  *
- * -xxx ---- Index for pen #0
- * ---- -xxx Border color? (NB: according to SystemSoft techbook not all machines have this)
+ * -RGB ---- BGx: Background color, index for pen #0
+ * ---- -RGB Rx: Border color?
+ *           (NB: according to some sources not all machines have border control)
  *
  */
-// TODO: sorcerml uses index on main playlist (0x10 setting, should have blue instead of black)
 void pc8801_state::bgpal_w(uint8_t data)
 {
+	// TODO: sorcerml uses index on main playlist (0x10 setting, should have blue instead of black)
+
 	if(data)
 		logerror("BG Pal %02x\n",data);
 }
@@ -1226,15 +1262,15 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// TODO: at least analog mode can do rasters
 }
 
+
+/*
+ * ---- x--- green gvram masked flag
+ * ---- -x-- red gvram masked flag
+ * ---- --x- blue gvram masked flag
+ * ---- ---x text vram masked
+ */
 void pc8801_state::layer_masking_w(uint8_t data)
 {
-	/*
-	---- x--- green gvram masked flag
-	---- -x-- red gvram masked flag
-	---- --x- blue gvram masked flag
-	---- ---x text vram masked
-	*/
-
 	m_layer_mask = data;
 }
 
@@ -1244,7 +1280,7 @@ uint8_t pc8801_state::crtc_param_r()
 	return 0xff;
 }
 
-void pc8801_state::pc88_crtc_param_w(uint8_t data)
+void pc8801_state::crtc_param_w(uint8_t data)
 {
 	if(m_crtc.param_count < 5)
 	{
@@ -1283,7 +1319,7 @@ static const char *const crtc_command[] =
 };
 #endif
 
-void pc8801_state::pc88_crtc_cmd_w(uint8_t data)
+void pc8801_state::crtc_cmd_w(uint8_t data)
 {
 	m_crtc.cmd = (data & 0xe0) >> 5;
 	m_crtc.param_count = 0;
@@ -1326,6 +1362,10 @@ uint8_t pc8801_state::dmac_r(offs_t offset)
 	return 0xff;
 }
 
+// CH0: 5-inch floppy DMA
+// CH1: 8-inch floppy DMA
+// CH2: CRTC
+// CH3: CD-ROM and probably HxC etc.
 void pc8801_state::dmac_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
@@ -1396,17 +1436,6 @@ void pc8801_state::pcg8100_w(offs_t offset, uint8_t data)
 	logerror("%s: Possible write to PCG-8100 %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-void pc8801_state::txt_cmt_ctrl_w(uint8_t data)
-{
-	/* bits 2 to 5 are cmt related */
-
-	m_txt_width = data & 1;
-	m_txt_color = data & 2;
-
-	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-}
-
-
 uint8_t pc8801_state::kanji_r(offs_t offset)
 {
 	if((offset & 2) == 0)
@@ -1442,7 +1471,7 @@ void pc8801_state::rtc_w(uint8_t data)
 	m_rtc->c2_w((data & 4) >> 2);
 	m_rtc->data_in_w((data & 8) >> 3);
 
-	/* TODO: remaining bits */
+	// TODO: remaining bits
 }
 
 uint8_t pc8801_state::sound_board_r(offs_t offset)
@@ -1583,23 +1612,27 @@ void pc8801_state::main_io(address_map &map)
 	map(0x00, 0x02).w(FUNC(pc8801_state::pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
 	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
-	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::txt_cmt_ctrl_w));
-	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::gfx_ctrl_w));
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
 	map(0x33, 0x33).rw(FUNC(pc8801_state::unk_r), FUNC(pc8801_state::unk_w));
 	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
-	map(0x40, 0x40).rw(FUNC(pc8801_state::ctrl_r), FUNC(pc8801_state::ctrl_w));
+	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 	map(0x44, 0x47).rw(FUNC(pc8801_state::sound_board_r), FUNC(pc8801_state::sound_board_w)); /* OPN / OPNA ports */
-	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::pc88_crtc_param_w));
-	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::pc88_crtc_cmd_w));
+//	uPD3301
+	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::crtc_param_w));
+	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::crtc_cmd_w));
+
 	map(0x52, 0x52).w(FUNC(pc8801_state::bgpal_w));
 	map(0x53, 0x53).w(FUNC(pc8801_state::layer_masking_w));
 	map(0x54, 0x5b).w(FUNC(pc8801_state::palram_w));
 	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
+//	i8257
 	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
 	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
+
 //  map(0x6e, 0x6f) clock settings (8801FH and later)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
@@ -1810,24 +1843,25 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "BASIC" )
+	PORT_DIPNAME( 0x01, 0x01, "BASIC" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "N88-BASIC" )
 	PORT_DIPSETTING(    0x00, "N-BASIC" )
-	PORT_DIPNAME( 0x02, 0x02, "Terminal mode" )
+	PORT_DIPNAME( 0x02, 0x02, "Terminal mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Text width" )
+	PORT_DIPNAME( 0x04, 0x00, "Text width" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "40 chars/line" )
 	PORT_DIPSETTING(    0x00, "80 chars/line" )
-	PORT_DIPNAME( 0x08, 0x00, "Text height" )
+	PORT_DIPNAME( 0x08, 0x00, "Text height" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
-	PORT_DIPNAME( 0x10, 0x10, "Enable S parameter" )
+	PORT_DIPNAME( 0x10, 0x10, "Enable S parameter" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Enable DEL code" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable DEL code" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// TODO: these really maps to "general purpose inputs" UIP1 / UIP2
 	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1836,22 +1870,22 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Parity generate" )
+	PORT_DIPNAME( 0x01, 0x01, "Parity generate" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Parity type" )
+	PORT_DIPNAME( 0x02, 0x00, "Parity type" ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, "Even" )
 	PORT_DIPSETTING(    0x02, "Odd" )
-	PORT_DIPNAME( 0x04, 0x00, "Serial character length" )
+	PORT_DIPNAME( 0x04, 0x00, "Serial character length" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "7 bits/char" )
 	PORT_DIPSETTING(    0x00, "8 bits/char" )
-	PORT_DIPNAME( 0x08, 0x08, "Stop bit length" )
+	PORT_DIPNAME( 0x08, 0x08, "Stop bit length" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x10, 0x10, "Enable X parameter" )
+	PORT_DIPNAME( 0x10, 0x10, "Enable X parameter" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
+	PORT_DIPNAME( 0x20, 0x20, "Duplex" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
 	PORT_DIPNAME( 0xc0, 0x40, "Basic mode" )
@@ -1976,19 +2010,6 @@ static GFXDECODE_START( gfx_pc8801 )
 	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
 
-
-#if 0
-/* Cassette Configuration */
-
-static const cassette_interface pc88_cassette_interface =
-{
-	cassette_default_formats,   // we need T88 format support!
-	nullptr,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED,
-	"pc8801_cass"
-};
-#endif
-
 #if USE_PROPER_I8214
 void pc8801_state::raise_irq(uint8_t irq,uint8_t state)
 {
@@ -2091,7 +2112,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
 WRITE_LINE_MEMBER(pc8801_state::sound_irq)
 {
 //  logerror("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
-	/* TODO: correct i8214 irq level? */
+	// TODO: correct i8214 irq level?
 	if(state)
 	{
 		if(m_sound_irq_mask)
@@ -2297,6 +2318,8 @@ void pc8801_state::pc8801(machine_config &config)
 	#endif
 	UPD1990A(config, m_rtc);
 	//CENTRONICS(config, "centronics", centronics_devices, "printer");
+
+	// TODO: needs T88 format support
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pc8801_cass");

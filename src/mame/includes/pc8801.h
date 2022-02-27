@@ -163,11 +163,12 @@ private:
 	void gvram_w(offs_t offset, uint8_t data);
 	uint8_t high_wram_r(offs_t offset);
 	void high_wram_w(offs_t offset, uint8_t data);
-	uint8_t ctrl_r();
-	void ctrl_w(uint8_t data);
+	uint8_t port40_r();
+	void port40_w(uint8_t data);
 	uint8_t ext_rom_bank_r();
 	void ext_rom_bank_w(uint8_t data);
-	void gfx_ctrl_w(uint8_t data);
+	void port30_w(uint8_t data);
+	void port31_w(uint8_t data);
 	uint8_t vram_select_r();
 	void vram_select_w(offs_t offset, uint8_t data);
 	void irq_level_w(uint8_t data);
@@ -181,9 +182,9 @@ private:
 	void palram_w(offs_t offset, uint8_t data);
 	void layer_masking_w(uint8_t data);
 	uint8_t crtc_param_r();
-	void pc88_crtc_param_w(uint8_t data);
+	void crtc_param_w(uint8_t data);
 	uint8_t crtc_status_r();
-	void pc88_crtc_cmd_w(uint8_t data);
+	void crtc_cmd_w(uint8_t data);
 	uint8_t dmac_r(offs_t offset);
 	void dmac_w(offs_t offset, uint8_t data);
 	uint8_t dmac_status_r();
@@ -195,7 +196,6 @@ private:
 	void alu_ctrl1_w(uint8_t data);
 	void alu_ctrl2_w(uint8_t data);
 	void pcg8100_w(offs_t offset, uint8_t data);
-	void txt_cmt_ctrl_w(uint8_t data);
 	uint8_t kanji_r(offs_t offset);
 	void kanji_w(offs_t offset, uint8_t data);
 	uint8_t kanji_lv2_r(offs_t offset);
