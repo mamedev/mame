@@ -46,7 +46,7 @@ class rc2014mini_state : public gsz80_state
 public:
 	rc2014mini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsz80_state(mconfig, type, tag)
-		, m_rombank(*this, "bank")
+		, m_rombank(*this, "rombank")
 		, m_jump_rom(*this, "A13-15")
 	{ }
 
@@ -85,7 +85,7 @@ void rc2014mini_state::machine_reset()
 // RC2014 Mini only has 32K RAM
 void rc2014mini_state::rc2014mini_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().bankr("bank");
+	map(0x0000, 0x1fff).bankr("rombank");
 	map(0x8000, 0xffff).ram();
 }
 
