@@ -112,6 +112,8 @@ private:
 	uint16_t m_display[128*2 * 128];
 	int m_displayposx;
 	int m_displayposy;
+	uint16_t m_3003;
+	uint16_t m_3005;
 	uint16_t m_3050;
 
 	void map(address_map &map);
@@ -202,12 +204,13 @@ void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
 
 uint16_t generalplus_gpl_unknown_state::reg3003_r(offs_t offset)
 {
-	return 0x0000;//machine().rand();
+	return m_3003;
 }
 
 void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg3003_w %04x\n", machine().describe_context(), data);
+	m_3003 = data;
+	logerror("%s: reg3003_w %04x\n", machine().describe_context(), data);
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
@@ -217,8 +220,15 @@ uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
 
 uint16_t generalplus_gpl_unknown_state::reg3005_r(offs_t offset)
 {
-	return 0x0000;//machine().rand();
+	return m_3005;
 }
+
+void generalplus_gpl_unknown_state::reg3005_w(offs_t offset, uint16_t data)
+{
+	m_3005 = data;
+	//logerror("%s: reg3005_w %04x\n", machine().describe_context(), data);
+}
+
 
 uint16_t generalplus_gpl_unknown_state::reg3006_r(offs_t offset)
 {
@@ -240,10 +250,6 @@ uint16_t generalplus_gpl_unknown_state::reg3016_r(offs_t offset)
 	return 0x0000;//machine().rand();
 }
 
-void generalplus_gpl_unknown_state::reg3005_w(offs_t offset, uint16_t data)
-{
-	//logerror("%s: reg3005_w %04x\n", machine().describe_context(), data);
-}
 
 
 void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
@@ -257,6 +263,7 @@ void generalplus_gpl_unknown_state::reg3041_audiodac_w(offs_t offset, uint16_t d
 //	logerror("%s: reg3041_audiodac_w %04x\n", machine().describe_context(), data);
 
 	// mapacman only writes 0000 / 7fff / 8000, but is known to have more limited sound than other units
+
 	m_dac->data_w(data);
 }
 
@@ -321,12 +328,18 @@ void generalplus_gpl_unknown_state::reg30e3_w(offs_t offset, uint16_t data)
 uint16_t generalplus_gpl_unknown_state::reg30e4_r(offs_t offset)
 {
 	logerror("%s: reg30e4_r\n", machine().describe_context());
-	return machine().rand();
+	return machine().rand() & 0x01;
 }
 
 uint16_t generalplus_gpl_unknown_state::reg30e5_r(offs_t offset)
 {
-	return machine().rand();
+	// status flag: loops on bit 0x0010 after writes to 0x30e2
+	// and before reading from 0x30e4
+
+	// clrb [3001],12 is also usually executed before write operations
+	// to 0x30e2 and setb [3001],12 befoe the result is read back
+
+	return 0x0000;
 }
 
 /*
@@ -372,39 +385,49 @@ uint16_t generalplus_gpl_unknown_state::reg3091_r(offs_t offset)
 
 void generalplus_gpl_unknown_state::reg3092_lcd_w(offs_t offset, uint16_t data)
 {
-	//logerror("%s: reg3092_lcd_w %04x (Video?)\n", machine().describe_context(), data);
-	if ((m_displayposx < 256) && (m_displayposy < 256))
-		m_display[(m_displayposy * 256) + m_displayposx] = data;
-
-	if (data & 0xff00)
-		fatalerror("upper data bits set?\n");
-
-	m_displayposx++;
-
-	/*
-	if (m_displayposx == 256)
+	if (m_3005 & 0x1000)
 	{
-		m_displayposy++;
-		m_displayposx = 0;
+		//if (m_3005 & 0x0800) // also always set for video writes?
+		{
+			//logerror("%s: reg3092_lcd_w %04x (Video?)\n", machine().describe_context(), data);
+			if ((m_displayposx < 256) && (m_displayposy < 256))
+				m_display[(m_displayposy * 256) + m_displayposx] = data;
+
+			if (data & 0xff00)
+				fatalerror("upper data bits set?\n");
+
+			m_displayposx++;
+
+			/*
+			if (m_displayposx == 256)
+			{
+				m_displayposy++;
+				m_displayposx = 0;
+			}
+			*/
+			/*
+			if (m_displayposy == 128)
+			{
+				m_displayposy = 0;
+				m_displayposx = 0;
+			}
+			*/
+		}
 	}
-	*/
-	/*
-	if (m_displayposy == 128)
-	{
-		m_displayposy = 0;
-		m_displayposx = 0;
-	}
-	*/
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3094_r(offs_t offset)
 {
-	return 0x0000;//machine().rand();
+	return 0x0000;
 }
 
 uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
 {
-	return machine().rand();
+	// loops on bit 0x0010 after writing data to 0x3092
+
+	// clrb [3005],12 is used before writing non-pixel data to 0x3092
+	// setb [3005],12 is used after reading from 0x3094
+	return 0x0000;
 }
 
 
@@ -468,6 +491,8 @@ void generalplus_gpl_unknown_state::machine_start()
 	save_item(NAME(m_display));
 	save_item(NAME(m_displayposx));
 	save_item(NAME(m_displayposy));
+	save_item(NAME(m_3003));
+	save_item(NAME(m_3005));
 	save_item(NAME(m_3050));
 }
 
