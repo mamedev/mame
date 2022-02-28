@@ -37,21 +37,6 @@ Notes:
 
 */
 
-/*
-
-    TODO
-
-    - sector length error in read check after format (breakpoint @ 97ba)
-
-        0C xx               INITIALIZE DRIVE CHARACTERISTICS
-        01 00 00 00 00 02   RECALIBRATE
-        04 00 00 00 05 02   FORMAT UNIT
-        08 00 00 00 11 02   READ
-        ...transfer 8704 (17*512) bytes...
-        error
-
-*/
-
 #include "emu.h"
 #include "lux4105.h"
 #include "bus/scsi/scsihd.h"
@@ -62,6 +47,8 @@ Notes:
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
+
+#define LOG 0
 
 #define SASIBUS_TAG     "sasi"
 #define DMA_O1  BIT(m_dma, 0)
@@ -156,7 +143,10 @@ luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *
 	m_1e(*this, "1E"),
 	m_5e(*this, "5E"),
 	m_cs(false),
-	m_dma(0)
+	m_dma(0),
+	m_pren(1),
+	m_prac(1),
+	m_trrq(1)
 {
 }
 
@@ -174,6 +164,7 @@ void luxor_4105_device::device_start()
 	save_item(NAME(m_req));
 	save_item(NAME(m_drq));
 	save_item(NAME(m_pren));
+	save_item(NAME(m_trrq));
 }
 
 
@@ -204,24 +195,43 @@ void luxor_4105_device::internal_reset()
 
 void luxor_4105_device::update_dma()
 {
-	// IRQ
-	bool cd = m_sasi->cd_r();
-	bool io = m_sasi->io_r();
-	bool req = m_sasi->req_r() && !m_req;
-	m_drq = (!((!cd || !io) && !(!cd && !DMA_O2))) && req;
-	bool irq = !(DMA_O3 && m_pren) || !(DMA_O1 && m_drq);
-	m_slot->irq_w(irq);
-
 	// TRRQ
+	bool req = m_sasi->req_r() && !m_req;
+	bool cd = m_sasi->cd_r();
+	m_trrq = !(req && !cd);
 	if (DMA_O2)
 	{
-		bool trrq = !(!cd && req);
-		m_slot->trrq_w(trrq);
+		if (m_prac && !m_trrq)
+		{
+			// set REQ FF
+			m_req = 1;
+
+			update_ack();
+
+			req = m_sasi->req_r() && !m_req;
+			m_trrq = !(req && !cd);
+		}
 	}
-	else
+	m_slot->trrq_w(DMA_O2 ? m_trrq : 1);
+
+	// DRQ
+	bool io = m_sasi->io_r();
+	m_drq = (!((!cd || !io) && !(!cd && !DMA_O2))) && req;
+
+	// IRQ
+	bool irq = 1;
+	if (DMA_O2)
 	{
-		m_slot->trrq_w(1);
+		if (DMA_O1 && m_drq)
+		{
+			irq = 0;
+		}
 	}
+	else if (DMA_O3)
+	{
+		irq = 0;
+	}
+	m_slot->irq_w(!irq);
 }
 
 
@@ -249,6 +259,7 @@ void luxor_4105_device::write_dma_register(uint8_t data)
 	*/
 
 	m_dma = BIT(data, 5) << 2 | BIT(data, 6) << 1 | BIT(data, 7);
+	if (LOG) logerror("%s DMA O1 %u O2 %u O3 %u\n", machine().describe_context(), DMA_O1, DMA_O2, DMA_O3);
 
 	// PREN
 	m_pren = !DMA_O2;
@@ -269,6 +280,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 
 	// clock REQ FF
 	m_req = m_sasi->req_r();
+	
 	update_ack();
 	update_dma();
 }
@@ -291,6 +303,8 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 {
+	if (LOG) logerror("%s REQ %u\n", machine().describe_context(), state);
+	
 	if (!state)
 	{
 		// reset REQ FF
@@ -390,19 +404,25 @@ uint8_t luxor_4105_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
-	if (m_sasi->bsy_r())
+	if (m_cs)
 	{
-		data = m_sasi->read();
-	}
-	else
-	{
-		data = m_1e->read();
-	}
+		if (m_sasi->bsy_r())
+		{
+			data = m_sasi->read();
+		}
+		else
+		{
+			data = m_1e->read();
+		}
 
-	// clock REQ FF
-	m_req = m_sasi->req_r();
-	update_ack();
-	update_dma();
+		// clock REQ FF
+		m_req = m_sasi->req_r();
+
+		update_ack();
+		update_dma();
+
+		if (LOG) logerror("%s INP %02x\n", machine().describe_context(), data);
+	}
 
 	return data;
 }
@@ -416,6 +436,8 @@ void luxor_4105_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
+		if (LOG) logerror("%s OUT %02x\n", machine().describe_context(), data);
+
 		write_sasi_data(data);
 	}
 }
@@ -429,6 +451,8 @@ void luxor_4105_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
+		if (LOG) logerror("%s SELECT\n", machine().describe_context());
+
 		m_sasi->sel_w(1);
 	}
 }
@@ -442,6 +466,8 @@ void luxor_4105_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
+		if (LOG) logerror("%s RESET\n", machine().describe_context());
+
 		internal_reset();
 	}
 }
@@ -455,6 +481,8 @@ void luxor_4105_device::abcbus_c4(uint8_t data)
 {
 	if (m_cs)
 	{
+		if (LOG) logerror("%s DMA %02x\n", machine().describe_context(), data);
+
 		write_dma_register(data);
 	}
 }
@@ -468,15 +496,21 @@ uint8_t luxor_4105_device::abcbus_tren()
 {
 	uint8_t data = 0xff;
 
-	if (m_sasi->bsy_r())
+	if (DMA_O2)
 	{
-		data = m_sasi->read();
-	}
+		if (m_sasi->bsy_r())
+		{
+			data = m_sasi->read();
+		}
 
-	// clock REQ FF
-	m_req = m_sasi->req_r();
-	update_ack();
-	update_dma();
+		// clock REQ FF
+		m_req = m_sasi->req_r();
+
+		update_ack();
+		update_dma();
+
+		if (LOG) logerror("%s TREN R %02x\n", machine().describe_context(), data);
+	}
 
 	return data;
 }
@@ -488,7 +522,12 @@ uint8_t luxor_4105_device::abcbus_tren()
 
 void luxor_4105_device::abcbus_tren(uint8_t data)
 {
-	write_sasi_data(data);
+	if (DMA_O2)
+	{
+		if (LOG) logerror("%s TREN W %02x\n", machine().describe_context(), data);
+
+		write_sasi_data(data);
+	}
 }
 
 
@@ -498,11 +537,9 @@ void luxor_4105_device::abcbus_tren(uint8_t data)
 
 void luxor_4105_device::abcbus_prac(int state)
 {
-	if ((state && DMA_O2) && !m_slot->trrq_r())
-	{
-		// set REQ FF
-		m_req = 1;
-		update_ack();
-		update_dma();
-	}
+	if (LOG) logerror("%s PRAC %u\n", machine().describe_context(), state);
+
+	m_prac = state;
+	
+	update_dma();
 }
