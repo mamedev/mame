@@ -23,6 +23,8 @@ public:
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_prg_view(*this, "prg_view")
 		, m_vrom_region(*this, "gfx2")
 		, m_timedigits(*this, "digit_%u", 0U)
 	{
@@ -48,10 +50,8 @@ public:
 	void init_pcbboard();
 	void init_pccboard();
 	void init_pcdboard();
-	void init_pcdboard_2();
 	void init_pceboard();
 	void init_pcfboard();
-	void init_pcfboard_2();
 	void init_virus();
 	void init_ttoon();
 	void init_pcgboard();
@@ -150,6 +150,14 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	void init_prg_banking();
+	void prg32(int bank);
+	void prg16(int slot, int bank);
+	void prg8(int slot, int bank);
+	memory_bank_array_creator<4> m_prg_banks;
+	memory_view m_prg_view;
+	int m_prg_chunks;
+
 	optional_memory_region m_vrom_region;
 
 	output_finder<4> m_timedigits;
@@ -173,14 +181,11 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t* m_nametable[4];
 	std::unique_ptr<uint8_t[]> m_nt_ram;
-	std::unique_ptr<uint8_t[]> m_extra_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
-	int m_mmc1_rom_mask;
 	int m_gboard_banks[2];
 	int m_gboard_4screen;
-	int m_gboard_last_bank;
 	int m_gboard_command;
 	int m_IRQ_count;
 	uint8_t m_IRQ_count_latch;
