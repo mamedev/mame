@@ -268,7 +268,7 @@ void dio16_98265a_device::dmack_w_in(int channel, uint8_t data)
 	if(channel == 0 && !(m_control & REG_CONTROL_DE0))
 		return;
 	if(channel == 1 && !(m_control & REG_CONTROL_DE1))
-			return;
+		return;
 
 	m_spc->dma_w(data);
 }
