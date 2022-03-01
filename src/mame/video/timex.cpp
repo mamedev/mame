@@ -192,9 +192,6 @@ uint32_t ts2068_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	/* for now TS2068 will do a full-refresh */
 	int count;
 
-	//if (m_border_bitmap.valid())
-		//copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
-
 	if ((m_port_ff_data & 7) == 6)
 	{
 		/* 64 Column mode */
@@ -230,9 +227,6 @@ uint32_t tc2048_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	/* for now TC2048 will do a full-refresh */
 	int count;
-
-	//if (m_border_bitmap.valid())
-	//	copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
 
 	if ((m_port_ff_data & 7) == 6)
 	{
