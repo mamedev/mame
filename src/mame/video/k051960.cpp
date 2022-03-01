@@ -24,27 +24,33 @@ The 051960 can also genenrate IRQ, FIRQ and NMI signals.
 memory map:
 000-007 is for the 051937, but also seen by the 051960
 400-7ff is 051960 only
-000     R  bit 0 = vblank?
+000     R  bit 0 = active display flag
                    aliens waits for it to be 0 before starting to copy sprite data
                    thndrx2 needs it to pulse for the startup checks to succeed
 000     W  bit 0 = irq acknowledge
-           bit 1 = firq acknowledge?
+           bit 1 = firq acknowledge
            bit 2 = nmi enable/acknowledge
            bit 3 = flip screen (applies to sprites only, not tilemaps)
-           bit 4 = unknown, used by Devastators, TMNT, Aliens, Chequered Flag, maybe others
+           bit 4 = disable internal sprite processing
+		   		   used by Devastators, TMNT, Aliens, Chequered Flag, maybe others
                    aliens sets it just after checking bit 0, and before copying
                    the sprite data
            bit 5 = enable gfx ROM reading
-001     W  Devastators sets bit 1, function unknown.
+           bit 6 = let cpu address bits 2~5 pass through CA0~3 when bit 5 is set
+001     W  bit 0 = invert shadow for all pens
+		   bit 1 = force shadows for pen 0x0f
+		   bit 2 = disable shadows for pen 0x0f (priority over bit 1)	
+		   Devastators sets bit 1.
            Ultraman sets the register to 0x0f.
            None of the other games I tested seem to set this register to other than 0.
-           Update: Chequered Flag sets bit 0 when background should be dimmed (palette control?)
+           Update: Chequered Flag sets bit 0 when background should be dimmed.
 002-003 W  selects the portion of the gfx ROMs to be read.
-004     W  Aliens uses this to select the ROM bank to be read, but Punk Shot
+004     W  bit 0 = OC6 when gfx ROM reading is enabled
+		   bit 1 = OC7 when gfx ROM reading is enabled
+		   Aliens uses this to select the ROM bank to be read, but Punk Shot
            and TMNT don't, they use another bit of the registers above. Many
            other games write to this register before testing.
-           It is possible that bits 2-7 of 003 go to OC0-OC5, and bits 0-1 of
-           004 go to OC6-OC7.
+           Bits 2-7 of 003 go to OC0-OC5.
 004-007 R  reads data from the gfx ROMs (32 bits in total). The address of the
            data is determined by the register above and by the last address
            accessed on the 051960; plus bank switch bits for larger ROMs.
@@ -144,6 +150,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_romoffset(0)
 	, m_spriteflip(0)
 	, m_readroms(0)
+	, m_shadow_config(0)
 	, m_nmi_enabled(0)
 {
 }
@@ -209,6 +216,7 @@ void k051960_device::device_start()
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
 	save_item(NAME(m_readroms));
+	save_item(NAME(m_shadow_config));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
 	save_pointer(NAME(m_ram), 0x400);
@@ -223,6 +231,7 @@ void k051960_device::device_reset()
 	m_romoffset = 0;
 	m_spriteflip = 0;
 	m_readroms = 0;
+	m_shadow_config = 0;
 	m_nmi_enabled = 0;
 
 	m_spriterombank[0] = 0;
@@ -309,7 +318,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 		//if (data & 0xc2) popmessage("051937 reg 00 = %02x",data);
 
 		if (BIT(data, 0)) m_irq_handler(CLEAR_LINE);  // bit 0, irq ack
-		if (BIT(data, 1)) m_firq_handler(CLEAR_LINE); // bit 1, firq ack?
+		if (BIT(data, 1)) m_firq_handler(CLEAR_LINE); // bit 1, firq ack
 
 		// bit 2, nmi enable/ack
 		m_nmi_enabled = BIT(data, 2);
@@ -319,7 +328,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 		/* bit 3 = flip screen */
 		m_spriteflip = data & 0x08;
 
-		/* bit 4 used by Devastators and TMNT, unknown */
+		/* bit 4 used by Devastators and TMNT, to protect sprite RAM from corruption during updates ? */
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
@@ -327,13 +336,10 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 	}
 	else if (offset == 1)
 	{
-		//popmessage("%04x: write %02x to 051937 address %x", m_maincpu->pc(), data, offset);
-		// Chequered Flag uses this bit to enable background palette dimming
-		// TODO: use a callback here for now, pending further investigation over this bit
-		m_vreg_contrast_handler(BIT(data,0));
-		// unknown, Devastators writes 02 here in game
 		if (0)
 			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);
+		
+		m_shadow_config = data & 0x07;
 	}
 	else if (offset >= 2 && offset < 5)
 	{
@@ -385,7 +391,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 	int sortedlist[NUM_SPRITES];
 	uint8_t drawmode_table[256];
 
-	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
+	memset(drawmode_table, (m_shadow_config & 0x01) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
@@ -428,7 +434,12 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		code = m_ram[offs + 2] + ((m_ram[offs + 1] & 0x1f) << 8);
 		color = m_ram[offs + 3] & 0xff;
 		pri = 0;
-		shadow = color & 0x80;
+		if (m_shadow_config & 0x04)
+			shadow = 0;
+		else if (m_shadow_config & 0x02)
+			shadow = 1;
+		else
+			shadow = color & 0x80;
 		m_k051960_cb(&code, &color, &pri, &shadow);
 
 		if (max_priority != -1)
@@ -463,7 +474,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = (shadow && !(m_shadow_config & 0x01)) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{

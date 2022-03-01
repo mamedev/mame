@@ -14,13 +14,6 @@ Notes:
 - Devastators: has player-trench collision detection issues, player isn't
   supposed to go through them.
 
-- Devastators: shadows don't work. Bit 7 of the sprite attribute is always 0,
-  could there be a global enable flag in the 051960?
-  This is particularly evident in level 2 where plane shadows cover other sprites.
-  The priority/shadow encoder PROM is quite complex, however bits 5-7 of the sprite
-  attribute don't seem to be used, at least not in the first two levels, so the
-  PROM just maps to the fixed priority order currently implemented.
-
 - Devastators: sprite zooming for the planes in level 2 is particularly bad.
 
 - Devastators: title screen white backdrop is always supposed to flicker,

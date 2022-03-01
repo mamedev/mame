@@ -88,7 +88,7 @@ private:
 
 	uint8_t    m_spriterombank[3];
 	int      m_romoffset;
-	int      m_spriteflip, m_readroms;
+	int      m_spriteflip, m_readroms, m_shadow_config;
 	int m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
