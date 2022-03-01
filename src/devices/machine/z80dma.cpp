@@ -197,6 +197,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_addressA));
 	save_item(NAME(m_addressB));
 	save_item(NAME(m_count));
+	save_item(NAME(m_byte_counter));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_is_read));
@@ -485,6 +486,7 @@ int z80dma_device::do_write()
 	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
+	m_byte_counter++;
 	m_count--;
 	done = (m_count == 0xFFFF); //correct?
 
@@ -551,6 +553,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 			m_addressA = PORTA_ADDRESS;
 			m_addressB = PORTB_ADDRESS;
 			m_count = BLOCKLEN;
+			m_byte_counter = 0;
 			m_status |= 0x30;
 		}
 	}
@@ -713,8 +716,8 @@ void z80dma_device::write(uint8_t data)
 					LOG("Z80DMA Initiate Read Sequence\n");
 					m_read_cur_follow = m_read_num_follow = 0;
 					if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
-					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
 					if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
 					if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
 					if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
@@ -744,6 +747,7 @@ void z80dma_device::write(uint8_t data)
 					m_addressA = PORTA_ADDRESS;
 					m_addressB = PORTB_ADDRESS;
 					m_count = BLOCKLEN;
+					m_byte_counter = 0;
 					m_status |= 0x30;
 
 					LOG("Z80DMA Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
@@ -764,6 +768,7 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_CONTINUE:
 					LOG("Z80DMA Continue\n");
 					m_count = BLOCKLEN;
+					m_byte_counter = 0;
 					m_dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					m_status |= 0x30;
@@ -831,8 +836,8 @@ void z80dma_device::write(uint8_t data)
 			m_read_cur_follow = m_read_num_follow = 0;
 
 			if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
-			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
 			if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
 			if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
 			if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)

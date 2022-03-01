@@ -118,6 +118,7 @@ private:
 	uint16_t m_addressA;
 	uint16_t m_addressB;
 	uint16_t m_count;
+	uint16_t m_byte_counter;
 
 	int m_rdy;
 	int m_force_ready;
