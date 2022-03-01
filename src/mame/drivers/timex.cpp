@@ -698,7 +698,7 @@ void ts2068_state::ts2068(machine_config &config)
 
 	/* video hardware */
 	// timings not confirmed!
-	m_screen->set_raw(XTAL(14'112'000) / 2, 456, 311, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
+	m_screen->set_raw(XTAL(14'112'000) / 2, 456 * 2, 311, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(ts2068_state::screen_update));
 
@@ -737,7 +737,7 @@ void tc2048_state::tc2048(machine_config &config)
 
 	/* video hardware */
 	// timings not confirmed!
-	m_screen->set_raw(X1 / 2, 448, 312, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
+	m_screen->set_raw(X1 / 2, 448 * 2, 312, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(50);
 	m_screen->set_screen_update(FUNC(tc2048_state::screen_update));
 
