@@ -334,7 +334,12 @@ int z80dma_device::is_ready()
 void z80dma_device::interrupt_check()
 {
 	m_out_int_cb(m_ip ? ASSERT_LINE : CLEAR_LINE);
-	m_out_ieo_cb(m_iei && !m_ip);
+	
+	int ieo = m_iei;
+	if (m_ip) {
+		ieo = 0;
+	}
+	m_out_ieo_cb(ieo);
 }
 
 
