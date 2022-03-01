@@ -339,30 +339,21 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
  bit 3: MIC/Tape Output
  bit 2-0: border colour
 */
-
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
-	unsigned char Changed;
-
-	Changed = m_port_fe_data^data;
+	unsigned char Changed = m_port_fe_data^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
-	{
-		spectrum_UpdateBorderBitmap();
-	}
+		spectrum_update_screen();
 
 	if ((Changed & (1<<4))!=0)
-	{
 		/* DAC output state */
 		m_speaker->level_w(BIT(data, 4));
-	}
 
 	if ((Changed & (1<<3))!=0)
-	{
 		/* write cassette data */
 		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
-	}
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
@@ -747,13 +738,22 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
+	case TIMER_IRQ_ON:
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		timer_set(m_maincpu->clocks_to_attotime(32), TIMER_IRQ_OFF, 0);
+		break;
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
-		spectrum_UpdateScreenBitmap();
+	{
+		auto vpos_next = m_screen->vpos() + 1;
+		if(vpos_next <= get_screen_area().bottom()) {
+			m_scanline_timer->adjust(m_screen->time_until_pos(vpos_next), get_screen_area().left());
+			spectrum_update_screen();
+		}
 		break;
+	}
 	default:
 		throw emu_fatalerror("Unknown id in spectrum_state::device_timer");
 	}
@@ -761,8 +761,14 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	timer_set(m_screen->time_until_pos(0), TIMER_IRQ_ON, 0);
+
+	/* Default implementation performs screen updates per scanline. Some other
+	clones e.g. pentagon do updates based on video_ram access, border updates,
+	and full frame refresh (for attributes flashing). Such clones may define own
+	*_interrupt config. */
+	if (m_scanline_timer != nullptr)
+		m_scanline_timer->adjust(m_screen->time_until_pos(get_screen_area().top() + 1));
 }
 
 void spectrum_state::spectrum_common(machine_config &config)
@@ -784,7 +790,8 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(X1 / 2, 448, 0, 352, 312, 0, 296);
+
+	m_screen->set_raw(X1 / 2, 448, 312, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_spectrum));
 	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_spectrum));
 	m_screen->set_palette("palette");

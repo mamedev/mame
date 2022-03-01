@@ -144,17 +144,14 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
-	// Changing this consider to revert 'virtual' in spectrum.h
-	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void spectrum_UpdateScreenBitmap(bool eof = false) override;
-	void spectrum_UpdateBorderBitmap() override;
-	void spectrum_UpdateZxScreenBitmap();
+	rectangle get_screen_area() override;
+	void spectrum_update_screen(bool eof = false, bool border_only = false) override;
+	void tsconf_UpdateZxScreenBitmap();
 	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
 	void tsconf_palette(palette_device &palette) const;
 	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
-	rectangle get_screen_area();
 
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_ula_w(offs_t offset, u8 data);

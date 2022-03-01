@@ -28,20 +28,10 @@ void spectrum_state::video_start()
 	m_frame_number = 0;
 	m_flash_invert = 0;
 
-	m_previous_border_x = 0;
-	m_previous_border_y = 0;
-	m_screen->register_screen_bitmap(m_border_bitmap);
-	m_previous_screen_x = 0;
-	m_previous_screen_y = 0;
-	m_screen->register_screen_bitmap(m_screen_bitmap);
-
+	m_previous_screen_x = m_previous_screen_y = 0;
 	m_screen_location = m_video_ram;
 
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
-	m_CyclesPerLine = SPEC_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
 void spectrum_128_state::video_start()
@@ -50,30 +40,10 @@ void spectrum_128_state::video_start()
 	m_frame_number = 0;
 	m_flash_invert = 0;
 
-	m_previous_border_x = 0;
-	m_previous_border_y = 0;
-	m_screen->register_screen_bitmap(m_border_bitmap);
-	m_previous_screen_x = 0;
-	m_previous_screen_y = 0;
-	m_screen->register_screen_bitmap(m_screen_bitmap);
-
+	m_previous_screen_x = m_previous_screen_y = 0;
 	m_screen_location = m_ram->pointer() + (5 << 14);
 
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
-	m_CyclesPerLine = SPEC128_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
-}
-
-
-/* return the color to be used inverting FLASHing colors if necessary */
-inline unsigned char spectrum_state::get_display_color (unsigned char color, int invert)
-{
-	if (invert && (color & 0x80))
-		return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
-	else
-		return color;
 }
 
 /* Code to change the FLASH status every 25 frames. Note this must be
@@ -83,11 +53,7 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 	// rising edge
 	if (state)
 	{
-		spectrum_UpdateBorderBitmap();
-		spectrum_UpdateScreenBitmap(true);
-
 		m_frame_number++;
-
 		if (m_frame_number >= m_frame_invert_count)
 		{
 			m_frame_number = 0;
@@ -96,14 +62,12 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 	}
 }
 
-
-
 /***************************************************************************
   Update the spectrum screen display.
 
   The screen consists of 312 scanlines as follows:
   64  border lines (the last 48 are actual border lines; the others may be
-                    border lines or vertical retrace)
+					border lines or vertical retrace)
   192 screen lines
   56  border lines
 
@@ -121,195 +85,141 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 
 ***************************************************************************/
 
-inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
-{
-	bitmap.pix(y, x) = (uint16_t)color;
-}
-
 uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const rectangle rect(SPEC_LEFT_BORDER, SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE - 1, SPEC_TOP_BORDER, SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1);
-
-	if (m_border_bitmap.valid())
-		copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
-
-	spectrum_UpdateScreenBitmap();
-	if (m_screen_bitmap.valid())
-		copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, rect);
-
-#if 0
-	// note, don't update borders in here, this can time travel w/regards to other timers and may end up giving you
-	// screen positions earlier than the last write handler gave you
-
-	/* for now do a full-refresh */
-	int x, y, b, scrx, scry;
-	unsigned short ink, pap;
-	unsigned char *attr, *scr;
-	//  int full_refresh = 1;
-
-	scr=m_screen_location;
-
-	for (y=0; y<192; y++)
-	{
-		scrx=SPEC_LEFT_BORDER;
-		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-		attr=m_screen_location + ((scry>>3)*32) + 0x1800;
-
-		for (x=0;x<32;x++)
-		{
-			/* Get ink and paper colour with bright */
-			if (m_flash_invert && (*attr & 0x80))
-			{
-				ink=((*attr)>>3) & 0x0f;
-				pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-			}
-			else
-			{
-				ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-				pap=((*attr)>>3) & 0x0f;
-			}
-
-			for (b=0x80;b!=0;b>>=1)
-			{
-				if (*scr&b)
-					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
-				else
-					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
-			}
-
-			scr++;
-			attr++;
-		}
-	}
-#endif
-
+	// Mostly for support attributes flashing.
+	// Only requires force full refresh if updates are not performed per scanline.
+	spectrum_update_screen(m_scanline_timer == nullptr);
 	return 0;
 }
 
-
 static constexpr rgb_t spectrum_pens[16] = {
-	{ 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0xbf },
-	{ 0xbf, 0x00, 0x00 },
-	{ 0xbf, 0x00, 0xbf },
-	{ 0x00, 0xbf, 0x00 },
-	{ 0x00, 0xbf, 0xbf },
-	{ 0xbf, 0xbf, 0x00 },
-	{ 0xbf, 0xbf, 0xbf },
-	{ 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0xff },
-	{ 0xff, 0x00, 0x00 },
-	{ 0xff, 0x00, 0xff },
-	{ 0x00, 0xff, 0x00 },
-	{ 0x00, 0xff, 0xff },
-	{ 0xff, 0xff, 0x00 },
-	{ 0xff, 0xff, 0xff }
-};
+	{0x00, 0x00, 0x00},
+	{0x00, 0x00, 0xbf},
+	{0xbf, 0x00, 0x00},
+	{0xbf, 0x00, 0xbf},
+	{0x00, 0xbf, 0x00},
+	{0x00, 0xbf, 0xbf},
+	{0xbf, 0xbf, 0x00},
+	{0xbf, 0xbf, 0xbf},
+	{0x00, 0x00, 0x00},
+	{0x00, 0x00, 0xff},
+	{0xff, 0x00, 0x00},
+	{0xff, 0x00, 0xff},
+	{0x00, 0xff, 0x00},
+	{0x00, 0xff, 0xff},
+	{0xff, 0xff, 0x00},
+	{0xff, 0xff, 0xff}};
+
 // Initialise the palette
 void spectrum_state::spectrum_palette(palette_device &palette) const
 {
 	palette.set_pen_colors(0, spectrum_pens);
 }
 
-void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
+rectangle spectrum_state::get_screen_area()
 {
-	unsigned int x = m_screen->hpos();
-	unsigned int y = m_screen->vpos();
-	int width = m_screen_bitmap.width();
-	int height = m_screen_bitmap.height();
+	// 256x192 screen position without border
+	return rectangle{48, 48 + 255, 64, 64 + 191};
+}
 
-
-	if ((m_previous_screen_x == x) && (m_previous_screen_y == y) && !eof)
-		return;
-
-	if (m_screen_bitmap.valid())
+void spectrum_state::to_area(rectangle area, unsigned int &x, unsigned int &y)
+{
+	if (y < area.top() || y > area.bottom())
 	{
-		//printf("update screen from %d,%d to %d,%d\n", m_previous_screen_x, m_previous_screen_y, x, y);
-
-		do
-		{
-			uint16_t scrx = m_previous_screen_x - SPEC_LEFT_BORDER;
-			uint16_t scry = m_previous_screen_y - SPEC_TOP_BORDER;
-
-			if (scrx < SPEC_DISPLAY_XSIZE && scry < SPEC_DISPLAY_YSIZE)
-			{
-				// this can/must be optimised
-				if ((scrx & 7) == 0) {
-					uint16_t *bm = &m_screen_bitmap.pix(m_previous_screen_y, m_previous_screen_x);
-					uint8_t attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
-					uint8_t scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
-					uint16_t ink = (attr & 0x07) + ((attr >> 3) & 0x08);
-					uint16_t pap = (attr >> 3) & 0x0f;
-
-					if (m_flash_invert && (attr & 0x80))
-						scr = ~scr;
-
-					for (uint8_t b = 0x80; b != 0; b >>= 1)
-						*bm++ = (scr & b) ? ink : pap;
-				}
-			}
-
-			m_previous_screen_x += 1;
-
-			if (m_previous_screen_x >= width)
-			{
-				m_previous_screen_x = 0;
-				m_previous_screen_y += 1;
-
-				if (m_previous_screen_y >= height)
-				{
-					m_previous_screen_y = 0;
-				}
-			}
-		} while (!((m_previous_screen_x == x) && (m_previous_screen_y == y)));
-
+		x = area.left();
+		y = area.top();
+	}
+	else if (x > area.right())
+	{
+		x = area.left();
+		to_area(area, x, ++y);
+	}
+	else if (x < area.left())
+	{
+		x = area.left();
 	}
 }
 
-u16 spectrum_state::get_border_color() {
-	return m_port_fe_data & 0x07;
-}
-
-/* The code below is just a per-pixel 'partial update' for the border */
-
-void spectrum_state::spectrum_UpdateBorderBitmap()
+void spectrum_state::spectrum_update_screen(bool eof, bool border_only)
 {
-	unsigned int x = m_screen->hpos();
-	unsigned int y = m_screen->vpos();
-	int width = m_border_bitmap.width();
-	int height = m_border_bitmap.height();
+	unsigned int to_x = m_screen->hpos();
+	unsigned int to_y = m_screen->vpos();
+	to_area(m_screen->visible_area(), to_x, to_y);
 
-
-	if (m_border_bitmap.valid())
+	if ((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y))
 	{
-		uint16_t border = get_border_color();
-
-		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
-
-		do
+		if (eof)
 		{
-			m_border_bitmap.pix(m_previous_border_y, m_previous_border_x) = border;
-
-			m_previous_border_x += 1;
-
-			if (m_previous_border_x >= width)
-			{
-				m_previous_border_x = 0;
-				m_previous_border_y += 1;
-
-				if (m_previous_border_y >= height)
-				{
-					m_previous_border_y = 0;
-				}
-			}
+			m_previous_screen_x = m_screen->visible_area().left();
+			m_previous_screen_y++;
 		}
-		while (!((m_previous_border_x == x) && (m_previous_border_y == y)));
-
+		else
+			return;
 	}
-	else
+
+	bitmap_ind16 *bm = &m_screen->curbitmap().as_ind16();
+	if (bm->valid())
 	{
-		// no border bitmap allocated? fatalerror?
+		rectangle screen = get_screen_area();
+		u8 *attrs_location = m_screen_location + 0x1800;
+		bool stop = false;
+		do
+		{
+			u16 *pix = &bm->pix(m_previous_screen_y, m_previous_screen_x);
+			s32 x_max = m_screen->visible_area().right() + 1;
+			if (m_previous_screen_y == to_y)
+				x_max = std::min(s32(to_x), x_max);
+
+			u16 border_color = get_border_color();
+			if (m_previous_screen_y >= screen.top() && m_previous_screen_y <= screen.bottom())
+			{
+				for (; m_previous_screen_x < std::min(screen.left(), x_max); m_previous_screen_x++)
+					*pix++ = border_color;
+
+				// Some clones e.g. timex, tsconf use custom drawing and only inherit border updates.
+				if (border_only)
+				{
+					s16 width = std::min(screen.right() + 1, x_max) - m_previous_screen_x;
+					if (width > 0)
+					{
+						pix += width;
+						m_previous_screen_x += width;
+					}
+				}
+				else
+				{
+					u16 x = m_previous_screen_x - screen.left();
+					u16 y = m_previous_screen_y - screen.top();
+					u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
+					u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
+					while (m_previous_screen_x < std::min(screen.right() + 1, x_max))
+					{
+						u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
+						u16 pap = (*attr >> 3) & 0x0f;
+						u8 pix8 = (m_flash_invert && (*attr & 0x80)) ? ~*scr : *scr;
+
+						for (u8 b = 0x80 >> (x & 0x07); b != 0 && m_previous_screen_x < std::min(screen.right() + 1, x_max); b >>= 1)
+						{
+							*pix++ = (pix8 & b) ? ink : pap;
+							x++;
+							m_previous_screen_x++;
+						}
+						scr++;
+						attr++;
+					}
+				}
+			}
+			for (; m_previous_screen_x < x_max; m_previous_screen_x++)
+				*pix++ = border_color;
+
+			stop = m_previous_screen_y == to_y;
+			to_area(m_screen->visible_area(), m_previous_screen_x, m_previous_screen_y);
+		} while (!stop);
 	}
+}
 
-
+u16 spectrum_state::get_border_color()
+{
+	return m_port_fe_data & 0x07;
 }

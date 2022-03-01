@@ -23,11 +23,8 @@
 
 /* Spectrum crystals */
 
-#define X1 XTAL(14'000'000)       // Main clock (48k Spectrum)
-#define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
-#define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
-
-#define X2 XTAL(4'433'619) // PAL color subcarrier
+#define X1 14_MHz_XTAL          // Main clock (48k Spectrum)
+#define X2 XTAL(4'433'619)      // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
@@ -47,18 +44,6 @@
 #define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
-
-struct EVENT_LIST_ITEM
-{
-	/* driver defined ID for this write */
-	int Event_ID;
-	/* driver defined data for this write */
-	int Event_Data;
-	/* time at which this write occurred */
-	int Event_Time;
-};
-
-
 
 
 class spectrum_state : public driver_device
@@ -131,19 +116,10 @@ protected:
 
 	int m_ROMSelection;
 
-	emu_timer *m_irq_off_timer;
-
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
-	// Elimiates sprite flicker on various games (E.g. Marauder and
+	// Eliminates sprite flicker on various games (E.g. Marauder and
 	// Stormlord) and makes Firefly playable.
 	emu_timer *m_scanline_timer;
-
-	EVENT_LIST_ITEM *m_pCurrentItem;
-	int m_NumEvents;
-	int m_TotalEvents;
-	char *m_pEventListBuffer;
-	int m_LastFrameStartTime;
-	int m_CyclesPerLine;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -164,10 +140,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 
-	unsigned int m_previous_border_x, m_previous_border_y;
-	bitmap_ind16 m_border_bitmap;
 	unsigned int m_previous_screen_x, m_previous_screen_y;
-	bitmap_ind16 m_screen_bitmap;
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -210,11 +183,11 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
-	virtual void spectrum_UpdateBorderBitmap();
 	virtual u16 get_border_color();
-	virtual void spectrum_UpdateScreenBitmap(bool eof = false);
-	inline unsigned char get_display_color(unsigned char color, int invert);
-	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
+	// Defines position of main screen excluding border
+	virtual rectangle get_screen_area();
+	virtual void spectrum_update_screen(bool eof = false, bool border_only = false);
+	void to_area(rectangle area, unsigned int &x, unsigned int &y);
 
 	// snapshot helpers
 	void update_paging();
@@ -255,6 +228,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void spectrum_128_update_memory() override;
+	virtual rectangle get_screen_area() override;
 
 private:
 	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);

@@ -213,7 +213,7 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 			return;
 
 	if ((m_port_7ffd_data ^ data) & 0x08)
-		spectrum_UpdateScreenBitmap();
+		spectrum_update_screen();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -322,12 +322,16 @@ static GFXDECODE_START( spec128 )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
+rectangle spectrum_128_state::get_screen_area()
+{
+	return rectangle{48, 48 + 255, 63, 63 + 191};
+}
 
 void spectrum_128_state::spectrum_128(machine_config &config)
 {
 	spectrum(config);
 
-	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
+	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_128_state::spectrum_128_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
@@ -335,12 +339,12 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 456, 0, 352,  311, 0, 296);
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
-	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay8912", X1_128_SINCLAIR / 20).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
@@ -353,14 +357,11 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 }
 
 
-
-
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
-
 
 ROM_START(spec128)
 	ROM_REGION(0x18000,"maincpu",0)
