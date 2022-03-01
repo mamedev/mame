@@ -52,6 +52,7 @@ public:
 	void init_pcdboard();
 	void init_pceboard();
 	void init_pcfboard();
+	void init_rp5h01_fix();
 	void init_virus();
 	void init_ttoon();
 	void init_pcgboard();
@@ -101,6 +102,7 @@ private:
 
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
+	void ppu_map(address_map &map);
 	void cart_map(address_map &map);
 	void cart_a_map(address_map &map);
 	void cart_b_map(address_map &map);
@@ -126,8 +128,6 @@ private:
 	};
 
 	void playch10_palette(palette_device &palette) const;
-	DECLARE_MACHINE_START(playch10_hboard);
-	DECLARE_VIDEO_START(playch10_hboard);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
@@ -181,11 +181,11 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t* m_nametable[4];
 	std::unique_ptr<uint8_t[]> m_nt_ram;
+	std::unique_ptr<uint8_t[]> m_cart_nt_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
 	int m_gboard_banks[2];
-	int m_gboard_4screen;
 	int m_gboard_command;
 	int m_IRQ_count;
 	uint8_t m_IRQ_count_latch;

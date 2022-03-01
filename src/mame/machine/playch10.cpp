@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
+
 #include "emu.h"
 #include "screen.h"
 #include "includes/playch10.h"
@@ -41,33 +42,14 @@ void playch10_state::machine_start()
 
 	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
-	/* allocate 4K of nametable ram here */
-	/* move to individual boards as documentation of actual boards allows */
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+	// allocate 2K of nametable ram here
+	// this is on the main board and does not belong to the cart board
+	m_nt_ram = std::make_unique<u8[]>(0x800);
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(playch10_state::pc10_chr_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_chr_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(playch10_state::pc10_nt_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_nt_w)));
-
-	if (nullptr != m_vram)
+	if (m_vram != nullptr)
 		set_videoram_bank(0, 8, 0, 8);
-	else pc10_set_videorom_bank(0, 8, 0, 8);
-}
-
-MACHINE_START_MEMBER(playch10_state,playch10_hboard)
-{
-	m_timedigits.resolve();
-
-	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
-
-	/* allocate 4K of nametable ram here */
-	/* move to individual boards as documentation of actual boards allows */
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-	/* allocate vram */
-
-	m_vram = std::make_unique<uint8_t[]>(0x2000);
-
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(playch10_state::pc10_chr_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_chr_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(playch10_state::pc10_nt_r)), write8sm_delegate(*this, FUNC(playch10_state::pc10_nt_w)));
+	else
+		pc10_set_videorom_bank(0, 8, 0, 8);
 }
 
 /*************************************
@@ -166,6 +148,15 @@ void playch10_state::pc10_prot_w(uint8_t data)
 	}
 }
 
+// Some prototypes/location test games need this
+void playch10_state::init_rp5h01_fix()
+{
+	u8 *ROM = memregion("rp5h01")->base();
+	u32 len = memregion("rp5h01")->bytes();
+
+	for (int i = 0; i < len; i++)
+		ROM[i] = ~bitswap<8>(ROM[i], 0, 1, 2, 3, 4, 5, 6, 7);
+}
 
 /*************************************
  *
@@ -275,13 +266,13 @@ uint8_t playch10_state::pc10_in1_r()
 
 void playch10_state::pc10_nt_w(offs_t offset, uint8_t data)
 {
-	int page = ((offset & 0xc00) >> 10);
+	int page = BIT(offset, 10, 2);
 	m_nametable[page][offset & 0x3ff] = data;
 }
 
 uint8_t playch10_state::pc10_nt_r(offs_t offset)
 {
-	int page = ((offset & 0xc00) >> 10);
+	int page = BIT(offset, 10, 2);
 	return m_nametable[page][offset & 0x3ff];
 }
 
@@ -317,17 +308,17 @@ void playch10_state::pc10_set_mirroring(int mirroring)
 		m_nametable[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
+	default:
 		m_nametable[0] = m_nt_ram.get();
 		m_nametable[1] = m_nt_ram.get() + 0x400;
 		m_nametable[2] = m_nt_ram.get();
 		m_nametable[3] = m_nt_ram.get()+ 0x400;
 		break;
-	case PPU_MIRROR_NONE:
-	default:
+	case PPU_MIRROR_4SCREEN:
 		m_nametable[0] = m_nt_ram.get();
 		m_nametable[1] = m_nt_ram.get() + 0x400;
-		m_nametable[2] = m_nt_ram.get() + 0x800;
-		m_nametable[3] = m_nt_ram.get() + 0xc00;
+		m_nametable[2] = m_cart_nt_ram.get();
+		m_nametable[3] = m_cart_nt_ram.get() + 0x400;
 		break;
 	}
 }
@@ -365,7 +356,7 @@ void playch10_state::pc10_set_videorom_bank( int first, int count, int bank, int
 	for (i = 0; i < count; i++)
 	{
 		m_chr_page[i + first].writable = 0;
-		m_chr_page[i + first].chr=m_vrom + (i * 0x400) + (bank * size * 0x400);
+		m_chr_page[i + first].chr = m_vrom + (i * 0x400) + (bank * size * 0x400);
 	}
 }
 
@@ -399,10 +390,10 @@ void playch10_state::init_playch10()
 {
 	m_vram = nullptr;
 
-	/* set the controller to default */
+	// set the controller to default
 	m_pc10_gun_controller = 0;
 
-	/* default mirroring */
+	// default mirroring
 	m_mirroring = PPU_MIRROR_VERT;
 }
 
@@ -412,26 +403,25 @@ void playch10_state::init_playch10()
  *
  **********************************************************************************/
 
-/* Gun games */
+// Gun games
 
 void playch10_state::init_pc_gun()
 {
-	/* common init */
+	// common init
 	init_playch10();
 
-	/* set the control type */
+	// set the control type
 	m_pc10_gun_controller = 1;
 }
 
-
-/* Horizontal mirroring */
+// Horizontal mirroring
 
 void playch10_state::init_pc_hrz()
 {
-	/* common init */
+	// common init
 	init_playch10();
 
-	/* setup mirroring */
+	// setup mirroring
 	m_mirroring = PPU_MIRROR_HORZ;
 }
 
@@ -454,7 +444,7 @@ void playch10_state::init_prg_banking()
 	m_prg_view.select(0);
 }
 
-// safe banking helpers
+// safe banking helpers (only work when PRG size is a power of 2)
 
 void playch10_state::prg32(int bank)
 {
@@ -478,11 +468,10 @@ void playch10_state::prg8(int slot, int bank)
 	m_prg_banks[slot & 0x03]->set_entry(bank & (m_prg_chunks - 1));
 }
 
-/* MMC1 mapper, used by D, F, and K boards */
+// MMC1 mapper, used by D, F, and K boards
 
 void playch10_state::mmc1_rom_switch_w(offs_t offset, uint8_t data)
 {
-	/* basically, a MMC1 mapper from the nes */
 	static int size16k, switchlow, vrom4k;
 
 	/* reset mapper */
@@ -574,8 +563,8 @@ void playch10_state::mmc1_rom_switch_w(offs_t offset, uint8_t data)
 	}
 }
 
-/**********************************************************************************/
-/* A Board games (Track & Field, Gradius) */
+//**********************************************************************************
+// A Board games (Track & Field, Gradius)
 
 void playch10_state::aboard_vrom_switch_w(uint8_t data)
 {
@@ -584,12 +573,12 @@ void playch10_state::aboard_vrom_switch_w(uint8_t data)
 
 void playch10_state::init_pcaboard()
 {
-	/* common init */
+	// common init
 	init_playch10();
 }
 
-/**********************************************************************************/
-/* B Board games (Contra, Rush N' Attach, Pro Wrestling) */
+//**********************************************************************************
+// B Board games (Contra, Rush N' Attach, Pro Wrestling)
 
 void playch10_state::bboard_rom_switch_w(uint8_t data)
 {
@@ -601,15 +590,12 @@ void playch10_state::init_pcbboard()
 	// point program banks to last 32K
 	init_prg_banking();
 
-	/* allocate vram */
+	// allocate vram
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
-
-	/* special init */
-	set_videoram_bank(0, 8, 0, 8);
 }
 
-/**********************************************************************************/
-/* C Board games (The Goonies) */
+//**********************************************************************************
+// C Board games (The Goonies)
 
 void playch10_state::cboard_vrom_switch_w(uint8_t data)
 {
@@ -618,29 +604,26 @@ void playch10_state::cboard_vrom_switch_w(uint8_t data)
 
 void playch10_state::init_pccboard()
 {
-	/* common init */
+	// common init
 	init_playch10();
 }
 
-/**********************************************************************************/
-/* D Board games (Rad Racer, Metroid) */
+//**********************************************************************************
+// D Board games (Rad Racer, Metroid)
 
 void playch10_state::init_pcdboard()
 {
 	// point program banks to last 32K
 	init_prg_banking();
 
-	/* allocate vram */
+	// allocate vram
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
-
-	/* special init */
-	set_videoram_bank(0, 8, 0, 8);
 }
 
-/**********************************************************************************/
-/* E Board games (Mike Tyson's Punchout) - BROKEN - FIX ME */
+//**********************************************************************************
+// E Board (MMC2) games (Mike Tyson's Punchout)
 
-/* callback for the ppu_latch */
+// callback for the ppu_latch
 void playch10_state::mapper9_latch(offs_t offset)
 {
 	if((offset & 0x1ff0) == 0x0fd0 && m_MMC2_bank_latch[0] != 0xfd)
@@ -699,7 +682,7 @@ void playch10_state::eboard_rom_switch_w(offs_t offset, uint8_t data)
 		break;
 
 		case 0x7000: /* mirroring */
-			pc10_set_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			pc10_set_mirroring(data & 1 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 		break;
 	}
@@ -710,12 +693,12 @@ void playch10_state::init_pceboard()
 	// point program banks to last 32K
 	init_prg_banking();
 
-	/* ppu_latch callback */
+	// ppu_latch callback
 	m_ppu->set_latch(*this, FUNC(playch10_state::mapper9_latch));
 }
 
-/**********************************************************************************/
-/* F Board games (Ninja Gaiden, Double Dragon) */
+//**********************************************************************************
+// F Board games (Ninja Gaiden, Double Dragon)
 
 void playch10_state::init_pcfboard()
 {
@@ -723,9 +706,16 @@ void playch10_state::init_pcfboard()
 	init_prg_banking();
 }
 
-/**********************************************************************************/
-/* G Board games (Super Mario Bros. 3) */
+void playch10_state::init_virus()
+{
+	// common init
+	init_pcfboard();
 
+	init_rp5h01_fix();
+}
+
+//**********************************************************************************
+// G Board (MMC3) games (Super Mario Bros. 3, etc)
 
 void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 {
@@ -746,8 +736,6 @@ void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 
 void playch10_state::gboard_rom_switch_w(offs_t offset, uint8_t data)
 {
-	/* basically, a MMC3 mapper from the nes */
-
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
@@ -801,7 +789,7 @@ void playch10_state::gboard_rom_switch_w(offs_t offset, uint8_t data)
 		break;
 
 		case 0x2000: /* mirroring */
-			if (!m_gboard_4screen)
+			if (m_mirroring != PPU_MIRROR_4SCREEN)
 				pc10_set_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 
@@ -835,7 +823,6 @@ void playch10_state::init_pcgboard()
 
 	m_gboard_banks[0] = 0x1e;
 	m_gboard_banks[1] = 0x1f;
-	m_gboard_4screen = 0;
 	m_gboard_command = 0;
 	m_IRQ_enable = 0;
 	m_IRQ_count = m_IRQ_count_latch = 0;
@@ -845,16 +832,25 @@ void playch10_state::init_pcgboard()
 
 void playch10_state::init_pcgboard_type2()
 {
-	/* common init */
+	// common init
 	init_pcgboard();
 
-	/* enable 4 screen mirror */
-	m_gboard_4screen = 1;
-	m_mirroring = PPU_MIRROR_NONE;
+	// enable 4 screen mirroring
+	// 2K on the cart board, in addition to the 2K on the main board
+	m_cart_nt_ram = std::make_unique<u8[]>(0x800);
+	m_mirroring = PPU_MIRROR_4SCREEN;
 }
 
-/**********************************************************************************/
-/* H Board games (PinBot) */
+void playch10_state::init_ttoon()
+{
+	// common init
+	init_pcgboard();
+
+	init_rp5h01_fix();
+}
+
+//**********************************************************************************
+// H Board games (PinBot)
 
 void playch10_state::hboard_rom_switch_w(offs_t offset, uint8_t data)
 {
@@ -867,8 +863,8 @@ void playch10_state::hboard_rom_switch_w(offs_t offset, uint8_t data)
 
 				switch (cmd)
 				{
-					case 0: /* char banking */
-					case 1: /* char banking */
+					case 0: // char banking
+					case 1: // char banking
 						data &= 0xfe;
 						page ^= (cmd << 1);
 						if (data & 0x40)
@@ -881,10 +877,10 @@ void playch10_state::hboard_rom_switch_w(offs_t offset, uint8_t data)
 						}
 					return;
 
-					case 2: /* char banking */
-					case 3: /* char banking */
-					case 4: /* char banking */
-					case 5: /* char banking */
+					case 2: // char banking
+					case 3: // char banking
+					case 4: // char banking
+					case 5: // char banking
 						page ^= cmd + 2;
 						if (data & 0x40)
 						{
@@ -901,15 +897,17 @@ void playch10_state::hboard_rom_switch_w(offs_t offset, uint8_t data)
 	gboard_rom_switch_w(offset,data);
 }
 
-
 void playch10_state::init_pchboard()
 {
 	// common init
 	init_pcgboard();
+
+	// allocate vram
+	m_vram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-/**********************************************************************************/
-/* i Board games (Captain Sky Hawk, Solar Jetman) */
+//**********************************************************************************
+// i Board games (Captain Sky Hawk, Solar Jetman)
 
 void playch10_state::iboard_rom_switch_w(uint8_t data)
 {
@@ -925,15 +923,12 @@ void playch10_state::init_pciboard()
 
 	m_mirroring = PPU_MIRROR_LOW;
 
-	/* allocate vram */
+	// allocate vram
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
-
-	/* special init */
-	set_videoram_bank(0, 8, 0, 8);
 }
 
-/**********************************************************************************/
-/* K Board games (Mario Open Golf) */
+//**********************************************************************************
+// K Board games (Mario Open Golf)
 
 void playch10_state::init_pckboard()
 {
