@@ -74,7 +74,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_rv;
+	bool m_rv = 0;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<u8> m_vram;
 	required_device<z80_device> m_maincpu;

@@ -4585,8 +4585,6 @@ files {
 	MAME_DIR .. "src/mame/includes/taotaido.h",
 	MAME_DIR .. "src/mame/video/taotaido.cpp",
 	MAME_DIR .. "src/mame/drivers/welltris.cpp",
-	MAME_DIR .. "src/mame/includes/welltris.h",
-	MAME_DIR .. "src/mame/video/welltris.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "wing")
@@ -5146,8 +5144,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/tecnodar.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
-	MAME_DIR .. "src/mame/includes/thedeep.h",
-	MAME_DIR .. "src/mame/video/thedeep.cpp",
 	MAME_DIR .. "src/mame/drivers/tickee.cpp",
 	MAME_DIR .. "src/mame/drivers/tmspoker.cpp",
 	MAME_DIR .. "src/mame/drivers/triviaquiz.cpp",

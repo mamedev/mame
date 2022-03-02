@@ -18,6 +18,9 @@
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 // State class - derives from driver_device
 class gsz80_state : public driver_device
 {
@@ -149,7 +152,7 @@ static INPUT_PORTS_START( rc2014mini )
 	PORT_CONFSETTING( 0x4, "EMPTY4" )
 	PORT_CONFSETTING( 0x5, "EMPTY5" )
 	PORT_CONFSETTING( 0x6, "EMPTY6" )
-	PORT_CONFSETTING( 0x7, "SCM" ) 
+	PORT_CONFSETTING( 0x7, "SCM" )
 INPUT_PORTS_END
 
 // ROM mapping is trivial, this binary was created from the HEX file on Grant's website
@@ -163,7 +166,10 @@ ROM_START(rc2014mini)
 	ROM_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057))
 ROM_END
 
+} // anonymous namespace
+
+
 // This ties everything together
 //    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT          CLASS             INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gsz80,          0,        0,        gsz80,         0,             gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+COMP( 2007, gsz80,          0,        0,        gsz80,         0,             gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
 COMP( 2015, rc2014mini,     gsz80,    0,        rc2014mini,    rc2014mini,    rc2014mini_state, empty_init,    "Z80Kits",        "RC2014 Mini",          MACHINE_NO_SOUND_HW )

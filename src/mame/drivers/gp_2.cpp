@@ -28,7 +28,7 @@ Status:
 - All games are working without sound, except:
 - gwarfare stops responding to inputs after a while
 - mbossy rom missing, black screen
-- andromep, andromepa, cyclopes, cyclopes1 cannot be started with the credit button
+- andromep, andromepa, cyclopes, cyclopes1: To start, hold CX hit 1. End ball, CX
 
 
 ToDo:
@@ -851,8 +851,6 @@ GAME( 1984, agent777,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game
 GAME( 1985, cpthook,   0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Captain Hook",              MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, ladyshot,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, ladyshota, ladyshot, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-
-// credit (start) button not working
 GAME( 1985, andromep,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, andromepa, andromep, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, cyclopes,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes (12/85)",  MACHINE_IS_SKELETON_MECHANICAL)

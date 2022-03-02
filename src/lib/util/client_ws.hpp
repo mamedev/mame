@@ -11,6 +11,7 @@
 #include <atomic>
 #include <list>
 #include "crypto.hpp"
+#include "base64.hpp"
 
 #ifndef CASE_INSENSITIVE_EQUALS_AND_HASH
 #define CASE_INSENSITIVE_EQUALS_AND_HASH
@@ -65,7 +66,7 @@ namespace webpp {
 			unsigned short remote_endpoint_port;
 
 		private:
-			explicit Connection(socket_type* socket): remote_endpoint_port(0), socket(socket), strand(socket->get_io_context()), closed(false) { }
+			explicit Connection(asio::io_context &context, socket_type* socket): remote_endpoint_port(0), socket(socket), strand(context), closed(false) { }
 
 			class SendData {
 			public:
@@ -488,7 +489,7 @@ namespace webpp {
 			resolver->async_resolve(query, [this]
 					(const std::error_code &ec, asio::ip::tcp::resolver::iterator it){
 				if(!ec) {
-					connection=std::shared_ptr<Connection>(new Connection(new WS(*io_context)));
+					connection=std::shared_ptr<Connection>(new Connection(*io_context, new WS(*io_context)));
 
 					asio::async_connect(*connection->socket, it, [this]
 							(const std::error_code &ec, asio::ip::tcp::resolver::iterator /*it*/){
