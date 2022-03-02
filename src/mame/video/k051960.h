@@ -13,7 +13,7 @@ enum
 };
 
 
-#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
+#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, bool *shadow)
 
 
 class k051960_device : public device_t, public device_gfx_interface, public device_video_interface
@@ -26,7 +26,7 @@ class k051960_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, int *shadow)>;
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, bool *shadow)>;
 
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -86,10 +86,11 @@ private:
 	devcb_write_line m_nmi_handler;
 	devcb_write_line m_vreg_contrast_handler;
 
-	uint8_t    m_spriterombank[3];
-	int      m_romoffset;
-	int      m_spriteflip, m_readroms, m_shadow_config;
-	int m_nmi_enabled;
+	uint8_t	m_spriterombank[3];
+	uint8_t	m_romoffset;
+	bool	m_spriteflip, m_readroms;
+	uint8_t m_shadow_config;
+	bool	m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
 };

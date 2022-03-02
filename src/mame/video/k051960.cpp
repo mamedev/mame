@@ -148,10 +148,10 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_nmi_handler(*this)
 	, m_vreg_contrast_handler(*this)
 	, m_romoffset(0)
-	, m_spriteflip(0)
-	, m_readroms(0)
+	, m_spriteflip(false)
+	, m_readroms(false)
 	, m_shadow_config(0)
-	, m_nmi_enabled(0)
+	, m_nmi_enabled(false)
 {
 }
 
@@ -229,10 +229,10 @@ void k051960_device::device_start()
 void k051960_device::device_reset()
 {
 	m_romoffset = 0;
-	m_spriteflip = 0;
-	m_readroms = 0;
+	m_spriteflip = false;
+	m_readroms = false;
 	m_shadow_config = 0;
-	m_nmi_enabled = 0;
+	m_nmi_enabled = false;
 
 	m_spriterombank[0] = 0;
 	m_spriterombank[1] = 0;
@@ -263,14 +263,15 @@ TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 
 int k051960_device::k051960_fetchromdata( int byte )
 {
-	int code, color, pri, shadow, off1, addr;
+	int code, color, pri, off1, addr;
+	bool shadow;
 
 	addr = m_romoffset + (m_spriterombank[0] << 8) + ((m_spriterombank[1] & 0x03) << 16);
 	code = (addr & 0x3ffe0) >> 5;
 	off1 = addr & 0x1f;
 	color = ((m_spriterombank[1] & 0xfc) >> 2) + ((m_spriterombank[2] & 0x03) << 6);
 	pri = 0;
-	shadow = color & 0x80;
+	shadow = false;
 	m_k051960_cb(&code, &color, &pri, &shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
@@ -326,12 +327,12 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 			m_nmi_handler(CLEAR_LINE);
 
 		/* bit 3 = flip screen */
-		m_spriteflip = data & 0x08;
+		m_spriteflip = BIT(data, 3);
 
 		/* bit 4 used by Devastators and TMNT, to protect sprite RAM from corruption during updates ? */
 
 		/* bit 5 = enable gfx ROM reading */
-		m_readroms = data & 0x20;
+		m_readroms = BIT(data, 5);
 		//logerror("%s: write %02x to 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 	else if (offset == 1)
@@ -391,7 +392,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 	int sortedlist[NUM_SPRITES];
 	uint8_t drawmode_table[256];
 
-	memset(drawmode_table, (m_shadow_config & 0x01) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE, sizeof(drawmode_table));
+	memset(drawmode_table, BIT(m_shadow_config, 0) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
@@ -411,7 +412,8 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 	for (pri_code = 0; pri_code < NUM_SPRITES; pri_code++)
 	{
-		int ox, oy, code, color, pri, shadow, size, w, h, x, y, flipx, flipy, zoomx, zoomy;
+		int ox, oy, code, color, pri, size, w, h, x, y, flipx, flipy, zoomx, zoomy;
+		bool shadow;
 		/* sprites can be grouped up to 8x8. The draw order is
 		     0  1  4  5 16 17 20 21
 		     2  3  6  7 18 19 22 23
@@ -434,12 +436,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		code = m_ram[offs + 2] + ((m_ram[offs + 1] & 0x1f) << 8);
 		color = m_ram[offs + 3] & 0xff;
 		pri = 0;
-		if (m_shadow_config & 0x04)
-			shadow = 0;
-		else if (m_shadow_config & 0x02)
-			shadow = 1;
-		else
-			shadow = color & 0x80;
+		shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
 		m_k051960_cb(&code, &color, &pri, &shadow);
 
 		if (max_priority != -1)
@@ -474,7 +471,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawmode_table[gfx(0)->granularity() - 1] = (shadow && !(m_shadow_config & 0x01)) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = (shadow && !BIT(m_shadow_config, 0)) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
