@@ -248,20 +248,6 @@ uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
 	return floating_bus_r();
 }
 
-uint8_t spectrum_128_state::floating_bus_r()
-{
-	// very basic "floating bus" implementation, see notes in spectrum.cpp
-	uint8_t data = 0xff;
-	int hpos = m_screen->hpos();
-	int vpos = m_screen->vpos();
-
-	rectangle screen = get_screen_area();
-	if (screen.contains(hpos, vpos))
-		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
-
-	return data;
-}
-
 void spectrum_128_state::spectrum_128_io(address_map &map)
 {
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_ula_r), FUNC(spectrum_128_state::spectrum_ula_w));

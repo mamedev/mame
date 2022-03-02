@@ -499,8 +499,9 @@ uint8_t spectrum_state::floating_bus_r()
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
 
-	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
-		data = m_video_ram[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
+	rectangle screen = get_screen_area();
+	if (screen.contains(hpos, vpos))
+		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
 
 	return data;
 }

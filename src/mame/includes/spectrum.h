@@ -132,7 +132,7 @@ protected:
 	uint8_t spectrum_ula_r(offs_t offset);
 	void spectrum_port_w(offs_t offset, uint8_t data);
 	virtual uint8_t spectrum_port_r(offs_t offset);
-	virtual uint8_t floating_bus_r();
+	uint8_t floating_bus_r();
 	uint8_t spectrum_clone_port_r(offs_t offset);
 
 	void spectrum_palette(palette_device &palette) const;
@@ -236,7 +236,6 @@ private:
 	uint8_t spectrum_128_bank1_r(offs_t offset);
 	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
 	virtual uint8_t spectrum_port_r(offs_t offset) override;
-	virtual uint8_t floating_bus_r() override;
 	//uint8_t spectrum_128_ula_r();
 
 	void spectrum_128_io(address_map &map);
