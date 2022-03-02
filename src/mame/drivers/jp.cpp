@@ -674,12 +674,12 @@ ROM_END
 
 } // Anonymous namespace
 
-// 6-digit display - not working
+// 6-digit display
 GAME(1985,  petacon,  0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1985,  petacona, 0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
 
-// 7-digit display - working
+// 7-digit display
 GAME(1985,  petaco2,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1985,  faeton,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1986,  halley,   0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL )
