@@ -2,13 +2,13 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        VTA-2000 Terminal
+VTA-2000 Terminal
 
-            board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
+Board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
 
-        BDP-15 board only
+BDP-15 board only
 
-        29/11/2010 Skeleton driver.
+2010-11-29 Skeleton driver.
 
 Better known on the net as BTA2000-15m.
 It is a green-screen terminal, using RS232, and supposedly VT100 compatible.
@@ -28,6 +28,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class vta2000_state : public driver_device
 {
@@ -232,7 +233,7 @@ ROM_START( vta2000 )
 	ROM_LOAD( "bdp-15_14.rom", 0x0000, 0x2000, CRC(a1dc4f8e) SHA1(873fd211f44713b713d73163de2d8b5db83d2143) )
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
 COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
