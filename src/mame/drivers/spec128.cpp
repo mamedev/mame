@@ -255,8 +255,9 @@ uint8_t spectrum_128_state::floating_bus_r()
 	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
 
-	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
-		data = m_screen_location[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
+	rectangle screen = get_screen_area();
+	if (screen.contains(hpos, vpos))
+		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
 
 	return data;
 }
