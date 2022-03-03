@@ -3,7 +3,7 @@
 /*
  * Namco System 11 Protection
  *
- * The 409 has been decapped and verified to be an ULA, so probably every keycus is.
+ * The 409 has been decapped and verified to be a ULA, so probably every keycus is.
  */
 
 #include "emu.h"
