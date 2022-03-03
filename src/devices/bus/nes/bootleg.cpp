@@ -992,7 +992,7 @@ void nes_btl_dn_device::hblank_irq(int scanline, int vblank, int blanked )
 		return;
 
 	m_irq_count = 0;
-	hold_irq_line();
+	set_irq_line(ASSERT_LINE);
 }
 
 void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
@@ -1024,6 +1024,7 @@ void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
 			break;
 		case 0x7000:
 			m_irq_count = data;
+			set_irq_line(CLEAR_LINE);
 			break;
 	}
 }
