@@ -17,6 +17,7 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -735,6 +736,9 @@ void lua_engine::initialize()
 	emu["cassette_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<cassette_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<cassette_device_enumerator>(dev, maxdepth); });
+	emu["floppy_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<floppy_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<floppy_interface_enumerator>(dev, maxdepth); });
 	emu["image_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<image_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<image_interface_enumerator>(dev, maxdepth); });
@@ -1263,6 +1267,7 @@ void lua_engine::initialize()
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
+	machine_type["floppies"] = sol::property([](running_machine &m) { return devenum<floppy_interface_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
 
@@ -1598,6 +1603,51 @@ void lua_engine::initialize()
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
+	auto floppy_image_format_type = sol().registry().new_usertype<floppy_image_format_t>("floppy_image_format", sol::no_constructor);
+	floppy_image_format_type["name"] = sol::property(&floppy_image_format_t::name);
+	floppy_image_format_type["description"] = sol::property(&floppy_image_format_t::description);
+	floppy_image_format_type["extensions"] = sol::property(&floppy_image_format_t::extensions);
+	floppy_image_format_type["supports_save"] = sol::property(&floppy_image_format_t::supports_save);
+
+	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
+	floppy_fs_type["name"] = sol::property(&floppy_image_device::fs_info::name);
+	floppy_fs_type["description"] = sol::property(&floppy_image_device::fs_info::description);
+
+	auto floppy_type = sol().registry().new_usertype<floppy_image_device>(
+		"floppy",
+		sol::no_constructor,
+		sol::base_classes, sol::bases<device_t, device_image_interface>());
+	floppy_type["set_rpm"] = &floppy_image_device::set_rpm;
+	floppy_type["formats"] = sol::property(
+		[this](floppy_image_device const &floppy)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (floppy_image_format_t *format : floppy.get_formats())
+				ret[index++] = format;
+			return ret;
+		});
+	floppy_type["create_fs"] = sol::property(
+		[this](floppy_image_device const &floppy)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (floppy_image_device::fs_info const &fs : floppy.get_create_fs())
+				ret[index++] = &fs;
+			return ret;
+		});
+	floppy_type["io_fs"] = sol::property(
+		[this](floppy_image_device const &floppy)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (floppy_image_device::fs_info const &fs : floppy.get_io_fs())
+				ret[index++] = &fs;
+			return ret;
+		});
+	floppy_type["load_format"] = sol::property(&floppy_image_device::get_load_format);
+	floppy_type["identify"] = &floppy_image_device::identify;
+	floppy_type["setup_write"] = &floppy_image_device::setup_write;
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;

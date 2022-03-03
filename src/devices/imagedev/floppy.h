@@ -73,6 +73,9 @@ public:
 			m_key(key),
 			m_description(description)
 		{}
+
+		const char *name() { return m_name; }
+		const char *description() { return m_description; }
 	};
 
 	// construction/destruction
@@ -492,6 +495,9 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector)
+
+// device iterator
+typedef device_interface_enumerator<floppy_image_device> floppy_interface_enumerator;
 
 extern template class device_finder<floppy_connector, false>;
 extern template class device_finder<floppy_connector, true>;
