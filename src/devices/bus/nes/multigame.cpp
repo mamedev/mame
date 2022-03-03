@@ -3281,11 +3281,6 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
- TODO: Investigate why Legend of Kage has a corrupt
- title screen (inverting mirroring bit fixes it but
- breaks the rest of the game). Also why are walls in
- Pacman glitched?
-
  -------------------------------------------------*/
 
 u8 nes_bmc_ctc12in1_device::read_m(offs_t offset)
