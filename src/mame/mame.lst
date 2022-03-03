@@ -23611,6 +23611,7 @@ nbajamten                       // (c) 1995 Midway
 
 @source:midvunit.cpp
 crusnusa                        // (c) 1994 Midway
+crusnusa11                      // (c) 1994 Midway
 crusnusa21                      // (c) 1994 Midway
 crusnusa40                      // (c) 1994 Midway
 crusnusa41                      // (c) 1994 Midway
@@ -33939,6 +33940,7 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmanlai                     // bootleg
 mspacmat                        // hack
 mspacmbe                        // bootleg
 mspacmbmc                       // bootleg (Marti Colls / Falgas)

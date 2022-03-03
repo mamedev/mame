@@ -3083,7 +3083,7 @@ void model2c_state::topskatr(machine_config &config)
 
 The smt ROMs are located on the CPU board and are labelled....
 OPR-14742A \
-OPR-14743A /  Linked to 315-5674
+OPR-14743A /  Linked to 315-5674 ULA
 OPR-14744    \
 OPR-14745    /  Linked to 315-5679B
 OPR-14746    \
