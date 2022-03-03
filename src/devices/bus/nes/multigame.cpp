@@ -3316,7 +3316,7 @@ void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
 			break;
 	}
 
-	m_vram_protect == !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
+	m_vram_protect = !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
 	set_nt_mirroring(BIT(m_reg[0], 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
