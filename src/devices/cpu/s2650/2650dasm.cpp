@@ -486,15 +486,15 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			util::stream_format(stream, z80 ? "**** $%02X" : "****   $%02X",op);
 			break;
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
-			util::stream_format(stream, z80 ? "ld   (%s),r%d" : "strr,%d %s", rv, REL(pc, params));
+			util::stream_format(stream, z80 ? "ld   (%2$s),r%1$d" : "strr,%d %s", rv, REL(pc, params));
 			pc+=1;
 			break;
 		case 0xcc: case 0xcd: case 0xce: case 0xcf:
-			util::stream_format(stream, z80 ? "ld   %s" : "stra,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "ld   %s" : "stra,%s", ABS(0,rv,pc, params));
 			pc+=2;
 			break;
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
-			util::stream_format(stream, z80 ? "rol  r%d" : "rrl,%d", rv);
+			util::stream_format(stream, z80 ? "rlca r%d" : "rrl,%d", rv);
 			break;
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			util::stream_format(stream, z80 ? "out  (%s),r%d" : "wrte,%d %s", rv, IMM(pc, params));
