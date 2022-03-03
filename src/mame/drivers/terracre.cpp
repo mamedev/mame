@@ -559,7 +559,7 @@ ROM_START( terracre )
 	ROM_LOAD16_BYTE( "2.6b",    0x10001, 0x8000, CRC(539352f2) SHA1(b960f75d12ebdcd6781a073a66b8e503a8f55186) )
 	ROM_LOAD16_BYTE( "4.6d",    0x10000, 0x8000, CRC(19387586) SHA1(76473493d173efde83ded52ad721d2c532f590e2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )// Z80 code (sound) on BK-2 PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 )// Z80 code (sound) on BK-2 PCB, with intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
@@ -592,7 +592,7 @@ ROM_START( terracre )
 	ROM_LOAD( "12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on BK-2 PCB
 ROM_END
 
-ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitches in the music when the ship appears
+ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
 	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
 	ROM_LOAD16_BYTE( "5.4d",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
@@ -603,7 +603,7 @@ ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitch
 	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
 	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB, with intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
@@ -636,7 +636,8 @@ ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitch
 	ROM_LOAD( "tc1412.12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on TC-2A PCB
 ROM_END
 
-// probably newest TC-1A/2A board ROM-set for YM3526 version as this fixes a glitch in the music when the ship appears
+// probably newest TC-1A/2A board ROM-set for YM3526 version
+// for unknown reasons, intro fill-in in the main theme had been removed
 ROM_START( terracrea ) // older pcb TC-1A & TC-2A, the only difference is one sound rom
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
 	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
@@ -648,7 +649,7 @@ ROM_START( terracrea ) // older pcb TC-1A & TC-2A, the only difference is one so
 	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
 	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB, without intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(9e9b3808) SHA1(7b6f8d2b75f063aa81711a7c2bf1563cc38eee8b) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
