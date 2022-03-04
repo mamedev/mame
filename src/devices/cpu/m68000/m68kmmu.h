@@ -1086,6 +1086,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 				m_pmmu_enabled = 0;
 				MMULOG("PMMU disabled\n");
 			}
+			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 
 			if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP with FD bit clear
 			{
