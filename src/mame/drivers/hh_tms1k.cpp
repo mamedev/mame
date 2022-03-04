@@ -48,7 +48,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
  @MP1183   TMS1100   1980, E.R.S. Superbowl XV Football/Tandy Championship Football (model 60-2151)
- @MP1185   TMS1100   1979, Fonas 3-in-1: Football, Basketball, Soccer
+ @MP1185   TMS1100   1979, Fonas 3 in 1: Football, Basketball, Soccer
  @MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
@@ -104,7 +104,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
   MP3479   TMS1100   1980, Microvision cartridge: Baseball
   MP3481   TMS1100   1979, Microvision cartridge: Connect Four
- *MP3489   TMS1100   1980, Kenner Live Action Football
+ @MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
@@ -123,7 +123,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
- *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
+ *MP6361   ?         1983, <unknown> Defender Strikes (? note: VFD-capable)
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -179,6 +179,7 @@ TODO:
 - improve elecbowl driver
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
+- is starwbcp the same as MP3438? (starwbc is MP3438A)
 
 ***************************************************************************/
 
@@ -248,6 +249,7 @@ TODO:
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
+#include "liveafb.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
 #include "mathmagi.lh"
@@ -4942,6 +4944,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 2 Player Baseball
+  * PCB label CA-014 (probably Cassia)
   * TMS1000NLL MP0154 (die label 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
@@ -5080,6 +5083,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 3 in 1: Football, Basketball, Soccer
+  * PCB label HP-801
   * TMS1100NLL MP1185
   * 4 7seg LEDs, 40 other LEDs, 1-bit sound
 
@@ -6206,7 +6210,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Star Wars - Electronic Battle Command
-  * TMS1100 MCU, label MP3438A
+  * TMS1100 MCU, label MP3438A (die label 1100B, MP3438A)
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
@@ -6356,9 +6360,157 @@ ROM_END
 
 /***************************************************************************
 
+  Kenner Live Action Football
+  * TMS1100NLL MCU, label MP3489-N2 (die label 1100E, MP3489)
+  * 6-digit 7seg LED display, other LEDs under overlay, 1-bit sound
+
+  The LEDs are inside reflective domes, with an overlay mask on top of that.
+  It is done with an SVG screen on MAME. In reality, the display is not as
+  sharp or as evenly lit as MAME suggests it to be.
+
+  It has a 1-bit roller controller. Half of the axis connects to the input
+  (eg. 1 rising edge per full rotation), so there's no difference between
+  rotating left or right.
+
+***************************************************************************/
+
+class liveafb_state : public hh_tms1k_state
+{
+public:
+	liveafb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void liveafb(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void liveafb_state::update_display()
+{
+	u8 d = (~m_r & 0x100) ? (m_r & 0x3f) : 0; // digit select
+	u8 l = (m_r & 0x100) ? (m_r & 0xf) : 0; // led select
+	m_display->matrix(d | l << 6 | BIT(m_r, 6) << 10 | BIT(m_r, 8, 3) << 11, m_o | (m_r << 4 & 0x300));
+}
+
+void liveafb_state::write_r(u16 data)
+{
+	// R0-R3: input mux
+	m_inp_mux = data & 0xf;
+
+	// R7(+R8): speaker out
+	m_speaker->level_w(BIT(data, 7) & BIT(data, 8));
+
+	// R8: enable digit or led select
+	// R0-R3: led select
+	// R0-R5: digit select
+	// R4,R5: led data high
+	// R6,R8-R10: direct leds
+	m_r = data & ~0x80;
+	update_display();
+}
+
+void liveafb_state::write_o(u16 data)
+{
+	// O0-O7: led data low
+	m_o = data;
+	update_display();
+}
+
+u8 liveafb_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( liveafb )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("ROLLER", 0x7f, LESSTHAN, 0x40)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Tackle")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Punt")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Field Goal")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Skill / Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Action")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("ROLLER")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+void liveafb_state::liveafb(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(liveafb_state::read_k));
+	m_maincpu->r().set(FUNC(liveafb_state::write_r));
+	m_maincpu->o().set(FUNC(liveafb_state::write_o));
+
+	// video hardware
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1834, 1080);
+	mask.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(6+4+4, 8+2);
+	m_display->set_segmask(0x3f, 0x7f);
+	m_display->set_segmask(0x20, 0xff); // only one digit has DP
+	config.set_default_layout(layout_liveafb);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( liveafb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3489", 0x0000, 0x0800, CRC(1fe05ab3) SHA1(a8d7dfed61a6397b7af1d3fcf17b26d5d917b4f0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_liveafb_output.pla", 0, 365, CRC(a7bc9384) SHA1(fab458de394eeddbf5ba0830853a915e51f909c6) )
+
+	ROM_REGION( 162058, "mask", 0)
+	ROM_LOAD( "liveafb.svg", 0, 162058, CRC(046078d0) SHA1(68a5775f4f9a1258c06b76839e1cfdab69b61920) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Kosmos Astro
   * TMS1470NLHL MP1133 (die label TMS1400 MP1133)
-  * 9digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
+  * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
   calculations. Refer to the official manual on how to use this device.
@@ -8454,7 +8606,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Merlin handheld game, by Bob Doyle
-  * TMS1100NLL MP3404A-N2
+  * TMS1100NLL MP3404 or MP3404A-N2
   * 11 LEDs behind buttons, 3-level sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
@@ -8571,7 +8723,17 @@ void merlin_state::merlin(machine_config &config)
 
 ROM_START( merlin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+	ROM_LOAD( "mp3404a", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
+ROM_END
+
+ROM_START( merlina )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(9362d9f9) SHA1(266d2a4a98cc33944a4fc7ed073ba9321bba8e05) ) // 1 bit different
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
@@ -9958,6 +10120,7 @@ ROM_END
 /***************************************************************************
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
+  * PCB label HP-804
   * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
@@ -13930,6 +14093,7 @@ CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   emp
 
 CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, liveafb,    0,         0, liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
@@ -13949,7 +14113,8 @@ CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  emp
 CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlina,    merlin,    0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***

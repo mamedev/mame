@@ -732,7 +732,7 @@ void mfootb2_state::mfootb2(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	m_display->set_segmask(0x3c7, 0x7f);
-	m_display->set_segmask(0x002, 0xff);
+	m_display->set_segmask(0x002, 0xff); // only one digit has DP
 	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mfootb2);
 
