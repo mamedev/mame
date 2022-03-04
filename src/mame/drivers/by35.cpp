@@ -13,42 +13,104 @@ There are many sound boards used, however there are only a few major types.
 * Cheap Squeak has 6803 + ZN429 + 2x2kROM
 * Xenon (#1196) has a sound board (similar to AS-3022) and a vocalizer board, with 32k of roms.
 
+List of games:
 
-Sound Board     Machine
----------------------------------------------
-AS-2888-1       1106,1116,1119,1138,1147,1148
-AS-2888-3       1152
-AS-2888-4       1161,1162,1167
-AS-3022-1       1173
-AS-3022-2       1154
-AS-3022-3       1157
-AS-3022-5       1187
-AS-3022-6       1178
-AS-3022-7       1192
-AS-3022-8       1198
-AS-3022-9       1199
-AS-3022-11      1210
-AS-3022-12      1217
-AS-3022-14      1273
-AS-3022-15      1276
-AS-3022-18      1311
-AS-3059/3060    1196
-AS-3107-1       1215
-AS-3107-2       1220
-AS-3107-3       1219
-AS-3107-4       1222
-AS-3107-5       1233
-AS-3107-6       1245
-AS-3107-7       1239
-AS-3107-8       1248
-AS-3107-9       1247
-AS-3107-10      1262
-AS-3107-11      1282
-AS-3107-12      1283
-A084-91495-A371 1371
-Cheap Squeak    1390,1391,0A17,0A40,0A44,0B42
-(unknown)       1370 (Centaur II - Manual has the correct cover but insides are for Centaur #1239)
-
+Game                              NUM        Sound Board
+-----------------------------------------------------------------------------------------------
+**** Bally ****
+Mysterian                         868
+Supersonic                       1106        AS-2888-1
+Playboy                          1116        AS-2888-1
+Lost World                       1119        AS-2888-1
+The Six Million Dollar Man       1138        AS-2888-1
+Voltan Escapes Cosmic Doom       1147        AS-2888-1
+Star Trek                        1148        AS-2888-1
+Kiss                             1152        AS-2888-3
+Nitro Ground Shaker              1154        AS-3022-2
+Silverball Mania                 1157        AS-3022-3
+Harlem Globetrotters on Tour     1161        AS-2888-4
+Dolly Parton                     1162        AS-2888-4
+Paragon                          1167        AS-2888-4
+Future Spa                       1173        AS-3022-1
+Space Invaders                   1178        AS-3022-6
+Rolling Stones                   1187        AS-3022-5
+Mystic                           1192        AS-3022-7
+Xenon                            1196        AS-3059 (AS-2518-56) (Sounds Plus) and AS-3060 (AS-2518-57) (Vocalizer)
+Viking                           1198        AS-3022-8
+Hotdoggin'                       1199        AS-3022-9
+Skateball                        1210        AS-3022-11
+Flash Gordon                     1215        AS-3107-1 (AS-2518-61) (Squawk & Talk)
+Frontier                         1217        AS-3022-12
+Fireball II                      1219        AS-3107-3
+Eight Ball Deluxe                1220        AS-3107-2
+Embryon                          1222        AS-3107-4
+Fathom                           1233        AS-3107-5
+Centaur                          1239        AS-3107-7
+Medusa                           1245        AS-3107-6
+Vector                           1247        AS-3107-9
+Elektra                          1248        AS-3107-8
+Spectrum                         1262        AS-3107-10
+Speakeasy / Speakeasy 4          1273        AS-3022-14
+BMX                              1276        AS-3022-15
+Rapid Fire                       1282        AS-3107-11 (No flippers in this game)
+Mr & Mrs Pac-Man Pinball         1283        AS-3107-12
+Eight Ball Deluxe LE             1300
+Grand Slam (BY133)               1311        AS-3022-18
+Gold Ball (BY133)                1314 (0371) A084-91945-A371
+Centaur II                       1370 (0370) Squawk & Talk, plus Say It Again (reverb card)
+Kings of Steel                   1390 (0390) Cheap Squeak
+X's & O's                        1391 (0391) Cheap Squeak
+Midnight Marauders               0A12        (gun game)
+Spy Hunter                       0A17        Cheap Squeak
+Fireball Classic                 0A40        Cheap Squeak
+Black Pyramid                    0A44        Cheap Squeak
+Cybernaut                        0B42        Cheap Squeak
+Eight Ball Deluxe (reissue)      0B87
+Big Bat (BY133)                  ----        AS-2518-61 (Squawk & Talk)
+**** Bell ****
+Cosmic Flash
+Fantasy
+Fireball II
+Flash Gordon
+Frontier
+New Wave
+Pinball
+Pin Ball Pool
+Saturn 2
+Super Bowl
+Tiger Rag
+**** Nuova Bell ****
+Cobra
+Dark Shadow
+F1 Grand Prix
+Future Queen
+Skill Flight
+Space Hawks
+Top Pin
+U-boat 65
+World Defender
+**** I.D.I. ****
+Movie Master
+**** Geiger-Automatenbau ****
+Dark Rider
+Fly High
+Miss World
+Space Rider
+**** Grand Products ****
+301/Bullseye
+**** Arkon Automaten ****
+Sexy Girl
+**** Elbos Electronics ****
+Genesis
+**** Zaccaria ****
+Mystic Star
+**** United ****
+Big Ball Bowling (shuffle)
+**** Monroe ****
+Stars and Strikes (shuffle)
+**** Stern ****
+Black Beauty (shuffle)
+--------------------------------------------------------------------------------------------
 
 - The Nuova Bell Games from Dark Shadow onwards use inhouse designed circuit boards. The MPU board contains enhancements for full
   CPU address space, larger ROMs, 6802 CPU, Toshiba TC5517 CMOS RAM (2kb) for battery backup that can be jumpered in nibble or byte mode, etc.
@@ -171,24 +233,24 @@ protected:
 	void by35_map(address_map &map);
 	void nuovo_map(address_map &map);
 
-	uint8_t m_u10a;
-	uint8_t m_u10b;
-	uint8_t m_u11a;
-	uint8_t m_u11b;
+	uint8_t m_u10a = 0U;
+	uint8_t m_u10b = 0U;
+	uint8_t m_u11a = 0U;
+	uint8_t m_u11b = 0U;
 
 	static solenoid_feature_data const s_solenoid_features_default;
 
 private:
-	bool m_u10_ca2;
-	bool m_u10_cb1;
-	bool m_u10_cb2;
-	bool m_u11_ca1;
-	bool m_u11_cb2;
-	bool m_7d;
-	uint8_t m_segment[6];
-	uint8_t m_lamp_decode;
+	bool m_u10_ca2 = 0;
+	bool m_u10_cb1 = 0;
+	bool m_u10_cb2 = 0;
+	bool m_u11_ca1 = 0;
+	bool m_u11_cb2 = 0;
+	bool m_7d = 0;
+	uint8_t m_segment[6]{};
+	uint8_t m_lamp_decode = 0U;
 	solenoid_feature_data const &m_solenoid_features;
-	uint8_t m_io_hold_x[6];
+	uint8_t m_io_hold_x[6]{};
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -1240,7 +1302,7 @@ void by35_state::u11_b_w(uint8_t data)
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
 		}
-		else                        // Rest output - all momentary solenoids are off
+		else                        // Reset output - all momentary solenoids are off
 		{
 			std::fill_n(std::begin(m_solenoids), 15, false);
 		}

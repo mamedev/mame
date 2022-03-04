@@ -2,18 +2,32 @@
 // copyright-holders:Robbbert, Quench
 /********************************************************************************************
 
-    PINBALL
-    Bally MPU AS-2518-17
+PINBALL
+Bally MPU AS-2518-17
 
-    These are some very early and well known Solid State machines, such as 'Eight Ball'.
+Games:
+**** Bally ****
+- Bow and Arrow (#1033)
+- Freedom (#1066)
+- Night Rider (#1074)
+- Black Jack (#1092)
+- Evel Knievel (#1094)
+- Mata Hari (#1104)
+- Eight Ball (#1118)
+- Bobby Orr Power Play (#1120)
+- Strikes and Spares (#1135)
+**** Other ****
+- 301/Bull's Eye
+- Stellar Airship
+- Super Zeus
+- Verspiel Dein Wasser Nicht!
 
-    They have orange digital 6 digit displays, and a mechanical chime unit for sounds.
+They have orange digital 6 digit displays, and a mechanical chime unit for sounds.
 
 
 ToDo:
 - Bow & Arrow fails the PIA test and doesn't boot
 - Dips, Inputs, Solenoids vary per game
-- Mechanical
 
 *********************************************************************************************/
 
@@ -75,19 +89,19 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_u10a;
-	uint8_t m_u10b;
-	uint8_t m_u11a;
-	uint8_t m_u11b;
-	bool m_u10_ca2;
-	bool m_u10_cb1;
-	bool m_u10_cb2;
-	bool m_u11_ca1;
-	bool m_u11_cb2;
-	uint8_t m_segment[6];
-	uint8_t m_lamp_decode;
-	uint8_t m_solenoid_features[20][4];
-	uint8_t m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
+	uint8_t m_u10a = 0U;
+	uint8_t m_u10b = 0U;
+	uint8_t m_u11a = 0U;
+	uint8_t m_u11b = 0U;
+	bool m_u10_ca2 = 0;
+	bool m_u10_cb1 = 0;
+	bool m_u10_cb2 = 0;
+	bool m_u11_ca1 = 0;
+	bool m_u11_cb2 = 0;
+	uint8_t m_segment[6]{};
+	uint8_t m_lamp_decode = 0U;
+	uint8_t m_solenoid_features[20][4]{};
+	uint8_t m_io_hold_x[5]{};       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -1127,7 +1141,7 @@ ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold ti
 ROM_END
 
 /*--------------------------------
-/ Power Play #1120
+/ Bobby Orr Power Play #1120
 /-------------------------------*/
 ROM_START(pwerplay)
 	ROM_REGION(0x1000, "roms", 0)
@@ -1145,7 +1159,7 @@ ROM_START(stk_sprs)
 ROM_END
 
 /*--------------------------------------------------------------
-/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1981)
+/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1979)
 /---------------------------------------------------------------*/
 
 } // anonymous namespace

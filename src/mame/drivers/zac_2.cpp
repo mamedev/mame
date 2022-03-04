@@ -47,14 +47,14 @@ private:
 	void zac_2_io(address_map &map);
 	void zac_2_map(address_map &map);
 
-	uint8_t m_input_line = 0U;
+	uint8_t m_row = 0U;
 	uint8_t m_t_c = 0U;
 	uint8_t m_out_offs = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<7> m_io_keyboard;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<78> m_digits;
 };
 
@@ -167,19 +167,19 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP54")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP55")
+
+	PORT_START("X7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 uint8_t zac_2_state::ctrl_r()
 {
-	if (m_input_line < 7)
-		return m_io_keyboard[m_input_line]->read();
-
-	return 0xff;
+	return m_io_keyboard[m_row]->read();
 }
 
 void zac_2_state::ctrl_w(uint8_t data)
 {
-	m_input_line = data & 7;
+	m_row = data & 7;
 }
 
 void zac_2_state::data_w(uint8_t data)
