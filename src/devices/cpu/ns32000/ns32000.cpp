@@ -10,6 +10,7 @@
 DEFINE_DEVICE_TYPE(NS32008, ns32008_device, "ns32008", "National Semiconductor NS32008")
 DEFINE_DEVICE_TYPE(NS32016, ns32016_device, "ns32016", "National Semiconductor NS32016")
 DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor NS32032")
+DEFINE_DEVICE_TYPE(NS32332, ns32332_device, "ns32332", "National Semiconductor NS32332")
 
 /*
  * TODO:
@@ -45,13 +46,17 @@ enum psr_mask : u16
 
 enum cfg_mask : u32
 {
-	CFG_I = 0x01, // vectored interrupts
-	CFG_F = 0x02, // fpu present
-	CFG_M = 0x04, // mmu present
-	CFG_C = 0x08, // custom coprocessor present
+	CFG_I  = 0x01, // vectored interrupts
+	CFG_F  = 0x02, // fpu present
+	CFG_M  = 0x04, // mmu present
+	CFG_C  = 0x08, // custom coprocessor present
+	CFG_FF = 0x10, // (32332 only) fast fpu protocol
+	CFG_FM = 0x20, // (32332 only) fast mmu protocol
+	CFG_FC = 0x40, // (32332 only) fast custom coprocessor protocol
+	CFG_P  = 0x80, // (32332 only) page size >= 4kb
 };
 
-enum trap_type : unsigned
+enum exception_type : unsigned
 {
 	NVI   =  0, // non-vectored interrupt
 	NMI   =  1, // non-maskable interrupt
@@ -93,6 +98,7 @@ static const u32 size_mask[] = { 0x000000ffU, 0x0000ffffU, 0x00000000U, 0xffffff
 
 template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int databits, int addrbits)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_address_mask(0xffffffffU >> (32 - addrbits))
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_iam_config("iam", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_iac_config("iac", ENDIANNESS_LITTLE, databits, addrbits, 0)
@@ -139,6 +145,11 @@ ns32032_device::ns32032_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+ns32332_device::ns32332_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ns32000_device(mconfig, NS32332, tag, owner, clock, 32, 32)
+{
+}
+
 template <int Width> void ns32000_device<Width>::device_start()
 {
 	set_icountptr(m_icount);
@@ -177,7 +188,7 @@ template <int Width> void ns32000_device<Width>::device_start()
 	state_add(index++, "INTBASE", m_intbase);
 	state_add(index++, "PSR", m_psr);
 	state_add(index++, "MOD", m_mod);
-	state_add(index++, "CFG", m_cfg).formatstr("%4s");
+	state_add(index++, "CFG", m_cfg).formatstr("%5s");
 
 	// general registers
 	for (unsigned i = 0; i < 8; i++)
@@ -225,10 +236,11 @@ template <int Width> void ns32000_device<Width>::state_string_export(device_stat
 		break;
 
 	case 8:
-		str = string_format("%c%c%c%c",
-			(m_cfg & CFG_C) ? 'C' : '.',
-			(m_cfg & CFG_M) ? 'M' : '.',
-			(m_cfg & CFG_F) ? 'F' : '.',
+		str = string_format("%c%c%c%c%c",
+			(m_cfg & CFG_P) ? 'P' : '.',
+			(m_cfg & CFG_C) ? ((m_cfg & CFG_FC) ? 'C' : 'c') : '.',
+			(m_cfg & CFG_M) ? ((m_cfg & CFG_FM) ? 'M' : 'm') : '.',
+			(m_cfg & CFG_F) ? ((m_cfg & CFG_FF) ? 'F' : 'f') : '.',
 			(m_cfg & CFG_I) ? 'I' : '.');
 		break;
 	}
@@ -742,31 +754,72 @@ template <int Width> void ns32000_device<Width>::flags(u32 const src1, u32 const
 		m_psr |= PSR_F;
 }
 
-template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector, u32 const return_address, bool const trap)
+template <int Width> void ns32000_device<Width>::interrupt(unsigned const type, u32 const return_address)
 {
-	// clear trace pending flag
-	if (vector == TRC)
-		m_psr &= ~PSR_P;
-	else if (trap)
+	unsigned offset = type * 4;
+
+	switch (type)
 	{
-		// restore state
-		SP = m_ssp;
-		m_psr = m_sps;
-	}
-
-	// push psr
-	m_sp0 -= 2;
-	mem_write<u16>(ST_ODT, m_sp0, m_psr);
-
-	// update psr
-	if (trap && vector != ABT)
-		m_psr &= ~(PSR_P | PSR_S | PSR_U | PSR_T);
-	else
+	case NVI:
+		// maskable interrupt
+		m_sps = m_psr;
 		m_psr &= ~(PSR_I | PSR_P | PSR_S | PSR_U | PSR_T);
 
-	// fetch external procedure descriptor
-	u16 const dlo = mem_read<u16>(ST_ODT, m_intbase + vector * 4 + 0);
-	u16 const dhi = mem_read<u16>(ST_ODT, m_intbase + vector * 4 + 2);
+		if (m_cfg & CFG_I)
+		{
+			// acknowledge interrupt and read vector
+			s8 vector = mem_read<u8>(ST_IAM, 0xfffffe00 & m_address_mask);
+			if (vector < 0 && vector >= -16)
+			{
+				// vectored mode, cascaded
+				u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
+
+				vector = mem_read<u8>(ST_IAC, cascade);
+			}
+
+			offset = vector * 4;
+		}
+		else
+			// acknowledge non-vectored interrupt
+			mem_read<u8>(ST_IAM, 0xfffffe00 & m_address_mask);
+		break;
+
+	case NMI:
+		// non-maskable interrupt
+		m_sps = m_psr;
+		m_psr &= ~(PSR_I | PSR_P | PSR_S | PSR_U | PSR_T);
+
+		// acknowledge interrupt and discard vector
+		mem_read<u8>(ST_IAM, 0xffffff00 & m_address_mask);
+		m_nmi_line = false;
+		break;
+
+	case ABT:
+		// abort
+		SP = m_ssp;
+		m_psr &= ~PSR_P;
+		m_sps = m_psr;
+		m_psr &= ~(PSR_I | PSR_S | PSR_U | PSR_T);
+		break;
+
+	case TRC:
+		// trace trap
+		m_psr &= ~PSR_P;
+		m_sps = m_psr;
+		m_psr &= ~(PSR_S | PSR_U | PSR_T);
+		break;
+
+	default:
+		// traps other than trace
+		SP = m_ssp;
+		m_psr = m_sps;
+		m_psr &= ~(PSR_P | PSR_S | PSR_U | PSR_T);
+		break;
+	}
+
+	// push saved program status
+	m_sp0 -= 2;
+	mem_write<u16>(ST_ODT, m_sp0, m_sps);
 
 	// push mod
 	m_sp0 -= 2;
@@ -776,18 +829,21 @@ template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector
 	m_sp0 -= 4;
 	mem_write<u32>(ST_ODT, m_sp0, return_address);
 
+	// fetch external procedure descriptor
+	u32 const desc = mem_read<u32>(ST_ODT, m_intbase + offset);
+
 	// update mod, sb, pc
-	m_mod = dlo;
+	m_mod = u16(desc);
 	m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-	m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + dhi;
+	m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + (desc >> 16);
 
 	// TODO: flush queue
 	m_sequential = false;
 
-	m_icount -= top(SIZE_W, m_sp0) * 2 + top(SIZE_W, m_intbase + vector * 4) + top(SIZE_D, m_sp0) + top(SIZE_D, m_mod);
+	m_icount -= top(SIZE_W, m_sp0) * 2 + top(SIZE_W, m_intbase + offset) + top(SIZE_D, m_sp0) + top(SIZE_D, m_mod);
 
-	if (trap && machine().debug_enabled())
-		debug()->exception_hook(vector);
+	if (machine().debug_enabled() && (type > ABT))
+		debug()->exception_hook(type);
 }
 
 template <int Width> void ns32000_device<Width>::execute_run()
@@ -804,12 +860,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 		{
 			if (m_nmi_line)
 			{
-				// acknowledge interrupt and discard vector
-				mem_read<u8>(ST_IAM, 0xffff00);
-				m_nmi_line = false;
-
 				// service interrupt
-				interrupt(NMI, m_pc, false);
+				interrupt(NMI, m_pc);
 
 				// notify the debugger
 				if (machine().debug_enabled())
@@ -817,26 +869,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			}
 			else if (m_int_line && (m_psr & PSR_I))
 			{
-				// acknowledge interrupt and read vector
-				s8 vector = mem_read<u8>(ST_IAM, 0xfffe00);
-
-				// check for vectored mode
-				if (m_cfg & CFG_I)
-				{
-					if (vector < 0 && vector >= -16)
-					{
-						// vectored mode, cascaded
-						u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
-
-						vector = mem_read<u8>(ST_IAC, cascade);
-					}
-				}
-				else
-					// non-vectored mode
-					vector = NVI;
-
 				// service interrupt
-				interrupt(vector, m_pc, false);
+				interrupt(NVI, m_pc);
 
 				// notify the debugger
 				if (machine().debug_enabled())
@@ -916,19 +950,18 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						s32 const index = displacement(bytes);
 
 						u32 const link_base = mem_read<u32>(ST_ODT, m_mod + 4);
-						u16 const dlo = mem_read<u16>(ST_ODT, link_base + index * 4 + 0);
-						u16 const dhi = mem_read<u16>(ST_ODT, link_base + index * 4 + 2);
+						u32 const desc = mem_read<u32>(ST_ODT, link_base + index * 4);
 
 						SP -= 4;
 						mem_write<u16>(ST_ODT, SP, m_mod);
 						SP -= 4;
 						mem_write<u32>(ST_ODT, SP, m_pc + bytes);
 
-						tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, dlo) * 2 + 16;
+						tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, u16(desc)) * 2 + 16;
 
-						m_mod = dlo;
+						m_mod = u16(desc);
 						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-						m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + dhi;
+						m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + (desc >> 16);
 						m_sequential = false;
 					}
 					break;
@@ -978,7 +1011,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					if (!(m_psr & PSR_U))
 					{
 						// end of interrupt, master
-						s8 vector = mem_read<u8>(ST_EIM, 0xfffe00);
+						s8 vector = mem_read<u8>(ST_EIM, 0xfffffe00 & m_address_mask);
 
 						// check for vectored mode
 						if (m_cfg & CFG_I)
@@ -1352,9 +1385,11 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							SP -= 4;
 							mem_write<u32>(ST_ODT, SP, m_pc + bytes);
 
-							m_mod = mem_read<u16>(ST_ODT, address + 0);
+							u32 const desc = mem_read<u32>(ST_ODT, address);
+
+							m_mod = u16(desc);
 							m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-							m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + mem_read<u16>(ST_ODT, address + 2);
+							m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + (desc >> 16);
 
 							tex = mode[0].tea + top(SIZE_W, address) * 3 + top(SIZE_D, m_mod) * 3 + 13;
 							m_sequential = false;
@@ -1918,7 +1953,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						//        short
 						if (!(m_psr & PSR_U))
 						{
-							m_cfg = BIT(opword, 7, 4);
+							m_cfg = BIT(opword, 7, (type() == NS32332) ? 8 : 4);
 
 							tex = 15;
 						}
@@ -2918,17 +2953,11 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				// format 9: xxxx xyyy yyoo ofii 0011 1110
 				if (m_cfg & CFG_F)
 				{
-					if (!m_fpu)
-						fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
-
 					u16 const opword = fetch<u16>(bytes);
 
 					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
 					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
 					size_code const size = size_code(opword & 3);
-
-					m_fpu->write_id(opbyte);
-					m_fpu->write_op(swapendian_int16(opword));
 
 					switch (BIT(opword, 3, 3))
 					{
@@ -2940,7 +2969,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 1:
@@ -2950,7 +2979,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].read_i(size);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 2:
@@ -2961,7 +2990,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 3:
@@ -2972,7 +3001,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 4:
@@ -2983,7 +3012,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 5:
@@ -2994,7 +3023,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 6:
@@ -3004,7 +3033,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].write_i(size);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[1], mode[0]))
+						if (slave(opbyte, opword, mode[1], mode[0]))
 							interrupt(SLV, m_pc);
 						break;
 					case 7:
@@ -3015,7 +3044,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					}
@@ -3030,16 +3059,10 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				// format 11: xxxx xyyy yyoo oo0f 1011 1110
 				if (m_cfg & CFG_F)
 				{
-					if (!m_fpu)
-						fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
-
 					u16 const opword = fetch<u16>(bytes);
 
 					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
 					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
-
-					m_fpu->write_id(opbyte);
-					m_fpu->write_op(swapendian_int16(opword));
 
 					switch (BIT(opword, 2, 4))
 					{
@@ -3051,7 +3074,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].rmw_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x1:
@@ -3062,7 +3085,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x2:
@@ -3074,7 +3097,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mode[1].read_f(size_f);
 							decode(mode, bytes);
 
-							u16 const status = slave(m_fpu, mode[0], mode[1]);
+							u16 const status = slave(opbyte, opword, mode[0], mode[1]);
 							if (!(status & ns32000_slave_interface::SLAVE_Q))
 							{
 								m_psr &= ~(PSR_N | PSR_Z | PSR_L);
@@ -3086,12 +3109,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						break;
 					case 0x3:
 						// Trap(SLAVE)
-						// operands from ns32532 datasheet
+						// not defined; treat like CMPf
 						mode[0].read_f(size_f);
 						mode[1].read_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x4:
@@ -3102,7 +3125,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].rmw_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x5:
@@ -3113,7 +3136,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x8:
@@ -3124,17 +3147,17 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].rmw_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0x9:
 						// Trap(SLAVE)
-						// operands from ns32532 datasheet
+						// not defined; treat like MOVf
 						mode[0].read_f(size_f);
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0xc:
@@ -3145,7 +3168,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].rmw_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					case 0xd:
@@ -3156,7 +3179,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_f(size_f);
 						decode(mode, bytes);
 
-						if (slave(m_fpu, mode[0], mode[1]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV, m_pc);
 						break;
 					}
@@ -3164,7 +3187,96 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				else
 					interrupt(UND, m_pc);
 				break;
-			case 0xfe: // format 12
+			case 0xfe:
+				// format 12: xxxx xyyy yyoo oo0f 1111 1110
+				if ((m_cfg & CFG_F) && type() == NS32332)
+				{
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+
+					switch (BIT(opword, 2, 4))
+					{
+					case 0x2:
+						// POLYf src,dst
+						//       gen,gen
+						//       read.f,read.f
+						mode[0].read_f(size_f);
+						mode[1].read_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x3:
+						// DOTf src,dst
+						//      gen,gen
+						//      read.f,read.f
+						mode[0].read_f(size_f);
+						mode[1].read_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x4:
+						// SCALBf src,dst
+						//        gen,gen
+						//        read.f,rmw.f
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x5:
+						// LOGBf src,dst
+						//       gen,gen
+						//       read.f,write.f
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x0: // REMf
+					case 0x8: // Trap(SLV)
+					case 0xc: // ATAN2f
+						// not defined; treat like ADDf
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x1: // SQRTf
+					case 0x9: // Trap(SLV)
+					case 0xd: // SICOSf
+						// not defined; treat like MOVf
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(opbyte, opword, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x6: // Trap(UND)
+					case 0x7: // Trap(UND)
+					case 0xa: // Trap(UND)
+					case 0xb: // Trap(UND)
+					case 0xe: // Trap(UND)
+					case 0xf: // Trap(UND)
+						interrupt(UND, m_pc);
+						break;
+					}
+				}
+				else
+					interrupt(UND, m_pc);
+				break;
 			case 0x9e: // format 13
 				interrupt(UND, m_pc);
 				break;
@@ -3174,18 +3286,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					if (m_cfg & CFG_M)
 					{
-						if (!m_mmu)
-							fatalerror("memory management unit not configured (%s)\n", machine().describe_context());
-
 						u16 const opword = fetch<u16>(bytes);
 
 						addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
 
 						//unsigned const quick = BIT(opword, 7, 4);
 						size_code const size = size_code(opword & 3);
-
-						m_mmu->write_id(opbyte);
-						m_mmu->write_op(swapendian_int16(opword));
 
 						switch (BIT(opword, 2, 4))
 						{
@@ -3200,7 +3306,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								// dummy read
 								mem_read<u8>(ST_ODT, ea(mode[0]), true);
 
-								u16 const status = slave(m_mmu, mode[0], mode[1]);
+								u16 const status = slave(opbyte, opword, mode[0], mode[1]);
 								if (!(status & ns32000_slave_interface::SLAVE_Q))
 								{
 									if (status & ns32000_slave_interface::SLAVE_F)
@@ -3225,7 +3331,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								// dummy read
 								mem_read<u8>(ST_ODT, ea(mode[0]), true);
 
-								u16 const status = slave(m_mmu, mode[0], mode[1]);
+								u16 const status = slave(opbyte, opword, mode[0], mode[1]);
 								if (!(status & ns32000_slave_interface::SLAVE_Q))
 								{
 									if (status & ns32000_slave_interface::SLAVE_F)
@@ -3246,7 +3352,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mode[0].read_i(size);
 							decode(mode, bytes);
 
-							if (slave(m_mmu, mode[0], mode[1]))
+							if (slave(opbyte, opword, mode[0], mode[1]))
 								interrupt(SLV, m_pc);
 
 							tex = mode[0].tea + top(size);
@@ -3258,7 +3364,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mode[0].write_i(size);
 							decode(mode, bytes);
 
-							if (slave(m_mmu, mode[1], mode[0]))
+							if (slave(opbyte, opword, mode[1], mode[0]))
 								interrupt(SLV, m_pc);
 
 							tex = mode[0].tea + top(size);
@@ -3357,8 +3463,43 @@ template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Widt
 	return std::make_unique<ns32000_disassembler>();
 }
 
-template <int Width> u16 ns32000_device<Width>::slave(ns32000_slave_interface *slave, addr_mode op1, addr_mode op2)
+template <int Width> u16 ns32000_device<Width>::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 {
+	switch (opbyte)
+	{
+	case 0x1e:
+		if (!m_mmu)
+			fatalerror("slave mmu coprocessor not configured (%s)\n", machine().describe_context());
+
+		if (m_cfg & CFG_FM)
+			return slave_fast(dynamic_cast<ns32000_fast_slave_interface &>(*m_mmu), opbyte, opword, op1, op2);
+		else
+			return slave_slow(dynamic_cast<ns32000_slow_slave_interface &>(*m_mmu), opbyte, opword, op1, op2);
+		break;
+
+	case 0x3e:
+	case 0xbe:
+	case 0xfe:
+		if (!m_fpu)
+			fatalerror("slave fpu coprocessor not configured (%s)\n", machine().describe_context());
+
+		if (m_cfg & CFG_FF)
+			return slave_fast(dynamic_cast<ns32000_fast_slave_interface &>(*m_fpu), opbyte, opword, op1, op2);
+		else
+			return slave_slow(dynamic_cast<ns32000_slow_slave_interface &>(*m_fpu), opbyte, opword, op1, op2);
+		break;
+
+	default:
+		fatalerror("slave coprocessor not supported (%s)\n", machine().describe_context());
+		return ns32000_slave_interface::SLAVE_Q;
+	}
+}
+
+template <int Width> u16 ns32000_device<Width>::slave_slow(ns32000_slow_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
+{
+	slave.write_id(opbyte);
+	slave.write_op(swapendian_int16(opword));
+
 	if ((op1.access == READ || op1.access == RMW) && !(op1.type == REG && op1.slave))
 	{
 		u64 const data = gen_read(op1);
@@ -3366,20 +3507,20 @@ template <int Width> u16 ns32000_device<Width>::slave(ns32000_slave_interface *s
 		switch (op1.size)
 		{
 		case SIZE_B:
-			slave->write_op(u8(data));
+			slave.write_op(u8(data));
 			break;
 		case SIZE_W:
-			slave->write_op(u16(data));
+			slave.write_op(u16(data));
 			break;
 		case SIZE_D:
-			slave->write_op(u16(data >> 0));
-			slave->write_op(u16(data >> 16));
+			slave.write_op(u16(data >> 0));
+			slave.write_op(u16(data >> 16));
 			break;
 		case SIZE_Q:
-			slave->write_op(u16(data >> 0));
-			slave->write_op(u16(data >> 16));
-			slave->write_op(u16(data >> 32));
-			slave->write_op(u16(data >> 48));
+			slave.write_op(u16(data >> 0));
+			slave.write_op(u16(data >> 16));
+			slave.write_op(u16(data >> 32));
+			slave.write_op(u16(data >> 48));
 			break;
 		}
 	}
@@ -3391,45 +3532,112 @@ template <int Width> u16 ns32000_device<Width>::slave(ns32000_slave_interface *s
 		switch (op2.size)
 		{
 		case SIZE_B:
-			slave->write_op(u8(data));
+			slave.write_op(u8(data));
 			break;
 		case SIZE_W:
-			slave->write_op(u16(data));
+			slave.write_op(u16(data));
 			break;
 		case SIZE_D:
-			slave->write_op(u16(data >> 0));
-			slave->write_op(u16(data >> 16));
+			slave.write_op(u16(data >> 0));
+			slave.write_op(u16(data >> 16));
 			break;
 		case SIZE_Q:
-			slave->write_op(u16(data >> 0));
-			slave->write_op(u16(data >> 16));
-			slave->write_op(u16(data >> 32));
-			slave->write_op(u16(data >> 48));
+			slave.write_op(u16(data >> 0));
+			slave.write_op(u16(data >> 16));
+			slave.write_op(u16(data >> 32));
+			slave.write_op(u16(data >> 48));
 			break;
 		}
 	}
 
-	u16 const status = slave->read_st(&m_icount);
+	u16 const status = slave.read_st(&m_icount);
 
 	if (!(status & ns32000_slave_interface::SLAVE_Q))
 	{
 		if ((op2.access == WRITE || op2.access == RMW) && !(op2.type == REG && op2.slave))
 		{
-			u64 data = slave->read_op();
+			u64 data = slave.read_op();
 
 			switch (op2.size)
 			{
 			case SIZE_D:
-				data |= u64(slave->read_op()) << 16;
+				data |= u64(slave.read_op()) << 16;
 				break;
 			case SIZE_Q:
-				data |= u64(slave->read_op()) << 16;
-				data |= u64(slave->read_op()) << 32;
-				data |= u64(slave->read_op()) << 48;
+				data |= u64(slave.read_op()) << 16;
+				data |= u64(slave.read_op()) << 32;
+				data |= u64(slave.read_op()) << 48;
 				break;
 			default:
 				break;
 			}
+
+			gen_write(op2, data);
+		}
+	}
+
+	return status;
+}
+
+template <int Width> u16 ns32000_device<Width>::slave_fast(ns32000_fast_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
+{
+	slave.write(u32(opbyte) << 24 | u32(swapendian_int16(opword)) << 8);
+
+	if ((op1.access == READ || op1.access == RMW) && !(op1.type == REG && op1.slave))
+	{
+		u64 const data = gen_read(op1);
+
+		switch (op1.size)
+		{
+		case SIZE_B:
+			slave.write(u8(data));
+			break;
+		case SIZE_W:
+			slave.write(u16(data));
+			break;
+		case SIZE_D:
+			slave.write(u32(data));
+			break;
+		case SIZE_Q:
+			slave.write(u32(data >> 0));
+			slave.write(u32(data >> 32));
+			break;
+		}
+	}
+
+	if ((op2.access == READ || op2.access == RMW) && !(op2.type == REG && op2.slave))
+	{
+		u64 const data = gen_read(op2);
+
+		switch (op2.size)
+		{
+		case SIZE_B:
+			slave.write(u8(data));
+			break;
+		case SIZE_W:
+			slave.write(u16(data));
+			break;
+		case SIZE_D:
+			slave.write(u32(data));
+			break;
+		case SIZE_Q:
+			slave.write(u32(data >> 0));
+			slave.write(u32(data >> 32));
+			break;
+		}
+	}
+
+	// TODO: status is optional in fast protocol
+	u32 const status = slave.read_st(&m_icount);
+
+	if (!(status & ns32000_slave_interface::SLAVE_Q))
+	{
+		if ((op2.access == WRITE || op2.access == RMW) && !(op2.type == REG && op2.slave))
+		{
+			u64 data = slave.read();
+
+			if (op2.size == SIZE_Q)
+				data |= u64(slave.read()) << 32;
 
 			gen_write(op2, data);
 		}

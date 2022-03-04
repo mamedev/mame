@@ -383,7 +383,9 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	VGA(config, "vga", 0).set_screen("screen");
+	vga_device &vga(VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 }
 
 ROM_START( pntnpuzl )

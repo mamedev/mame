@@ -205,21 +205,19 @@ public:
 		: m_callback(std::move(callback))
 		, m_engine(engine)
 		, m_space(space)
-		, m_handler(nullptr)
+		, m_handler()
 		, m_name(std::move(name))
 		, m_start(start)
 		, m_end(end)
 		, m_mode(mode)
-		, m_installing(false)
-		, m_installed(false)
+		, m_installing(0U)
 	{
 		reinstall();
 	}
 
 	~tap_helper()
 	{
-		if (m_handler && m_installed)
-			m_handler->remove();
+		remove();
 	}
 
 	offs_t start() const noexcept { return m_start; }
@@ -239,11 +237,17 @@ public:
 
 	void remove()
 	{
-		if (m_handler)
+		++m_installing;
+		try
 		{
-			m_handler->remove();
-			m_installed = false;
+			m_handler.remove();
 		}
+		catch (...)
+		{
+			--m_installing;
+			throw;
+		}
+		--m_installing;
 	}
 
 private:
@@ -252,148 +256,61 @@ private:
 	{
 		if (m_installing)
 			return;
-		m_installing = true;
-		if (m_handler)
-			m_handler->remove();
-
-		switch (m_mode)
+		++m_installing;
+		try
 		{
-		case read_or_write::READ:
-			m_handler = m_space.install_read_tap(
-					m_start,
-					m_end,
-					m_name,
-					[this] (offs_t offset, T &data, T mem_mask)
-					{
-						auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
-						if (result)
-							data = *result;
-					},
-					m_handler);
-			break;
-		case read_or_write::WRITE:
-			m_handler = m_space.install_write_tap(
-					m_start,
-					m_end,
-					m_name,
-					[this] (offs_t offset, T &data, T mem_mask)
-					{
-						auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
-						if (result)
-							data = *result;
-					},
-					m_handler);
-			break;
-		case read_or_write::READWRITE:
-			// won't ever get here, but compilers complain about unhandled enum value
-			break;
-		}
+			m_handler.remove();
 
-		m_installed = true;
-		m_installing = false;
+			switch (m_mode)
+			{
+			case read_or_write::READ:
+				m_handler = m_space.install_read_tap(
+						m_start,
+						m_end,
+						m_name,
+						[this] (offs_t offset, T &data, T mem_mask)
+						{
+							auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							if (result)
+								data = *result;
+						},
+						&m_handler);
+				break;
+			case read_or_write::WRITE:
+				m_handler = m_space.install_write_tap(
+						m_start,
+						m_end,
+						m_name,
+						[this] (offs_t offset, T &data, T mem_mask)
+						{
+							auto result = m_engine.invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							if (result)
+								data = *result;
+						},
+						&m_handler);
+				break;
+			case read_or_write::READWRITE:
+				// won't ever get here, but compilers complain about unhandled enum value
+				break;
+			}
+		}
+		catch (...)
+		{
+			--m_installing;
+			throw;
+		}
+		--m_installing;
 	};
 
 	sol::protected_function m_callback;
 	lua_engine &m_engine;
 	address_space &m_space;
-	memory_passthrough_handler *m_handler;
+	memory_passthrough_handler m_handler;
 	std::string m_name;
 	offs_t const m_start;
 	offs_t const m_end;
 	read_or_write const m_mode;
-	bool m_installing;
-	bool m_installed;
-};
-
-
-//-------------------------------------------------
-//  addr_space_change_notif - helper for hanging
-//  on to an address space change notification
-//  subscription
-//-------------------------------------------------
-
-class lua_engine::addr_space_change_notif
-{
-public:
-	addr_space_change_notif(addr_space_change_notif const &) = delete;
-
-	addr_space_change_notif(addr_space_change_notif &&that)
-		: m_callback(std::move(that.m_callback))
-		, m_engine(that.m_engine)
-		, m_space(that.m_space)
-		, m_id(-1)
-	{
-		that.remove();
-		install();
-	}
-
-	addr_space_change_notif &operator=(addr_space_change_notif &&that)
-	{
-		if (&that != this)
-		{
-			remove();
-			m_callback = std::move(that.m_callback);
-			m_engine = that.m_engine;
-			m_space = that.m_space;
-			that.remove();
-			install();
-		}
-		return *this;
-	}
-
-	addr_space_change_notif(lua_engine &engine, address_space &space, sol::protected_function &&callback)
-		: m_callback(std::move(callback))
-		, m_engine(&engine)
-		, m_space(&space)
-		, m_id(-1)
-	{
-		install();
-	}
-
-	~addr_space_change_notif()
-	{
-		if (m_space)
-			m_space->remove_change_notifier(m_id);
-	}
-
-	void remove()
-	{
-		if (m_space)
-		{
-			m_space->remove_change_notifier(m_id);
-			m_space = nullptr;
-			m_id = -1;
-		}
-	}
-
-private:
-	void install()
-	{
-		if (m_space)
-		{
-			m_id = m_space->add_change_notifier(
-					[this] (read_or_write mode)
-					{
-						char const *modestr = "";
-						switch (mode)
-						{
-						case read_or_write::READ:      modestr = "r";  break;
-						case read_or_write::WRITE:     modestr = "w";  break;
-						case read_or_write::READWRITE: modestr = "rw"; break;
-						}
-						m_engine->invoke(m_callback, modestr);
-					});
-		}
-		else
-		{
-			m_id = -1;
-		}
-	}
-
-	sol::protected_function m_callback;
-	lua_engine *m_engine;
-	address_space *m_space;
-	int m_id;
+	unsigned m_installing;
 };
 
 
@@ -724,7 +641,18 @@ void lua_engine::initialize_memory(sol::table &emu)
 	addr_space_type["add_change_notifier"] =
 			[this] (addr_space &sp, sol::protected_function &&cb)
 			{
-				return addr_space_change_notif(*this, sp.space, std::move(cb));
+				return sp.space.add_change_notifier(
+						[this, callback = std::move(cb)] (read_or_write mode)
+						{
+							char const *modestr = "";
+							switch (mode)
+							{
+							case read_or_write::READ:      modestr = "r";  break;
+							case read_or_write::WRITE:     modestr = "w";  break;
+							case read_or_write::READWRITE: modestr = "rw"; break;
+							}
+							invoke(callback, modestr);
+						});
 			};
 	addr_space_type["install_read_tap"] =
 			[this] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
@@ -744,9 +672,6 @@ void lua_engine::initialize_memory(sol::table &emu)
 	addr_space_type["endianness"] = sol::property([] (addr_space &sp) { return sp.space.endianness(); });
 	addr_space_type["map"] = sol::property([] (addr_space &sp) { return sp.space.map(); });
 
-
-	auto change_notif_type = sol().registry().new_usertype<addr_space_change_notif>("addr_space_change", sol::no_constructor);
-	change_notif_type["remove"] = &addr_space_change_notif::remove;
 
 	auto tap_type = sol().registry().new_usertype<tap_helper>("mempassthrough", sol::no_constructor);
 	tap_type["reinstall"] = &tap_helper::reinstall;

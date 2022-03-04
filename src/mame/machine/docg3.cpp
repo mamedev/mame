@@ -819,11 +819,13 @@ void diskonchip_g3_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void diskonchip_g3_device::nvram_read(emu_file &file)
+bool diskonchip_g3_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_data[0].get(), m_data_size[0]);
-	file.read(m_data[1].get(), m_data_size[1]);
-	file.read(m_data[2].get(), m_data_size[2]);
+	size_t actual;
+	bool result = !file.read(m_data[0].get(), m_data_size[0], actual) && actual == m_data_size[0];
+	result = result && !file.read(m_data[1].get(), m_data_size[1], actual) && actual == m_data_size[1];
+	result = result && !file.read(m_data[2].get(), m_data_size[2], actual) && actual == m_data_size[2];
+	return result;
 }
 
 //-------------------------------------------------
@@ -831,9 +833,11 @@ void diskonchip_g3_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void diskonchip_g3_device::nvram_write(emu_file &file)
+bool diskonchip_g3_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_data[0].get(), m_data_size[0]);
-	file.write(m_data[1].get(), m_data_size[1]);
-	file.write(m_data[2].get(), m_data_size[2]);
+	size_t actual;
+	bool result = !file.write(m_data[0].get(), m_data_size[0], actual) && actual == m_data_size[0];
+	result = result && !file.write(m_data[1].get(), m_data_size[1], actual) && actual == m_data_size[1];
+	result = result && !file.write(m_data[2].get(), m_data_size[2], actual) && actual == m_data_size[2];
+	return result;
 }

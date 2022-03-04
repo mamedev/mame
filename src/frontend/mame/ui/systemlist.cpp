@@ -14,6 +14,7 @@
 #include "ui/moptions.h"
 
 #include "drivenum.h"
+#include "fileio.h"
 
 #include "util/corestr.h"
 #include "util/unicode.h"

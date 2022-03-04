@@ -502,7 +502,7 @@ ROM_START( winner ) // dump confirmed from 3 different PCBs
 	ROM_LOAD( "palce16v8h-25pc-4.9c", 0x000, 0x117, CRC(ac0347ee) SHA1(26b27d2037400c06e63528e0e59be6d7d1a81cab) )
 ROM_END
 
-ROM_START( unkvsaa ) // all labels unreadable
+ROM_START( scratch ) // all labels unreadable
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "68hc705.0d", 0x0000, 0x2000, NO_DUMP ) // no label
 
@@ -519,6 +519,22 @@ ROM_START( unkvsaa ) // all labels unreadable
 	ROM_LOAD( "pld.9c", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( toureiff )
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD( "68hc705-tour eiffel-pgm4.0d", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_LOAD( "tour eiffel-video0.5b", 0x0000, 0x2000, CRC(9f3671c4) SHA1(2db14e1c0863d8f2c8e82d1ab03fd93ee2df1c07) )
+	ROM_LOAD( "tour eiffel-video1.7b", 0x2000, 0x2000, CRC(db35e5cc) SHA1(d996c5e17efdf777244fc57ceb230769c2447b60) )
+	ROM_LOAD( "tour eiffel-video2.8b", 0x4000, 0x2000, CRC(5bc5c41d) SHA1(bfafc4e94d9e1dcfae74ac20a38bc555bc6b51a9) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_LOAD( "tour eiffel-msg0.5a", 0x00000, 0x10000, CRC(81f7c0cb) SHA1(15ee0c12a8f9c94beac7e5fe894e5f82a53d9fc1) ) // same as winner and paradar
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pal.9c", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -529,4 +545,5 @@ GAME( 1995?, jokrlady,  0,      videosaa, videosaa, videosaa_state, empty_init, 
 GAME( 1995?, ladygum,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Lady Gum",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
 GAME( 1995?, paradar,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Paradar",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1995?, winner,    0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Winner",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?,  unkvsaa,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "unknown Videos A A game", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // has Scratch! GFX, may be title or not
+GAME( 199?,  scratch,   0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Scratch!! Scratch!!",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995?, toureiff,  0,      videosaa, videosaa, videosaa_state, empty_init, ROT0,     "Videos A A", "Torre Eiffel",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

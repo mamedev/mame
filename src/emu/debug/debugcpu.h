@@ -239,10 +239,10 @@ private:
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
 	};
-	std::unique_ptr<tracer>                m_trace;                    // tracer state
+	std::unique_ptr<tracer>                m_trace;     // tracer state
 
-	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
-	std::vector<int>        m_notifiers;                // notifiers for each space
+	std::vector<memory_passthrough_handler> m_phw;      // passthrough handler reference for each space, write mode
+	std::vector<util::notifier_subscription> m_notifiers; // notifiers for each space
 
 	// pc tracking
 	class dasm_pc_tag

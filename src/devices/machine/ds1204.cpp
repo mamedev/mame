@@ -91,20 +91,24 @@ void ds1204_device::nvram_default()
 	}
 }
 
-void ds1204_device::nvram_read( emu_file &file )
+bool ds1204_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_unique_pattern, sizeof( m_unique_pattern ) );
-	file.read( m_identification, sizeof( m_identification ) );
-	file.read( m_security_match, sizeof( m_security_match ) );
-	file.read( m_secure_memory, sizeof( m_secure_memory ) );
+	size_t actual;
+	bool result = !file.read( m_unique_pattern, sizeof( m_unique_pattern ), actual ) && actual == sizeof( m_unique_pattern );
+	result = result && !file.read( m_identification, sizeof( m_identification ), actual ) && actual == sizeof( m_identification );
+	result = result && !file.read( m_security_match, sizeof( m_security_match ), actual ) && actual == sizeof( m_security_match );
+	result = result && !file.read( m_secure_memory, sizeof( m_secure_memory ), actual ) && actual == sizeof( m_secure_memory );
+	return result;
 }
 
-void ds1204_device::nvram_write( emu_file &file )
+bool ds1204_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_unique_pattern, sizeof( m_unique_pattern ) );
-	file.write( m_identification, sizeof( m_identification ) );
-	file.write( m_security_match, sizeof( m_security_match ) );
-	file.write( m_secure_memory, sizeof( m_secure_memory ) );
+	size_t actual;
+	bool result = !file.write( m_unique_pattern, sizeof( m_unique_pattern ), actual ) && actual == sizeof( m_unique_pattern );
+	result = result && !file.write( m_identification, sizeof( m_identification ), actual ) && actual == sizeof( m_identification );
+	result = result && !file.write( m_security_match, sizeof( m_security_match ), actual ) && actual == sizeof( m_security_match );
+	result = result && !file.write( m_secure_memory, sizeof( m_secure_memory ), actual ) && actual == sizeof( m_secure_memory );
+	return result;
 }
 
 void ds1204_device::new_state( int state )

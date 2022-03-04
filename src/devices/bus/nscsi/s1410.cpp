@@ -53,7 +53,7 @@ void nscsi_s1410_device::scsi_command()
 		scsi_data_in(SBUF_SENSE, 4);
 		scsi_status_complete(SS_GOOD);
 		break;
-		
+
 	case SC_FORMAT_UNIT:
 		LOG("command FORMAT UNIT\n");
 		{

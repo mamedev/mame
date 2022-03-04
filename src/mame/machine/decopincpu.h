@@ -47,14 +47,13 @@ public:
 	auto lamp_write_callback() { return m_write_lamp.bind(); }
 	auto solenoid_write_callback() { return m_write_solenoid.bind(); }
 
-	void solenoid2_w(uint8_t data);
 	INPUT_CHANGED_MEMBER(main_nmi);
-	INPUT_CHANGED_MEMBER(audio_nmi);
 
 	template <typename T> void set_cpuregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); } // region for cpu board code and data
 
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
+	void solenoid0_w(uint8_t data);
 
 	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -76,9 +75,9 @@ protected:
 	required_region_ptr<uint8_t> m_rom;
 
 private:
-	emu_timer* m_irq_timer;
-	bool m_irq_active;
-	bool m_ca2;
+	emu_timer* m_irq_timer = 0;
+	bool m_irq_active = 0;
+	u8 m_lamp_data = 0U;
 
 	// callbacks
 	devcb_read8 m_read_display;
@@ -89,9 +88,16 @@ private:
 	devcb_write8 m_write_switch;
 	devcb_write8 m_write_lamp;
 	devcb_write8 m_write_solenoid;
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }   // flipper enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[18] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[20] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[21] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[17] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; }
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[16] = state; }
 	void lamp0_w(uint8_t data);
 	void lamp1_w(uint8_t data);
 	uint8_t display_strobe_r();

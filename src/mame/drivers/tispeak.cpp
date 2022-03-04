@@ -520,7 +520,6 @@ void tispeak_state::machine_start()
 	hh_tms1k_state::machine_start();
 
 	m_ol_out.resolve();
-
 	init_cartridge();
 }
 
@@ -1292,7 +1291,7 @@ INPUT_PORTS_END
 
 void tispeak_state::tms5110_route(machine_config &config)
 {
-	/* sound hardware */
+	// sound hardware
 	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
 	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
 	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
@@ -1303,7 +1302,7 @@ void tispeak_state::tms5110_route(machine_config &config)
 
 void tispeak_state::snmath(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
 	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
@@ -1313,12 +1312,12 @@ void tispeak_state::snmath(machine_config &config)
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
 	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0x21ff, 0x3fff);
 	config.set_default_layout(layout_snmath);
 
-	/* sound hardware */
+	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
 	SPEAKER(config, "mono").front_center();
@@ -1331,12 +1330,12 @@ void tispeak_state::sns_cd2801(machine_config &config)
 {
 	snmath(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snspell);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
@@ -1347,7 +1346,7 @@ void tispeak_state::snspellit(machine_config &config)
 {
 	sns_cd2801(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	config.set_default_layout(layout_snmath);
 }
 
@@ -1355,7 +1354,7 @@ void tispeak_state::sns_tmc0281(machine_config &config)
 {
 	sns_cd2801(config);
 
-	/* sound hardware */
+	// sound hardware
 	TMC0281(config.replace(), m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 }
@@ -1364,7 +1363,7 @@ void tispeak_state::snspellsp(machine_config &config)
 {
 	sns_tmc0281(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	config.set_default_layout(layout_snspellsp);
 }
 
@@ -1372,7 +1371,7 @@ void tispeak_state::sns_tmc0281d(machine_config &config)
 {
 	sns_cd2801(config);
 
-	/* sound hardware */
+	// sound hardware
 	TMC0281D(config.replace(), m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 }
@@ -1382,12 +1381,12 @@ void tispeak_state::snread(machine_config &config)
 {
 	snmath(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snread);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
@@ -1399,13 +1398,13 @@ void tispeak_state::lantutor(machine_config &config)
 {
 	snmath(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::lantutor_write_r));
 
 	config.set_default_layout(layout_snread);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
@@ -1416,22 +1415,22 @@ void tispeak_state::lantutor(machine_config &config)
 
 void tispeak_state::snspellc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->k().set(FUNC(tispeak_state::snspellc_read_k));
 	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
-	/* no visual feedback! */
+	// no visual feedback!
 
-	/* sound hardware */
+	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
 	SPEAKER(config, "mono").front_center();
 	TMC0281D(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
@@ -1442,7 +1441,7 @@ void tispeak_state::snspellcuk(machine_config &config)
 {
 	snspellc(config);
 
-	/* sound hardware */
+	// sound hardware
 	CD2801(config.replace(), m_tms5100, MASTER_CLOCK); // CD2801A!
 	tms5110_route(config);
 }
@@ -1450,7 +1449,7 @@ void tispeak_state::snspellcuk(machine_config &config)
 
 void tispeak_state::vocaid(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->k().set(FUNC(tispeak_state::tntell_read_k));
 	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
@@ -1459,7 +1458,7 @@ void tispeak_state::vocaid(machine_config &config)
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
 	config.set_default_layout(layout_tntell);
 
-	/* sound hardware */
+	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
 	SPEAKER(config, "mono").front_center();
@@ -1471,7 +1470,7 @@ void tispeak_state::tntell(machine_config &config)
 {
 	vocaid(config);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
@@ -1481,7 +1480,7 @@ void tispeak_state::tntell(machine_config &config)
 
 void tispeak_state::k28m2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->k().set(FUNC(tispeak_state::k28_read_k));
 	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
@@ -1489,14 +1488,14 @@ void tispeak_state::k28m2(machine_config &config)
 
 	config.set_default_layout(layout_k28m2);
 
-	/* sound hardware */
+	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
 	SPEAKER(config, "mono").front_center();
 	TMS5110A(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 

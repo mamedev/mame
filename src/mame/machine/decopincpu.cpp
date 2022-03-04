@@ -9,7 +9,6 @@
  *  Type 3b: Adds printer option
  *
  *  TODO:
- *   - make use of solenoid callbacks
  *   - printer option (type 3b)
  */
 
@@ -25,7 +24,7 @@ void decocpu_type1_device::decocpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(FUNC(decocpu_type1_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type1_device::solenoid0_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -38,7 +37,7 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(FUNC(decocpu_type2_device::solenoid2_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(decocpu_type2_device::solenoid0_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -49,10 +48,9 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 
 static INPUT_PORTS_START( decocpu1 )
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, decocpu_type1_device, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, decocpu_type1_device, main_nmi, 1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, decocpu_type1_device, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
 	PORT_CONFSETTING( 0x00, "German" )
 	PORT_CONFSETTING( 0x10, "English" )
@@ -90,11 +88,6 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
-{
-	// Not on DECO board?
-}
-
 WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 {
 	if(state == CLEAR_LINE)
@@ -112,20 +105,20 @@ WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 	}
 }
 
-WRITE_LINE_MEMBER( decocpu_type1_device::pia21_ca2_w )
-{
-// sound ns
-	m_ca2 = state;
-}
-
 void decocpu_type1_device::lamp0_w(uint8_t data)
 {
 	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+	m_lamp_data = data ^ 0xff;
 	m_write_lamp(0,data,0xff);
 }
 
 void decocpu_type1_device::lamp1_w(uint8_t data)
 {
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(data, i))
+			for (u8 j = 0; j < 8; j++)
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
+
 	m_write_lamp(1,data,0xff);
 }
 
@@ -191,12 +184,16 @@ void decocpu_type1_device::sound_w(uint8_t data)
 
 void decocpu_type1_device::solenoid1_w(uint8_t data)
 {
-	// todo
+	m_write_solenoid(1,data,0xff);
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i+8] = BIT(data, i);
 }
 
-void decocpu_type1_device::solenoid2_w(uint8_t data)
+void decocpu_type1_device::solenoid0_w(uint8_t data)
 {
-	// todo
+	m_write_solenoid(0,data,0xff);
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = BIT(data, i);
 }
 
 void decocpu_type1_device::device_add_mconfig(machine_config &config)
@@ -207,14 +204,16 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 
 	/* Devices */
 	PIA6821(config, m_pia21, 0); // 5F - PIA at 0x2100
-	m_pia21->writepa_handler().set(FUNC(decocpu_type1_device::solenoid1_w));
-	m_pia21->ca2_handler().set(FUNC(decocpu_type1_device::pia21_ca2_w));
+	m_pia21->writepb_handler().set(FUNC(decocpu_type1_device::solenoid1_w));
+	m_pia21->cb2_handler().set(FUNC(decocpu_type1_device::pia21_cb2_w));
 	m_pia21->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia21->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
 	PIA6821(config, m_pia24, 0); // 11D - PIA at 0x2400
 	m_pia24->writepa_handler().set(FUNC(decocpu_type1_device::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(decocpu_type1_device::lamp1_w));
+	m_pia24->ca2_handler().set(FUNC(decocpu_type1_device::pia24_ca2_w));
+	m_pia24->cb2_handler().set(FUNC(decocpu_type1_device::pia24_cb2_w));
 	m_pia24->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia24->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
@@ -229,12 +228,16 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_pia2c->readpb_handler().set(FUNC(decocpu_type1_device::display_in3_r));
 	m_pia2c->writepa_handler().set(FUNC(decocpu_type1_device::display_out2_w));
 	m_pia2c->writepb_handler().set(FUNC(decocpu_type1_device::display_out3_w));
+	m_pia2c->ca2_handler().set(FUNC(decocpu_type1_device::pia2c_ca2_w));
+	m_pia2c->cb2_handler().set(FUNC(decocpu_type1_device::pia2c_cb2_w));
 	m_pia2c->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia2c->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
 	PIA6821(config, m_pia30, 0); // 8H - PIA at 0x3000
 	m_pia30->readpa_handler().set(FUNC(decocpu_type1_device::switch_r));
 	m_pia30->writepb_handler().set(FUNC(decocpu_type1_device::switch_w));
+	m_pia30->ca2_handler().set(FUNC(decocpu_type1_device::pia30_ca2_w));
+	m_pia30->cb2_handler().set(FUNC(decocpu_type1_device::pia30_cb2_w));
 	m_pia30->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia30->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
@@ -242,6 +245,7 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_pia34->readpa_handler().set(FUNC(decocpu_type1_device::dmdstatus_r));
 	m_pia34->writepa_handler().set(FUNC(decocpu_type1_device::display_out4_w));
 	m_pia34->writepb_handler().set(FUNC(decocpu_type1_device::sound_w));
+	m_pia34->cb2_handler().set_nop();
 	m_pia34->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia34->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
@@ -258,23 +262,24 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const 
 {}
 
 decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_cpu(*this,"maincpu"),
-		m_pia21(*this, "pia21"),
-		m_pia24(*this, "pia24"),
-		m_pia28(*this, "pia28"),
-		m_pia2c(*this, "pia2c"),
-		m_pia30(*this, "pia30"),
-		m_pia34(*this, "pia34"),
-		m_rom(*this, finder_base::DUMMY_TAG),
-		m_read_display(*this),
-		m_write_display(*this),
-		m_read_dmdstatus(*this),
-		m_write_soundlatch(*this),
-		m_read_switch(*this),
-		m_write_switch(*this),
-		m_write_lamp(*this),
-		m_write_solenoid(*this)
+	: device_t(mconfig, type, tag, owner, clock)
+		, m_cpu(*this,"maincpu")
+		, m_pia21(*this, "pia21")
+		, m_pia24(*this, "pia24")
+		, m_pia28(*this, "pia28")
+		, m_pia2c(*this, "pia2c")
+		, m_pia30(*this, "pia30")
+		, m_pia34(*this, "pia34")
+		, m_rom(*this, finder_base::DUMMY_TAG)
+		, m_read_display(*this)
+		, m_write_display(*this)
+		, m_read_dmdstatus(*this)
+		, m_write_soundlatch(*this)
+		, m_read_switch(*this)
+		, m_write_switch(*this)
+		, m_write_lamp(*this)
+		, m_write_solenoid(*this)
+		, m_io_outputs(*this, "out%d", 0U)
 {}
 
 void decocpu_type1_device::device_start()
@@ -294,6 +299,9 @@ void decocpu_type1_device::device_start()
 	m_irq_active = false;
 
 	m_cpu->space(AS_PROGRAM).install_rom(0x4000,0xffff,&m_rom[0x4000]);
+
+	m_io_outputs.resolve();
+	save_item(NAME(m_lamp_data));
 }
 
 decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

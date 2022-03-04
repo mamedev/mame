@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Joystick
+    BBC Master Compact Joystick
 
 **********************************************************************/
 
@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBCMC_JOYSTICK, bbcmc_joystick_device, "bbcmc_joystick", "Master Compact Joystick")
+DEFINE_DEVICE_TYPE(BBCMC_JOYSTICK, bbcmc_joystick_device, "bbcmc_joystick", "BBC Master Compact Joystick")
 
 
 //-------------------------------------------------
@@ -61,15 +61,6 @@ bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 
 void bbcmc_joystick_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbcmc_joystick_device::device_reset()
 {
 }
 

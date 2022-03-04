@@ -60,8 +60,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 	inline uint8_t rtc_read(uint8_t offset);
 	inline void rtc_write(uint8_t offset,uint8_t data);
 

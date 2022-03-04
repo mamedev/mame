@@ -582,20 +582,22 @@ void vme_hcpu30_card_device::device_reset()
 	m_fdc->ready_w(false);
 
 	program.install_rom(0x00000000, 0x00000007, m_sysrom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xff000000, 0xff007fff, "rom_shadow_r", [this](offs_t offset, u32 &data, u32 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xff000000, 0xff007fff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u32 &data, u32 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, 0x00000007, m_p_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, 0x00000007, m_p_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void vme_hcpu30_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)

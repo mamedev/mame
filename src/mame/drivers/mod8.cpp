@@ -122,6 +122,7 @@ void mod8_state::mem_map(address_map &map)
 void mod8_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
+	map.global_mask(0x1f);
 	map(0x00, 0x00).r(FUNC(mod8_state::tty_r));
 	map(0x0a, 0x0a).w(FUNC(mod8_state::out_w));
 	map(0x0b, 0x0b).w(FUNC(mod8_state::tty_w));

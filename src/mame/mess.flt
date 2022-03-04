@@ -199,6 +199,7 @@ comx35.cpp
 concept.cpp
 conchess.cpp
 conic_cchess2.cpp
+conic_cchess3.cpp
 consola_emt.cpp
 controlid.cpp
 cortex.cpp
@@ -348,6 +349,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+freedom120.cpp
 fs3216.cpp
 ft68m.cpp
 galaxy.cpp
@@ -528,7 +530,6 @@ korgm1.cpp
 korgws.cpp
 korgz3.cpp
 kramermc.cpp
-krokha.cpp
 kron.cpp
 krz2000.cpp
 ktm3.cpp
@@ -789,6 +790,7 @@ pce220.cpp
 pcfx.cpp
 pcipc.cpp
 pcm.cpp
+pcmx2.cpp
 pcw.cpp
 pcw16.cpp
 pda600.cpp

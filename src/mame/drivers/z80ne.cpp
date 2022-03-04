@@ -128,12 +128,15 @@ Natural Keyboard and Paste:
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
-#include "formats/dmk_dsk.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/ram.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/dmk_dsk.h"
 
 /* Layout */
 #include "z80ne.lh"

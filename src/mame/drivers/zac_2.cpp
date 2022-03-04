@@ -5,6 +5,12 @@
 PINBALL
 Zaccaria Generation 2
 
+Status:
+- Shows all 0 then no response
+
+ToDo:
+- Make them work
+
 ****************************************************************************************************/
 
 
@@ -13,6 +19,8 @@ Zaccaria Generation 2
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
 #include "zac_2.lh"
+
+namespace {
 
 class zac_2_state : public driver_device
 {
@@ -103,7 +111,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Factory Burn Test")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1068,6 +1076,8 @@ ROM_START(zankor)
 	ROM_LOAD("zan_ic5.128", 0x4000, 0x4000, CRC(bf61aab0) SHA1(939266696d0562f255f0fa5068280fe6a4cf8267))
 	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
 ROM_END
+
+} // anonymous namespace
 
 GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL)

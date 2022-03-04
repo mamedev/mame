@@ -2075,7 +2075,24 @@ void galaxian_state::froggervd_map(address_map &map)
 	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
-/* map not derived from schematics. Used by explorer and takeoff */
+void galaxian_state::mandinka_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x97ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa001, 0xa001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xa002, 0xa002).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0xa003, 0xa003).w(FUNC(galaxian_state::scramble_background_enable_w));
+	map(0xa006, 0xa006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa007, 0xa007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa800, 0xa800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xb000, 0xb003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb800, 0xb803).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+// Map not derived from schematics. Used by explorer and takeoff
 void galaxian_state::explorer_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -3372,21 +3389,45 @@ static INPUT_PORTS_START( redufob )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )    PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x40, "A 2C/1C  B 1C/3C" )
 	PORT_DIPSETTING(    0x00, "A 1C/1C  B 1C/6C" )
 	PORT_DIPSETTING(    0x80, "A 1C/2C  B 1C/12C" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x01, "4000" )
 	PORT_DIPSETTING(    0x02, "5000" )
 	PORT_DIPSETTING(    0x03, "7000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPUNUSED( 0x08, 0x00 )                      PORT_DIPLOCATION("SW1:!6")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( redufob3 )
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPSETTING(    0x01, "4000" )
+	PORT_DIPSETTING(    0x02, "5000" )
+	PORT_DIPSETTING(    0x03, "7000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPUNUSED( 0x08, 0x00 )                        PORT_DIPLOCATION("SW1:!6")
 INPUT_PORTS_END
 
 
@@ -7451,6 +7492,12 @@ void galaxian_state::mandingarf(machine_config &config)
 {
 	galaxian(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mandingarf_map);
+}
+
+void galaxian_state::mandinka(machine_config &config)
+{
+	scramble_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mandinka_map);
 }
 
 void galaxian_state::pacmanbl(machine_config &config)
@@ -13254,11 +13301,11 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-/* Hermatic Frogger, found on a Video Dens PCB */
+// Hermatic Frogger, found on a Video Dens PCB
 ROM_START( froggervd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
-	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) BAD_DUMP ) // 2716 (hand-patched at XX0)
+	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) ) // 2716
 	ROM_LOAD( "frogvd_r3-libro-s3.af9", 0x1000, 0x0800, CRC(637a2ff8) SHA1(e9b9fc692ca5d8deb9cd30d9d73ad25c8d8bafe1) ) // 2716
 	ROM_LOAD( "frogvd_r4-libro-s4.ah9", 0x1800, 0x0800, CRC(1dc9ab15) SHA1(94b327dd2eaf0ffb19fee86a2a890a0012d52849) ) // 2716
 	ROM_LOAD( "frogvd_r5-libro-s5.aj9", 0x2000, 0x0800, CRC(35e11cd2) SHA1(c2d01324c052d79ad9de00d13ddc4322f9c44292) ) // 2716
@@ -13266,7 +13313,7 @@ ROM_START( froggervd )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "frogvd_r11-ot1.bc5", 0x0000, 0x0800, CRC(79326efe) SHA1(087cd61ba9c09be6ff71be8f89933a4a0f620650) ) // 2716
-	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) BAD_DUMP ) // 2716 (hand-patched at XXe)
+	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) ) // 2716
 	ROM_LOAD( "frogvd_r13-ot3.be5", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -13683,6 +13730,29 @@ ROM_START( mandingac )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
+ROM_END
+
+ROM_START( mandinka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",         0x0000, 0x0800, CRC(ad332c55) SHA1(4f33485e0247cc8e9e9c6cb93a55ba08506d063f) )
+	ROM_LOAD( "2.bin",         0x0800, 0x0800, CRC(2cb90c95) SHA1(b1721165395018a02e718d7d5e5dfa8ab794546b) )
+	ROM_LOAD( "3.bin",         0x1000, 0x0800, CRC(5c7c74d4) SHA1(a321508525d4cf774924dd3e6ca9688d9d3cc4f6) )
+	ROM_LOAD( "4.bin",         0x1800, 0x0800, CRC(57fe5a01) SHA1(4c4378f5e392549a85a6f52cf27719887315e36d) )
+	ROM_LOAD( "no_id_2.bin",   0x2000, 0x0800, CRC(83b91651) SHA1(9c514743da47a92deea39c7a41f032d5dc0f5700) )
+	ROM_LOAD( "6.bin",         0x2800, 0x0800, CRC(33dfca98) SHA1(ef15742674ad8f6c27dd9fd67fc0e8335699ad1b) )
+	ROM_LOAD( "7.bin",         0x3000, 0x0800, CRC(b6b835e3) SHA1(ba14e664dbaa0e4e8b4e55e732ba7581afe4c9a7) )
+	ROM_LOAD( "no_id_1.bin",   0x3800, 0x0800, CRC(d6721955) SHA1(725cacc8486f197e2a88ee1bbe9af01c792772a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1a_sonido.bin", 0x0000, 0x1000, NO_DUMP ) // missing
+	ROM_LOAD( "2b_sonido.bin", 0x1000, 0x1000, BAD_DUMP CRC(e8af1d77) SHA1(d05d7c015962989651a90f4bf9e64cd98c2ddd38) ) // FIXED BITS (xxx1xxxx)
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",         0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) )
+	ROM_LOAD( "10.bin",        0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "7603-5.bin",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
 ROM_START( olmandingo )
@@ -15579,7 +15649,7 @@ GAME( 1981, spactrai,    warofbug, spactrai,   spactrai,   galaxian_state, init_
 GAME( 1981, redufo,      0,        galaxian,   redufo,     galaxian_state, init_nolock,     ROT270, "Artic",                           "Defend the Terra Attack on the Red UFO",                              MACHINE_SUPPORTS_SAVE ) // is this the original?
 GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 1)",             MACHINE_SUPPORTS_SAVE ) // rev A?
 GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redufob3,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redufob3,    redufo,   galaxian,   redufob3,   galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III ('Super Galaxians' hack)",                               MACHINE_SUPPORTS_SAVE )  // Hack of a hack (superg)
@@ -15785,6 +15855,7 @@ GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
 GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinka,    amidar,   mandinka,   amidar,     galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Mandinka (bootleg of Amidar)",                                           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // bad / missing audio CPU ROMs and color PROM
 GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 GAME( 1982, olmandingo,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )

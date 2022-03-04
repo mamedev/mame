@@ -10780,7 +10780,7 @@ void naomi_state::init_hotd2()
 /* 0003-01 */    GAME( 1999, doa2,      doa2m,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2", GAME_FLAGS )
 /* 0003 */       GAME( 2000, doa2m,     naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
 /* 0004 */       GAME( 1999, shangril,  naomi,    naomim2, naomi_mp,naomi_state,init_naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la", GAME_FLAGS ) // (Build 0728) version shown in service mode
-/* 0005 */       GAME( 1999, spawn,     naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn: In the Demon's Hand (Rev B)", GAME_FLAGS )
+/* 0005 */       GAME( 1999, spawn,     naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Todd McFarlane / Capcom","Spawn: In the Demon's Hand (Rev B)", GAME_FLAGS )
 /* 0006 */       GAME( 1999, puyoda,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Compile",         "Puyo Puyo Da! (Japan)", GAME_FLAGS )
 /* 0007-01 */    GAME( 2000, mvsc2u,    mvsc2,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2: New Age of Heroes (USA, Rev A)", GAME_FLAGS)
 /* 0007-02 -03 */GAME( 2000, mvsc2,     naomi,    naomim1, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2: New Age of Heroes (Export, Korea, Rev A)", GAME_FLAGS)

@@ -6230,8 +6230,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="raizer">
-		<description>Chikyuu Senshi Raizer</description>
+	<software name="rayieza">
+		<description>The Earth Fighter Rayieza</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -6244,8 +6244,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="raizera" cloneof="raizer">
-		<description>Chikyuu Senshi Raizer (alt)</description>
+	<software name="rayiezaa" cloneof="rayieza">
+		<description>The Earth Fighter Rayieza (alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -35181,8 +35181,8 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="東京女子高生セーラー服入門 第2巻"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="tokyo joshikosei sailor-fuku nyumon dai2kan.d88" size="348848" crc="870dbb9c" sha1="08c07cb445dbfacc0086f6bde19b09bd11b09b34"/>
+			<dataarea name="flop" size="348576">
+				<rom name="tokyo joshikosei sailor-fuku nyumon dai2kan.d88" size="348576" crc="1b66be31" sha1="bea94b35a43b402e9b8b8d1faefadc1cc7b1802a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35195,16 +35195,17 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="東京女子高生セーラー服入門 第3巻"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348576">
-				<rom name="tokyo joshikosei sailor-fuku nyumon dai3kan.d88" size="348576" crc="1b66be31" sha1="bea94b35a43b402e9b8b8d1faefadc1cc7b1802a"/>
+			<dataarea name="flop" size="348848">
+				<rom name="tokyo joshikosei sailor-fuku nyumon dai3kan.d88" size="348848" crc="870dbb9c" sha1="08c07cb445dbfacc0086f6bde19b09bd11b09b34"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- TODO: is this a true release or just arbitrary merging of the three sets above? -->
 	<software name="tokyojnc">
 		<description>Tokyo Joshikosei Sailor-fuku Nyumon (1 &amp; 2 &amp; 3)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="東京女子高生ｾｰﾗｰ服123"/>
 		<!--combined image-->
 		<!--rom name="tokyo joshikosei sailor-fuku nyumon(1&amp;2&amp;3).d88" size="1046272" crc="63a79526" sha1="ca85e86628503edc15c4d40cba981e1123c0f04c"/-->

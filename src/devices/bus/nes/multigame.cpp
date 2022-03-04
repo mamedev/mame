@@ -434,18 +434,18 @@ nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig
 {
 }
 
-nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mirror_flip(type == NES_BMC_NC20MB)
+nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mirror_flip)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mirror_flip(mirror_flip)
 {
 }
 
 nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_42in1reset_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock, 0)
 {
 }
 
 nes_bmc_nc20mb_device::nes_bmc_nc20mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_42in1reset_device(mconfig, NES_BMC_NC20MB, tag, owner, clock)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_NC20MB, tag, owner, clock, 1)
 {
 }
 
@@ -499,18 +499,18 @@ nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char
 {
 }
 
-nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_vram_prot_bit(type == NES_BMC_TH22913 ? 10 : 9)
+nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vram_prot_bit)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_vram_prot_bit(vram_prot_bit)
 {
 }
 
 nes_bmc_th22913_device::nes_bmc_th22913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_th22913_device(mconfig, NES_BMC_TH22913, tag, owner, clock)
+	: nes_bmc_th22913_device(mconfig, NES_BMC_TH22913, tag, owner, clock, 10)
 {
 }
 
 nes_bmc_82ab_device::nes_bmc_82ab_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_bmc_th22913_device(mconfig, NES_BMC_82AB, tag, owner, clock)
+	: nes_bmc_th22913_device(mconfig, NES_BMC_82AB, tag, owner, clock, 9)
 {
 }
 
@@ -3281,11 +3281,6 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
- TODO: Investigate why Legend of Kage has a corrupt
- title screen (inverting mirroring bit fixes it but
- breaks the rest of the game). Also why are walls in
- Pacman glitched?
-
  -------------------------------------------------*/
 
 u8 nes_bmc_ctc12in1_device::read_m(offs_t offset)
@@ -3316,7 +3311,7 @@ void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
 			break;
 	}
 
-	m_vram_protect == !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
+	m_vram_protect = !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
 	set_nt_mirroring(BIT(m_reg[0], 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
@@ -3344,7 +3339,7 @@ void nes_bmc_891227_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_891227 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x4000)
-	     data = (data & 0x80) >> 2 | (data & 0x60) << 1 | (data & 0x1f);
+		 data = (data & 0x80) >> 2 | (data & 0x60) << 1 | (data & 0x1f);
 
 	nes_bmc_ctc12in1_device::write_h(offset, data);
 

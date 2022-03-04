@@ -80,6 +80,18 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
+
+	configuration { "gmake or ninja" }
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
+
+	else
+		buildoptions_c {
+			"-Wno-maybe-uninitialized", -- expat in GCC 11.1
+		}
+	end
+end
+
 	configuration { }
 
 	files {
@@ -104,7 +116,7 @@ project "zlib"
 	kind "StaticLib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android")) then
 		configuration { "gmake or ninja" }
 		if (version >= 30700) then
 			buildoptions {
@@ -961,17 +973,24 @@ project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
 		}
-if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 		buildoptions_c {
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 		}
+	else
+		buildoptions_c {
+			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+		}
+	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
@@ -1186,7 +1205,7 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-unused-but-set-variable",
 		}
@@ -2215,11 +2234,6 @@ project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
 
-	configuration { "gmake" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-		}
-
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
@@ -2231,30 +2245,65 @@ project "asmjit"
 	end
 
 	files {
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit-scope-begin.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit-scope-end.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64archtraits_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64assembler.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64assembler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64builder.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64builder.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64compiler.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emithelper_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emitter.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64formatter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64formatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64func.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64func_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64globals.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instapi.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instapi_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64operand.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64operand.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64utils.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armglobals.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armoperand.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-build_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-config.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/arch.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/arch.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archcommons.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archtraits.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archtraits.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/assembler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/assembler.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/callconv.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/callconv.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codebuffer.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codebufferwriter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codewriter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codewriter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compiler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compilerdefs.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/constpool.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/constpool.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/cpuinfo.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/cpuinfo.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/datatypes.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emithelper_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitter.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitterutils.cpp",
@@ -2263,11 +2312,13 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/environment.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/errorhandler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/errorhandler.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/features.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/func.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/func.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/funcargscontext.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/funcargscontext_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/globals.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/globals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/inst.cpp",
@@ -2316,29 +2367,26 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonetree.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonevector.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonevector.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archdata.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archdata_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archtraits_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86assembler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86assembler.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86builder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86builder.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86callconv.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86callconv_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86compiler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emithelper_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emitter.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86features.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86features.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86formatter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86formatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86func.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86func_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86globals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instapi.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instapi_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb_p.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86internal.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86internal_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86opcode_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86operand.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86operand.h",

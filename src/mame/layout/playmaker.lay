@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="0.5" green="0.05" blue="0.075" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+
+<!-- led matrix -->
+
+	<group name="display1">
+		<bounds x="0" y="0" width="36" height="21" />
+
+		<repeat count="5">
+			<param name="y" start="0" increment="5" />
+			<param name="i2" start="4" increment="-1" />
+
+			<repeat count="8">
+				<param name="x" start="0" increment="5" />
+				<param name="i1" start="7" increment="-1" />
+				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+	</group>
+
+
+<!-- 7seg leds -->
+
+	<group name="display2">
+		<bounds x="0" y="0" width="5.5" height="3" />
+
+		<element name="digit8" ref="digit"><bounds x="0" y="0" width="2" height="3" /></element>
+		<element name="digit9" ref="digit"><bounds x="3.5" y="0" width="2" height="3" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="2.1" right="35" top="-2" bottom="38" />
+
+		<group ref="display1"><bounds x="12" y="0" width="21" height="36" /><orientation rotate="270" /></group>
+		<group ref="display2"><bounds x="4.1" y="14" width="3.9" height="8" /><orientation rotate="270" /></group>
+	</view>
+</mamelayout>

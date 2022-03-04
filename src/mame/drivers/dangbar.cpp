@@ -20,7 +20,9 @@ Main PCB named Hi-Pric P41 B 8813960102 (8813970102)
 
 For Dangerous Bar:
 Led display PCB named Namco ST-M4
-Pic too blurry to read the chip markings
+ CPU: Sharp LZ8415M
+ Xtal: Marked "D122C5"
+ Display controller: Seiko-Epson SED1351F-0A
 */
 
 #include "emu.h"
@@ -120,7 +122,7 @@ ROM_START( dangbar )
 	ROM_LOAD16_BYTE( "drb1_voi2.14a",  0x100000, 0x080000, CRC(ba704115) SHA1(0d027bf7cd9cf0b9d0b5dff7b8ae88ad6b82e45f) )
 
 	ROM_REGION( 0x20000, "ledcpu", 0 )
-	ROM_LOAD( "drb1_dot0.bin", 0x00000, 0x20000, BAD_DUMP CRC(e77b9919) SHA1(2479fbdff9b570061dbdc2906c2d4fc0152998f7) ) // FIXED BITS (xxxx1xxx)
+	ROM_LOAD( "drb1_dot0.ic13", 0x00000, 0x20000, CRC(aeaeb246) SHA1(b470f3450e763411ced795abcc4c8c810dd9b956) )
 ROM_END
 
 ROM_START( sspanic )
@@ -131,12 +133,12 @@ ROM_START( sspanic )
 	ROM_LOAD( "jp1_snd.8a", 0x00000, 0x20000, CRC(46e2401c) SHA1(0edddd42e17da67c57f9c778c5fbf7a76ed287f5) ) // x11xxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION16_BE( 0x200000, "c140", 0 )
-	ROM_LOAD16_BYTE( "jp0_voi1.14a",  0x000000, 0x080000, CRC(49a943ee) SHA1(fae4bdc2812a8f90de980845185161c14608ca5a) )
-	ROM_LOAD16_BYTE( "jp0_voi2.13a",  0x100000, 0x080000, CRC(55bb4550) SHA1(961e50366159afd25cd38e3a37c3a06fcfdff1a7) )
+	ROM_LOAD16_BYTE( "jp0_voi1.14a", 0x000000, 0x080000, CRC(49a943ee) SHA1(fae4bdc2812a8f90de980845185161c14608ca5a) )
+	ROM_LOAD16_BYTE( "jp0_voi2.13a", 0x100000, 0x080000, CRC(55bb4550) SHA1(961e50366159afd25cd38e3a37c3a06fcfdff1a7) )
 ROM_END
 
 } // Anonymous namespace
 
 
 GAME( 1993, sspanic, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, dangbar, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, dangbar, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_IS_SKELETON_MECHANICAL )

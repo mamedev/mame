@@ -14,6 +14,31 @@ Titles, serial #s, publishers and release dates taken from:
 
 <softwarelist name="fm77av" description="Fujitsu FM-77AV disk images">
 
+	<software name="4thunit2">
+		<description>The 4th Unit 2</description>
+		<year>1988</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="第４のユニット２"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1080873">
+				<rom name="the_4th_unit_2_disk_a.mfm" size="1080873" crc="f741b323" sha1="70b9e200b61c02e13f67ef3c1b35c051fd511b49" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1081109">
+				<rom name="the_4th_unit_2_disk_b.mfm" size="1081109" crc="d9d8c06e" sha1="26a498a8840ce78216628e9d0b8364d0c8d390c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1083157">
+				<rom name="the_4th_unit_2_disk_c.mfm" size="1083157" crc="5193b780" sha1="0df535b079a03929b84ca4f1e9c4c35a82033aa5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- the alt set with crcs 63033bba and b1511bd6 only differs for d77 headers, but data in the disks are identical -->
 	<software name="9gyokudn">
 		<description>Ku Gyoku Den</description>

@@ -184,11 +184,9 @@ debug_watchpoint::debug_watchpoint(
 
 debug_watchpoint::~debug_watchpoint()
 {
-	m_space.remove_change_notifier(m_notifier);
-	if (m_phr)
-		m_phr->remove();
-	if (m_phw)
-		m_phw->remove();
+	m_notifier.reset();
+	m_phr.remove();
+	m_phw.remove();
 }
 
 void debug_watchpoint::setEnabled(bool value)
@@ -201,10 +199,8 @@ void debug_watchpoint::setEnabled(bool value)
 		else
 		{
 			m_installing = true;
-			if(m_phr)
-				m_phr->remove();
-			if(m_phw)
-				m_phw->remove();
+			m_phr.remove();
+			m_phw.remove();
 			m_installing = false;
 		}
 	}
@@ -215,24 +211,28 @@ void debug_watchpoint::install(read_or_write mode)
 	if (m_installing)
 		return;
 	m_installing = true;
-	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
-		m_phr->remove();
-	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
-		m_phw->remove();
+	if (u32(mode) & u32(read_or_write::READ))
+		m_phr.remove();
+	if (u32(mode) & u32(read_or_write::WRITE))
+		m_phw.remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
 	{
 	case  8:
 		if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-			m_phr = m_space.install_read_tap(m_start_address[0], m_end_address[0], name,
-											 [this](offs_t offset, u8 &data, u8 mem_mask) {
-												 triggered(read_or_write::READ, offset, data, mem_mask);
-											 }, m_phr);
+			m_phr = m_space.install_read_tap(
+					m_start_address[0], m_end_address[0], name,
+					[this](offs_t offset, u8 &data, u8 mem_mask) {
+						triggered(read_or_write::READ, offset, data, mem_mask);
+					},
+					&m_phr);
 		if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-			m_phw = m_space.install_write_tap(m_start_address[0], m_end_address[0], name,
-											  [this](offs_t offset, u8 &data, u8 mem_mask) {
-												  triggered(read_or_write::WRITE, offset, data, mem_mask);
-											  }, m_phw);
+			m_phw = m_space.install_write_tap(
+					m_start_address[0], m_end_address[0], name,
+					[this](offs_t offset, u8 &data, u8 mem_mask) {
+						triggered(read_or_write::WRITE, offset, data, mem_mask);
+					},
+					&m_phw);
 		break;
 
 	case 16:
@@ -241,17 +241,21 @@ void debug_watchpoint::install(read_or_write mode)
 			{
 				u16 mask = m_masks[i];
 				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u16 &data, u16 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
+					m_phr = m_space.install_read_tap(
+							m_start_address[i], m_end_address[i], name,
+							[this, mask](offs_t offset, u16 &data, u16 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::READ, offset, data, mem_mask);
+							},
+							&m_phr);
 				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u16 &data, u16 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
+					m_phw = m_space.install_write_tap(
+							m_start_address[i], m_end_address[i], name,
+							[this, mask](offs_t offset, u16 &data, u16 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::WRITE, offset, data, mem_mask);
+							},
+							&m_phw);
 			}
 		break;
 
@@ -261,17 +265,21 @@ void debug_watchpoint::install(read_or_write mode)
 			{
 				u32 mask = m_masks[i];
 				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u32 &data, u32 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
+					m_phr = m_space.install_read_tap(
+							m_start_address[i], m_end_address[i], name,
+							[this, mask](offs_t offset, u32 &data, u32 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::READ, offset, data, mem_mask);
+							},
+							&m_phr);
 				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u32 &data, u32 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
+					m_phw = m_space.install_write_tap(
+							m_start_address[i], m_end_address[i], name,
+							[this, mask](offs_t offset, u32 &data, u32 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::WRITE, offset, data, mem_mask);
+								},
+								&m_phw);
 			}
 		break;
 
@@ -281,17 +289,20 @@ void debug_watchpoint::install(read_or_write mode)
 			{
 				u64 mask = m_masks[i];
 				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u64 &data, u64 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
+					m_phr = m_space.install_read_tap(
+							m_start_address[i], m_end_address[i], name,
+							[this, mask](offs_t offset, u64 &data, u64 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::READ, offset, data, mem_mask);
+							},
+							&m_phr);
 				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
 					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u64 &data, u64 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
+							[this, mask](offs_t offset, u64 &data, u64 mem_mask) {
+								if (mem_mask & mask)
+									triggered(read_or_write::WRITE, offset, data, mem_mask);
+							},
+							&m_phw);
 			}
 		break;
 	}

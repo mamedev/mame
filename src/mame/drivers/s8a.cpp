@@ -91,7 +91,7 @@ private:
 	u8 m_row = 0;
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = 0;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;
@@ -147,7 +147,7 @@ static INPUT_PORTS_START( s8a )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8a_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( s8a_state::main_nmi )

@@ -1292,7 +1292,7 @@ void dkong_state::radarscp1_sound_io_map(address_map &map)
 
 void dkong_state::dkong3_sound1_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram();
 	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));       /* overwrite default */
 	map(0x4017, 0x4017).r("latch2", FUNC(latch8_device::read));
 	map(0xe000, 0xffff).rom();
@@ -1300,7 +1300,7 @@ void dkong_state::dkong3_sound1_map(address_map &map)
 
 void dkong_state::dkong3_sound2_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram();
 	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));       /* overwrite default */
 	map(0xe000, 0xffff).rom();
 }

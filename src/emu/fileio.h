@@ -61,7 +61,7 @@ public:
 	path_iterator &operator=(path_iterator const &that);
 
 	// main interface
-	bool next(std::string &buffer, const char *name = nullptr);
+	bool next(std::string &buffer);
 	void reset();
 
 private:

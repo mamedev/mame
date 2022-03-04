@@ -20,13 +20,15 @@ Games:
 
 The first time run, the display will show the model number. Press F3 to clear this.
 
-Rat Race is played in a one-player cocktail cabinet, the player uses a joystick
-to tilt the board, to coax the ball into following lit arrows in a maze. After
-a successful navigation, the maze changes to something else faster and harder.
-It's almost an arcade game done mechanically. Obviously there is no way to emulate it
-in its intended form. Probably would have been a nice game, but it never passed the
-prototype stage. Currently it runs but the player display flashes randoms ones while
-a sound is produced every couple of seconds. Bad byte at "maincpu" D7FF.
+Rat Race is played in a cocktail cabinet, the player uses a joystick to tilt the
+ board, to coax the ball into following lit arrows in a maze. After a successful
+ navigation, the maze changes to something else faster and harder. It's almost an
+ arcade game done mechanically. Obviously there is no way to emulate it in its intended
+ form. Probably would have been a nice game, but it never passed the prototype stage.
+ Currently it runs but the player display flashes randoms ones while a sound is produced
+ every couple of seconds. Bad byte at "maincpu" D7FF. Technically the machine is a
+ mixture of sys7 and sys9, so it will require more work.
+
 
 Here are the key codes to enable play:
 
@@ -72,6 +74,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
+	void init_rr() { m_game = 1; }
 	void s9(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
@@ -101,11 +104,12 @@ private:
 
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
+	bool m_game = 0;
 	bool m_comma12 = 0;
 	bool m_comma34 = 0;
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0U;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = 0;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;
@@ -200,7 +204,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s9_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sorcr )
@@ -248,6 +252,11 @@ READ_LINE_MEMBER( s9_state::pia21_ca1_r )
 
 void s9_state::sol2_w(u8 data)
 {
+	if (m_game)
+	{
+		m_comma12 = BIT(data, 7);
+		m_comma34 = BIT(data, 6);
+	}
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[16U+i] = BIT(data, i);
 }
@@ -418,7 +427,6 @@ void s9_state::s9(machine_config &config)
 
 /*-----------------------------------------------------------------------------
 / Rat Race - Sys.9 (Game #527)- Prototype (displays as #500L1)
-/ IMPD shows this as System 7, however the writes to 0x2200 indicate System 9.
 /-----------------------------------------------------------------------------*/
 ROM_START(ratrc_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
@@ -520,7 +528,7 @@ ROM_END
 } // Anonymous namespace
 
 // Novelty
-GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, init_rr,    ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
 
 // Pinball
 GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )

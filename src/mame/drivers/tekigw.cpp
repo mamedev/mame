@@ -128,9 +128,10 @@ private:
 	u8 m_ssr; // system status register
 
 	// ram parity state
-	memory_passthrough_handler *m_parity_mph;
-	std::unique_ptr<u32[]> m_parity_flag;
+	memory_passthrough_handler m_parity_mph;
+	std::unique_ptr<u32 []> m_parity_flag;
 	unsigned m_parity_bad;
+	bool m_parity_check;
 };
 
 class tek6100_state : public tekigw_state_base
@@ -232,6 +233,8 @@ void tekigw_state_base::machine_start()
 
 	m_per = 0;
 	m_ssr = 0;
+
+	m_parity_check = false;
 
 	m_buserror = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tek4132_state::buserror), this));
 }
@@ -349,93 +352,97 @@ void tekigw_state_base::scr_w(u8 data)
 		m_ssr &= ~(SSR_BERR | SSR_DMACH);
 
 	// install parity handlers
-	if (!(m_scr & SCR_PARB) && (data & SCR_PARB) && !m_parity_mph)
+	if (!(m_scr & SCR_PARB) && (data & SCR_PARB) && !m_parity_check)
 	{
 		m_parity_flag = std::make_unique<u32[]>(m_ram->size() / 32);
 		m_parity_bad = 0;
+		m_parity_check = true;
 
-		m_parity_mph = m_cpu->space(0).install_readwrite_tap(0, m_ram->mask(), "parity",
-			[this](offs_t offset, u16 &data, u16 mem_mask)
-			{
-				if (m_scr & SCR_PARE)
+		m_parity_mph = m_cpu->space(0).install_readwrite_tap(
+				0, m_ram->mask(),
+				"parity",
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
 				{
-					bool error = false;
-
-					// check bad parity (lo)
-					if ((mem_mask & 0x00ff) && BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+					if (m_scr & SCR_PARE)
 					{
-						m_ssr |= SSR_PERR;
-						m_per &= ~PER_PARADR;
-						m_per |= PER_LOERR | ((offset >> 9) & PER_PARADR);
+						bool error = false;
 
-						error = true;
+						// check bad parity (lo)
+						if ((mem_mask & 0x00ff) && BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+						{
+							m_ssr |= SSR_PERR;
+							m_per &= ~PER_PARADR;
+							m_per |= PER_LOERR | ((offset >> 9) & PER_PARADR);
+
+							error = true;
+						}
+
+						// check bad parity (hi)
+						if ((mem_mask & 0xff00) && BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
+						{
+							m_ssr |= SSR_PERR;
+							m_per &= ~PER_PARADR;
+							m_per |= PER_HIERR | ((offset >> 9) & PER_PARADR);
+
+							error = true;
+						}
+
+						if (error && (m_scr & SCR_NMIE))
+							m_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 					}
-
-					// check bad parity (hi)
-					if ((mem_mask & 0xff00) && BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
-					{
-						m_ssr |= SSR_PERR;
-						m_per &= ~PER_PARADR;
-						m_per |= PER_HIERR | ((offset >> 9) & PER_PARADR);
-
-						error = true;
-					}
-
-					if (error && (m_scr & SCR_NMIE))
-						m_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-				}
-			},
-			[this](offs_t offset, u16 &data, u16 mem_mask)
-			{
-				if (m_scr & SCR_PARB)
+				},
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
 				{
-					// mark bad parity (lo)
-					if ((mem_mask & 0x00ff) && !BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+					if (m_scr & SCR_PARB)
 					{
-						m_parity_flag[offset / 32] |= 1U << ((offset & 31) + 0);
-						m_parity_bad++;
-					}
+						// mark bad parity (lo)
+						if ((mem_mask & 0x00ff) && !BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+						{
+							m_parity_flag[offset / 32] |= 1U << ((offset & 31) + 0);
+							m_parity_bad++;
+						}
 
-					// mark bad parity (hi)
-					if ((mem_mask & 0xff00) && !BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
-					{
-						m_parity_flag[offset / 32] |= 1U << ((offset & 31) + 1);
-						m_parity_bad++;
+						// mark bad parity (hi)
+						if ((mem_mask & 0xff00) && !BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
+						{
+							m_parity_flag[offset / 32] |= 1U << ((offset & 31) + 1);
+							m_parity_bad++;
+						}
 					}
-				}
-				else
-				{
-					// clear bad parity (lo)
-					if ((mem_mask & 0x00ff) && BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+					else
 					{
-						m_parity_flag[offset / 32] &= ~(1U << ((offset & 31) + 0));
-						m_parity_bad--;
-					}
+						// clear bad parity (lo)
+						if ((mem_mask & 0x00ff) && BIT(m_parity_flag[offset / 32], (offset & 31) + 0))
+						{
+							m_parity_flag[offset / 32] &= ~(1U << ((offset & 31) + 0));
+							m_parity_bad--;
+						}
 
-					// clear bad parity (hi)
-					if ((mem_mask & 0xff00) && BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
-					{
-						m_parity_flag[offset / 32] &= ~(1U << ((offset & 31) + 1));
-						m_parity_bad--;
-					}
+						// clear bad parity (hi)
+						if ((mem_mask & 0xff00) && BIT(m_parity_flag[offset / 32], (offset & 31) + 1))
+						{
+							m_parity_flag[offset / 32] &= ~(1U << ((offset & 31) + 1));
+							m_parity_bad--;
+						}
 
-					// stop checking parity if all clear
-					if (!m_parity_bad)
-					{
-						m_parity_flag.reset();
-						m_parity_mph->remove();
-						m_parity_mph = nullptr;
+						// stop checking parity if all clear
+						if (!m_parity_bad)
+						{
+							m_parity_flag.reset();
+							m_parity_mph.remove();
+							m_parity_check = false;
+						}
 					}
-				}
-			});
+				},
+				&m_parity_mph);
 	}
 
 	// stop checking parity if all clear
-	if ((m_scr & SCR_PARB) && !(data & SCR_PARB) && m_parity_mph && !m_parity_bad)
+	if ((m_scr & SCR_PARB) && !(data & SCR_PARB) && m_parity_check && !m_parity_bad)
 	{
 		m_parity_flag.reset();
-		m_parity_mph->remove();
-		m_parity_mph = nullptr;
+		m_parity_mph.remove();
+		m_parity_check = false;
 	}
 
 	if (data & SCR_PARE)

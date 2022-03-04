@@ -25,9 +25,10 @@ void matsushita_cr589_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void matsushita_cr589_device::nvram_read(emu_file &file)
+bool matsushita_cr589_device::nvram_read(util::read_stream &file)
 {
-	file.read(buffer, sizeof(buffer));
+	size_t actual;
+	return !file.read(buffer, sizeof(buffer), actual) && actual == sizeof(buffer);
 }
 
 
@@ -37,9 +38,10 @@ void matsushita_cr589_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void matsushita_cr589_device::nvram_write(emu_file &file)
+bool matsushita_cr589_device::nvram_write(util::write_stream &file)
 {
-	file.write(buffer, sizeof(buffer));
+	size_t actual;
+	return !file.write(buffer, sizeof(buffer), actual) && actual == sizeof(buffer);
 }
 
 

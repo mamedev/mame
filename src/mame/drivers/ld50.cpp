@@ -1,47 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio LD-50 electronic drums
+    Casio LD-50 electronic drums
 
-	Unlike most Casio instruments, this is either rebranded or outsourced.
-	It's unclear who developed it, or if it was ever sold under other brands,
-	but the data ROM mentions "SharpWin".
+    Unlike most Casio instruments, this is either rebranded or outsourced.
+    It's unclear who developed it, or if it was ever sold under other brands,
+    but the data ROM mentions "SharpWin".
 
-	Main board:
-		bottom left:  "DIGITAL DRUM [LD-50] DATE: 2001/07/20"
-		bottom right: "LD50 Main PCB Rev.1"
+    Main board:
+        bottom left:  "DIGITAL DRUM [LD-50] DATE: 2001/07/20"
+        bottom right: "LD50 Main PCB Rev.1"
 
-		IC1:   Burr-Brown PCM1717E DAC
-		IC2:   unknown SOIC8 ("2429 170")
-		IC4:   Philips P87C52UBAA MCU
-		IC5:   AMD AM29F040 ROM
-		IC7/8/9/10: 4x 74HC374
-		IC11:  unknown COB (letter "B" handwritten on epoxy)
-		IC12:  Dream SAM9793
-		XTAL1: 9.6MHz (for SAM9793)
-		XTAL2: 12MHz (for MCU)
+        IC1:   Burr-Brown PCM1717E DAC
+        IC2:   unknown SOIC8 ("2429 170")
+        IC4:   Philips P87C52UBAA MCU
+        IC5:   AMD AM29F040 ROM
+        IC7/8/9/10: 4x 74HC374
+        IC11:  unknown COB (letter "B" handwritten on epoxy)
+        IC12:  Dream SAM9793
+        XTAL1: 9.6MHz (for SAM9793)
+        XTAL2: 12MHz (for MCU)
 
-	A 10-pin header at the upper left connects to the input matrix and
-	a small plastic LCD assembly on the other side of the board.
+    A 10-pin header at the upper left connects to the input matrix and
+    a small plastic LCD assembly on the other side of the board.
 
-	Most of the sound is provided by the SAM9793, which is just a MIDI
-	synth on a chip that takes in serial MIDI input and outputs I2S.
-	The four sound effect pads also trigger PCM samples separately,
-	possibly via the black blob at IC11.
+    Most of the sound is provided by the SAM9793, which is just a MIDI
+    synth on a chip that takes in serial MIDI input and outputs I2S.
+    The four sound effect pads also trigger PCM samples separately,
+    possibly via the black blob at IC11.
 
-	The external ROM contains the demo and rhythms, which are all stored
-	as standard type 0 MIDI files.
+    The external ROM contains the demo and rhythms, which are all stored
+    as standard type 0 MIDI files.
 
-	To activate the test mode, hold "Rhythm" and "Assign" when powering on.
-	From here, hitting the drum pads will display time/velocity measurements.
+    To activate the test mode, hold "Rhythm" and "Assign" when powering on.
+    From here, hitting the drum pads will display time/velocity measurements.
 
-	TODO:
-	- drum LEDs
-	- LCD artwork
-	- clickable layout?
-	- possibly connect a MIDI out port in lieu of the SAM9793
-	  (MCS51 core needs proper serial output first)
-	- dump/emulate the other PCM device somehow
+    TODO:
+    - drum LEDs
+    - LCD artwork
+    - clickable layout?
+    - possibly connect a MIDI out port in lieu of the SAM9793
+      (MCS51 core needs proper serial output first)
+    - dump/emulate the other PCM device somehow
  */
 
 #include "emu.h"

@@ -170,7 +170,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 		break;
 	}
 
-	osd_printf_verbose("Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
+	osd_printf_verbose("jvc_format: Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
 
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
@@ -184,6 +184,7 @@ int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std:
 bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
+	int max_tracks, max_heads;
 
 	if (!parse_header(io, header_size, track_count, head_count, sector_count, sector_size, sector_base_id))
 		return false;
@@ -192,6 +193,20 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (sector_count * sector_size > 10000)
 	{
 		osd_printf_error("jvc_format: incorrect track layout\n");
+		return false;
+	}
+
+	image->get_maximal_geometry(max_tracks, max_heads);
+
+	if (track_count > max_tracks)
+	{
+		osd_printf_error("jvc_format: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, max_tracks);
+		return false;
+	}
+
+	if (head_count > max_heads)
+	{
+		osd_printf_error("jvc_format: Floppy disk has too many sides for this drive (floppy sides=%d, drive sides=%d).\n", head_count, max_heads);
 		return false;
 	}
 

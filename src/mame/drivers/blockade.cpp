@@ -2,7 +2,7 @@
 // copyright-holders: Frank Palazzolo, Dirk Best
 /***************************************************************************
 
-    Blockade/CoMOTION/Blasto/Hustle/Minesweeper
+    Blockade/CoMotion/Blasto/Hustle/Minesweeper
 
     TODO:
     - Noise generator
@@ -521,6 +521,20 @@ ROM_START( comotion )
 	ROM_LOAD_NIB_LOW( "316-0005.u29", 0x000, 0x100, CRC(53fb8821) SHA1(0a499aa4cf15f7ebea155aacd914de8851544215))
 ROM_END
 
+// typed in from patent US4089524, lacks bugfix(?) at 0x68
+ROM_START( comotionp )
+	ROM_REGION(0x800, "maincpu", 0)
+	// ROM_LOAD("comotionp.bin", 0x000, 0x800, CRC(3992bf85) SHA1(42191d4afc460a0da1429a63a50adb0a5acac276))
+	ROM_LOAD_NIB_HIGH("comotionp-1h.u2", 0x000, 0x400, CRC(3e88b7dd) SHA1(1059a6dc9f77f3ea8af0ba2737a1379b4fcfd860))
+	ROM_LOAD_NIB_LOW( "comotionp-1l.u3", 0x000, 0x400, CRC(1f5bbfd9) SHA1(7c2276552503a92bac6b495becae122d637da2ec))
+	ROM_LOAD_NIB_HIGH("comotionp-2h.u4", 0x400, 0x400, CRC(eec29372) SHA1(3890ff7d0d847b9cc9e09a62152dc2b6bc143d50))
+	ROM_LOAD_NIB_LOW( "comotionp-2l.u5", 0x400, 0x400, CRC(c68b63de) SHA1(53962eba1bee39470ec8505ddbfcd274b05cee08))
+
+	ROM_REGION(0x100, "gfx1", 0)
+	ROM_LOAD_NIB_HIGH("316-0006.u43", 0x000, 0x100, CRC(8f071297) SHA1(811471c87b77b4b9ab056cf0c0743fc2616b754c))  // these are reversed
+	ROM_LOAD_NIB_LOW( "316-0005.u29", 0x000, 0x100, CRC(53fb8821) SHA1(0a499aa4cf15f7ebea155aacd914de8851544215))
+ROM_END
+
 ROM_START( blasto )
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD_NIB_HIGH("316-0089.u2", 0x000, 0x400, CRC(ec99d043) SHA1(10650e54bf55f3ace5c199215c2fce211916d3b7))
@@ -572,7 +586,8 @@ ROM_END
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
 GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMotion",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotionp, comotion, blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMotion (patent)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
 GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, empty_init, ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
 GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
 GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

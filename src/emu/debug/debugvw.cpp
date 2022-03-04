@@ -503,11 +503,11 @@ bool debug_view_expression::recompute()
 		std::string oldstring(m_parsed.original_string());
 		try
 		{
-			m_parsed.parse(m_string.c_str());
+			m_parsed.parse(m_string);
 		}
 		catch (expression_error &)
 		{
-			m_parsed.parse(oldstring.c_str());
+			m_parsed.parse(oldstring);
 		}
 	}
 

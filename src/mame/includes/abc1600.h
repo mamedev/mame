@@ -121,11 +121,7 @@ public:
 	void spec_contr_reg_w(uint8_t data);
 
 	void dbrq_w(int state);
-	uint8_t dma0_iorq_r(offs_t offset) { return m_sysfs ? m_mac->dma0_iorq_r(offset) : (m_bus0i->read_tren() & m_bus0x->read_tren()); }
-	void dma0_iorq_w(offs_t offset, uint8_t data) { if (m_sysfs) m_mac->dma0_iorq_w(offset, data); else { m_bus0i->write_tren(data); m_bus0x->write_tren(data); }; }
-	uint8_t dma1_iorq_r(offs_t offset) { return m_sysscc ? m_mac->dma1_iorq_r(offset) : m_bus1->read_tren(); }
-	void dma1_iorq_w(offs_t offset, uint8_t data) { if (m_sysscc) m_mac->dma1_iorq_w(offset, data); else m_bus1->write_tren(data); }
-
+	
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
 	void cio_pb_w(uint8_t data);
@@ -155,7 +151,7 @@ public:
 	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
-	
+
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected
