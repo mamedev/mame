@@ -14370,6 +14370,7 @@ royalcdfr                       // (c) 1991 TAB-Austria
 royalcrd                        // (c) 1991 TAB-Austria
 royalcrd_msx                    //
 royalcrd_nes                    //
+royalcrd_nesa                   //
 royalcrda                       // (c) 1991 TAB-Austria
 royalcrdb                       // (c) 1991 TAB-Austria
 royalcrdc                       // (c) 1991 TAB-Austria
@@ -41953,6 +41954,9 @@ truco                           // (c) 198? Playtronic SRL
 
 @source:trucocl.cpp
 trucocl                         // (c) 1991 Miky SRL
+
+@source:truesys.cpp
+unkts                           //
 
 @source:trvmadns.cpp
 trvmadns                        // (c) 1985 Thunderhead Inc.

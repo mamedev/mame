@@ -7700,9 +7700,32 @@ ROM_END
 // http://www.citylan.it/wiki/images/6/69/1189_PCB_component_side.jpg
 ROM_START( royalcrd_nes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "me2.bin", 0x0000, 0x10000, CRC(2144efab) SHA1(47fef8e0d2b05869e667731fdaf535722b9a8f19)) // this is one (or more?) Royal Card programs, with (c)1991 TAB Austria in them
+	ROM_LOAD( "me2.bin", 0x0000, 0x10000, CRC(2144efab) SHA1(47fef8e0d2b05869e667731fdaf535722b9a8f19) ) // this is one (or more?) Royal Card programs, with (c)1991 TAB Austria in them
 
 	ROM_REGION( 0x2000, "pic16c57", 0 )
+	ROM_LOAD( "pic.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // these are (encrypted?) GFX ROMS
+	ROM_LOAD( "me3.bin", 0x00000, 0x10000, CRC(398a6f7c) SHA1(126048c75ab5df421f9dd2e39c6b68e15bf54f38) )
+	ROM_LOAD( "me4.bin", 0x10000, 0x10000, CRC(6f84222a) SHA1(eee8e46d464211914cb99d15fd9f7dd4aa009664) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "24c04.bin",    0x0000, 0x0200, CRC(e349687c) SHA1(1e6da87ba771baacc7687524158a1db8b789b673) )
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s147.bin",    0x0000, 0x0200, CRC(5377c680) SHA1(33857bbbfebfce28b8a68c69e030bf560a701e83) )
+
+	// and this is just an untouched NES multigame..
+	ROM_REGION( 0x0100000, "nes_prg", 0 )
+	ROM_LOAD( "me0.bin",    0x0000, 0x0100000, CRC(83a4e841) SHA1(280e1a26737fe0b90dd19be706df89e09ef84c77) ) // == 64 in 1 [a1][p1].prg  nes:mc_64a 64 in 1 (Alt Games)
+	ROM_REGION( 0x80000, "nes_chr", 0 )
+	ROM_LOAD( "me1.bin",    0x0000, 0x80000, CRC(7114b404) SHA1(0f5a206af25725b2e97c404a616e341f15925431) ) // == 64 in 1 [a1][p1].chr  nes:mc_64a 64 in 1 (Alt Games)
+ROM_END
+
+ROM_START( royalcrd_nesa ) // same as royalcrd_nes but for different main CPU ROM (mostly some routines appear to have been removed in royalcrd_nes but present here)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "me2.bin", 0x0000, 0x10000, CRC(04b16c53) SHA1(b0fcf8e2049b6065b95990c3a597166a83d7c7e6) ) // SLDH, this is one (or more?) Royal Card programs, with (c)1991 TAB Austria in them
+
+	ROM_REGION( 0x2000, "pic16c55", 0 )
 	ROM_LOAD( "pic.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // these are (encrypted?) GFX ROMS
@@ -8811,5 +8834,6 @@ GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empt
 GAMEL( 199?, clubcard,   0,        clubcard,   clubcard,  funworld_state,   empty_init,   ROT0, "Impera / Mega Tech", "Club Card (ver. 1.1 English)",                MACHINE_IMPERFECT_COLORS, layout_jollycrd ) // use fw1stpal machine for green background
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
-GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame, set 1)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_nesa, royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame, set 2)",  MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, royalcrd_msx,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with MSX multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
