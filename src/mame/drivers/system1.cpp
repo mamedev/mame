@@ -2894,7 +2894,7 @@ ROM_START( mrvikingj )
 ROM_END
 
 
-ROM_START( swat )
+ROM_START( swat ) /* Sega game ID# 834-5388 SWAT */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5807b.129",   0x0000, 0x2000, CRC(93db9c9f) SHA1(56e9d9a33f04b4d5971c0db24cc8719a52e64678) ) /* encrypted */
 	ROM_LOAD( "epr-5808.130",   0x2000, 0x2000, CRC(67116665) SHA1(e8aa72f2835d38367be5e8a9313e51b64f452ee7) ) /* encrypted */
