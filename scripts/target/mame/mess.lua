@@ -4632,6 +4632,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
+	MAME_DIR .. "src/mame/drivers/freedom120.cpp",
 	MAME_DIR .. "src/mame/drivers/fs3216.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",

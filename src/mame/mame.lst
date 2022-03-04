@@ -14195,6 +14195,9 @@ fp200                           //
 @source:fp6000.cpp
 fp6000                          //
 
+@source:freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
 @source:freekick.cpp
 omega                           // (c) 1986 Nihon System
 omegaa                          // (c) 1986 Nihon System
