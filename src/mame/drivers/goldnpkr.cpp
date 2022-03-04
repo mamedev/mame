@@ -139,7 +139,7 @@
   * Bonus Poker,                                      1984, Galanthis Inc.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
-  * "Unknown Sisteme France Poker",                   198?, Sisteme France.
+  * "Good Luck! poker (Sisteme France)",              198?, Sisteme France.
   * Bonne Chance! (Golden Poker prequel HW, set 1),   198?, Unknown.
   * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
   * Boa Sorte! (Golden Poker prequel HW),             198?, Unknown.
@@ -11834,15 +11834,15 @@ void goldnpkr_state::init_pokersis()
 	ROM[0x5fff] = 0x48;
 	ROM[0x6001] = 0x48;
 	ROM[0x7000] = 0x00;
-	ROM[0x7001] = 0xA0;
+	ROM[0x7001] = 0xa0;
 	ROM[0x7002] = 0x08;
-	ROM[0x7003] = 0xAD;
+	ROM[0x7003] = 0xad;
 	ROM[0x7004] = 0x48;
 	ROM[0x7005] = 0x08;
 	ROM[0x7007] = 0x10;
-	ROM[0x700a] = 0xA0;
+	ROM[0x700a] = 0xa0;
 	ROM[0x700b] = 0x07;
-	ROM[0x700c] = 0xA2;
+	ROM[0x700c] = 0xa2;
 	ROM[0x7fbf] = 0x7d;
 	ROM[0x7fc0] = 0x60;
 	ROM[0x7fc1] = 0xb9;
