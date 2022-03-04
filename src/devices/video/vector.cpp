@@ -75,10 +75,17 @@ DEFINE_DEVICE_TYPE(VECTOR, vector_device, "vector_device", "VECTOR")
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VECTOR, tag, owner, clock),
 		device_video_interface(mconfig, *this),
+		m_alt_vector(*this, "alt_vector"),        
 		m_vector_list(nullptr),
 		m_min_intensity(255),
 		m_max_intensity(0)
 {
+}
+
+void vector_device::device_add_mconfig(machine_config &config)
+{
+	const char *driver_str = config.options().vector_driver();
+	ALT_VECTOR_DRIVER_INSTANTIATE(driver_str, config, m_alt_vector);
 }
 
 void vector_device::device_start()
@@ -107,6 +114,13 @@ float vector_device::normalized_sigmoid(float n, float k)
  */
 void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
+	if (m_alt_vector.found()) 
+	{
+		if (m_alt_vector->add_point(x, y, color, intensity)) 
+		{
+		return;
+		}
+	}
 	point *newpoint;
 
 	intensity = std::clamp(intensity, 0, 255);
@@ -150,6 +164,16 @@ void vector_device::clear_list(void)
 
 uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+
+	if (m_alt_vector.found()) 
+	{
+		m_alt_vector->update(screen, cliprect);
+		if (m_vector_index == 0) 
+        {
+			return 0;
+		}
+	}
+
 	uint32_t flags = PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
 	const rectangle &visarea = screen.visible_area();
 	float xscale = 1.0f / (65536 * visarea.width());

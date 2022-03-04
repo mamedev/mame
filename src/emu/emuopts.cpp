@@ -134,6 +134,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_BEAM_DOT_SIZE,                              "1.0",       OPTION_FLOAT,      "set vector beam size for dots" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
+	{ OPTION_VECTOR_DRIVER,                              "screen",    OPTION_STRING,     "set vector driver (screen | usb_dvg)" },
+	{ OPTION_VECTOR_PORT,                            "/dev/ttyACM0",  OPTION_STRING,     "set vector serial port"},
+	{ OPTION_VECTOR_SCREEN_MIRROR,                        "0",        OPTION_BOOLEAN,    "enable screen mirror"},
 
 	// sound options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SOUND OPTIONS" },

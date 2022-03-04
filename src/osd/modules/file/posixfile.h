@@ -32,4 +32,7 @@ std::error_condition posix_open_domain(std::string const &path, std::uint32_t op
 bool posix_check_ptty_path(std::string const &path) noexcept;
 std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize, std::string &name) noexcept;
 
+bool posix_check_tty_path(std::string const &path) noexcept;
+std::error_condition posix_open_tty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
+
 #endif // MAME_OSD_MODULES_FILE_POSIXFILE_H
