@@ -122,15 +122,6 @@ public:
 
 	void dbrq_w(int state);
 	
-	uint8_t dma0_mreq_r(offs_t offset) { return m_mac->dma0_mreq_r(offset, m_bus0i->read_tren() & m_bus0x->read_tren()); }
-	void dma0_mreq_w(offs_t offset, uint8_t data) { m_mac->dma0_mreq_w(offset, data); m_bus0i->write_tren(data); m_bus0x->write_tren(data); }
-	
-	uint8_t dma1_mreq_r(offs_t offset) { return m_mac->dma1_mreq_r(offset, m_bus1->read_tren()); }
-	void dma1_mreq_w(offs_t offset, uint8_t data) { m_mac->dma1_mreq_w(offset, data); m_bus1->write_tren(data); }
-	
-	uint8_t dma2_mreq_r(offs_t offset) { return m_mac->dma2_mreq_r(offset, m_bus2->read_tren()); }
-	void dma2_mreq_w(offs_t offset, uint8_t data) { m_mac->dma2_mreq_w(offset, data); m_bus2->write_tren(data); }
-
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
 	void cio_pb_w(uint8_t data);
