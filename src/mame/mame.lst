@@ -24178,6 +24178,8 @@ mps1230                         // 1988 Commodore MPS-1230 near-letter-quality d
 @source:mpu12wbk.cpp
 fruitstb                        // 199? Webak
 fruitstba                       // 1997 Webak
+fruitstbb                       // 1997 Webak
+fruitstbc                       // 1997 Webak
 
 @source:mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
