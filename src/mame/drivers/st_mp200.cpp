@@ -1154,7 +1154,7 @@ GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_m
 GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_IS_SKELETON_MECHANICAL)
 
-// multiball, unusable
+// multiball
 GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_IS_SKELETON_MECHANICAL)

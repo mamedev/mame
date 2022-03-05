@@ -576,8 +576,7 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	// red led
 	m_beep->set_clock(950);
 	m_beep->set_state(state);
-	if (!m_sound_int_handler.isnull())
-		m_sound_int_handler(state);
+	m_sound_int_handler(state);
 }
 
 WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
@@ -619,11 +618,7 @@ void by133_state::u7_b_w(u8 data)
 	//machine().scheduler().synchronize();
 	m_u7b = data;
 	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		//u8 sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-		m_sound_select_handler(data & 15);
-	}
+	m_sound_select_handler(data & 0x1f);
 }
 
 u8 by133_state::u10_a_r()
