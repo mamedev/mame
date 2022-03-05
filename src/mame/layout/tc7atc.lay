@@ -205,7 +205,6 @@ license:CC0
 		<element ref="white"><bounds x="64.5" y="67" width="15" height="10" /></element>
 		<element ref="black"><bounds x="65.25" y="67.75" width="13.5" height="8.5" /></element>
 
-
 		<element ref="disks1" blend="add"><bounds x="0" y="0" width="144" height="144" /></element>
 
 		<!-- bezel text -->
