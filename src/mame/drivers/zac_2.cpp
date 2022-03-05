@@ -51,7 +51,7 @@ private:
 	uint8_t m_t_c = 0U;
 	uint8_t m_out_offs = 0U;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<8> m_io_keyboard;
@@ -196,6 +196,15 @@ READ_LINE_MEMBER( zac_2_state::serial_r )
 WRITE_LINE_MEMBER( zac_2_state::serial_w )
 {
 // to printer
+}
+
+void zac_2_state::machine_start()
+{
+	m_digits.resolve();
+
+	save_item(NAME(m_row));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_out_offs));
 }
 
 void zac_2_state::machine_reset()

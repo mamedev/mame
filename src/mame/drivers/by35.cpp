@@ -1492,6 +1492,20 @@ void by35_state::machine_start()
 	m_solenoids.resolve();
 	m_sound_select_handler.resolve();
 	m_sound_int_handler.resolve();
+
+	save_item(NAME(m_u10a));
+	save_item(NAME(m_u10b));
+	save_item(NAME(m_u11a));
+	save_item(NAME(m_u11b));
+	save_item(NAME(m_u10_ca2));
+	save_item(NAME(m_u10_cb1));
+	save_item(NAME(m_u10_cb2));
+	save_item(NAME(m_u11_ca1));
+	save_item(NAME(m_u11_cb2));
+	save_item(NAME(m_7d));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_lamp_decode));
+	save_item(NAME(m_io_hold_x));
 }
 
 void by35_state::machine_reset()

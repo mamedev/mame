@@ -986,6 +986,20 @@ void by17_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
+
+	save_item(NAME(m_u10a));
+	save_item(NAME(m_u10b));
+	save_item(NAME(m_u11a));
+	save_item(NAME(m_u11b));
+	save_item(NAME(m_u10_ca2));
+	save_item(NAME(m_u10_cb1));
+	save_item(NAME(m_u10_cb2));
+	save_item(NAME(m_u11_ca1));
+	save_item(NAME(m_u11_cb2));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_lamp_decode));
+	save_item(NAME(m_solenoid_features));
+	save_item(NAME(m_io_hold_x));
 }
 
 void by17_state::machine_reset()

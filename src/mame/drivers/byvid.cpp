@@ -99,7 +99,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 	void by133(machine_config &config);
-	void babypac(machine_config &config);
 	void granny(machine_config &config);
 
 private:
