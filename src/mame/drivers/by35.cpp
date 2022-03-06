@@ -282,7 +282,9 @@ private:
 class playboy_state : public by35_state
 {
 public:
-	using by35_state::by35_state;
+	playboy_state(machine_config const &mconfig, device_type type, char const *tag)
+		: by35_state(mconfig, type, tag, s_solenoid_features_playboy)
+	{ }
 
 protected:
 	static solenoid_feature_data const s_solenoid_features_playboy;
