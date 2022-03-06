@@ -14,6 +14,49 @@ part of a series is (or will be) in its own driver, see:
 - tispellb: TI Spelling B series gen. 1
 - tispeak: TI Speak & Spell series gen. 1
 
+About the approximated MCU frequency everywhere: The RC osc. is not that
+stable on most of these handhelds. When comparing multiple video recordings
+of the same game, it shows(and sounds) that the frequency range can differ
+up to 50kHz. This is probably exaggerated due to components getting worn out
+after many decades. TMS1000 RC curve is documented in the data manual, but
+not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
+
+ROM source notes when dumped from another publisher, but confident it's the same:
+- arrball: Tandy Zingo
+- bcheetah: Fundimensions Incredible Brain Buggy
+- cmsport: Conic Basketball
+- cnbaskb: Cardinal Electronic Basketball
+- cnfball: Elecsonic Football
+- copycat: Sears Follow Me
+- ditto: Tandy Electronic Pocket Repeat
+- fxmcr165: Tandy Science Fair Microcomputer Trainer
+- ginv1000: Tandy Cosmic 1000 Fire Away
+- gjackpot: Entex Electronic Jackpot: Gin Rummy & Black Jack
+- gpoker: Entex Electronic Poker
+- matchnum: LJN Electronic Concentration
+- palmf31: Toshiba BC-8018B
+- ti1250: Texas Instruments TI-1200
+- ti25503: Texas Instruments TI-1265
+- ti5100: loose 1979 TMS1073NL chip
+
+TODO:
+- Verify output PLA and microinstructions PLA for MCUs that have been dumped
+  electronically (mpla is usually the default, opla is often custom).
+- unknown MCU clocks for some, especially if no YouTube videos are found
+- Fake-press ON button when emulation starts for machines that have it on the
+  button matrix (doesn't look like any relies on it though).
+- t7in1ss: in 2-player mode, game select and skill select can be configured after
+  selecting a game? Possibly BTANB, players are expected to quickly press the
+  "First Up" button after the alarm sound.
+- bship discrete sound, netlist is documented
+- finish bshipb SN76477 sound
+- improve elecbowl driver
+- tithermos temperature sensor comparator (right now just the digital clock works)
+- is alphie(patent) the same as the final version?
+- is starwbcp the same as MP3438? (starwbc is MP3438A)
+
+============================================================================
+
 Let's use this driver for a list of known devices and their serials,
 excluding most of TI's own products(they normally didn't use "MP" codes).
 For TI's calculators, a comprehensive list of MCU serials is available
@@ -59,7 +102,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
- *MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
+ @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
@@ -144,42 +187,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @CD7282SL TMS1100   1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* means undumped unless noted, @ denotes it's in this driver)
-
-============================================================================
-
-ROM source notes when dumped from another publisher, but confident it's the same:
-- arrball: Tandy Zingo
-- bcheetah: Fundimensions Incredible Brain Buggy
-- cmsport: Conic Basketball
-- cnbaskb: Cardinal Electronic Basketball
-- cnfball: Elecsonic Football
-- copycat: Sears Follow Me
-- ditto: Tandy Electronic Pocket Repeat
-- fxmcr165: Tandy Science Fair Microcomputer Trainer
-- ginv1000: Tandy Cosmic 1000 Fire Away
-- gjackpot: Entex Electronic Jackpot: Gin Rummy & Black Jack
-- gpoker: Entex Electronic Poker
-- matchnum: LJN Electronic Concentration
-- palmf31: Toshiba BC-8018B
-- ti1250: Texas Instruments TI-1200
-- ti25503: Texas Instruments TI-1265
-- ti5100: loose 1979 TMS1073NL chip
-
-TODO:
-- verify output PLA and microinstructions PLA for MCUs that have been dumped
-  electronically (mpla is usually the default, opla is often custom)
-- unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
-  but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-- fake-press ON button when emulation starts for machines that have it on the button matrix
-  (doesn't look like any relies on it though)
-- t7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
-  Possibly BTANB, players are expected to quickly press the "First Up" button after the alarm sound.
-- bship discrete sound, netlist is documented
-- finish bshipb SN76477 sound
-- improve elecbowl driver
-- tithermos temperature sensor comparator (right now just the digital clock works)
-- is alphie(patent) the same as the final version?
-- is starwbcp the same as MP3438? (starwbc is MP3438A)
 
 ***************************************************************************/
 
@@ -279,6 +286,7 @@ TODO:
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
+#include "tc7atc.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
 #include "ti1250.lh"
@@ -966,6 +974,132 @@ ROM_START( bcheetah )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai TC7: Air Traffic Control
+  * TMS1100 MCU, label MP1311 (die label 1100E, MP1311)
+  * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
+
+  It is a very complicated game, refer to the manual on how to play.
+
+***************************************************************************/
+
+class tc7atc_state : public hh_tms1k_state
+{
+public:
+	tc7atc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void tc7atc(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void tc7atc_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void tc7atc_state::write_r(u16 data)
+{
+	// R5: speaker out
+	m_speaker->level_w(BIT(data, 5));
+
+	// R0-R4: input mux, led select
+	// R6-R9: digit select
+	m_inp_mux = m_r = data;
+	update_display();
+}
+
+void tc7atc_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 tc7atc_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( tc7atc )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("High Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Hazard")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("West")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("East")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Arrive")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Depart")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Flight Path A / Level 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Flight Path B / Level 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Flight Path C / Level 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Flight Path D / Level 4")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Altitude Descend")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Altitude Ascend")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Air Speed Decrease")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Air Speed Increase")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("10%")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("20%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("40%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("80%")
+INPUT_PORTS_END
+
+void tc7atc_state::tc7atc(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=68K, C=47pF
+	m_maincpu->k().set(FUNC(tc7atc_state::read_k));
+	m_maincpu->r().set(FUNC(tc7atc_state::write_r));
+	m_maincpu->o().set(FUNC(tc7atc_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
+	config.set_default_layout(layout_tc7atc);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tc7atc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1311", 0x0000, 0x0800, CRC(704f5e1b) SHA1(765dce31798640480eab7576550c5378d6351b65) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tc7atc_output.pla", 0, 365, CRC(0e6e3096) SHA1(375beb43657af0cc3070e581b42e501878c0eaaa) )
 ROM_END
 
 
@@ -14044,6 +14178,7 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -14099,8 +14234,8 @@ COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     emp
 
 CONS( 1978, elecbowl,   0,         0, elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
-COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel Electronics", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
 CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***

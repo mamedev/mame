@@ -1605,10 +1605,10 @@ CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_in
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel Electronics", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel Electronics", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel Electronics", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel Electronics", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE ) // ***
