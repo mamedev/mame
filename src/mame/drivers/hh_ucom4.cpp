@@ -2761,8 +2761,8 @@ ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
 
-	ROM_REGION( 235601, "screen", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
+	ROM_REGION( 243830, "screen", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 243830, CRC(300b098a) SHA1(9fde58ac0f4e4cfea05301346cbf5b1ced9fe973) )
 ROM_END
 
 
