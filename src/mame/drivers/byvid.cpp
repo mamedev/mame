@@ -160,7 +160,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(u7_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_ack_w) { m_pia_u11->cb2_w(state); }
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void granny_crtc_w(offs_t offset, u8 data);
@@ -381,7 +380,7 @@ static INPUT_PORTS_START( granny )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Power")  // Also 2P start
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Power")  // Also 2P start
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
@@ -839,7 +838,7 @@ void by133_state::by133(machine_config &config)
 	m_cheap_squeak->add_route(ALL_OUTPUTS, "mono", 1.00);
 	m_sound_select_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_select));
 	m_sound_int_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_int));
-	m_cheap_squeak->sound_ack_w_handler().set(FUNC(by133_state::sound_ack_w));
+	m_cheap_squeak->sound_ack_w_handler().set(m_pia_u11, FUNC(pia6821_device::cb2_w));
 
 	SPEAKER(config, "beee").front_center();
 	BEEP(config, m_beep, 600).add_route(ALL_OUTPUTS, "beee", 0.10);
