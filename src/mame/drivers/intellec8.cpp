@@ -12,6 +12,7 @@ It has the usual array of switches, lights and buttons.
 #include "emu.h"
 #include "cpu/i8008/i8008.h"
 
+namespace {
 
 class intlc8_state : public driver_device
 {
@@ -77,7 +78,7 @@ ROM_START( intlc8 )
 	ROM_LOAD( "miss7.bin",    0x0700, 0x0100, NO_DUMP )
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME         FLAGS
 COMP( 1973, intlc8,   0,      0,      intlc8, intlc8,     intlc8_state,   empty_init, "Intel", "Intellec 8 MCS", MACHINE_IS_SKELETON )

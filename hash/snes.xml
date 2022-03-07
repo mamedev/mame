@@ -121,7 +121,6 @@ Undumped
   - Spanky no Orifuru Puzzle - Japan, for 1995, Natsume
   - Spot Goes To Hollywood - Europ, for 199?, Virgin
   - Superman - USA, for 1993, Sunsoft
-  - Super Baseball Simulator 1.000 2 - USA, for 199?, unknown dev
   - Super Hustler - Japan, for 199?, Opera House
   - Taloon's Mystery Dungeon - USA, for 199?, Squaresoft
   - Targa - Europe, for 1995, Virgin Interactive
@@ -35374,6 +35373,23 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="ballz3dp" cloneof="ballz3d">
+		<description>Ballz (prototype)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<info name="alt_title" value="Ballz 3D - Fighting at its Ballziest" />
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
+			<feature name="slot" value="hirom_dsp" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ballz 3d - fighting at its ballziest (prototype).sfc" size="1048576" crc="50e09e71" sha1="85546e6aaa9c0abec060ae8e41d41918e127679e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="addon" size="10240">
+				<rom name="dsp1a.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barbaros">
 		<description>Barbarossa (Jpn)</description>
 		<year>1992</year>
@@ -35484,6 +35500,18 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="batman forever (japan).sfc" size="3145728" crc="903348f5" sha1="07cc822e9ca7040af19491bd75dcc18d8641e3cf" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batblazp1" cloneof="batblaz">
+		<description>Battle Blaze (prototype, alt)</description>
+		<year>1992?</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="battle blaze (prototype b).sfc" size="1048576" crc="d458c07e" sha1="7ecec338b416207dc7e93b0d20c787a9423293e5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35853,6 +35881,32 @@ List of unclassified roms
 				<rom name="big sky trooper (usa) (beta).sfc" size="1048576" crc="7955ebfe" sha1="4f78bcaebdef55328f663f9cb74683e44747e303" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigskyp" cloneof="bigsky">
+		<description>Big Sky Trooper (prototype)</description>
+		<year>1995</year>
+		<publisher>JVC</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="big sky trooper (5-23 prototype).sfc" size="1048576" crc="20503fac" sha1="f26c3b6a5de4972c7f0af791695b27c3905346b2" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -36671,6 +36725,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="captnovop" cloneof="captnovo">
+		<description>Captain Novolin (prototype)</description>
+		<year>1992</year>
+		<publisher>Raya Systems</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="captain novolin (prototype).sfc" size="524288" crc="025dc28a" sha1="785e4cc9b52a709f13edc4bcbc6cd2ef49f62b0c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ctsubaj">
 		<description>Captain Tsubasa J - The Way to World Youth (Jpn)</description>
 		<year>1995</year>
@@ -37109,6 +37175,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="clayfghtp" cloneof="clayfght">
+		<description>Clay Fighter (Euro, prototype)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="clay fighter (prototype).sfc" size="2097152" crc="5fb18fc6" sha1="165f9d9b8a2ef52f5953bcc3638338a2c9d27c16" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="clayfght">
 		<description>Clay Fighter (Euro)</description>
 		<year>1993</year>
@@ -37130,6 +37209,33 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="clay fighter 2 - judgment clay (europe).sfc" size="3145728" crc="caa9abf1" sha1="8717b18ee64fb3df74a9c7c75f393c514b4d87e4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claymatep" cloneof="claymate">
+		<description>Claymates (Euro, prototype)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="claymates (prototype a) (1176f1320ecd).sfc" size="1048576" crc="864d7291" sha1="cde2a93abdfa75f35f75813922888aad31e651b7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claymatep1" cloneof="claymate">
+		<!-- Notes: differs in 3 bytes near header from the other prototype. Is one a bad dump from the same cartridge? -->
+		<description>Claymates (Euro, prototype, alt)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="claymates (prototype a) (1177f1330ecc).sfc" size="1048576" crc="f0330184" sha1="9445394205d726ee5e429c9b5cd436cf86a40768" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40273,6 +40379,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="fstrikerp1" cloneof="fstriker">
+		<description>Fire Striker (USA, prototype, alt)</description>
+		<year>1994</year>
+		<publisher>DTMC</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="fire striker (prototype).sfc" size="1048576" crc="b0ec371d" sha1="b6ce7c4ac96b4391f06c47173d61850571ca0c4e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fstriker">
 		<description>FireStriker (USA)</description>
 		<year>1994</year>
@@ -43345,7 +43463,7 @@ List of unclassified roms
 	</software>
 
 	<software name="illgaiap1" cloneof="illtime" supported="no">
-		<description>Illusion of Gaia (prototype B)</description>
+		<description>Illusion of Gaia (prototype, alt)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -57443,6 +57561,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="bbsim1k2">
+		<description>Super Baseball Simulator 1.000 2 (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Culture Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="baseballsimulator21841.sfc" size="524288" crc="892f92a5" sha1="11804448b1f229069421f4cd0ad85eb949af4bc3" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basload">
 		<description>Super Bases Loaded (USA)</description>
 		<year>1991</year>
@@ -60346,7 +60478,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="subaseb2">
+	<software name="subaseb2" cloneof="bbsim1k2">
 		<description>Super Ultra Baseball 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Culture Brain</publisher>

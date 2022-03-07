@@ -151,7 +151,6 @@ private:
 	class disk_component;
 	class text_component;
 	class led7seg_component;
-	class led8seg_gts1_component;
 	class led14seg_component;
 	class led16seg_component;
 	class led14segsc_component;

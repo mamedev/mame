@@ -12,8 +12,6 @@
 #include "ds1386.h"
 #include "machine/timehelp.h"
 
-#include "fileio.h"
-
 #define DISABLE_OSC     (0x80)
 #define DISABLE_SQW     (0x40)
 
@@ -414,14 +412,16 @@ void ds1386_device::nvram_default()
 	m_ram[REGISTER_COMMAND] = COMMAND_TE | COMMAND_WAM | COMMAND_TDM;
 }
 
-void ds1386_device::nvram_read(emu_file &file)
+bool ds1386_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
-void ds1386_device::nvram_write(emu_file &file)
+bool ds1386_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 void ds1386_device::data_w(offs_t offset, uint8_t data)

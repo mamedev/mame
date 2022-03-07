@@ -82,6 +82,7 @@ public:
 		, m_dmdtype2(*this, "decodmd2")
 		, m_dmdtype3(*this, "decodmd3")
 		, m_decobsmt(*this, "decobsmt")
+		, m_sound1(*this, "sound1")
 		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
@@ -136,6 +137,7 @@ private:
 	optional_device<decodmd_type2_device> m_dmdtype2;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 	optional_device<decobsmt_device> m_decobsmt;
+	optional_memory_region m_sound1;
 	required_ioport_array<8> m_io_keyboard;
 
 	uint8_t m_row = 0U;
@@ -245,7 +247,7 @@ void de_3_state::sound_w(uint8_t data)
 		if(data != 0xfe)
 			m_decobsmt->bsmt_comms_w(data);
 	}
-	if (memregion("sound1"))
+	if (m_sound1)
 	{
 		m_sound_data = data;
 		m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -467,9 +469,9 @@ void de_3_state::machine_start()
 	save_item(NAME(m_sample_data));
 	save_item(NAME(m_more_data));
 
-	if (memregion("sound1"))
+	if (m_sound1)
 	{
-		uint8_t *const ROM = memregion("sound1")->base();
+		uint8_t *const ROM = m_sound1->base();
 		m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
 		m_sample_bank->set_entry(0);
 	}
@@ -479,7 +481,7 @@ void de_3_state::machine_reset()
 {
 	genpin_class::machine_reset();
 
-	if (memregion("sound1"))
+	if (m_sound1)
 		m_sample_bank->set_entry(0);
 }
 

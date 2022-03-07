@@ -4934,3 +4934,14 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
+---------------------------------------------------
+if (MACHINES["NS32382"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32382.cpp",
+		MAME_DIR .. "src/devices/machine/ns32382.h",
+	}
+end

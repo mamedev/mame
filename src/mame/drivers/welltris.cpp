@@ -313,23 +313,183 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/welltris.h"
+
+#include "video/vsystem_gga.h"
+#include "video/vsystem_spr2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopn.h"
-#include "video/vsystem_gga.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+namespace {
 
 #define WELLTRIS_4P_HACK 0
+
+class welltris_state : public driver_device
+{
+public:
+	welltris_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_spr_old(*this, "vsystem_spr_old"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_spriteram(*this, "spriteram"),
+		m_pixelram(*this, "pixelram"),
+		m_charvideoram(*this, "charvideoram"),
+		m_soundbank(*this, "soundbank")
+	{ }
+
+	void quiz18k(machine_config &config);
+	void welltris(machine_config &config);
+
+	void init_quiz18k();
+	void init_welltris();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<vsystem_spr2_device> m_spr_old;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pixelram;
+	required_shared_ptr<uint16_t> m_charvideoram;
+	required_memory_bank m_soundbank;
+
+	tilemap_t *m_char_tilemap;
+	uint8_t m_gfxbank[2];
+	uint16_t m_charpalettebank;
+	uint16_t m_spritepalettebank;
+	uint16_t m_pixelpalettebank;
+	int m_scrollx;
+	int m_scrolly;
+
+	void sound_bankswitch_w(uint8_t data);
+	void palette_bank_w(offs_t offset, uint8_t data);
+	void gfxbank_w(offs_t offset, uint8_t data);
+	void scrollreg_w(offs_t offset, uint16_t data);
+	void charvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void setbank(int num, int bank);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
+};
+
+
+void welltris_state::setbank(int num, int bank)
+{
+	if (m_gfxbank[num] != bank)
+	{
+		m_gfxbank[num] = bank;
+		m_char_tilemap->mark_all_dirty();
+	}
+}
+
+
+// Not really enough evidence here
+
+void welltris_state::palette_bank_w(offs_t offset, uint8_t data)
+{
+	if (m_charpalettebank != (data & 0x03))
+	{
+		m_charpalettebank = (data & 0x03);
+		m_char_tilemap->mark_all_dirty();
+	}
+
+	flip_screen_set(data & 0x80);
+
+	m_spritepalettebank = (data & 0x20) >> 5;
+	m_pixelpalettebank = (data & 0x08) >> 3;
+}
+
+void welltris_state::gfxbank_w(offs_t offset, uint8_t data)
+{
+	setbank(0, (data & 0xf0) >> 4);
+	setbank(1, data & 0x0f);
+}
+
+void welltris_state::scrollreg_w(offs_t offset, uint16_t data)
+{
+	switch (offset)
+	{
+		case 0: m_scrollx = data - 14; break;
+		case 1: m_scrolly = data +  0; break;
+	}
+}
+
+TILE_GET_INFO_MEMBER(welltris_state::get_tile_info)
+{
+	uint16_t code = m_charvideoram[tile_index];
+	int bank = (code & 0x1000) >> 12;
+
+	tileinfo.set(0,
+			(code & 0x0fff) + (m_gfxbank[bank] << 12),
+			((code & 0xe000) >> 13) + (8 * m_charpalettebank),
+			0);
+}
+
+void welltris_state::charvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_charvideoram[offset]);
+	m_char_tilemap->mark_tile_dirty(offset);
+}
+
+void welltris_state::video_start()
+{
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(welltris_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_char_tilemap->set_transparent_pen(15);
+
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_charpalettebank));
+	save_item(NAME(m_spritepalettebank));
+	save_item(NAME(m_pixelpalettebank));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+}
+
+void welltris_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 256; y++) {
+		for (int x = 0; x < 512 / 2; x++) {
+			int pixdata = m_pixelram[(x & 0xff) + (y & 0xff) * 256];
+
+			bitmap.pix(y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * m_pixelpalettebank) + 0x400;
+			bitmap.pix(y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * m_pixelpalettebank) + 0x400;
+		}
+	}
+}
+
+uint32_t welltris_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_char_tilemap->set_scrollx(0, m_scrollx);
+	m_char_tilemap->set_scrolly(0, m_scrolly);
+
+	draw_background(bitmap, cliprect);
+	m_char_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram, m_spriteram.bytes(), m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	return 0;
+}
 
 
 void welltris_state::sound_bankswitch_w(uint8_t data)
 {
-	membank("soundbank")->set_entry(data & 0x03);
+	m_soundbank->set_entry(data & 0x03);
 }
 
 
@@ -337,21 +497,21 @@ void welltris_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x17ffff).rom();
-	map(0x800000, 0x81ffff).ram().share("pixelram");    /* Graph_1 & 2*/
-	map(0xff8000, 0xffbfff).ram();                             /* work */
-	map(0xffc000, 0xffc3ff).ram().share("spriteram");           /* Sprite */
-	map(0xffd000, 0xffdfff).ram().w(FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
-	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    /* Palette */
-	map(0xfff000, 0xfff001).portr("P1");                 /* Bottom Controls */
-	map(0xfff000, 0xfff001).w(FUNC(welltris_state::palette_bank_w));
-	map(0xfff002, 0xfff003).portr("P2");                 /* Top Controls */
-	map(0xfff002, 0xfff003).w(FUNC(welltris_state::gfxbank_w));
-	map(0xfff004, 0xfff005).portr("P3");                 /* Left Side Ctrls */
+	map(0x800000, 0x81ffff).ram().share(m_pixelram);    // graph_1 & 2
+	map(0xff8000, 0xffbfff).ram();                      // work
+	map(0xffc000, 0xffc3ff).ram().share(m_spriteram);
+	map(0xffd000, 0xffdfff).ram().w(FUNC(welltris_state::charvideoram_w)).share(m_charvideoram);
+	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("P1");                 // bottom controls
+	map(0xfff001, 0xfff001).w(FUNC(welltris_state::palette_bank_w));
+	map(0xfff002, 0xfff003).portr("P2");                 // top controls
+	map(0xfff003, 0xfff003).w(FUNC(welltris_state::gfxbank_w));
+	map(0xfff004, 0xfff005).portr("P3");                 // left side controls
 	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
-	map(0xfff006, 0xfff007).portr("P4");                 /* Right Side Ctrls */
-	map(0xfff008, 0xfff009).portr("SYSTEM");             /* Bit 5 Tested at start of irq 1 */
-	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xfff00a, 0xfff00b).portr("EXTRA");              /* P3+P4 Coin + Start Buttons */
+	map(0xfff006, 0xfff007).portr("P4");                 // right side controls
+	map(0xfff008, 0xfff009).portr("SYSTEM");             // bit 5 tested at start of IRQ 1 */
+	map(0xfff009, 0xfff009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xfff00a, 0xfff00b).portr("EXTRA");              // P3+P4 coin + start buttons
 	map(0xfff00c, 0xfff00d).portr("DSW1");
 	map(0xfff00e, 0xfff00f).portr("DSW2");
 	map(0xfff00c, 0xfff00f).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
@@ -361,7 +521,7 @@ void welltris_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("soundbank");
+	map(0x8000, 0xffff).bankr(m_soundbank);
 }
 
 void welltris_state::sound_port_map(address_map &map)
@@ -369,8 +529,8 @@ void welltris_state::sound_port_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(welltris_state::sound_bankswitch_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x10, 0x10).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x18, 0x18).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 static INPUT_PORTS_START( welltris )
@@ -379,10 +539,10 @@ static INPUT_PORTS_START( welltris )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Test (used to go through tests in service mode) */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )       /* Tested at start of irq 1 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* Service (adds a coin) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) /* pending sound command */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Test (used to go through tests in service mode)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )       // Tested at start of IRQ 1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service (adds a coin)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // pending sound command
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -512,7 +672,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 #if WELLTRIS_4P_HACK
-	/* again might be handy if a real 4 player version shows up */
+	// again might be handy if a real 4 player version shows up
 	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW 2-5 (see notes)" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -527,7 +687,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 #endif
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) /* Flip Screen Not Currently Supported */
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) // Flip screen not currently supported
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
@@ -542,7 +702,7 @@ static INPUT_PORTS_START( quiz18k )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* pending sound command */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // pending sound command
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -600,7 +760,7 @@ static INPUT_PORTS_START( quiz18k )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) /* Flip Screen Not Currently Supported */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) // Flip screen not currently supported
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
@@ -651,45 +811,45 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_welltris )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16* 0, 4*16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*96, 2*16 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout,   16* 0, 4*16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 16*96, 2*16 )
 GFXDECODE_END
 
 
 void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
-	/* A Hack which shows 4 player mode in code which is disabled */
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0xB91C/2] = 0x4e71;
-	RAM[0xB91E/2] = 0x4e71;
+	// A Hack which shows 4 player mode in code which is disabled
+	uint16_t *ram = (uint16_t *)memregion("maincpu")->base();
+	ram[0xb91c / 2] = 0x4e71;
+	ram[0xb91e / 2] = 0x4e71;
 #endif
 }
 
 void welltris_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
 void welltris_state::welltris(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);  /* 10 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 20000000 / 2);  // 10 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &welltris_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(welltris_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2);     /* 4 MHz ??? */
+	Z80(config, m_audiocpu, 8000000 / 2);     // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &welltris_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &welltris_state::sound_port_map); /* IRQs are triggered by the YM2610 */
+	m_audiocpu->set_addrmap(AS_IO, &welltris_state::sound_port_map); // IRQs are triggered by the YM2610
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(15, 367-1, 8, 248-1);
-	m_screen->set_screen_update(FUNC(welltris_state::screen_update));
-	m_screen->set_palette("palette");
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(15, 367-1, 8, 248-1);
+	screen.set_screen_update(FUNC(welltris_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_welltris);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048);
@@ -701,12 +861,12 @@ void welltris_state::welltris(machine_config &config)
 	m_spr_old->set_pritype(-1);
 	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	m_soundlatch->set_separate_acknowledge(true);
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	soundlatch.set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -719,8 +879,8 @@ void welltris_state::quiz18k(machine_config &config)
 {
 	welltris(config);
 
-	/* basic machine hardware */
-	m_screen->set_visarea(15, 335-1, 0, 224-1);
+	// basic machine hardware
+	subdevice<screen_device>("screen")->set_visarea(15, 335-1, 0, 224-1);
 
 	m_spr_old->set_offsets(6, 1);
 }
@@ -728,87 +888,88 @@ void welltris_state::quiz18k(machine_config &config)
 
 
 ROM_START( welltris )
-	ROM_REGION( 0x180000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "j2u.8", 0x000000, 0x20000, CRC(7488fe94) SHA1(41874366e2ab763cd827ff712b76ea2da0f9af6a) )
 	ROM_LOAD16_BYTE( "j1u.7", 0x000001, 0x20000, CRC(571413ac) SHA1(5eb9387efb9c1597005abff4d79f4b32aa7c93b2) )
-	/* Space */
+	// Space
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // 128k for the audio CPU + banks
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
 
-	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* CHAR Tiles */
+	ROM_REGION( 0x0a0000, "chars", 0 )
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) /* SPRITE Tiles */
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
 	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
 
-	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 ROM_END
 
 ROM_START( welltrisj )
-	ROM_REGION( 0x180000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "j2.8", 0x000000, 0x20000, CRC(68ec5691) SHA1(8615415c5c98aa9caa0878a8251da7985f050f94) )
 	ROM_LOAD16_BYTE( "j1.7", 0x000001, 0x20000, CRC(1598ea2c) SHA1(e9150c3ab9b5c0eb9a5fee3e071358f92a005078) )
-	/* Space */
+	// Space
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // 128k for the audio CPU + banks
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
 
-	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* CHAR Tiles */
+	ROM_REGION( 0x0a0000, "chars", 0 )
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) /* SPRITE Tiles */
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
 	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
 
-	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 ROM_END
 
 ROM_START( quiz18k )
-	ROM_REGION( 0x180000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "1-ic8.bin", 0x000000, 0x20000, CRC(10a64336) SHA1(d63c0752385e1d66b09a7197e267dcd0e5e93be8) )
 	ROM_LOAD16_BYTE( "2-ic7.bin", 0x000001, 0x20000, CRC(8b21b431) SHA1(278238ab4a5d11577c5ab3c7462b429f510a1d50) )
-	/* Space */
+	// Space
 	ROM_LOAD16_BYTE( "ic10.bin", 0x100000, 0x40000, CRC(501453a3) SHA1(d127f417f1c52333e478ac397fbe8a2f223b1ce7) )
 	ROM_LOAD16_BYTE( "ic9.bin",  0x100001, 0x40000, CRC(99b6840f) SHA1(8409a33c64729066bfed6e49dcd84f30906274cb) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // 128k for the audio CPU + banks
 	ROM_LOAD( "3-ic144.bin", 0x00000, 0x20000, CRC(72d372e3) SHA1(d077e34947de1050b68d76506cc8926b06a94a76) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 ) /* CHAR Tiles */
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "ic77.bin", 0x000000, 0x80000, CRC(af3b6fd1) SHA1(d22f7cf62a94ae3a2dcb0236630e9ac88d5e528b) )
 	ROM_LOAD( "ic78.bin", 0x080000, 0x80000, CRC(44bbdef3) SHA1(cd91eaf98602ef3448f49c8287591aa845afb874) )
 	ROM_LOAD( "ic79.bin", 0x100000, 0x80000, CRC(d721e169) SHA1(33ec819c4e7b4dbab41756af9eca857107d96c8b) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* SPRITE Tiles */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "ic93.bin", 0x000000, 0x80000, CRC(4d387c5e) SHA1(e77aea06b9b2dc8ada5618aaf83bb80f63670363) )
 	ROM_LOAD( "ic94.bin", 0x080000, 0x80000, CRC(6be2f164) SHA1(6a3ca63d6238d587a50718d2a6c76f01932c76c3) )
 
-	ROM_REGION( 0x140000, "ymsnd:adpcma", 0 ) /* sound samples */
+	ROM_REGION( 0x140000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ic123.bin", 0x00000, 0x80000, CRC(ee4995cf) SHA1(1b47938ddc87709f8d118b86fe62602972c77ced) )
 	ROM_LOAD( "ic124.bin", 0x80000, 0x40000, CRC(076f58c3) SHA1(bd78f39b85b2697e733896705355e21b8d2a141d) )
 
-	ROM_REGION( 0x040000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_REGION( 0x040000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "ic126.bin", 0x00000, 0x40000, CRC(7a92fbc9) SHA1(c13be1e84fc8e74c85d25d3357e078bc9e264682) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, empty_init,   ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, empty_init,    ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

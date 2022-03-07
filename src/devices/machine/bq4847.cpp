@@ -21,8 +21,6 @@
 #include "emu.h"
 #include "bq4847.h"
 
-#include "fileio.h"
-
 #define LOG_WARN         (1U<<1)    // Warnings
 #define LOG_CLOCK        (1U<<2)    // Clock operation
 #define LOG_REG          (1U<<3)    // Register write
@@ -504,12 +502,14 @@ void bq4847_device::nvram_default()
 	}
 }
 
-void bq4847_device::nvram_read(emu_file& file)
+bool bq4847_device::nvram_read(util::read_stream& file)
 {
-	file.read(m_register, std::size(m_register));
+	size_t actual;
+	return !file.read(m_register, std::size(m_register), actual) && actual == std::size(m_register);
 }
 
-void bq4847_device::nvram_write(emu_file& file)
+bool bq4847_device::nvram_write(util::write_stream& file)
 {
-	file.write(m_register, std::size(m_register));
+	size_t actual;
+	return !file.write(m_register, std::size(m_register), actual) && actual == std::size(m_register);
 }

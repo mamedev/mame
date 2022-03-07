@@ -23,6 +23,8 @@
     CUS30 also uses the 99XX DAC, or two 99XX in the optional 16-channel
     stereo configuration, but it uses no PROM and delivers its own samples.
 
+    The CUS30 has been decapped and verified to be a ULA.
+
 ***************************************************************************/
 
 #include "emu.h"

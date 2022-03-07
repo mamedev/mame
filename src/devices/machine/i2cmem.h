@@ -57,8 +57,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read( emu_file &file ) override;
-	virtual void nvram_write( emu_file &file ) override;
+	virtual bool nvram_read( util::read_stream &file ) override;
+	virtual bool nvram_write( util::write_stream &file ) override;
 
 	// configuration helpers
 	void set_devsel_address_low(bool devsel_address_low) { m_devsel_address_low = devsel_address_low; }

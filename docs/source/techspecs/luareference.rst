@@ -1962,7 +1962,7 @@ Wraps MAME’s ``ioport_field`` class, representing a field within an I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.ioport.ports[tag]:field[mask]
+manager.machine.ioport.ports[tag]:field(mask)
     Gets a field for the given port by bit mask.
 manager.machine.ioport.ports[tag].fields[name]
     Gets a field for the given port by display name.
@@ -1974,6 +1974,9 @@ field:set_value(value)
     Set the value of the I/O port field.  For digital fields, the value is
     compared to zero to determine whether the field should be active; for
     analog fields, the value must be right-aligned and in the correct range.
+field:clear_value()
+    Clear programmatically overridden value and restore the field’s regular
+    behaviour.
 field:set_input_seq(seqtype, seq)
     Set the :ref:`input sequence <luareference-input-iptseq>` for the
     specified sequence type.  This is used to configure per-machine input
@@ -2018,9 +2021,13 @@ field.player (read-only)
 field.mask (read-only)
     Bits in the I/O port corresponding to this field.
 field.defvalue (read-only)
-    The field’s default value
+    The field’s default value.
+field.minvalue (read-only)
+    The minimum allowed value for analog fields, or ``nil`` for digital fields.
+field.maxvalue (read-only)
+    The maximum allowed value for analog fields, or ``nil`` for digital fields.
 field.sensitivity (read-only)
-    The sensitivity or gain for analog fields
+    The sensitivity or gain for analog fields, or ``nil`` for digital fields.
 field.way (read-only)
     The number of directions allowed by the restrictor plate/gate for a digital
     joystick, or zero (0) for other inputs.

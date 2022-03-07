@@ -1460,6 +1460,49 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 ROM_END
 
 
+ROM_START( crusnusa11 ) /* Version 1.1, Wed Aug 31 1994 - 18:44:40 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u6.u6", 0x800000, 0x80000, CRC(a9f915d3) SHA1(6a16a2d7a807a775673e7121b54f37c583581203) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u7.u7", 0xa00000, 0x80000, CRC(424f0bbc) SHA1(f38a431fc0fb7102c51f2d5b6f716dd4669a9822) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u8.u8", 0xc00000, 0x80000, CRC(03c28199) SHA1(393b009acd3eceb346b8fff45ae2bdf4f53d041f) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u9.u9", 0xe00000, 0x80000, CRC(24ba6371) SHA1(f60a9ff73b3645e2c8bad67e2f6debc61b5e0653) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u10.u10", 0x000000, 0x80000, CRC(44f36b34) SHA1(6180579631319b3748539c79a016e12e5543185a) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u11.u11", 0x000001, 0x80000, CRC(f0328c25) SHA1(b129f3fb4eb95c5e27119ceced1484077b2fb1f9) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u12.u12", 0x000002, 0x80000, CRC(0e529551) SHA1(30bc072cd175a6ce85f7688f7bb42bcb2ab1d672) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u13.u13", 0x000003, 0x80000, CRC(bd5fa269) SHA1(46b1f7012020e5a960cb743c92cf251de18ff94a) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u14.u14", 0x200000, 0x80000, CRC(6a4ae622) SHA1(f488e7616371125d5aef2047b8e0fc954ca4b9b4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u15.u15", 0x200001, 0x80000, CRC(1a0ad3b7) SHA1(a5300f3c789a4d9d257fda3a280e882f17f4a99f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u16.u16", 0x200002, 0x80000, CRC(799d4dd6) SHA1(f1208967544477005924f2a553037e0ffbc668ab) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u17.u17", 0x200003, 0x80000, CRC(3d68b660) SHA1(3f14e32c205a504ef39abf1e390bd8031d9d7b5b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u18.u18", 0x400000, 0x80000, CRC(9e8193fb) SHA1(ec88c2b51bb607d3181e467f8b255c13efebc73c) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u19.u19", 0x400001, 0x80000, CRC(0bf60cde) SHA1(6c63b3eacaefeb405c8fdf641437786262bcb10d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u20.u20", 0x400002, 0x80000, CRC(c07f68f0) SHA1(444ccf8e49fd9c0f707ab32347984ca5628207f9) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u21.u21", 0x400003, 0x80000, CRC(b0264aed) SHA1(d6a6eca4e4ecedfbc5590dbd06870761155ae8c5) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u22.u22", 0x600000, 0x80000, CRC(ad137193) SHA1(642a7c37940cb3b2b190661da7b1d4848c7c513d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u23.u23", 0x600001, 0x80000, CRC(842449b0) SHA1(b23ebe28ff3c6a268ff9ae1242a4392d2305396b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u24.u24", 0x600002, 0x80000, CRC(0b2275be) SHA1(3dc79095064cc158d37218c9a038b5b7a777fc66) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u25.u25", 0x600003, 0x80000, CRC(2b9fe68f) SHA1(2750613e61c1eaac629ef5b9e89fd88e99a262cc) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u26.u26", 0x800000, 0x80000, CRC(ae56b871) SHA1(1e218426084123c6c2389d96ce92691010012aa4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u27.u27", 0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u28.u28", 0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u29.u29", 0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT  NOTE: Head to Head games use a different U38 PAL */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+ROM_END
+
+
 /*
 Some Cruis'n World PCBs have mask ROMs for the data ROMs
 
@@ -2089,6 +2132,7 @@ GAMEL( 1994, crusnusa44, crusnusa, midvunit, crusnusa, midvunit_state, init_crus
 GAMEL( 1994, crusnusa41, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa11, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v1.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )

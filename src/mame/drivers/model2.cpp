@@ -3083,7 +3083,7 @@ void model2c_state::topskatr(machine_config &config)
 
 The smt ROMs are located on the CPU board and are labelled....
 OPR-14742A \
-OPR-14743A /  Linked to 315-5674
+OPR-14743A /  Linked to 315-5674 ULA
 OPR-14744    \
 OPR-14745    /  Linked to 315-5679B
 OPR-14746    \
@@ -5259,7 +5259,7 @@ ROM_START( waverunr ) /* Wave Runner Revision A (Japan), Model 2C, Sega Game ID#
 	ROM_LOAD16_WORD_SWAP("mpr-19296.34", 0x0400000, 0x400000, CRC(b4b9faff) SHA1(3a258e0f7c642d043cbab5f94dfe69fac8561e93) )
 ROM_END
 
-ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-11809 */
+ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-11809 RAIL CHASE2, ROM board ID# 834-11866 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18045a.15", 0x000000, 0x080000, CRC(bfca0314) SHA1(9eb0f2cdab8c10fda9edc0ddc439263af3903cdc) )
 	ROM_LOAD32_WORD("epr-18046a.16", 0x000002, 0x080000, CRC(0b8d3074) SHA1(fee8436399fb97ad5b8357b81e69bd5c27af1dde) )

@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "midwayic.h"
 
-#include "fileio.h"
-
 
 #define LOG_NVRAM           (0)
 
@@ -634,14 +632,16 @@ void midway_serial_pic2_device::nvram_default()
 	memcpy(m_nvram, m_default_nvram, sizeof(m_nvram));
 }
 
-void midway_serial_pic2_device::nvram_read(emu_file &file)
+bool midway_serial_pic2_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_nvram, sizeof(m_nvram));
+	size_t actual;
+	return !file.read(m_nvram, sizeof(m_nvram), actual) && actual == sizeof(m_nvram);
 }
 
-void midway_serial_pic2_device::nvram_write(emu_file &file)
+bool midway_serial_pic2_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_nvram, sizeof(m_nvram));
+	size_t actual;
+	return !file.write(m_nvram, sizeof(m_nvram), actual) && actual == sizeof(m_nvram);
 }
 
 

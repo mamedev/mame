@@ -1135,8 +1135,8 @@ void running_machine::nvram_load()
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (!file.open(nvram_filename(nvram.device())))
 		{
-			// FIXME: don't swallow errors
-			nvram.nvram_load(file);
+			if (!nvram.nvram_load(file))
+				osd_printf_error("Error reading NVRAM file %s\n", file.filename());
 			file.close();
 		}
 		else
@@ -1158,8 +1158,8 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
-				// FIXME: don't swallow errors
-				nvram.nvram_save(file);
+				if (!nvram.nvram_save(file))
+					osd_printf_error("Error writing NVRAM file %s\n", file.filename());
 				file.close();
 			}
 		}

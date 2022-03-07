@@ -202,7 +202,7 @@ static int flopconvert(int argc, char *argv[])
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Aaving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
 		return 1;
 	}
 
