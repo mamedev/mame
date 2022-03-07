@@ -13372,7 +13372,7 @@ has been replaced with an all-zero block. -->
 				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="291faf52" sha1="32b2162aa9d0da03b20d852e6d81d7dffc89c30f"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="22a3e6f7" sha1="e8578da3abb9d9c5104d39b4268b71f718cbc3ba"/>
 			</dataarea>
