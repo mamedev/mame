@@ -16,8 +16,9 @@ for Hello World are on the EVMBUG page:
 
 http://www.stuartconner.me.uk/tibug_evmbug/tibug_evmbug.htm#evmbug_example
 
-Though assembler doesn't seem to work, so hex codes have to be entered
-directly from IM ED00
+Pay close attention to "On lines where no label is to be input,
+remember to press <Space> to step over the symbol field before
+entering the instruction." e.g. a space is needed before XOP.
 
 2022-03-05 TMS9995 Breadboard System added by Chris Swan.
 
