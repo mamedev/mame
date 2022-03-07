@@ -349,6 +349,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+freedom120.cpp
 fs3216.cpp
 ft68m.cpp
 galaxy.cpp

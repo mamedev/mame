@@ -14195,6 +14195,9 @@ fp200                           //
 @source:fp6000.cpp
 fp6000                          //
 
+@source:freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
 @source:freekick.cpp
 omega                           // (c) 1986 Nihon System
 omegaa                          // (c) 1986 Nihon System
@@ -14367,6 +14370,7 @@ royalcdfr                       // (c) 1991 TAB-Austria
 royalcrd                        // (c) 1991 TAB-Austria
 royalcrd_msx                    //
 royalcrd_nes                    //
+royalcrd_nesa                   //
 royalcrda                       // (c) 1991 TAB-Austria
 royalcrdb                       // (c) 1991 TAB-Austria
 royalcrdc                       // (c) 1991 TAB-Austria
@@ -16724,6 +16728,7 @@ h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
 lilprof78                       // Texas Instruments
+liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
 mathmagi                        // APF
@@ -16731,6 +16736,7 @@ mathmarv                        // Texas Instruments
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
+merlina                         // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
 palmf31                         // Canon
@@ -16757,6 +16763,7 @@ t7in1ss                         // Tiger Electronics
 tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
+tc7atc                          // Bandai
 tcfball                         // Tandy Corporation
 tcfballa                        // Tandy Corporation
 ti1000                          // Texas Instruments
@@ -23611,6 +23618,7 @@ nbajamten                       // (c) 1995 Midway
 
 @source:midvunit.cpp
 crusnusa                        // (c) 1994 Midway
+crusnusa11                      // (c) 1994 Midway
 crusnusa21                      // (c) 1994 Midway
 crusnusa40                      // (c) 1994 Midway
 crusnusa41                      // (c) 1994 Midway
@@ -24171,6 +24179,8 @@ mps1230                         // 1988 Commodore MPS-1230 near-letter-quality d
 @source:mpu12wbk.cpp
 fruitstb                        // 199? Webak
 fruitstba                       // 1997 Webak
+fruitstbb                       // 1997 Webak
+fruitstbc                       // 1997 Webak
 
 @source:mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
@@ -33472,6 +33482,7 @@ redhawkg                        // (c) 1997
 redhawki                        // (c) 1997 Haedong Corp. license
 redhawkk                        // (c) 1997
 redhawks                        // (c) 1997 Haedong Corp. license
+redhawksa                       // (c) 1997 Haedong Corp. license
 sabotenb                        // (c) 1992 NMK / Tecmo
 sabotenba                       // (c) 1992 NMK / Tecmo
 sbsgomo                         // UPL-90062 (c) 1990 UPL
@@ -33939,6 +33950,7 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmanlai                     // bootleg
 mspacmat                        // hack
 mspacmbe                        // bootleg
 mspacmbmc                       // bootleg (Marti Colls / Falgas)
@@ -37012,6 +37024,7 @@ jst_l2                          //
 lsrcu_l2                        //
 pharo_l2                        //
 solar_l2                        //
+splbn_l0                        //
 strlt_l1                        //
 thund_p1                        //
 thund_p2                        //
@@ -41945,6 +41958,9 @@ truco                           // (c) 198? Playtronic SRL
 
 @source:trucocl.cpp
 trucocl                         // (c) 1991 Miky SRL
+
+@source:truesys.cpp
+unkts                           //
 
 @source:trvmadns.cpp
 trvmadns                        // (c) 1985 Thunderhead Inc.

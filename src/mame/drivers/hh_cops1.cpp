@@ -836,10 +836,10 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***

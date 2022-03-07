@@ -10,9 +10,9 @@ It was only briefly on the market and was quickly superceded by the
 2nd "COPS": the COP400 series.
 
 Short list of MCU types:
-- MM5781+MM5782: 2KB ROM, 160 nybbles RAM
-- MM5799: 1.5KB ROM, 96 nybbles RAM
-- MM57140: 640 bytes ROM(10 bytes inaccessible?), 55 nybbles RAM
+- MM5781+MM5782: 2KB ROM, 160 nibbles RAM
+- MM5799: 1.5KB ROM, 96 nibbles RAM
+- MM57140: 640 bytes ROM(10 bytes inaccessible?), 55 nibbles RAM
 
 Note that not every "MM57" chip is a generic MCU, there are plenty other chips,
 mostly for calculators. For example MM5780 for the Quiz Kid, the decap of that

@@ -40,10 +40,10 @@ From Pac-Mania schematics (but they show the Dragon Spirit key custom, and the
 Galaga '88 schematics are the same again, so these three should be identical)
 Custom ICs:
 ----------
-CUS27       clock divider
+CUS27       ULA clock divider
 CUS30       sound control
-CUS39       sprite generator
-CUS48       sprite address generator
+CUS39       ULA sprite generator
+CUS48       ULA sprite address generator
 CUS64       MCU (63701)
 CUS95(x5)   I/O interface
 CUS99(x2)   sound volume

@@ -163,7 +163,7 @@ protected:
 	u32 m_segment1 = 0U;
 	u32 m_segment2 = 0U;
 	u32 m_timer_count = 0U;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = 0;
 	bool m_timer_irq_active = false;
 	bool m_pia_irq_active = false;
 	u8 m_lock1 = 0U;

@@ -102,6 +102,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_watchdog(*this, "watchdog"),
 	m_read_fc(*this),
 	m_write_buserr(*this),
+	m_read_tren(*this),
+	m_write_tren(*this),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
@@ -119,6 +121,8 @@ void abc1600_mac_device::device_start()
 	// resolve callbacks
 	m_read_fc.resolve_safe(0);
 	m_write_buserr.resolve_safe();
+	m_read_tren.resolve_all_safe(0xff);
+	m_write_tren.resolve_all_safe();
 
 	// state saving
 	save_item(NAME(m_boote));
@@ -564,22 +568,29 @@ offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 //  dma_mreq_r - DMA memory read
 //-------------------------------------------------
 
-uint8_t abc1600_mac_device::dma_mreq_r(int index, offs_t offset, uint8_t data)
+uint8_t abc1600_mac_device::dma_mreq_r(int index, int dmamap, offs_t offset)
 {
 	bool rw;
-	offs_t virtual_offset = get_dma_address(index, offset, rw);
+	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
 	if (LOG_DMA) logerror("%s DMRQ R %04x:%06x %c\n", machine().describe_context(), offset, virtual_offset, rw ? 'R' : 'W');
-	
+
+	uint8_t data = 0xff;
+
 	if (rw)
 	{
-		return space().read_byte(virtual_offset);
+		data = space().read_byte(virtual_offset);
+
+		m_write_tren[index](data);
 	}
 	else
 	{
+		data = m_read_tren[index](data);
+
 		space().write_byte(virtual_offset, data);
-		return data;
 	}
+
+	return data;
 }
 
 
@@ -587,10 +598,10 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, offs_t offset, uint8_t data)
 //  dma_mreq_w - DMA memory write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_mreq_w(int index, offs_t offset, uint8_t data)
+void abc1600_mac_device::dma_mreq_w(int index, int dmamap, offs_t offset, uint8_t data)
 {
 	bool rw;
-	offs_t virtual_offset = get_dma_address(index, offset, rw);
+	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
 	if (LOG_DMA) logerror("%s DMRQ W %04x:%06x %c\n", machine().describe_context(), offset, virtual_offset, rw ? 'R' : 'W');
 
@@ -605,10 +616,10 @@ void abc1600_mac_device::dma_mreq_w(int index, offs_t offset, uint8_t data)
 //  dma_iorq_r - DMA I/O read
 //-------------------------------------------------
 
-uint8_t abc1600_mac_device::dma_iorq_r(int index, offs_t offset)
+uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 {
 	bool rw;
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset, rw);
+	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
 	if (LOG_DMA) logerror("%s DIORQ R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
@@ -620,10 +631,10 @@ uint8_t abc1600_mac_device::dma_iorq_r(int index, offs_t offset)
 //  dma_iorq_w - DMA I/O write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_iorq_w(int index, offs_t offset, uint8_t data)
+void abc1600_mac_device::dma_iorq_w(int dmamap, offs_t offset, uint8_t data)
 {
 	bool rw;
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset, rw);
+	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
 	if (LOG_DMA) logerror("%s DIORQ W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 

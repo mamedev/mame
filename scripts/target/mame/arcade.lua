@@ -5153,6 +5153,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/trucocl.cpp",
 	MAME_DIR .. "src/mame/includes/trucocl.h",
 	MAME_DIR .. "src/mame/video/trucocl.cpp",
+	MAME_DIR .. "src/mame/drivers/truesys.cpp",
 	MAME_DIR .. "src/mame/drivers/trvmadns.cpp",
 	MAME_DIR .. "src/mame/drivers/trvquest.cpp",
 	MAME_DIR .. "src/mame/drivers/ttchamp.cpp",

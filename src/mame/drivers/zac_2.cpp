@@ -5,6 +5,12 @@
 PINBALL
 Zaccaria Generation 2
 
+Status:
+- Shows all 0 then no response
+
+ToDo:
+- Make them work
+
 ****************************************************************************************************/
 
 
@@ -13,6 +19,8 @@ Zaccaria Generation 2
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
 #include "zac_2.lh"
+
+namespace {
 
 class zac_2_state : public driver_device
 {
@@ -39,14 +47,14 @@ private:
 	void zac_2_io(address_map &map);
 	void zac_2_map(address_map &map);
 
-	uint8_t m_input_line = 0U;
+	uint8_t m_row = 0U;
 	uint8_t m_t_c = 0U;
 	uint8_t m_out_offs = 0U;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<7> m_io_keyboard;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<78> m_digits;
 };
 
@@ -103,7 +111,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Factory Burn Test")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -159,19 +167,19 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP54")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP55")
+
+	PORT_START("X7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 uint8_t zac_2_state::ctrl_r()
 {
-	if (m_input_line < 7)
-		return m_io_keyboard[m_input_line]->read();
-
-	return 0xff;
+	return m_io_keyboard[m_row]->read();
 }
 
 void zac_2_state::ctrl_w(uint8_t data)
 {
-	m_input_line = data & 7;
+	m_row = data & 7;
 }
 
 void zac_2_state::data_w(uint8_t data)
@@ -188,6 +196,15 @@ READ_LINE_MEMBER( zac_2_state::serial_r )
 WRITE_LINE_MEMBER( zac_2_state::serial_w )
 {
 // to printer
+}
+
+void zac_2_state::machine_start()
+{
+	m_digits.resolve();
+
+	save_item(NAME(m_row));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_out_offs));
 }
 
 void zac_2_state::machine_reset()
@@ -1068,6 +1085,8 @@ ROM_START(zankor)
 	ROM_LOAD("zan_ic5.128", 0x4000, 0x4000, CRC(bf61aab0) SHA1(939266696d0562f255f0fa5068280fe6a4cf8267))
 	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
 ROM_END
+
+} // anonymous namespace
 
 GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL)

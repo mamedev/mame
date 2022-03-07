@@ -69484,17 +69484,17 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
         </part>
         <part name="flop1" interface="floppy_5_25">
             <dataarea name="flop" size="1265664">
-                <rom name="quest for glory disk 01.fdi" size="1265664" crc="695c079e" sha1="93195094944af1d88338c4a2ce82f9188a7f3898" offset="0" />
+                <rom name="quest for glory disk 01.fdi" size="1186816" crc="695c079e" sha1="93195094944af1d88338c4a2ce82f9188a7f3898" offset="0" />
             </dataarea>
         </part>
         <part name="flop1" interface="floppy_5_25">
             <dataarea name="flop" size="1265664">
-                <rom name="quest for glory disk 02.fdi" size="1265664" crc="b8cdbf73" sha1="d6048c691963d159ce29c9e90b0f33a60e71c29d" offset="0" />
+                <rom name="quest for glory disk 02.fdi" size="1186816" crc="b8cdbf73" sha1="d6048c691963d159ce29c9e90b0f33a60e71c29d" offset="0" />
             </dataarea>
         </part>
         <part name="flop1" interface="floppy_5_25">
             <dataarea name="flop" size="1265664">
-                <rom name="quest for glory disk 03.fdi" size="1265664" crc="10f50bfa" sha1="7aab2821b8a18ef3ec4811d6c8e50767f96f0108" offset="0" />
+                <rom name="quest for glory disk 03.fdi" size="1186816" crc="10f50bfa" sha1="7aab2821b8a18ef3ec4811d6c8e50767f96f0108" offset="0" />
             </dataarea>
         </part>
     </software>

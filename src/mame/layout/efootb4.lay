@@ -138,7 +138,7 @@ license:CC0
 	</group>
 
 
-<!-- status/score panel -->
+<!-- 7seg display -->
 
 	<group name="display2">
 		<bounds x="13" y="20.5" width="56" height="19.85" />
@@ -194,10 +194,8 @@ license:CC0
 		<element ref="static_black"><bounds x="16.2" y="48.9" width="49.6" height="23.4" /></element>
 		<group ref="display1"><bounds x="16.2" y="49" width="49.6" height="23.02374" /></group>
 
-		<collection name="Score Display">
-			<element ref="static_black"><bounds x="-0.5" y="43.4" width="1" height="1" /></element>
-			<group ref="display2"><bounds x="0" y="43.4" width="12.115" height="34.4" /><orientation rotate="270" /></group>
-		</collection>
+		<element ref="static_black"><bounds x="-0.5" y="43.4" width="1" height="1" /></element>
+		<group ref="display2"><bounds x="0" y="43.4" width="12.115" height="34.4" /><orientation rotate="270" /></group>
 	</view>
 
 </mamelayout>

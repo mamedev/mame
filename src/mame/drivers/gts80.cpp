@@ -8,7 +8,7 @@ Gottlieb System 80
 An evolution of the original system 1, again plagued by numerous problems. The R6502 and R6532 replaced the
 ancient 4-bit spider chips, but the problems of poor-quality PCBs, bad connectors and no common grounding were
 still there. Like most pinball machines, the leaky battery could destroy everything, as could an unnoticed
-stuck-on solenoid. If the machine was left on was a while, it could lock up, so a reset board (watchdog) was
+stuck-on solenoid. If the machine was left on for a while, it could lock up, so a reset board (watchdog) was
 added.
 
 Here are the key codes to enable play: (may need to hit X to start a ball)

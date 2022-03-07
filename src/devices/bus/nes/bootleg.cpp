@@ -733,7 +733,7 @@ void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
 		if (!blanked && (m_irq_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			hold_irq_line();
+			set_irq_line(ASSERT_LINE);
 			m_irq_enable = 0;
 		}
 	}
@@ -768,6 +768,7 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 			break;
 		case 0x4002:
 			m_irq_enable = 0;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x4003:
 			m_irq_enable = 1;
