@@ -41,6 +41,7 @@ public:
 	{ }
 
 	void evmbug(machine_config &config);
+	void tms9995bb(machine_config &config);
 
 protected:
 	uint8_t rs232_r(offs_t offset);
@@ -48,7 +49,8 @@ protected:
 	void kbd_put(u8 data);
 
 	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void evmbug_mem(address_map &map);
+	void tms9995bb_mem(address_map &map);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -60,27 +62,14 @@ protected:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-class tms9995bb_state : public evmbug_state
-{
-public:
-	tms9995bb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: evmbug_state(mconfig, type, tag)
-	{ }
-
-	void tms9995bb(machine_config &config);
-
-protected:
-	void mem_map(address_map &map);
-};
-
-void evmbug_state::mem_map(address_map &map)
+void evmbug_state::evmbug_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0xec00, 0xefff).ram();
 }
 
 // Breadboard system uses 32K ROM and 32K RAM
-void tms9995bb_state::mem_map(address_map &map)
+void evmbug_state::tms9995bb_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xffff).ram();
@@ -159,7 +148,7 @@ void evmbug_state::evmbug(machine_config &config)
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
 	TMS9995(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::evmbug_mem);
 	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 
 	/* video hardware */
@@ -169,10 +158,10 @@ void evmbug_state::evmbug(machine_config &config)
 	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);
 }
 
-void tms9995bb_state::tms9995bb(machine_config &config)
+void evmbug_state::tms9995bb(machine_config &config)
 {
 	evmbug(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tms9995bb_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::tms9995bb_mem);
 }
 
 /* ROM definition */
@@ -206,4 +195,4 @@ ROM_END
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY              FULLNAME              FLAGS
 COMP( 198?, evmbug,    0,         0,      evmbug,     evmbug, evmbug_state,    empty_init, "Texas Instruments", "TMAM6095",           MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 19??, tms9995bb, evmbug,    0,      tms9995bb,  evmbug, tms9995bb_state, empty_init, "Stuart Conner",     "TMS9995 breadboard", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 19??, tms9995bb, evmbug,    0,      tms9995bb,  evmbug, evmbug_state,    empty_init, "Stuart Conner",     "TMS9995 breadboard", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
