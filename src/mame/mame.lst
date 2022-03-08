@@ -39022,7 +39022,6 @@ denseib                         // bootleg
 denseib2                        // bootleg
 endless                         // bootleg
 endlessa                        // bootleg
-fatfurspb                       // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
 iron                            // bootleg
@@ -39035,6 +39034,7 @@ venom                           // bootleg
 wldgunsb                        // bootleg
 
 @source:snesb51.cpp
+fatfurspb
 mk3snes
 snes4sl
 snes4sln

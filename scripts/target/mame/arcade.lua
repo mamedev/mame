@@ -2569,8 +2569,6 @@ files {
 	MAME_DIR .. "src/mame/includes/mainevt.h",
 	MAME_DIR .. "src/mame/video/mainevt.cpp",
 	MAME_DIR .. "src/mame/drivers/megazone.cpp",
-	MAME_DIR .. "src/mame/includes/megazone.h",
-	MAME_DIR .. "src/mame/video/megazone.cpp",
 	MAME_DIR .. "src/mame/drivers/mikie.cpp",
 	MAME_DIR .. "src/mame/includes/mikie.h",
 	MAME_DIR .. "src/mame/video/mikie.cpp",
