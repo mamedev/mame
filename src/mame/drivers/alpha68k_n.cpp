@@ -759,13 +759,13 @@ void sstingray_state::sstingry(machine_config &config)
 	video_config(config, 0x40, 0, true);
 
 	// sound hardware
-	ym2203_device &ym(YM2203(config, "ym", 2000000));            // Verified from video by PCB, 24MHz/12?
+	ym2203_device &ym(YM2203(config, "ym", 2'000'000));            // Verified from video by PCB, 24MHz/12?
 	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2000000));    // Verified from video by PCB, 24MHz/12?
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2'000'000));    // Verified from video by PCB, 24MHz/12?
 	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2000000));    // Verified from video by PCB, 24MHz/12?
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2'000'000));    // Verified from video by PCB, 24MHz/12?
 	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
