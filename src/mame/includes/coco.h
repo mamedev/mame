@@ -18,7 +18,7 @@
 #include "machine/6821pia.h"
 #include "bus/coco/cococart.h"
 #include "machine/coco_vhd.h"
-#include "bus/coco/coco_dwsock.h"
+#include "bus/coco/coco/dwsock.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "sound/dac.h"
