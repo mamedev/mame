@@ -128,6 +128,7 @@ public:
 	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
 	int idx_r() { return idx; }
 	int mon_r() { return mon; }
+	int cyl_r() { return cyl; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
 

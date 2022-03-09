@@ -1648,6 +1648,8 @@ void lua_engine::initialize()
 	floppy_type["load_format"] = sol::property(&floppy_image_device::get_load_format);
 	floppy_type["identify"] = &floppy_image_device::identify;
 	floppy_type["setup_write"] = &floppy_image_device::setup_write;
+	floppy_type["motor_on"] = sol::property([](floppy_image_device &floppy) { return floppy.mon_r() == 0; });
+	floppy_type["cylinder"] = sol::property(&floppy_image_device::cyl_r);
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
