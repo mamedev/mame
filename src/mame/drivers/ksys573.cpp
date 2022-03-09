@@ -114,7 +114,7 @@ P Hyper Bishi Bashi Champ                       1998.07    GC876 EA          (no
 P Hyper Bishi Bashi Champ - 2 Player            1999.08    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
 P *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
-? *Kick & Kick                                  2001
+K *Kick & Kick                                  2001       GNA36 EA          (no CD)
 P Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
 P Konami 80's AC Special                        1998       GC826 UA          826 UA A01
 D *Mambo a GoGo                                 2001.06
@@ -125,10 +125,11 @@ P Salary Man Champ - 2 Player                   2001.02    GCA18 JA          A18
 P *Step Champ                                   1999.12
 
 P: plain System573
-A: uses ext. analog I/O board
-D: uses ext. digital sound and I/O board
-N: uses network PCB unit + ext. digital sound and I/O board
+A: uses ext. analog I/O board GX700-PWB(F)
+D: uses ext. digital sound and I/O board GX894-PWB(B)
+N: uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
 G: gun mania only, drives air soft gun (this game uses real BB bullet)
+K: uses alt. ext. analog I/O board GX700-PWB(K)
 
   Note:
        Not all games listed above are confirmed to run on System 573.
@@ -5931,6 +5932,30 @@ ROM_START( strgchmp )
 	ROM_LOAD( "710uaa.22h",   0x000000, 0x002000, CRC(a3e93d49) SHA1(630daa1a02320433a068eb5214f6b30acc06df76) )
 ROM_END
 
+ROM_START( kicknkick )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31m",   0x000000, 0x200000, CRC(f7461ee1) SHA1(60898894237ef2c478eb91c1d11e0f2beda7d55c) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27m",   0x000000, 0x200000, CRC(80379c73) SHA1(9e226c258570efc6c45b76b277010c23527ce480) )
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31l",   0x000000, 0x200000, CRC(a1129729) SHA1(50b8134b2fd6fd82ad1e95db39633f1e338174ea) )
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27l",   0x000000, 0x200000, CRC(8f489306) SHA1(d5a27ed048139fd46404cb11e5d42a813989e0ab) )
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31j",   0x000000, 0x200000, CRC(4608ab06) SHA1(033e30f0a866bcedd9b718d234e788c8919f7f3a) )
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27j",   0x000000, 0x200000, CRC(1f75eb84) SHA1(c54c4221a2fa0668b688ec2479abf1838461493a) )
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31h",   0x000000, 0x200000, CRC(6475da5f) SHA1(6b1de2ed06504583bfa3e5b11851c459d227e6d8) )
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27h",   0x000000, 0x200000, CRC(1179ab7b) SHA1(19a316cacb6eb87b905884091820e6b53aef64b7) )
+
+	ROM_REGION( 0x002000, "m48t58", 0 )
+	ROM_LOAD( "a36eaa.22h",   0x000000, 0x002000, CRC(d193e1b6) SHA1(e201c7fdce08d512a9a5dd429b35db907f557c03) )
+ROM_END
+
 
 GAME( 1997, sys573,    0,        konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
 
@@ -6047,6 +6072,7 @@ GAME( 2001, pcnfrk4mk, pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_ini
 GAME( 2001, drmn4m,    pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 4th Mix (G*A25 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk5m,  sys573,   gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, kicknkick, sys573,   konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "Kick & Kick (GNA36 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, mamboagg,  sys573,   mamboagg,   mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, mamboagga, mamboagg, mamboagga,  mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go e-Amusement (GQA40 VER. JRB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
