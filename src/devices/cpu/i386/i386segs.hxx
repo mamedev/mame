@@ -2479,7 +2479,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 inline void i386_device::dri_changed()
 {
 	int dr;
-	if(!(m_dr[7] & 0xff)) return;
+
 	for(dr = 0; dr < 4; dr++)
 	{
 		m_dr_breakpoints[dr].remove();
@@ -2490,7 +2490,7 @@ inline void i386_device::dri_changed()
 			int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
 			uint32_t phys_addr = m_dr[dr];
 			uint32_t error;
-			phys_addr = translate_address(m_CPL, TRANSLATE_READ, &phys_addr, &error);
+			phys_addr = (m_cr[0] & ( 1<<31 )) ? translate_address(m_CPL, TRANSLATE_READ, &m_dr[dr], &error) : m_dr[dr];
 			phys_addr &= ~3; // According to CUP386, data breakpoints are only reliable on dword-aligned addresses, so align this to a dword.
 			uint32_t true_mask = 0;
 			switch(breakpoint_length)
@@ -2510,7 +2510,7 @@ inline void i386_device::dri_changed()
 				if(true_mask & mem_mask)
 				{
 					m_dr[6] |= 1 << dr;
-					i386_trap(1,0,0);
+					i386_trap(1,1,0);
 				}
 			}, &m_dr_breakpoints[dr]);
 			else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + 3, "i386_debug_readwrite_breakpoint",
@@ -2519,7 +2519,7 @@ inline void i386_device::dri_changed()
 				if(true_mask & mem_mask)
 				{
 					m_dr[6] |= 1 << dr;
-					i386_trap(1,0,0);
+					i386_trap(1,1,0);
 				}
 			},
 			[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
@@ -2527,7 +2527,7 @@ inline void i386_device::dri_changed()
 				if(true_mask & mem_mask)
 				{
 					m_dr[6] |= 1 << dr;
-					i386_trap(1,0,0);
+					i386_trap(1,1,0);
 				}
 			}, &m_dr_breakpoints[dr]);
 		}
