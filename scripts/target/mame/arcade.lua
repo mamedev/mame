@@ -1877,8 +1877,6 @@ files {
 	MAME_DIR .. "src/mame/includes/dynax.h",
 	MAME_DIR .. "src/mame/video/dynax.cpp",
 	MAME_DIR .. "src/mame/drivers/hnayayoi.cpp",
-	MAME_DIR .. "src/mame/includes/hnayayoi.h",
-	MAME_DIR .. "src/mame/video/hnayayoi.cpp",
 	MAME_DIR .. "src/mame/drivers/realbrk.cpp",
 	MAME_DIR .. "src/mame/includes/realbrk.h",
 	MAME_DIR .. "src/mame/video/realbrk.cpp",
