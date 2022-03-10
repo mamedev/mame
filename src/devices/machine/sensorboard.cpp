@@ -59,8 +59,6 @@ sensor state instead.
 #include "emu.h"
 #include "machine/sensorboard.h"
 
-#include "fileio.h"
-
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")
 
@@ -217,15 +215,17 @@ void sensorboard_device::nvram_default()
 	m_custom_init_cb(1);
 }
 
-void sensorboard_device::nvram_read(emu_file &file)
+bool sensorboard_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_curstate, sizeof(m_curstate));
+	size_t actual;
+	return !file.read(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
 }
 
-void sensorboard_device::nvram_write(emu_file &file)
+bool sensorboard_device::nvram_write(util::write_stream &file)
 {
 	// save last board position
-	file.write(m_curstate, sizeof(m_curstate));
+	size_t actual;
+	return !file.write(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
 }
 
 bool sensorboard_device::nvram_can_write()

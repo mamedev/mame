@@ -1272,6 +1272,7 @@ punchy                          //
 punchy3                         //
 usafootb                        //
 usafootba                       //
+usafootf                        //
 wrldtour                        //
 wrldtour2                       //
 wrldtour3                       //
@@ -10018,6 +10019,7 @@ capbowl4                        // (c) 1989 Incredible Technologies
 clbowl                          // (c) 1989 Incredible Technologies
 
 @source:capcom.cpp
+abv105                          //
 abv106                          //
 abv106r                         //
 bbb108                          //
@@ -10797,6 +10799,9 @@ concept                         // 1982 Corvus Concept
 
 @source:conic_cchess2.cpp
 cncchess2
+
+@source:conic_cchess3.cpp
+cncchess3
 
 @source:consola_emt.cpp
 consoemt                        //
@@ -14191,6 +14196,9 @@ fp200                           //
 @source:fp6000.cpp
 fp6000                          //
 
+@source:freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
 @source:freekick.cpp
 omega                           // (c) 1986 Nihon System
 omegaa                          // (c) 1986 Nihon System
@@ -14363,6 +14371,7 @@ royalcdfr                       // (c) 1991 TAB-Austria
 royalcrd                        // (c) 1991 TAB-Austria
 royalcrd_msx                    //
 royalcrd_nes                    //
+royalcrd_nesa                   //
 royalcrda                       // (c) 1991 TAB-Austria
 royalcrdb                       // (c) 1991 TAB-Austria
 royalcrdc                       // (c) 1991 TAB-Austria
@@ -14930,7 +14939,8 @@ gamekin3                        //
 gameking                        //
 
 @source:gamemachine.cpp
-2001tgm                         //
+gamemach                        //
+v4in1eg                         //
 
 @source:gamemasters.cpp
 gmsshoot                        // (c) 1989 GameMasters
@@ -16668,7 +16678,6 @@ vespovar                        // Elektronika
 vfutbol                         // Elektronika
 
 @source:hh_tms1k.cpp
-7in1ss                          // Tiger Electronics
 alphie                          // Playskool
 arcmania                        // Milton Bradley
 arrball                         // A-One LSI
@@ -16720,6 +16729,7 @@ h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
 lilprof78                       // Texas Instruments
+liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
 mathmagi                        // APF
@@ -16727,6 +16737,7 @@ mathmarv                        // Texas Instruments
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
+merlina                         // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
 palmf31                         // Canon
@@ -16748,9 +16759,12 @@ starwbcp                        // Kenner (patent)
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
 subwars                         // Tiger Electronics
+t3in1sa                         // Tandy Corporation
+t7in1ss                         // Tiger Electronics
 tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
+tc7atc                          // Bandai
 tcfball                         // Tandy Corporation
 tcfballa                        // Tandy Corporation
 ti1000                          // Texas Instruments
@@ -17593,6 +17607,7 @@ pokrdice                        // (c) 1991 Strata/Incredible Technologies
 rimrockn                        // (c) 1991 Strata/Incredible Technologies
 rimrockn12                      // (c) 1991 Strata/Incredible Technologies
 rimrockn12b                     // bootleg
+rimrockn15                      // (c) 1991 Strata/Incredible Technologies
 rimrockn16                      // (c) 1991 Strata/Incredible Technologies
 rimrockn20                      // (c) 1991 Strata/Incredible Technologies
 slikshot                        // (c) 1990 Grand Products/Incredible Technologies
@@ -19832,6 +19847,7 @@ hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
 jppyex98                        // 1998 - Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)
+kicknkick                       // 2001 - Kick & Kick (GNA36 VER. EAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -20632,6 +20648,7 @@ glxplay2                        //
 kidnap                          //
 mac_1808                        //
 macgalxy                        //
+macgalxyb                       // (c) 1986 MAC S.A.
 macjungl                        //
 macjungn                        //
 nbamac                          //
@@ -23603,6 +23620,7 @@ nbajamten                       // (c) 1995 Midway
 
 @source:midvunit.cpp
 crusnusa                        // (c) 1994 Midway
+crusnusa11                      // (c) 1994 Midway
 crusnusa21                      // (c) 1994 Midway
 crusnusa40                      // (c) 1994 Midway
 crusnusa41                      // (c) 1994 Midway
@@ -23957,6 +23975,7 @@ desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
 doab                            // 1996.12 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
+doaab                           // 1996.11 Dead or Alive (Revision A)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -24163,6 +24182,8 @@ mps1230                         // 1988 Commodore MPS-1230 near-letter-quality d
 @source:mpu12wbk.cpp
 fruitstb                        // 199? Webak
 fruitstba                       // 1997 Webak
+fruitstbb                       // 1997 Webak
+fruitstbc                       // 1997 Webak
 
 @source:mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
@@ -33464,6 +33485,7 @@ redhawkg                        // (c) 1997
 redhawki                        // (c) 1997 Haedong Corp. license
 redhawkk                        // (c) 1997
 redhawks                        // (c) 1997 Haedong Corp. license
+redhawksa                       // (c) 1997 Haedong Corp. license
 sabotenb                        // (c) 1992 NMK / Tecmo
 sabotenba                       // (c) 1992 NMK / Tecmo
 sbsgomo                         // UPL-90062 (c) 1990 UPL
@@ -33931,6 +33953,7 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmanlai                     // bootleg
 mspacmat                        // hack
 mspacmbe                        // bootleg
 mspacmbmc                       // bootleg (Marti Colls / Falgas)
@@ -37004,6 +37027,7 @@ jst_l2                          //
 lsrcu_l2                        //
 pharo_l2                        //
 solar_l2                        //
+splbn_l0                        //
 strlt_l1                        //
 thund_p1                        //
 thund_p2                        //
@@ -39001,7 +39025,6 @@ denseib                         // bootleg
 denseib2                        // bootleg
 endless                         // bootleg
 endlessa                        // bootleg
-fatfurspb                       // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
 iron                            // bootleg
@@ -39014,6 +39037,7 @@ venom                           // bootleg
 wldgunsb                        // bootleg
 
 @source:snesb51.cpp
+fatfurspb
 mk3snes
 snes4sl
 snes4sln
@@ -41177,6 +41201,7 @@ amazont                         // (c) 1986
 boobhack                        // bootleg
 horekid                         // (c) 1987
 horekidb                        // bootleg
+horekidb2                       // bootleg
 terracre                        // (c) 1985
 terracrea                       // (c) 1985
 terracren                       // (c) 1985
@@ -41936,6 +41961,9 @@ truco                           // (c) 198? Playtronic SRL
 
 @source:trucocl.cpp
 trucocl                         // (c) 1991 Miky SRL
+
+@source:truesys.cpp
+unkts                           //
 
 @source:trvmadns.cpp
 trvmadns                        // (c) 1985 Thunderhead Inc.
@@ -44385,6 +44413,7 @@ simpr8210                       // Pioneer PR-8210
 
 @source:gsz80.cpp
 gsz80                           // Grant Searle's Simple Z-80 Machine
+rc2014mini                      // RC2014 Mini
 
 @source:gscpm.cpp
 gscpm                           // Grant Searle's Simple CP/M Machine

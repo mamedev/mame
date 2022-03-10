@@ -400,8 +400,8 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			{
 			case 0x0: util::stream_format(stream, "MOVM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
 			case 0x1: util::stream_format(stream, "CMPM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
-			case 0x2: util::stream_format(stream, "INSS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
-			case 0x3: util::stream_format(stream, "EXTS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
+			case 0x2: util::stream_format(stream, "INSS%c   %s, %s, %d, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, (imm & 31) + 1); break;
+			case 0x3: util::stream_format(stream, "EXTS%c   %s, %s, %d, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, (imm & 31) + 1); break;
 			case 0x4: util::stream_format(stream, "MOVXBW  %s, %s", mode[0].mode, mode[1].mode); break;
 			case 0x5: util::stream_format(stream, "MOVZBW  %s, %s", mode[0].mode, mode[1].mode); break;
 			case 0x6: util::stream_format(stream, "MOVZ%cD  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;

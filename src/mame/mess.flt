@@ -199,6 +199,7 @@ comx35.cpp
 concept.cpp
 conchess.cpp
 conic_cchess2.cpp
+conic_cchess3.cpp
 consola_emt.cpp
 controlid.cpp
 cortex.cpp
@@ -348,6 +349,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+freedom120.cpp
 fs3216.cpp
 ft68m.cpp
 galaxy.cpp

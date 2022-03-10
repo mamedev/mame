@@ -73,9 +73,6 @@ ToDo:
 
 - Z80-based sound board for hexagone and sahalove.
 
-- Outputs to lamps and to optional solenoids.
-
-
 *****************************************************************************************************/
 
 
@@ -86,6 +83,7 @@ ToDo:
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
 #include "audio/gottlieb.h"
+#include "sound/beep.h"
 #include "speaker.h"
 #include "gts1.lh"
 
@@ -104,13 +102,16 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_dips(*this, "DSW%u", 0U)
 		, m_switches(*this, "X%u", 0U)
-		, m_r0_sound(*this, "r0sound")
+		, m_p1_sound(*this, "beeper")
+		, m_p2_sound(*this, "p2sound")
 		, m_digit8(*this, "digit8_%u", 0U)
 		, m_digit7(*this, "digit7_%u", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void gts1(machine_config &config);
-	void gts1s(machine_config &config);
+	void p0(machine_config &config); // chimes
+	void p1(machine_config &config); // ne555 tones
+	void p2(machine_config &config); // multi-mode sound card
 
 private:
 	u8 gts1_solenoid_r(offs_t offset);
@@ -118,6 +119,7 @@ private:
 	u8 gts1_switches_r(offs_t offset);
 	void gts1_switches_w(offs_t offset, u8 data);
 	void gts1_display_w(offs_t offset, u8 data);
+	u16 seg8to14(u16 data);
 	u8 gts1_lamp_apm_r(offs_t offset);
 	void gts1_lamp_apm_w(offs_t offset, u8 data);
 	u8 gts1_nvram_r(offs_t offset);
@@ -138,17 +140,21 @@ private:
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_dips;
 	required_ioport_array<7> m_switches;
-	optional_device<gottlieb_sound_r0_device> m_r0_sound;
+	optional_device<beep_device> m_p1_sound;
+	optional_device<gottlieb_sound_p2_device> m_p2_sound;
 	output_finder<32> m_digit8; // digits 0-5,8-13,16-21,24-29
 	output_finder<32> m_digit7; // digits 6,7,14,15 on repurposed digital clock display
+	output_finder<44> m_io_outputs; // 8 solenoids + 36 lamps
 
-	u8 m_strobe = 0;             //!< switches strobe lines (5 lower bits used)
-	u8 m_nvram_addr = 0xff;         //!< NVRAM address
-	u8 m_nvram_data = 0;
-	bool m_nvram_e2 = 0;            //!< NVRWAM enable (E2 line)
-	bool m_nvram_wr = 0;            //!< NVRWAM write (W/R line)
-	u16 m_6351_addr = 0;         //!< ROM MM6351 address (12 bits)
-	u8 m_z30_out = 0;           //!< 4-to-16 decoder outputs
+	u8 m_strobe = 0U;             //!< switches strobe lines (5 lower bits used)
+	u8 m_nvram_addr = 0xffU;      //!< NVRAM address
+	u8 m_nvram_data = 0U;
+	bool m_nvram_e2 = 0;          //!< NVRWAM enable (E2 line)
+	bool m_nvram_wr = 0;          //!< NVRWAM write (W/R line)
+	u16 m_6351_addr = 0U;         //!< ROM MM6351 address (12 bits)
+	u8 m_z30_out = 0U;            //!< 4-to-16 decoder outputs
+	u8 m_lamp_data = 0U;
+	u8 m_snd_save = 0U;
 };
 
 void gts1_state::gts1_map(address_map &map)
@@ -165,8 +171,8 @@ void gts1_state::gts1_data(address_map &map)
 void gts1_state::gts1_io(address_map &map)
 {
 	map(0x20, 0x2f).rw("u5", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U5) switch matrix
-	map(0x30, 0x3f).rw("u3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U3) solenoid + dips
-	map(0x40, 0x4f).rw("u4", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U4) solenoid
+	map(0x30, 0x3f).rw("u3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U3) lamps, display, dips
+	map(0x40, 0x4f).rw("u4", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U4) solenoids, nvram control
 	map(0x60, 0x6f).rw("u2", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U2) NVRAM io chip
 	map(0xd0, 0xdf).rw("u6", FUNC(r10788_device::io_r), FUNC(r10788_device::io_w)); // (U6) display chip
 }
@@ -377,10 +383,9 @@ INPUT_PORTS_END
 
 void gts1_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digit8.resolve();
 	m_digit7.resolve();
+	m_io_outputs.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_nvram_addr));
@@ -389,19 +394,21 @@ void gts1_state::machine_start()
 	save_item(NAME(m_nvram_wr));
 	save_item(NAME(m_6351_addr));
 	save_item(NAME(m_z30_out));
+	save_item(NAME(m_lamp_data));
+	save_item(NAME(m_snd_save));
 }
 
 void gts1_state::machine_reset()
 {
-	genpin_class::machine_reset();
-
 	m_strobe = 0;
 	m_nvram_addr = 0xff;
 	m_nvram_data = 0;
 	m_nvram_e2 = false;
 	m_nvram_wr = false;
 	m_6351_addr = 0x3ff;
-	m_z30_out = 0;
+	m_z30_out = 0U;
+	m_lamp_data = 0U;
+	m_snd_save = 0U;
 }
 
 u8 gts1_state::gts1_solenoid_r(offs_t offset) // does nothing
@@ -425,15 +432,36 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 			m_samples->start(0, 6);
 		break;
 	case  2:  // tens chime
-		if (!m_r0_sound && data)
+		m_snd_save = data ? (m_snd_save | 4) : (m_snd_save & 0xfb);
+		if (m_p1_sound)
+		{
+			m_p1_sound->set_clock(593);
+			m_p1_sound->set_state(data);
+		}
+		else
+		if (!m_p2_sound && data)
 			m_samples->start(3, 3);
 		break;
 	case  3:  // hundreds chime
-		if (!m_r0_sound && data)
+		m_snd_save = data ? (m_snd_save | 2) : (m_snd_save & 0xfd);
+		if (m_p1_sound)
+		{
+			m_p1_sound->set_clock(265);
+			m_p1_sound->set_state(data);
+		}
+		else
+		if (!m_p2_sound && data)
 			m_samples->start(2, 2);
 		break;
 	case  4:  // thousands chime
-		if (!m_r0_sound && data)
+		m_snd_save = data ? (m_snd_save | 1) : (m_snd_save & 0xfe);
+		if (m_p1_sound)
+		{
+			m_p1_sound->set_clock(153);
+			m_p1_sound->set_state(data);
+		}
+		else
+		if (!m_p2_sound && data)
 			m_samples->start(1, 1);
 		break;
 	case  5:  // optional per machine
@@ -457,8 +485,11 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 	case 15:    // spare
 		break;
 	}
-	if (m_r0_sound && data)
-		m_r0_sound->write(offset);
+	if (m_p2_sound)
+		m_p2_sound->write(m_snd_save);
+
+	if (offset < 8)
+		m_io_outputs[offset] = data;
 }
 
 u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are working; can't go in-game to try the others **********
@@ -485,6 +516,12 @@ void gts1_state::gts1_switches_w(offs_t offset, u8 data) // WORKS
 			m_strobe &= ~(1<<offset);
 		//LOG("%s: strobe is now[%x], data was %x\n", __FUNCTION__, m_strobe, data);
 	}
+}
+
+u16 gts1_state::seg8to14(u16 data)
+{
+	// convert custom 8seg digit to MAME 14seg digit
+	return bitswap<10>(data,7,7,6,6,5,4,3,2,1,0);
 }
 
 /**
@@ -534,8 +571,8 @@ void gts1_state::gts1_display_w(offs_t offset, u8 data) // WORKS
 	// LOG("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b);
 	if ((offset % 8) < 6)
 	{
-		m_digit8[offset] = a;
-		m_digit8[offset + 16] = b;
+		m_digit8[offset] = seg8to14(a);
+		m_digit8[offset + 16] = seg8to14(b);
 	}
 	else
 	{
@@ -639,13 +676,27 @@ u8 gts1_state::gts1_lamp_apm_r(offs_t offset) // Think this works - dips seem to
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips, not sure about the PM address. Lamps to be done. ***********
+void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips, not sure about the PM address. ***********
 {
 	switch (offset) {
-		case 0: // LD1-LD4 on jumper J5 // lamps - TODO *********
+		case 0: // LD1-LD4 on jumper J5
+			m_lamp_data = data & 15;
 			break;
-		case 1: // Z30 1-of-16 decoder  // lamps - TODO *********
+		case 1: // Z30 1-of-16 decoder
 			m_z30_out = ~data & 15;
+			if (m_z30_out == 1)
+			{
+				if (m_p2_sound)
+				{
+					// Sound card has inputs from tilt and game over relays
+					m_snd_save = BIT(m_lamp_data, 0) ? (m_snd_save | 0x40) : (m_snd_save & 0xbf);
+					m_snd_save = BIT(m_lamp_data, 1) ? (m_snd_save | 0x08) : (m_snd_save & 0xf7);
+					m_p2_sound->write(m_snd_save);
+				}
+			}
+			if ((m_z30_out >= 1) && (m_z30_out <= 9))
+				for (u8 i = 0; i < 4; i++)
+					m_io_outputs[4+m_z30_out*4+i] = BIT(m_lamp_data, i);
 			break;
 		case 2: // O9: PGOL PROM A8, O10: PGOL PROM A9
 			m_6351_addr = (m_6351_addr & 0xff) | ((data & 3) << 8);
@@ -672,7 +723,7 @@ void gts1_state::gts1_do_w(u8 data)
 }
 
 
-void gts1_state::gts1(machine_config & config)
+void gts1_state::p0(machine_config & config)
 {
 	/* basic machine hardware */
 	PPS4_2(config, m_maincpu, XTAL(3'579'545));  // divided by 18 in the CPU
@@ -717,11 +768,18 @@ void gts1_state::gts1(machine_config & config)
 	genpin_audio(config);
 }
 
-void gts1_state::gts1s(machine_config &config)
+void gts1_state::p1(machine_config &config)
 {
-	gts1(config);
-	SPEAKER(config, "speaker").front_center();
-	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	p0(config);
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_p1_sound, 387).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void gts1_state::p2(machine_config &config)
+{
+	p0(config);
+	SPEAKER(config, "mono").front_center();
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -746,7 +804,7 @@ ROM_START(astannie)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("442.cpu",   0x0000, 0x0400, CRC(579521e0) SHA1(b1b19473e1ca3373955ee96104b87f586c4c311c))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("442.snd", 0x0400, 0x0400, CRC(c70195b4) SHA1(ff06197f07111d6a4b8942dcfe8d2279bda6f281))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -761,7 +819,7 @@ ROM_START(buckrgrs)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("437.cpu",   0x0000, 0x0400, CRC(e57d9278) SHA1(dfc4ebff1e14b9a074468671a8e5ac7948d5b352))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("437.snd", 0x0400, 0x0400, CRC(732b5a27) SHA1(7860ea54e75152246c3ac3205122d750b243b40c))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -825,7 +883,7 @@ ROM_START(geniep)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("435.cpu",   0x0000, 0x0400, CRC(7749fd92) SHA1(9cd3e799842392e3939877bf295759c27f199e58))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("435.snd", 0x0400, 0x0400, CRC(4a98ceed) SHA1(f1d7548e03107033c39953ee04b043b5301dbb47))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -882,7 +940,7 @@ ROM_START(roldisco)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("440.cpu",   0x0000, 0x0400, CRC(bc50631f) SHA1(6aa3124d09fc4e369d087a5ad6dd1737ace55e41))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("440.snd", 0x0400, 0x0400, CRC(4a0a05ae) SHA1(88f21b5638494d8e78dc0b6b7d69873b76b5f75d))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -944,7 +1002,7 @@ ROM_START(hulk)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("433.cpu",   0x0000, 0x0400, CRC(c05d2b52) SHA1(393fe063b029246317c90ee384db95a84d61dbb7))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("433.snd", 0x0400, 0x0400, CRC(20cd1dff) SHA1(93e7c47ff7051c3c0dc9f8f95aa33ba094e7cf25))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -959,7 +1017,7 @@ ROM_START(torch)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("438.cpu",   0x0000, 0x0400, CRC(2d396a64) SHA1(38a1862771500faa471071db08dfbadc6e8759e8))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("438.snd", 0x0400, 0x0400, CRC(a9619b48) SHA1(1906bc1b059bf31082e3b4546f5a30159479ad3c))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -974,7 +1032,7 @@ ROM_START(totem)
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("429.cpu",   0x0000, 0x0400, CRC(7885a384) SHA1(1770662af7d48ad8297097a9877c5c497119978d))
 
-	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("429.snd", 0x0400, 0x0400, CRC(5d1b7ed4) SHA1(4a584f880e907fb21da78f3b3a0617f20599688f))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
@@ -992,32 +1050,32 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1977,  gts1,     0,      gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(19??,  sys1test, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 // chimes
-GAME(1977,  cleoptra, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbad,   gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbadn,  sinbad, gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  jokrpokr, gts1,   gts1,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  dragon,   gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  solaride, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  countdwn, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  dragon,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  solaride, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  countdwn, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL)
 
 // NE555 beeper
-GAME(1978,  closeenc, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  charlies, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  pinpool,  gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL)
 
 // sound card
-GAME(1979,  totem,    gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  hulk,     gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  geniep,   gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  buckrgrs, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  torch,    gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  roldisco, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  astannie, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  hulk,     gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  geniep,   gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  buckrgrs, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  torch,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  roldisco, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  astannie, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
 
 // homebrew
-GAME(1984,  sahalove, sinbad, gts1,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
-GAME(1986,  hexagone, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  sahalove, sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
+GAME(1986,  hexagone, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)

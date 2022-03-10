@@ -135,7 +135,6 @@
 #include "mcs51dasm.h"
 
 #include "debugger.h"
-#include "fileio.h"
 
 #define VERBOSE 0
 
@@ -2553,16 +2552,24 @@ void ds5002fp_device::nvram_default()
 	}
 }
 
-void ds5002fp_device::nvram_read( emu_file &file )
+bool ds5002fp_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_scratchpad, 0x80 );
-	file.read( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.read( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.read( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
-void ds5002fp_device::nvram_write( emu_file &file )
+bool ds5002fp_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_scratchpad, 0x80 );
-	file.write( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.write( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.write( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
 std::unique_ptr<util::disasm_interface> mcs51_cpu_device::create_disassembler()

@@ -58,6 +58,7 @@ public:
 	void yosakdon(machine_config &config);
 	void polaris(machine_config &config);
 	void attackfc(machine_config &config);
+	void attackfcu(machine_config &config);
 	void astropal(machine_config &config);
 	void rollingc(machine_config &config);
 	void vortex(machine_config &config);
@@ -239,6 +240,7 @@ private:
 
 	void astropal_io_map(address_map &map);
 	void attackfc_io_map(address_map &map);
+	void attackfcu_io_map(address_map &map);
 	void ballbomb_io_map(address_map &map);
 	void claybust_io_map(address_map &map);
 	void cosmicmo_io_map(address_map &map);

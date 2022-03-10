@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="0.5" green="0.05" blue="0.075" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+
+<!-- led matrix -->
+
+	<group name="display1">
+		<bounds x="0" y="0" width="25" height="13" />
+
+		<repeat count="5">
+			<param name="y" start="0" increment="3" />
+			<param name="i1" start="7" increment="-1" />
+
+			<repeat count="9">
+				<param name="x" start="0" increment="3" />
+				<param name="i2" start="0" increment="1" />
+				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+	</group>
+
+
+<!-- 7seg leds -->
+
+	<group name="display2">
+		<bounds x="0" y="0" width="10" height="3" />
+
+		<element name="digit9" ref="digit"><bounds x="0" y="0" width="2" height="3" /></element>
+		<element name="digit8" ref="digit"><bounds x="2" y="0" width="2" height="3" /></element>
+		<element name="digit1" ref="digit"><bounds x="6" y="0" width="2" height="3" /></element>
+		<element name="digit0" ref="digit"><bounds x="8" y="0" width="2" height="3" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="4" right="25" top="-2" bottom="27" />
+
+		<group ref="display1"><bounds x="10" y="0" width="13" height="25" /><orientation rotate="270" /></group>
+		<group ref="display2"><bounds x="6" y="9" width="2" height="7" /><orientation rotate="270" /></group>
+
+		<element name="0.8" ref="led"><bounds x="6.8" y="18.33" width="0.33" height="0.33" /></element>
+		<element name="1.8" ref="led"><bounds x="6.8" y="6.33" width="0.33" height="0.33" /></element>
+	</view>
+</mamelayout>

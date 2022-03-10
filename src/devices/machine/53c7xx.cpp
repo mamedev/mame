@@ -23,10 +23,10 @@
 //  DEBUGGERY
 //**************************************************************************
 
-#define LOG_UNHANDLED       (1U << 0)
-#define LOG_HOST            (1U << 1)
-#define LOG_STATE           (1U << 2)
-#define LOG_SCRIPTS         (1U << 3)
+#define LOG_UNHANDLED       (1U << 1)
+#define LOG_HOST            (1U << 2)
+#define LOG_STATE           (1U << 3)
+#define LOG_SCRIPTS         (1U << 4)
 #define VERBOSE             (0)
 
 #include "logmacro.h"
@@ -1735,7 +1735,7 @@ void ncr53c7xx_device::tc_int()
 //  disassemble_scripts -
 //-------------------------------------------------
 
-const char* ncr53c7xx_device::disassemble_scripts()
+std::string ncr53c7xx_device::disassemble_scripts()
 {
 	static char const *const phases[] =
 	{
@@ -1749,14 +1749,13 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		"Message In"
 	};
 
-	static char buffer[64];
-	char opstring[64];
+	std::string opstring;
 
 	switch ((m_dcmd >> 6) & 3)
 	{
 		case 0:
 		{
-			sprintf(opstring, "BMOV: %s [%x] %d bytes\n", phases[m_dcmd & 7], m_dnad, m_dbc);
+			opstring = util::string_format("BMOV: %s [%x] %d bytes\n", phases[m_dcmd & 7], m_dnad, m_dbc);
 			break;
 		}
 		case 1:
@@ -1773,7 +1772,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 				"ILLEGAL",
 			};
 
-			sprintf(opstring, "IO: %s (%x)\n", ops[(m_dcmd >> 3) & 7], m_dnad);
+			opstring = util::string_format("IO: %s (%x)\n", ops[(m_dcmd >> 3) & 7], m_dnad);
 			break;
 		}
 		case 2:
@@ -1790,17 +1789,15 @@ const char* ncr53c7xx_device::disassemble_scripts()
 				"ILLEGAL",
 			};
 
-			sprintf(opstring, "TC: %s %c (%s) (%x)\n", ops[(m_dcmd >> 3) & 7], m_dbc & (1 << 19) ? 'T' : 'F', phases[m_dcmd & 7], m_dnad);
+			opstring = util::string_format("TC: %s %c (%s) (%x)\n", ops[(m_dcmd >> 3) & 7], m_dbc & (1 << 19) ? 'T' : 'F', phases[m_dcmd & 7], m_dnad);
 			break;
 		}
 		case 3:
 		{
-			sprintf(opstring, "ILLEGAL");
+			opstring = "ILLEGAL";
 			break;
 		}
 	}
 
-	sprintf(buffer, "SCRIPTS [%08x]: %s", m_dsp - 8, opstring);
-
-	return buffer;
+	return util::string_format("SCRIPTS [%08x]: %s", m_dsp - 8, opstring);
 }

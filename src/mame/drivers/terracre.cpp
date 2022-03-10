@@ -143,6 +143,16 @@ void terracre_state::amazon_base_map(address_map &map)
 	map(0x070000, 0x070003).noprw(); // protection (nop for bootlegs)
 }
 
+void terracre_state::horekidb2_map(address_map &map) // weirdly, this bootleg inverts the order of the inputs
+{
+	amazon_base_map(map);
+
+	map(0x044000, 0x044001).portr("IN3");
+	map(0x044002, 0x044003).portr("IN2");
+	map(0x044004, 0x044005).portr("IN1");
+	map(0x044006, 0x044007).portr("IN0");
+}
+
 void amazon_state::amazon_1412m2_map(address_map &map)
 {
 	amazon_base_map(map);
@@ -399,6 +409,15 @@ static INPUT_PORTS_START( horekid )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( horekidb2 ) 
+	PORT_INCLUDE(horekid)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
+INPUT_PORTS_END
+
+
 static const gfx_layout char_layout =
 {
 	8,8,
@@ -516,6 +535,11 @@ void amazon_state::amazon_1412m2(machine_config &config)
 	NB1412M2(config, m_prot, XTAL(16'000'000)/4); // divided by 4 maybe
 }
 
+void terracre_state::horekidb2(machine_config &config)
+{
+	amazon_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &terracre_state::horekidb2_map);
+}
 
 /**************************************
 
@@ -535,7 +559,7 @@ ROM_START( terracre )
 	ROM_LOAD16_BYTE( "2.6b",    0x10001, 0x8000, CRC(539352f2) SHA1(b960f75d12ebdcd6781a073a66b8e503a8f55186) )
 	ROM_LOAD16_BYTE( "4.6d",    0x10000, 0x8000, CRC(19387586) SHA1(76473493d173efde83ded52ad721d2c532f590e2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )// Z80 code (sound) on BK-2 PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 )// Z80 code (sound) on BK-2 PCB, with intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
@@ -568,7 +592,7 @@ ROM_START( terracre )
 	ROM_LOAD( "12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on BK-2 PCB
 ROM_END
 
-ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitches in the music when the ship appears
+ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
 	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
 	ROM_LOAD16_BYTE( "5.4d",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
@@ -579,7 +603,7 @@ ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitch
 	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
 	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB, with intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
@@ -612,7 +636,8 @@ ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitch
 	ROM_LOAD( "tc1412.12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on TC-2A PCB
 ROM_END
 
-// probably newest TC-1A/2A board ROM-set for YM3526 version as this fixes a glitch in the music when the ship appears
+// probably newest TC-1A/2A board ROM-set for YM3526 version
+// for unknown reasons, intro fill-in in the main theme had been removed
 ROM_START( terracrea ) // older pcb TC-1A & TC-2A, the only difference is one sound rom
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
 	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
@@ -624,7 +649,7 @@ ROM_START( terracrea ) // older pcb TC-1A & TC-2A, the only difference is one so
 	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
 	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB, without intro fill-in in the main theme
 	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
 	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(9e9b3808) SHA1(7b6f8d2b75f063aa81711a7c2bf1563cc38eee8b) )
 	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
@@ -897,6 +922,48 @@ ROM_START( horekidb )
 	ROM_LOAD( "horekid.17", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
+ROM_START( horekidb2 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code, first 2 ROMs different
+	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x8000, CRC(2df0e086) SHA1(7179486431e9b5566ea0549a1854e00193afcabf) )
+	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x8000, CRC(af9cdd7e) SHA1(8b93a67f8c50ade025332eee0c98f9752acb5c72) )
+	ROM_LOAD16_BYTE( "6.bin", 0x10000, 0x8000, CRC(375c0c50) SHA1(ee040dbdfe6673cf48f143518458609b21b4e15d) )
+	ROM_LOAD16_BYTE( "2.bin", 0x10001, 0x8000, CRC(ee7d52bb) SHA1(b9083f672a6bc37ec2bbb9af081e6f27b712b663) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code, identical to the original if you ignore the first, 0xff filled, half
+	ROM_LOAD( "11b.bin", 0x0000, 0x4000, CRC(3b85e6ef) SHA1(8f7926b3c6fd7999e9d8e643bcd36311f7965cdf) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(        0x0000, 0x4000 )
+	ROM_LOAD( "12b.bin", 0x4000, 0x4000, CRC(b3a27456) SHA1(835be300df31b7121d558e9095ef093b0476615d) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(        0x4000, 0x4000 )
+	ROM_LOAD( "13b.bin", 0x8000, 0x4000, CRC(78631a6c) SHA1(24b43d8d86c53990d6d781830f49ce28d69eef02) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(        0x8000, 0x4000 )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // alphanumerics, believed , identical to the original
+	ROM_LOAD( "18.bin",     0x0000, 0x2000, BAD_DUMP CRC(23a1d180) SHA1(daf212e7b82f8ec65265f0ee6b05ba4c78cfa379) )
+	ROM_LOAD( "horekid.16", 0x0000, 0x2000, CRC(104b77cc) SHA1(f875c7fe4f2b540bc44fa144a449a01268011431) ) // Given the rest of the GFX ROMs match horekid we'll assume this does too, for now
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) // tiles, identical to the original
+	ROM_LOAD( "9.bin",  0x00000, 0x8000, CRC(da25ae10) SHA1(83d8b78cff85854b497b40525ec3c93a84ba6248) )
+	ROM_LOAD( "10.bin", 0x08000, 0x8000, CRC(616e4321) SHA1(5bf0e0a7290b6bcb5dfbb1070eeb683830e6916b) )
+	ROM_LOAD( "11.bin", 0x10000, 0x8000, CRC(8c7d2be2) SHA1(efd70997126fc7c2622546fabe69cb222dca87f9) )
+	ROM_LOAD( "12.bin", 0x18000, 0x8000, CRC(a0066b02) SHA1(d6437932028e937dab5728f40d6d09b6afe9a903) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) // sprites, identical to the original
+	ROM_LOAD( "14b.bin", 0x00000, 0x8000, CRC(a3caa07a) SHA1(4baa7d1867dbaa8bace43416040114129f5405d6) )
+	ROM_LOAD( "15b.bin", 0x08000, 0x8000, CRC(0e48ff8e) SHA1(5a3025991378ed3f9bdc2d420b1432332278178b) )
+	ROM_LOAD( "16b.bin", 0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
+	ROM_LOAD( "17b.bin", 0x18000, 0x8000, CRC(51105741) SHA1(01c3bb2c03ce1ca959d62d64be3a019e74f677ba) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) // red
+	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) // green
+	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) // blue
+	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) // clut
+
+	ROM_REGION( 0x0100, "user1", 0 ) // not dumped for this set
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) // ctable
+ROM_END
+
+
 /* This is not the REAL Booby Kids (early Japanese version of Kid no Hore Hore Daisakusen),
   it is a bootleg that was manufactureed in Italy which became popular in Europe.  The bootleggers
   probably called it 'Booby Kids' because this is the name under which the game was known on home systems
@@ -942,18 +1009,19 @@ ROM_END
 
 
 
-//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    STATE,                 INIT,        MONITOR, COMPANY,      FULLNAME, FLAGS
-GAME( 1985, terracre, 0,        ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracreo,terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE, INPUT,    STATE,                 INIT,       MONITOR, COMPANY,      FULLNAME, FLAGS
+GAME( 1985, terracre,  0,        ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracreo, terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracrea, terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracren, terracre, ym2203,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
 
 // later HW: supports 1412M2 device, see also mightguy.cpp
-GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amazont,  amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu (Tecfri license)", "Soldier Girl Amazon (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,    0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazont,   amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu (Tecfri license)", "Soldier Girl Amazon (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amatelas,  amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekid,   0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
-GAME( 1987, horekidb, horekid,  amazon_base,    horekid,  terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, boobhack, horekid,  amazon_base,    horekid,  terracre_state, empty_init, ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekidb,  horekid,  amazon_base,    horekid,   terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekidb2, horekid,  horekidb2,      horekidb2, terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, boobhack,  horekid,  amazon_base,    horekid,   terracre_state, empty_init, ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )

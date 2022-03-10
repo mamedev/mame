@@ -603,6 +603,8 @@ if (BUSES["BBC_JOYPORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.h",
 		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.h",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/mouse.h",
 	}
 end
 

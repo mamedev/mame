@@ -49,14 +49,16 @@ Status:
 - All pinball machines are playable
 
 ToDo:
-- Checkpoint: no sound
-- TMNT: no sound
-- Batman: music missing
 - Cut the Cheese: screen goes blank after a short while
 - Test fixture: nothing to see
 
 *********************************************************************************************************************/
 #include "emu.h"
+
+#include "cpu/m6809/m6809.h"
+#include "sound/msm5205.h"
+#include "sound/ymopm.h"
+#include "speaker.h"
 
 #include "audio/decobsmt.h"
 #include "machine/decopincpu.h"
@@ -72,13 +74,19 @@ class de_3_state : public genpin_class
 public:
 	de_3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
+		, m_ym2151(*this, "ym2151")
+		, m_audiocpu(*this, "audiocpu")
+		, m_msm5205(*this, "msm5205")
+		, m_sample_bank(*this, "sample_bank")
 		, m_dmdtype1(*this, "decodmd1")
 		, m_dmdtype2(*this, "decodmd2")
 		, m_dmdtype3(*this, "decodmd3")
 		, m_decobsmt(*this, "decobsmt")
+		, m_sound1(*this, "sound1")
 		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
+	void de_3_dmdo(machine_config &config);
 	void de_3_dmd1(machine_config &config);
 	void de_3_dmd2(machine_config &config);
 	void detest(machine_config &config);
@@ -90,6 +98,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void de_bg_audio(machine_config &config);
+	void audio_map(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	uint8_t sound_latch_r();
+	void sample_bank_w(uint8_t data);
+	void sample_w(uint8_t data);
+	uint8_t m_sample_data = 0U;
+	uint8_t m_sound_data = 0U;
+	bool m_more_data = 0;
+	bool m_nmi_enable = 0;
+
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
 	void pia2c_pa_w(uint8_t data);
@@ -109,16 +129,33 @@ private:
 	void de_3(machine_config &config);
 
 	// devices
+	optional_device<ym2151_device> m_ym2151;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm5205;
+	optional_memory_bank m_sample_bank;
 	optional_device<decodmd_type1_device> m_dmdtype1;
 	optional_device<decodmd_type2_device> m_dmdtype2;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 	optional_device<decobsmt_device> m_decobsmt;
+	optional_memory_region m_sound1;
 	required_ioport_array<8> m_io_keyboard;
 
 	uint8_t m_row = 0U;
 	u16 m_sol = 0U;
 };
 
+void de_3_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2400, 0x2400).r(FUNC(de_3_state::sound_latch_r));
+	map(0x2800, 0x2800).w(FUNC(de_3_state::sample_bank_w));
+	// 0x2c00        - 4052(?)
+	map(0x3000, 0x3000).w(FUNC(de_3_state::sample_w));
+	// 0x3800        - Watchdog reset
+	map(0x4000, 0x7fff).bankr("sample_bank");
+	map(0x8000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( de3 )
 	PORT_START("X0")
@@ -205,8 +242,16 @@ INPUT_PORTS_END
 // 6821 PIA at 0x2000
 void de_3_state::sound_w(uint8_t data)
 {
-	if(data != 0xfe)
-		m_decobsmt->bsmt_comms_w(data);
+	if (m_decobsmt)
+	{
+		if(data != 0xfe)
+			m_decobsmt->bsmt_comms_w(data);
+	}
+	if (m_sound1)
+	{
+		m_sound_data = data;
+		m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	}
 }
 
 // 6821 PIA at 0x2400
@@ -371,6 +416,48 @@ void de_3_state::lamps_w(offs_t offset, uint8_t data)
 	}
 }
 
+WRITE_LINE_MEMBER(de_3_state::ym2151_irq_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
+}
+
+WRITE_LINE_MEMBER(de_3_state::msm5205_irq_w)
+{
+	m_msm5205->data_w(m_sample_data >> 4);
+	if(m_more_data)
+	{
+		if(m_nmi_enable)
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // generate NMI when we need more data
+		m_more_data = false;
+	}
+	else
+	{
+		m_more_data = true;
+		m_sample_data <<= 4;
+	}
+}
+
+// Sound board
+void de_3_state::sample_w(uint8_t data)
+{
+	m_sample_data = data;
+}
+
+uint8_t de_3_state::sound_latch_r()
+{
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	return m_sound_data;
+}
+
+void de_3_state::sample_bank_w(uint8_t data)
+{
+	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
+
+	m_sample_bank->set_entry(data & 15);
+	m_nmi_enable = !BIT(data, 7);
+	m_msm5205->playmode_w(prescale[BIT(data, 4, 2)]);
+	m_msm5205->reset_w(BIT(data, 6));
+}
 
 void de_3_state::machine_start()
 {
@@ -378,11 +465,42 @@ void de_3_state::machine_start()
 
 	save_item(NAME(m_row));
 	save_item(NAME(m_sol));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sample_data));
+	save_item(NAME(m_more_data));
+
+	if (m_sound1)
+	{
+		uint8_t *const ROM = m_sound1->base();
+		m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
+		m_sample_bank->set_entry(0);
+	}
 }
 
 void de_3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
+	if (m_sound1)
+		m_sample_bank->set_entry(0);
+}
+
+void de_3_state::de_bg_audio(machine_config &config)
+{
+	/* sound CPU */
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_3_state::audio_map);
+
+	SPEAKER(config, "bg").front_center();
+
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(de_3_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.40);
+
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_3_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.90);
 }
 
 void de_3_state::de_3(machine_config &config)
@@ -399,20 +517,27 @@ void de_3_state::de_3(machine_config &config)
 	decocpu.dmdstatus_read_callback().set(FUNC(de_3_state::dmd_status_r));
 
 	genpin_audio(config);
-
-	DECOBSMT(config, m_decobsmt, 0);
 }
 
 void de_3_state::de_3_dmd2(machine_config &config)
 {
 	de_3(config);
 	DECODMD2(config, m_dmdtype2, 0, "dmdcpu");
+	DECOBSMT(config, m_decobsmt, 0);
 }
 
 void de_3_state::de_3_dmd1(machine_config &config)
 {
 	de_3(config);
 	DECODMD1(config, m_dmdtype1, 0, "dmdcpu");
+	DECOBSMT(config, m_decobsmt, 0);
+}
+
+void de_3_state::de_3_dmdo(machine_config &config)
+{
+	de_3(config);
+	DECODMD1(config, m_dmdtype1, 0, "dmdcpu");
+	de_bg_audio(config);
 }
 
 void de_3_state::de_3b(machine_config &config)
@@ -430,12 +555,11 @@ void de_3_state::de_3b(machine_config &config)
 
 	genpin_audio(config);
 
+	DECODMD3(config, m_dmdtype3, 0, "dmdcpu");
+
 	/* sound hardware */
 	DECOBSMT(config, m_decobsmt, 0);
-
-	DECODMD3(config, m_dmdtype3, 0, "dmdcpu");
 }
-
 
 void de_3_state::detest(machine_config &config)
 {
@@ -514,7 +638,7 @@ ROM_START(btmn_106)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103)
@@ -527,7 +651,7 @@ ROM_START(btmn_103)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103f)
@@ -540,7 +664,7 @@ ROM_START(btmn_103f)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103g)
@@ -553,7 +677,7 @@ ROM_START(btmn_103g)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_101)
@@ -566,7 +690,7 @@ ROM_START(btmn_101)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 /*------------------------------------------------------------
@@ -579,9 +703,9 @@ ROM_START(ckpt_a17)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("chkpntds.512", 0x00000, 0x10000, CRC(14d9c6d6) SHA1(5470a4ebe7bc4a056f75aa1fffe3a4e3e24457c6))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("chkpntf7.rom", 0x8000, 0x8000, CRC(e6f6d716) SHA1(a034eb94acb174f7dbe192a55cfd00715ca85a75))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("chkpntf6.rom", 0x00000, 0x20000, CRC(2d08043e) SHA1(476c9945354e733bfc9a854760ca8cfa3bc62294))
 	ROM_LOAD("chkpntf5.rom", 0x20000, 0x20000, CRC(167daa2c) SHA1(458781726c73a09da2b8e8313e1d359cb795a744))
 ROM_END
@@ -1253,9 +1377,9 @@ ROM_START(tmnt_104)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1267,9 +1391,9 @@ ROM_START(tmnt_104g)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1281,9 +1405,9 @@ ROM_START(tmnt_103)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1295,9 +1419,9 @@ ROM_START(tmnt_101)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdspa.103", 0x00000, 0x10000, CRC(d52a7d49) SHA1(9249aafe272a052d19f1dd461708e8152516f79f))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1826,7 +1950,7 @@ GAME(1991,  btmn_103,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT
 GAME(1991,  btmn_103f,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (France 1.03, display F1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // BATMAN FRANCE 1.03. DISP VER: BATMAN F1.03
 GAME(1991,  btmn_103g,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (Germany 1.03, display G1.04)",                                     MACHINE_IS_SKELETON_MECHANICAL) // BATMAN GERMANY 1.03. DISP VER: BATMAN G1.04
 GAME(1991,  btmn_101,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.01, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.01
-GAME(1991,  ckpt_a17,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL) // CP80 3/6/91
+GAME(1991,  ckpt_a17,      0,        de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL) // CP80 3/6/91
 GAME(1994,  gnr_300,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 3.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 USA CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
 GAME(1994,  gnr_300f,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (French 3.00, display F3.00)",                                MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 FRENCH CPU 3.00. DISPLAY VERSION- GNR F3.00 AUGUST 16, 1994
 GAME(1994,  gnr_300d,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (Dutch 3.00, display A3.00)",                                 MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 DUTCH CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
@@ -1878,10 +2002,10 @@ GAME(1993,  tftc_302,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT
 GAME(1993,  tftc_300,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.00, display A3.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 15, 1993 USA CPU 3.00. DISPLAY VERSION- CRYPT A3.00 12/16/1993
 GAME(1993,  tftc_200,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 2.00, display A2.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 03, 1993 USA CPU 2.00. DISPLAY VERSION- CRYPT A2.00 12/3/1993
 GAME(1993,  tftc_104s,     tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 1.04, display L1.03)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC NOVEMBER 19, 1993 USA CPU 1.04. DISPLAY VERSION- CRYPT L1.03 11/11/1993
-GAME(1991,  tmnt_104,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
-GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. GERMANY 1.04.
-GAME(1991,  tmnt_103,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.03
-GAME(1991,  tmnt_101,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.01
+GAME(1991,  tmnt_104,      0,        de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
+GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. GERMANY 1.04.
+GAME(1991,  tmnt_103,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.03
+GAME(1991,  tmnt_101,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.01
 GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
 GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
 GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994

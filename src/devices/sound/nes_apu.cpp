@@ -408,7 +408,6 @@ static inline void apu_dpcmreset(apu_t::dpcm_t *chan)
 	chan->bits_left = chan->length << 3;
 	chan->irq_occurred = false;
 	chan->enabled = true; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
-	chan->vol = 0; /* Fixed * DPCM DAC resets itself when restarted */
 }
 
 /* OUTPUT DPCM WAVE SAMPLE (VALUES FROM 0 to +127) */
@@ -435,7 +434,6 @@ void nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 			if (!chan->length)
 			{
 				chan->enabled = false; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
-				chan->vol = 0; /* Fixed * DPCM DAC resets itself when restarted */
 				if (chan->regs[0] & 0x40)
 					apu_dpcmreset(chan);
 				else

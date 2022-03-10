@@ -31,8 +31,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="2.5" right="33.5" top="5.7" bottom="40.3" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_green"><bounds x="5" y="5" width="25" height="35" /></element>
 
 		<!-- middle -->
@@ -89,45 +88,44 @@ license:CC0
 		<element ref="static_black"><bounds x="3" y="1.6" width="30" height="4" /></element>
 		<element ref="static_black"><bounds x="3" y="40.4" width="30" height="4" /></element>
 
-	<!-- leds -->
-
-		<element name="0.0" ref="led"><bounds x="15" y="7.5" width="1" height="1" /></element>
+		<!-- leds -->
+		<element name="0.2" ref="led"><bounds x="15" y="7.5" width="1" height="1" /></element>
 		<element name="0.1" ref="led"><bounds x="17.5" y="7.5" width="1" height="1" /></element>
-		<element name="0.2" ref="led"><bounds x="20" y="7.5" width="1" height="1" /></element>
+		<element name="0.0" ref="led"><bounds x="20" y="7.5" width="1" height="1" /></element>
 
-		<element name="1.0" ref="led"><bounds x="10" y="10" width="1" height="1" /></element>
-		<element name="1.1" ref="led"><bounds x="15" y="10" width="1" height="1" /></element>
-		<element name="1.2" ref="led"><bounds x="20" y="10" width="1" height="1" /></element>
-		<element name="1.3" ref="led"><bounds x="25" y="10" width="1" height="1" /></element>
+		<element name="1.3" ref="led"><bounds x="10" y="10" width="1" height="1" /></element>
+		<element name="1.2" ref="led"><bounds x="15" y="10" width="1" height="1" /></element>
+		<element name="1.1" ref="led"><bounds x="20" y="10" width="1" height="1" /></element>
+		<element name="1.0" ref="led"><bounds x="25" y="10" width="1" height="1" /></element>
 
-		<element name="2.0" ref="led"><bounds x="10" y="15" width="1" height="1" /></element>
-		<element name="2.1" ref="led"><bounds x="15" y="15" width="1" height="1" /></element>
-		<element name="2.2" ref="led"><bounds x="20" y="15" width="1" height="1" /></element>
-		<element name="2.3" ref="led"><bounds x="25" y="15" width="1" height="1" /></element>
+		<element name="2.3" ref="led"><bounds x="10" y="15" width="1" height="1" /></element>
+		<element name="2.2" ref="led"><bounds x="15" y="15" width="1" height="1" /></element>
+		<element name="2.1" ref="led"><bounds x="20" y="15" width="1" height="1" /></element>
+		<element name="2.0" ref="led"><bounds x="25" y="15" width="1" height="1" /></element>
 
-		<element name="3.0" ref="led"><bounds x="10" y="20" width="1" height="1" /></element>
-		<element name="3.1" ref="led"><bounds x="15" y="20" width="1" height="1" /></element>
-		<element name="3.2" ref="led"><bounds x="20" y="20" width="1" height="1" /></element>
-		<element name="3.3" ref="led"><bounds x="25" y="20" width="1" height="1" /></element>
+		<element name="3.3" ref="led"><bounds x="10" y="20" width="1" height="1" /></element>
+		<element name="3.2" ref="led"><bounds x="15" y="20" width="1" height="1" /></element>
+		<element name="3.1" ref="led"><bounds x="20" y="20" width="1" height="1" /></element>
+		<element name="3.0" ref="led"><bounds x="25" y="20" width="1" height="1" /></element>
 
-		<element name="4.0" ref="led"><bounds x="10" y="25" width="1" height="1" /></element>
-		<element name="4.1" ref="led"><bounds x="15" y="25" width="1" height="1" /></element>
-		<element name="4.2" ref="led"><bounds x="20" y="25" width="1" height="1" /></element>
-		<element name="4.3" ref="led"><bounds x="25" y="25" width="1" height="1" /></element>
+		<element name="4.3" ref="led"><bounds x="10" y="25" width="1" height="1" /></element>
+		<element name="4.2" ref="led"><bounds x="15" y="25" width="1" height="1" /></element>
+		<element name="4.1" ref="led"><bounds x="20" y="25" width="1" height="1" /></element>
+		<element name="4.0" ref="led"><bounds x="25" y="25" width="1" height="1" /></element>
 
-		<element name="5.0" ref="led"><bounds x="10" y="30" width="1" height="1" /></element>
-		<element name="5.1" ref="led"><bounds x="15" y="30" width="1" height="1" /></element>
-		<element name="5.2" ref="led"><bounds x="20" y="30" width="1" height="1" /></element>
-		<element name="5.3" ref="led"><bounds x="25" y="30" width="1" height="1" /></element>
+		<element name="5.3" ref="led"><bounds x="10" y="30" width="1" height="1" /></element>
+		<element name="5.2" ref="led"><bounds x="15" y="30" width="1" height="1" /></element>
+		<element name="5.1" ref="led"><bounds x="20" y="30" width="1" height="1" /></element>
+		<element name="5.0" ref="led"><bounds x="25" y="30" width="1" height="1" /></element>
 
-		<element name="6.0" ref="led"><bounds x="10" y="35" width="1" height="1" /></element>
-		<element name="6.1" ref="led"><bounds x="15" y="35" width="1" height="1" /></element>
-		<element name="6.2" ref="led"><bounds x="20" y="35" width="1" height="1" /></element>
-		<element name="6.3" ref="led"><bounds x="25" y="35" width="1" height="1" /></element>
+		<element name="6.3" ref="led"><bounds x="10" y="35" width="1" height="1" /></element>
+		<element name="6.2" ref="led"><bounds x="15" y="35" width="1" height="1" /></element>
+		<element name="6.1" ref="led"><bounds x="20" y="35" width="1" height="1" /></element>
+		<element name="6.0" ref="led"><bounds x="25" y="35" width="1" height="1" /></element>
 
-		<element name="7.0" ref="led"><bounds x="15" y="37.5" width="1" height="1" /></element>
+		<element name="7.2" ref="led"><bounds x="15" y="37.5" width="1" height="1" /></element>
 		<element name="7.1" ref="led"><bounds x="17.5" y="37.5" width="1" height="1" /></element>
-		<element name="7.2" ref="led"><bounds x="20" y="37.5" width="1" height="1" /></element>
+		<element name="7.0" ref="led"><bounds x="20" y="37.5" width="1" height="1" /></element>
 
 		<element name="digit8" ref="digit"><bounds x="30.5" y="20" width="2" height="3" /></element>
 		<element ref="text_score"><bounds x="30" y="23.2" width="3" height="0.8" /></element>

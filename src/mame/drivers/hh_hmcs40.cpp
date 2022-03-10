@@ -449,7 +449,7 @@ u8 bmboxing_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P2 side *                                       * right = P1 side *
 
@@ -3774,7 +3774,7 @@ u8 mwcbaseb_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
         (visitor team side)                                       (home team side)
     COMP PITCH                     [SCORE]       [INNING]
@@ -4527,8 +4527,8 @@ CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_in
 CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 

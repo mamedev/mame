@@ -4,10 +4,92 @@
 
 This driver contains several Konami 68000 based games. For the most part they
 run on incompatible boards, but since 90% of the work is done by the custom
-ICs emulated in video/konamiic.c, we can just as well keep them all
+ICs emulated in video/k0*.cpp, we can just as well keep them all
 together.
 
 driver by Nicola Salmoria
+
+***************************************************************************
+
+Teenage Mutant Ninja Turtles, Konami, 1989
+Hardware info by Guru
+
+PCB Layout
+----------
+
+GX963
+PWB351853A
+|------------------------------------------------------------------|
+|  MB3731         963A25.D5                 963A17.H4    963A15.K4 |
+|     VOL                                                          |
+|                                           963A18.H6    963A16.K6 |
+|                                 963A30.G7                        |
+|   007341                                 |--------|   |--------| |
+|   007341 4066                MCM2018     |KONAMI  |   |KONAMI  | |
+|          4066     640kHz                 |051960  |   |051937  | |
+|                           3.579545MHz    |        |   |        | |
+|      LM358  Y3014   |-------------|      |--------|   |--------| |
+|J  C324              |   007232    |                              |
+|A         963A26.C13 |-------------| 963E20.G13     007644 007644 |
+|M        C324        007340  007340           MB8464     MB8464   |
+|M  LM358      640kHz               D780C-1  963X21.J15  963X22.K15|
+|A         D7759C      MB8416                963X23.I17  963X24.K17|
+|                                           |-------------------|  |
+|          963A27.D18  YM2151     24MHz     |      68000        |  |
+|   051550                   963A31.G19     |-------------------|  |
+|                                                                  |
+|   052535(X3)                             |--------|   |--------| |
+|   005273(X10)               MCM2018      |KONAMI  |   |KONAMI  | |
+|                             MCM2018      |052109  |   |051962  | |
+|  CN4                                     |        |   |        | |
+|  CN3                                     |--------|   |--------| |
+|                                MB8464                            |
+|DIPSW1 DIPSW2 DIPSW3            MB8464     963A28.H27   963A29.K27|
+|------------------------------------------------------------------|
+Notes:
+       68000 - Motorola MC68000P8 CPU. Clock input 8.000MHz [24/3]
+     D780C-1 - NEC D780C-1 Z80-compatible CPU. Clock input 3.579545MHz
+      D7759C - NEC uPD7759C ADPCM Speech Synthesizer. Clock input 640kHz on pin 23
+      YM2151 - Yamaha YM2151 FM Operator Type-M (OPM) sound chip. Clock input 3.579545MHz
+       LM358 - Motorola LM358 Dual Operational Amplifier
+       Y3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 320kHz [640/2] on pin 5
+        C324 - NEC uPC324 Quad Operational Amplifier (equivalent to LM324)
+      MB8464 - Fujitsu MB8464 8kBx8-bit SRAM
+     MCM2018 - Motorola MCM2018 2kBx8-bit SRAM
+      MB8416 - Fujitsu MB8416 2kBx8-bit SRAM
+      051550 - Custom ceramic module providing coin counter drivers, watchdog timer and master reset signal
+      MB3731 - Fujitsu MB3731 Audio Power Amplifier
+         VOL - 5K-ohm volume pot
+        4066 - Oki M4066 Quad Bilateral Switch
+      007340 - Konami custom resistor array pack
+      007341 - Konami custom resistor array pack
+      052535 - Konami custom resistor array pack
+      005273 - Konami custom resistor array pack
+      007232 - Konami custom PCM Controller/Sample Player. Clock input 3.579545MHz on pin 51
+      052109 - Konami custom Tilemap Generator \
+      051962 - Konami custom Tilemap Generator / paired together
+      051960 - Konami custom Sprite Generator \
+      051937 - Konami custom Sprite Generator / paired together
+      007644 - Konami custom (unknown purpose) DIP22 400mil-wide IC
+  963A27.D18 - 1Mbit 28-pin mask ROM (uPD7759 samples)
+  963A26.C13 - 1Mbit 28-pin mask ROM (007232 PCM samples)
+   963A25.D5 - 4Mbit 40-pin mask ROM (title theme sample for uPD7759)
+  963E20.G13 - 32kBx8-bit (27256) OTP EPROM (Z80 program)
+   963A17.H4 \
+   963A15.K4  \
+   963A18.H6  / 4Mbit 40-pin mask ROM (sprite data)
+   963A16.K6 /
+  963A28.H27 \
+  963A29.K27 / 4Mbit 40-pin mask ROM (tile data)
+  963A31.G19 - AMD27S21 Bi-polar PROM (priority encoder)
+   963A30.G7 - AMD27S21 Bi-polar PROM (sprite address decoder)
+    DIPDW1/2 - 8-position DIP switch
+      DIPSW3 - 4-position DIP switch
+       CN3/4 - 15-position connector for player 3 & 4 controls
+       HSync - 14.9626kHz
+       VSync - 59.1846Hz
+
+***************************************************************************
 
 Notes:
 - Golfing Greats has a peculiar way to know where the ball is laying: the

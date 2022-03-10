@@ -8,47 +8,39 @@ Gottlieb System 80
 An evolution of the original system 1, again plagued by numerous problems. The R6502 and R6532 replaced the
 ancient 4-bit spider chips, but the problems of poor-quality PCBs, bad connectors and no common grounding were
 still there. Like most pinball machines, the leaky battery could destroy everything, as could an unnoticed
-stuck-on solenoid. If the machine was left on was a while, it could lock up, so a reset board (watchdog) was
+stuck-on solenoid. If the machine was left on for a while, it could lock up, so a reset board (watchdog) was
 added.
 
 Here are the key codes to enable play: (may need to hit X to start a ball)
 
-Game                     NUM  Start game                            End ball
---------------------------------------------------------------------------------------------------
-Panthera                 652  1                                     X
-Le Grand 8               ---  1                                     X
-The Amazing Spider-man   653  1                                     X
-Circus                   654  1                                     X
-Counterforce             656  1                                     X
-Star Race                657  1                                     X
-James Bond               658  1                                     X
-Timeline                 659  1                                     X
-Force II                 661  1 then PgDn and Down                  Down then PgDn
-Pink Panther             664  1 then PgDn and Down                  PgDn
-Mars God of War          666  1 them Home and \                     Home then \ (wait for flash or match)
-Volcano                  667  1 then M=                             M then = (wait for flash or match)
-Black Hole               668  1 then R (wait for score to flash)    L then R (wait for flash or match)
-Haunted House            669  1                                     X
-Eclipse                  671  1 then RW                             X
+Game                              NUM  Start game                            End ball
+-------------------------------------------------------------------------------------------------------------
+Panthera                          652  1                                     X
+Le Grand 8 (Panthera conversion)  ---  1                                     X
+The Amazing Spider-man            653  1                                     X
+Circus                            654  1                                     X
+Counterforce                      656  1                                     X
+Star Race                         657  1                                     X
+James Bond                        658  1                                     X
+Timeline                          659  1                                     X
+Force II                          661  1 then PgDn and Down                  Down then PgDn
+Pink Panther                      664  1 then PgDn and Down                  PgDn
+Mars God of War                   666  1 them Home and \                     Home then \ (wait for flash or match)
+Volcano                           667  1 then M=                             M then = (wait for flash or match)
+Black Hole                        668  1 then R (wait for score to flash)    L then R (wait for flash or match)
+Haunted House                     669  1                                     X
+Eclipse                           671  1 then RW                             X
 
 Status:
-- Machines boot up, coins can be inserted, and a game begun.
-
-Notes:
-- Jamesb is a timed game and appears to be never-ending.
-- Haunted House uses the R1 sound card which doesn't have anything for save-states. If the game has save-state
-  support, it will fatal-error at start.
+- All machines are playable but read notes below.
+- jamesb is a timed game
+- If 'tones' is selected, sound might not work.
 
 
 ToDO:
-- Sounds are mostly not correct. The games only seem to use 2 or 3 sounds each.
-- The Sound & Speech board has extra control lines (Sound16 and Sound32). Sound16 comes from a lamp output,
-  while Sound32 hasn't been tracked down yet.
-- Mars, Pink Panther: Sound board CPU runs into the weeds
+- Mars (all versions): no sound, audio cpu runs into the weeds
+- Volcano (all versions): Unstable, certain inputs will freeze the machine (E for example)
 - Grand8: Z80-based sound board
-- None of the "talking" machines talk.
-
-
 
 ************************************************************************************************************/
 
@@ -73,16 +65,16 @@ public:
 		, m_riot3(*this, "riot3")
 		, m_io_dips(*this, "DSW%d", 0U)
 		, m_io_keyboard(*this, "X%d", 0U)
-		, m_r0_sound(*this, "r0sound")
+		, m_p2_sound(*this, "p2sound")
 		, m_r1_sound(*this, "r1sound")
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void gts80(machine_config &config);
-	void gts80_ss(machine_config &config);
-	void gts80_s(machine_config &config);
-	void gts80_hh(machine_config &config);
+	void p0(machine_config &config);  // no sound card
+	void p2(machine_config &config);  // multi-mode card
+	void r1v(machine_config &config); // r1 with votrax
+	void r1(machine_config &config);  // r1
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 private:
@@ -108,9 +100,9 @@ private:
 	required_device<riot6532_device> m_riot3;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
-	optional_device<gottlieb_sound_r0_device> m_r0_sound;
+	optional_device<gottlieb_sound_p2_device> m_p2_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
-	output_finder<56> m_digits;
+	output_finder<76> m_digits;
 	output_finder<57> m_io_outputs;   // 8 solenoids, 1 outhole, 48 lamps
 };
 
@@ -364,7 +356,9 @@ void gts80_state::port2a_w(u8 data)
 			break;
 		case 0x40: // credits & balls
 			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			m_digits[(data & 15)+40] = patterns[m_segment & 15];
+			m_digits[(data & 15)+60] = patterns[m_segment & 15];
+			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
+			m_digits[(data & 15)+40] = seg2;
 			break;
 	}
 }
@@ -386,8 +380,8 @@ void gts80_state::port3a_w(u8 data)
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board
-	if (m_r0_sound)
-		m_r0_sound->write(sndcmd);
+	if (m_p2_sound)
+		m_p2_sound->write(sndcmd | 0x40);
 	else
 	if (m_r1_sound)
 		m_r1_sound->write(sndcmd | m_soundex);
@@ -475,13 +469,12 @@ void gts80_state::port3b_w(u8 data)
 	if (m_lamprow && (m_lamprow < 13))
 		for (u8 i = 0; i < 4; i++)
 			m_io_outputs[m_lamprow*4+i+5] = BIT(data, i);
-	m_soundex = m_io_outputs[18] << 4;   // Sound16 line (there's a Sound32 line, but haven't found its source)
+	m_soundex = m_io_outputs[18] << 4;   // Sound16 line
+	m_soundex = m_soundex ? 32 : 16;   // This gives working speech for Black Hole
 }
 
 void gts80_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -494,7 +487,6 @@ void gts80_state::machine_start()
 
 void gts80_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	m_lamprow = 0;
 	m_swrow = 0;
 	m_segment = 0;
@@ -503,7 +495,7 @@ void gts80_state::machine_reset()
 
 
 /* with Sound Board */
-void gts80_state::gts80(machine_config &config)
+void gts80_state::p0(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(3'579'545)/4);
@@ -535,25 +527,25 @@ void gts80_state::gts80(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "speaker").front_center();
+	SPEAKER(config, "mono").front_center();
 }
 
-void gts80_state::gts80_s(machine_config &config)
+void gts80_state::p2(machine_config &config)
 {
-	gts80(config);
-	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	p0(config);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
-void gts80_state::gts80_hh(machine_config &config)
+void gts80_state::r1(machine_config &config)
 {
-	gts80(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	p0(config);
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
-void gts80_state::gts80_ss(machine_config &config)
+void gts80_state::r1v(machine_config &config)
 {
-	gts80(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	p0(config);
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 /* SYSTEM-80 ALTERNATE ROMS =======================================================================
@@ -627,7 +619,7 @@ ROM_START(blckhols)
 	GTS80_BIOS
 	ROM_LOAD("668-a2.cpu", 0x1000, 0x0800, CRC(df56f896) SHA1(1ec945a7ed8d25064476791adab2b554371dadbe))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("668-a-s.snd", 0x0400, 0x0400, CRC(5175f307) SHA1(97be8f2bbc393cc45a07fa43daec4bbba2336af8))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -643,7 +635,7 @@ ROM_START(circusp)
 	ROM_LOAD("654-2.cpu", 0x1200, 0x0200, CRC(01e23569) SHA1(47088421254e487aa1d1e87ea911dc1634e7d9ad))
 	ROM_RELOAD(0x1600, 0x0200)
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("654.snd", 0x0400, 0x0400, CRC(75c3ad67) SHA1(4f59c451b8659d964d5242728814c2d97f68445b))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -659,7 +651,7 @@ ROM_START(cntforce)
 	ROM_LOAD("656-2.cpu", 0x1200, 0x0200, CRC(0e185c30) SHA1(01d9fb5d335c24bed9f747d6e23f57adb6ef09a5))
 	ROM_RELOAD(0x1600, 0x0200)
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("656.snd", 0x0400, 0x0400, CRC(0be2cbe9) SHA1(306a3e7d93733562360285de35b331b5daae7250))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -677,7 +669,7 @@ ROM_START(eclipse)
 	GTS80_BIOS
 	ROM_LOAD("671-a.cpu", 0x1000, 0x0800, CRC(efad7312) SHA1(fcfd5e5c7924d65ac42561994797156a80018667))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("671-a-s.snd", 0x0400, 0x0400, CRC(5175f307) SHA1(97be8f2bbc393cc45a07fa43daec4bbba2336af8))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -690,7 +682,7 @@ ROM_START(forceii)
 	GTS80_BIOS
 	ROM_LOAD("661-2.cpu", 0x1000, 0x0800, CRC(a4fa42a4) SHA1(c17af4f0da6d5630e43db44655bece0e26b0112a))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0) // no sound
 	ROM_LOAD("661.snd", 0x0400, 0x0400, CRC(650158a7) SHA1(c7a9d521d1e7de1e00e7abc3a97aaaee04f8052e))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -724,7 +716,7 @@ ROM_START(jamesb)
 	GTS80_BIOS
 	ROM_LOAD("658-1.cpu", 0x1000, 0x0800, CRC(b841ad7a) SHA1(3396e82351c975781cac9112bfa341a3b799f296))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("658.snd", 0x0400, 0x0400, CRC(962c03df) SHA1(e8ff5d502a038531a921380b75c27ef79b6feac8))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -734,7 +726,7 @@ ROM_START(jamesb2)
 	GTS80_BIOS
 	ROM_LOAD("658-x.cpu", 0x1000, 0x0800, CRC(e7e0febf) SHA1(2c101a88b61229f30ed15d38f395bc538999d766))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("658.snd", 0x0400, 0x0400, CRC(962c03df) SHA1(e8ff5d502a038531a921380b75c27ef79b6feac8))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -777,7 +769,7 @@ ROM_START(panthera)
 	GTS80_BIOS
 	ROM_LOAD("652.cpu", 0x1000, 0x0800, CRC(5386e5fb) SHA1(822f47951b702f9c6a1ce674baaab0a596f34413))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("652.snd", 0x0400, 0x0400, CRC(4d0cf2c0) SHA1(0da5d118ffd19b1e78dfaaee3e31c43750d45c8d))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -799,7 +791,7 @@ ROM_START(pnkpnthr)
 	GTS80_BIOS
 	ROM_LOAD("664-1.cpu", 0x1000, 0x0800, CRC(a0d3e69a) SHA1(590e68dc28067e61832927cd4b3eefcc066f0a92))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("664.snd", 0x0400, 0x0400, CRC(18f4abfd) SHA1(9e85eb7e9b1e2fe71be828ff1b5752424ed42588))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -815,7 +807,7 @@ ROM_START(starrace)
 	ROM_LOAD("657-2.cpu", 0x1200, 0x0200, CRC(c56e31c8) SHA1(1e129fb6309e015a16f2bdb1e389cbc85d1919a7))
 	ROM_RELOAD(0x1600, 0x0200)
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("657.snd", 0x0400, 0x0400, CRC(3a1d3995) SHA1(6f0bdb34c4fa11d5f8ecbb98ae55bafeb5d62c9e))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -831,7 +823,7 @@ ROM_START(spidermn)
 	ROM_LOAD("653-2.cpu", 0x1200, 0x0200, CRC(ff1ddfd7) SHA1(dd7b98e491045916153b760f36432506277a4093))
 	ROM_RELOAD(0x1600, 0x0200)
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("653.snd", 0x0400, 0x0400, CRC(f5650c46) SHA1(2d0e50fa2f4b3d633daeaa7454630e3444453cb2))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -849,7 +841,7 @@ ROM_START(timeline)
 	GTS80_BIOS
 	ROM_LOAD("659.cpu", 0x1000, 0x0800, CRC(d6950e3b) SHA1(939b45a9ee4bb122fbea534ad728ec6b85120416))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("659.snd", 0x0400, 0x0400, CRC(28185568) SHA1(2fd26e7e0a8f050d67159f17634df2b1fc47cbd3))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -871,7 +863,7 @@ ROM_START(vlcno_1c)
 	GTS80_BIOS
 	ROM_LOAD("667-1c.cpu", 0x1000, 0x0800, CRC(e364202d) SHA1(128eaa5b390e309f4cf89f3631da0341f1419ffe))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -881,7 +873,7 @@ ROM_START(vlcno_1b)
 	GTS80_BIOS
 	ROM_LOAD("667-1b.cpu", 0x1000, 0x0800, CRC(a422d862) SHA1(2785388eb43c08405774a9413ffa52c1591a84f2))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -891,7 +883,7 @@ ROM_START(vlcno_1a)
 	GTS80_BIOS
 	ROM_LOAD("667-1a.cpu", 0x1000, 0x0800, CRC(5931c6f7) SHA1(e104a6c3ca2175bb49199e06963e26185dd563d2))
 
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("667-a-s.snd", 0x0400, 0x0400, CRC(894b4e2e) SHA1(d888f8e00b2b50cef5cc916d46e4c5e6699914a1))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
@@ -911,29 +903,29 @@ ROM_END
 
 } // Anonymous namespace
 
-/* disp1 */GAME(1981, s80tst,    0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, s80tst,    0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-/* disp1 */GAME(1980, panthera,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1980, grand8,    panthera, gts80,    gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // Panthera conversion
-/* disp1 */GAME(1980, spidermn,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1980, circusp,   0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1980, cntforce,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1980, starrace,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1980, jamesb,    0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1980, jamesb2,   jamesb,   gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* cust  */GAME(1980, timeline,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, forceii,   0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* cust  */GAME(1981, pnkpnthr,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, marsp,     0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, marspf,    marsp,    gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, marspp,    marsp,    gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, vlcno_ax,  0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, vlcno_1c,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, vlcno_1b,  vlcno_1c, gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp1 */GAME(1981, vlcno_1a,  vlcno_1c, gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1981, blckhole,  0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1981, blckhole2, blckhole, gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1981, blckhols,  0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-/* disp2 */GAME(1982, hh,        0,        gts80_hh, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_IS_SKELETON_MECHANICAL ) // MACHINE_SUPPORTS_SAVE crashes MAME at start
-/* disp2 */GAME(1982, hh_1,      hh,       gts80_hh, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_IS_SKELETON_MECHANICAL ) // MACHINE_SUPPORTS_SAVE crashes MAME at start
-/* disp2 */GAME(1981, eclipse,   0,        gts80_s,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, panthera,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Panthera",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, grand8,    panthera, p0,  gts80, gts80_state, empty_init, ROT0, "Christian Tabart", "Le Grand 8",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, spidermn,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "The Amazing Spider-Man",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, circusp,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Circus",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, cntforce,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Counterforce",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, starrace,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Star Race",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb,    0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, jamesb2,   jamesb,   p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "James Bond (3/5-Ball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, timeline,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Time Line",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, forceii,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Force II",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, pnkpnthr,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Pink Panther",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marsp,     0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspf,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marspp,    marsp,    r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_ax,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1c,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1b,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, vlcno_1a,  vlcno_1c, p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole,  0,        r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 4)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhole2, blckhole, r1v, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Rev. 2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, blckhols,  0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Black Hole (Sound Only)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh,        0,        r1,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 2)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, hh_1,      hh,       r1,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Haunted House (Rev. 1)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, eclipse,   0,        p2,  gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "Eclipse",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

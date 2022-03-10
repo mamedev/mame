@@ -139,7 +139,7 @@
   * Bonus Poker,                                      1984, Galanthis Inc.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
-  * "Unknown Sisteme France Poker",                   198?, Sisteme France.
+  * "Good Luck! poker (Sisteme France)",              198?, Sisteme France.
   * Bonne Chance! (Golden Poker prequel HW, set 1),   198?, Unknown.
   * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
   * Boa Sorte! (Golden Poker prequel HW),             198?, Unknown.
@@ -1020,7 +1020,6 @@ public:
 	void wildcrdb(machine_config &config);
 	void witchcrd(machine_config &config);
 	void mondial(machine_config &config);
-	void bchancep(machine_config &config);
 	void wcfalcon(machine_config &config);
 	void geniea(machine_config &config);
 	void genie(machine_config &config);
@@ -1055,6 +1054,7 @@ public:
 	void init_bchancep();
 	void init_bonuspkr();
 	void init_super98();
+	void init_pokersis();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
@@ -1089,14 +1089,6 @@ private:
 	uint8_t ay8910_data_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
-	void pia0_a_w(uint8_t data);
-	void pia0_b_w(uint8_t data);
-	void pia1_a_w(uint8_t data);
-	void pia1_b_w(uint8_t data);
-	uint8_t pia0_a_r();
-	uint8_t pia0_b_r();
-	uint8_t pia1_a_r();
-	uint8_t pia1_b_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
@@ -1108,7 +1100,6 @@ private:
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
 
-	void bchancep_map(address_map &map);
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
 	void mondial_map(address_map &map);
@@ -1602,47 +1593,6 @@ void goldnpkr_state::sound_w(uint8_t data)
 	m_discrete->write(NODE_10, data & 0x07);
 }
 
-void goldnpkr_state::pia0_a_w(uint8_t data)
-{
-	logerror("pia0_a_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia0_b_w(uint8_t data)
-{
-	logerror("pia0_b_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia1_a_w(uint8_t data)
-{
-	logerror("pia1_a_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia1_b_w(uint8_t data)
-{
-	logerror("pia1_b_w: %2x\n", data);
-}
-
-
-uint8_t goldnpkr_state::pia0_a_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia0_b_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia1_a_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia1_b_r()
-{
-	return 0xff;
-}
-
 
 /*********************************************
 *           Memory Map Information           *
@@ -1824,19 +1774,6 @@ void goldnpkr_state::mondial_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x4000, 0x7fff).bankr("bank1");
-}
-
-void goldnpkr_state::bchancep_map(address_map &map)
-{
-	map.global_mask(0x7fff);
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	map(0x2000, 0x7fff).rom();
 }
 
 void goldnpkr_state::super21p_map(address_map &map)
@@ -4592,28 +4529,6 @@ void goldnpkr_state::mondial(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void goldnpkr_state::bchancep(machine_config &config)
-{
-	goldnpkr_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::bchancep_map);
-
-	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pia0_a_r));
-	m_pia[0]->readpb_handler().set(FUNC(goldnpkr_state::pia0_b_r));
-	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::pia0_a_w));
-	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::pia0_b_w));
-
-	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::pia1_a_r));
-	m_pia[1]->readpb_handler().set(FUNC(goldnpkr_state::pia1_b_r));
-	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::pia1_a_w));
-	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::pia1_b_w));
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
 
 void goldnpkr_state::caspoker(machine_config &config)
 {
@@ -4632,17 +4547,13 @@ void goldnpkr_state::caspoker(machine_config &config)
 
 void goldnpkr_state::gldnirq0(machine_config &config)
 {
-	goldnpkr_base(config);
+	goldnpkr(config);
 
 	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -11199,7 +11110,7 @@ ROM_END
 
 ROM_START( pokersis )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // seems  to contains 4 selectable programs, but vectors lack of sense
-	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
+	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, BAD_DUMP CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
 
 	ROM_REGION( 0x18000, "gfx", 0 )
 	ROM_LOAD( "gs1.bin",  0x00000, 0x8000, CRC(47834a0b) SHA1(5fbc7443fe22ebb35a2449647259dc06420ba3fd) )
@@ -11911,6 +11822,38 @@ void goldnpkr_state::init_super98()
 	ROM[0x69f6] = 0xea;
 }
 
+
+void goldnpkr_state::init_pokersis()
+{
+//  bad dump fix
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x5f26] = 0x20;
+	ROM[0x5f29] = 0x20;
+	ROM[0x5fff] = 0x48;
+	ROM[0x6001] = 0x48;
+	ROM[0x7000] = 0x00;
+	ROM[0x7001] = 0xa0;
+	ROM[0x7002] = 0x08;
+	ROM[0x7003] = 0xad;
+	ROM[0x7004] = 0x48;
+	ROM[0x7005] = 0x08;
+	ROM[0x7007] = 0x10;
+	ROM[0x700a] = 0xa0;
+	ROM[0x700b] = 0x07;
+	ROM[0x700c] = 0xa2;
+	ROM[0x7fbf] = 0x7d;
+	ROM[0x7fc0] = 0x60;
+	ROM[0x7fc1] = 0xb9;
+	ROM[0x7fc2] = 0x00;
+	ROM[0x7fc3] = 0x00;
+	ROM[0x7ffa] = 0xfd;
+	ROM[0x7ffb] = 0x5f;
+	ROM[0x7ffc] = 0x22;
+	ROM[0x7ffd] = 0x5f;
+}
+
 } // anonymous namespace
 
 
@@ -12066,8 +12009,8 @@ GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
-GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.
+GAMEL( 198?, pokersis,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_pokersis, ROT0,   "Sisteme France",           "Good Luck! poker (Sisteme France)",       0,                layout_goldnpkr )  // fix banking (4 prgs?)...
 
 GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )  // banked selectable program.
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.

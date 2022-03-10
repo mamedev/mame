@@ -12055,6 +12055,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="renegade3">
+		<description>Renegade III: The Final Chapter</description>
+		<year>1989</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1139698">
+				<rom name="Renegade_III-_The_Final_Chapter_Side_1.tap" size="1139698" crc="9a57dcbb" sha1="2032787ce5ea16bdcc08c85fc8b716d9d2297806"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="598114">
+				<rom name="Renegade_III-_The_Final_Chapter_Side_2.tap" size="598114" crc="ffbb3dd1" sha1="4f2681f1842afa52f7e613f5701a6ec3e49f2ed9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fractal">
 		<description>Rescue on Fractalus!</description>
 		<year>1989</year>
@@ -12063,6 +12083,82 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="429826">
 				<rom name="Rescue_on_Fractalus.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractala" cloneof="fractal">
+		<description>Rescue on Fractalus! (Activision)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="609703">
+				<rom name="Rescue_on_Fractalus.tap" size="609703" crc="89735b64" sha1="6c52a7f625280a7fbde79c9b4a136cc37a528b09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retrogra">
+		<description>Retrograde</description>
+		<year>1989</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="560849">
+				<rom name="Retrograde_Side_1.tap" size="560849" crc="8d413e70" sha1="054fc95fe34eb227fabd7cb4e99fdc8dafa67706"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="2076073">
+				<rom name="Retrograde_Side_2.tap" size="2076073" crc="c531f30a" sha1="21e0a50a01642ad936136cfcfbc0e818f31b2dff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="returnoz">
+		<description>Return to Oz</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="519276">
+				<rom name="Return_to_Oz.tap" size="519276" crc="02553fc2" sha1="4cbb5d94941ca68f374f29c9e34a56ffb72477dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revcamel">
+		<description>Revenge of the Mutant Camels</description>
+		<year>1983</year>
+		<publisher>Llamasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Fastload"/>
+			<dataarea name="cass" size="338088">
+				<rom name="Revenge_of_the_Mutant_Camels_Side_1_-_Fastload.tap" size="338088" crc="403e34dc" sha1="8074b1a08b8b1e3dc3df620a745638cc187ed2c8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Slowload"/>
+			<dataarea name="cass" size="2076073">
+				<rom name="Revenge_of_the_Mutant_Camels_Side_2_-_Slowload.tap" size="1597742" crc="1bfed32c" sha1="e8ea1999f03f143a3a757f76372e8db19256ba92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talladeg">
+		<description>Richard Petty's Talladega</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="653268">
+				<rom name="Richard_Petty's_Talladega.tap" size="653268" crc="01f9ee21" sha1="fc317b1979bb0a48061a2e67dc397a57537acf2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12193,6 +12289,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="roadwars">
+		<description>Roadwars</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="480182">
+				<rom name="Roadwars.tap" size="480182" crc="b39eca44" sha1="85e742e1f99334f6b49cb442252416b53b687ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robbers">
 		<description>Robbers of the Lost Tomb</description>
 		<year>1983</year>
@@ -12231,8 +12339,8 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="robocoph">
-		<description>Robocop</description>
+	<software name="robocop">
+		<description>RoboCop</description>
 		<year>1991</year>
 		<publisher>The Hit Squad</publisher>
 		<!-- Dumped by @c64tapes -->
@@ -12248,6 +12356,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocopo" cloneof="robocop">
+		<description>RoboCop (Ocean)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1510854">
+				<rom name="RoboCop.tap" size="1510854" crc="72c55b24" sha1="1cb1d87a7cccab082e304e37c8f80ae76a1aa494"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12317,6 +12437,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rodland">
+		<description>Rodland</description>
+		<year>1991</year>
+		<publisher>Storm</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="448374">
+				<rom name="Rodland_Side_1.tap" size="448374" crc="081741a7" sha1="14eb1c38341433ff409eacfae50a110fca8c515c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="411556">
+				<rom name="Rodland_Side_2.tap" size="411556" crc="f209521b" sha1="91a2491639af1dd0f258d30072058b6bbe1ba0b2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rollarnd">
 		<description>Rollaround</description>
 		<year>1988</year>
@@ -12365,6 +12505,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rthunderu" cloneof="rthunder">
+		<description>Rolling Thunder (U.S. Gold)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="569954">
+				<rom name="Rolling_Thunder.tap" size="569954" crc="88cbc0b1" sha1="babc75b96d5b9aafc0ce5c6cb9f2429a0da16b75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roomten">
+		<description>Room Ten</description>
+		<year>1986</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="322194">
+				<rom name="Room_Ten.tap" size="322194" crc="f5a7e427" sha1="b281493b84833097b69e0481c49f519ff3dad251"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="322194">
+				<rom name="Room_Ten_a1.tap" size="322194" crc="fcfbb7e6" sha1="08b13a786b4d0494e50169ff5310d393962435e8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="roomlord">
 		<description>RoomLord</description>
 		<year>1984</year>
@@ -12393,14 +12563,28 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Run the Gauntlet</description>
 		<year>1990</year>
 		<publisher>The Hit Squad</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2223542">
 				<rom name="run the gauntlet side a.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="2217669">
 				<rom name="run the gauntlet side b.tap" size="2217669" crc="493bae24" sha1="17ff144092680f6635414e05586cb7af405772de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runthego" cloneof="runtheg">
+		<description>Run the Gauntlet (Ocean)</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2223162">
+				<rom name="Run_the_Gauntlet.tap" size="2223162" crc="81323723" sha1="5794e7c1c5a01809def7a432bd05e9377ac301ff"/>
 			</dataarea>
 		</part>
 	</software>

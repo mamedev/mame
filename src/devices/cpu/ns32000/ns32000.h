@@ -136,7 +136,7 @@ protected:
 	// other execution helpers
 	bool condition(unsigned const cc);
 	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
-	void interrupt(unsigned const vector, u32 const return_address, bool const trap = true);
+	void interrupt(unsigned const type, u32 const return_address);
 
 	// slave protocol helpers
 	u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);

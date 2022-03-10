@@ -424,7 +424,7 @@ u8 ssfball_state::input_b_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [A]    [B]    [C]    [PASS]  [KICK/
        ^FORMATION^                DISPLAY]
@@ -845,7 +845,7 @@ u8 splasfgt_state::input_b_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
 
@@ -2453,7 +2453,7 @@ u8 tmtennis_state::input_r(offs_t offset)
 
 // config
 
-/* Pro-Tennis physical button layout and labels is like this:
+/* Pro-Tennis physical button layout and labels are like this:
 
     * left = P2/CPU side *    * right = P1 side *
 
@@ -2761,8 +2761,8 @@ ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
 
-	ROM_REGION( 235601, "screen", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
+	ROM_REGION( 243830, "screen", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 243830, CRC(300b098a) SHA1(9fde58ac0f4e4cfea05301346cbf5b1ced9fe973) )
 ROM_END
 
 
@@ -2946,7 +2946,7 @@ u8 alnchase_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     POWER SOUND LEVEL PLAYER
      ON    ON    PRO   TWO        START
@@ -3051,7 +3051,7 @@ CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_ini
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel Electronics", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
