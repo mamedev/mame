@@ -8,9 +8,6 @@
 
 #define LOG_TEMP_PAUSE      0
 
-// Needed for RAW Input
-#define WM_INPUT 0x00FF
-
 // standard C headers
 #include <process.h>
 
@@ -1110,6 +1107,21 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_NCPAINT:
 		if (!window->fullscreen() || window->win_has_menu())
 			return DefWindowProc(wnd, message, wparam, lparam);
+		break;
+
+	// input device change: handle RawInput device connection/disconnection
+	case WM_INPUT_DEVICE_CHANGE:
+		switch (wparam)
+		{
+		case GIDC_ARRIVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_ARRIVAL, &lparam);
+			break;
+		case GIDC_REMOVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_REMOVAL, &lparam);
+			break;
+		default:
+			return DefWindowProc(wnd, message, wparam, lparam);
+		}
 		break;
 
 	// input: handle the raw input

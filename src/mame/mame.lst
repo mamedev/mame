@@ -10019,6 +10019,7 @@ capbowl4                        // (c) 1989 Incredible Technologies
 clbowl                          // (c) 1989 Incredible Technologies
 
 @source:capcom.cpp
+abv105                          //
 abv106                          //
 abv106r                         //
 bbb108                          //
@@ -19846,6 +19847,7 @@ hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
 jppyex98                        // 1998 - Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)
+kicknkick                       // 2001 - Kick & Kick (GNA36 VER. EAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -23973,6 +23975,7 @@ desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
 doab                            // 1996.12 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
+doaab                           // 1996.11 Dead or Alive (Revision A)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -39022,7 +39025,6 @@ denseib                         // bootleg
 denseib2                        // bootleg
 endless                         // bootleg
 endlessa                        // bootleg
-fatfurspb                       // bootleg
 ffight2b                        // bootleg
 ffight3b                        // bootleg
 iron                            // bootleg
@@ -39035,6 +39037,7 @@ venom                           // bootleg
 wldgunsb                        // bootleg
 
 @source:snesb51.cpp
+fatfurspb
 mk3snes
 snes4sl
 snes4sln
@@ -43778,6 +43781,7 @@ wy50                            // WY-50
 wy75                            // WY-75
 
 @source:wy55.cpp
+wy185es                         // WY-185ES
 wy55                            // WY-55
 wy65                            // WY-65
 

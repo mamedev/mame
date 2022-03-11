@@ -1464,6 +1464,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 					condition code (CC) is set to 000; otherwise the condition code is set to
 					010.
 				*/
+				m_icount -= 7;
 				t1 = get_1_ri(opcode);
 				set_ri(opcode, t1);
 				m_AC &= 0xfff8;

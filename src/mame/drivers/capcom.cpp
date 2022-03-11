@@ -108,6 +108,22 @@ ROM_START(abv106)
 	ROM_LOAD("u30_v11.bin", 0x200000, 0x80000, CRC(e16f1c4d) SHA1(9aa0ff87c303c6a8c95ef1c0e5382abad6179e21))
 ROM_END
 
+ROM_START(abv105)
+	ROM_REGION16_BE(0x00500000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("u1l_v15.bin", 0x000001, 0x80000, CRC(c66e8abc) SHA1(06e5b36dcb98eb33c7239592bb8e2485814789b3))
+	ROM_LOAD16_BYTE("u1h_v15.bin", 0x000000, 0x80000, CRC(de642229) SHA1(cb62d966f8088d069d66faec1554c63e504f18d6))
+	ROM_LOAD16_BYTE("u2l_v10.bin", 0x400001, 0x80000, CRC(a15b1ec0) SHA1(673a283ddf670109a9728fefac2bcf493d70f23d))
+	ROM_LOAD16_BYTE("u2h_v10.bin", 0x400000, 0x80000, CRC(c22e3338) SHA1(1a25c85a1ed59647c40f9a4d417d78cccff7e51c))
+
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u24_v11.bin", 0x0000, 0x2000, CRC(d46212f4) SHA1(50f1279d995b597c468805b323e0252800b28274))
+
+	ROM_REGION(0x400000, "sound1", ROMREGION_ERASEFF)
+	ROM_LOAD("u28_v10.bin", 0 , 0x100000, CRC(ca3c6954) SHA1(44345c0a720c78c312459425c54180a4c5413c0d))
+	ROM_LOAD("u29_v10.bin", 0x100000, 0x100000, CRC(8989d566) SHA1(f1827fb5c1d917a324fffe2035e87fcca77f362f))
+	ROM_LOAD("u30_v11.bin", 0x200000, 0x80000, CRC(e16f1c4d) SHA1(9aa0ff87c303c6a8c95ef1c0e5382abad6179e21))
+ROM_END
+
 ROM_START(abv106r)
 	ROM_REGION16_BE(0x00500000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("u1l_v16i.bin", 0x000001, 0x80000, CRC(7d7d2d85) SHA1(5c83022d7c0b61b15455942b3bdd0cf89fc75b57))
@@ -377,7 +393,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1996,  abv106,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  abv106,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne (1.6)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  abv105,  abv106, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne (1.5)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  abv106r, abv106, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne (Redemption)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  bbb109,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Big Bang Bar (Beta 1.9 US)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996,  bbb108,  bbb109, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Big Bang Bar (Beta 1.8 US)", MACHINE_IS_SKELETON_MECHANICAL)

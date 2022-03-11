@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV0,        gottlieb_sound_r0_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
@@ -29,14 +29,14 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> gottlieb_sound_r0_device
+// ======================> gottlieb_sound_p2_device
 
 // rev 0 sound board
-class gottlieb_sound_r0_device : public device_t, public device_mixer_interface
+class gottlieb_sound_p2_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	void write(uint8_t data);
@@ -50,7 +50,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	void gottlieb_sound_r0_map(address_map &map);
+	void gottlieb_sound_p2_map(address_map &map);
 
 private:
 	// devices
@@ -95,6 +95,7 @@ protected:
 private:
 	// devices
 	required_device<riot6532_device> m_riot;
+	u8 m_dummy = 0;   // needed for save-state support
 };
 
 // fully populated rev 1 sound board
@@ -122,7 +123,7 @@ private:
 	required_device<votrax_sc01_device> m_votrax;
 
 	// internal state
-	uint8_t m_last_speech_clock;
+	uint8_t m_last_speech_clock = 0;
 };
 
 
