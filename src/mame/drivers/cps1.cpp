@@ -13373,6 +13373,9 @@ ROM_END
       - Some code to handle the PIC (protection?). 
         Read and write to addresses 0x5762b0 and 0x57a2b0 occurs in the code but the return value is never really used (nop or bra skips relevant parts)
         and so seems that the PIC protection is ineffective.
+      - Read and write to port 0x80017a (EEPROM in pang3) still are present in the code, but are filtered by the PAL16V8 @ E13 so there is no need to 
+        create a port for that address here in mame (altough this causes a popmessage "CPS-B read port 3A contact MAMEDEV" to occurr at startup if compiled with
+        DEBUG=1)
 
    Board-B has five PALs:
       - PALCE16V8  @A2
@@ -14142,6 +14145,39 @@ void cps_state::init_pang3()
 	init_pang3b();
 }
 
+/*
+Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
+
+--------- Dip switch decoding ---------
+0E001A: move.b  $80001c.l, D0    ; !Dip switch B
+0E0020: not.b   D0               ; Dip switch B
+0E0022: move.b  D0, D1           ; D1 = D0  - Save DSWB for later use
+0E0024: andi.b  #$7, D0          ; D0 = D0 & $7 - first 3 bits - Game level -- 7<= D0 <= 0
+0E0028: move.w  D0, $5762b0.l    ; [$5762b0] = D0
+0E002E: nop                      ;
+0E0030: move.w  $57a2b0.l, D2    ; D2 = [$57a2b0]
+0E0036: move.b  D1, D0           ; D0 = D1 - restore value read from DSWB
+0E0038: andi.w  #$60, D0         ; D0 = D0 & $60 - bit 5, 6
+
+--------- Copy protection ? ---------
+000300: move.w  #$17, $5762b0.l  ; [5762B0] = 17 (Pic?)
+000308: nop                      ;
+00030A: move.w  #$3, D2          ; D2 = 3
+00030E: move.w  $57a2b0.l, D0    ; D0 = [$57A2B0]
+000314: cmpi.w  #$7321, D0       ; DO <= $7321 (not used?)
+000318: bra     $360             ; jmp 360
+; unused code
+00031A: dbra    D2, $30e         ; loop until D2=0 to $30E
+00031E: move.l  #$0, $ff10fa.l   ; [$ff10fa] = 0 ; reset values initialized at 238F0-23922
+000328: move.l  #$0, $ff113a.l   ; [$ff113a] = 0 ; reset values initialized at 238F0-23922
+000332: move.l  #$0, $ff10fe.l   ; [$ff10fe] = 0 ; reset values initialized at 238F0-23922
+00033C: move.l  #$0, $ff113e.l   ; [$ff113e] = 0 ; reset values initialized at 238F0-23922
+000346: move.l  #$0, $ff10d2.l   ; [$ff10d2] = 0 ; reset values initialized at 238F0-23922
+000350: move.l  #$0, $ff1112.l   ; [$ff1112] = 0 ; reset values initialized at 238F0-23922
+00035A: jmp     $20acc.l         ; jmp $20ACC
+; unused code [END]
+000360: jmp     $e0000.l         ; jmp $E0000
+*/
 uint16_t cps_state::pang3b4_prot_r()
 {
 
@@ -14162,6 +14198,11 @@ void cps_state::init_pang3b4()
 {
   m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_w)));
   m_maincpu->space(AS_PROGRAM).install_read_handler(0x57A2b0, 0x57A2b1, read16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_r)));
+
+  /* In pang3 the Mach215 security chip outputs 2 control signals (pins 4, 6) which switch the eeprom in/out serial data lines onto the main 68k data bus when required
+     They're mapped in the CPS-B address range but there is not the EPROM on the board
+     Read and write to port 0x80017a still are present in the code, but they are filtered by the PAL16V8 @ E13 */
+  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x80017a, 0x80017b);
 
   init_cps1();
 }
