@@ -194,5 +194,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY              FULLNAME              FLAGS
-COMP( 198?, evmbug,    0,         0,      evmbug,     evmbug, evmbug_state,    empty_init, "Texas Instruments", "TMAM6095",           MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, evmbug,    0,         0,      evmbug,     evmbug, evmbug_state,    empty_init, "Texas Instruments", "TMAM 6095",          MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 19??, tms9995bb, evmbug,    0,      tms9995bb,  evmbug, evmbug_state,    empty_init, "Stuart Conner",     "TMS9995 breadboard", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
