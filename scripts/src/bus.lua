@@ -4647,6 +4647,10 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.h",
+		MAME_DIR .. "src/devices/bus/multibus/cpuap.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/cpuap.h",
+		MAME_DIR .. "src/devices/bus/multibus/serad.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/serad.h",
 	}
 end
 
