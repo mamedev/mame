@@ -44,7 +44,7 @@ public:
 	void evmbug(machine_config &config);
 	void tms9995bb(machine_config &config);
 
-protected:
+private:
 	uint8_t rs232_r(offs_t offset);
 	void rs232_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
@@ -172,8 +172,7 @@ ROM_START( evmbug )
 	ROM_LOAD( "u9.bin", 0x1000, 0x0800, CRC(7f71c9bf) SHA1(5215892585e5282650209c5ce13a2e4bd6041675) )
 ROM_END
 
-/* ROMs from http://www.stuartconner.me.uk/tms9995_breadboard/tms9995_breadboard.htm#eprom_binary_images
-and FF padded to make 32K */
+/* ROMs from and FF padded to make 32K */
 ROM_START( tms9995bb )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "evmbug", "EVMBUG system monitor")
