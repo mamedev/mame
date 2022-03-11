@@ -20,6 +20,7 @@
 //**************************************************************************
 
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
@@ -90,7 +91,7 @@ protected:
 	virtual void gottlieb_sound_r1_map(address_map &map);
 
 protected:
-	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<mc1408_device> m_dac;
 
 private:
 	// devices
@@ -127,20 +128,30 @@ private:
 };
 
 
-// ======================> gottlieb_sound_r2_device
+// ======================> gottlieb_sound_p4_device
 
-// fully populated rev 2 sound board
-class gottlieb_sound_r2_device : public device_t, public device_mixer_interface
+// fully populated pin 4 sound board
+class gottlieb_sound_p4_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	// configuration helpers
-	void enable_cobram3_mods() { m_cobram3_mod = true; }
+	gottlieb_sound_p4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	void write(u8 data);
+
+protected:
+	gottlieb_sound_p4_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal communications
 	uint8_t speech_data_r();
@@ -148,21 +159,12 @@ public:
 	uint8_t signal_audio_nmi_r();
 	void signal_audio_nmi_w(uint8_t data);
 	void nmi_rate_w(uint8_t data);
-	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
-	void speech_control_w(uint8_t data);
-	void sp0250_latch_w(uint8_t data);
+	void speech_ctrl_w(uint8_t data);
 	void psg_latch_w(uint8_t data);
 
-	void gottlieb_sound_r2_map(address_map &map);
-	void gottlieb_speech_r2_map(address_map &map);
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	void gottlieb_sound_p4_map(address_map &map);
+	void gottlieb_speech_p4_map(address_map &map);
 
-private:
 	// internal helpers
 	void nmi_timer_adjust();
 	void nmi_state_update();
@@ -180,10 +182,8 @@ private:
 	required_device<m6502_device>   m_speechcpu;
 	required_device<ay8913_device>  m_ay1;
 	required_device<ay8913_device>  m_ay2;
-	optional_device<sp0250_device>  m_sp0250;
 
 	// internal state
-	bool        m_cobram3_mod;
 	emu_timer * m_nmi_timer;
 	uint8_t       m_nmi_rate;
 	uint8_t       m_nmi_state;
@@ -193,6 +193,42 @@ private:
 	uint8_t       m_last_command;
 	uint8_t       m_psg_latch;
 	uint8_t       m_psg_data_latch;
-	uint8_t       m_sp0250_latch;
+};
+
+
+// ======================> gottlieb_sound_r2_device
+
+// fully populated rev 2 sound board
+class gottlieb_sound_r2_device : public gottlieb_sound_p4_device
+{
+public:
+	// construction/destruction
+	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// configuration helpers
+	void enable_cobram3_mods() { m_cobram3_mod = true; }
+
+	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	// internal communications
+	void sp0250_latch_w(uint8_t data);
+	void speech_control_w(uint8_t data);
+
+	void gottlieb_sound_r2_map(address_map &map);
+	void gottlieb_speech_r2_map(address_map &map);
+
+	// devices
+	optional_device<sp0250_device>  m_sp0250;
+
+	// internal state
+	bool     m_cobram3_mod;
+	uint8_t  m_sp0250_latch;
 };
 
