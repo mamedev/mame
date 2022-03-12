@@ -281,7 +281,7 @@ void famibox_state::famibox_cartswitch(u8 data)
 	if (column != (m_curr_slot - 1) / 5 + 1)
 		m_curr_slot = 0;
 
-	auto &cart = cart_list[slot];
+	auto &cart = cart_list[m_curr_slot];
 	u8 *base = memregion(cart.memory_region)->base();
 
 	membank("cpubank1")->set_base(base + cart.bank1_offset);
