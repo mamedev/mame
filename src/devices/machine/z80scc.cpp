@@ -1077,6 +1077,9 @@ void z80scc_channel::device_start()
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
 	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
+	m_rxc   = 0x00;
+	m_txc   = 0x00;
+
 #if Z80SCC_USE_LOCAL_BRG
 	// baudrate clocks and timers
 	baudtimer = timer_alloc(TIMER_ID_BAUD);
