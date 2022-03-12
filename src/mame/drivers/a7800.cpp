@@ -106,7 +106,7 @@
 #include "bus/a7800/a78_carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define A7800_NTSC_Y1   XTAL(14'318'181)

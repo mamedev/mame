@@ -48,6 +48,7 @@
 
 #include "emu.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/timer.h"
 #include "cpu/f2mc16/mb9061x.h"

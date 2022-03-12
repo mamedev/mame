@@ -1049,6 +1049,7 @@ function cheatfind.startplugin()
 			menu_is_showing = false
 			return false -- return false so menu will be popped off the stack
 		end
+		if index == 0 then return false end
 		return menu_func[index](event)
 	end
 	emu.register_menu(menu_callback, menu_populate, _("Cheat Finder"))

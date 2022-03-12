@@ -169,6 +169,9 @@ INPUT_PORTS_START( dw_keyboard )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Reqst")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Memory Record") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 INPUT_PORTS_END
 
 
@@ -180,6 +183,7 @@ ioport_constructor dw_keyboard_device::device_input_ports() const
 dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DW_KEYBOARD, tag, owner, clock)
 	, m_kbd(*this, "COL.%u", 0)
+	, m_mr(*this, "MR")
 	, m_out_data(*this)
 	, m_out_clock(*this)
 	, m_out_strobe(*this)

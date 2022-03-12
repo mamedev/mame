@@ -296,7 +296,7 @@ Few other notes:
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/m5_dsk.h"

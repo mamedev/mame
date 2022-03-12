@@ -50,6 +50,13 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override { update_int(); }
+	virtual void device_post_load() override { update_int(); }
+
 	// devices
 	required_device<pps41_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -65,14 +72,7 @@ public:
 	u16 m_r = 0;
 
 	u8 read_inputs(int columns);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-protected:
 	virtual void update_int() { ; }
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override { update_int(); }
-	virtual void device_post_load() override { update_int(); }
 };
 
 
@@ -149,10 +149,12 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
+	void ftri1(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
-	void ftri1(machine_config &config);
 };
 
 // handlers
@@ -200,18 +202,18 @@ INPUT_PORTS_END
 
 void ftri1_state::ftri1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM78(config, m_maincpu, 300000); // approximation - VC osc. R=68K
 	m_maincpu->write_d().set(FUNC(ftri1_state::write_d));
 	m_maincpu->write_r().set(FUNC(ftri1_state::write_r));
 	m_maincpu->read_p().set_ioport("IN.0");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1e0, 0x7f);
 	config.set_default_layout(layout_ftri1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -252,15 +254,16 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void mastmind(machine_config &config);
+	void smastmind(machine_config &config);
+
+private:
 	optional_device<beep_device> m_beeper;
 
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
-
-	void mastmind(machine_config &config);
-	void smastmind(machine_config &config);
 };
 
 // handlers
@@ -325,18 +328,18 @@ INPUT_PORTS_END
 
 void mastmind_state::mastmind(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM75(config, m_maincpu, 360000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mastmind_state::write_d));
 	m_maincpu->write_r().set(FUNC(mastmind_state::write_r));
 	m_maincpu->read_p().set(FUNC(mastmind_state::read_p));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_mastmind);
 
-	/* no sound! */
+	// no sound!
 }
 
 void mastmind_state::smastmind(machine_config &config)
@@ -345,7 +348,7 @@ void mastmind_state::smastmind(machine_config &config)
 
 	config.set_default_layout(layout_smastmind);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2400); // approximation
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -398,14 +401,16 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
+	void dunksunk(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { update_int(); }
 	DECLARE_INPUT_CHANGED_MEMBER(game_switch) { update_int(); }
-	virtual void update_int() override;
 
+private:
+	virtual void update_int() override;
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
-	void dunksunk(machine_config &config);
 };
 
 // handlers
@@ -467,19 +472,19 @@ INPUT_PORTS_END
 
 void dunksunk_state::dunksunk(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM76EL(config, m_maincpu, 390000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(dunksunk_state::write_d));
 	m_maincpu->write_r().set(FUNC(dunksunk_state::write_r));
 	m_maincpu->read_p().set_ioport("IN.0");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1e0, 0x7f);
 	m_display->set_bri_levels(0.015, 0.2); // player led is brighter
 	config.set_default_layout(layout_dunksunk);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -524,14 +529,16 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(digits_switch) { update_int(); }
-	virtual void update_int() override;
+	void memoquiz(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(digits_switch) { update_int(); }
+
+private:
+	virtual void update_int() override;
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
-	void memoquiz(machine_config &config);
 };
 
 // handlers
@@ -608,18 +615,18 @@ INPUT_PORTS_END
 
 void memoquiz_state::memoquiz(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM75(config, m_maincpu, 360000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(memoquiz_state::write_d));
 	m_maincpu->write_r().set(FUNC(memoquiz_state::write_r));
 	m_maincpu->read_p().set(FUNC(memoquiz_state::read_p));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_memoquiz);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -655,11 +662,13 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
+	void mfootb2(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	void write_spk(u8 data);
-	void mfootb2(machine_config &config);
 };
 
 // handlers
@@ -712,7 +721,7 @@ INPUT_PORTS_END
 
 void mfootb2_state::mfootb2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM77LA(config, m_maincpu, 380000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mfootb2_state::write_d));
 	m_maincpu->read_d().set_ioport("IN.1");
@@ -720,14 +729,14 @@ void mfootb2_state::mfootb2(machine_config &config)
 	m_maincpu->read_p().set_ioport("IN.0");
 	m_maincpu->write_spk().set(FUNC(mfootb2_state::write_spk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	m_display->set_segmask(0x3c7, 0x7f);
-	m_display->set_segmask(0x002, 0xff);
+	m_display->set_segmask(0x002, 0xff); // only one digit has DP
 	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mfootb2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -767,12 +776,14 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
+	void brainbaf(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
 	void write_spk(u8 data);
-	void brainbaf(machine_config &config);
 };
 
 // handlers
@@ -875,19 +886,19 @@ INPUT_PORTS_END
 
 void brainbaf_state::brainbaf(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
 	m_maincpu->write_d().set(FUNC(brainbaf_state::write_d));
 	m_maincpu->write_r().set(FUNC(brainbaf_state::write_r));
 	m_maincpu->read_p().set(FUNC(brainbaf_state::read_p));
 	m_maincpu->write_spk().set(FUNC(brainbaf_state::write_spk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 14);
 	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_brainbaf);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -928,12 +939,14 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
+	void horocomp(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
 	void write_spk(u8 data);
-	void horocomp(machine_config &config);
 };
 
 // handlers
@@ -975,7 +988,7 @@ void horocomp_state::write_spk(u8 data)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
               CAP.
        AQU.   [ ]   SAG.
@@ -1051,19 +1064,19 @@ INPUT_PORTS_END
 
 void horocomp_state::horocomp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
 	m_maincpu->write_d().set(FUNC(horocomp_state::write_d));
 	m_maincpu->write_r().set(FUNC(horocomp_state::write_r));
 	m_maincpu->read_p().set(FUNC(horocomp_state::read_p));
 	m_maincpu->write_spk().set(FUNC(horocomp_state::write_spk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 14);
 	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_horocomp);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -1105,6 +1118,9 @@ public:
 		m_subcpu(*this, "subcpu")
 	{ }
 
+	void mwcfootb(machine_config &config);
+
+private:
 	required_device<pps41_base_device> m_subcpu;
 
 	void update_display();
@@ -1116,8 +1132,6 @@ public:
 
 	void sub_write_d(u16 data);
 	void sub_write_r(u16 data);
-
-	void mwcfootb(machine_config &config);
 };
 
 // handlers
@@ -1183,7 +1197,7 @@ void mwcfootb_state::sub_write_r(u16 data)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
      (home team side)                                                      (visitor team side)
     [1] RECEIVERS [2]                                                       [1] RECEIVERS [2]
@@ -1234,7 +1248,7 @@ INPUT_PORTS_END
 
 void mwcfootb_state::mwcfootb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM78(config, m_maincpu, 360000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mwcfootb_state::main_write_d));
 	m_maincpu->read_d().set(FUNC(mwcfootb_state::main_read_d));
@@ -1250,7 +1264,7 @@ void mwcfootb_state::mwcfootb(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 571);
@@ -1260,7 +1274,7 @@ void mwcfootb_state::mwcfootb(machine_config &config)
 	m_display->set_segmask(0x7f, 0x7f);
 	config.set_default_layout(layout_mwcfootb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1301,14 +1315,16 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(players_switch) { update_int(); }
-	virtual void update_int() override;
+	void scrabsen(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(players_switch) { update_int(); }
+
+private:
+	virtual void update_int() override;
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
-	void scrabsen(machine_config &config);
 };
 
 // handlers
@@ -1404,17 +1420,17 @@ INPUT_PORTS_END
 
 void scrabsen_state::scrabsen(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM76EL(config, m_maincpu, 380000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(scrabsen_state::write_d));
 	m_maincpu->write_r().set(FUNC(scrabsen_state::write_r));
 	m_maincpu->read_p().set(FUNC(scrabsen_state::read_p));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	config.set_default_layout(layout_scrabsen);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1452,14 +1468,16 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(players_switch) { update_int(); }
-	virtual void update_int() override;
+	void rdqa(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(players_switch) { update_int(); }
+
+private:
+	virtual void update_int() override;
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u16 data);
 	u8 read_p();
-	void rdqa(machine_config &config);
 };
 
 // handlers
@@ -1538,18 +1556,18 @@ INPUT_PORTS_END
 
 void rdqa_state::rdqa(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM76EL(config, m_maincpu, 400000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(rdqa_state::write_d));
 	m_maincpu->write_r().set(FUNC(rdqa_state::write_r));
 	m_maincpu->read_p().set(FUNC(rdqa_state::read_p));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5, 7);
 	m_display->set_segmask(0x1f, 0x7f);
 	config.set_default_layout(layout_rdqa);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -1587,10 +1605,10 @@ CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_in
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel Electronics", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel Electronics", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel Electronics", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel Electronics", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE ) // ***

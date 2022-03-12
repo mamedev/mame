@@ -121,6 +121,8 @@ private:
 	template<typename T, size_t SIZE> class enum_parser;
 
 	struct addr_space;
+	class tap_helper;
+	class addr_space_change_notif;
 
 	struct save_item {
 		void *base;
@@ -159,7 +161,7 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
-	void resume(void *ptr, int nparam);
+	void resume(int nparam);
 	void register_function(sol::function func, const char *id);
 	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
 	bool execute_function(const char *id);

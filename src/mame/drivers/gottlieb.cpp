@@ -226,6 +226,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 void gottlieb_state::machine_start()
 {
 	m_leds.resolve();
+	m_knockers.resolve();
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -338,7 +339,7 @@ void gottlieb_state::qbert_output_w(u8 data)
 	general_output_w(data & ~0x20);
 
 	// bit 5 controls the knocker
-	qbert_knocker(data >> 5 & 1);
+	qbert_knocker(BIT(data, 5));
 }
 
 void gottlieb_state::qbertqub_output_w(u8 data)
@@ -658,7 +659,8 @@ void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const 
 
 void gottlieb_state::qbert_knocker(u8 knock)
 {
-	output().set_value("knocker0", knock);
+	//output().set_value("knocker0", knock);
+	m_knockers[0] = knock ? 1 : 0;
 
 	// start sound on rising edge
 	if (knock & ~m_knocker_prev)
@@ -691,21 +693,21 @@ void gottlieb_state::qbert_knocker(machine_config &config)
 *
 *************************************/
 
-void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_LASERDISC_PHILIPS:
-		laserdisc_philips_callback(ptr, param);
+		laserdisc_philips_callback(param);
 		break;
 	case TIMER_LASERDISC_BIT_OFF:
-		laserdisc_bit_off_callback(ptr, param);
+		laserdisc_bit_off_callback(param);
 		break;
 	case TIMER_LASERDISC_BIT:
-		laserdisc_bit_callback(ptr, param);
+		laserdisc_bit_callback(param);
 		break;
 	case TIMER_NMI_CLEAR:
-		nmi_clear(ptr, param);
+		nmi_clear(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gottlieb_state::device_timer");

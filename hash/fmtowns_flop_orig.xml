@@ -169,7 +169,6 @@ School-Card Alpha Sensei Kit                                        Fujitsu     
 School-Edin Alpha Sensei-you V1.1 L10                               Fujitsu                           1993/5     FD
 Schoolmenu Henshuu-you                                              Fujitsu                           1994/9     FD
 Schoolmenu Jikkou-you                                               Fujitsu                           1994/9     FD
-Setsujuu: Yuganda Kioku                                             JAST                              1995/4     FD×04
 Shin Kakeibo Good Manager                                           Cosmos Computer                   1992/7     FD×02
 Shisetsu Sangokushi                                                 Tensui Software                   1993/9     FD
 Shisetsu Sengoku Jidai                                              Tensui Software                   1994/6     FD
@@ -234,7 +233,6 @@ Video Library V2.1                                                  Fujitsu     
 VideoCD Saisei Kit V1.1 L10                                         Fujitsu                           1995/1     FD
 VIP Karaoke                                                         CSK Research Institute (CRI)      1992/4     FD
 WordLook                                                            CSK Research Institute (CRI)      1991/4     FD
-Youjuu Club Custom                                                  D.O.                              1992/3     FD×03
 Zurukamashi Adult Jisho                                             Nichikonren Kikaku                1992/2     FD
 Zurukamashi Ver 2.0                                                 Nichikonren Kikaku                1993/?     FD×02
 
@@ -1175,7 +1173,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk a).hdm" size="1261568" crc="8e5377bb" sha1="1b977a5dbc3bae53f995cce516be29eef231267d"/>
+				<rom name="kawarazaki-ke no ichizoku (disk a).hdm" size="1261568" crc="597f5010" sha1="757285d97981d1385c3bfd030dd8d5f0a4876e26"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -1934,6 +1932,39 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<software name="setsuju">
+		<description>Setsujuu - Yuganda Kioku</description>
+		<year>1995</year>
+		<publisher>ジャスト (JAST)</publisher>
+		<info name="alt_title" value="雪猫　ゆがんだ記憶" />
+		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="setsujuu_disk_a.hdm" size="1261568" crc="16d06cf1" sha1="4c096759a785d67df4531aedd90e72de161813cf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="setsujuu_disk_b.hdm" size="1261568" crc="c2246692" sha1="d0384ec649dbd55019edd4eae7ba260a29cdc9ac"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="setsujuu_disk_c.hdm" size="1261568" crc="fbdda730" sha1="72c28b73539d6654c7b0194addb8d0952eca5691"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="setsujuu_disk_d.hdm" size="1261568" crc="01f4d40e" sha1="fc9c49802334863cad8ec7f80533c4292851479a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shangrl">
 		<description>Shangrlia</description>
 		<year>1992</year>
@@ -2398,6 +2429,33 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="yajiuma_pennant_race2_disk_e.hdm" size="1261568" crc="ba33ff7f" sha1="43a4de18e2485426b88bfc59906ca7d2a5e55cee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yojuclub">
+		<description>Youjuu Club Custom</description>
+		<year>1992</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="妖獣倶楽部カスタム" />
+		<info name="release" value="199203xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="youjuu_club_custom_disk_a.hdm" size="1261568" crc="e3f2a6a2" sha1="f8ba8158190305c963fbbe07dffc6985d6bb2875"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="youjuu_club_custom_disk_b.hdm" size="1261568" crc="3222062b" sha1="3df957d95dea33f6a33b033a842ddc2768f4f088"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="youjuu_club_custom_disk_c.hdm" size="1261568" crc="dee16755" sha1="300f3069d4fa1e4e7dfa6f25a0f511e4eb68e080"/>
 			</dataarea>
 		</part>
 	</software>

@@ -860,7 +860,7 @@ std::string input_manager::code_to_token(input_code code) const
 	std::string str(devclass);
 	if (!devindex.empty())
 		str.append("_").append(devindex);
-	if (devcode[0] != 0)
+	if (!devcode.empty())
 		str.append("_").append(devcode);
 	if (modifier != nullptr)
 		str.append("_").append(modifier);
@@ -1150,7 +1150,7 @@ input_seq input_manager::seq_clean(const input_seq &seq) const
 	{
 		// if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs
 		input_code code = seq[codenum];
-		if (!code.internal() && code_name(code).empty())
+		if (!code.internal() && (((code.device_index() > 0) && !m_class[code.device_class()]->multi()) || !item_from_code(code)))
 		{
 			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
 			{

@@ -16,6 +16,8 @@ public:
 	auto out_clock_handler() { return m_out_clock.bind(); }
 	auto out_strobe_handler() { return m_out_strobe.bind(); }
 
+	int memory_record_r() { return m_mr->read(); }
+
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
 
@@ -33,6 +35,7 @@ private:
 	int m_keylatch, m_ack;
 
 	required_ioport_array<12> m_kbd;
+	required_ioport m_mr;
 	devcb_write_line m_out_data;
 	devcb_write_line m_out_clock;
 	devcb_write_line m_out_strobe;

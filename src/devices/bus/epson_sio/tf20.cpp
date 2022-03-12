@@ -149,8 +149,8 @@ void epson_tf20_device::device_start()
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	m_timer_serial = timer_alloc(0, nullptr);
-	m_timer_tc = timer_alloc(1, nullptr);
+	m_timer_serial = timer_alloc(0);
+	m_timer_tc = timer_alloc(1);
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
@@ -178,7 +178,7 @@ void epson_tf20_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

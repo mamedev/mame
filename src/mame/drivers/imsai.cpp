@@ -17,12 +17,15 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
+
 //#include "bus/s100/s100.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/terminal.h"
 
+
+namespace {
 
 class imsai_state : public driver_device
 {
@@ -49,7 +52,7 @@ private:
 	u8 m_term_data = 0U;
 	void machine_reset() override;
 	void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_device<generic_terminal_device> m_terminal;
@@ -109,20 +112,22 @@ void imsai_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xd800, 0xdfff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xd800, 0xdfff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// remove from the memory map
-			m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x07ff);
-		}
-
-		// return the original data
-		return data;
-	});
+					// remove from the memory map
+					m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x07ff);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void imsai_state::machine_start()
@@ -163,6 +168,8 @@ ROM_START( imsai )
 	ROM_REGION( 0x20, "status", 0 ) // PROM for decoding 8085 status signals
 	ROM_LOAD( "74s288.u38", 0x00, 0x20, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

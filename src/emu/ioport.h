@@ -662,116 +662,6 @@ typedef device_delegate<void (ioport_field &, u32, ioport_value, ioport_value)> 
 typedef device_delegate<float (float)> ioport_field_crossmap_delegate;
 
 
-// ======================> inp_header
-
-// header at the front of INP files
-class inp_header
-{
-public:
-	// parameters
-	static constexpr unsigned MAJVERSION = 3;
-	static constexpr unsigned MINVERSION = 0;
-
-	bool read(emu_file &f)
-	{
-		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-	bool write(emu_file &f) const
-	{
-		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-
-	bool check_magic() const
-	{
-		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	u64 get_basetime() const
-	{
-		return
-				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
-	}
-	unsigned get_majversion() const
-	{
-		return m_data[OFFS_MAJVERSION];
-	}
-	unsigned get_minversion() const
-	{
-		return m_data[OFFS_MINVERSION];
-	}
-	std::string get_sysname() const
-	{
-		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
-	}
-	std::string get_appdesc() const
-	{
-		return get_string<OFFS_APPDESC, OFFS_END>();
-	}
-
-	void set_magic()
-	{
-		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	void set_basetime(u64 time)
-	{
-		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
-	}
-	void set_version()
-	{
-		m_data[OFFS_MAJVERSION] = MAJVERSION;
-		m_data[OFFS_MINVERSION] = MINVERSION;
-	}
-	void set_sysname(std::string const &name)
-	{
-		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
-	}
-	void set_appdesc(std::string const &desc)
-	{
-		set_string<OFFS_APPDESC, OFFS_END>(desc);
-	}
-
-private:
-	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
-	{
-		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
-		std::memcpy(m_data + BEGIN, str.c_str(), used);
-		if ((END - BEGIN) > used)
-			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
-	}
-	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
-	{
-		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
-		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
-	}
-
-	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
-	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
-	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
-	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
-																// 0x02 bytes reserved
-	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
-	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
-	static constexpr std::size_t    OFFS_END         = 0x40;
-
-	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
-
-	u8                              m_data[OFFS_END];
-};
-
-
 // ======================> input_device_default
 
 // device defined default input settings
@@ -1026,6 +916,7 @@ public:
 	u8 player() const { return m_player; }
 	bool digital_value() const { return m_digital_value; }
 	void set_value(ioport_value value);
+	void clear_value();
 
 	bool optional() const { return ((m_flags & FIELD_FLAG_OPTIONAL) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
@@ -1262,8 +1153,9 @@ public:
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 
-	// setters
+	// programmatic override (for script bindings)
 	void set_value(s32 value);
+	void clear_value();
 
 private:
 	// helpers
@@ -1280,6 +1172,7 @@ private:
 	s32                 m_adjdefvalue;          // adjusted default value from the config
 	s32                 m_adjmin;               // adjusted minimum value from the config
 	s32                 m_adjmax;               // adjusted maximum value from the config
+	s32                 m_adjoverride;          // programmatically set adjusted value
 
 	// live values of configurable parameters
 	s32                 m_sensitivity;          // current live sensitivity (100=normal)
@@ -1291,7 +1184,6 @@ private:
 	s32                 m_accum;                // accumulated value (including relative adjustments)
 	s32                 m_previous;             // previous adjusted value
 	s32                 m_previousanalog;       // previous analog value
-	s32                 m_prog_analog_value;    // programmatically set analog value
 
 	// parameters for modifying live values
 	s32                 m_minimum;              // minimum adjusted value
@@ -1313,7 +1205,7 @@ private:
 	bool                m_single_scale;         // scale joystick differently if default is between min/max
 	bool                m_interpolate;          // should we do linear interpolation for mid-frame reads?
 	bool                m_lastdigital;          // was the last modification caused by a digital form?
-	bool                m_was_written;          // was the last modification caused programmatically?
+	bool                m_use_adjoverride;      // override what will be read from the field
 };
 
 
@@ -1449,8 +1341,8 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (closed if not recording)
-	emu_file                m_playback_file;        // playback file (closed if not recording)
+	std::unique_ptr<emu_file> m_record_file;        // recording file (nullptr if not recording)
+	std::unique_ptr<emu_file> m_playback_file;      // playback file (nullptr if not recording)
 	util::write_stream::ptr m_record_stream;        // recording stream (nullptr if not recording)
 	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback

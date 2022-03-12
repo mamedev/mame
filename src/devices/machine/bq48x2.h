@@ -56,8 +56,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(rtc_watchdog_cb);
 
 	void nvram_default() override;
-	void nvram_read(emu_file &file) override;
-	void nvram_write(emu_file &file) override;
+	bool nvram_read(util::read_stream &file) override;
+	bool nvram_write(util::write_stream &file) override;
 
 	void device_start() override;
 

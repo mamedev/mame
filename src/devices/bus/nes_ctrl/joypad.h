@@ -31,16 +31,18 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	virtual u8 read_bit0() override;
 	virtual void write(u8 data) override;
+	virtual void set_latch() { m_latch = m_joypad->read(); }
 
 	required_ioport m_joypad;
 	u32 m_latch;  // wider than standard joypad's 8-bit latch to accomodate subclass devices
+	const u32 m_latch_fill;  // the new MSB as a joypad's shift register shifts
 };
 
 
@@ -53,7 +55,7 @@ public:
 	nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
 
 	virtual u8 read_bit0() override { return 0; }
 	virtual u8 read_exp(offs_t offset) override;
@@ -122,6 +124,19 @@ protected:
 };
 
 
+// ======================> nes_vboyctrl_device
+
+class nes_vboyctrl_device : public nes_joypad_device
+{
+public:
+	// construction/destruction
+	nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_JOYPAD,         nes_joypad_device)
 DECLARE_DEVICE_TYPE(NES_FCPAD_EXP,      nes_fcpadexp_device)
@@ -129,5 +144,6 @@ DECLARE_DEVICE_TYPE(NES_FCPAD_P2,       nes_fcpad2_device)
 DECLARE_DEVICE_TYPE(NES_CCPAD_LEFT,     nes_ccpadl_device)
 DECLARE_DEVICE_TYPE(NES_CCPAD_RIGHT,    nes_ccpadr_device)
 DECLARE_DEVICE_TYPE(NES_ARCSTICK,       nes_arcstick_device)
+DECLARE_DEVICE_TYPE(NES_VBOYCTRL,       nes_vboyctrl_device)
 
 #endif // MAME_BUS_NES_CTRL_JOYPAD_H

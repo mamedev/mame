@@ -11,11 +11,12 @@
 
 #pragma once
 
-#include "video/mc6845.h"
 #include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 
 /* Tags */
@@ -29,56 +30,6 @@
 
 #define DGNBETA_CPU_SPEED_HZ        2000000 /* 2MHz */
 #define DGNBETA_FRAMES_PER_SECOND   50
-
-#define RamSize             256         /* 256K by default */
-#define RamPageSize         4096        /* ram pages are 4096 bytes */
-
-#define MaxTasks            16          /* Tasks 0..15 */
-#define MaxPage             16          /* 16 4K pages */
-#define NoPagingTask        MaxTasks    /* Task registers to use when paging disabled 16 */
-
-#define RAMPage             0           /* Page with RAM in at power on */
-#define VideoPage           6           /* Page where video ram mapped */
-#define IOPage              MaxPage-1   /* Page for I/O */
-#define ROMPage             MaxPage-2   /* Page for ROM */
-#define LastPage            MaxPage-1
-
-#define RAMPageValue        0x00        /* page with RAM at power on */
-#define VideoPageValue      0x1F        /* Default page for video ram */
-#define NoMemPageValue      0xC0        /* Page guaranteed not to have memory in */
-#define ROMPageValue        0xFE        /* Page with boot ROM */
-#define IOPageValue         0xFF        /* Page with I/O & Boot ROM */
-
-#define TextVidBasePage     0x18        /* Base page of text video ram */
-
-/***** Keyboard stuff *****/
-#define NoKeyrows           0x0a        /* Number of rows in keyboard */
-
-/* From Dragon Beta OS9 keyboard driver */
-#define KAny                0x04        /* Any key pressed mask PB2 */
-#define KOutClk             0x08        /* Output shift register clock */
-#define KInClk              0x10        /* Input shift register clock */
-#define KOutDat             KInClk      /* Also used for data into output shifter */
-#define KInDat              0x20        /* Keyboard data in from keyboard (serial stream) */
-
-/***** Video Modes *****/
-
-enum BETA_VID_MODES
-{
-	TEXT_40x25,             /* Text mode 40x25 */
-	TEXT_80x25,             /* Text mode 80x25 */
-	GRAPH_320x256x4,        /* Graphics 320x256x4 */
-	GRAPH_320x256x16,       /* Graphics 320x256x16 */
-	GRAPH_640x512x2         /* Graphics 640X512X2 */
-};
-
-#define iosize  (0xfEFF-0xfc00)
-
-struct PageReg
-{
-	int     value;          /* Value of the page register */
-	uint8_t *memory;        /* The memory it actually points to */
-};
 
 
 class dgn_beta_state : public driver_device
@@ -109,6 +60,56 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	static constexpr unsigned RamSize           = 256;          // 256K by default
+	static constexpr unsigned RamPageSize       = 4096;         // ram pages are 4096 bytes
+
+	static constexpr unsigned MaxTasks          = 16;           // Tasks 0..15
+	static constexpr unsigned MaxPage           = 16;           // 16 4K pages
+	static constexpr unsigned NoPagingTask      = MaxTasks;     // Task registers to use when paging disabled 16
+
+	static constexpr unsigned RAMPage           = 0;            // Page with RAM in at power on
+	static constexpr unsigned VideoPage         = 6;            // Page where video ram mapped
+	static constexpr unsigned IOPage            = MaxPage-1;    // Page for I/O
+	static constexpr unsigned ROMPage           = MaxPage-2;    // Page for ROM
+	static constexpr unsigned LastPage          = MaxPage-1;
+
+	static constexpr uint8_t RAMPageValue       = 0x00;         // page with RAM at power on
+	static constexpr uint8_t VideoPageValue     = 0x1f;         // Default page for video ram
+	static constexpr uint8_t NoMemPageValue     = 0xc0;         // Page guaranteed not to have memory in
+	static constexpr uint8_t ROMPageValue       = 0xfe;         // Page with boot ROM
+	static constexpr uint8_t IOPageValue        = 0xff;         // Page with I/O & Boot ROM
+
+	static constexpr uint8_t TextVidBasePage    = 0x18;         // Base page of text video RAM
+
+	/***** Keyboard stuff *****/
+	static constexpr uint8_t NoKeyrows          = 0x0a;         // Number of rows in keyboard
+
+	/* From Dragon Beta OS9 keyboard driver */
+	static constexpr uint8_t KAny               = 0x04;         // Any key pressed mask PB2
+	static constexpr uint8_t KOutClk            = 0x08;         // Output shift register clock
+	static constexpr uint8_t KInClk             = 0x10;         // Input shift register clock
+	static constexpr uint8_t KOutDat            = KInClk;       // Also used for data into output shifter
+	static constexpr uint8_t KInDat             = 0x20;         // Keyboard data in from keyboard (serial stream)
+
+	/***** Video Modes *****/
+
+	enum BETA_VID_MODES
+	{
+		TEXT_40x25,             /* Text mode 40x25 */
+		TEXT_80x25,             /* Text mode 80x25 */
+		GRAPH_320x256x4,        /* Graphics 320x256x4 */
+		GRAPH_320x256x16,       /* Graphics 320x256x16 */
+		GRAPH_640x512x2         /* Graphics 640X512X2 */
+	};
+
+	static constexpr unsigned iosize = 0xfeff-0xfc00;
+
+	struct PageReg
+	{
+		int     value;          /* Value of the page register */
+		uint8_t *memory;        /* The memory it actually points to */
+	};
+
 	static void floppy_formats(format_registration &fr);
 
 	required_device<mc6845_device> m_mc6845;

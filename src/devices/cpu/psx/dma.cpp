@@ -196,7 +196,7 @@ void psxdma_device::dma_finished( int index )
 	dma_stop_timer( index );
 }
 
-void psxdma_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void psxdma_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	dma_finished(id);
 }

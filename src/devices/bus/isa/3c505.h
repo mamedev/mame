@@ -90,8 +90,8 @@ protected:
 
 	// adapter register helpers
 	u8 acmd_r();
-	u8 acr_r() { return m_acr; };
-	u8 asr_r() { return m_asr; };
+	u8 acr_r() { return m_acr; }
+	u8 asr_r() { return m_asr; }
 	u16 adata_r();
 	void acmd_w(u8 data);
 	void acr_w(u8 data);

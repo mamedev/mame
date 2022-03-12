@@ -216,7 +216,7 @@ To Do:
   2019-07-31
   ----------
 
-  - Added Victor 5 (otiginal set, now parent).
+  - Added Victor 5 (original set, now parent).
   - Dumped the samples ROMs of Victor 5 and Victor 21, and hooked the OKI6295.
 
 
@@ -269,6 +269,7 @@ public:
 	void stbsub(machine_config &config);
 	void tisub(machine_config &config);
 	void crsbingo(machine_config &config);
+	void dinofmly(machine_config &config);
 	void srider(machine_config &config);
 	void victor21(machine_config &config);
 	void sharkpy(machine_config &config);
@@ -341,6 +342,7 @@ private:
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void crsbingo_map(address_map &map);
+	void dinofmly_map(address_map &map);
 	void mtrainnv_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void sharkpy_map(address_map &map);
@@ -795,6 +797,15 @@ void subsino_state::srider_map(address_map &map)
 	map(0x0d01b, 0x0d01b).w(FUNC(subsino_state::tiles_offset_w));
 	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+}
+
+void subsino_state::dinofmly_map(address_map &map)
+{
+	srider_map(map);
+
+	map(0x0d800, 0x0d800).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0d801, 0x0d801).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0d802, 0x0d802).w("ramdac", FUNC(ramdac_device::mask_w));
 }
 
 void subsino_state::sharkpy_map(address_map &map)
@@ -2812,13 +2823,25 @@ void subsino_state::srider(machine_config &config)
 	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
 }
 
-
 void subsino_state::sharkpy(machine_config &config)
 {
 	srider(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::sharkpy_map);
+}
+
+void subsino_state::dinofmly(machine_config &config)
+{
+	srider(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::dinofmly_map);
+
+	PALETTE(config.replace(), m_palette).set_entries(0x100);
+
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 }
 
 void subsino_state::tisub(machine_config &config)
@@ -3754,6 +3777,43 @@ ROM_START( mtrainnv )
 ROM_END
 
 
+ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dino iii tetris_1 ver1.3.u18", 0x00000, 0x10000, CRC(ddf09230) SHA1(1e83b17cfc64b5eba484abfc922a67c9c3e0d1bf) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "dino iii tetris_3 ver1.0.u16", 0x00000, 0x08000, CRC(88319fdf) SHA1(f0e97476d9664a5bdf16c27568a2c044d0818fad) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
+	ROM_LOAD( "dino iii tetris_2 ver1.0.u17", 0x20000, 0x08000, CRC(fa355811) SHA1(d2f40e648d0c9f72c38e39021897cba23f09a56f) )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u54", 0x00000, 0x20000, CRC(4e2ef62a) SHA1(77dbc2a03619ad3608a27ed70e74f3e76431498d) ) // missing label
+ROM_END
+
+ROM_START( dinofmlya )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tangasofii rom1.u18", 0x00000, 0x10000, CRC(0039174c) SHA1(452d0704620600b8c376674a300b2481598f31a8) ) // hand-written label
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "dino iii tetris_3 ver1.0.u16", 0x00000, 0x08000, CRC(88319fdf) SHA1(f0e97476d9664a5bdf16c27568a2c044d0818fad) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
+	ROM_LOAD( "dino iii tetris_2 ver1.0.u17", 0x20000, 0x08000, CRC(fa355811) SHA1(d2f40e648d0c9f72c38e39021897cba23f09a56f) )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u54", 0x00000, 0x20000, CRC(4e2ef62a) SHA1(77dbc2a03619ad3608a27ed70e74f3e76431498d) ) // missing label
+ROM_END
+
+
 /***************************************************************************
 *                        Driver Init / Decryption                          *
 ***************************************************************************/
@@ -3936,6 +3996,9 @@ GAMEL( 1992, tisub,       0,       tisub,    tisub,    subsino_state, init_tisub
 GAMEL( 1992, tisuba,      tisub,   tisub,    tisub,    subsino_state, init_tisuba,      ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,               layout_tisub    )
 
 GAMEL( 1991, crsbingo,    0,       crsbingo, crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                       0,               layout_crsbingo )
+
+GAMEL( 1994, dinofmly,    0,       dinofmly, sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",         "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
+GAMEL( 1995, dinofmlya,   dinofmly,dinofmly, sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
 
 GAMEL( 1995, stbsub,      0,       stbsub,   stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",       0,               layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
 GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",  MACHINE_NOT_WORKING, layout_stisub   ) // need proper patches

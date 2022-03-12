@@ -33,7 +33,10 @@ public:
 		TIMER_LIGHTPEN_TRIGGER,
 		TIMER_VECTREX_REFRESH,
 		TIMER_VECTREX_ZERO_INTEGRATORS,
-		TIMER_UPDATE_SIGNAL
+		TIMER_UPDATE_ANALOG,
+		TIMER_UPDATE_BLANK,
+		TIMER_UPDATE_MUX_ENABLE,
+		TIMER_UPDATE_RAMP
 	};
 
 	void vectrex_cart(device_slot_interface &device);
@@ -69,7 +72,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(lightpen_trigger);
 	TIMER_CALLBACK_MEMBER(vectrex_refresh);
 	TIMER_CALLBACK_MEMBER(vectrex_zero_integrators);
-	TIMER_CALLBACK_MEMBER(update_signal);
+	void update_vector();
 	uint8_t vectrex_via_pb_r();
 	uint8_t vectrex_via_pa_r();
 	void v_via_pb_w(uint8_t data);
@@ -81,7 +84,7 @@ protected:
 
 	void vectrex_base(machine_config &config);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void configure_imager(bool reset_refresh, const double *imager_angles);
 	void vectrex_configuration();

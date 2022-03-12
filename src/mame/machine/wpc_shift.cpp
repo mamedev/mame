@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "wpc_shift.h"
 
-DEFINE_DEVICE_TYPE(WPC_SHIFT, wpc_shift_device, "wpc_shift", "Windows Pinball Controller Shifter")
+DEFINE_DEVICE_TYPE(WPC_SHIFT, wpc_shift_device, "wpc_shift", "Williams Pinball Controller Shifter")
 
 wpc_shift_device::wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_SHIFT, tag, owner, clock)

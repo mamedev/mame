@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_irq )
 	m_irq_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

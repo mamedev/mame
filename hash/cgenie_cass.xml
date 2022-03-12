@@ -9,33 +9,56 @@ They were the German distributor of the Colour Genie EG2000 computers.
 
 Known missing software titles (incomplete):
 
+ARRAY, Luidger Röckrath (also in the book "Assemblertricks auf dem ColourGenie") (Tape and Disk versions)
+Bar (aka 'Drinks'), TCS, 1984 (from the book "Das Colour-Genie Buch 2")
+Basic-Monitor, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 Blitz, MCE, 1983
-Break Out
+Bubble Sort, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
+Code Breaker, TCG, 1983 (from the book "Colour BASIC - leicht gelernt")
+COLBAS V1.0, Luidger Röckrath, 1983 (also in the book "Assemblertricks auf dem ColourGenie")
 Colour-Monitor I
 Colour-Skat
-Colour-Text
+Colour-Text, TCS, 1983 (Horst Kausch)
 Composer, TCS, 1983 (Carsten Schmidt)
 Conquer
+COPBIT V3.0, Luidger Röckrath, 1984 (also in the book "Assemblertricks auf dem ColourGenie")
+Dirsort, 1984, TCS (from the book "Das Colour-Genie Buch 3")
+Disketten Umbenennung, 1984, TCS (from the book "Das Colour-Genie Buch 3")
 Double Agent, Algray Software, 1983
 Doppelwurm, TCS, 1983
 Draughts (A. G. Kneeus)
 Droids, Arcade Games, 1984 (R. Bartlett)
 ExNimroid, TCS, 1983
+Extended Directory, 1984, TCS (from the book "Das Colour-Genie Buch 3")
 Exterminator Part 1: The Birds, Algray Software, 1983
+Fast Format, TCS, 1984 (from the book "Das Colour-Genie Buch 2")
 Fortress of Evil, Algray Software, 1983
 Galactic Attack (Klaus Weber)
+Garbage Collect, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
+Gleichungen mit 3 Unbekannten, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
+Lissajou-Figuren, TCS, 1984 (from the book "Das Colour-Genie Buch 2")
 Mau-Mau, TCS, 1982 (Carsten Schmidt, Kalle Braun)
 Mampf (Mampfman?), TCS, 1983
 Mathematik-Lernprogramm
 Mausi, TCS, 1983
 Memory
+Monitor, 1984, TCS (from the book "Das Colour-Genie Buch 3") (Tape and Disk versions)
+Neuer Zeichensatz, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 Opamp (Operationsverstärker Applikationen) (Uwe Gerber)
 Optik (Grundeigenschaften des Lichts)
 Panzerkampf, TCS, 1983
-Sound-Editor
-Space Figher, Molimerx, 1982
-Screen-Printer (standalone)
+Pascalsches Dreieck, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
+Sabotage, TCG, 1983 (from the book "Colour BASIC - leicht gelernt")
+SAVETAPE V1.0, Luidger Röckrath, 1984 (also in the book "Assemblertricks auf dem ColourGenie")
+SEDIT, Luidger Röckrath (also in the book "Assemblertricks auf dem ColourGenie")
+Sektor In-/Output, TCS, 1984 (from the book "Das Colour-Genie Buch 2")
+Space Fighter, Molimerx, 1982
+Screen-Printer, TCS, 1983 (from the book "Das Colour-Genie Buch 1", but also sold separately)
 Sucker!, Arcade Games
+Run to Morlock's Tower, TCS, 1984 (from the book "Das Colour-Genie Buch 2")
+Tape-Editor, 1984, TCS (from the book "Das Colour-Genie Buch 3") (not the same as 'tapeedit')
+Tilgungsplan, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
+Tuerme von Hanoi, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 
 TODO: There are some hacked/modified images. Remove when the best version
 is confirmed.
@@ -54,6 +77,19 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="10894">
 				<rom name="adressdatei2.cas" size="10894" crc="3fe7d06a" sha1="398c8fb13df611b3fea49d8a9b3ed02139e12b35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- From the book "Das Colour-Genie Buch 2" -->
+	<software name="basicm">
+		<description>Basic-Monitor</description>
+		<year>1984</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="3700">
+				<rom name="basic_monitor.cas" size="3700" crc="a1ad2580" sha1="855110e0ed1afad663e4c42d2faf057d15a7bf79" />
 			</dataarea>
 		</part>
 	</software>
@@ -336,14 +372,29 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- From the book "Colour BASIC - leicht gelernt" -->
 	<software name="editdef">
 		<description>Editor fuer definierbare Zeichen</description>
+		<year>1983</year>
+		<publisher>TCG</publisher>
+		<info name="author" value="Clemens Becher" />
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="6888">
+				<rom name="editdef.cas" size="6888" crc="c54f7a61" sha1="32db514aa648da670426581cd139bc5d99fcc28f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Modified version of 'editdef'? -->
+	<software name="editdefa">
+		<description>Editor fuer definierbare Zeichen (modified?)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CLOAD, enter RUN to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7477">
-				<rom name="editdef.cas" size="7477" crc="da0d26f5" sha1="d8375ae9692bd6d51354268f8a0e13d0d97cfcde" />
+				<rom name="editdefa.cas" size="7477" crc="da0d26f5" sha1="d8375ae9692bd6d51354268f8a0e13d0d97cfcde" />
 			</dataarea>
 		</part>
 	</software>
@@ -381,9 +432,9 @@ is confirmed.
 	<software name="grafiked" supported="no">
 		<description>Grafik-Editor</description>
 		<year>1983</year>
-		<publisher>TCS</publisher>
+		<publisher>TCG</publisher>
 		<info name="author" value="Udo Gerber" />
-		<info name="usage" value="Type SYSTEM and load with GRAFIK" />
+		<info name="usage" value="Type SYSTEM and load with GRAFIK (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="41591">
 				<!-- Aborts with a syntax error, bad? -->
@@ -392,15 +443,26 @@ is confirmed.
 		</part>
 	</software>
 
-	<!-- Real title unknown -->
-	<software name="machinem">
-		<description>Machine Monitor (?)</description>
+	<software name="linearg">
+		<description>Lineare Gleichungssysteme</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CLOAD, enter RUN to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="3700">
-				<rom name="machine_monitor.cas" size="3700" crc="a1ad2580" sha1="855110e0ed1afad663e4c42d2faf057d15a7bf79" />
+			<dataarea name="cass" size="2552">
+				<rom name="lineare_gleichungssysteme.cas" size="2552" crc="b109dc16" sha1="90c417c040e19c63231d813f97d54875901acc3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="listform">
+		<description>Listing-Formatierer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start (req. floppy and printer)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="669">
+				<rom name="listing_formatierer.cas" size="669" crc="68f61c65" sha1="5658fbf41e04293a81103d2665f8b337351bceee" />
 			</dataarea>
 		</part>
 	</software>
@@ -497,6 +559,18 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="progmod">
+		<description>Programm-Modifizierer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start (req. floppy)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="669">
+				<rom name="programm_modifizierer.cas" size="669" crc="89dd8429" sha1="6c07fb60ebca8d3b44f5f4404dd745c79eb5e3bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="realcomp">
 		<description>Real-Compiler</description>
 		<year>198?</year>
@@ -572,6 +646,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- From the book "Colour BASIC - leicht gelernt" -->
+	<software name="sounded">
+		<description>Sound Editor</description>
+		<year>1983</year>
+		<publisher>TCG</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="3661">
+				<rom name="sound_editor.cas" size="3661" crc="b0eca68e" sha1="2da550aec4e440e4f980bc7efb64fee158618bc7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spriteed">
 		<description>Sprite-Editor</description>
 		<year>1983</year>
@@ -632,6 +719,19 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="6964">
 				<rom name="synthesizer.cas" size="6964" crc="e8338e8a" sha1="66ba121a611acdcf3a96a84dad39ff6c15ae97ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synthy">
+		<description>Synthy</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with SYNTH, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="2094">
+				<rom name="synthy.cas" size="2094" crc="0fe53b80" sha1="07a5ea51cc550e3635a90e05f907d4f008429832" />
 			</dataarea>
 		</part>
 	</software>
@@ -712,6 +812,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- Title might be different -->
+	<software name="uhrzeit">
+		<description>Uhrzeit</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start (req. floppy)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="237">
+				<rom name="uhrzeit.cas" size="237" crc="b7ef745f" sha1="80ffac03fbf2753420fd4e8b31d35316190d307e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="unkmulti" supported="no">
 		<description>Unknown multi-program tape</description>
 		<year>198?</year>
@@ -775,6 +888,19 @@ is confirmed.
 	</software>
 
 	<!-- Demos -->
+
+	<!-- From the book "Das Colour-Genie Buch 2" -->
+	<software name="bluesmak">
+		<description>Bluesmaker</description>
+		<year>1984</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="984">
+				<rom name="bluesmaker.cas" size="984" crc="6a23d327" sha1="9c2dd48fa30a6f1fd14287ca1d0e709054bc76c4" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="colemu3w">
 		<description>Colour Emu 3.0 Welcome Tape</description>
@@ -1124,10 +1250,11 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- From the book "Das Colour-Genie Buch 3" -->
 	<software name="ballon">
 		<description>Ballon</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>TCS</publisher>
 		<info name="usage" value="Type SYSTEM and load with BALLON, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4223">
@@ -1162,6 +1289,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="breakout">
+		<description>Break-Out</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with BREAK, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="7271">
+				<rom name="break_out.cas" size="7271" crc="f97a49df" sha1="af9d5bac73d5672bcb8585c3e6294bf99985fda0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bruecke">
 		<description>Brücke</description>
 		<year>1984</year>
@@ -1175,7 +1315,7 @@ is confirmed.
 		</part>
 	</software>
 
-	<!-- From the Colour Genie manual -->
+	<!-- From the book "Das Colour-Genie Buch 1" -->
 	<software name="bumm">
 		<description>Bumm Bumm</description>
 		<year>198?</year>
@@ -2468,6 +2608,23 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="micronop">
+		<description>Micronopoly</description>
+		<year>1983</year>
+		<publisher>JD Tronics</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="2599">
+				<rom name="micronopoly_part1.cas" size="2599" crc="7f9132c5" sha1="4f9025f77ced85a233c36e3b073f46557bb5312b" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cgenie_cass">
+			<dataarea name="cass" size="21165">
+				<rom name="micronopoly_part2.cas" size="21165" crc="73983a6d" sha1="57d343b8cb4468e51d29ab64c458b4dd10e30e84" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="milliped">
 		<description>Millipede</description>
 		<year>1984</year>
@@ -2632,6 +2789,19 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="13412">
 				<rom name="pac_boy.cas" size="13412" crc="3f9d780b" sha1="fb6da292a700917cf687d9e00493ea2b6b53567e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pacman</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with PACMAN, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="11423">
+				<rom name="pacman.cas" size="11423" crc="aef392a7" sha1="e856dc0f8bff2bc1e0a5625e4c0b5402dca96d3c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2848,10 +3018,11 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- From the book "Das Colour-Genie Buch 3" -->
 	<software name="santapar">
 		<description>Santa Paravia und Fuimaccio</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>TCS</publisher>
 		<info name="usage" value="Load with CLOAD, enter RUN to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="13860">
@@ -2952,6 +3123,19 @@ is confirmed.
 		</part>
 	</software>
 
+	<software name="spacefig">
+		<description>Space-Fight</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerd Meier" />
+		<info name="usage" value="Type SYSTEM and load with SPACE, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="7983">
+				<rom name="space_fight.cas" size="7983" crc="a7fec2fb" sha1="0c5718e5f052600338672cd287ef703b63937326" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spaceman">
 		<description>Spaceman</description>
 		<year>198?</year>
@@ -3002,8 +3186,8 @@ is confirmed.
 		</part>
 	</software>
 
-	<!-- Needs ROMs v2 -->
-	<software name="sstartrk" supported="no">
+	<!-- From the book "Das Colour-Genie Buch 2", but modified (or another source?) -->
+	<software name="sstartrk">
 		<description>Super Star Treck</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3309,7 +3493,7 @@ is confirmed.
 	<software name="wurm">
 		<description>Wurm</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>TGC</publisher>
 		<info name="usage" value="Type SYSTEM and load with WURM, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8399">
@@ -3318,26 +3502,28 @@ is confirmed.
 		</part>
 	</software>
 
+	<!-- From the book "Das Colour-Genie Buch 2" -->
 	<software name="zalaga">
 		<description>Zalaga</description>
+		<year>1984</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Type SYSTEM and load with ZALAGA, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="4228">
+				<rom name="zalaga.cas" size="4228" crc="d9d9aa24" sha1="62e53a50fdb1c1ac844e88d7571296588feda7bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Same as 'zalaga', but modified to autostart -->
+	<software name="zalagaa" cloneof="zalaga">
+		<description>Zalaga (autostart)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Type SYSTEM and load with ZALAGA" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4334">
-				<rom name="zalaga.cas" size="4334" crc="836706e0" sha1="7ae6c09548fecc206dc1c60017ee80dcff537fe3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zalagaa" cloneof="zalaga">
-		<description>Zalaga (no autostart)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with ZALAGA, enter / to start" />
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="4228">
-				<rom name="zalaga_noauto.cas" size="4228" crc="d9d9aa24" sha1="62e53a50fdb1c1ac844e88d7571296588feda7bf" />
+				<rom name="zalaga_auto.cas" size="4334" crc="836706e0" sha1="7ae6c09548fecc206dc1c60017ee80dcff537fe3" />
 			</dataarea>
 		</part>
 	</software>

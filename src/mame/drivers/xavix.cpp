@@ -232,6 +232,7 @@
 
 #include "emu.h"
 #include "includes/xavix.h"
+#include "softlist_dev.h"
 
 
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably

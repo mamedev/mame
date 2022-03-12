@@ -235,7 +235,7 @@ public:
 	void mpu4base(machine_config &config);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);

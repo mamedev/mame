@@ -57,13 +57,14 @@ protected:
 	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	int     m_beol;
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	static const device_timer_id HOLD_TIME = 0;
 	static const device_timer_id FREE_TIME = 1;
 
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	std::string tts(attotime t);
 	devcb_read8   m_mem_read_cb; // Callback to read memory
 	devcb_write_line m_hold_cb;
@@ -109,13 +110,14 @@ public:
 
 	uint8_t cruread(offs_t offset);
 	void cruwrite(offs_t offset, uint8_t data);
-	void device_start() override;
-	ioport_constructor device_input_ports() const override;
 	auto rombank_cb() { return m_set_rom_bank.bind(); }
 
 protected:
 	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	bool m_have_banked_rom;
+
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void hexbus_value_changed(uint8_t data) override;
 
@@ -197,8 +199,8 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	void device_start() override { };
-	void device_config_complete() override;
+	virtual void device_start() override { }
+	virtual void device_config_complete() override;
 
 private:
 	ti992_expport_attached_device*    m_connected;
@@ -210,12 +212,14 @@ class ti992_expram_device : public ti992_expport_attached_device
 {
 public:
 	ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void readz(offs_t offset, uint8_t *value) override;
-	void write(offs_t offset, uint8_t data) override;
+	virtual void readz(offs_t offset, uint8_t *value) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override {}
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	void device_start() override {};
-	void device_add_mconfig(machine_config &config) override;
 	required_device<ram_device> m_ram;
 };
 

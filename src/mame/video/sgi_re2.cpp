@@ -191,7 +191,7 @@ void sgi_re2_device::reg_w(offs_t offset, u32 data)
 		logerror("reg_w unhandled register 0x%02x data 0x%x\n", offset, data);
 }
 
-void sgi_re2_device::step(void *ptr, int param)
+void sgi_re2_device::step(s32 param)
 {
 	switch (m_state)
 	{

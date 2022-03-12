@@ -25,7 +25,7 @@
 #include "bus/rs232/terminal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -99,7 +99,7 @@ private:
 	int m_signal_count;
 	uint8_t m_nmi_enabled;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -153,7 +153,7 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

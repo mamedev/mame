@@ -130,6 +130,7 @@ from Brett Selwood and Andrew Davies.
 #include "includes/mbee.h"
 #include "formats/mbee_cas.h"
 #include "sound/sn76496.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void mbee_state::mbee_mem(address_map &map)

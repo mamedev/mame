@@ -124,6 +124,7 @@ const double XTAL::known_xtals[] = {
 	  5'460'000, /* 5.46_MHz_XTAL          ec1840 and ec1841 keyboard */
 	  5'529'600, /* 5.5296_MHz_XTAL        Kontron PSI98 keyboard */
 	  5'626'000, /* 5.626_MHz_XTAL         RCA CDP1869 PAL dot clock */
+	  5'659'200, /* 5.6592_MHz_XTAL        Digilog 320 dot clock */
 	  5'670'000, /* 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock */
 	  5'714'300, /* 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards */
 	  5'856'000, /* 5.856_MHz_XTAL         HP 3478A Multimeter */
@@ -263,6 +264,7 @@ const double XTAL::known_xtals[] = {
 	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
+	 16'537'000, /* 16.537_MHz_XTAL        Falco terminals 80-column clock */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
 	 16'666'600, /* 16.6666_MHz_XTAL       Firebeat GCU */
@@ -374,7 +376,7 @@ const double XTAL::known_xtals[] = {
 	 28'475'000, /* 28.475_MHz_XTAL        CoCo 3 PAL */
 	 28'480'000, /* 28.48_MHz_XTAL         Chromatics CGC-7900 */
 	 28'636'000, /* 28.636_MHz_XTAL        Super Kaneko Nova System */
-	 28'636'363, /* 28.636363_MHz_XTAL     Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier)*/
+	 28'636'363, /* 28.636363_MHz_XTAL     Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier), NEC PC-88xx */
 	 28'640'000, /* 28.64_MHz_XTAL         Fuuki FG-1c AI AM-2 PCB */
 	 28'700'000, /* 28.7_MHz_XTAL          - */
 	 29'376'000, /* 29.376_MHz_XTAL        Qume QVT-103 */
@@ -405,6 +407,7 @@ const double XTAL::known_xtals[] = {
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
+	 35'469'000, /* 35.469_MHz_XTAL        ZX Spectrum +2/+3 (~8x PAL subcarrier) */
 	 35'640'000, /* 35.640_MHz_XTAL        HDS200 132-column display clock */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
 	 35'840'000, /* 35.84_MHz_XTAL         Akai MPC 60 voice PCB */
@@ -454,6 +457,7 @@ const double XTAL::known_xtals[] = {
 	 57'272'727, /* 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
 	 57'283'200, /* 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display */
 	 58'000'000, /* 58_MHz_XTAL            Magic Reel (Play System) */
+	 58'982'400, /* 58.9824_MHz_XTAL       Wyse WY-65 */
 	 59'292'000, /* 59.292_MHz_XTAL        Data General D461 */
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */

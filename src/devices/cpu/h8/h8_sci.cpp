@@ -309,7 +309,7 @@ void h8_sci_device::device_reset()
 	cur_sync_time = attotime::never;
 }
 
-void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Used only to force system-wide syncs
 }

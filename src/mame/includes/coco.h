@@ -132,7 +132,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -147,7 +147,7 @@ protected:
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(uint8_t *cart_base) { };
+	virtual void update_cart_base(uint8_t *cart_base) { }
 
 protected:
 	// timer constants

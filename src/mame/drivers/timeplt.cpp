@@ -609,7 +609,7 @@ ROM_START( spaceplta )
 	ROM_LOAD( "4",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "5",          0x0000, 0x2000, CRC(76caa8af) SHA1(f81bb73877d415a6587a32bddaad6db8a8fd4941) )
+	ROM_LOAD( "5",          0x0000, 0x2000, CRC(76caa8af) SHA1(f81bb73877d415a6587a32bddaad6db8a8fd4941) ) // also seen with an original ROM from tileplt (so that it shows the original title)
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "6",          0x0000, 0x2000, CRC(86ab1ae7) SHA1(8e3f84aa6b2c21e7e1383ea1811fd99a4d940a23) ) // difference to spaceplt: erased Konami

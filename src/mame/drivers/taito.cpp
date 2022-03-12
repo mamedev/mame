@@ -9,7 +9,7 @@ Unable to locate any meaningful schematics.
 
 You need to have a ball in the outhole (hold down X) when starting a game.
 
-To activate setup mode, tuen on both the Adjust and Service dipswitches. Service needs to
+To activate setup mode, turn on both the Adjust and Service dipswitches. Service needs to
 be on to access any of the dipswitch functions.
 
 Status of each game:

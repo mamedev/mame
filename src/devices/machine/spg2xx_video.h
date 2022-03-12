@@ -30,9 +30,9 @@ public:
 	uint16_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint16_t data);
 
-	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); };
+	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); }
 
-	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -46,7 +46,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void do_sprite_dma(uint32_t len);
 

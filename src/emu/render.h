@@ -47,18 +47,11 @@
 #define MAME_EMU_RENDER_H
 
 #include "rendertypes.h"
-#include "screen.h"
 
-#include <array>
 #include <cmath>
-#include <functional>
-#include <map>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 

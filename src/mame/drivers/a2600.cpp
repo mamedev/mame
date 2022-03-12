@@ -91,7 +91,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -503,8 +503,8 @@ void a2600_pop_state::machine_start()
 	a2600_base_state::machine_start();
 	m_bank->configure_entries(0, 48, memregion("maincpu")->base(), 0x1000);
 	m_bank->set_entry(0);
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::reset_timer_callback),this), nullptr);
-	m_game_select_button_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::game_select_button_timer_callback),this), nullptr);
+	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::reset_timer_callback),this));
+	m_game_select_button_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::game_select_button_timer_callback),this));
 }
 
 
@@ -592,7 +592,7 @@ static void a2600_cart(device_slot_interface &device)
 
 void a2600_state::a2600_cartslot(machine_config &config)
 {
-	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr);
+	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr).set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a2600");

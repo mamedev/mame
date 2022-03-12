@@ -26,6 +26,7 @@
 #include "machine/mc68681.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "emupal.h"
 #include "screen.h"
 
 class att610_state : public driver_device
@@ -77,6 +78,21 @@ u32 att610_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	return 0;
 }
+
+static const gfx_layout char_layout =
+{
+	8, 13,
+	RGN_FRAC(1, 1),
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8 },
+	8 * 16
+};
+
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+GFXDECODE_END
 
 void att610_state::cart_select_w(u8 data)
 {
@@ -133,6 +149,10 @@ void att610_state::att610(machine_config &config)
 	//m_screen->set_raw(27.72_MHz_XTAL, 1232, 0, 924, 375, 0, 351);
 	m_screen->set_screen_update(FUNC(att610_state::screen_update));
 	m_screen->screen_vblank().set("ctc", FUNC(z80ctc_device::trg0));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
 }
 
 ROM_START(att610)
@@ -146,4 +166,20 @@ ROM_START(att610)
 	ROM_LOAD("att-tc85_456309-1.h7", 0x0000, 0x2000, CRC(d313e022) SHA1(a24df1d8d8c55413e4cdb0734783c0fa244bdf00)) // HN27C64G-15
 ROM_END
 
+ROM_START( att615 )
+	ROM_REGION(0x10000, "firmware", 0)
+	ROM_LOAD("523481059.bin", 0x00000, 0x10000, CRC(9649bf59) SHA1(bed7900f8848a98b04ba69492c3bc3727d30d67d))
+
+	ROM_REGION(0x2000, "chargen", 0)
+	ROM_LOAD("457756-2.bin", 0x0000, 0x2000, CRC(85871007) SHA1(018ea318ea9668e65043bc7c52c5b6dd3ed68687))
+
+	ROM_REGION(0x6000, "cartridge", 0)
+	ROM_LOAD("523458727.bin", 0x0000, 0x4000, CRC(beea70fd) SHA1(7b7a50832e44e5ece85a0ef83d40599f9fff5692))
+	ROM_LOAD("523458735.bin", 0x4000, 0x2000, CRC(7f1b9d63) SHA1(0e07c435e7f6bef153e4b1f0d1d9d391a7562602))
+
+	ROM_REGION(0x1000, "keyboard", 0)
+	ROM_LOAD("20417-21_8031.bin", 0x0000, 0x1000, CRC(c48b4a2a) SHA1(f01dadc0239f81a58d50ae077f5cb3a029bad110))
+ROM_END
+
 COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
+COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_IS_SKELETON)

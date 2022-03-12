@@ -674,7 +674,7 @@ private:
 	void reprime_sync_timer();
 
 	// timer callback for synchronous streams
-	void sync_update(void *, s32);
+	void sync_update(s32);
 
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);
@@ -817,7 +817,7 @@ private:
 	stream_buffer::sample_t adjust_toward_compressor_scale(stream_buffer::sample_t curscale, stream_buffer::sample_t prevsample, stream_buffer::sample_t rawsample);
 
 	// periodic sound update, called STREAMS_UPDATE_FREQUENCY per second
-	void update(void *ptr = nullptr, s32 param = 0);
+	void update(s32 param = 0);
 
 	// internal state
 	running_machine &m_machine;           // reference to the running machine

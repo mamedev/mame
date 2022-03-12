@@ -130,7 +130,7 @@ void mdisk_state::fdc_side_w(uint8_t data)
 void mdisk_state::machine_start()
 {
 	// timer to switch rom to ram
-	m_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdisk_state::rom_timer_callback), this), nullptr);
+	m_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdisk_state::rom_timer_callback), this));
 
 	// register for save states
 	save_item(NAME(m_uart1_rxrdy));

@@ -132,7 +132,7 @@ uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 *
 ***************************************************/
 
-void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

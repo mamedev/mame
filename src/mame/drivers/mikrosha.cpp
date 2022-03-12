@@ -15,6 +15,7 @@
 #include "machine/pit8253.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"

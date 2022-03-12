@@ -41,6 +41,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
@@ -1197,63 +1198,103 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
-				src_aspect = 1.0 / src_aspect;
+				src_aspect = 1.0f / src_aspect;
 
-			// get target aspect
-			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
+			// we need the ratio of target to source aspect
+			float aspect_ratio = m_keepaspect ? (float)target_width / (float)target_height * target_pixel_aspect / src_aspect : 1.0f;
+
+			// first compute (a, b) scale factors to fit the screen
+			float a = (float)target_width / src_width;
+			float b = (float)target_height / src_height;
 
 			// apply automatic axial stretching if required
 			int scale_mode = m_scale_mode;
-			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
+			if (scale_mode == SCALE_FRACTIONAL_AUTO)
+				scale_mode = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY) ?
+							SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+
+			// determine the scaling method for each axis
+			bool a_is_fract = (scale_mode == SCALE_FRACTIONAL_X || scale_mode == SCALE_FRACTIONAL);
+			bool b_is_fract = (scale_mode == SCALE_FRACTIONAL_Y || scale_mode == SCALE_FRACTIONAL);
+
+			// check if we have user defined scale factors, if so use them instead, but only on integer axes
+			int a_user = a_is_fract ? 0 : m_int_scale_x;
+			int b_user = b_is_fract ? 0 : m_int_scale_y;
+
+			// we allow overscan either explicitely or if integer scale factors are forced by user
+			bool int_overscan = m_int_overscan || (m_keepaspect && (a_user != 0 || b_user != 0));
+			float a_max = std::max(a, (float)a_user);
+			float b_max = std::max(b, (float)b_user);
+
+
+			// get the usable bounding box considering the type of scaling for each axis
+			float usable_aspect = (a_is_fract ? a : std::max(1.0f, floorf(a))) * src_width /
+								 ((b_is_fract ? b : std::max(1.0f, floorf(b))) * src_height) * target_pixel_aspect;
+
+			// depending on the relative shape between target and source, let's define 'a' and 'b' so that:
+			// * a is the leader axis (first to hit a boundary)
+			// * b is the follower axis
+			if (usable_aspect > src_aspect)
 			{
-				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
-				scale_mode = is_rotated ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+				std::swap(a, b);
+				std::swap(a_user, b_user);
+				std::swap(a_is_fract, b_is_fract);
+				std::swap(a_max, b_max);
+				aspect_ratio = 1.0f / aspect_ratio;
 			}
 
-			// first compute scale factors to fit the screen
-			float xscale = (float)target_width / src_width;
-			float yscale = (float)target_height / src_height;
+			// now find an (a, b) pair that best fits our boundaries and scale options
+			float a_best = 1.0f, b_best = 1.0f;
+			float diff = 1000;
 
-			// apply aspect correction
-			if (m_keepaspect)
+			// fill (a0, a1) range
+			float u = a_user == 0 ? a : (float)a_user;
+			float a_range[] = {a_is_fract ? u : std::max(1.0f, floorf(u)), a_is_fract ? u : std::max(1.0f, roundf(u))};
+
+			for (float aa : a_range)
 			{
-				if (target_aspect > src_aspect)
-					xscale *= src_aspect / target_aspect;
-				else
-					yscale *= target_aspect / src_aspect;
-			}
+				// apply aspect correction to 'b' axis if needed, considering resulting 'a' borders
+				float ba = b * (m_keepaspect ? aspect_ratio * (aa / a) : 1.0f);
 
-			bool x_fits = render_round_nearest(xscale) * src_width <= target_width;
-			bool y_fits = render_round_nearest(yscale) * src_height <= target_height;
+				// fill (b0, b1) range
+				float v = b_user == 0 ? ba : (float)b_user;
+				float b_range[] = {b_is_fract ? v : std::max(1.0f, floorf(v)), b_is_fract ? v : std::max(1.0f, roundf(v))};
 
-			// compute integer scale factors
-			float integer_x = std::max(1.0f, float(m_int_overscan || x_fits ? render_round_nearest(xscale) : floor(xscale)));
-			float integer_y = std::max(1.0f, float(m_int_overscan || y_fits ? render_round_nearest(yscale) : floor(yscale)));
+				for (float bb : b_range)
+				{
+					// we may need to propagate proportions back to 'a' axis
+					float ab = aa;
+					if (m_keepaspect && a_user == 0)
+					{
+						if (a_is_fract) ab *= (bb / ba);
+						else if (b_user != 0) ab = std::max(1.0f, roundf(ab * (bb / ba)));
+					}
 
-			// check if we have user defined scale factors, if so use them instead
-			integer_x = m_int_scale_x > 0 ? m_int_scale_x : integer_x;
-			integer_y = m_int_scale_y > 0 ? m_int_scale_y : integer_y;
+					// if overscan isn't allowed, discard values that exceed the usable bounding box, except a minimum of 1.0f
+					if (!int_overscan && ((ab > a_max && bb > 1.0f) || (bb > b_max && ab > 1.0f)))
+						continue;
 
-			// now apply desired scale mode
-			if (scale_mode == SCALE_FRACTIONAL_X)
-			{
-				if (m_keepaspect) xscale *= integer_y / yscale;
-				yscale = integer_y;
+					// score the result
+					float new_diff = fabsf(aspect_ratio * (a / b) - (ab / bb));
+
+					if (new_diff <= diff)
+					{
+						diff = new_diff;
+						a_best = ab;
+						b_best = bb;
+					}
+				}
 			}
-			else if (scale_mode == SCALE_FRACTIONAL_Y)
-			{
-				if (m_keepaspect) yscale *= integer_x / xscale;
-				xscale = integer_x;
-			}
-			else
-			{
-				xscale = integer_x;
-				yscale = integer_y;
-			}
+			a = a_best;
+			b = b_best;
+
+			// restore orientation
+			if (usable_aspect > src_aspect)
+				std::swap(a, b);
 
 			// set the final width/height
-			visible_width = render_round_nearest(src_width * xscale);
-			visible_height = render_round_nearest(src_height * yscale);
+			visible_width = render_round_nearest(src_width * a);
+			visible_height = render_round_nearest(src_height * b);
 			break;
 		}
 	}
@@ -2309,11 +2350,11 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				// clip the primitive
 				if (!m_transform_container && PRIMFLAG_GET_VECTOR(curitem.flags()))
 				{
-					clipped = render_clip_line(&prim->bounds, &root_cliprect);
+					clipped = render_clip_line(prim->bounds, root_cliprect);
 				}
 				else
 				{
-					clipped = render_clip_line(&prim->bounds, &cliprect);
+					clipped = render_clip_line(prim->bounds, cliprect);
 				}
 				break;
 
@@ -2346,7 +2387,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					prim->texcoords = oriented_texcoords[finalorient];
 
 					// apply clipping
-					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+					clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
 					prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2406,7 +2447,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						prim->texcoords = oriented_texcoords[finalorient];
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+						clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 
 						// apply the final orientation from the quad flags and then build up the final flags
 						prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
@@ -2422,7 +2463,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 							| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 						// apply clipping
-						clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
+						clipped = render_clip_quad(prim->bounds, cliprect, nullptr);
 					}
 				}
 				break;
@@ -2547,7 +2588,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		}
 
 		// add to the list or free if we're clipped out
-		bool const clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+		bool const clipped = render_clip_quad(prim->bounds, cliprect, &prim->texcoords);
 		list.append_or_return(*prim, clipped);
 	}
 }

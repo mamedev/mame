@@ -136,7 +136,7 @@ small ics.
 #include "bus/spc1000/fdd.h"
 #include "bus/spc1000/vdp.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/spc1000_cas.h"

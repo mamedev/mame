@@ -827,11 +827,12 @@ void _8080bw_state::spacecom_io_map(address_map &map)
 void _8080bw_state::spacecom(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'000'000) / 9); // divider guessed
+	i8080a_cpu_device &maincpu(I8080A(config, m_maincpu, XTAL(18'000'000) / 9)); // divider guessed
 	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
@@ -1120,6 +1121,18 @@ void _8080bw_state::lrescue_io_map(address_map &map)
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x06, 0x06).nopw(); // noise? LED?
+}
+
+void _8080bw_state::lrescuem2_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
+	map(0x04, 0x04).nopw(); // one leftover write
+	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x06, 0x06).nopw(); // noise? LED?
 }
 
 
@@ -1164,13 +1177,23 @@ void _8080bw_state::lrescue(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void _8080bw_state::lrescuem2(machine_config &config)
+{
+	lrescue(config);
+
+	// no shifter
+	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescuem2_io_map);
+	config.device_remove("mb14241");
+}
+
 void _8080bw_state::escmars(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(18'000'000) / 10)); // divider guessed
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -1556,10 +1579,11 @@ void _8080bw_state::schaser(machine_config &config)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
@@ -2775,11 +2799,12 @@ void _8080bw_state::shuttlei_io_map(address_map &map)
 void _8080bw_state::shuttlei(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 9);
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(18'000'000) / 9));
 	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
+	maincpu.set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(_8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -3405,6 +3430,26 @@ static INPUT_PORTS_START( attackfc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
+void _8080bw_state::attackfcu_io_map(address_map &map)
+{
+	attackfc_io_map(map);
+
+	map(0x00, 0x00).unmapr();
+	map(0x01, 0x01).portr("IN0");
+}
+
+
+static INPUT_PORTS_START( attackfcu )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 void _8080bw_state::attackfc(machine_config &config)
 {
@@ -3418,6 +3463,14 @@ void _8080bw_state::attackfc(machine_config &config)
 
 	/* sound hardware */
 	// TODO: custom discrete
+}
+
+void _8080bw_state::attackfcu(machine_config &config)
+{
+	attackfc(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::attackfcu_io_map);
 }
 
 
@@ -3862,10 +3915,11 @@ void cane_state::cane(machine_config &config)
 	mw8080bw_root(config);
 
 	// Basic machine hardware
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cane_state::cane_map);
-	m_maincpu->set_addrmap(AS_IO, &cane_state::cane_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cane_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &cane_state::cane_map);
+	maincpu.set_addrmap(AS_IO, &cane_state::cane_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(cane_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(cane_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
@@ -3968,10 +4022,11 @@ void orbite_state::orbite(machine_config &config)
 	mw8080bw_root(config);
 
 	// basic machine hardware
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &orbite_state::orbite_map);
-	m_maincpu->set_addrmap(AS_IO, &orbite_state::orbite_io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(orbite_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config.replace(), m_maincpu, 1996800)); /* 19.968MHz / 10 */
+	maincpu.set_addrmap(AS_PROGRAM, &orbite_state::orbite_map);
+	maincpu.set_addrmap(AS_IO, &orbite_state::orbite_io_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(orbite_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(orbite_state::int_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
@@ -5645,6 +5700,17 @@ ROM_START( attackfc )
 	ROM_LOAD( "39a.bin",       0x1c00, 0x0400, CRC(f538cf08) SHA1(4a375a41ab5d9f0d9f9a2ebef4c448038c139204) )
 ROM_END
 
+ROM_START( attackfcu ) // unencrypted, possibly bootleg, has code differences
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "egs0.bin", 0x0000, 0x0400, CRC(653bbb40) SHA1(8627b8e06e42d61ae41fc70654e530974dd2c5d0) )
+	ROM_LOAD( "egs1.bin", 0x0400, 0x0400, CRC(56024445) SHA1(5cf6270977509c4ea1655e9dd4ec1b6a52ba280e) )
+	ROM_LOAD( "egs2.bin", 0x0800, 0x0400, CRC(0a5fbe34) SHA1(f8276e215889a9282b15290774708d4dd9bfc3ed) )
+	ROM_LOAD( "egs3.bin", 0x0c00, 0x0400, CRC(50f7cd22) SHA1(39d5023c5f5e71b5f353960a4b6e848e55f3277f) )
+	ROM_LOAD( "egs4.bin", 0x1000, 0x0400, CRC(f59bac9e) SHA1(eaa807aade1b6a25c41d017e62f229bf1c7e1d0e) )
+	ROM_LOAD( "egs6.bin", 0x1800, 0x0400, CRC(a9eb4699) SHA1(0c170fc6f533b03a0ac626e1074d7ebd27ce216a) )
+	ROM_LOAD( "egs7.bin", 0x1c00, 0x0400, CRC(7e705388) SHA1(22a567059fd28a88cc4b815dfa7c5824a9d3fdc8) )
+ROM_END
+
 ROM_START( cane )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mrcane.71",     0x0000, 0x0800, CRC(47de691e) SHA1(8ed359774489ccf6023819b0d604b5a6d94b9f98) )
@@ -5729,7 +5795,7 @@ GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito (Universal license?)",         "Galaxy Rescue",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, lrescuem2,   lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Destination Earth (bootleg of Lunar Rescue)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Escape from Mars (bootleg of Lunar Rescue)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 GAMEL(1980, resclunar,   lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Niemer S.A.)",              "Rescate Lunar (Spanish bootleg of Lunar Rescue)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
@@ -5802,7 +5868,8 @@ GAME( 1979?,orbite,      0,        orbite,    orbite,    orbite_state,   empty_i
 
 GAME( 1980?,astropal,    0,        astropal,  astropal,  _8080bw_state,  empty_init,    ROT0,   "Sidam?",                             "Astropal",                                                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAMEL(1979?,attackfc,    0,        attackfc,  attackfc,  _8080bw_state,  init_attackfc, ROT0,   "Electronic Games Systems",           "Attack Force",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc )
+GAMEL(1979?,attackfc,    0,        attackfc,  attackfc,  _8080bw_state,  init_attackfc, ROT0,   "Electronic Games Systems",           "Attack Force (encrypted)",                                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc )
+GAMEL(1979?,attackfcu,   attackfc, attackfcu, attackfcu, _8080bw_state,  empty_init,    ROT0,   "bootleg?",                           "Attack Force (unencrypted)",                                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_attackfc )
 
 GAME( 2002, invmulti,    0,        invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)",          "Space Invaders Multigame (M8.03D)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a, invmulti, invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)",          "Space Invaders Multigame (M8.03A)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

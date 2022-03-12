@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -26,7 +26,7 @@ enum
 	STD_SXROM, STD_SOROM, STD_SZROM,
 	STD_TXROM, STD_TXSROM, STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
-	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
+	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT, STD_EVENT2,
 	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
@@ -86,7 +86,7 @@ enum
 	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
 	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_F600, BMC_L6IN1,
-	BMC_GN45, BMC_HIK8IN1, BMC_SFC12, BMC_JY208,
+	BMC_GN45, BMC_HIK8IN1, BMC_SFC12, BMC_JY208, BMC_JY302, BMC_KC885,
 	BMC_S24IN1SC03, BMC_T262, BMC_TELETUBBIES,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
@@ -97,22 +97,22 @@ enum
 	BMC_70IN1, BMC_500IN1, BMC_800IN1, BMC_1200IN1,
 	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_GN91B,
 	BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
-	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C,
-	BMC_830506C, BMC_830928C, BMC_850437C, BMC_970630C,
+	BMC_CTC09, BMC_CTC_12IN1, BMC_60311C, BMC_80013B, BMC_810544C, BMC_82AB,
+	BMC_830425C, BMC_830506C, BMC_830928C, BMC_850437C, BMC_891227, BMC_970630C,
 	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
-	BMC_EL860947C, BMC_EL861121C, BMC_FK23C, BMC_FK23CA, BMC_JY012005,
-	BMC_JY820845C, BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
+	BMC_EL860947C, BMC_EL861121C, BMC_FAM250, BMC_FK23C, BMC_FK23CA,
+	BMC_JY012005, BMC_JY820845C, BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
 	BMC_2751, BMC_8157, BMC_00202650,
 	BMC_411120C, BMC_810305C, BMC_820720C, BMC_830118C,
 	BMC_830832C, BMC_YY841101C, BMC_YY841155C,
 	BMC_GOLD150, BMC_GOLD260,
-	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160, BMC_CTC09,
+	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160,
 	BMC_K1029, BMC_K3006, BMC_K3033, BMC_K3036, BMC_K3046, BMC_SA005A,
 	BMC_TF2740, BMC_TJ03, BMC_RESETSXROM, BMC_RESETTXROM, BMC_TECHLINE9IN1,
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX40G, UNL_AX5705, UNL_KN42,
 	UNL_KOF97, UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
-	UNL_MK2, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
+	UNL_JY830623C, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_158B, UNL_2708,
 	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_43272, UNL_TF1201, UNL_TH21311,
@@ -136,7 +136,7 @@ enum
 	OPENCORP_DAOU306, HES_BOARD, SVISION16_BOARD, RUMBLESTATION_BOARD, JYCOMPANY_A, JYCOMPANY_B, JYCOMPANY_C,
 	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12, SOMARI_HUANG2,
 	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2,
-	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, SMD133_BOARD, YOKO_BOARD,
+	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, CONY1K_BOARD, SMD133_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
 	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
 	WAIXING_TYPE_E, WAIXING_TYPE_F, WAIXING_TYPE_G, WAIXING_TYPE_H, WAIXING_TYPE_H1,
@@ -170,7 +170,6 @@ enum
 #define CART_NTRAM 4
 
 
-#define PPU_MIRROR_NONE     0
 #define PPU_MIRROR_VERT     1
 #define PPU_MIRROR_HORZ     2
 #define PPU_MIRROR_HIGH     3
@@ -269,7 +268,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 	[[deprecated("IRQs should be cleared explicitly")]] void hold_irq_line();
 	void reset_cpu();
-	[[deprecated("devices should stop poking into memory spaces where they don't belong")]] void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;
@@ -335,7 +333,6 @@ public:
 
 	// CHR
 	int m_chr_source;   // global source for the 8 VROM banks
-	inline void chr_sanity_check(int source);
 
 	//these were previously called chr_map. they are a quick banking structure,
 	//because some of these change multiple times per scanline!
@@ -347,24 +344,27 @@ public:
 	uint32_t m_vram_chunks;
 
 	// CHR helpers
-	void chr8(int bank, int source);
-	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
-	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
-	void chr2_x(int start, int bank, int source);
-	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
-	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
-	void chr2_4(int bank, int source) { chr2_x(4, bank, source); }
-	void chr2_6(int bank, int source) { chr2_x(6, bank, source); }
-	void chr1_x(int start, int bank, int source);
-	void chr1_0(int bank, int source) { chr1_x(0, bank, source); }
-	void chr1_1(int bank, int source) { chr1_x(1, bank, source); }
-	void chr1_2(int bank, int source) { chr1_x(2, bank, source); }
-	void chr1_3(int bank, int source) { chr1_x(3, bank, source); }
-	void chr1_4(int bank, int source) { chr1_x(4, bank, source); }
-	void chr1_5(int bank, int source) { chr1_x(5, bank, source); }
-	void chr1_6(int bank, int source) { chr1_x(6, bank, source); }
-	void chr1_7(int bank, int source) { chr1_x(7, bank, source); }
+private:
+	void bank_chr(int shift, int start, int bank, int source);
+public:
+	void chr8(int bank, int source) { bank_chr(3, 0, bank, source); }
+	void chr4_x(int start, int bank, int source) { bank_chr(2, start, bank, source); }
+	void chr4_0(int bank, int source) { bank_chr(2, 0, bank, source); }
+	void chr4_4(int bank, int source) { bank_chr(2, 4, bank, source); }
+	void chr2_x(int start, int bank, int source) { bank_chr(1, start, bank, source); }
+	void chr2_0(int bank, int source) { bank_chr(1, 0, bank, source); }
+	void chr2_2(int bank, int source) { bank_chr(1, 2, bank, source); }
+	void chr2_4(int bank, int source) { bank_chr(1, 4, bank, source); }
+	void chr2_6(int bank, int source) { bank_chr(1, 6, bank, source); }
+	void chr1_x(int start, int bank, int source) { bank_chr(0, start, bank, source); }
+	void chr1_0(int bank, int source) { bank_chr(0, 0, bank, source); }
+	void chr1_1(int bank, int source) { bank_chr(0, 1, bank, source); }
+	void chr1_2(int bank, int source) { bank_chr(0, 2, bank, source); }
+	void chr1_3(int bank, int source) { bank_chr(0, 3, bank, source); }
+	void chr1_4(int bank, int source) { bank_chr(0, 4, bank, source); }
+	void chr1_5(int bank, int source) { bank_chr(0, 5, bank, source); }
+	void chr1_6(int bank, int source) { bank_chr(0, 6, bank, source); }
+	void chr1_7(int bank, int source) { bank_chr(0, 7, bank, source); }
 
 
 	// NameTable & Mirroring
@@ -383,7 +383,7 @@ public:
 // ======================> nes_cart_slot_device
 
 class nes_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_nes_cart_interface>
 {
 public:
@@ -404,11 +404,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "nes_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
@@ -440,19 +435,13 @@ public:
 
 	int get_crc_hack() { return m_crc_hack; }
 
-	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
-
 //private:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
-	bool                            m_must_be_loaded;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
 	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);

@@ -164,9 +164,9 @@ void rtc65271_device::nvram_default()
 {
 	if (m_default_data.found())
 	{
-		emu_file file(OPEN_FLAG_READ);
-		file.open_ram(m_default_data, m_default_data.bytes());
-		nvram_read(file);
+		auto file = util::ram_read(m_default_data, m_default_data.bytes());
+		if (file != nullptr)
+			nvram_read(*file);
 	}
 	else
 	{
@@ -181,39 +181,40 @@ void rtc65271_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rtc65271_device::nvram_read(emu_file &file)
+bool rtc65271_device::nvram_read(util::read_stream &file)
 {
 	uint8_t buf;
+	size_t actual;
 
 	/* version flag */
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	if (buf != 0)
-		return;
+		return false;
 
 	/* control registers */
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	m_regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	m_regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 
 	/* alarm registers */
-	if (file.read(&m_regs[reg_alarm_second], 1) != 1)
-		return;
-	if (file.read(&m_regs[reg_alarm_minute], 1) != 1)
-		return;
-	if (file.read(&m_regs[reg_alarm_hour], 1) != 1)
-		return;
+	if (file.read(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+		return false;
+	if (file.read(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+		return false;
+	if (file.read(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+		return false;
 
 	/* user RAM */
-	if (file.read(m_regs+14, 50) != 50)
-		return;
+	if (file.read(m_regs+14, 50, actual) || actual != 50)
+		return false;
 
 	/* extended RAM */
-	if (file.read(m_xram, 4096) != 4096)
-		return;
+	if (file.read(m_xram, 4096, actual) || actual != 4096)
+		return false;
 
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
 	/*m_dirty = false;*/
@@ -260,6 +261,8 @@ void rtc65271_device::nvram_read(emu_file &file)
 			m_regs[reg_year] = binary_to_BCD(m_regs[reg_year]);
 		}
 	}
+
+	return true;
 }
 
 //-------------------------------------------------
@@ -267,39 +270,41 @@ void rtc65271_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rtc65271_device::nvram_write(emu_file &file)
+bool rtc65271_device::nvram_write(util::write_stream &file)
 {
 	uint8_t buf;
-
+	size_t actual;
 
 	/* version flag */
 	buf = 0;
-	if (file.write(& buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 
 	/* control registers */
 	buf = m_regs[reg_A] & (reg_A_DV | reg_A_RS);
-	if (file.write(&buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 	buf = m_regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
-	if (file.write(&buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 
 	/* alarm registers */
-	if (file.write(&m_regs[reg_alarm_second], 1) != 1)
-		return;
-	if (file.write(&m_regs[reg_alarm_minute], 1) != 1)
-		return;
-	if (file.write(&m_regs[reg_alarm_hour], 1) != 1)
-		return;
+	if (file.write(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+		return false;
+	if (file.write(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+		return false;
+	if (file.write(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+		return false;
 
 	/* user RAM */
-	if (file.write(m_regs+14, 50) != 50)
-		return;
+	if (file.write(m_regs+14, 50, actual) || actual != 50)
+		return false;
 
 	/* extended RAM */
-	if (file.write(m_xram, 4096) != 4096)
-		return;
+	if (file.write(m_xram, 4096, actual) || actual != 4096)
+		return false;
+
+	return true;
 }
 
 /*

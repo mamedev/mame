@@ -190,6 +190,7 @@ Afega Games
 Afega stands for "Art-Fiction Electronic Game"
 
 Reference of music tempo:
+    tdragon3h - https://youtu.be/-cHM5EQnxA8
     stagger1 - https://www.youtube.com/watch?v=xWszb2fP07M
 
 ********************************************************************/
@@ -4998,12 +4999,15 @@ void nmk16_state::tdragon2(machine_config &config)
 
 void nmk16_state::tdragon3h(machine_config &config)
 {
+	// PCB has 12 MHz and 16 MHz XTAL, clocks are same as original except 68000 clock? it's has no 10 MHz XTAL.
 	tdragon2(config);
+	m_maincpu->set_clock(XTAL(12'000'000)); // MC68000P12 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon3h_map);
 
 	// No YM2203 and only one OKI, the PCB has a space for the YM2203, populated by a 7474 and a 74367.
 	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
 
+	// Z84C0006PEC 4? MHz
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
 
 	config.device_remove("ymsnd");
@@ -7850,6 +7854,39 @@ ROM_START( redhawks )
 	ROM_LOAD( "gal20v8b.bin", 0x117, 0x157, NO_DUMP )
 ROM_END
 
+void afega_state::init_redhawksa()
+{
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
+ROM_START( redhawksa )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(0e428cbb) SHA1(2851d9d4b677b79f7987c02025825e6e4b37907e) )
+	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(e944627f) SHA1(c5fcbe912d83f5ce176eb5055e94a087297de53f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x080000, CRC(533cb5f2) SHA1(86c0bb474fdc2f65aa74c27dfe5fd070be501fc3) )
+	ROM_LOAD16_BYTE( "7.bin", 0x000000, 0x080000, CRC(1a8c8560) SHA1(fb738af2fe6cc9a4ded4f4a15b4d34102f1af78d) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 )   // Layer 0, 16x16x8
+	ROM_LOAD( "4.bin", 0x000000, 0x080000, CRC(aafb3cc4) SHA1(b5f6608c1e05470fdfb22e0a35a8a74974c4d3cf) )
+
+	ROM_REGION( 0x00100, "fgtile", ROMREGION_ERASEFF )    // Layer 1, 8x8x4
+	// Unused
+
+	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
+	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+
+	ROM_REGION( 0x900, "plds", 0 )    // PLDs, not dumped
+	ROM_LOAD( "gal16v8d.bin",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_2.bin", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8b.bin",   0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "gal22v10b.bin",  0x600, 0x2e5, NO_DUMP )
+ROM_END
+
 void afega_state::init_redhawkg()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 15, 14, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
@@ -8902,7 +8939,8 @@ GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
 GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Italy)", 0 ) // bootleg? strange scroll regs
-GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain)", 0 )
+GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 1)", 0 )
+GAME( 1997, redhawksa,  stagger1, redhawki,     stagger1,     afega_state, init_redhawksa,       ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 2)", 0 )
 GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", 0 )
 GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
 GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", 0 )

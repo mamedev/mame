@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(GT913, gt913_device, "gt913", "Casio GT913F")
 
 gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
+	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
 	m_bank(*this, "bank"),
 	m_intc(*this, "intc"),
@@ -80,8 +81,11 @@ void gt913_device::map(address_map &map)
 	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-//  map(0xfff4, 0xfff4).nopw(); probably not port 3 DDR - ctk551 writes 0x00 but uses port 3 for output only
-	map(0xfff5, 0xfff5).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	// likely port 3 - pins are shared with input matrix, ctk551 clears this register on boot and nothing else
+	// (specifically, the pins are also used for key velocity detection, so port 3 is probably used by very few models, if any at all)
+	map(0xfff4, 0xfff4).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	// unknown - ctk551 sets/clears a few bits on boot and before going to sleep
+//  map(0xfff5, 0xfff5).noprw();
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)
@@ -90,6 +94,8 @@ void gt913_device::device_add_mconfig(machine_config &config)
 
 	GT913_SOUND(config, m_sound, DERIVED_CLOCK(1, 1));
 	m_sound->set_device_rom_tag(m_rom);
+	m_sound->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_sound->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	GT913_KBD_HLE(config, m_kbd, 0);
 	m_kbd->irq_cb().set([this] (int val) { if (val) m_intc->internal_interrupt(5); });

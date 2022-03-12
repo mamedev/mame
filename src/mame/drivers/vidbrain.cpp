@@ -54,7 +54,7 @@ Using the system:
 #include "includes/vidbrain.h"
 
 #include "machine/rescap.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "vidbrain.lh"
@@ -373,7 +373,7 @@ uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_uv->ext_int_w(0);
 	m_smi->ext_int_w(0);

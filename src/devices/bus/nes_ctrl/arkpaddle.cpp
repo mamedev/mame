@@ -33,9 +33,9 @@ DEFINE_DEVICE_TYPE(NES_ARKPADDLE_FC, nes_vausfc_device, "nes_vausfc", "FC Arkano
 
 static INPUT_PORTS_START( arkanoid_paddle )
 	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CENTERDELTA(0) PORT_MINMAX(0x4e,0xf2) // this minmax is from what Arkanoid 2 clamps values to, so an actual paddle's range may be greater
+	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CENTERDELTA(0) PORT_MINMAX(0x4e, 0xf2) // this minmax is from what Arkanoid 2 clamps values to, so an actual paddle's range may be greater
 	PORT_START("BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Paddle button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paddle button")
 INPUT_PORTS_END
 
 

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "icm7170.h"
+
 #include "coreutil.h"
 
 #define VERBOSE (0)
@@ -112,7 +113,7 @@ void icm7170_device::device_reset()
 //  device_timer - handles timer events
 //-------------------------------------------------
 
-void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// advance hundredths
 	m_irq_status |= IRQ_BIT_100TH_SECOND;
@@ -259,9 +260,10 @@ void icm7170_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void icm7170_device::nvram_read(emu_file &file)
+bool icm7170_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_regs, 0x20);
+	size_t actual;
+	return !file.read(m_regs, 0x20, actual) && actual == 0x20;
 }
 
 
@@ -270,9 +272,10 @@ void icm7170_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void icm7170_device::nvram_write(emu_file &file)
+bool icm7170_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_regs, 0x20);
+	size_t actual;
+	return !file.write(m_regs, 0x20, actual) && actual == 0x20;
 }
 
 // non-inherited device functions

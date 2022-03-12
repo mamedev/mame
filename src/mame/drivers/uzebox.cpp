@@ -22,7 +22,7 @@
 #include "bus/snes_ctrl/ctrl.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // overclocked to 8 * NTSC burst frequency

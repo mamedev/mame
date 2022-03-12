@@ -52,30 +52,30 @@ void snes_state::scpu_irq_refresh()
 }
 
 
-void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_NMI_TICK:
-		snes_nmi_tick(ptr, param);
+		snes_nmi_tick(param);
 		break;
 	case TIMER_HIRQ_TICK:
-		snes_hirq_tick_callback(ptr, param);
+		snes_hirq_tick_callback(param);
 		break;
 	case TIMER_RESET_OAM_ADDRESS:
-		snes_reset_oam_address(ptr, param);
+		snes_reset_oam_address(param);
 		break;
 	case TIMER_RESET_HDMA:
-		snes_reset_hdma(ptr, param);
+		snes_reset_hdma(param);
 		break;
 	case TIMER_UPDATE_IO:
-		snes_update_io(ptr, param);
+		snes_update_io(param);
 		break;
 	case TIMER_SCANLINE_TICK:
-		snes_scanline_tick(ptr, param);
+		snes_scanline_tick(param);
 		break;
 	case TIMER_HBLANK_TICK:
-		snes_hblank_tick(ptr, param);
+		snes_hblank_tick(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in snes_state::device_timer");
@@ -1222,7 +1222,7 @@ inline int snes_state::dma_abus_valid( uint32_t address )
 
 inline uint8_t snes_state::abus_read( address_space &space, uint32_t abus )
 {
-	m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
+	// m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
 	if (!dma_abus_valid(abus))
 		return 0;
 
@@ -1233,7 +1233,7 @@ inline void snes_state::dma_transfer( address_space &space, uint8_t dma, uint32_
 {
 	if (m_dma_channel[dma].dmap & 0x80)  /* PPU->CPU */
 	{
-		m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
+		// m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
 		{
 			//illegal WRAM->WRAM transfer (bus conflict)

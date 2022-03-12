@@ -94,9 +94,9 @@ private:
 	void ay1_a_w(u8 data) {}
 	void ay1_b_w(u8 data) {}
 	void ay2_b_w(u8 data) {}
-	u8 m_row = 0;
-	u8 m_game = 0;
-	u8 m_outhole_solenoid = 8;
+	u8 m_row = 0U;
+	u8 m_game = 0U;
+	u8 m_outhole_solenoid = 8U;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_io_keyboard;
 	output_finder<4> m_leds;

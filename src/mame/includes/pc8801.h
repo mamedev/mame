@@ -203,7 +203,7 @@ private:
 	void pc8801_kanji_lv2_w(offs_t offset, uint8_t data);
 	void pc8801_dic_bank_w(uint8_t data);
 	void pc8801_dic_ctrl_w(uint8_t data);
-	uint8_t pc8801_cdrom_r();
+	uint8_t pc8801_cdrom_r(offs_t offset);
 	void pc8801_cdrom_w(offs_t offset, uint8_t data);
 	uint8_t pc8801_cpuclock_r();
 	uint8_t pc8801_baudrate_r();

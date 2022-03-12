@@ -553,7 +553,7 @@ void segaorun_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

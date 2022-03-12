@@ -1,5 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+/********************************************************************************************************************
+PINBALL
+Bally prototyping system with MC68701 CPU.
+It eventually emerged 5 years later as BY6803.
+
+
+Status:
+- Skeletons
+
+ToDo:
+- Everything
+
+*********************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6801.h"

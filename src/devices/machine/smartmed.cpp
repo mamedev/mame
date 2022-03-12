@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "smartmed.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -777,6 +779,11 @@ DEFINE_DEVICE_TYPE(SMARTMEDIA, smartmedia_image_device, "smartmedia", "SmartMedi
 
 smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, SMARTMEDIA, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_memcard_image_interface(mconfig, *this)
 {
+}
+
+const software_list_loader &smartmedia_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }

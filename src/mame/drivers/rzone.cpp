@@ -32,7 +32,6 @@
 #include "emu.h"
 #include "includes/hh_sm510.h"
 
-#include "cpu/sm510/sm510.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
@@ -63,9 +62,9 @@ private:
 	output_finder<> m_led_out;
 	required_device<timer_device> m_led_off;
 
-	int m_led_pin;
-	int m_sctrl;
-	int m_sclock;
+	int m_led_pin = 0;
+	int m_sctrl = 0;
+	int m_sclock = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(led_off_callback) { m_led_out = m_led_pin ? 1 : 0; }
 	DECLARE_WRITE_LINE_MEMBER(led_w);
@@ -92,11 +91,6 @@ void rzone_state::machine_start()
 
 	// resolve handlers
 	m_led_out.resolve();
-
-	// zerofill
-	m_led_pin = 0;
-	m_sctrl = 0;
-	m_sclock = 0;
 
 	// register for savestates
 	save_item(NAME(m_led_pin));

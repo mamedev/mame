@@ -81,7 +81,7 @@ protected:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?

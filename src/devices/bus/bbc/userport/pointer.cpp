@@ -47,10 +47,10 @@ DEFINE_DEVICE_TYPE(BBC_TRACKER,   bbc_tracker_device,   "bbc_tracker",   "Marcon
 
 static INPUT_PORTS_START( amxmouse )
 	PORT_START("POINTER_X")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100)
 
 	PORT_START("POINTER_Y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100)
 
 	PORT_START("BUTTONS")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Left Button (Execute)") PORT_CODE(MOUSECODE_BUTTON1)
@@ -65,10 +65,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( m512mouse )
 	PORT_START("POINTER_X")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100)
 
 	PORT_START("POINTER_Y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100)
 
 	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -82,10 +82,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tracker )
 	PORT_START("POINTER_X")
-	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100)
 
 	PORT_START("POINTER_Y")
-	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_pointer_device, pointer_changed, 0) PORT_RESET
+	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100)
 
 	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Left Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -151,8 +151,7 @@ bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char
 
 void bbc_pointer_device::device_start()
 {
-	m_pointer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_pointer_device::pointer_poll), this));
-	m_pointer_timer->adjust(attotime::zero, 0, attotime::from_hz(1400));
+	m_pointer_timer = timer_alloc();
 }
 
 
@@ -164,12 +163,12 @@ void bbc_pointer_device::device_reset()
 {
 	m_xdir = 0;
 	m_ydir = 0;
-	m_direction_x = 0;
-	m_direction_y = 0;
-	m_distance_x = 0;
-	m_distance_y = 0;
+	m_x = 0;
+	m_y = 0;
 	m_phase_x = 0;
 	m_phase_y = 0;
+
+	m_pointer_timer->adjust(attotime::zero, 0, attotime::from_hz(1400));
 }
 
 
@@ -177,25 +176,16 @@ void bbc_pointer_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-INPUT_CHANGED_MEMBER(bbc_pointer_device::pointer_changed)
+void bbc_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int x = m_pointer_x->read();
 	int y = m_pointer_y->read();
-	x -= (x & 0x80) ? 0x100 : 0;
-	y -= (y & 0x80) ? 0x100 : 0;
 
-	// Set the mouse movement direction and record the movement units
-	m_direction_x = (x > 0) ? 1 : 0;
-	m_distance_x = abs(x);
+	int dx = x - m_x;
+	int dy = y - m_y;
 
-	m_direction_y = (y > 0) ? 1 : 0;
-	m_distance_y = abs(y);
-}
-
-TIMER_CALLBACK_MEMBER(bbc_pointer_device::pointer_poll)
-{
 	// Process X output
-	if (m_distance_x)
+	if (dx)
 	{
 		// Set the output pins according to the current phase
 		switch (m_phase_x)
@@ -215,20 +205,17 @@ TIMER_CALLBACK_MEMBER(bbc_pointer_device::pointer_poll)
 		}
 
 		// Change phase
-		if (m_direction_x == 0)
-			m_phase_x--;
-		else
+		if (dx > 0)
 			m_phase_x++;
-
-		// Decrement the distance left to move
-		m_distance_x--;
+		else
+			m_phase_x--;
 
 		// Range check the phase
 		m_phase_x &= 3;
 	}
 
 	// Process Y output
-	if (m_distance_y)
+	if (dy)
 	{
 		// Set the output pins according to the current phase
 		switch (m_phase_y)
@@ -248,17 +235,17 @@ TIMER_CALLBACK_MEMBER(bbc_pointer_device::pointer_poll)
 		}
 
 		// Change phase
-		if (m_direction_y == 0)
-			m_phase_y--;
-		else
+		if (dy > 0)
 			m_phase_y++;
-
-		// Decrement the distance left to move
-		m_distance_y--;
+		else
+			m_phase_y--;
 
 		// Range check the phase
 		m_phase_y &= 3;
 	}
+
+	m_x = x;
+	m_y = y;
 }
 
 uint8_t bbc_amxmouse_device::pb_r()

@@ -2874,6 +2874,24 @@ ROM_START( insectxj )
 	ROM_LOAD( "b97__02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END
 
+ROM_START( insectxbl )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic71", 0x00000, 0x20000, CRC(86ae1c66) SHA1(15a8d2fa296248346908643a5ff3a69dc2a0938a) ) // mainly copyright change
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "ic3", 0x00000, 0x10000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) ) // identical to the original
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // smaller ROMs, Taito and title have been blanked out
+	ROM_LOAD16_BYTE( "ic174", 0x00000, 0x20000, CRC(f5a5c8bf) SHA1(e5ecf0c43bf28fda73a85c9f0674872c1d41eac8) )
+	ROM_LOAD16_BYTE( "ic176", 0x00001, 0x20000, CRC(ef3436f4) SHA1(e143070d8ac4398af2f00e771e218b87a06b1afa) )
+	ROM_LOAD16_BYTE( "ic175", 0x40000, 0x20000, CRC(e926ec1b) SHA1(e013200ec58f8274a83c53c5d34c98c61a035803) )
+	ROM_LOAD16_BYTE( "ic177", 0x40001, 0x20000, CRC(88ead1fb) SHA1(952ef8301b13239e8f6877fa26b59caab5df81e2) )
+	ROM_LOAD16_BYTE( "ic212", 0x80000, 0x20000, CRC(54547590) SHA1(6e756bd88d89df092552b2e7f06f3dd3a077803f) )
+	ROM_LOAD16_BYTE( "ic214", 0x80001, 0x20000, CRC(da312ccd) SHA1(a8eea3730cbcd64d61ef5fcee69dd28126cf60e1) )
+	ROM_LOAD16_BYTE( "ic213", 0xc0000, 0x20000, CRC(5b6faea0) SHA1(18b3ca62153b689b5d42e91f4a56b72bb9f6f94f) )
+	ROM_LOAD16_BYTE( "ic215", 0xc0001, 0x20000, CRC(ff1dee9e) SHA1(3ef91f8188ae400880c03ba8d1fc039c8920d6c0) )
+ROM_END
+
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR,COMPANY,             FULLNAME,            FLAGS
 GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2914,5 +2932,6 @@ GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init,
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan", "Insector X (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",       "Insector X (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan",   "Insector X (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",         "Insector X (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, insectxbl, insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "bootleg (Nagoya Kaihatsu)", "Insector X (bootleg)", MACHINE_SUPPORTS_SAVE )

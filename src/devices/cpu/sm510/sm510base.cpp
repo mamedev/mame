@@ -32,8 +32,6 @@ enum
 
 void sm510_base_device::device_start()
 {
-	assert(SM510_INPUT_LINE_K1 == 0);
-
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
@@ -67,8 +65,7 @@ void sm510_base_device::device_start()
 	m_div = 0;
 	m_1s = false;
 	m_1s_rise = false;
-	m_k_rise = false;
-	std::fill_n(m_k_input, std::size(m_k_input), 0);
+	m_ext_wakeup = false;
 	m_l = 0;
 	m_x = 0;
 	m_y = 0;
@@ -102,8 +99,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
 	save_item(NAME(m_1s_rise));
-	save_item(NAME(m_k_rise));
-	save_item(NAME(m_k_input));
+	save_item(NAME(m_ext_wakeup));
 	save_item(NAME(m_l));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
@@ -251,14 +247,10 @@ void sm510_base_device::init_divider()
 
 void sm510_base_device::execute_set_input(int line, int state)
 {
-	if (!valid_wakeup_line(line))
+	if (line != SM510_EXT_WAKEUP_LINE)
 		return;
 
-	// rising edge of any K input
-	if (state && !m_k_input[line])
-		m_k_rise = true;
-
-	m_k_input[line] = state;
+	m_ext_wakeup = bool(state);
 }
 
 void sm510_base_device::do_interrupt()
@@ -292,8 +284,7 @@ void sm510_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		// in halt mode, wake up after 1S signal or K input
-		bool wakeup = m_k_rise || m_1s_rise;
-		m_k_rise = false;
+		bool wakeup = m_ext_wakeup || m_1s_rise;
 		m_1s_rise = false;
 
 		if (m_halt)

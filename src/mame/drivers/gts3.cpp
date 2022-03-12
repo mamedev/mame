@@ -12,21 +12,42 @@ Setting up:
 - Press 1 (to load factory defaults)
 - Press 1 (to select English)
 - Press num-0 until the credit settings appear (settings #9,10,11)
-- On each of the 3 coin slots, press num-1/num-2 to set to 1 credit.
+- On each of the 3 coin slots, press num1/num2 to set to 1 credit.
 - Press F3 or 0
 - Now you can play
 
-Setting up for surfnsaf,opthund,tt_game,ccruise:
-- Press 0 and follow instructions
-- Use A and B to cycle up and down (instead of num-1/num-2)
-- After that, still cannot insert a coin.
+Quick setup for surfnsaf,opthund,tt_game,ccruise:
+- Press 0 A num1 num1 to load factory defaults
+- Press 0 until you get to Game Pricing, press A to get Universal. Press 0 a few times then F3 to save.
+- Now press 7 to insert a coin.
+Further setup if needed:
+- Use A and B to cycle up and down (instead of num1/num2)
+- num1 selects default setting
+- 0 to choose another setting
+- F3 to save and reboot
 
-Known outhole per game:
-- lca,lca2: V
-- vegas: A
-- deadweap: I (but can't score)
-- cactjack allows you to score, but outhole unknown
-- other games won't score.
+Here are the key codes to enable play:
+
+Game                 NUM  Start game                                       End ball
+--------------------------------------------------------------------------------------------------
+Lights Camera Action 720  1 then W                                         V
+Silver Slugger       722  1 then jiggle ; and quote                        ;
+Vegas                723  1 then B                                         A
+Deadly Weapon        724  1 then Q                                         I then Q
+Car Hop              725  1 then P and ]                                   P then ]
+Title Fight          726  1 then [ and left                                [ (wait for message) then left
+Hoops                727  1 then Q and Z                                   [ then Z (may have to jiggle ] and [, or try multiple times)
+Cactus Jack          729  1 then ; and quote                               ;
+Class of 1812        730  1 then ; and quote                               up
+Nudge-it            N102  1 then B and M                                   unknown (Redemption machine)
+Bell Ringer         N103  1 then A                                         unknown (Redemption machine)
+
+** From here, num1 = start button, 7 = coin, 0 = test/setup
+Surf'n Safari        731  num1 then num2 then P                            num2 then P
+Operation: Thunder   732  num1 then G and O                                G then hold O for a few seconds
+tt_game              7**  unknown                                          unknown
+Caribbean Cruise    C102  1, enter, hold \ and right until message goes    \
+
 
 Status:
 - Display works
@@ -191,44 +212,16 @@ static INPUT_PORTS_START( gts3 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP77")
 
 	PORT_START("X8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP80")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP81")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP82")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP83")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP84")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP85")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP86")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP87")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP90")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP91")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP92")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP93")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP94")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP95")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP96")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP97")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X10")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA4")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA5")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPA7")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X11")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB4")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB5")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INPB7")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts3_state::test_inp )
@@ -359,7 +352,7 @@ void gts3_state::gts3(machine_config &config)
 }
 
 /*-------------------------------------------------------------------
-/ Bell Ringer (N103)
+/ Bell Ringer (N103) Redemption Machine
 /-------------------------------------------------------------------*/
 ROM_START(bellring)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -412,6 +405,7 @@ ROM_END
 
 /*-------------------------------------------------------------------
 / Caribbean Cruise (#C102)
+/ One-sided cocktail designed and built by Gottlieb for International Concepts
 /-------------------------------------------------------------------*/
 ROM_START(ccruise)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -506,7 +500,7 @@ ROM_START(lca2)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Nudge-It (N102)
+/ Nudge-It (N102) Redemption Machine
 /-------------------------------------------------------------------*/
 ROM_START(nudgeit)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -603,7 +597,7 @@ ROM_END
 
 
 /************************************/
-/* NOT OFFICIALLY LISTED             */
+/* NOT OFFICIALLY LISTED            */
 /************************************/
 
 /*-------------------------------------------------------------------

@@ -54,8 +54,8 @@ public:
 	auto holda_cb() { return m_holda_line.bind(); }
 
 	// For debugger access
-	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
-	void debug_write_onchip_memory(offs_t addr, uint8_t data) { m_onchip_memory[addr & 0xff] = data; };
+	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; }
+	void debug_write_onchip_memory(offs_t addr, uint8_t data) { m_onchip_memory[addr & 0xff] = data; }
 	bool is_onchip(offs_t addrb) { return (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537; }
 
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }

@@ -165,7 +165,7 @@ protected:
 	void crrb_w(u8 data);
 	void dia_w(u8 data);
 
-	void mcu_timer(timer_device &timer, void *ptr, s32 param)
+	void mcu_timer(timer_device &timer, s32 param)
 	{
 		m_mcu_p3 ^= 0x10;
 		m_mcu->set_input_line(MCS51_T0_LINE, BIT(m_mcu_p3, 4));

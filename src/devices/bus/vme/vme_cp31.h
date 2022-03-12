@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include "vme.h"
+
 #include "bus/rs232/rs232.h"
-#include "bus/vme/vme.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68153bim.h"
 #include "machine/68230pit.h"
@@ -31,7 +32,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<m68000_base_device> m_maincpu;
@@ -44,7 +45,7 @@ private:
 	required_region_ptr<uint32_t> m_sysrom;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	bool m_bus_error;
 	emu_timer *m_bus_error_timer;
 

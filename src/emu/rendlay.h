@@ -16,6 +16,16 @@
 #include "rendertypes.h"
 #include "screen.h"
 
+#include <array>
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -113,16 +123,16 @@ private:
 		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, std::string_view str, int align, const render_color &color);
-		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
-		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
-		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
-		void draw_segment_vertical(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, rgb_t color);
-		void draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_decimal(bitmap_argb32 &dest, int midx, int midy, int width, rgb_t color);
-		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void apply_skew(bitmap_argb32 &dest, int skewwidth);
+		static void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, std::string_view str, int align, const render_color &color);
+		static void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
+		static void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
+		static void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
+		static void draw_segment_vertical(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, rgb_t color);
+		static void draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		static void draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		static void draw_segment_decimal(bitmap_argb32 &dest, int midx, int midy, int width, rgb_t color);
+		static void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		static void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 	private:
 		using bounds_vector = emu::render::detail::bounds_vector;
@@ -141,7 +151,6 @@ private:
 	class disk_component;
 	class text_component;
 	class led7seg_component;
-	class led8seg_gts1_component;
 	class led14seg_component;
 	class led16seg_component;
 	class led14segsc_component;
@@ -173,7 +182,6 @@ private:
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 
@@ -281,7 +289,7 @@ public:
 
 	// interactivity
 	bool has_input() const { return bool(m_input_port); }
-	std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
+	std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); }
 	bool clickthrough() const { return m_clickthrough; }
 
 	// fetch state based on configured source

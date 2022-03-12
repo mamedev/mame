@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "rom.h"
+#include "softlist_dev.h"
 
 
 //-------------------------------------------------

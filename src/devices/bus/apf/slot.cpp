@@ -73,7 +73,7 @@ void device_apf_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APF_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_apf_cart_interface>(mconfig, *this),
 	m_type(APF_STD),
 	m_cart(nullptr)

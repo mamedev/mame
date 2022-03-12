@@ -62,7 +62,7 @@ void saa1043_device::device_reset()
 	m_outputs[V2](ASSERT_LINE);
 }
 
-void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

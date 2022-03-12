@@ -67,7 +67,7 @@ const char *os9_format::description() const
 
 const char *os9_format::extensions() const
 {
-	return "dsk,os9";
+	return "os9,dsk";
 }
 
 int os9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
@@ -218,7 +218,7 @@ int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std
 				continue;
 		}
 
-		LOG_FORMATS("OS9 matching format index %d\n", i);
+		LOG_FORMATS("os9_dsk: matching format index %d: tracks %d, sectors %d, sides: %d\n", i, f.track_count, f.sector_count, f.head_count);
 		return i;
 	}
 	return -1;
@@ -236,17 +236,17 @@ const wd177x_format::format &os9_format::get_track_format(const format &f, int h
 	}
 
 	if (n < 0) {
-		LOG_FORMATS("Error format not found\n");
+		LOG_FORMATS("os9_dsk: Error format not found\n");
 		return f;
 	}
 
 	if (head >= f.head_count) {
-		LOG_FORMATS("Error invalid head %d\n", head);
+		LOG_FORMATS("os9_dsk: Error invalid head %d\n", head);
 		return f;
 	}
 
 	if (track >= f.track_count) {
-		LOG_FORMATS("Error invalid track %d\n", track);
+		LOG_FORMATS("os9_dsk: Error invalid track %d\n", track);
 		return f;
 	}
 

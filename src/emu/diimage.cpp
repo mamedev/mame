@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "romload.h"
 #include "softlist.h"
 #include "softlist_dev.h"
@@ -25,35 +26,7 @@
 #include <cctype>
 #include <cstring>
 #include <regex>
-
-
-//**************************************************************************
-//  DEVICE CONFIG IMAGE INTERFACE
-//**************************************************************************
-const image_device_type_info device_image_interface::m_device_info_array[] =
-	{
-		{ IO_UNKNOWN,   "unknown",      "unkn" }, /*  0 */
-		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  1 */
-		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  2 */
-		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  3 */
-		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  4 */
-		{ IO_CASSETTE,  "cassette",     "cass" }, /*  5 */
-		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  6 */
-		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  7 */
-		{ IO_PRINTER,   "printout",     "prin" }, /*  8 */
-		{ IO_SERIAL,    "serial",       "serl" }, /*  9 */
-		{ IO_PARALLEL,  "parallel",     "parl" }, /* 10 */
-		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 11 */
-		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 12 */
-		{ IO_MEMCARD,   "memcard",      "memc" }, /* 13 */
-		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 14 */
-		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 15 */
-		{ IO_ROM,       "romimage",     "rom"  }, /* 16 */
-		{ IO_MIDIIN,    "midiin",       "min"  }, /* 17 */
-		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 18 */
-		{ IO_PICTURE,   "picture",      "pic"  }, /* 19 */
-		{ IO_VIDEO,     "vidfile",      "vid"  }  /* 20 */
-	};
+#include <sstream>
 
 
 //**************************************************************************
@@ -103,6 +76,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	, m_create_format(0)
 	, m_create_args(nullptr)
 	, m_user_loadable(true)
+	, m_must_be_loaded(false)
 	, m_is_loading(false)
 	, m_is_reset_and_loading(false)
 {
@@ -130,56 +104,6 @@ void device_image_interface::interface_config_complete()
 	update_names();
 }
 
-
-//-------------------------------------------------
-//  find_device_type - search through list of
-//  device types to extract data
-//-------------------------------------------------
-
-const image_device_type_info *device_image_interface::find_device_type(iodevice_t type)
-{
-	for (const image_device_type_info &info : m_device_info_array)
-	{
-		if (info.m_type == type)
-			return &info;
-	}
-	return nullptr;
-}
-
-//-------------------------------------------------
-//  device_typename - retrieves device type name
-//-------------------------------------------------
-
-const char *device_image_interface::device_typename(iodevice_t type)
-{
-	const image_device_type_info *info = find_device_type(type);
-	return (info != nullptr) ? info->m_name : "unknown";
-}
-
-//-------------------------------------------------
-//  device_brieftypename - retrieves device
-//  brief type name
-//-------------------------------------------------
-
-const char *device_image_interface::device_brieftypename(iodevice_t type)
-{
-	const image_device_type_info *info = find_device_type(type);
-	return (info != nullptr) ? info->m_shortname : "unk";
-}
-
-//-------------------------------------------------
-//  device_typeid - retrieves device type id
-//-------------------------------------------------
-
-iodevice_t device_image_interface::device_typeid(const char *name)
-{
-	for (const image_device_type_info &info : m_device_info_array)
-	{
-		if (!core_stricmp(name, info.m_name) || !core_stricmp(name, info.m_shortname))
-			return info.m_type;
-	}
-	return (iodevice_t)-1;
-}
 
 //-------------------------------------------------
 //  set_image_filename - specifies the filename of
@@ -231,10 +155,10 @@ bool device_image_interface::is_filetype(std::string_view candidate_filetype) co
 //  image creation by name
 //-------------------------------------------------
 
-const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name) noexcept
+const image_device_format *device_image_interface::device_get_named_creatable_format(std::string_view format_name) const noexcept
 {
-	for (auto &format : m_formatlist)
-		if (format->name() == format_name)
+	for (const auto &format : m_formatlist)
+		if (std::string_view(format->name()) == format_name)
 			return format.get();
 	return nullptr;
 }
@@ -266,11 +190,10 @@ void device_image_interface::add_format(std::string &&name, std::string &&descri
 ****************************************************************************/
 
 //-------------------------------------------------
-//  image_clear_error - clear out any specified
-//  error
+//  clear_error - clear out any specified error
 //-------------------------------------------------
 
-void device_image_interface::clear_error()
+void device_image_interface::clear_error() noexcept
 {
 	m_err.clear();
 	m_err_message.clear();
@@ -370,7 +293,7 @@ const software_info *device_image_interface::software_entry() const noexcept
 //  get_software_region
 //-------------------------------------------------
 
-u8 *device_image_interface::get_software_region(const char *tag)
+u8 *device_image_interface::get_software_region(std::string_view tag)
 {
 	if (!loaded_through_softlist())
 		return nullptr;
@@ -385,7 +308,7 @@ u8 *device_image_interface::get_software_region(const char *tag)
 //  image_get_software_region_length
 //-------------------------------------------------
 
-u32 device_image_interface::get_software_region_length(const char *tag)
+u32 device_image_interface::get_software_region_length(std::string_view tag)
 {
 	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
 	memory_region *region = device().machine().root_device().memregion(full_tag);
@@ -397,7 +320,7 @@ u32 device_image_interface::get_software_region_length(const char *tag)
 //  image_get_feature
 //-------------------------------------------------
 
-const char *device_image_interface::get_feature(const char *feature_name) const
+const char *device_image_interface::get_feature(std::string_view feature_name) const
 {
 	return !m_software_part_ptr ? nullptr : m_software_part_ptr->feature(feature_name);
 }
@@ -407,7 +330,7 @@ const char *device_image_interface::get_feature(const char *feature_name) const
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, std::unique_ptr<u8[]> &ptr)
+bool device_image_interface::load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
@@ -477,7 +400,7 @@ bool device_image_interface::image_checkhash()
 	{
 		// do not cause a linear read of 600 megs please
 		// TODO: use SHA1 in the CHD header as the hash
-		if (image_type() == IO_CDROM)
+		if (image_is_chd_type())
 			return true;
 
 		// Skip calculating the hash when we have an image mounted through a software list
@@ -511,33 +434,6 @@ u32 device_image_interface::crc()
 		crc = 0;
 
 	return crc;
-}
-
-
-//-------------------------------------------------
-//  support_command_line_image_creation - do we
-//  want to support image creation from the front
-//  end command line?
-//-------------------------------------------------
-
-bool device_image_interface::support_command_line_image_creation() const noexcept
-{
-	bool result;
-	switch (image_type())
-	{
-	case IO_PRINTER:
-	case IO_SERIAL:
-	case IO_PARALLEL:
-		// going by the assumption that these device image types should support this
-		// behavior; ideally we'd get rid of IO_* and just push this to the specific
-		// devices
-		result = true;
-		break;
-	default:
-		result = false;
-		break;
-	}
-	return result;
 }
 
 
@@ -616,34 +512,6 @@ void device_image_interface::battery_save(const void *buffer, int length)
 	std::error_condition const filerr = file.open(fname);
 	if (!filerr)
 		file.write(buffer, length);
-}
-
-
-//-------------------------------------------------
-//  uses_file_extension - update configuration
-//  based on completed device setup
-//-------------------------------------------------
-
-bool device_image_interface::uses_file_extension(const char *file_extension) const
-{
-	bool result = false;
-
-	if (file_extension[0] == '.')
-		file_extension++;
-
-	/* find the extensions */
-	std::string extensions(file_extensions());
-	char *ext = strtok((char*)extensions.c_str(),",");
-	while (ext != nullptr)
-	{
-		if (!core_stricmp(ext, file_extension))
-		{
-			result = true;
-			break;
-		}
-		ext = strtok (nullptr, ",");
-	}
-	return result;
 }
 
 
@@ -816,7 +684,24 @@ bool device_image_interface::load_software(software_list_device &swlist, std::st
 				else
 					filerr = m_mame_file->open(romp->name());
 				if (filerr)
+				{
 					m_mame_file.reset();
+					std::ostringstream msg;
+					util::stream_format(msg,
+							"%s: error opening image file %s: %s (%s:%d)",
+							device().tag(), romp->name(),
+							filerr.message(),
+							filerr.category().name(),
+							filerr.value());
+					if (!searchpath.empty())
+					{
+						msg << " (tried in";
+						for (auto const &path : searchpath)
+							msg << ' ' << path;
+						msg << ')';
+					}
+					osd_printf_error("%s\n", std::move(msg).str());
+				}
 
 				warningcount += verify_length_and_hash(m_mame_file.get(), romp->name(), romp->get_length(), util::hash_collection(romp->hashdata()));
 
@@ -1137,12 +1022,10 @@ const util::option_guide &device_image_interface::create_option_guide() const
 
 void device_image_interface::update_names()
 {
-	const char *inst_name = custom_instance_name();
-	const char *brief_name = custom_brief_instance_name();
-	if (inst_name == nullptr)
-		inst_name = device_typename(image_type());
-	if (brief_name == nullptr)
-		brief_name = device_brieftypename(image_type());
+	const char *inst_name = image_type_name();
+	const char *brief_name = image_brief_type_name();
+	assert(inst_name != nullptr);
+	assert(brief_name != nullptr);
 
 	// count instances of the general image type, or device type if custom
 	int count = 0;
@@ -1151,19 +1034,21 @@ void device_image_interface::update_names()
 	{
 		if (this == &image)
 			index = count;
-		const char *other_name = image.custom_instance_name();
-		if (!other_name)
-			other_name = device_typename(image.image_type());
+		const char *other_name = image.image_type_name();
+		const char *other_brief_name = image.image_brief_type_name();
+		assert(other_name != nullptr);
+		assert(other_brief_name != nullptr);
 
-		if (other_name == inst_name || !strcmp(other_name, inst_name))
+		if (other_name == inst_name || !strcmp(other_name, inst_name) ||
+			other_brief_name == brief_name || !strcmp(other_brief_name, brief_name))
 			count++;
 	}
 
-	m_canonical_instance_name = string_format("%s%d", inst_name, index + 1);
+	m_canonical_instance_name = util::string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
 		m_instance_name = m_canonical_instance_name;
-		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
+		m_brief_instance_name = util::string_format("%s%d", brief_name, index + 1);
 	}
 	else
 	{

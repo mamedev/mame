@@ -726,7 +726,7 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 }
 
 
-void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

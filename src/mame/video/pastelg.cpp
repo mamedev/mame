@@ -128,7 +128,7 @@ void pastelg_common_state::vramflip()
 	m_flipscreen_old = m_flipscreen;
 }
 
-void pastelg_common_state::blitter_timer_callback(void *ptr, s32 param)
+void pastelg_common_state::blitter_timer_callback(s32 param)
 {
 	m_nb1413m3->busyflag_w(1);
 }

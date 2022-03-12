@@ -173,7 +173,9 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 	subdevice<screen_device>("screen")->set_refresh_hz(60);
-	TVGA9000_VGA(config.replace(), "vga", 0);
+	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
 
 	pcat_common(config);
 

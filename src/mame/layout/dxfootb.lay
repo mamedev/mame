@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="dark"><rect><color red="0.14" green="0.15" blue="0.14" /></rect></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.011" green="0.08" blue="0.008" /></disk>
+		<disk state="1"><color red="0.15" green="1.0" blue="0.1" /></disk>
+	</element>
+
+
+<!-- main display -->
+
+	<group name="display1">
+		<bounds x="0" y="0" width="30.2" height="15.4" />
+
+		<!-- bezel (etched, not white) -->
+		<element ref="dark"><bounds x="0" y="0" width="30.2" height="15.4" /></element>
+		<element ref="black"><bounds x="0.2" y="0.2" width="29.8" height="15" /></element>
+
+		<repeat count="9">
+			<param name="x" start="3" increment="3" />
+			<element ref="dark"><bounds x="~x~" y="0" width="0.2" height="15.4" /></element>
+		</repeat>
+
+		<element ref="black"><bounds x="1" y="2.2" width="13" height="11" /></element>
+		<element ref="black"><bounds x="16" y="2.2" width="13" height="11" /></element>
+
+		<!-- led matrix -->
+		<repeat count="4">
+			<param name="y" start="1.2" increment="4" />
+			<param name="i2r" start="0" increment="2" />
+			<param name="i2g" start="1" increment="2" />
+
+			<repeat count="10">
+				<param name="xr" start="1.6" increment="3" />
+				<param name="xg" start="0.6" increment="3" />
+				<param name="i1" start="0" increment="1" />
+				<element name="~i1~.~i2r~" ref="ledr"><bounds x="~xr~" y="~y~" width="1" height="1" /></element>
+				<element name="~i1~.~i2g~" ref="ledg"><bounds x="~xg~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+	</group>
+
+
+<!-- 7seg leds -->
+
+	<group name="display2">
+		<bounds x="0" y="0" width="9.8" height="3" />
+
+		<element name="digit10" ref="digit"><bounds x="0" y="0" width="2" height="3" /></element>
+		<element name="digit11" ref="digit"><bounds x="2.6" y="0" width="2" height="3" /></element>
+		<element name="digit12" ref="digit"><bounds x="5.2" y="0" width="2" height="3" /></element>
+		<element name="digit13" ref="digit"><bounds x="7.8" y="0" width="2" height="3" /></element>
+		<element ref="dark"><bounds x="4.8" y="0" width="0.2" height="3" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="21.2" top="-1" bottom="31.2" />
+
+		<group ref="display1"><bounds x="0" y="0" width="15.4" height="30.2" /><orientation rotate="90" /></group>
+		<group ref="display2"><bounds x="17.2" y="10.2" width="3" height="9.8" /><orientation rotate="90" /></group>
+	</view>
+</mamelayout>

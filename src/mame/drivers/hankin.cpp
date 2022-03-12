@@ -48,6 +48,7 @@ public:
 		, m_io_test(*this, "TEST")
 		, m_io_keyboard(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
 		, m_digits(*this, "digit%d%d", 0U, 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -105,6 +106,7 @@ private:
 	required_ioport m_io_test;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<5, 6> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<96> m_io_outputs;   // 32 solenoids + 64 lamps
 };
 
@@ -325,7 +327,7 @@ void hankin_state::ic10_b_w(u8 data)
 
 WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }
@@ -439,9 +441,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 
 void hankin_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_timer_sb));
@@ -464,7 +465,6 @@ void hankin_state::machine_start()
 
 void hankin_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

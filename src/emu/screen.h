@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "rendertypes.h"
+
 #include <type_traits>
 #include <utility>
 
@@ -29,16 +31,6 @@ enum screen_type_enum
 	SCREEN_TYPE_VECTOR,
 	SCREEN_TYPE_LCD,
 	SCREEN_TYPE_SVG
-};
-
-// texture formats
-enum texture_format
-{
-	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
-	TEXFORMAT_PALETTE16,                                // 16bpp palettized, no alpha
-	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
-	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
-	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
 };
 
 // screen_update callback flags
@@ -445,7 +437,7 @@ private:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
