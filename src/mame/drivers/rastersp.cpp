@@ -22,10 +22,12 @@
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/53c7xx.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/mc146818.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "machine/z80scc.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -57,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dsp(*this, "dsp")
+		, m_duart(*this, "duart")
 		, m_dram(*this, "dram")
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
@@ -82,11 +85,12 @@ protected:
 	void nvram_w(offs_t offset, uint8_t data);
 
 	void cpu_map_base(address_map &map);
-	void io_map_base(address_map &map);
+	void io_map(address_map &map);
 	void dsp_map_base(address_map &map);
 
 	required_device<i486_device>     m_maincpu;
 	required_device<tms3203x_device> m_dsp;
+	required_device<z80scc_device>   m_duart;
 
 	void update_irq(uint32_t which, uint32_t state);
 
@@ -156,6 +160,7 @@ private:
 	TIMER_CALLBACK_MEMBER(tms_timer1);
 	TIMER_CALLBACK_MEMBER(tms_tx_timer);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void upload_palette(uint32_t word1, uint32_t word2);
@@ -164,9 +169,8 @@ private:
 	static void ncr53c700_config(device_t *device);
 	void cpu_map(address_map &map);
 	void dsp_map(address_map &map);
-	void io_map(address_map &map);
 	uint8_t interrupt_status_r(offs_t offset);
-	
+
 	std::unique_ptr<uint8_t[]>   m_nvram8;
 	uint8_t   m_irq_status;
 	uint32_t  m_dlba;
@@ -189,7 +193,7 @@ class fbcrazy_state : public rastersp_state
 public:
 	fbcrazy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: rastersp_state(mconfig, type, tag)
-		, m_edc_tb_timer(nullptr)
+		, m_trackball_timer(nullptr)
 	{
 	}
 
@@ -203,31 +207,25 @@ protected:
 
 private:
 
-	emu_timer *m_edc_tb_timer;
 	void aux_port0_w(offs_t offset, uint8_t data);
 	void aux_port1_w(offs_t offset, uint8_t data);
 	void aux_port2_w(offs_t offset, uint8_t data);
 	void aux_port3_w(offs_t offset, uint8_t data);
 	void aux_port4_w(offs_t offset, uint8_t data);
-	uint8_t m_aux_port3_data;
 
 	void cpu_map(address_map &map);
-	void io_map(address_map &map);
 	void dsp_map(address_map &map);
 
-	void edc_tb_w(offs_t offset, uint8_t data);
-	uint8_t edc_tb_r(offs_t offset);
-	TIMER_CALLBACK_MEMBER(edc_tb_timer);
+	TIMER_CALLBACK_MEMBER(trackball_timer);
+	DECLARE_WRITE_LINE_MEMBER(trackball_rts);
 
-	uint8_t m_uart_regs[2][15];
-	uint8_t m_uart_ints;
-	uint8_t m_uart_ctrl;
-	uint8_t m_uart_count;
-	uint8_t m_uart_tx_count[2];
-	uint8_t m_uart_rx_data[2][4];
+	emu_timer *m_trackball_timer;
+	uint8_t m_aux_port3_data;
 	uint8_t m_trackball_ctr;
-	uint8_t m_oldxpos;
-	uint8_t m_oldypos;
+	uint8_t m_trackball_data[3];
+	uint16_t m_oldxpos;
+	uint16_t m_oldypos;
+	uint8_t m_trackball_enabled;
 };
 
 
@@ -275,18 +273,13 @@ void fbcrazy_state::machine_start()
 {
 	rastersp_state::machine_start();
 
-	if (!m_edc_tb_timer)
-		m_edc_tb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fbcrazy_state::edc_tb_timer), this));
+	m_trackball_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fbcrazy_state::trackball_timer), this));
 
-	save_item(NAME(m_uart_regs));
-	save_item(NAME(m_uart_ints));
-	save_item(NAME(m_uart_ctrl));
-	save_item(NAME(m_uart_count));
-	save_item(NAME(m_uart_tx_count));
-	save_item(NAME(m_uart_rx_data));
 	save_item(NAME(m_trackball_ctr));
+	save_item(NAME(m_trackball_data));
 	save_item(NAME(m_oldxpos));
 	save_item(NAME(m_oldypos));
+	save_item(NAME(m_trackball_enabled));
 }
 
 void rastersp_state::machine_reset()
@@ -326,22 +319,14 @@ void fbcrazy_state::machine_reset()
 
 	m_aux_port3_data = 0;
 
-	m_uart_ints = 0;
-	m_uart_ctrl = 0;
-	m_uart_count = 0;
 	m_trackball_ctr = 0;
+	m_trackball_data[0] = m_trackball_data[1] = m_trackball_data[2] = 0;
 	m_oldxpos = 0;
 	m_oldypos = 0;
+	m_trackball_enabled = 0;
 
-	for (uint32_t i = 0; i < 2; ++i)
-	{
-		std::fill_n(m_uart_regs[i], std::size(m_uart_regs[0]), 0);
-		m_uart_tx_count[i] = 0;
-		std::fill_n(m_uart_rx_data[i], std::size(m_uart_rx_data[0]), 0);
-	}
-
-	period = attotime::from_hz(120); // ~1200 baud
-	m_edc_tb_timer->adjust(period, 0, period);
+	period = attotime::from_hz(1200); // 1200 baud
+	m_trackball_timer->adjust(period, 0, period);
 }
 
 
@@ -615,7 +600,7 @@ WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 {
 	update_irq(IRQ_SCSI, state);
 	
-	if ( state && m_dsp_ctrl_data&0x20)
+	if (state && BIT(m_dsp_ctrl_data, 5))
 	{
 		m_dsp->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
 		m_dsp->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
@@ -629,9 +614,19 @@ WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
 		update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
 
+WRITE_LINE_MEMBER( rastersp_state::duart_irq )
+{
+	update_irq(IRQ_UART, state);
+}
+
+
+WRITE_LINE_MEMBER( fbcrazy_state::trackball_rts )
+{
+	m_trackball_enabled = state;
+}
+
 /*
-	Mimic a Bacta Dataport unit just enough to satisfy Football Crazy.
-	Also mimic trackball unit. This uses a small PIC based interface board
+	Mimic trackball unit. This uses a small PIC based interface board
 	which converts the trackball movement into RS232 data.
 	The data format is as follows:
 	Byte 0 : 0100abAB bits 7 & 6 = 01 signifies 1st byte
@@ -641,182 +636,106 @@ WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
 	The trackball X movement is ABCDEFGH and Y movement abcdefgh
 	We do not have a PCB nor a dump of the PIC :(
 */
-TIMER_CALLBACK_MEMBER(fbcrazy_state::edc_tb_timer)
+TIMER_CALLBACK_MEMBER(fbcrazy_state::trackball_timer)
 {
-	uint8_t	newxpos, newypos;
-
-	// Check if uart interrupts are enabled
-	if (m_uart_regs[0][9] != 0)
+	if (m_trackball_enabled)
 	{
-		// Check for pending tx data
-		if (m_uart_ctrl != 0)
+		if (m_trackball_ctr == 0)
 		{
-			// Set tx complete!
-			m_uart_ints |= m_uart_ctrl;
-			m_uart_ctrl = 0;
-			update_irq(IRQ_UART, 1);
-		}
-		if (m_uart_tx_count[0] >= 2)
-		{
-			// At least 2 bytes have been received - most edc packets are 2 bytes
-			// so we can just send ack to keep Rasterspeed system happy
-			// and prevent it from locking up
-			m_uart_rx_data[0][1]=0x06;//ack
-			m_uart_rx_data[0][0]=0x01;//1 byte to send
-			m_uart_ints |= 0x02;//flag rx int
-			m_uart_tx_count[0]=0;
-			update_irq(IRQ_UART, 1);
-		}
-
-		// Check rx ints are enabled for trackball
-		if ((m_uart_regs[1][1] & 0x18) == 0x10 && (++m_trackball_ctr > 3) && (m_uart_ints & 0x08) == 0)
-		{
-			m_trackball_ctr = 0;
+			uint16_t newxpos, newypos;
 
 			newxpos = ioport("TRACK_X")->read();
 			newypos = ioport("TRACK_Y")->read();
 
-			if (newxpos != m_oldxpos || newypos != m_oldypos)
+			int diffx, diffy;
+			diffx = newxpos - m_oldxpos;
+			diffy = newypos - m_oldypos;
+
+			if (diffx<-3900)
 			{
-				int diffx, diffy;
-				diffx = newxpos - m_oldxpos;
-				diffy = newypos - m_oldypos;
-				m_oldxpos = newxpos;
-				m_oldypos = newypos;
-
-				//Format movement into 3 byte as described above and tx
-				m_uart_rx_data[1][3] = 0x40 | ((diffy>>4)&0x0c) | ((diffx>>6)&0x03);
-				m_uart_rx_data[1][2] = diffx & 0x3f;
-				m_uart_rx_data[1][1] = diffy & 0x3f;
-				m_uart_rx_data[1][0] = 3;
-				m_uart_ints |= 0x08;
-				update_irq(IRQ_UART, 1);
+				diffx += 4096;
 			}
-		}
-	}
-}
-
-uint8_t fbcrazy_state::edc_tb_r(offs_t offset)
-{
-	uint8_t reg;
-	uint8_t retval = 0;
-
-	offset >>= 3; //1 = channel A, 0 = channel B
-	offset ^= 1;
-
-	reg = m_uart_regs[offset][0];
-	m_uart_regs[offset][0] = 0;
-
-	// Interrupt vector
-	if (reg == 2)
-	{
-		if (m_uart_ints & 2) // RX int on channel A
-		{
-			retval = 0x0c;
-		}
-		else if (m_uart_ints & 8) // RX int on channel b
-		{
-			retval = 0x04;
-		}
-		else if (m_uart_ints & 1) // TX int on channel A
-		{
-			retval = 8;
-		}
-		else if (m_uart_ints & 4) // TX int on channel b
-		{
-			retval = 0;
-		}
-	}
-	// Pending ints
-	else if (reg == 3)
-	{
-		if (m_uart_ints & 2) //rx int on channel A
-		{
-			retval = 0x20;
-		}
-		else if (m_uart_ints & 8) //rx int on channel b
-		{
-			retval = 0x04;
-		}
-		else if (m_uart_ints & 1) //tx int on channel A
-		{
-			retval = 0x10;
-		}
-		else if (m_uart_ints & 4) //tx int on channel b
-		{
-			retval = 0x02;
-		}
-	}
-	// RX data
-	else if (reg == 8)
-	{
-		// Return next byte from buffer or keep repeating last byte if none
-		retval = m_uart_rx_data[offset][m_uart_rx_data[offset][0]];
-		if (m_uart_rx_data[offset][0] > 0)
-		{
-			m_uart_rx_data[offset][0]--;
-			if (m_uart_rx_data[offset][0] == 0)
+			else if (diffx>3900)
 			{
-				// No more rx data so set int flag
-				m_uart_ints &= ~(2 << (offset * 2));
+				diffx -= 4096;
 			}
-		}
-	}
-	if (m_uart_ints == 0)
-	{
-		update_irq(IRQ_UART, 0);
-	}
-	return retval;
-}
-
-void fbcrazy_state::edc_tb_w(offs_t offset, uint8_t data)
-{
-	uint8_t reg;
-
-	offset >>= 3; // 1 = channel A, 0 = channel B
-	offset ^= 1; // 0 = channel A
-	
-	reg = m_uart_regs[offset][0];
-	m_uart_regs[offset][0] = 0;
-
-	if (reg == 0)
-	{
-		m_uart_regs[offset][reg] = data & 7;
-
-		if ((data & 0x38) == 0x08)
-		{
-			m_uart_regs[offset][reg] |= 0x08;
-		}
-		else if (data == 0x28)
-		{
-			// Clear TX ints
-			m_uart_ints &= ~(1 << (offset * 2));
-			m_uart_ctrl &= ~(1 << (offset * 2));
-			if (m_uart_ctrl == 0)
+			if (diffx>127)
 			{
-				update_irq(IRQ_UART, 0);
+				diffx = 127;
 			}
+			else if (diffx <-127)
+			{
+				diffx = -127;
+			}
+
+			if (diffy<-3900)
+			{
+				diffy += 4096;
+			}
+			else if (diffy>3900)
+			{
+				diffy -= 4096;
+			}
+			if (diffy>127)
+			{
+				diffy = 127;
+			}
+			else if (diffy <-127)
+			{
+				diffy = -127;
+			}
+
+			m_oldxpos = newxpos;
+			m_oldypos = newypos;
+
+			//Format movement into 3 bytes as described above for tx
+			m_trackball_data[0] = 0x40 | ((diffy>>4)&0x0c) | ((diffx>>6)&0x03);
+			m_trackball_data[1] = diffx & 0x3f;
+			m_trackball_data[2] = diffy & 0x3f;
+		}
+
+		if (m_trackball_ctr < 36)
+		{
+			//Transmitting data
+			uint8_t bitnum = m_trackball_ctr % 12 ;
+			if (bitnum == 0)
+			{
+				//start bit
+				m_duart->rxb_w(0);
+			}
+			else if (bitnum < 9)
+			{
+				//Data bits
+				if (m_trackball_data[(m_trackball_ctr/12)]&(1<<(bitnum-1)))
+				{
+					m_duart->rxb_w(1);
+				}
+				else
+				{
+					m_duart->rxb_w(0);
+				}
+			}
+			else
+			{
+				//Stop bit and small gap
+				m_duart->rxb_w(1);
+			}
+			m_trackball_ctr++;
+		}
+		else
+		{
+			m_trackball_ctr = 0;
 		}
 	}
 	else
 	{
-		// Set reg
-		m_uart_regs[offset][reg] = data;
-		if (reg == 9)
-		{
-			// There is only 1 reg 9 so mirror in both halves
-			m_uart_regs[offset ^ 1][reg] = data;
-		}
-		// Transmitting data
-		else if (reg == 8)
-		{
-			m_uart_ctrl |= 1 << (offset * 2); // start TX
-			m_uart_ints &= ~(1 << (offset * 2)); // start TX
-			m_uart_tx_count[offset]++;
-		}
+		m_trackball_ctr = 0;
+		m_trackball_data[0] = 0;
+		m_trackball_data[1] = 0;
+		m_trackball_data[2] = 0;
+		m_duart->rxb_w(1);
 	}
 }
-
 
 /*************************************
  *
@@ -834,7 +753,7 @@ void rastersp_state::port1_w(uint32_t data)
 	  .... ..x. - Coin meter A
 	  .... ...x - Coin meter B
 	*/
-	if (BIT(data, 5) && m_dsp_ctrl_data & 0x20)
+	if (BIT(data, 5) && BIT(m_dsp_ctrl_data, 5))
 	{
 		m_dsp->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
 		m_dsp->set_input_line(TMS3203X_IRQ2, CLEAR_LINE);
@@ -1212,7 +1131,7 @@ void fbcrazy_state::cpu_map(address_map &map)
 	map(0x01000010, 0x01000013).w( FUNC(fbcrazy_state::aux_port4_w)).umask32(0x000000ff);
 }
 
-void rastersp_state::io_map_base(address_map &map)
+void rastersp_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0000).r(FUNC(rastersp_state::interrupt_status_r));
 	map(0x0020, 0x0023).w(FUNC(rastersp_state::cyrix_cache_w));
@@ -1223,17 +1142,10 @@ void rastersp_state::io_map_base(address_map &map)
 	map(0x1010, 0x1013).portr("DSW1");
 	map(0x1014, 0x1017).portr("EXTRA");
 	map(0x4000, 0x4007).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write)).umask32(0x000000ff);
-}
-void rastersp_state::io_map(address_map &map)
-{
-	io_map_base(map);
-	map(0x6008, 0x600b).nopr().nopw(); // RS232
-}
-
-void fbcrazy_state::io_map(address_map &map)
-{
-	rastersp_state::io_map_base(map);
-	map(0x6000, 0x600f).rw( FUNC(fbcrazy_state::edc_tb_r), FUNC(fbcrazy_state::edc_tb_w));
+	map(0x6000, 0x6000).rw( m_duart, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
+	map(0x6004, 0x6004).rw( m_duart, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
+	map(0x6008, 0x6008).rw( m_duart, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
+	map(0x600c, 0x600c).rw( m_duart, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w));
 }
 
 void rastersp_state::dsp_map_base(address_map &map)
@@ -1531,6 +1443,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 {
 	I486(config, m_maincpu, 33'330'000);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(rastersp_state::irq_callback));
+	m_maincpu->set_addrmap(AS_IO, &rastersp_state::io_map);
 
 	TMS32031(config, m_dsp, 33'330'000);
 	m_dsp->set_mcbl_mode(true); // Boot-loader mode
@@ -1570,6 +1483,10 @@ void rastersp_state::rs_config_base(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	
+	SCC85C30(config, m_duart, 8'000'000);
+	m_duart->configure_channels(1'843'200, 0, 1'843'200, 0);
+	m_duart->out_int_callback().set(FUNC(rastersp_state::duart_irq));
 }
 
 /*************************************
@@ -1582,7 +1499,6 @@ void rastersp_state::rastersp(machine_config &config)
 {
 	rs_config_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rastersp_state::cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &rastersp_state::io_map);
 	
 	m_dsp->set_addrmap(AS_PROGRAM, &rastersp_state::dsp_map);
 
@@ -1598,7 +1514,6 @@ void fbcrazy_state::fbcrazy(machine_config &config)
 {
 	rs_config_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fbcrazy_state::cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &fbcrazy_state::io_map);
 
 	m_dsp->set_addrmap(AS_PROGRAM, &fbcrazy_state::dsp_map);
 
@@ -1607,6 +1522,13 @@ void fbcrazy_state::fbcrazy(machine_config &config)
 	connector3.option_add_internal("ncr53c700", NCR53C7XX);
 	connector3.set_default_option("cdrom");
 	connector3.set_fixed(true);
+
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+
+	m_duart->out_txda_callback().set("bacta", FUNC(bacta_datalogger_device::write_txd));
+	bacta.rxd_handler().set(m_duart, FUNC(z80scc_device::rxa_w));
+	m_duart->out_rtsa_callback().set(FUNC(fbcrazy_state::trackball_rts));
+
 }
 
 /*************************************
