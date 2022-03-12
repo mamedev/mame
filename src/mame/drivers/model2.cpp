@@ -3128,7 +3128,7 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_LOAD32_WORD("mpr-20296.10", 0x000000, 0x400000, CRC(072d8a5e) SHA1(7f69c90dd3c3e6e522d1065b3c4b09434cb4e634) )
 	ROM_LOAD32_WORD("mpr-20297.11", 0x000002, 0x400000, CRC(ba6a825b) SHA1(670a86c3a1a78550c760cc66c0a6181928fb9054) )
 	ROM_LOAD32_WORD("mpr-20294.8",  0x800000, 0x400000, CRC(a0bd1474) SHA1(c0c032adac69bd545e3aab481878b08f3c3edab8) )
-	ROM_LOAD32_WORD("mpr-20295.9", 0x800002, 0x400000, CRC(c548cced) SHA1(d34f2fc9b4481c75a6824aa4bdd3f1884188d35b) )
+	ROM_LOAD32_WORD("mpr-20295.9",  0x800002, 0x400000, CRC(c548cced) SHA1(d34f2fc9b4481c75a6824aa4bdd3f1884188d35b) )
 
 	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc) (COPRO socket)
 
@@ -3664,8 +3664,7 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )
 
 	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
-	ROM_LOAD( "epr-17762.ic12", 0x000000, 0x010000, NO_DUMP ) /* Need to verify actual EPR-xxxx number, might be EPR-17759 */
-	ROM_LOAD( "epr-17891.ic12", 0x000000, 0x010000, CRC(9a33b437) SHA1(3e8f210aa5159e78f640126cb5ce7f05f22560f2) ) /* REMOVE when EPR-17762 is dumped & added */
+	ROM_LOAD( "epr-17182.ic12", 0x000000, 0x010000, CRC(08d3db42) SHA1(57d902a835f4f738b9383760073193d206cf6343) )
 
 	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-17748.16", 0x000000, 0x200000, CRC(3148a2b2) SHA1(283cc49bfb6c6381a7ead9273fd097dca5b981b6) )
@@ -3711,8 +3710,7 @@ ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player
 	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) ) //
 
 	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
-	ROM_LOAD( "epr-17762.ic12", 0x000000, 0x010000, NO_DUMP ) /* Need to verify actual EPR-xxxx number, might be EPR-17759 */
-	ROM_LOAD( "epr-17891.ic12", 0x000000, 0x010000, CRC(9a33b437) SHA1(3e8f210aa5159e78f640126cb5ce7f05f22560f2) ) /* REMOVE when EPR-17762 is dumped & added */
+	ROM_LOAD( "epr-17182.ic12", 0x000000, 0x010000, CRC(08d3db42) SHA1(57d902a835f4f738b9383760073193d206cf6343) )
 
 	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-17748.16", 0x000000, 0x200000, CRC(3148a2b2) SHA1(283cc49bfb6c6381a7ead9273fd097dca5b981b6) )
@@ -3786,12 +3784,12 @@ ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set 
 	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
 	ROM_LOAD32_WORD( "mpr-18751.10", 0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
 	ROM_LOAD32_WORD( "mpr-18752.11", 0x000002, 0x200000, CRC(4da3719e) SHA1(24007e4ae3ba1a06321328d14e2bd6002fa1936e) )
-	ROM_LOAD32_WORD( "mpr-18749.8", 0x400000, 0x200000, CRC(c3fe0eea) SHA1(ada21405a136935ac4da1a3535c25fccf903f2d1) )
-	ROM_LOAD32_WORD( "mpr-18750.9", 0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
-	ROM_LOAD32_WORD( "mpr-18747.6", 0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
-	ROM_LOAD32_WORD( "mpr-18748.7", 0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
-	ROM_LOAD32_WORD( "epr-18862.4", 0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
-	ROM_LOAD32_WORD( "epr-18863.5", 0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
+	ROM_LOAD32_WORD( "mpr-18749.8",  0x400000, 0x200000, CRC(c3fe0eea) SHA1(ada21405a136935ac4da1a3535c25fccf903f2d1) )
+	ROM_LOAD32_WORD( "mpr-18750.9",  0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
+	ROM_LOAD32_WORD( "mpr-18747.6",  0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
+	ROM_LOAD32_WORD( "mpr-18748.7",  0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
+	ROM_LOAD32_WORD( "epr-18862.4",  0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
+	ROM_LOAD32_WORD( "epr-18863.5",  0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
 	ROM_COPY( "main_data", 0xc00000, 0xd00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xe00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xf00000, 0x100000 )
@@ -3844,14 +3842,14 @@ ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_LOAD32_WORD( "epr-18825c.15",  0x040002, 0x020000, CRC(f88b036c) SHA1(f6196e8da5e6579fe3fa5c24ab9538964c98e267) )
 
 	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
-	ROM_LOAD32_WORD( "mpr-18751.10",  0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
-	ROM_LOAD32_WORD( "mpr-18752.11",  0x000002, 0x200000, CRC(4da3719e) SHA1(24007e4ae3ba1a06321328d14e2bd6002fa1936e) )
-	ROM_LOAD32_WORD( "mpr-18749.8",   0x400000, 0x200000, CRC(c3fe0eea) SHA1(ada21405a136935ac4da1a3535c25fccf903f2d1) )
-	ROM_LOAD32_WORD( "mpr-18750.9",   0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
-	ROM_LOAD32_WORD( "mpr-18747.6",   0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
-	ROM_LOAD32_WORD( "mpr-18748.7",   0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
-	ROM_LOAD32_WORD( "epr-18862.4",   0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
-	ROM_LOAD32_WORD( "epr-18863.5",   0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
+	ROM_LOAD32_WORD( "mpr-18751.10", 0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
+	ROM_LOAD32_WORD( "mpr-18752.11", 0x000002, 0x200000, CRC(4da3719e) SHA1(24007e4ae3ba1a06321328d14e2bd6002fa1936e) )
+	ROM_LOAD32_WORD( "mpr-18749.8",  0x400000, 0x200000, CRC(c3fe0eea) SHA1(ada21405a136935ac4da1a3535c25fccf903f2d1) )
+	ROM_LOAD32_WORD( "mpr-18750.9",  0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
+	ROM_LOAD32_WORD( "mpr-18747.6",  0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
+	ROM_LOAD32_WORD( "mpr-18748.7",  0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
+	ROM_LOAD32_WORD( "epr-18862.4",  0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
+	ROM_LOAD32_WORD( "epr-18863.5",  0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
 	ROM_COPY( "main_data", 0xc00000, 0xd00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xe00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xf00000, 0x100000 )
@@ -4114,14 +4112,14 @@ Model2c:
   epr-20952.15    epr-20956.15    epr-20981.15    epr-20948.15
   epr-20953.16    epr-20957.16    epr-20982.16    epr-20949.16
 
-* The numbers for the Japan sets were not listed, but are shown for comparision
+* The numbers for the Japan sets were not listed, but are shown for comparison
 
 In Dynamite Deka 2 manual 420-6406-01 it states there are C-CRX versions of the
 USA, Export and Korea versions as well as the Japan version.
 
 */
 
-ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-11341, ROM board ID# 834-11342 */
+ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-13461-02 DYNAMITE COP A-CRX EXP, ROM board ID# 834-13462-02 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20930.12", 0x000000, 0x080000, CRC(b8fc8ff7) SHA1(53b0f9dc8494effa077170ddced2d95f43a5f134) )
 	ROM_LOAD32_WORD("epr-20931.13", 0x000002, 0x080000, CRC(89d13f88) SHA1(5e266b5e153a0d9a57360cfd1af81e3a58a2fb7d) )
@@ -4172,7 +4170,7 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
-ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A, Sega Game ID# 833-13461 DYNAMITE DEKA 2 A-CRX */
+ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A, Sega Game ID# 833-13461 DYNAMITE DEKA 2 A-CRX, ROM board ID# 834-13462 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20922.12",  0x000000, 0x080000, CRC(0a8b5604) SHA1(4076998fc600c1df3bb5ef48d42681c01e651495) )
 	ROM_LOAD32_WORD("epr-20923.13",  0x000002, 0x080000, CRC(83be73d4) SHA1(1404a9c79cd2bae13f60e5e008307417324c3666) )
@@ -5722,9 +5720,9 @@ The Dead or Alive set below is also known to have genuine Tecmo labels:
 Sega ID# 836-12884 DEAD OR ALIVE
 
 */
-ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 833-11341, ROM board ID# 834-11342, 837-12880 security board */
+ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884 DEAD OR ALIVE, ROM board ID# 838-12885, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD("epr-19310a.12", 0x000000, 0x080000, CRC(06486f7a) SHA1(b3e14103570e5f45aed16e1c158e469bc85002ae) )
+	ROM_LOAD32_WORD("epr-19310a.12", 0x000000, 0x080000, CRC(06486f7a) SHA1(b3e14103570e5f45aed16e1c158e469bc85002ae) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19311a.13", 0x000002, 0x080000, CRC(1be62912) SHA1(dcc2df8e28e1a107867f74248e6ffcac83afe7c0) )
 
 	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
@@ -5765,9 +5763,9 @@ ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 833-11341
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( doaab ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 833-?????, ROM board ID# 838-12885-02, 837-12880 security board, defaults to export and can't be changed in test mode */
+ROM_START( doaab ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884-02 DEAD OR ALIVE, ROM board ID# 838-12885-02, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD("epr-19383a.12", 0x000000, 0x080000, CRC(42e61481) SHA1(ecee88b17d60924c63d01ff72acb186350265e0a) )
+	ROM_LOAD32_WORD("epr-19383a.12", 0x000000, 0x080000, CRC(42e61481) SHA1(ecee88b17d60924c63d01ff72acb186350265e0a) ) // Game Mode Settings : Nation : defaults to Export and can't be changed in test mode
 	ROM_LOAD32_WORD("epr-19384a.13", 0x000002, 0x080000, CRC(034a3ab9) SHA1(a01d2f0a4accfdf892228b65c25e2ad9144ecf59) )
 
 	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
@@ -5811,7 +5809,7 @@ ROM_END
 ROM_START( doa ) /* Dead or Alive Jan 10 1997, probably Revision C, Model 2B, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	// ROMs have hand written labels - "EPR-19379B / EPR-19380B, 96/12/6", probably was reused and reprogrammed to newer revision
-	ROM_LOAD32_WORD("epr-19379c.15", 0x000000, 0x080000, CRC(5cc62fbe) SHA1(a1489b92f32bcd16cca10017975beb62fc27a060) )
+	ROM_LOAD32_WORD("epr-19379c.15", 0x000000, 0x080000, CRC(5cc62fbe) SHA1(a1489b92f32bcd16cca10017975beb62fc27a060) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19380c.16", 0x000002, 0x080000, CRC(58cfeaa9) SHA1(4319c22b8ebcff152676b62b5b1d4c1c7ce64fa6) )
 
 	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
@@ -5849,9 +5847,9 @@ ROM_START( doa ) /* Dead or Alive Jan 10 1997, probably Revision C, Model 2B, 83
 	ROM_LOAD16_WORD_SWAP("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
 ROM_END
 
-ROM_START( doab ) /* Dead or Alive Revision B, Model 2B, 837-12880 security board */
+ROM_START( doab ) /* Dead or Alive Dec 6 1996, Revision B, Model 2B, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD("epr-19379b.15", 0x000000, 0x080000, CRC(8a10a944) SHA1(c675a344f74d0118907fb5292495883c0c30c719) )
+	ROM_LOAD32_WORD("epr-19379b.15", 0x000000, 0x080000, CRC(8a10a944) SHA1(c675a344f74d0118907fb5292495883c0c30c719) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19380b.16", 0x000002, 0x080000, CRC(766c1ec8) SHA1(49250886f66db9fd37d88bc22c8f22046f74f043) )
 
 	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
