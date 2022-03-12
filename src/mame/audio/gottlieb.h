@@ -21,6 +21,7 @@
 
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
@@ -32,7 +33,6 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 // ======================> gottlieb_sound_p2_device
 
-// rev 0 sound board
 class gottlieb_sound_p2_device : public device_t, public device_mixer_interface
 {
 public:
@@ -51,11 +51,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	void gottlieb_sound_p2_map(address_map &map);
+	void p2_map(address_map &map);
 
 private:
 	// devices
-	required_device<m6502_device>       m_audiocpu;
+	required_device<m6502_device>       m_cpu;
 	required_device<mos6530_device>     m_r6530;
 
 	uint8_t m_sndcmd;
@@ -88,7 +88,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void gottlieb_sound_r1_map(address_map &map);
+	virtual void r1_map(address_map &map);
 
 protected:
 	required_device<mc1408_device> m_dac;
@@ -117,7 +117,7 @@ protected:
 	void votrax_data_w(uint8_t data);
 	void speech_clock_dac_w(uint8_t data);
 
-	virtual void gottlieb_sound_r1_map(address_map &map) override;
+	virtual void r1_map(address_map &map) override;
 
 private:
 	// devices
@@ -162,8 +162,8 @@ protected:
 	void speech_ctrl_w(uint8_t data);
 	void psg_latch_w(uint8_t data);
 
-	void gottlieb_sound_p4_map(address_map &map);
-	void gottlieb_speech_p4_map(address_map &map);
+	void p4_dmap(address_map &map);
+	void p4_ymap(address_map &map);
 
 	// internal helpers
 	void nmi_timer_adjust();
@@ -178,8 +178,9 @@ protected:
 	};
 
 	// devices
-	required_device<m6502_device>   m_audiocpu;
-	required_device<m6502_device>   m_speechcpu;
+	required_device<m6502_device>   m_dcpu;
+	optional_device<m6502_device>   m_dcpu2;
+	required_device<m6502_device>   m_ycpu;
 	required_device<ay8913_device>  m_ay1;
 	required_device<ay8913_device>  m_ay2;
 
@@ -187,12 +188,13 @@ protected:
 	emu_timer * m_nmi_timer;
 	uint8_t       m_nmi_rate;
 	uint8_t       m_nmi_state;
-	uint8_t       m_audiocpu_latch;
-	uint8_t       m_speechcpu_latch;
+	uint8_t       m_dcpu_latch;
+	uint8_t       m_ycpu_latch;
 	uint8_t       m_speech_control;
 	uint8_t       m_last_command;
 	uint8_t       m_psg_latch;
 	uint8_t       m_psg_data_latch;
+	uint8_t       m_dcpu2_latch;
 };
 
 
@@ -221,8 +223,8 @@ private:
 	void sp0250_latch_w(uint8_t data);
 	void speech_control_w(uint8_t data);
 
-	void gottlieb_sound_r2_map(address_map &map);
-	void gottlieb_speech_r2_map(address_map &map);
+	void r2_dmap(address_map &map);
+	void r2_ymap(address_map &map);
 
 	// devices
 	optional_device<sp0250_device>  m_sp0250;
@@ -230,5 +232,24 @@ private:
 	// internal state
 	bool     m_cobram3_mod;
 	uint8_t  m_sp0250_latch;
+};
+
+// ======================> gottlieb_sound_p5_device
+
+// same as p4 plus an extra dac, same as existing audiocpu. For bonebusters.
+class gottlieb_sound_p5_device : public gottlieb_sound_p4_device
+{
+public:
+	// construction/destruction
+	gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	void p5_dmap(address_map &map);
+	uint8_t d2_data_r();
 };
 

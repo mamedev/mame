@@ -61,7 +61,6 @@ ToDo:
 - p3 sound card to be written, haven't found a schematic as manuals are hard to obtain
 - Missing sounds because of program crashes
 - bighouse: after game ends, the display freezes. Game keeps running though.
-- Bone Busters: uses 3 CPUs for sound. No manual/schematic found.
 
 *****************************************************************************************************************/
 
@@ -69,8 +68,6 @@ ToDo:
 #include "machine/input_merger.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
-
-#include "cpu/i86/i86.h"
 #include "speaker.h"
 
 #include "gts80b.lh"
@@ -91,7 +88,7 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		//, m_p3_sound(*this, "p3sound")
 		, m_p4_sound(*this, "p4sound")
-		//, m_p5_sound(*this, "p5sound")
+		, m_p5_sound(*this, "p5sound")
 		, m_r2_sound(*this, "r2sound")
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
@@ -100,7 +97,7 @@ public:
 	void p0(machine_config &config);  // base config
 	void p3(machine_config &config);  // no schematic available
 	void p4(machine_config &config);  // same as r2 but bigger roms, no speech
-	void p5(machine_config &config);  // bonebusters - no schematic available
+	void p5(machine_config &config);  // bonebusters
 	void r2(machine_config &config);  // r2 (2x ay, spo250, dac)
 	void master(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
@@ -137,7 +134,7 @@ private:
 	required_ioport_array<9> m_io_keyboard;
 	//optional_device<gottlieb_sound_p3_device> m_p3_sound;
 	optional_device<gottlieb_sound_p4_device> m_p4_sound;
-	//optional_device<gottlieb_sound_p5_device> m_p5_sound;
+	optional_device<gottlieb_sound_p5_device> m_p5_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 	output_finder<40> m_digits;
 	output_finder<57> m_io_outputs;   // 8 solenoids, 1 outhole, 48 lamps
@@ -470,6 +467,9 @@ void gts80b_state::port3a_w(u8 data)
 	else
 	if (m_p4_sound)
 		m_p4_sound->write(sndcmd | m_soundex);
+	else
+	if (m_p5_sound)
+		m_p5_sound->write(sndcmd | m_soundex);
 
 	// Solenoids group 1
 	if (!BIT(data, 5))
@@ -643,7 +643,7 @@ void gts80b_state::p5(machine_config &config)
 {
 	p0(config);
 
-	//GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::r2(machine_config &config)
@@ -1105,13 +1105,13 @@ ROM_START(bonebstr)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu4", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
@@ -1126,13 +1126,13 @@ ROM_START(bonebstrf)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu4", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
@@ -1147,13 +1147,13 @@ ROM_START(bonebstrg)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu4", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
