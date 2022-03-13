@@ -9,6 +9,9 @@
 //
 //============================================================
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
@@ -19,6 +22,46 @@
 #include "effectmanager.h"
 #include "effectreader.h"
 #include "effect.h"
+
+static bool prepare_effect_document(std::string &name, osd_options &options, rapidjson::Document &document)
+{
+	std::string full_name = name;
+	if (full_name.length() < 5 || (full_name.compare(full_name.length() - 5, 5, ".json") != 0))
+	{
+		full_name = full_name + ".json";
+	}
+
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, options.bgfx_path()));
+	path += full_name;
+
+	bx::FileReader reader;
+	if (!bx::open(&reader, path.c_str()))
+	{
+		osd_printf_error("Unable to open effect file %s\n", path.c_str());
+		return false;
+	}
+
+	int32_t size (bx::getSize(&reader));
+	char* data = new char[size + 1];
+	bx::read(&reader, reinterpret_cast<void*>(data), size);
+	bx::close(&reader);
+	data[size] = 0;
+
+	document.Parse<rapidjson::kParseCommentsFlag>(data);
+
+	delete [] data;
+
+	if (document.HasParseError())
+	{
+		std::string error(rapidjson::GetParseError_En(document.GetParseError()));
+		osd_printf_error("Unable to parse effect %s. Errors returned:\n", path.c_str());
+		osd_printf_error("%s\n", error.c_str());
+		return false;
+	}
+
+	return true;
+}
 
 effect_manager::~effect_manager()
 {
@@ -70,44 +113,4 @@ bool effect_manager::validate_effect(osd_options &options, std::string name)
 	}
 
 	return effect_reader::validate_value(document, "Effect '" + name + "': ", options);
-}
-
-bool effect_manager::prepare_effect_document(std::string &name, osd_options &options, rapidjson::Document &document)
-{
-	std::string full_name = name;
-	if (full_name.length() < 5 || (full_name.compare(full_name.length() - 5, 5, ".json") != 0))
-	{
-		full_name = full_name + ".json";
-	}
-
-	std::string path;
-	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, options.bgfx_path()));
-	path += full_name;
-
-	bx::FileReader reader;
-	if (!bx::open(&reader, path.c_str()))
-	{
-		osd_printf_error("Unable to open effect file %s\n", path.c_str());
-		return false;
-	}
-
-	int32_t size (bx::getSize(&reader));
-	char* data = new char[size + 1];
-	bx::read(&reader, reinterpret_cast<void*>(data), size);
-	bx::close(&reader);
-	data[size] = 0;
-
-	document.Parse<rapidjson::kParseCommentsFlag>(data);
-
-	delete [] data;
-
-	if (document.HasParseError())
-	{
-		std::string error(rapidjson::GetParseError_En(document.GetParseError()));
-		osd_printf_error("Unable to parse effect %s. Errors returned:\n", path.c_str());
-		osd_printf_error("%s\n", error.c_str());
-		return false;
-	}
-
-	return true;
 }

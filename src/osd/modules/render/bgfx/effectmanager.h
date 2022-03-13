@@ -17,9 +17,6 @@
 #include <map>
 #include <string>
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-
 #include <bgfx/bgfx.h>
 
 #include "shadermanager.h"
@@ -34,7 +31,6 @@ public:
 	// Getters
 	bgfx_effect* get_or_load_effect(osd_options &options, std::string name);
 	static bool validate_effect(osd_options &options, std::string name);
-	static bool prepare_effect_document(std::string &name, osd_options &options, rapidjson::Document &document);
 
 private:
 	bgfx_effect* load_effect(osd_options& options, std::string name);
