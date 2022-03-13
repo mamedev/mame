@@ -89,6 +89,7 @@ public:
 		//, m_p3_sound(*this, "p3sound")
 		, m_p4_sound(*this, "p4sound")
 		, m_p5_sound(*this, "p5sound")
+		, m_p6_sound(*this, "p6sound")
 		, m_r2_sound(*this, "r2sound")
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
@@ -97,7 +98,8 @@ public:
 	void p0(machine_config &config);  // base config
 	void p3(machine_config &config);  // no schematic available
 	void p4(machine_config &config);  // same as r2 but bigger roms, no speech
-	void p5(machine_config &config);  // bonebusters
+	void p5(machine_config &config);  // same as p4 + YM2151
+	void p6(machine_config &config);  // bonebusters
 	void r2(machine_config &config);  // r2 (2x ay, spo250, dac)
 	void master(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
@@ -135,6 +137,7 @@ private:
 	//optional_device<gottlieb_sound_p3_device> m_p3_sound;
 	optional_device<gottlieb_sound_p4_device> m_p4_sound;
 	optional_device<gottlieb_sound_p5_device> m_p5_sound;
+	optional_device<gottlieb_sound_p6_device> m_p6_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 	output_finder<40> m_digits;
 	output_finder<57> m_io_outputs;   // 8 solenoids, 1 outhole, 48 lamps
@@ -470,6 +473,9 @@ void gts80b_state::port3a_w(u8 data)
 	else
 	if (m_p5_sound)
 		m_p5_sound->write(sndcmd | m_soundex);
+	else
+	if (m_p6_sound)
+		m_p6_sound->write(sndcmd | m_soundex);
 
 	// Solenoids group 1
 	if (!BIT(data, 5))
@@ -644,6 +650,13 @@ void gts80b_state::p5(machine_config &config)
 	p0(config);
 
 	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+void gts80b_state::p6(machine_config &config)
+{
+	p0(config);
+
+	GOTTLIEB_SOUND_PIN6(config, m_p6_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::r2(machine_config &config)
@@ -991,10 +1004,10 @@ ROM_START(badgirls)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(452dec20) SHA1(a9c41dfb2d83c5671ab96e946f13df774b567976))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(ab3b8e2d) SHA1(b57a0b804b42b923bb102d295e3b8a69b1033d27))
 ROM_END
 
@@ -1009,10 +1022,10 @@ ROM_START(badgirlsf)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(452dec20) SHA1(a9c41dfb2d83c5671ab96e946f13df774b567976))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(ab3b8e2d) SHA1(b57a0b804b42b923bb102d295e3b8a69b1033d27))
 ROM_END
 
@@ -1027,10 +1040,10 @@ ROM_START(badgirlsg)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(452dec20) SHA1(a9c41dfb2d83c5671ab96e946f13df774b567976))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(ab3b8e2d) SHA1(b57a0b804b42b923bb102d295e3b8a69b1033d27))
 ROM_END
 
@@ -1048,10 +1061,10 @@ ROM_START(bighouse)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(f330fd04) SHA1(1288c47f636d9d5b826a2b870b81788a630e489e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(0b1ba1cb) SHA1(26327689992018837b1c9957c515ab67248623eb))
 ROM_END
 
@@ -1066,10 +1079,10 @@ ROM_START(bighousef)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(f330fd04) SHA1(1288c47f636d9d5b826a2b870b81788a630e489e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(0b1ba1cb) SHA1(26327689992018837b1c9957c515ab67248623eb))
 ROM_END
 
@@ -1084,10 +1097,10 @@ ROM_START(bighouseg)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(f330fd04) SHA1(1288c47f636d9d5b826a2b870b81788a630e489e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(0b1ba1cb) SHA1(26327689992018837b1c9957c515ab67248623eb))
 ROM_END
 
@@ -1105,13 +1118,13 @@ ROM_START(bonebstr)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
@@ -1126,13 +1139,13 @@ ROM_START(bonebstrf)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
@@ -1147,13 +1160,13 @@ ROM_START(bonebstrg)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p5sound:dcpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:dcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
 
-	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
 
-	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p6sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
@@ -1526,10 +1539,10 @@ ROM_START(hotshots)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(42c3cc3d) SHA1(26ca7f3a71b83df18ac6be1d1eb28da20120285e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(2933a80e) SHA1(5982b9ed361d90f8ea47047fc29770ef142acbec))
 ROM_END
 
@@ -1544,10 +1557,10 @@ ROM_START(hotshotsf)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(42c3cc3d) SHA1(26ca7f3a71b83df18ac6be1d1eb28da20120285e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(2933a80e) SHA1(5982b9ed361d90f8ea47047fc29770ef142acbec))
 ROM_END
 
@@ -1562,10 +1575,10 @@ ROM_START(hotshotsg)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(42c3cc3d) SHA1(26ca7f3a71b83df18ac6be1d1eb28da20120285e))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(2933a80e) SHA1(5982b9ed361d90f8ea47047fc29770ef142acbec))
 ROM_END
 
@@ -1682,10 +1695,10 @@ ROM_START(nmoves)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("nmovdrom.256", 0x8000, 0x8000, CRC(90929841) SHA1(e203ccd3552c9843c91fc49a437f60ae2dd49142))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("nmovyrom.256", 0x8000, 0x8000, CRC(cb74a687) SHA1(af8275807491eb35643cdeb6c898025fde47ceac))
 ROM_END
 
@@ -2227,26 +2240,26 @@ GAME(1988, diamondpg, diamondp, p4, gts80b, gts80b_state, empty_init, ROT0, "Got
 GAME(1988, txsector,  0,        p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, txsectorf, txsector, p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, txsectorg, txsector, p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bighouse,  0,        p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bighousef, bighouse, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bighouseg, bighouse, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bighouse,  0,        p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bighousef, bighouse, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bighouseg, bighouse, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, robowars,  0,        p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Robo-War",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, robowarsf, robowars, p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Robo-War (French)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, excalibr,  0,        p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, excalibrf, excalibr, p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, excalibrg, excalibr, p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988, badgirls,  0,        p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988, badgirlsf, badgirls, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988, badgirlsg, badgirls, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, hotshots,  0,        p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, hotshotsf, hotshots, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, hotshotsg, hotshots, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bonebstr,  0,        p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc.",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bonebstrf, bonebstr, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (French)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, bonebstrg, bonebstr, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (German)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989, nmoves,    0,        p4, gts80b, gts80b_state, init_s80c,  ROT0, "International Concepts", "Night Moves",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988, badgirls,  0,        p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988, badgirlsf, badgirls, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988, badgirlsg, badgirls, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, hotshots,  0,        p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, hotshotsf, hotshots, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, hotshotsg, hotshots, p5, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (German)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bonebstr,  0,        p6, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc.",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bonebstrf, bonebstr, p6, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (French)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, bonebstrg, bonebstr, p6, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (German)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989, nmoves,    0,        p5, gts80b, gts80b_state, init_s80c,  ROT0, "International Concepts", "Night Moves",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987, amazonh3,  0,        p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Amazon Hunt III (French)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987, amazonh3a, amazonh3, p4, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Amazon Hunt III (rev. 1, French)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(198?, s80btest,  0,        p4, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "System 80B Test",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?, s80btest,  0,        p0, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "System 80B Test",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, mmmaster,  0,    master, gts80b, gts80b_state, empty_init, ROT0, "ManilaMatic",            "Master",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988, topsound,  0,    master, gts80b, gts80b_state, empty_init, ROT0, "ManilaMatic",            "Top Sound (French)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

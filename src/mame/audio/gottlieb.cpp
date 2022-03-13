@@ -32,6 +32,7 @@ constexpr XTAL SOUND2_SPEECH_CLOCK(3'120'000);
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device,             "gotsndp2",   "Gottlieb Multi-mode Sound Board")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device,             "gotsndp4",   "Gottlieb Sound pin. 4")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device,             "gotsndp5",   "Gottlieb Sound pin. 5")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device,             "gotsndp6",   "Gottlieb Sound pin. 6")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device, "gotsndr1vt", "Gottlieb Sound rev. 1 with Votrax")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
@@ -824,7 +825,7 @@ void gottlieb_sound_p4_device::p4_ymap(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram(); // 6116 @ H3
 	map(0x2000, 0x2000).mirror(0x1fff).nopw(); // unemulated variable butterworth filter (HC592, LS74, MF-4)
-	map(0x4000, 0x4000).mirror(0x1fff).nopw(); // writes lots of stuff to the 'expand' socket (unused?)
+	map(0x4000, 0x4000).nopr();
 	map(0x6000, 0x6000).mirror(0x07ff).w(FUNC(gottlieb_sound_p4_device::nmi_rate_w));
 	map(0x6800, 0x6800).mirror(0x07ff).r(FUNC(gottlieb_sound_p4_device::speech_data_r));
 	map(0x7000, 0x7000).mirror(0x07ff).rw(FUNC(gottlieb_sound_p4_device::signal_audio_nmi_r), FUNC(gottlieb_sound_p4_device::signal_audio_nmi_w));
@@ -920,34 +921,36 @@ void gottlieb_sound_p4_device::device_timer(emu_timer &timer, device_timer_id id
 
 
 //**************************************************************************
-//  PIN5 SOUND BOARD: same as p4 + extra 6502 + AD7528
+//  PIN5 SOUND BOARD: same as p4 + YM2151
 //**************************************************************************
 
 //-------------------------------------------------
-//  gottlieb_sound_r2_device - constructor
+//  gottlieb_sound_p5_device - constructor
 //-------------------------------------------------
 
 gottlieb_sound_p5_device::gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gottlieb_sound_p4_device(mconfig, GOTTLIEB_SOUND_PIN5, tag, owner, clock)
+	, m_ym2151(*this, "ym2151")
 {
 }
 
-
-uint8_t gottlieb_sound_p5_device::d2_data_r()
+gottlieb_sound_p5_device::gottlieb_sound_p5_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: gottlieb_sound_p4_device(mconfig, type, tag, owner, clock)
+	, m_ym2151(*this, "ym2151")
 {
-	if (!machine().side_effects_disabled())
-		m_dcpu2->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	return m_dcpu2_latch;
 }
 
-void gottlieb_sound_p5_device::p5_dmap(address_map &map)
+void gottlieb_sound_p5_device::p5_ymap(address_map &map)
 {
+	gottlieb_sound_p4_device::p4_ymap(map);
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).mirror(0x3800).ram();
-	map(0x4000, 0x4000).mirror(0x3fff).r(FUNC(gottlieb_sound_p5_device::d2_data_r));
-	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol2", FUNC(dac_byte_interface::data_w));
-	map(0x8001, 0x8001).mirror(0x3ffe).w("dac2", FUNC(dac_byte_interface::data_w));
-	map(0x8000, 0xffff).rom();
+	map(0x4000, 0x4000).mirror(0x1fff).lw8(NAME([this] (u8 data)
+		{ if (BIT(m_speech_control, 7)) m_ym2151->data_w(data); else m_ym2151->address_w(data); } ));
 }
 
 //-------------------------------------------------
@@ -957,10 +960,59 @@ void gottlieb_sound_p5_device::p5_dmap(address_map &map)
 void gottlieb_sound_p5_device::device_add_mconfig(machine_config &config)
 {
 	gottlieb_sound_p4_device::device_add_mconfig(config);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p5_device::p5_ymap);
+
+	YM2151(config, m_ym2151, SOUND2_CLOCK).add_route(ALL_OUTPUTS, *this, 0.5);
+}
+
+void gottlieb_sound_p5_device::device_start()
+{
+	gottlieb_sound_p4_device::device_start();
+}
+
+
+//**************************************************************************
+//  PIN6 SOUND BOARD: same as p5 + extra 6502 + AD7528
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p6_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p6_device::gottlieb_sound_p6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p5_device(mconfig, GOTTLIEB_SOUND_PIN6, tag, owner, clock)
+{
+}
+
+
+uint8_t gottlieb_sound_p6_device::d2_data_r()
+{
+	if (!machine().side_effects_disabled())
+		m_dcpu2->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	return m_dcpu2_latch;
+}
+
+void gottlieb_sound_p6_device::p6_dmap(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4000).mirror(0x3fff).r(FUNC(gottlieb_sound_p6_device::d2_data_r));
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol2", FUNC(dac_byte_interface::data_w));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac2", FUNC(dac_byte_interface::data_w));
+	map(0x8000, 0xffff).rom();
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p6_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_p5_device::device_add_mconfig(config);
 
 	// extra cpu + dac
 	M6502(config, m_dcpu2, SOUND2_CLOCK/2);
-	m_dcpu2->set_addrmap(AS_PROGRAM, &gottlieb_sound_p5_device::p5_dmap);
+	m_dcpu2->set_addrmap(AS_PROGRAM, &gottlieb_sound_p6_device::p6_dmap);
 
 	AD7528(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.5);
 	AD7528(config, "dacvol2", 0)
@@ -969,7 +1021,7 @@ void gottlieb_sound_p5_device::device_add_mconfig(machine_config &config)
 		.add_route(0, "dac2", -1.0, DAC_INPUT_RANGE_LO);
 }
 
-void gottlieb_sound_p5_device::device_start()
+void gottlieb_sound_p6_device::device_start()
 {
-	gottlieb_sound_p4_device::device_start();
+	gottlieb_sound_p5_device::device_start();
 }

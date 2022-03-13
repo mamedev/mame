@@ -13,6 +13,7 @@
 #include "sound/dac.h"
 #include "sound/sp0250.h"
 #include "sound/votrax.h"
+#include "sound/ymopm.h"
 
 
 //**************************************************************************
@@ -22,6 +23,7 @@
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
@@ -236,7 +238,7 @@ private:
 
 // ======================> gottlieb_sound_p5_device
 
-// same as p4 plus an extra dac, same as existing audiocpu. For bonebusters.
+// same as p5 plus a YM2151 in the expansion socket
 class gottlieb_sound_p5_device : public gottlieb_sound_p4_device
 {
 public:
@@ -244,12 +246,38 @@ public:
 	gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
+	gottlieb_sound_p5_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
-	void p5_dmap(address_map &map);
+	void p5_ymap(address_map &map);
+	optional_device<ym2151_device> m_ym2151;
+};
+
+// ======================> gottlieb_sound_p6_device
+
+// same as p5 plus an extra dac, same as existing audiocpu. For bonebusters.
+class gottlieb_sound_p6_device : public gottlieb_sound_p5_device
+{
+public:
+	// construction/destruction
+	gottlieb_sound_p6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	void p6_dmap(address_map &map);
 	uint8_t d2_data_r();
 };
 

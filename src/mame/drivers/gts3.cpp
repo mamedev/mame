@@ -50,14 +50,11 @@ Caribbean Cruise    C102  1, enter, hold \ and right until message goes    \
 
 
 Status:
-- Display works
-- Attract mode works
-- Can setup
-- Can play a game
+- All games are playable
+- Various sounds are missing in some games, usually because the cpu concerned runs into the weeds.
 
 ToDo:
 - Sound
-- Mechanical sounds
 - Display flickers a bit
 
 *****************************************************************************************************/
@@ -82,14 +79,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
-		, m_p4_sound(*this, "p4sound")
+		, m_p5_sound(*this, "p5sound")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void p0(machine_config &config);  // no sound card assigned yet
-	void p4(machine_config &config);  // p4 sound card
+	void p5(machine_config &config);  // p5 sound card
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 private:
@@ -114,7 +111,7 @@ private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
-	optional_device<gottlieb_sound_p4_device> m_p4_sound;
+	optional_device<gottlieb_sound_p5_device> m_p5_sound;
 	required_ioport_array<12> m_io_keyboard;
 	output_finder<40> m_digits;
 	output_finder<128> m_io_outputs;   // 32 solenoids + 96 lamps
@@ -123,11 +120,11 @@ private:
 
 void gts3_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x0000, 0x1fff).ram().share("nvram"); // sch shows a 6164 labelled as 6116LP, parts list says 6116
 	map(0x2000, 0x200f).mirror(0x1f80).m(m_u4, FUNC(via6522_device::map));
 	map(0x2010, 0x201f).mirror(0x1f80).m(m_u5, FUNC(via6522_device::map));
 	map(0x2020, 0x2023).mirror(0x1f8c).w(FUNC(gts3_state::segbank_w));
-	map(0x2030, 0x2033).mirror(0x1f8c).w(FUNC(gts3_state::solenoid_w));
+	map(0x2030, 0x2033).mirror(0x1f8c).w(FUNC(gts3_state::solenoid_w)).nopr(); // writing here causes a read?? lca @8CE7
 	map(0x2040, 0x2040).mirror(0x1f80).w(FUNC(gts3_state::lampret_w));
 	map(0x2041, 0x207f).mirror(0x1f80).nopw();   // AUX: purpose unknown
 	map(0x4000, 0xffff).rom();
@@ -254,7 +251,14 @@ void gts3_state::solenoid_w(offs_t offset, u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[offset*8+i] = BIT(data, i);
-	// Add knocker
+	// Mechanical sounds
+	if (offset == 3)
+	{
+		if (data & 0x18)
+			m_samples->start(0, 9);  // outhole
+		if (data & 0x20)
+			m_samples->start(1, 6);  // knocker
+	}
 }
 
 void gts3_state::segbank_w(offs_t offset, u8 data)
@@ -306,8 +310,8 @@ u8 gts3_state::u4b_r()
 
 void gts3_state::u5a_w(u8 data)
 {
-	if (m_p4_sound)
-		m_p4_sound->write(data);
+	if (m_p5_sound)
+		m_p5_sound->write(data);
 }
 
 void gts3_state::machine_start()
@@ -367,11 +371,11 @@ void gts3_state::p0(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
-void gts3_state::p4(machine_config &config)
+void gts3_state::p5(machine_config &config)
 {
 	p0(config);
 
-	GOTTLIEB_SOUND_PIN4(config, m_p4_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 /*-------------------------------------------------------------------
@@ -381,10 +385,10 @@ ROM_START(bellring)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("br_gprom.bin", 0x0000, 0x10000, CRC(a9a59b36) SHA1(ca6d0e54a5c85ef72485975c632660831a3b8c82))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("br_drom1.bin", 0x8000, 0x8000, CRC(99f38229) SHA1(f63d743e63e88728e8d53320b21b2fda1b6385f8))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("br_yrom1.bin", 0x8000, 0x8000, CRC(d5aab379) SHA1(b3995f8aa2e54f91f2a0fd010c807fbfbf9ae847))
 ROM_END
 
@@ -419,10 +423,10 @@ ROM_START(carhop)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(164b2c9c) SHA1(49cf7e3a3acb5de8dbfd2ad22f8bd9a352ff2899))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9dec74e7) SHA1(8234bdca5536d30dc1eabcb3a5505d2fd824ce0f))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(831ee812) SHA1(57056cde36b17cb7d7f34275b1bb5dc3d52bde4e))
 ROM_END
 
@@ -476,10 +480,10 @@ ROM_START(deadweap)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(07d84b32) SHA1(25d8772a5c8655b3406df94563076719b07129cd))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(f55dd7ec) SHA1(fe306c40bf3d98e4076d0d8a935c3671469d4cff))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(93369ed3) SHA1(3340478ffc00cf9991beabd4f0ecd89d0c88965e))
 ROM_END
 
@@ -490,10 +494,10 @@ ROM_START(hoops)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(78391273) SHA1(dbf91597ce2910e526fb5e82355ad862706b4975))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(e72c00eb) SHA1(5b9f85083b38d916afb0f9b72b061501504725ff))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(9718b958) SHA1(bac806267bab4852c0f3fdb48f8d872992f61ace))
 ROM_END
 
@@ -504,10 +508,10 @@ ROM_START(lca)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x8000, 0x8000, CRC(52957d70) SHA1(0c24d824b1aa966eb3af3db3ff02870ba463dcd6))
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(a258d72d) SHA1(eeb4768c8b2f57509a088d3ac8d35aa34f2cfc2c))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(20919ebb) SHA1(a2ea79863b41a04aa23ea596932825408cca64e3))
 ROM_END
 
@@ -515,10 +519,10 @@ ROM_START(lca2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x8000, 0x8000, CRC(937a8426) SHA1(6bc2d1b0c3dc273577376654ba72b60febe32529))
 
-	ROM_REGION(0x10000, "p4sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(a258d72d) SHA1(eeb4768c8b2f57509a088d3ac8d35aa34f2cfc2c))
 
-	ROM_REGION(0x10000, "p4sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(20919ebb) SHA1(a2ea79863b41a04aa23ea596932825408cca64e3))
 ROM_END
 
@@ -529,10 +533,10 @@ ROM_START(nudgeit)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(3d9e0309) SHA1(caaa28482e7f260668aa05b39b551acb8e4cc41a))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(ae0c4b1d) SHA1(c8aa409c9b54fd8ecf70eb2926f4e98fc5eb11fe))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(65fc2e60) SHA1(6377c220753d9e4b5c76d445056409526d95772f))
 ROM_END
 
@@ -563,10 +567,10 @@ ROM_START(silvslug)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(a6c524e2) SHA1(dc12dd8e814a37aada021f84c58475efe72cb846))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(eac3e1cc) SHA1(2725457231854e4f3d54fbba745b8fc6f55b1688))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(20bc9797) SHA1(5d17b5f0423d8854fb7c4816d53a223ecc7c50c6))
 ROM_END
 
@@ -597,10 +601,10 @@ ROM_START(tfight)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(43b3193a) SHA1(bd185fe67c147a6acca8e78da4b77c384124fc46))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9514739f) SHA1(2794549f549d68e064a9a962a4e91fff7dcf0160))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(8591d421) SHA1(74402cf8b419e0cb05069851b0d5616e66b2f0a9))
 ROM_END
 
@@ -611,10 +615,10 @@ ROM_START(vegas)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(48189981) SHA1(95144af4b222158becd4d5748d15b7b6c6021bd2))
 
-	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(46eb5755) SHA1(94ec2d0cf41f68a8c3d7505186b11b4abb4803db))
 
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "p5sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(af1095f1) SHA1(06609085cd74b969e4f2ec962c427c5c42ebc6ff))
 ROM_END
 
@@ -650,16 +654,16 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1989,  lca,      0,   p4, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action!", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  lca2,     lca, p4, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action! (rev.2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  silvslug, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Silver Slugger", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  vegas,    0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Vegas", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  deadweap, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Deadly Weapon", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  tfight,   0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Title Fight", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  nudgeit,  0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Nudge-It", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bellring, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Bell Ringer", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  carhop,   0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Car Hop", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hoops,    0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Hoops", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  lca,      0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action!", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  lca2,     lca, p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action! (rev.2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  silvslug, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Silver Slugger", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  vegas,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Vegas", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  deadweap, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Deadly Weapon", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  tfight,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Title Fight", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  nudgeit,  0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Nudge-It", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bellring, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Bell Ringer", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  carhop,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Car Hop", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hoops,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Hoops", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  cactjack, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Cactus Jack's", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  clas1812, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Class of 1812", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  surfnsaf, 0,   p0, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Surf'n Safari", MACHINE_IS_SKELETON_MECHANICAL)
