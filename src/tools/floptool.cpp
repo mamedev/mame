@@ -231,11 +231,11 @@ static int flopcreate(int argc, char *argv[])
 
 	auto dest_format = formats.find_floppy_format_info_by_key(argv[2]);
 	if(!dest_format) {
-		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[3]);
+		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[2]);
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[2]);
 		return 1;
 	}
 
