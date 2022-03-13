@@ -11,17 +11,13 @@
 
 u8 sm510_base_device::ram_r()
 {
-	int blh = (m_sbl) ? 8 : 0; // from SBL (optional)
-	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	u8 address = (bmh | blh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (m_bmask | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 void sm510_base_device::ram_w(u8 data)
 {
-	int blh = (m_sbl) ? 8 : 0; // from SBL (optional)
-	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	u8 address = (bmh | blh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (m_bmask | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -68,11 +64,6 @@ void sm510_base_device::op_lbl()
 	// LBL xy: load BM/BL with 8-bit immediate value
 	m_bl = m_param & 0xf;
 	m_bm = (m_param & m_datamask) >> 4;
-}
-
-void sm510_base_device::op_sbl()
-{
-	// SBL: set BL high bit for next opcode - handled in execute_one()
 }
 
 void sm510_base_device::op_sbm()
@@ -229,8 +220,8 @@ void sm510_base_device::op_kta()
 
 void sm510_base_device::op_atbp()
 {
-	// ATBP: output ACC to BP(internal LCD backplate signal)
-	m_bp = m_acc & 1;
+	// ATBP: output ACC to BP LCD flag(s)
+	m_bp = m_acc;
 }
 
 void sm510_base_device::op_atx()
@@ -352,8 +343,8 @@ void sm510_base_device::op_tabl()
 void sm510_base_device::op_tis()
 {
 	// TIS: skip next if 1S(gamma flag) is clear, reset it after
-	m_skip = !m_1s;
-	m_1s = false;
+	m_skip = !m_gamma;
+	m_gamma = 0;
 }
 
 void sm510_base_device::op_tal()
