@@ -17,6 +17,9 @@
 #include <map>
 #include <string>
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+
 #include <bgfx/bgfx.h>
 
 #include "shadermanager.h"
@@ -25,16 +28,17 @@ class bgfx_effect;
 
 class effect_manager {
 public:
-	effect_manager(osd_options& options, shader_manager& shaders) : m_options(options), m_shaders(shaders) { }
+	effect_manager(shader_manager& shaders) : m_shaders(shaders) { }
 	~effect_manager();
 
 	// Getters
-	bgfx_effect* effect(std::string name);
+	bgfx_effect* get_or_load_effect(osd_options &options, std::string name);
+	static bool validate_effect(osd_options &options, std::string name);
+	static bool prepare_effect_document(std::string &name, osd_options &options, rapidjson::Document &document);
 
 private:
-	bgfx_effect* load_effect(std::string name);
+	bgfx_effect* load_effect(osd_options& options, std::string name);
 
-	osd_options&                        m_options;
 	shader_manager&                     m_shaders;
 	std::map<std::string, bgfx_effect*> m_effects;
 };
