@@ -400,7 +400,7 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 		case 0x0800:
 			break;  // PRG banking at $8000 ignored
 		case 0x1000:
-			prg32((data >> 2) & 0x03);
+			prg32(BIT(data, 2, 2));
 			if (!(offset & 3))  // $9000 is also VRC4 mirroring
 				nes_konami_vrc4_device::write_h(offset, data);
 			break;

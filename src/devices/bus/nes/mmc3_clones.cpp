@@ -1119,15 +1119,15 @@ void nes_smd133_device::pcb_reset()
 
  iNES: mapper 250
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_nitra_device::write_h(offs_t offset, uint8_t data)
+void nes_nitra_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("nitra write_h, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_write((offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
+	txrom_write((offset & 0x6000) | BIT(offset, 10), offset);
 }
 
 /*-------------------------------------------------
@@ -1180,12 +1180,11 @@ void nes_bmw8544_device::write_m(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_fs6_device::write_h(offs_t offset, uint8_t data)
+void nes_fs6_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("fs6 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
-	txrom_write(offset, data);
+	txrom_write(bitswap<2>(offset, 0, 1) | (offset & ~0x03), data);
 }
 
 /*-------------------------------------------------
@@ -1199,15 +1198,15 @@ void nes_fs6_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 196
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_sbros11_device::write_h(offs_t offset, uint8_t data)
+void nes_sbros11_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("smb11 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	txrom_write((offset & 0x6000) | ((offset & 0x04) >> 2), data);
+	txrom_write((offset & 0x6000) | BIT(offset, 2), data);
 }
 
 /*-------------------------------------------------
@@ -1219,30 +1218,30 @@ void nes_sbros11_device::write_h(offs_t offset, uint8_t data)
  This is very similar to mapper 196, but with additional
  data bit swap.
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_malisb_device::prg_cb(int start, int bank)
 {
-	bank = (bank & 3) | ((bank & 8) >> 1) | ((bank & 4) << 1);
+	bank = bitswap<4>(bank, 2, 3, 1, 0);
 	prg8_x(start, bank);
 }
 
 void nes_malisb_device::chr_cb(int start, int bank, int source)
 {
-	bank = (bank & 0xdd) | ((bank & 0x20) >> 4) | ((bank & 2) << 4);
+	bank = bitswap<8>(bank, 7, 6, 1, 4, 3, 2, 5, 0);
 	chr1_x(start, bank, source);
 }
 
-void nes_malisb_device::write_h(offs_t offset, uint8_t data)
+void nes_malisb_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("malisb write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset > 0x4000)
-		txrom_write((offset & 0xfffe) | ((offset & 0x04) >> 2) | ((offset & 0x08) >> 3), data);
+		txrom_write((offset & 0xfffe) | BIT(offset, 2) | BIT(offset, 3), data);
 	else
-		txrom_write((offset & 0xfffe) | ((offset & 0x08) >> 3), data);
+		txrom_write((offset & 0xfffe) | BIT(offset, 3), data);
 }
 
 /*-------------------------------------------------
@@ -1801,31 +1800,29 @@ void nes_txc_tw_device::prg_cb(int start, int bank)
 
  MMC3 clone
 
- In MESS: Not working
+ In MAME: Not working
 
  -------------------------------------------------*/
 
-inline uint8_t kof97_unscramble( uint8_t data )
-{
-	return ((data >> 1) & 0x01) | ((data >> 4) & 0x02) | ((data << 2) & 0x04) | ((data >> 0) & 0xd8) | ((data << 3) & 0x20);
-}
-
-void nes_kof97_device::write_h(offs_t offset, uint8_t data)
+void nes_kof97_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("kof97 write_h, offset: %04x, data: %02x\n", offset, data));
 
+	// unscramble data
+	data = bitswap<8>(data, 7, 6, 2, 4, 3, 0, 5, 1);
+
 	// Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3
 	if (offset == 0x1000)
-		txrom_write(0x0001, kof97_unscramble(data));
+		txrom_write(0x0001, data);
 	else if (offset == 0x2000)
-		txrom_write(0x0000, kof97_unscramble(data));
+		txrom_write(0x0000, data);
 	else if (offset == 0x5000)
-		txrom_write(0x4001, kof97_unscramble(data));
+		txrom_write(0x4001, data);
 	else if (offset == 0x7000)
-		txrom_write(0x6001, kof97_unscramble(data));
+		txrom_write(0x6001, data);
 	// Other addresses behaves like MMC3, up to unscrambling data
 	else
-		txrom_write(offset, kof97_unscramble(data));
+		txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1866,7 +1863,7 @@ void nes_kof96_device::write_l(offs_t offset, u8 data)
 			set_prg(m_prg_base, m_prg_mask);
 		else
 		{
-			u8 bank = (data >> 1) & 0x0f;
+			u8 bank = BIT(data, 1, 4);
 			u8 mode = BIT(data, 5);
 			prg16_89ab(bank & ~mode);
 			prg16_cdef(bank | mode);
@@ -2005,7 +2002,7 @@ void nes_gouder_device::write_l(offs_t offset, uint8_t data)
 	else if (!(offset < 0xf00))
 		m_reg[4] = data;
 	else if (!(offset < 0x700))
-		prg32(((data >> 3) & 0x02) | (data & 0x01));
+		prg32(bitswap<2>(data, 4, 0));
 }
 
 uint8_t nes_gouder_device::read_l(offs_t offset)
@@ -2066,7 +2063,7 @@ void nes_sa9602b_device::write_h(offs_t offset, uint8_t data)
 			break;
 		case 0x0001:
 			if ((m_reg & 7) < 6)
-				m_prg_chip = (data & 0xc0) >> 6;
+				m_prg_chip = BIT(data, 6, 2);
 			set_prg(0, m_prg_mask);
 			break;
 	}
@@ -2151,7 +2148,7 @@ void nes_a9746_device::update_banks(uint8_t value)
 		case 0x08: case 0x0a: case 0x0c: case 0x0e:
 		case 0x10: case 0x12: case 0x14: case 0x16:
 		case 0x18: case 0x1a: case 0x1c: case 0x1e:
-			m_reg[2] = (value << 4);
+			m_reg[2] = value << 4;
 			break;
 		case 0x09: chr1_0(m_reg[2] | (value >> 1), m_chr_source); break;
 		case 0x0b: chr1_1(m_reg[2] | (value >> 1) | 1, m_chr_source);  break;
@@ -2509,7 +2506,7 @@ void nes_bmc_5in1_device::write_m(offs_t offset, u8 data)
 	if ((m_wram_protect & 0xc0) == 0x80)
 	{
 		if (!(offset & 0x03))
-			prg32((data >> 1) & 0x03);
+			prg32(BIT(data, 1, 2));
 	}
 }
 
@@ -2814,7 +2811,7 @@ void nes_bmc_hik4_device::write_m(offs_t offset, u8 data)
 			set_prg(m_prg_base, m_prg_mask);
 		}
 		else                // Master Fighter III only
-			prg32((data & 0x30) >> 4);
+			prg32(BIT(data, 4, 2));
 
 		m_chr_base = (data & 0xc0) << 1;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
@@ -3399,7 +3396,7 @@ void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)
 
 	if (BIT(offset, 7))    // outer register
 	{
-		m_outer = (offset >> 13) & 0x03;
+		m_outer = BIT(offset, 13, 2);
 
 		m_prg_base = m_outer << 5;
 		m_prg_mask = 0x1f >> (m_outer == 2);

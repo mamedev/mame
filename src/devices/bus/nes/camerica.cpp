@@ -180,7 +180,7 @@ void nes_bf9096_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset < 0x4000)
 	{
-		m_bank_base = ((data >> 3) & 3) << 2;
+		m_bank_base = (data & 0x18) >> 1;
 		prg16_89ab(m_bank_base | m_latch);
 		prg16_cdef(m_bank_base | 3);
 	}
