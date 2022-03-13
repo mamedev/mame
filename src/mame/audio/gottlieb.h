@@ -11,6 +11,7 @@
 #include "machine/6532riot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/okim6295.h"
 #include "sound/sp0250.h"
 #include "sound/votrax.h"
 #include "sound/ymopm.h"
@@ -25,6 +26,7 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
@@ -293,7 +295,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-private:
 	void p5_ymap(address_map &map);
 	optional_device<ym2151_device> m_ym2151;
 };
@@ -316,5 +317,29 @@ protected:
 private:
 	void p6_dmap(address_map &map);
 	uint8_t d2_data_r();
+};
+
+
+// ======================> gottlieb_sound_p7_device
+
+// same as p5 plus MSM6295.
+class gottlieb_sound_p7_device : public gottlieb_sound_p5_device
+{
+public:
+	// construction/destruction
+	gottlieb_sound_p7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	void p7_ymap(address_map &map);
+	void y_ctrl_w(u8);
+	void y_latch_w(u8);
+	uint8_t m_msm_latch1;
+	uint8_t m_msm_latch2;
+	optional_device<okim6295_device> m_oki;
 };
 

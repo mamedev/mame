@@ -30,24 +30,34 @@ Of the solid-state games, Asteroid Annie is single-player - the others are 4-pla
 
 Game List: (the ROM letter is stamped onto the personality prom)
 
-Number  ROM  Name
-409     A    Cleopatra
-412SS   B    Sinbad
-417SS   C    Joker Poker
-419SS   D    Dragon
-421SS   E    Solar Ride
-422SS   F    Countdown
-424SS   G    Close Encounters of the third kind
-425SS   H    Charlie's Angels
-427SS   I    Pinball Pool
-429SS   J    Totem
-433SS   K    The Incredible Hulk
-435     L    Genie
-437     N    Buck Rogers
-438     P    Torch
-440     R    Roller Disco
-442     S    Asteroid Annie and the Aliens
-        T    Test Prom
+Game                                  NUM    ROM
+------------------------------------------------
+Cleopatra                             409     A
+Sinbad                                412SS   B
+Joker Poker                           417SS   C
+Dragon                                419SS   D
+Solar Ride                            421SS   E
+Countdown                             422SS   F
+Close Encounters of the third kind    424SS   G
+Charlie's Angels                      425SS   H
+Pinball Pool                          427SS   I
+Totem                                 429SS   J
+The Incredible Hulk                   433SS   K
+Genie                                 435     L
+Buck Rogers                           437     N
+Torch                                 438     P
+Roller Disco                          440     R
+Asteroid Annie and the Aliens         442     S
+Test Prom                                     T
+**** Other Manufacturer ****
+Hell's Queen
+Sky Warrior
+Tiger Woman
+L'Hexagone
+Sahara Love
+Movie
+Jungle Queen
+
 
 The personality prom is programmed in PGOL (pinball-game oriented language).
 
