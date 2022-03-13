@@ -57,8 +57,6 @@ Status:
 - Various sounds are missing in some games, usually because the cpu concerned runs into the weeds.
 
 ToDo:
-- Some sound boards to be emulated (p3,p5)
-- p3 sound card to be written, haven't found a schematic as manuals are hard to obtain
 - Missing sounds because of program crashes
 - bighouse: after game ends, the display freezes. Game keeps running though.
 
@@ -86,7 +84,7 @@ public:
 		, m_riot3(*this, "riot3")
 		, m_io_dips(*this, "DSW%d", 0U)
 		, m_io_keyboard(*this, "X%d", 0U)
-		//, m_p3_sound(*this, "p3sound")
+		, m_p3_sound(*this, "p3sound")
 		, m_p4_sound(*this, "p4sound")
 		, m_p5_sound(*this, "p5sound")
 		, m_p6_sound(*this, "p6sound")
@@ -134,7 +132,7 @@ private:
 	required_device<riot6532_device> m_riot3;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
-	//optional_device<gottlieb_sound_p3_device> m_p3_sound;
+	optional_device<gottlieb_sound_p3_device> m_p3_sound;
 	optional_device<gottlieb_sound_p4_device> m_p4_sound;
 	optional_device<gottlieb_sound_p5_device> m_p5_sound;
 	optional_device<gottlieb_sound_p6_device> m_p6_sound;
@@ -468,6 +466,9 @@ void gts80b_state::port3a_w(u8 data)
 	if (m_r2_sound)
 		m_r2_sound->write(sndcmd | m_soundex);
 	else
+	if (m_p3_sound)
+		m_p3_sound->write(sndcmd);
+	else
 	if (m_p4_sound)
 		m_p4_sound->write(sndcmd | m_soundex);
 	else
@@ -634,28 +635,24 @@ void gts80b_state::p0(machine_config &config)
 void gts80b_state::p3(machine_config &config)
 {
 	p0(config);
-
-	//GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p4(machine_config &config)
 {
 	p0(config);
-
 	GOTTLIEB_SOUND_PIN4(config, m_p4_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p5(machine_config &config)
 {
 	p0(config);
-
 	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p6(machine_config &config)
 {
 	p0(config);
-
 	GOTTLIEB_SOUND_PIN6(config, m_p6_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

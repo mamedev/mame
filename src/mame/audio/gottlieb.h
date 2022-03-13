@@ -21,6 +21,7 @@
 //**************************************************************************
 
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device)
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device)
@@ -65,6 +66,37 @@ private:
 	uint8_t r6530b_r();
 };
 
+
+// ======================> gottlieb_sound_p3_device
+
+class gottlieb_sound_p3_device : public device_t, public device_mixer_interface
+{
+public:
+	// construction/destruction
+	gottlieb_sound_p3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// read/write
+	void write(uint8_t data);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	void p3_map(address_map &map);
+
+private:
+	// devices
+	required_device<m6502_device>       m_cpu;
+	required_device<mos6530_device>     m_r6530;
+
+	uint8_t m_sndcmd;
+
+	uint8_t r6530b_r();
+	void r6530b_w(u8);
+};
+
+
 // ======================> gottlieb_sound_r1_device
 
 // rev 1 sound board, with unpopulated VOTRAX
@@ -100,6 +132,9 @@ private:
 	required_device<riot6532_device> m_riot;
 	u8 m_dummy = 0;   // needed for save-state support
 };
+
+
+// ======================> gottlieb_sound_r1_with_votrax_device
 
 // fully populated rev 1 sound board
 class gottlieb_sound_r1_with_votrax_device : public gottlieb_sound_r1_device
@@ -236,6 +271,7 @@ private:
 	uint8_t  m_sp0250_latch;
 };
 
+
 // ======================> gottlieb_sound_p5_device
 
 // same as p5 plus a YM2151 in the expansion socket
@@ -261,6 +297,7 @@ private:
 	void p5_ymap(address_map &map);
 	optional_device<ym2151_device> m_ym2151;
 };
+
 
 // ======================> gottlieb_sound_p6_device
 

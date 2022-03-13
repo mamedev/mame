@@ -7,15 +7,9 @@ Gottlieb System 80A
 
 Same as system 80, except that the displays have 7 digits.
 
-Most games start up and will accept credits, and the test mode works. See key codes below.
-
 Caveman is missing its joystick. Need the manual. The video-pinball interface has not been written.
  If you turn on DIPS6,7,8, you can enter test mode, insert coins and start a game.
  But once in-game, no inputs work.
-
-Rocky has a habit of locking up. Have to reboot the machine with F3.
-
-Sound is wrong in all games.
 
 Note: If DIP28 is set to Novelty, then Match doesn't work.
 
@@ -80,6 +74,7 @@ public:
 		, m_io_dips(*this, "DSW%d", 0U)
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_p2_sound(*this, "p2sound")
+		, m_p3_sound(*this, "p3sound")
 		, m_r1_sound(*this, "r1sound")
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
@@ -116,6 +111,7 @@ private:
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
 	optional_device<gottlieb_sound_p2_device> m_p2_sound;
+	optional_device<gottlieb_sound_p3_device> m_p3_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	output_finder<80> m_digits;
 	output_finder<57> m_io_outputs;   // 8 solenoids, 1 outhole, 48 lamps
@@ -400,6 +396,9 @@ void gts80a_state::port3a_w(u8 data)
 	else
 	if (m_r1_sound)
 		m_r1_sound->write(sndcmd | m_soundex);
+	else
+	if (m_p3_sound)
+		m_p3_sound->write(sndcmd);
 
 	// Solenoids group 1
 	if (!BIT(data, 5))
@@ -557,8 +556,7 @@ void gts80a_state::p2(machine_config &config)
 void gts80a_state::p3(machine_config &config)
 {
 	p0(config);
-	// To be developed - no schematic has been found
-	//GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1(machine_config &config)
@@ -673,7 +671,7 @@ ROM_START(alienstr)
 	GTS80A_BIOS
 	ROM_LOAD("689.cpu", 0x1000, 0x0800, CRC(4262006b) SHA1(66520b66c31efd0dc654630b2d3567da799b4d89))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("689-s.snd", 0x0800, 0x0800, CRC(e1e7a610) SHA1(d4eddfc970127cf3a7d086ad46cbc7b95fdc269d))
 ROM_END
 
@@ -770,7 +768,7 @@ ROM_START(eldorado)
 	GTS80A_BIOS
 	ROM_LOAD("692-2.cpu", 0x1000, 0x0800, CRC(4ee6d09b) SHA1(5da0556204e76029380366f9fbb5662715cc3257))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("692-s.snd", 0x0800, 0x0800, CRC(9bfbf400) SHA1(58aed9c0b1f52bcd0b53edcdf7af576bb175e3d6))
 ROM_END
 
@@ -793,7 +791,7 @@ ROM_START(icefever)
 	GTS80A_BIOS
 	ROM_LOAD("695.cpu", 0x1000, 0x0800, CRC(2f6e9caf) SHA1(4f9eeafcbaf758ee6bbad74611b4912ff75b8576))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("695-s.snd", 0x0800, 0x0800, CRC(daededc2) SHA1(b43303c1e39b21f3fcbc339d440ea051ced1ea26))
 ROM_END
 
@@ -804,7 +802,7 @@ ROM_START(jack2opn)
 	GTS80A_BIOS
 	ROM_LOAD("687.cpu", 0x1000, 0x0800, CRC(0080565e) SHA1(c08412ba24d2ffccf11431e80bd2fc95fc4ce02b))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("687-s.snd", 0x0800, 0x0800, CRC(f9d10b7a) SHA1(db255711ed6cb46d183c0ae3894df447f3d8a8e3))
 ROM_END
 
@@ -851,7 +849,7 @@ ROM_START(rackempp)
 	GTS80A_BIOS
 	ROM_LOAD("685.cpu", 0x1000, 0x0800, CRC(4754d68d) SHA1(2af743287c1a021f3e130d3d6e191ec9724d640c))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("685-s.snd", 0x0800, 0x0800, CRC(d4219987) SHA1(7385d8723bdc937e7c9d6bf7f26ca06f64a9a212))
 ROM_END
 
@@ -862,7 +860,7 @@ ROM_START(raimfire)
 	GTS80A_BIOS
 	ROM_LOAD("686.cpu", 0x1000, 0x0800, CRC(d1e7a0de) SHA1(b9af2fcaadc55d37c7d9d22621c3817eb751de6b))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("686-s.snd", 0x0800, 0x0800, CRC(09740682) SHA1(4f36d78207bd5b8e7abb7118f03acbb3885173c2))
 ROM_END
 
@@ -943,7 +941,7 @@ ROM_START(thegames)
 	GTS80A_BIOS
 	ROM_LOAD("691.cpu", 0x1000, 0x0800, CRC(50f620ea) SHA1(2f997a637eba4eb362586d3aa8caac44acccc795))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("691-s.snd", 0x0800, 0x0800, CRC(d7011a31) SHA1(edf5de6cf5ddc1eb577dd1d8dcc9201522df8315))
 ROM_END
 
@@ -954,7 +952,7 @@ ROM_START(touchdn)
 	GTS80A_BIOS
 	ROM_LOAD("688.cpu", 0x1000, 0x0800, CRC(e531ab3f) SHA1(695aef0dd911fee27ac2d1493a9646b5430a07d5))
 
-	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
+	ROM_REGION(0x1000, "p3sound:audiocpu", 0)
 	ROM_LOAD("688-s.snd", 0x0800, 0x0800, CRC(5e9988a6) SHA1(5f531491722d3c30cf4a7c17982813a7c548387a))
 ROM_END
 

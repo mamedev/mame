@@ -13,7 +13,6 @@ Status:
 ToDo:
 - Sound
 - Make it work
-- Mechanical sounds
 - Make display show something sensible
 - There's an undumped GAL 16V8-25L on the DMD board (position U8)
 
@@ -267,7 +266,14 @@ void gts3a_state::solenoid_w(offs_t offset, u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[offset*8+i] = BIT(data, i);
-	// Add knocker
+	// Mechanical sounds
+	if (offset == 3)
+	{
+		if (data & 0x18)
+			m_samples->start(0, 9);  // outhole
+		if (data & 0x20)
+			m_samples->start(1, 6);  // knocker
+	}
 }
 
 void gts3a_state::segbank_w(u8 data)
