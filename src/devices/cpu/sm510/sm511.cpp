@@ -123,8 +123,8 @@ void sm511_device::clock_melody()
 		m_melody_rd |= 2;
 	}
 
-	// clock time base on F8(d7)
-	if ((m_div & 0x7f) == 0)
+	// clock time base on divider F7/F8
+	if ((m_div & melody_step_mask()) == 0)
 	{
 		u8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
 		m_melody_step_count = (m_melody_step_count + 1) & mask;
@@ -251,7 +251,7 @@ void sm511_device::execute_one()
 	} // big switch
 
 	// BM high bit is only valid for 1 step
-	m_sbm = (m_op == 0x02);
+	m_bmask = (m_op == 0x02) ? 0x40 : 0;
 }
 
 bool sm511_device::op_argument()

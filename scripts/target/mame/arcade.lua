@@ -4575,8 +4575,6 @@ files {
 	MAME_DIR .. "src/mame/includes/suprslam.h",
 	MAME_DIR .. "src/mame/video/suprslam.cpp",
 	MAME_DIR .. "src/mame/drivers/tail2nos.cpp",
-	MAME_DIR .. "src/mame/includes/tail2nos.h",
-	MAME_DIR .. "src/mame/video/tail2nos.cpp",
 	MAME_DIR .. "src/mame/drivers/taotaido.cpp",
 	MAME_DIR .. "src/mame/includes/taotaido.h",
 	MAME_DIR .. "src/mame/video/taotaido.cpp",

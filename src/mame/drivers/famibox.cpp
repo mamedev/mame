@@ -105,6 +105,8 @@ private:
 	uint8_t* m_nt_page[4];
 	uint8_t m_mirroring;
 
+	uint8_t       m_curr_slot;
+
 	uint8_t       m_exception_mask;
 	uint8_t       m_exception_cause;
 
@@ -113,6 +115,8 @@ private:
 
 	uint32_t      m_coins;
 	uint8_t       m_zapper_enable;
+	uint8_t       m_joypad_enable;
+	uint8_t       m_joypad_swap;
 
 	emu_timer*    m_gameplay_timer;
 	uint8_t       m_money_reg;
@@ -128,8 +132,8 @@ private:
 	void famibox_system_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
-	void famicombox_bankswitch(uint8_t bank);
-	void famicombox_reset();
+	void famibox_cartswitch(u8 data);
+	void famibox_reset();
 	void famibox_map(address_map &map);
 	void famibox_ppu_map(address_map &map);
 };
@@ -199,8 +203,14 @@ void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
 uint8_t famibox_state::famibox_IN0_r()
 {
 	uint8_t ret = 0x40;
-	ret |= m_ctrl[0]->read_bit0();
-	ret |= m_ctrl[0]->read_bit34();
+
+	if (m_joypad_enable)
+	{
+		// joypad swap only affects D0 pin
+		ret |= m_ctrl[m_joypad_swap]->read_bit0();
+		ret |= m_ctrl[0]->read_bit34();
+	}
+
 	return ret;
 }
 
@@ -208,8 +218,12 @@ uint8_t famibox_state::famibox_IN1_r()
 {
 	uint8_t ret = 0x40;
 
-	ret |= m_ctrl[1]->read_bit0();
-	ret |= m_ctrl[1]->read_bit34();
+	if (m_joypad_enable)
+	{
+		// joypad swap only affects D0 pin
+		ret |= m_ctrl[m_joypad_swap ^ 1]->read_bit0();
+		ret |= m_ctrl[1]->read_bit34();
+	}
 
 	// only read port 3 if its pin 1 (normally GND) is held low
 	if (m_zapper_enable)
@@ -231,54 +245,54 @@ void famibox_state::famibox_IN0_w(uint8_t data)
 
 *******************************************************/
 
-void famibox_state::famicombox_bankswitch(uint8_t bank)
+void famibox_state::famibox_cartswitch(u8 data)
 {
 	struct
 	{
-		uint8_t bank;
 		const char* memory_region;
 		offs_t bank1_offset;
 		offs_t bank2_offset;
 		offs_t ppubank_offset;
 		uint8_t mirroring;
-	} famicombox_banks[] =
+	} cart_list[16] =
 	{
-		{ 0x11, "baseball", 0, 0,      0x4000, PPU_MIRROR_HORZ },
-		{ 0x12, "bombman",  0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x13, "dkong",    0, 0,      0x4000, PPU_MIRROR_HORZ },
-		{ 0x14, "duckhunt", 0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x15, "excitebk", 0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x26, "f1race",   0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x27, "hogan",    0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x28, "golf",     0, 0,      0x4000, PPU_MIRROR_HORZ },
-		{ 0x29, "icehocky", 0, 0x4000, 0x8000, PPU_MIRROR_VERT },
-		{ 0x2a, "mahjong",  0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x3b, "mario",    0, 0,      0x4000, PPU_MIRROR_HORZ },
-		{ 0x3c, "smb",      0, 0x4000, 0x8000, PPU_MIRROR_VERT },
-		{ 0x3d, "tennis",   0, 0,      0x4000, PPU_MIRROR_HORZ },
-		{ 0x3e, "wildgunm", 0, 0,      0x4000, PPU_MIRROR_VERT },
-		{ 0x3f, "wrecking", 0, 0x4000, 0x8000, PPU_MIRROR_HORZ },
-		{ 0x00, "menu",     0, 0x4000, 0x8000, 0 }
+		{ "menu",     0, 0x4000, 0x8000, 0 },
+		{ "baseball", 0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "bombman",  0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "dkong",    0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "duckhunt", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "excitebk", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "f1race",   0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "golf",     0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "hogan",    0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "icehocky", 0, 0x4000, 0x8000, PPU_MIRROR_VERT },
+		{ "mahjong",  0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "mario",    0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "smb",      0, 0x4000, 0x8000, PPU_MIRROR_VERT },
+		{ "tennis",   0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "wildgunm", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "wrecking", 0, 0x4000, 0x8000, PPU_MIRROR_HORZ }
 	};
 
+	m_curr_slot = data & 0x0f;
+	int column = BIT(data, 4, 2);
 
-	for (auto & famicombox_bank : famicombox_banks)
-	{
-		if ( bank == famicombox_bank.bank ||
-				famicombox_bank.bank == 0 )
-		{
-			membank("cpubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank1_offset);
-			membank("cpubank2")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank2_offset);
-			membank("ppubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.ppubank_offset);
-			set_mirroring(famicombox_bank.bank ? famicombox_bank.mirroring : m_mirroring);
-			break;
-		}
-	}
+	// slot # must belong to correct column, else we default to menu cart
+	if (column != (m_curr_slot - 1) / 5 + 1)
+		m_curr_slot = 0;
+
+	auto &cart = cart_list[m_curr_slot];
+	u8 *base = memregion(cart.memory_region)->base();
+
+	membank("cpubank1")->set_base(base + cart.bank1_offset);
+	membank("cpubank2")->set_base(base + cart.bank2_offset);
+	membank("ppubank1")->set_base(base + cart.ppubank_offset);
+	set_mirroring(m_curr_slot ? cart.mirroring : m_mirroring);
 }
 
-void famibox_state::famicombox_reset()
+void famibox_state::famibox_reset()
 {
-	famicombox_bankswitch(0);
+	famibox_cartswitch(0);
 	m_maincpu->reset();
 }
 
@@ -288,7 +302,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 	if ( BIT(m_exception_mask,1) )
 	{
 		m_exception_cause &= ~0x02;
-		famicombox_reset();
+		famibox_reset();
 	}
 }
 
@@ -303,7 +317,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 		if ( BIT(m_exception_mask,4) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset();
+			famibox_reset();
 		}
 	}
 }
@@ -370,11 +384,13 @@ void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			logerror("%s: bankswitch %x\n", machine().describe_context(), data );
-			famicombox_bankswitch(data & 0x3f);
+			famibox_cartswitch(data & 0x3f);
 			break;
 		case 5:
 			logerror("%s: misc control register: %02x\n", machine().describe_context(), data);
 			m_zapper_enable = data & 0x04;
+			m_joypad_enable = !BIT(data, 6);
+			m_joypad_swap = !BIT(data, 7);
 			break;
 		default:
 			logerror("%s: Unhandled famibox_system_w(%x,%02x)\n", machine().describe_context(), offset, data );
@@ -418,7 +434,7 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 	if ( BIT(m_exception_mask, 3) )
 	{
 		m_exception_cause &= ~0x08;
-		famicombox_reset();
+		famibox_reset();
 	}
 }
 
@@ -435,7 +451,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 		if ( BIT(m_exception_mask,4) && (m_coins == 1) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset();
+			famibox_reset();
 		}
 	}
 }
@@ -456,10 +472,10 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Famicombox menu time" )
+	PORT_DIPNAME( 0x08, 0x00, "Logo attract time" )
 	PORT_DIPSETTING(    0x00, "5 sec" )
 	PORT_DIPSETTING(    0x08, "10 sec" )
-	PORT_DIPNAME( 0x30, 0x00, "Attract time" )
+	PORT_DIPNAME( 0x30, 0x00, "Game attract time" )
 	PORT_DIPSETTING(    0x30, "5 sec" )
 	PORT_DIPSETTING(    0x00, "10 sec" )
 	PORT_DIPSETTING(    0x10, "15 sec" )
@@ -492,14 +508,12 @@ INPUT_PORTS_END
 
 void famibox_state::machine_reset()
 {
-	famicombox_bankswitch(0);
+	famibox_cartswitch(0);
 }
 
 void famibox_state::machine_start()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x800);
-
-	famicombox_bankswitch(0);
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
 	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
@@ -509,6 +523,8 @@ void famibox_state::machine_start()
 	m_money_reg = 0;
 	m_coins = 0;
 	m_zapper_enable = 0;
+	m_joypad_enable = 1;
+	m_joypad_swap = 1;
 }
 
 void famibox_state::famibox(machine_config &config)
@@ -550,7 +566,7 @@ void famibox_state::init_famistat()
 	m_mirroring = PPU_MIRROR_VERT;
 }
 
-// These have all been confirmed against FamicomBox carts, except Excitebike and Hogan's Alley
+// These have all been confirmed against FamicomBox carts, except Excitebike
 #define GAME_LIST \
 	ROM_REGION(0x6000, "baseball", 0) \
 	ROM_LOAD("hvc-ba-0 prg", 0x0000, 0x4000, CRC(d18a3dde) SHA1(91f7d3e4c9d18c1969ca1fffdc811b763508a0a2) ) \

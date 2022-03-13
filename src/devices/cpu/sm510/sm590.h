@@ -98,10 +98,13 @@ protected:
 	void data_16x2x4(address_map &map);
 
 	virtual void device_reset() override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual void init_divider() override { }
-	virtual void init_lcd_driver() override { }
-	virtual void init_melody() override { }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
+
+	virtual void init_divider() override { } // no divider timer
+	virtual void init_lcd_driver() override { } // no lcd driver
 	virtual void increment_pc() override;
 	virtual void execute_one() override;
 	virtual bool op_argument() override;

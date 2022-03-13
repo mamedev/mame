@@ -12499,6 +12499,7 @@ bmclubmx                        // GX993 (c) 2000 (Japan)
 bmcmxaac                        // GX858 (c) 1999 (Asia)
 bmcompm2                        // GX988 (c) 2000 (Japan)
 bmcompmx                        // GX858 (c) 1999 (Japan)
+bmcompmxb                       // GX858 (c) 1999 (Japan)
 bmcorerm                        // GXA05 (c) 1999 (Japan)
 bmdct                           // GX995 (c) 2000 (Japan)
 bmfinal                         // GXC01 (c) 2002 (Japan)
@@ -13627,7 +13628,8 @@ eva11                           //
 eva24                           //
 
 @source:evmbug.cpp
-evmbug                          //
+evmbug                          // TI TMAM6095
+tms9995bb                       // TMS9995 breadboard
 
 @source:ews4800.cpp
 ews4800_310                     // NEC EWS4800/310
@@ -16613,6 +16615,9 @@ ktopgun                         // Konami
 kvakazad                        // Elektronika
 morataka                        // Elektronika
 nochnyev                        // Elektronika
+nsmb3                           // Nelsonic
+nsmw                            // Nelsonic
+nstarfox                        // Nelsonic
 nummunch                        // VTech
 nupogodi                        // Elektronika
 okhota                          // Elektronika

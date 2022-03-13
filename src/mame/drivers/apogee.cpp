@@ -36,9 +36,9 @@ public:
 	void apogee(machine_config &config);
 
 private:
-	uint8_t m_out0;
-	uint8_t m_out1;
-	uint8_t m_out2;
+	uint8_t m_out0 = 0U;
+	uint8_t m_out1 = 0U;
+	uint8_t m_out2 = 0U;
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);

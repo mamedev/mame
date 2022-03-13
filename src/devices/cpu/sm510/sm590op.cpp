@@ -139,14 +139,14 @@ void sm590_device::op_lbmx()
 void sm590_device::op_tl()
 {
 	// TL xyz: long jump (same as sm510 TL except m_op and m_param masks)
-	do_branch((m_op & 2)>>1, (((m_op & 1)<<1)|((m_param&0x80)?1:0)), m_param & 0x7f);
+	do_branch(BIT(m_op, 1), (m_op << 1 & 2) | BIT(m_param, 7), m_param & 0x7f);
 }
 
 void sm590_device::op_tml() // aka TLS
 {
 	// TLS xyz: long call (same as sm510 TML except m_param mask)
 	push_stack();
-	do_branch((m_op & 2)>>1, (((m_op & 1)<<1)|((m_param&0x80)?1:0)), m_param & 0x7f);
+	do_branch(BIT(m_op, 1), (m_op << 1 & 2) | BIT(m_param, 7), m_param & 0x7f);
 }
 
 void sm590_device::op_t()
