@@ -261,14 +261,13 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
-	<!-- Power-Up Kit works, but Map Construction asks for the system disk and fails to recognize it -->
-	<software name="aressh4m" supported="partial">
+	<software name="aressh4m">
 		<description>AIV - A Ressha de Ikou 4 - Map Construction + Power-Up Kit</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="A列車で行こう4 マップコンストラクション＋パワーアップキット" />
 		<info name="release" value="199404xx" />
-		<info name="usage" value="Requires 4 MB RAM and HDD installation. To install, boot TownsOS, insert the original A4 CD and run the INSTALL.EXP (Power-Up Kit) or INSTALLM.EXP (Map Construction) files from the Construction Disk." />
+		<info name="usage" value="Requires 2 MB RAM (4 for HDD version). To run directly, insert the Construction Disk (for Power-Up Kit) or System Disk (for Map Construction) and boot from the original A4 CD. To install to HDD, boot TownsOS, insert the original A4 CD and run the INSTALL.EXP (Power-Up Kit) or INSTALLM.EXP (Map Construction) files from the Construction Disk." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Construction Disk" />
 			<dataarea name="flop" size="1261568">
@@ -277,8 +276,8 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="a4_powerup_system_disk.hdm" size="1261568" crc="da6ab3b4" sha1="10318fb89945ba4a46a90ae659cf69753c17e447"/>
+			<dataarea name="flop" size="3444704">
+				<rom name="a4_powerup_system_disk.mfm" size="3444704" crc="6b6e695d" sha1="0aaf138a59a479fa7dfdfd469f3fb07b71952dd9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
