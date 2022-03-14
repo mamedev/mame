@@ -73,7 +73,7 @@ bool mac_osd_interface::window_init()
 	const int fallbacks[VIDEO_MODE_COUNT] = {
 		-1,                 // NONE -> no fallback
 		-1,                 // No GDI on macOS
-		VIDEO_MODE_D3D,     // BGFX -> OpenGL
+		VIDEO_MODE_OPENGL,  // BGFX -> OpenGL
 		-1,                 // OpenGL -> no fallback
 		-1,                 // No SDL2ACCEL on macOS
 		-1,                 // No D3D on macOS
@@ -86,9 +86,6 @@ bool mac_osd_interface::window_init()
 		bool error = false;
 		switch(current_mode)
 		{
-			case VIDEO_MODE_NONE:
-				error = renderer_none::init(machine());
-				break;
 			case VIDEO_MODE_BGFX:
 				error = renderer_bgfx::init(machine());
 				break;
