@@ -26,11 +26,7 @@ void bgfx_view::update() {
 }
 
 void bgfx_ortho_view::setup() {
-	if (m_window_index != 0)
-	{
-		bgfx::setViewFrameBuffer(m_index, m_backbuffer->target());
-	}
-
+	bgfx::setViewFrameBuffer(m_index, m_backbuffer->target());
 	bgfx::setViewRect(m_index, 0, 0, m_view_width, m_view_height);
 
 	while ((m_index + 1) > m_seen_views.size())
