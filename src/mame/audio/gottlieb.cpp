@@ -34,6 +34,7 @@ DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device,        
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device,             "gotsndp4",   "Gottlieb Sound pin. 4")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device,             "gotsndp5",   "Gottlieb Sound pin. 5")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device,             "gotsndp6",   "Gottlieb Sound pin. 6")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device,             "gotsndp7",   "Gottlieb Sound pin. 7")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device, "gotsndr1vt", "Gottlieb Sound rev. 1 with Votrax")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
@@ -1123,6 +1124,65 @@ void gottlieb_sound_p6_device::device_add_mconfig(machine_config &config)
 }
 
 void gottlieb_sound_p6_device::device_start()
+{
+	gottlieb_sound_p5_device::device_start();
+}
+
+
+//**************************************************************************
+//  PIN7 SOUND BOARD: same as p5 + MSM6295
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p7_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p7_device::gottlieb_sound_p7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p5_device(mconfig, GOTTLIEB_SOUND_PIN7, tag, owner, clock)
+	, m_oki(*this, "oki")
+{
+}
+
+void gottlieb_sound_p7_device::y_ctrl_w(uint8_t data)
+{
+	gottlieb_sound_p4_device::speech_ctrl_w(data);
+
+	if (BIT(m_speech_control, 5))
+		m_msm_latch2 = m_msm_latch1;
+	if (!BIT(m_msm_latch2, 2))
+		m_oki->write(m_msm_latch1);
+	m_oki->set_pin7(BIT(m_msm_latch2, 4));
+}
+
+void gottlieb_sound_p7_device::y_latch_w(uint8_t data)
+{
+	m_msm_latch1 = data;
+	if (!BIT(m_msm_latch2, 2))
+		m_oki->write(m_msm_latch1);
+}
+
+void gottlieb_sound_p7_device::p7_ymap(address_map &map)
+{
+	gottlieb_sound_p5_device::p5_ymap(map);
+	map.unmap_value_high();
+	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(gottlieb_sound_p7_device::y_latch_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(gottlieb_sound_p7_device::y_ctrl_w));
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p7_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_p5_device::device_add_mconfig(config);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p7_device::p7_ymap);
+
+	OKIM6295(config, m_oki, 4_MHz_XTAL/4, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, *this, 1.0);
+}
+
+void gottlieb_sound_p7_device::device_start()
 {
 	gottlieb_sound_p5_device::device_start();
 }

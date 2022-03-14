@@ -37,6 +37,11 @@ The Games            691  1                                                X
 El Dorado            692  1                                                X
 Ice Fever            695  1 then unknown                                   X
 Caveman            PV810  1 then unknown                                   X
+**** Other Manufacturer ****
+Commandos
+Fast Draw
+Mythology
+
 
 
 Status:
