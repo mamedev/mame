@@ -13913,6 +13913,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="galaxy5kup" cloneof="galaxy5k">
+		<description>Galaxy 5000 - Racing in the 51st Century (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3A" />
+			<dataarea name="prg" size="131072">
+				<rom name="galaxy 5000 prg ver 7.2 e827" size="131072" crc="1a0e676f" sha1="7605493953d0d876146f8f4954851d3b0b14f858" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="galaxy 5000 chr ver 7.0 50e9" size="131072" crc="e8bebb84" sha1="a843fd190546cd6abca92aae9508d7c8d0650473" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galaxy5k">
 		<description>Galaxy 5000 - Racing in the 51st Century (Euro)</description>
 		<year>1992</year>
@@ -30985,6 +31002,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="renegadep" cloneof="renegade">
+		<description>Renegade (USA, prototype)</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="NES-UNROM-04" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="renegade (4a91) taito 9-14-87" size="131072" crc="066e2671" sha1="6ac014cc1f82bb1e0289afceff42bf4bc2327c25" /> <!-- original label: レネゲード (4A91) TAITO 9/14/87 -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rescueu" cloneof="rescue">
 		<description>Rescue - The Embassy Mission (USA)</description>
 		<year>1990</year>
@@ -39941,6 +39975,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tokip" cloneof="toki">
+		<description>Toki (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="toki prg 0f28" size="131072" crc="892aff3e" sha1="3cac99481ed910cd94569e8a2cfe4d5250e41152" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="toki chr 1 6b3d" size="131072" crc="0a69685a" sha1="c23e0ec50aa319e1d1c3b90440c08c7309360a77" offset="0x00000" />
+				<rom name="toki chr 2 6502" size="131072" crc="c6add7ba" sha1="d45a9eae6c5aee7592f6931b4495f5899cb572f9" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="timestrn">
 		<description>Toki no Tabibito - Time Stranger (Jpn)</description>
 		<year>1986</year>
@@ -47299,6 +47351,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="squaredl" cloneof="greatdl">
+		<description>Square Deal (Japan, Great Deal prototype)</description>
+		<year>1991</year>
+		<publisher>Hector</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="square deal (japan) (sample).prg" size="131072" crc="3f57e040" sha1="c13041cbc4e5840cd35c762da387e3ff08d583bf" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gremlin2p" cloneof="gremlin2">
 		<description>Gremlins 2 - The New Batch (Euro, Prototype)</description>
 		<year>1991</year>
@@ -47346,6 +47414,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="harddrivin.prg" size="131072" crc="2e9851f2" sha1="426b20ddbe846569905b15efe74710b5f3000be3" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hatrisp" cloneof="hatris">
+		<description>Hatris (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SNROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="131072">
+				<rom name="hatris (prototype).prg" size="131072" crc="69ed419e" sha1="ed48a5805ead6ccfe872c468cc4af26ef4448f56" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -49912,6 +50000,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="rampartjs" cloneof="rampartj">
+		<description>Rampart (Japan, sample)</description>
+		<year>1991</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ランパート"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="131072">
+				<rom name="rampart (sample).prg" size="131072" crc="13f8c418" sha1="d0f36b40cadd4644345e58935a4dba073e35ef79" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampartup" cloneof="rampart">
 		<description>Rampart (USA, prototype)</description>
 		<year>1991</year>
@@ -50192,6 +50298,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="saint seiya - ougon densetsu kanketsu hen (japan) (beta).prg" size="131072" crc="9430ed52" sha1="a42629fabdc2d4f94cdd278e7a6eff22300c6cd8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saiyukiwp" cloneof="saiyukiw">
+		<description>Saiyuuki World (Japan, prototype)</description>
+		<year>1988</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="西遊記ワールド"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="saiyuuki world (prototype).prg" size="131072" crc="d44fbb05" sha1="7e45cc8718678227b9748c3d239c156887350176" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
