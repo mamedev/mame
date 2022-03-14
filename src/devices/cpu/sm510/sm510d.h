@@ -52,10 +52,9 @@ protected:
 		mKETA, mATF, mSDS, mRDS,
 		mINIS,
 
-		// SM590 aliases
-		mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7,
-		// SM590 uniques
-		mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA2, mADS, mADC, mLBMX, mTLS
+		// SM590 common
+		mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA2, mADS, mADC, mLBMX, mTLS,
+		mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7 // aliases
 	};
 
 	static const char *const s_mnemonics[];

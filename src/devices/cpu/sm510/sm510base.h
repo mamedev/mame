@@ -37,21 +37,24 @@ class sm510_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-		: cpu_device(mconfig, type, tag, owner, clock)
-		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_stack_levels(stack_levels)
-		, m_r_mask_option(RMASK_DIRECT)
-		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
-		, m_write_segs(*this)
-		, m_melody_rom(*this, "melody")
-		, m_read_k(*this)
-		, m_read_ba(*this), m_read_b(*this)
-		, m_write_s(*this)
-		, m_write_r(*this)
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+		cpu_device(mconfig, type, tag, owner, clock),
+		m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
+		m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+		m_prgwidth(prgwidth),
+		m_datawidth(datawidth),
+		m_stack_levels(stack_levels),
+		m_r_mask_option(RMASK_DIRECT),
+		m_lcd_ram_a(*this, "lcd_ram_a"),
+		m_lcd_ram_b(*this, "lcd_ram_b"),
+		m_lcd_ram_c(*this, "lcd_ram_c"),
+		m_write_segs(*this),
+		m_melody_rom(*this, "melody"),
+		m_read_k(*this),
+		m_read_ba(*this),
+		m_read_b(*this),
+		m_write_s(*this),
+		m_write_r(*this)
 	{ }
 
 	// For SM510, SM500, SM5A, R port output is selected with a mask option,
@@ -73,8 +76,9 @@ public:
 	// 4/8-bit S strobe output port
 	auto write_s() { return m_write_s.bind(); }
 
-	// 1/2/4-bit R (buzzer/melody) output port
+	// 1/2-bit R (buzzer/melody) output port
 	// may also be called F(frequency?) or SO(sound out)
+	// SM590 has 4 R ports, don't use this one, see sm590.h
 	auto write_r() { return m_write_r.bind(); }
 
 	// LCD segment outputs, SM51x: H1-4 as offset(low), a/b/c 1-16 as data d0-d15,
@@ -114,6 +118,7 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
+	int m_pagemask;
 
 	u16 m_pc, m_prev_pc;
 	u16 m_op, m_prev_op;
