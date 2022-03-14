@@ -32206,7 +32206,7 @@ starbladj                       // (c) 1991 (Japan)
 driveyes                        // (c) 1992?
 
 @source:namcos22.cpp
-acedrvrw                        // (c) 1994
+acedrive                        // (c) 1994
 adillor                         // (c) 1997
 adillorj                        // (c) 1997
 airco22b                        // (c) 1995
@@ -32225,22 +32225,25 @@ dirtdasha                       // (c) 1995
 dirtdashj                       // (c) 1995
 propcycl                        // (c) 1996
 propcyclj                       // (c) 1996
-raveracj                        // (c) 1995
-raveracja                       // (c) 1995
-raveracw                        // (c) 1995
+raverace                        // (c) 1995
+raveracej                       // (c) 1995
+raveraceja                      // (c) 1995
 ridgera2                        // (c) 1994
+ridgera28                       // (c) 1994
 ridgera2j                       // (c) 1994
 ridgera2ja                      // (c) 1994
 ridgerac                        // (c) 1993
-ridgerac3                       // (c) 1993
+ridgeraca                       // (c) 1993
 ridgeracb                       // (c) 1993
+ridgeracc                       // (c) 1993
 ridgeracf                       // (c) 1993
 ridgeracj                       // (c) 1993
 timecris                        // (c) 1995
 timecrisa                       // (c) 1995
 tokyowar                        // (c) 1996
 tokyowarj                       // (c) 1996
-victlapw                        // (c) 1996
+victlap                         // (c) 1996
+victlapa                        // (c) 1996
 victlapj                        // (c) 1996
 
 @source:namcos23.cpp

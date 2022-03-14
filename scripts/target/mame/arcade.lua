@@ -3953,8 +3953,6 @@ createMAMEProjects(_target, _subtarget, "suna")
 files {
 	MAME_DIR .. "src/mame/drivers/go2000.cpp",
 	MAME_DIR .. "src/mame/drivers/goindol.cpp",
-	MAME_DIR .. "src/mame/includes/goindol.h",
-	MAME_DIR .. "src/mame/video/goindol.cpp",
 	MAME_DIR .. "src/mame/drivers/suna8.cpp",
 	MAME_DIR .. "src/mame/includes/suna8.h",
 	MAME_DIR .. "src/mame/audio/suna8.cpp",
