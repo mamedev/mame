@@ -536,6 +536,7 @@ void vamphalf_state::qs1000_p3_w(u8 data)
  * \- then it tries 0xcfddfbbf / 0xeefff6e7 at $340 (PC=f9d6)
  * If protection check fails then game intentionally add massive refresh hiccups
  * after aforementioned 15 minutes.
+ * It doesn't seem to matter if game is being played or is left in attract during this time.
  */
 u16 vamphalf_state::misncrft_prot_r(offs_t offset)
 {
