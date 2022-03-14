@@ -168,5 +168,5 @@ void sm590_device::op_rta()
 {
 	// RTA: load ACC with R(BL)
 	u8 offset = m_bl & 3;
-	m_acc = (m_rports[offset] | m_read_rx[offset]()) & 0xf;
+	m_acc = (m_rports[offset] | m_read_rx[offset](offset)) & 0xf;
 }

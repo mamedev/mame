@@ -4,6 +4,17 @@
 
     Nintendo Family Computer & Entertainment System Zapper Lightgun
     Nintendo Family Computer Bandai Hyper Shot Lightgun
+    Nintendo R.O.B.
+
+    TODO:
+    - nes_rob is in here because it needs the zapper light sensor,
+      in reality it's not connected to the control port at all, but how
+      would it be interfaced with the NES driver otherwise?
+    - does nes_rob have motor sensors? (eg. limit switches, or optical
+      sensor to determine position)
+    - can't really play anything with nes_rob, because of interaction
+      with physical objects (gyromite especially, since it has a gadget
+      to make the robot press joypad buttons)
 
 **********************************************************************/
 
@@ -11,12 +22,15 @@
 #include "screen.h"
 #include "zapper.h"
 
+#include "nes_rob.lh"
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device,   "nes_zapper",   "Nintendo Zapper Lightgun")
+DEFINE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device, "nes_zapper", "Nintendo Zapper Lightgun")
 DEFINE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device, "nes_bandaihs", "Bandai Hyper Shot Lightgun")
+DEFINE_DEVICE_TYPE(NES_ROB, nes_rob_device, "nes_rob", "Nintendo R.O.B.")
 
 
 static INPUT_PORTS_START( nes_zapper )
@@ -33,7 +47,7 @@ static INPUT_PORTS_START( nes_bandaihs )
 	PORT_INCLUDE( nes_zapper )
 
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )  // has complete joypad inputs except button A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // has complete joypad inputs except button A
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
@@ -41,6 +55,15 @@ static INPUT_PORTS_START( nes_bandaihs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( nes_rob )
+	PORT_INCLUDE( nes_zapper )
+
+	// it has the x/y for aiming the 'eyes', but there is no lightgun trigger
+	PORT_MODIFY("ZAPPER_T")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -58,6 +81,10 @@ ioport_constructor nes_bandaihs_device::device_input_ports() const
 	return INPUT_PORTS_NAME( nes_bandaihs );
 }
 
+ioport_constructor nes_rob_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( nes_rob );
+}
 
 
 //**************************************************************************
@@ -89,6 +116,14 @@ nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const ch
 {
 }
 
+nes_rob_device::nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_zapper_device(mconfig, NES_ROB, tag, owner, clock)
+	, m_maincpu(*this, "maincpu")
+	, m_motor_out(*this, "rob_motor.%u", 0U)
+	, m_led_out(*this, "rob_led")
+{
+}
+
 
 //-------------------------------------------------
 //  device_start
@@ -103,6 +138,15 @@ void nes_bandaihs_device::device_start()
 	nes_zapper_device::device_start();
 	save_item(NAME(m_latch));
 	save_item(NAME(m_strobe));
+}
+
+void nes_rob_device::device_start()
+{
+	nes_zapper_device::device_start();
+
+	// resolve handlers
+	m_motor_out.resolve();
+	m_led_out.resolve();
 }
 
 
@@ -191,4 +235,64 @@ void nes_bandaihs_device::write(u8 data)
 {
 	if (write_strobe(data))
 		m_latch = m_joypad->read();
+}
+
+
+//-------------------------------------------------
+//  R.O.B. specific handlers
+//-------------------------------------------------
+
+u8 nes_rob_device::input_r()
+{
+	// R00: lightsensor
+	return (read_bit34() & 8) ? 1 : 0;
+}
+
+void nes_rob_device::output_w(offs_t offset, u8 data)
+{
+	switch (offset & 3)
+	{
+		case 0:
+			// R03: led
+			m_led_out = BIT(data, 3);
+			break;
+
+		case 1:
+			// R10-R13: motors: down, up, close, open
+			for (int i = 0; i < 4; i++)
+				m_motor_out[i] = BIT(data, i);
+			break;
+
+		case 2:
+			// R20,R21: motors: right, left
+			for (int i = 0; i < 2; i++)
+				m_motor_out[i + 4] = BIT(data, i);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void nes_rob_device::device_add_mconfig(machine_config &config)
+{
+	SM590(config, m_maincpu, 455_kHz_XTAL);
+	m_maincpu->read_r<0>().set(FUNC(nes_rob_device::input_r));
+	m_maincpu->write_r<0>().set(FUNC(nes_rob_device::output_w));
+	m_maincpu->write_r<1>().set(FUNC(nes_rob_device::output_w));
+	m_maincpu->write_r<2>().set(FUNC(nes_rob_device::output_w));
+	m_maincpu->write_r<3>().set(FUNC(nes_rob_device::output_w));
+
+	// must use -numscreens 2 to see the output status
+	config.set_default_layout(layout_nes_rob);
+}
+
+ROM_START( nes_rob )
+	ROM_REGION( 0x200, "maincpu", 0 )
+	ROM_LOAD( "rfc-cpu10.ic1", 0x000, 0x200, CRC(f9c96b9c) SHA1(a87e2f0f5e454c093d1352ac368aa9e82e9f6790) )
+ROM_END
+
+const tiny_rom_entry *nes_rob_device::device_rom_region() const
+{
+	return ROM_NAME(nes_rob);
 }
