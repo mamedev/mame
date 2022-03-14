@@ -33,6 +33,7 @@ Status:
 
 ToDo:
 - Sound
+- Mechanical sounds
 - Inputs vary per machine
 
 ******************************************************************************************/
@@ -69,6 +70,7 @@ public:
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -99,6 +101,7 @@ private:
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
 	output_finder<40> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<64> m_io_outputs;   // 16 solenoids + 48 lamps
 };
 
@@ -520,15 +523,14 @@ void gp_2_state::porta_w(u8 data)
 
 void gp_2_state::portc_w(u8 data)
 {
-	output().set_value("led0", !BIT(data, 3));
+	m_io_leds[0] = BIT(data, 3) ? 0 : 1;
 	m_digit = data & 7;
 }
 
 void gp_2_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_u14));
@@ -539,7 +541,6 @@ void gp_2_state::machine_start()
 
 void gp_2_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	m_u14 = 0;
 	m_digit = 0xff;
 	m_last_solenoid = 15;

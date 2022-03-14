@@ -47,6 +47,7 @@ public:
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
 		, m_leds(*this, "led%u", 0U)
+		, m_knockers(*this, "knocker%d", 0U)
 	{ }
 
 	void gottlieb_core(machine_config &config);
@@ -146,28 +147,29 @@ private:
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
 	output_finder<3> m_leds;  // only used by reactor
+	output_finder<1> m_knockers;  // only used by qbert
 
-	u8 m_knocker_prev;
-	u8 m_joystick_select;
-	u8 m_track[2];
-	emu_timer *m_laserdisc_bit_timer;
-	emu_timer *m_laserdisc_philips_timer;
-	u8 m_laserdisc_select;
-	u8 m_laserdisc_status;
-	uint16_t m_laserdisc_philips_code;
-	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
-	uint16_t m_laserdisc_audio_address;
-	int16_t m_laserdisc_last_samples[2];
+	u8 m_knocker_prev = 0U;
+	u8 m_joystick_select = 0U;
+	u8 m_track[2]{};
+	emu_timer *m_laserdisc_bit_timer = 0;
+	emu_timer *m_laserdisc_philips_timer = 0;
+	u8 m_laserdisc_select = 0U;
+	u8 m_laserdisc_status = 0U;
+	uint16_t m_laserdisc_philips_code = 0U;
+	std::unique_ptr<u8[]> m_laserdisc_audio_buffer{};
+	uint16_t m_laserdisc_audio_address = 0U;
+	int16_t m_laserdisc_last_samples[2]{};
 	attotime m_laserdisc_last_time;
 	attotime m_laserdisc_last_clock;
-	u8 m_laserdisc_zero_seen;
-	u8 m_laserdisc_audio_bits;
-	u8 m_laserdisc_audio_bit_count;
-	u8 m_gfxcharlo;
-	u8 m_gfxcharhi;
-	u8 m_background_priority;
-	u8 m_spritebank;
-	u8 m_transparent0;
-	tilemap_t *m_bg_tilemap;
-	double m_weights[4];
+	u8 m_laserdisc_zero_seen = 0U;
+	u8 m_laserdisc_audio_bits = 0U;
+	u8 m_laserdisc_audio_bit_count = 0U;
+	u8 m_gfxcharlo = 0U;
+	u8 m_gfxcharhi = 0U;
+	u8 m_background_priority = 0U;
+	u8 m_spritebank = 0U;
+	u8 m_transparent0 = 0U;
+	tilemap_t *m_bg_tilemap = 0;
+	double m_weights[4]{};
 };

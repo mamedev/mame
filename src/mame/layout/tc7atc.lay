@@ -1,0 +1,382 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="whitem"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="whited"><disk><color red="1" green="1" blue="1" /></disk></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+
+	<element name="blacks"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="whiteds"><disk><color red="1" green="1" blue="1" /></disk></element>
+	<element name="blackds"><disk><color red="0" green="0" blue="0" /></disk></element>
+
+	<element name="text_1"><text string="1"></text></element>
+	<element name="text_2"><text string="2"></text></element>
+	<element name="text_3"><text string="3"></text></element>
+	<element name="text_4"><text string="4"></text></element>
+	<element name="text_5"><text string="5"></text></element>
+	<element name="text_6"><text string="6"></text></element>
+	<element name="text_a"><text string="A"></text></element>
+	<element name="text_b"><text string="B"></text></element>
+	<element name="text_c"><text string="C"></text></element>
+	<element name="text_d"><text string="D"></text></element>
+
+	<element name="text_west"><text string="WEST"></text></element>
+	<element name="text_east"><text string="EAST"></text></element>
+
+	<element name="text_u1"><text string="3000 FT."></text></element>
+	<element name="text_u2"><text string="300 FT."></text></element>
+	<element name="text_u3"><text string="LAND:"></text></element>
+	<element name="text_u4"><text string="0-100'"></text></element>
+
+	<element name="text_d1"><text string="AIR SPEED" align="2"></text></element>
+	<element name="text_d2"><text string="ALTITUDE" align="1"></text></element>
+	<element name="text_d3"><text string="H1:ALT.OVER 3000'" align="1"></text></element>
+	<element name="text_d4"><text string="H2:ALT.UNDER 300'" align="1"></text></element>
+	<element name="text_d5"><text string="H3:SPEED UNDER 140mph" align="1"></text></element>
+	<element name="text_d6"><text string="MAX SPEED:450" align="1"></text></element>
+	<element name="text_d7"><text string="MIN SPEED:100" align="1"></text></element>
+
+	<element name="rled" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.13" green="0.013" blue="0.02" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<!-- 6 rings -->
+	<element name="disks1">
+		<disk><bounds x="0" y="0" width="144" height="144" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="0.75" y="0.75" width="142.5" height="142.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="12" y="12" width="120" height="120" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="12.75" y="12.75" width="118.5" height="118.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="24" y="24" width="96" height="96" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="24.75" y="24.75" width="94.5" height="94.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="36" y="36" width="72" height="72" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="36.75" y="36.75" width="70.5" height="70.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="48" y="48" width="48" height="48" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="48.75" y="48.75" width="46.5" height="46.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="60" y="60" width="24" height="24" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="60.75" y="60.75" width="22.5" height="22.5" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<!-- 4 intersecting rings -->
+	<element name="disks2">
+		<rect><bounds x="-8" y="-110" width="160" height="364" /><color red="0" green="0" blue="0" /></rect>
+
+		<disk><bounds x="-8" y="-22" width="160" height="96" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="-7.25" y="-21.25" width="158.5" height="94.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="15" y="-110" width="114" height="190" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="15.75" y="-109.25" width="112.5" height="188.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="-8" y="70" width="160" height="96" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="-7.25" y="70.75" width="158.5" height="94.5" /><color red="0" green="0" blue="0" /></disk>
+
+		<disk><bounds x="15" y="64" width="114" height="190" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="15.75" y="64.75" width="112.5" height="188.5" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<!-- star shape leds -->
+	<element name="slmask">
+		<rect><bounds x="0" y="0" width="3.3" height="3.3" /><color alpha="0" /></rect>
+		<disk><bounds x="0.8" y="0.8" width="1.7" height="1.7" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="sled0" defstate="0">
+		<rect><bounds x="0" y="0" width="3.3" height="3.3" /><color alpha="0" /></rect>
+		<disk state="1">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</disk>
+		<disk state="0">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="0.13" green="0.013" blue="0.02" />
+		</disk>
+		<disk><bounds x="1.707106" y="0.292893" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="1.707106" y="1.707106" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.292893" y="1.707106" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.292893" y="0.292893" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="sled15" defstate="0">
+		<rect><bounds x="0" y="0" width="3.3" height="3.3" /><color alpha="0" /></rect>
+		<disk state="1">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</disk>
+		<disk state="0">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="0.13" green="0.013" blue="0.02" />
+		</disk>
+		<disk><bounds x="1.866025" y="0.500000" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="1.500000" y="1.866025" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.133974" y="1.500000" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.500000" y="0.133974" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="sled30" defstate="0">
+		<rect><bounds x="0" y="0" width="3.3" height="3.3" /><color alpha="0" /></rect>
+		<disk state="1">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</disk>
+		<disk state="0">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="0.13" green="0.013" blue="0.02" />
+		</disk>
+		<disk><bounds x="1.965925" y="0.741180" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="1.258819" y="1.965925" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.034074" y="1.258819" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0.741180" y="0.034074" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="sled45" defstate="0">
+		<rect><bounds x="0" y="0" width="3.3" height="3.3" /><color alpha="0" /></rect>
+		<disk state="1">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</disk>
+		<disk state="0">
+			<bounds x="1" y="1" width="1.3" height="1.3" />
+			<color red="0.13" green="0.013" blue="0.02" />
+		</disk>
+		<disk><bounds x="1" y="0" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="2" y="1" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="1" y="2" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="0" y="1" width="1.3" height="1.3" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+
+<!-- 7seg display -->
+
+	<group name="digits">
+		<element name="digit9" ref="digit"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element name="digit8" ref="digit"><bounds x="1" y="0" width="1" height="1" /></element>
+		<element name="digit7" ref="digit"><bounds x="2" y="0" width="1" height="1" /></element>
+		<element name="digit6" ref="digit"><bounds x="3" y="0" width="1" height="1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-5" right="149" top="-5" bottom="144" />
+
+		<!-- bezel base -->
+		<element ref="whited"><bounds x="1" y="1" width="142" height="142" /></element>
+
+		<repeat count="19">
+			<param name="p1" start="2" increment="2.5" />
+			<param name="p2" start="2.75" increment="2.5" />
+			<param name="d1" start="140" increment="-5" />
+			<param name="d2" start="138.5" increment="-5" />
+
+			<element ref="blackds"><bounds x="~p1~" y="~p1~" width="~d1~" height="~d1~" /></element>
+			<element ref="whiteds"><bounds x="~p2~" y="~p2~" width="~d2~" height="~d2~" /></element>
+		</repeat>
+
+		<element ref="blackd"><bounds x="48" y="48" width="48" height="48" /></element>
+
+		<element ref="disks2" blend="multiply"><bounds x="-8" y="-110" width="160" height="364" /></element>
+
+		<element ref="white"><bounds x="48" y="71.625" width="48" height="0.75" /></element>
+
+		<repeat count="18">
+			<param name="p" start="50.325" increment="2.5" />
+			<element ref="blacks"><bounds x="~p~" y="70" width="0.75" height="4" /></element>
+		</repeat>
+
+		<element ref="white"><bounds x="60" y="71.625" width="24" height="0.75" /></element>
+
+		<element ref="white"><bounds x="64.5" y="67" width="15" height="10" /></element>
+		<element ref="black"><bounds x="65.25" y="67.75" width="13.5" height="8.5" /></element>
+
+		<element ref="disks1" blend="add"><bounds x="0" y="0" width="144" height="144" /></element>
+
+		<!-- bezel text -->
+		<element ref="text_west"><bounds x="4" y="11" width="20" height="5.5" /></element>
+		<element ref="text_east"><bounds x="120" y="11" width="20" height="5.5" /></element>
+
+		<element ref="text_a"><bounds x="9" y="18.5" width="10" height="5.5" /></element>
+		<element ref="text_a"><bounds x="125" y="18.5" width="10" height="5.5" /></element>
+
+		<element ref="text_b"><bounds x="-4" y="42.5" width="10" height="5.5" /></element>
+		<element ref="text_b"><bounds x="138" y="42.5" width="10" height="5.5" /></element>
+
+		<element ref="text_c"><bounds x="-4" y="95.75" width="10" height="5.5" /></element>
+		<element ref="text_c"><bounds x="138" y="95.75" width="10" height="5.5" /></element>
+
+		<element ref="text_d"><bounds x="9" y="119.5" width="10" height="5.5" /></element>
+		<element ref="text_d"><bounds x="125" y="119.5" width="10" height="5.5" /></element>
+
+		<element ref="black"><bounds x="68" y="-1" width="8" height="65" /></element>
+
+		<element ref="text_6"><bounds x="62" y="-5.5" width="20" height="11" /></element>
+		<element ref="text_5"><bounds x="62" y="6.5" width="20" height="11" /></element>
+		<element ref="text_4"><bounds x="62" y="18.5" width="20" height="11" /></element>
+		<element ref="text_3"><bounds x="62" y="30.5" width="20" height="11" /></element>
+		<element ref="text_2"><bounds x="62" y="42.5" width="20" height="11" /></element>
+		<element ref="text_1"><bounds x="62" y="54.5" width="20" height="11" /></element>
+
+		<element ref="text_u1"><bounds x="62" y="4.75" width="20" height="3" /></element>
+		<element ref="text_u2"><bounds x="62" y="52.75" width="20" height="3" /></element>
+		<element ref="text_u3"><bounds x="62" y="63.75" width="20" height="3" /></element>
+		<element ref="text_u4"><bounds x="62" y="77.25" width="20" height="3" /></element>
+
+		<element ref="black"><bounds x="54" y="110" width="36" height="50" /></element>
+		<element ref="black"><bounds x="26" y="112" width="92" height="5.5" /></element>
+
+		<element ref="text_d1"><bounds x="14" y="112" width="40" height="5.5" /></element>
+		<element ref="text_d2"><bounds x="91" y="112" width="40" height="5.5" /></element>
+
+		<element ref="text_d3"><bounds x="55" y="125" width="40" height="3" /></element>
+		<element ref="text_d4"><bounds x="55" y="128" width="40" height="3" /></element>
+		<element ref="text_d5"><bounds x="55" y="131" width="40" height="3" /></element>
+
+		<element ref="text_d6"><bounds x="-0.5" y="131" width="40" height="3" /></element>
+		<element ref="text_d7"><bounds x="-0.5" y="134" width="40" height="3" /></element>
+
+		<element ref="whitem" blend="multiply"><bounds x="-10" y="-10" width="164" height="164" /></element>
+
+		<!-- leds bottom -->
+		<group ref="digits"><bounds x="54.5" y="112" width="35" height="12" /></group>
+
+		<element name="4.7" ref="rled"><bounds x="46.5" y="120" width="4" height="4" /></element>
+		<element name="4.3" ref="rled"><bounds x="93.5" y="120" width="4" height="4" /></element>
+
+		<!-- leds middle -->
+		<element ref="slmask"><bounds x="43" y="66.5" width="11" height="11" /></element>
+		<element name="4.2" ref="sled0" blend="add"><bounds x="43" y="66.5" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="55" y="66.5" width="11" height="11" /></element>
+		<element name="4.1" ref="sled0" blend="add"><bounds x="55" y="66.5" width="11" height="11" /></element>
+
+		<element name="4.0" ref="sled0" blend="add"><bounds x="63.333" y="66.5" width="11" height="11" /></element>
+		<element name="4.4" ref="sled0" blend="add"><bounds x="69.666" y="66.5" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="78" y="66.5" width="11" height="11" /></element>
+		<element name="4.5" ref="sled0" blend="add"><bounds x="78" y="66.5" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="90" y="66.5" width="11" height="11" /></element>
+		<element name="4.6" ref="sled0" blend="add"><bounds x="90" y="66.5" width="11" height="11" /></element>
+
+		<!-- leds west a -->
+		<element ref="slmask"><bounds x="14.75" y="17" width="11" height="11" /></element>
+		<element name="0.3" ref="sled0" blend="add"><bounds x="14.75" y="17" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="19" y="30.75" width="11" height="11" /></element>
+		<element name="0.2" ref="sled15" blend="add"><bounds x="19" y="30.75" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="25" y="43.5" width="11" height="11" /></element>
+		<element name="0.1" ref="sled30" blend="add"><bounds x="25" y="43.5" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="32.75" y="55.5" width="11" height="11" /></element>
+		<element name="0.0" ref="sled45" blend="add"><bounds x="32.75" y="55.5" width="11" height="11" /></element>
+
+		<!-- leds west b -->
+		<element ref="slmask"><bounds x="-1.75" y="45.25" width="11" height="11" /></element>
+		<element name="1.3" ref="sled45" blend="add"><bounds x="-1.75" y="45.25" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="8.5" y="53" width="11" height="11" /></element>
+		<element name="1.2" ref="sled30" blend="add"><bounds x="8.5" y="53" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="19.5" y="59" width="11" height="11" /></element>
+		<element name="1.1" ref="sled15" blend="add"><bounds x="19.5" y="59" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="31" y="63" width="11" height="11" /></element>
+		<element name="1.0" ref="sled15" blend="add"><bounds x="31" y="63" width="11" height="11" /></element>
+
+		<!-- leds west c -->
+		<element ref="slmask"><bounds x="-1.75" y="87.75" width="11" height="11" /></element>
+		<element name="2.3" ref="sled45" blend="add"><bounds x="-1.75" y="87.75" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="8.5" y="80" width="11" height="11" /></element>
+		<element name="2.2" ref="sled30" blend="add"><bounds x="8.5" y="80" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="19.5" y="74" width="11" height="11" /></element>
+		<element name="2.1" ref="sled15" blend="add"><bounds x="19.5" y="74" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="31" y="70" width="11" height="11" /></element>
+		<element name="2.0" ref="sled15" blend="add"><bounds x="31" y="70" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<!-- leds west d -->
+		<element ref="slmask"><bounds x="14.75" y="116" width="11" height="11" /></element>
+		<element name="3.3" ref="sled0" blend="add"><bounds x="14.75" y="116" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="19" y="102.25" width="11" height="11" /></element>
+		<element name="3.2" ref="sled15" blend="add"><bounds x="19" y="102.25" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="25" y="89.5" width="11" height="11" /></element>
+		<element name="3.1" ref="sled30" blend="add"><bounds x="25" y="89.5" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="32.75" y="77.5" width="11" height="11" /></element>
+		<element name="3.0" ref="sled45" blend="add"><bounds x="32.75" y="77.5" width="11" height="11" /></element>
+
+		<!-- leds east a -->
+		<element ref="slmask"><bounds x="118.25" y="17" width="11" height="11" /></element>
+		<element name="0.7" ref="sled0" blend="add"><bounds x="118.25" y="17" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="114" y="30.75" width="11" height="11" /></element>
+		<element name="0.6" ref="sled15" blend="add"><bounds x="114" y="30.75" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="108" y="43.5" width="11" height="11" /></element>
+		<element name="0.5" ref="sled30" blend="add"><bounds x="108" y="43.5" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="100.25" y="55.5" width="11" height="11" /></element>
+		<element name="0.4" ref="sled45" blend="add"><bounds x="100.25" y="55.5" width="11" height="11" /></element>
+
+		<!-- leds east b -->
+		<element ref="slmask"><bounds x="134.75" y="45.25" width="11" height="11" /></element>
+		<element name="1.7" ref="sled45" blend="add"><bounds x="134.75" y="45.25" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="124.5" y="53" width="11" height="11" /></element>
+		<element name="1.6" ref="sled30" blend="add"><bounds x="124.5" y="53" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="113.5" y="59" width="11" height="11" /></element>
+		<element name="1.5" ref="sled15" blend="add"><bounds x="113.5" y="59" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="102" y="63" width="11" height="11" /></element>
+		<element name="1.4" ref="sled15" blend="add"><bounds x="102" y="63" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<!-- leds east c -->
+		<element ref="slmask"><bounds x="134.75" y="87.75" width="11" height="11" /></element>
+		<element name="2.7" ref="sled45" blend="add"><bounds x="134.75" y="87.75" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="124.5" y="80" width="11" height="11" /></element>
+		<element name="2.6" ref="sled30" blend="add"><bounds x="124.5" y="80" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="113.5" y="74" width="11" height="11" /></element>
+		<element name="2.5" ref="sled15" blend="add"><bounds x="113.5" y="74" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="102" y="70" width="11" height="11" /></element>
+		<element name="2.4" ref="sled15" blend="add"><bounds x="102" y="70" width="11" height="11" /></element>
+
+		<!-- leds east d -->
+		<element ref="slmask"><bounds x="118.25" y="116" width="11" height="11" /></element>
+		<element name="3.7" ref="sled0" blend="add"><bounds x="118.25" y="116" width="11" height="11" /></element>
+
+		<element ref="slmask"><bounds x="114" y="102.25" width="11" height="11" /></element>
+		<element name="3.6" ref="sled15" blend="add"><bounds x="114" y="102.25" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="108" y="89.5" width="11" height="11" /></element>
+		<element name="3.5" ref="sled30" blend="add"><bounds x="108" y="89.5" width="11" height="11" /><orientation flipx="yes" /></element>
+
+		<element ref="slmask"><bounds x="100.25" y="77.5" width="11" height="11" /></element>
+		<element name="3.4" ref="sled45" blend="add"><bounds x="100.25" y="77.5" width="11" height="11" /></element>
+
+	</view>
+</mamelayout>

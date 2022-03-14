@@ -81,7 +81,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	auto* base = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(0));
 	for (int y = 0; y < height; y++)
 	{
-		copy_util::copyline_argb32(data32 + y * width, base + y * rowpixels, width, nullptr);
+		copy_util::copyline_argb32_to_bgra(data32 + y * width, base + y * rowpixels, width, nullptr);
 	}
 
 	if (screen >= 0)

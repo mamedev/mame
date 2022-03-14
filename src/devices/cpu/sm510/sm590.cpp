@@ -7,8 +7,6 @@
   TODO:
   - finish SM590/SM595 emulation (NES/SNES CIC)
 
-  http://bitsavers.informatik.uni-stuttgart.de/pdf/sharp/_dataBooks/1990_Sharp_Microcomputers_Data_Book.pdf
-  pdf page 35/doc page 26 thru pdf page 44/doc page 35
 */
 
 #include "emu.h"
@@ -67,11 +65,9 @@ void sm590_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
-	m_sbm = false; // needed?
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
-	m_clk_div = 4; // 4 clock oscillations per cycle on SM59x, see datasheet page 30/pdf page 39
 
 	m_rports[0] = m_rports[1] = m_rports[2] = m_rports[3] = 0;
 	//m_write_r(0); // TODO: are the four ports zeroed on reset?

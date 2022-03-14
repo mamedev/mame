@@ -409,7 +409,7 @@ static INPUT_PORTS_START( horekid )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( horekidb2 ) 
+static INPUT_PORTS_START( horekidb2 )
 	PORT_INCLUDE(horekid)
 
 	PORT_MODIFY("IN1")
@@ -417,17 +417,6 @@ static INPUT_PORTS_START( horekidb2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
 
-
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
 
 static const gfx_layout tile_layout =
 {
@@ -466,7 +455,7 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( gfx_terracre )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout,            0,   1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0,   1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,         1*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 1*16+16*16, 256 )
 GFXDECODE_END
