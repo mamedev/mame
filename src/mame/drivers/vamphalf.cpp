@@ -54,6 +54,7 @@
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
+- misncrft: sound dies during stage 1-5;
 - wyvernsg: fails a protection check after ~1 hour of play?
 
 *********************************************************************/
@@ -70,6 +71,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "debugger.h"
 
 
 namespace {
@@ -87,6 +89,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_eeprom(*this, "eeprom")
+		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_tiles(*this,"tiles", 0x40000, ENDIANNESS_BIG)
 		, m_okiregion(*this, "oki%u", 1)
@@ -172,9 +175,15 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<screen_device> m_screen;
 
 	u32 finalgdr_prot_r();
 	void finalgdr_prot_w(u32 data);
+
+	u32 m_misncrft_prot_seed[2];
+	u8 m_misncrft_prot_retval;
+	u16 misncrft_prot_r(offs_t offset);
+	void misncrft_prot_w(offs_t offset, u16 data);
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -519,6 +528,74 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 }
 
 
+/*
+ * Mission Craft tests protection device on two places:
+ * 1. at POST on $680 (PC=0xf81c)
+ * 2. If check one is successful it attempts two new checks after ~15 minutes,
+ * \- first tries 0x5fd8988e / 0x1f3f37ee at $680,
+ * \- then it tries 0xcfddfbbf / 0xeefff6e7 at $340 (PC=f9d6)
+ * If protection check fails then game intentionally add massive refresh hiccups
+ * after aforementioned 15 minutes.
+ */
+u16 vamphalf_state::misncrft_prot_r(offs_t offset)
+{
+	if (offset)
+	{
+		u8 retval = (m_misncrft_prot_retval >> (7 - m_semicom_prot_idx)) & 1;
+		if (!machine().side_effects_disabled())
+			m_semicom_prot_idx ++;
+		return retval ? 0xffff : 0;
+	}
+	return 0;
+}
+
+void vamphalf_state::misncrft_prot_w(offs_t offset, u16 data)
+{
+	if (offset)
+	{
+		// Seed uploads with a 0xffff -> 1 byte x 8 times -> 0xffff
+		// This should be used as a commit/reset chip mechanism,
+		// likely in a flip-flop transition with any of the upper bits.
+		// Also note: return value is read 8 times but only first 4 bits are compared against, why?
+		if (data == 0xffff)
+		{
+			m_semicom_prot_idx = 0;
+			
+			if (m_misncrft_prot_seed[0] == 0x806b4bfb && m_misncrft_prot_seed[1] == 0xe3fb55f6)
+				m_misncrft_prot_retval = 0xf0;
+			else if (m_misncrft_prot_seed[0] == 0xdf7c1de1 && m_misncrft_prot_seed[1] == 0x8701be31)
+				m_misncrft_prot_retval = 0xe0;
+			else if (m_misncrft_prot_seed[0] == 0x57730e47 && m_misncrft_prot_seed[1] == 0x67678758)
+				m_misncrft_prot_retval = 0xa0;
+			else if (m_misncrft_prot_seed[0] == 0x893c59ea && m_misncrft_prot_seed[1] == 0x57127bd2)
+				m_misncrft_prot_retval = 0x00;
+			else if (m_misncrft_prot_seed[0] == 0xa1d83c54 && m_misncrft_prot_seed[1] == 0x542f36af)
+				m_misncrft_prot_retval = 0x80;
+			else if (m_misncrft_prot_seed[0] == 0x5fd8988e && m_misncrft_prot_seed[1] == 0x1f3f37ee)
+				m_misncrft_prot_retval = 0x20;
+			else if (m_misncrft_prot_seed[0] == 0xcfddfbbf && m_misncrft_prot_seed[1] == 0xeefff6e7)
+				m_misncrft_prot_retval = 0xa0;
+			else if (m_misncrft_prot_seed[0] != 0 && m_misncrft_prot_seed[1] != 0)
+			{
+				logerror("%s: unhandled protection seed %08x %08x\n", machine().describe_context(), m_misncrft_prot_seed[0], m_misncrft_prot_seed[1]);
+				//printf("else if (m_misncrft_prot_seed[0] == 0x%08x && m_misncrft_prot_seed[1] == 0x%08x)\n",m_misncrft_prot_seed[0], m_misncrft_prot_seed[1]);
+				m_misncrft_prot_retval = 0x00;
+				// tested up to 3 hours, leave this in anyway for checking out if any inp testing triggers here.
+				machine().debug_break();
+			}
+
+			for (int i = 0; i < 2; i++)
+				m_misncrft_prot_seed[i] = 0;
+		}
+		else
+		{
+			//printf("%02x %d\n", data & 0xff, m_semicom_prot_idx);
+			m_misncrft_prot_seed[(m_semicom_prot_idx & 4) >> 2] |= ((data & 0xff) << ((3 - (m_semicom_prot_idx & 3)) * 8));
+			m_semicom_prot_idx ++;
+		}
+	}
+}
+
 void vamphalf_state::common_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram");
@@ -561,9 +638,11 @@ void vamphalf_qdsp_state::misncrft_io(address_map &map)
 	map(0x100, 0x103).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x200, 0x203).portr("P1_P2");
 	map(0x240, 0x243).portr("SYSTEM");
+	map(0x340, 0x343).rw(FUNC(vamphalf_qdsp_state::misncrft_prot_r), FUNC(vamphalf_qdsp_state::misncrft_prot_w));
 	map(0x3c0, 0x3c3).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x400, 0x403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x580, 0x583).r(FUNC(vamphalf_state::eeprom_r));
+	map(0x680, 0x683).rw(FUNC(vamphalf_qdsp_state::misncrft_prot_r), FUNC(vamphalf_qdsp_state::misncrft_prot_w));
 }
 
 void vamphalf_state::coolmini_io(address_map &map)
@@ -1150,14 +1229,14 @@ void vamphalf_state::common(machine_config &config)
 	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// 28MHz
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(31, 350, 16, 251);
-	screen.set_screen_update(FUNC(vamphalf_state::screen_update_common));
-	screen.set_palette(m_palette);
+	m_screen->set_refresh_hz(59);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(31, 350, 16, 251);
+	m_screen->set_screen_update(FUNC(vamphalf_state::screen_update_common));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vamphalf);
@@ -1226,6 +1305,8 @@ void vamphalf_qdsp_state::misncrft(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+
+	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 31, 350, 264, 16, 251); // not measured, assume 59.18 Hz like others
 
 	sound_qs1000(config);
 }
@@ -1339,14 +1420,14 @@ void vamphalf_state::aoh(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// 32MHz
-	screen.set_refresh_hz(59.185);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(64, 511-64, 16, 255-16);
-	screen.set_screen_update(FUNC(vamphalf_state::screen_update_aoh));
-	screen.set_palette(m_palette);
+	m_screen->set_refresh_hz(59.185);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 512);
+	m_screen->set_visarea(64, 511-64, 16, 255-16);
+	m_screen->set_screen_update(FUNC(vamphalf_state::screen_update_aoh));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vamphalf);
