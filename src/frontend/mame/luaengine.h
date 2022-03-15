@@ -21,7 +21,11 @@
 #include <tuple>
 #include <vector>
 
+#ifdef MAME_DEBUG
+#define SOL_ALL_SAFETIES_ON 1
+#else
 #define SOL_SAFE_USERTYPE 1
+#endif
 #include "sol/sol.hpp"
 
 struct lua_State;
@@ -30,6 +34,7 @@ class lua_engine
 {
 public:
 	// helper structures
+	class buffer_helper;
 	template <typename T> struct devenum;
 	template <typename T> struct simple_list_wrapper;
 	template <typename T> struct tag_object_ptr_map;
