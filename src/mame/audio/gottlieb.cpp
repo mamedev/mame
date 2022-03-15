@@ -726,6 +726,7 @@ gottlieb_sound_p4_device::gottlieb_sound_p4_device(
 	, m_ay1(*this, "ay1")
 	, m_ay2(*this, "ay2")
 	, m_nmi_timer(nullptr)
+	, m_nmi_rate(0)
 	, m_nmi_state(0)
 	, m_dcpu_latch(0)
 	, m_ycpu_latch(0)
@@ -1152,6 +1153,8 @@ void gottlieb_sound_p7_device::y_ctrl_w(uint8_t data)
 	if (!BIT(m_msm_latch2, 2))
 		m_oki->write(m_msm_latch1);
 	m_oki->set_pin7(BIT(m_msm_latch2, 4));
+	u8 t = BIT(m_msm_latch2, 6) | (BIT(m_msm_latch2, 3) << 1);
+	m_oki->set_rom_bank(t);
 }
 
 void gottlieb_sound_p7_device::y_latch_w(uint8_t data)
@@ -1185,4 +1188,6 @@ void gottlieb_sound_p7_device::device_add_mconfig(machine_config &config)
 void gottlieb_sound_p7_device::device_start()
 {
 	gottlieb_sound_p5_device::device_start();
+	save_item(NAME(m_msm_latch1));
+	save_item(NAME(m_msm_latch2));
 }

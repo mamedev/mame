@@ -419,8 +419,6 @@ WRITE_LINE_MEMBER( gts3a_state::crtc_vs )
 
 void gts3a_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -433,7 +431,6 @@ void gts3a_state::machine_start()
 
 void gts3a_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
