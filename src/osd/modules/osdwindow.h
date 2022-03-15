@@ -220,6 +220,7 @@ public:
 	/* Interface to be implemented by render code */
 
 	virtual int create() = 0;
+	virtual void post_create() { }
 	virtual render_primitive_list *get_primitives() = 0;
 
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) { }

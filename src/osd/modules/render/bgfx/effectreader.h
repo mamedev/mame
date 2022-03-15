@@ -30,8 +30,6 @@ private:
 		std::vector<bgfx_uniform *> &uniforms);
 	static bool get_shader_data(const Value& value, osd_options &options, shader_manager &shaders, std::string &vertex_name, bgfx::ShaderHandle &vertex_shader,
 		std::string &fragment_name, bgfx::ShaderHandle &fragment_shader);
-	static bool get_shader_data(const Value& value, osd_options &options, std::string &vertex_name, bgfx::ShaderHandle &vertex_shader, std::string &fragment_name,
-		bgfx::ShaderHandle &fragment_shader);
 	static void clear_uniform_list(std::vector<bgfx_uniform *> &uniforms);
 	static bool validate_parameters(const Value& value, std::string prefix);
 };

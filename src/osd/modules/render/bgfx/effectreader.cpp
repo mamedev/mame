@@ -64,8 +64,6 @@ bool effect_reader::validate_value(const Value& value, std::string prefix, osd_o
 	uint64_t flags = 0;
 	std::string vertex_name;
 	std::string fragment_name;
-	bgfx::ShaderHandle vertex_shader = BGFX_INVALID_HANDLE;
-	bgfx::ShaderHandle fragment_shader = BGFX_INVALID_HANDLE;
 	std::vector<bgfx_uniform *> uniforms;
 
 	if (!get_base_effect_data(value, prefix, flags, vertex_name, fragment_name, uniforms))
@@ -73,22 +71,19 @@ bool effect_reader::validate_value(const Value& value, std::string prefix, osd_o
 		return false;
 	}
 
-	if (!get_shader_data(value, options, vertex_name, vertex_shader, fragment_name, fragment_shader))
+	if (!shader_manager::is_shader_present(options, vertex_name))
 	{
 		clear_uniform_list(uniforms);
 		return false;
 	}
 
-	bgfx::ProgramHandle program = bgfx::createProgram(vertex_shader, fragment_shader, true);
-
-	bool success = false;
-	if (program.idx != bgfx::kInvalidHandle)
+	if (!shader_manager::is_shader_present(options, fragment_name))
 	{
-		success = true;
-		bgfx::destroy(program);
+		clear_uniform_list(uniforms);
+		return false;
 	}
 
-	return success;
+	return true;
 }
 
 bool effect_reader::get_base_effect_data(const Value& value, std::string &prefix, uint64_t &flags, std::string &vertex_name, std::string &fragment_name,
@@ -156,32 +151,11 @@ bool effect_reader::get_shader_data(const Value& value, osd_options &options, sh
 	return true;
 }
 
-bool effect_reader::get_shader_data(const Value& value, osd_options &options, std::string &vertex_name, bgfx::ShaderHandle &vertex_shader, std::string &fragment_name,
-	bgfx::ShaderHandle &fragment_shader)
-{
-	vertex_shader = shader_manager::load_shader(options, vertex_name);
-	if (vertex_shader.idx == bgfx::kInvalidHandle)
-	{
-		return false;
-	}
-
-	fragment_shader = shader_manager::load_shader(options, fragment_name);
-	if (fragment_shader.idx == bgfx::kInvalidHandle)
-	{
-		return false;
-	}
-
-	return true;
-}
-
 void effect_reader::clear_uniform_list(std::vector<bgfx_uniform *> &uniforms)
 {
 	for (bgfx_uniform *uniform : uniforms)
 	{
-		if (uniform != nullptr)
-		{
-			delete uniform;
-		}
+		delete uniform;
 	}
 }
 
