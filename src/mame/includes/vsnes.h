@@ -19,7 +19,7 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
 		, m_chr_banks(*this, "chr%u", 0U)
-		, m_bank_vrom(*this, "vrom%u", 0U)
+		, m_chr_view(*this, "chr_view")
 	{
 	}
 
@@ -59,7 +59,6 @@ private:
 	optional_device<nvram_device> m_nvram;
 
 	optional_memory_region m_gfx1_rom;
-	memory_bank_array_creator<8> m_chr_banks;
 
 	void sprite_dma_0_w(address_space &space, uint8_t data);
 	void sprite_dma_1_w(address_space &space, uint8_t data);
@@ -72,8 +71,9 @@ private:
 	void vsnes_in0_1_w(uint8_t data);
 	uint8_t vsnes_in0_1_r();
 	uint8_t vsnes_in1_1_r();
-	void vsnormal_vrom_banking(uint8_t data);
 	void gun_in0_w(uint8_t data);
+	void vsnormal_vrom_banking(uint8_t data);
+	void vsnes_gun_in0_w(uint8_t data);
 	void vskonami_rom_banking(offs_t offset, uint8_t data);
 	void vsgshoe_gun_in0_w(uint8_t data);
 	void drmario_rom_banking(offs_t offset, uint8_t data);
@@ -96,7 +96,7 @@ private:
 	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_START(bootleg);
-	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
+	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
 
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
@@ -106,19 +106,19 @@ private:
 
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);
+	void vsnes_ppu_bootleg_map(address_map &map);
 	void vsnes_cpu1_map(address_map &map);
 	void vsnes_cpu2_map(address_map &map);
+	void vsnes_ppu1_map(address_map &map);
+	void vsnes_ppu2_map(address_map &map);
+
+	memory_bank_array_creator<8> m_chr_banks;
+	memory_view m_chr_view;
+	int m_chr_chunks;
 
 	int m_coin;
-	int m_do_vrom_bank;
 	int m_input_latch[4];
 	int m_input_strobe[2];
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t* m_vrom[2];
-	std::unique_ptr<uint8_t[]> m_nt_ram[2];
-	memory_bank_array_creator<8> m_bank_vrom;
-	uint32_t m_vrom_size[2];
-	int m_vrom_banks;
 	int m_old_bank;
 	int m_drmario_shiftreg;
 	int m_drmario_shiftcount;
