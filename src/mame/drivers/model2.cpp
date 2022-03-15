@@ -3378,7 +3378,7 @@ ROM_START( vf2b ) /* Virtua Fighter 2 Revision B, Model 2A, Sega game# 833-11341
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A, Sega game# 833-11341, ROM board# 834-11342 */
+ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A, Sega game# 833-11341 VIRTUA FIGHTER 2 REV.A, ROM board# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17568a.12", 0x000000, 0x020000, CRC(5b10f232) SHA1(04df1eb9cf094d8dc5118b95028b544b47d5d328) )
 	ROM_LOAD32_WORD( "epr-17569a.13", 0x000002, 0x020000, CRC(17c208e0) SHA1(260c762d7853fb1d6f894d4dd954d82dfbc92d2d) )

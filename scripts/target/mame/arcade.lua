@@ -4503,8 +4503,6 @@ files {
 	MAME_DIR .. "src/mame/includes/nova2001.h",
 	MAME_DIR .. "src/mame/video/nova2001.cpp",
 	MAME_DIR .. "src/mame/drivers/xxmissio.cpp",
-	MAME_DIR .. "src/mame/includes/xxmissio.h",
-	MAME_DIR .. "src/mame/video/xxmissio.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "valadon")
