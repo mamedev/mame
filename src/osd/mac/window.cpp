@@ -69,43 +69,17 @@ bool mac_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter macwindow_init\n");
 
-	// initialize the renderer
-	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,                 // NONE -> no fallback
-		-1,                 // No GDI on macOS
-		VIDEO_MODE_OPENGL,  // BGFX -> OpenGL
-		-1,                 // OpenGL -> no fallback
-		-1,                 // No SDL2ACCEL on macOS
-		-1,                 // No D3D on macOS
-		-1                  // No SOFT on macOS
-	};
+	// initialize the drawers
 
-	int current_mode = video_config.mode;
-	while (current_mode != VIDEO_MODE_NONE)
+	switch (video_config.mode)
 	{
-		bool error = false;
-		switch(current_mode)
-		{
-			case VIDEO_MODE_BGFX:
-				error = renderer_bgfx::init(machine());
-				break;
-			case VIDEO_MODE_OPENGL:
-				renderer_ogl::init(machine());
-				break;
-			default:
-				fatalerror("Unknown video mode.");
-				break;
-		}
-		if (error)
-		{
-			current_mode = fallbacks[current_mode];
-		}
-		else
-		{
+		case VIDEO_MODE_BGFX:
+			renderer_bgfx::init(machine());
 			break;
-		}
+		case VIDEO_MODE_OPENGL:
+			renderer_ogl::init(machine());
+			break;
 	}
-	video_config.mode = current_mode;
 
 	// set up the window list
 	osd_printf_verbose("Leave macwindow_init\n");

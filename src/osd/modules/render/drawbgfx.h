@@ -160,6 +160,7 @@ private:
 	static const uint32_t PACKABLE_SIZE;
 	static const uint32_t WHITE_HASH;
 
+	static bool s_window_set;
 	static uint32_t s_current_view;
 };
 
