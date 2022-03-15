@@ -1571,7 +1571,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: SNK -->
-	<software name="svccard2" supported="partial"> <!-- lots of glitches -->
+	<software name="svccard2">
 		<!-- NGPC only -->
 		<description>SNK vs. Capcom - Card Fighters 2 - Expand Edition (Jpn)</description>
 		<year>2001</year>
