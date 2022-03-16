@@ -39,7 +39,7 @@ TODO
 ====
 Unverified dumps: 1943, Devil World, Donald Land, Donkey Kong Jr., Excitebike, Ice Climber, Kame no Ongaeshi
 
-Missing dumps: Gradius, Senjou no Ookami UNEPROM alt, TwinBee, Punch-Out!!, Volleyball
+Missing dumps: Punch-Out!!
 
 Unverified PCB info: Bomberman, Devil World, Donald Land, Donkey Kong, Donkey Kong Jr., Fighting Golf,
 Gomoku Narabe Renju, Hogan's Alley, Ice Climber, Ice Hockey, Kame no Ongaeshi - Urashima Densetsu,
@@ -54,7 +54,7 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="SSS-UNEPROM-02" />
-			<feature name="mirroring" value="vertical" /> <!-- if correct this implies the game is different from Famicom -->
+			<feature name="mirroring" value="horizontal" /> <!-- real dump is vertical? -->
 			<dataarea name="prg" size="0x20000">
 				<rom name="sss-43 prg" size="0x20000" crc="4e42f13a" sha1="619c8c45c14bb26fee93d0f8646127f30e336128" status="baddump" /> <!-- dump taken from Famicom -->
 			</dataarea>
@@ -309,7 +309,6 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		</part>
 	</software>
 
-<!--
 	<software name="gradius">
 		<description>Gradius</description>
 		<year>1986</year>
@@ -320,14 +319,13 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 			<feature name="pcb" value="SSS-CNROM-01" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="0x8000">
-				<rom name="sss gr-0 prg" size="0x8000" crc="" sha1="" />
+				<rom name="sss gr-0 prg" size="0x8000" crc="cfe41c0c" sha1="d030d1010ec8e97e8f2fa0ef4cb5b76201db4268" />
 			</dataarea>
 			<dataarea name="chr" size="0x8000">
-				<rom name="sss gr-0 chr" size="0x8000" crc="" sha1="" />
+				<rom name="sss gr-0 chr" size="0x8000" crc="de963bec" sha1="ecb76b5897658ebac31a07516bb2a5820279474f" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="hogalley">
 		<description>Hogan's Alley</description>
@@ -586,7 +584,6 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		</part>
 	</software>
 
-<!--
 	<software name="senjokama" cloneof="senjokam">
 		<description>Senjou no Ookami (UNEPROM board)</description>
 		<year>1986</year>
@@ -597,14 +594,13 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 			<feature name="pcb" value="SSS-UNEPROM-02" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="0x20000">
-				<rom name="sss-sj prg" size="0x20000" crc="" sha1="" />
+				<rom name="sss-sj prg" size="0x20000" crc="7c2cbb96" sha1="1e6ef6615c6c45f366263ac39f54f312a37c134f" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge - FIXME space ->
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="soccerlg">
 		<description>Soccer League - Winner's Cup</description>
@@ -697,7 +693,6 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 		</part>
 	</software>
 
-<!--
 	<software name="twinbee">
 		<description>TwinBee</description>
 		<year>1986</year>
@@ -708,16 +703,14 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 			<feature name="pcb" value="SSS-CNROM-01" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="0x8000">
-				<rom name="tw-0" size="0x8000" crc="" sha1="" />
+				<rom name="tw-0" size="0x8000" crc="77756583" sha1="d0c3c21d1ec1d8a00df41f3d92757bc2b86d2869" />
 			</dataarea>
 			<dataarea name="chr" size="0x4000">
-				<rom name="sss tw-0 chr" size="0x4000" crc="" sha1="" />
+				<rom name="sss tw-0 chr" size="0x4000" crc="ebf022eb" sha1="2d1af6ed9411ce41594dcd92387aeb801983467b" />
 			</dataarea>
 		</part>
 	</software>
--->
 
-<!--
 	<software name="volley">
 		<description>Volleyball</description>
 		<year>1986</year>
@@ -728,14 +721,13 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 			<feature name="pcb" value="SSS-NROM-256-02" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="0x8000">
-				<rom name="sss vb-0 prg" size="0x8000" crc="" sha1="" />
+				<rom name="sss vb-0 prg" size="0x8000" crc="9ce5c242" sha1="4cbd1b58333bee32259b9b71bc21877b80ba08ca" />
 			</dataarea>
 			<dataarea name="chr" size="0x2000">
-				<rom name="sss vb-0 chr" size="0x2000" crc="" sha1="" />
+				<rom name="sss vb-0 chr" size="0x2000" crc="213e3193" sha1="52a477bac8c35ef1c38872070ed11beba0d64025" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="wildgunm">
 		<description>Wild Gunman</description>
