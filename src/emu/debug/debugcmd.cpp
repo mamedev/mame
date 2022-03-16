@@ -1052,7 +1052,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, "%c", char(*param));
+					stream << char(*param);
 					param++;
 					params--;
 					break;
@@ -1115,7 +1115,7 @@ void debugger_commands::execute_printf(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_console.printf("%s\n", buffer.str());
+		m_console.printf("%s\n", std::move(buffer).str());
 }
 
 
@@ -1134,7 +1134,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_machine.logerror("%s", buffer.str());
+		m_machine.logerror("%s", std::move(buffer).str());
 }
 
 
@@ -1153,7 +1153,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer.str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 
@@ -1189,7 +1189,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string> &params)
 	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, format.str(), params.size(), values))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer.str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 

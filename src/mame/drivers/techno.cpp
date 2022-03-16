@@ -91,8 +91,8 @@ private:
 	output_finder<48> m_digits;
 	output_finder<96> m_io_outputs;   // 64 lamps + 32 solenoids
 
-	emu_timer *m_irq_set_timer;
-	emu_timer *m_irq_advance_timer;
+	emu_timer *m_irq_set_timer = 0;
+	emu_timer *m_irq_advance_timer = 0;
 
 	bool m_digwait = 0;
 	u8 m_keyrow = 0U;

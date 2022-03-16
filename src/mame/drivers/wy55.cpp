@@ -32,6 +32,7 @@ public:
 
 	void wy55(machine_config &config);
 	void wy65(machine_config &config);
+	void wy185es(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -89,7 +90,7 @@ INPUT_PORTS_END
 
 void wy55_state::wy55(machine_config &config)
 {
-	I8032(config, m_maincpu, 14.7456_MHz_XTAL);
+	I80C32(config, m_maincpu, 14.7456_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy55_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::ext_map);
 	m_maincpu->port_out_cb<1>().set_membank("progbank").bit(2);
@@ -103,6 +104,12 @@ void wy55_state::wy55(machine_config &config)
 	m_screen->set_raw(49.4235_MHz_XTAL, 1575, 0, 1188, 448, 0, 416);
 	//m_screen->set_raw(49.4235_MHz_XTAL * 2 / 3, 1050, 0, 800, 392, 0, 338);
 	m_screen->set_screen_update(FUNC(wy55_state::screen_update));
+}
+
+void wy55_state::wy185es(machine_config &config)
+{
+	wy55(config);
+	m_maincpu->port_out_cb<1>().set_nop();
 }
 
 void wy55_state::wy65(machine_config &config)
@@ -129,6 +136,11 @@ ROM_START(wy65)
 	ROM_LOAD("251455-03.bin", 0x00000, 0x40000, CRC(2afbf73b) SHA1(5a29b78ef377a6e2f2f91ff42a7e4d86eb511a5f)) // v2.1
 ROM_END
 
+ROM_START(wy185es)
+	ROM_REGION(0x10000, "program", 0)
+	ROM_LOAD("251201-03.bin", 0x00000, 0x10000, CRC(5b8cace5) SHA1(484bba8244a99edb80d7f7a5437c2be52c980fc1)) // v2.0
+ROM_END
+
 void wy55_state::driver_start()
 {
 	memory_region *rgn = memregion("program");
@@ -145,5 +157,6 @@ void wy55_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1993, wy55, 0, 0, wy55, wy55, wy55_state, empty_init, "Wyse Technology", "WY-55 (v2.1)", MACHINE_IS_SKELETON)
-COMP(1996, wy65, 0, 0, wy65, wy55, wy55_state, empty_init, "Wyse Technology", "WY-65 (v2.1)", MACHINE_IS_SKELETON)
+COMP(1991, wy185es, 0, 0, wy185es, wy55, wy55_state, empty_init, "Wyse Technology", "WY-185ES (v2.0)", MACHINE_IS_SKELETON)
+COMP(1993, wy55,    0, 0, wy55,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-55 (v2.1)", MACHINE_IS_SKELETON)
+COMP(1996, wy65,    0, 0, wy65,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-65 (v2.1)", MACHINE_IS_SKELETON)

@@ -46,8 +46,6 @@ protected:
 	virtual software_list_loader const &get_software_list_loader() const override;
 
 private:
-	uint8_t const *m_next;
-	uint8_t const *m_end;
 	char const *m_interface;
 	bool m_is_readonly;
 };

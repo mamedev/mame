@@ -178,6 +178,8 @@ static INPUT_PORTS_START( mk3snes )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snes4sl )
+	PORT_INCLUDE(mk3snes)
+
 	PORT_START("S1")
 	PORT_DIPNAME(0x03, 0x00, "Game Time")    PORT_DIPLOCATION("S1:1,2")
 	PORT_DIPSETTING(   0x00, "5 Minutes")
@@ -339,6 +341,8 @@ ROM_START( mk3snes )
 ROM_END
 
 ROM_START( snes4sl )
+	ROM_REGION(0x400000, "user3", ROMREGION_ERASEFF)
+
 	ROM_REGION(0x8000, "mcu", 0)
 	ROM_SYSTEM_BIOS(0, "1207", "12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
 	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(0))
@@ -350,7 +354,7 @@ ROM_END
 
 ROM_START( snes4sln )
 	// identical to NBA Jam (nbajamua)
-	ROM_REGION(0x400000, "game", 0)
+	ROM_REGION(0x400000, "user3", 0)
 	ROM_LOAD("4.bin", 0x000000, 0x080000, CRC(d27bbebe) SHA1(fcf614fcd3c0fb06037038514d828f0cb597838e))
 	ROM_LOAD("3.bin", 0x080000, 0x080000, CRC(c0ca8c3c) SHA1(af5caa1b0254f6b42e4f7f3ba07d0af904017e3c))
 	ROM_LOAD("2.bin", 0x100000, 0x080000, CRC(4de70641) SHA1(1f575282a1bb842afcc80e29cebc13d96f8158a4))
@@ -389,6 +393,6 @@ void snesb51_state::init_fatfurspb()
 
 //    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                 FLAGS
 GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, empty_init,      ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, empty_init,      ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
+GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
 GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg)",     MACHINE_IS_SKELETON )

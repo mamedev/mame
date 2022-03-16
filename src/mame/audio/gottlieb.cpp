@@ -29,24 +29,29 @@ constexpr XTAL SOUND2_SPEECH_CLOCK(3'120'000);
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV0,        gottlieb_sound_r0_device,             "gotsndr0",   "Gottlieb Sound rev. 0")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN2,        gottlieb_sound_p2_device,             "gotsndp2",   "Gottlieb Multi-mode Sound Board")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN3,        gottlieb_sound_p3_device,             "gotsndp3",   "Gottlieb Sound pin. 3")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN4,        gottlieb_sound_p4_device,             "gotsndp4",   "Gottlieb Sound pin. 4")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN5,        gottlieb_sound_p5_device,             "gotsndp5",   "Gottlieb Sound pin. 5")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN6,        gottlieb_sound_p6_device,             "gotsndp6",   "Gottlieb Sound pin. 6")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_PIN7,        gottlieb_sound_p7_device,             "gotsndp7",   "Gottlieb Sound pin. 7")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device, "gotsndr1vt", "Gottlieb Sound rev. 1 with Votrax")
 DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
 
 
 //**************************************************************************
-//  REV 0 SOUND BOARD: 6502 + 6530 + DAC
+//  PIN 2 SOUND BOARD: 6502 + 6530 + DAC
 //**************************************************************************
 
 //-------------------------------------------------
-//  gottlieb_sound_r0_device - constructors
+//  gottlieb_sound_p2_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV0, tag, owner, clock)
+gottlieb_sound_p2_device::gottlieb_sound_p2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GOTTLIEB_SOUND_PIN2, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
-	, m_audiocpu(*this, "audiocpu")
+	, m_cpu(*this, "audiocpu")
 	, m_r6530(*this, "r6530")
 	, m_sndcmd(0)
 {
@@ -57,7 +62,7 @@ gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig
 //  read port -
 //-------------------------------------------------
 
-uint8_t gottlieb_sound_r0_device::r6530b_r()
+uint8_t gottlieb_sound_p2_device::r6530b_r()
 {
 	return m_sndcmd;
 }
@@ -67,7 +72,7 @@ uint8_t gottlieb_sound_r0_device::r6530b_r()
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_r0_device::write(uint8_t data)
+void gottlieb_sound_p2_device::write(uint8_t data)
 {
 	// write the command data to bits 0-3 (also bit 6 used in system1 pinballs)
 	uint8_t pb0_3 = ~data & 0x4f; // U7
@@ -81,7 +86,7 @@ void gottlieb_sound_r0_device::write(uint8_t data)
 //  audio CPU map
 //-------------------------------------------------
 
-void gottlieb_sound_r0_device::gottlieb_sound_r0_map(address_map &map)
+void gottlieb_sound_p2_device::p2_map(address_map &map)
 {
 	map.global_mask(0x0fff);
 	map.unmap_value_high();
@@ -95,10 +100,10 @@ void gottlieb_sound_r0_device::gottlieb_sound_r0_map(address_map &map)
 //  input ports
 //-------------------------------------------------
 
-INPUT_PORTS_START( gottlieb_sound_r0 )
+INPUT_PORTS_START( gottlieb_sound_p2 )
 	PORT_START("SB0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_r0_device, audio_nmi, 0)
-	PORT_DIPNAME( 0x80, 0x00, "Sound or Tones" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_p2_device, audio_nmi, 0)
+	PORT_DIPNAME( 0x80, 0x80, "Sound or Tones" )
 	PORT_DIPSETTING(    0x80, "Sound" )
 	PORT_DIPSETTING(    0x00, "Tones" )
 	PORT_DIPNAME( 0x10, 0x00, "Attract Sound" )
@@ -107,11 +112,11 @@ INPUT_PORTS_START( gottlieb_sound_r0 )
 INPUT_PORTS_END
 
 // The sound test will only work if the 2 above dips are in opposing directions (one off and one on)
-INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
+INPUT_CHANGED_MEMBER( gottlieb_sound_p2_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -119,16 +124,16 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void gottlieb_sound_r0_device::device_add_mconfig(machine_config &config)
+void gottlieb_sound_p2_device::device_add_mconfig(machine_config &config)
 {
 	// audio CPU
-	M6502(config, m_audiocpu, 800'000); // M6503 - clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r0_device::gottlieb_sound_r0_map);
+	M6502(config, m_cpu, 800'000); // M6503 - clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
+	m_cpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p2_device::p2_map);
 
 	// I/O configuration
 	MOS6530(config, m_r6530, 800'000); // same as cpu
 	m_r6530->out_pa_callback().set("dac", FUNC(dac_byte_interface::data_w));
-	m_r6530->in_pb_callback().set(FUNC(gottlieb_sound_r0_device::r6530b_r));
+	m_r6530->in_pb_callback().set(FUNC(gottlieb_sound_p2_device::r6530b_r));
 
 	// sound devices
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.50); // SSS1408-6P
@@ -140,9 +145,9 @@ void gottlieb_sound_r0_device::device_add_mconfig(machine_config &config)
 //  the device's I/O ports
 //-------------------------------------------------
 
-ioport_constructor gottlieb_sound_r0_device::device_input_ports() const
+ioport_constructor gottlieb_sound_p2_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( gottlieb_sound_r0 );
+	return INPUT_PORTS_NAME( gottlieb_sound_p2 );
 }
 
 
@@ -150,7 +155,107 @@ ioport_constructor gottlieb_sound_r0_device::device_input_ports() const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void gottlieb_sound_r0_device::device_start()
+void gottlieb_sound_p2_device::device_start()
+{
+	save_item(NAME(m_sndcmd));
+}
+
+
+//**************************************************************************
+//  PIN 3 SOUND BOARD: 6502 + 6530 + DAC
+//    No schematic found, so it's reversed engineered guesswork
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p3_device - constructors
+//-------------------------------------------------
+
+gottlieb_sound_p3_device::gottlieb_sound_p3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GOTTLIEB_SOUND_PIN3, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "audiocpu")
+	, m_r6530(*this, "r6530")
+	, m_sndcmd(0)
+{
+}
+
+
+//-------------------------------------------------
+//  read port -
+//-------------------------------------------------
+
+uint8_t gottlieb_sound_p3_device::r6530b_r()
+{
+	return m_sndcmd;
+}
+
+//-------------------------------------------------
+//  write port -
+//-------------------------------------------------
+
+void gottlieb_sound_p3_device::r6530b_w(u8 data)
+{
+//	if (BIT(data, 6))
+//		m_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  write - handle an external command write
+//-------------------------------------------------
+
+void gottlieb_sound_p3_device::write(uint8_t data)
+{
+	data = (data ^ 15) & 15;
+	//if (data) printf("%X ",data);
+	u8 pb7 = (data) ? 0 : 0x80;
+	m_sndcmd = data | pb7;
+	//m_r6530->write(2, m_sndcmd);   // has no effect
+	if (!pb7)
+		m_cpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+}
+
+
+//-------------------------------------------------
+//  audio CPU map
+//-------------------------------------------------
+
+void gottlieb_sound_p3_device::p3_map(address_map &map)
+{
+	map.global_mask(0x0fff);
+	map.unmap_value_high();
+	map(0x0000, 0x017f).ram();
+	map(0x0200, 0x03ff).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0400, 0x0fff).rom();
+}
+
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p3_device::device_add_mconfig(machine_config &config)
+{
+	// audio CPU
+	M6502(config, m_cpu, 800'000); // M6503 - clock is a gate, a resistor and a capacitor. Freq 675-1000kHz.
+	m_cpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p3_device::p3_map);
+
+	// I/O configuration
+	MOS6530(config, m_r6530, 800'000); // same as cpu
+	m_r6530->out_pa_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	m_r6530->in_pb_callback().set(FUNC(gottlieb_sound_p3_device::r6530b_r));
+	m_r6530->out_pb_callback().set(FUNC(gottlieb_sound_p3_device::r6530b_w));
+
+	// sound devices
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.50); // SSS1408-6P
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gottlieb_sound_p3_device::device_start()
 {
 	save_item(NAME(m_sndcmd));
 }
@@ -200,20 +305,22 @@ void gottlieb_sound_r1_device::write(u8 data)
 //  audio CPU map
 //-------------------------------------------------
 
-void gottlieb_sound_r1_device::gottlieb_sound_r1_map(address_map &map)
+void gottlieb_sound_r1_device::r1_map(address_map &map)
 {
 	// A15 not decoded except in expansion socket
 	map.global_mask(0x7fff);
+	map.unmap_value_high();
 	map(0x0000, 0x007f).mirror(0x0d80).ram();
 	map(0x0200, 0x021f).mirror(0x0de0).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x1000, 0x1000).mirror(0x0fff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x6000, 0x7fff).rom();
 }
 
-void gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_map(address_map &map)
+void gottlieb_sound_r1_with_votrax_device::r1_map(address_map &map)
 {
 	// A15 not decoded except in expansion socket
-	gottlieb_sound_r1_device::gottlieb_sound_r1_map(map);
+	gottlieb_sound_r1_device::r1_map(map);
+	map.unmap_value_high();
 	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::votrax_data_w));
 	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w));
 }
@@ -251,8 +358,8 @@ INPUT_PORTS_END
 void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 {
 	// audio CPU
-	m6502_device &audiocpu(M6502(config, "audiocpu", SOUND1_CLOCK/4)); // the board can be set to /2 as well
-	audiocpu.set_addrmap(AS_PROGRAM, &gottlieb_sound_r1_device::gottlieb_sound_r1_map);
+	m6502_device &cpu(M6502(config, "audiocpu", SOUND1_CLOCK/4)); // the board can be set to /2 as well
+	cpu.set_addrmap(AS_PROGRAM, &gottlieb_sound_r1_device::r1_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 
@@ -263,7 +370,7 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 	m_riot->irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
 
 	// sound devices
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
+	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 0.25);
 }
 
 
@@ -284,6 +391,8 @@ ioport_constructor gottlieb_sound_r1_device::device_input_ports() const
 
 void gottlieb_sound_r1_device::device_start()
 {
+	// register for save states
+	save_item(NAME(m_dummy));
 }
 
 
@@ -390,7 +499,7 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 
 
 //**************************************************************************
-//  REV 2 SOUND BOARD: 6502 + 2 x DAC + 2 x AY-8913
+//  REV 2 SOUND BOARD: 6502 + 2 x DAC + 2 x AY-8913 + SPO250
 //**************************************************************************
 
 //-------------------------------------------------
@@ -398,137 +507,11 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 //-------------------------------------------------
 
 gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV2, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_audiocpu(*this, "audiocpu"),
-		m_speechcpu(*this, "speechcpu"),
-		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2"),
-		m_sp0250(*this, "spsnd"),
-		m_cobram3_mod(false),
-		m_nmi_timer(nullptr),
-		m_nmi_state(0),
-		m_audiocpu_latch(0),
-		m_speechcpu_latch(0),
-		m_speech_control(0),
-		m_last_command(0),
-		m_psg_latch(0),
-		m_psg_data_latch(0),
-		m_sp0250_latch(0)
+	: gottlieb_sound_p4_device(mconfig, GOTTLIEB_SOUND_REV2, tag, owner, clock)
+	, m_sp0250(*this, "spsnd")
+	, m_cobram3_mod(false)
+	, m_sp0250_latch(0)
 {
-}
-
-
-//-------------------------------------------------
-//  write - handle an external command write
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::write(u8 data)
-{
-	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
-	if (data != 0xff)
-	{
-		// latch data on a timer
-		synchronize(TID_SOUND_LATCH_WRITE, data);
-
-		// if the previous data was 0xff, clock an IRQ on each
-		if (m_last_command == 0xff)
-		{
-			m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-			m_speechcpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		}
-	}
-	m_last_command = data;
-}
-
-
-//-------------------------------------------------
-//  nmi_timer_adjust - adjust the NMI timer to
-//  fire based on its configured rate
-//-------------------------------------------------
-
-inline void gottlieb_sound_r2_device::nmi_timer_adjust()
-{
-	// adjust timer to go off in the future based on the current rate
-	m_nmi_timer->adjust(attotime::from_hz(SOUND2_CLOCK/16) * (256 * (256 - m_nmi_rate)));
-}
-
-
-//-------------------------------------------------
-//  nmi_state_update - update the NMI state based
-//  on the timer firing and the enable control
-//-------------------------------------------------
-
-inline void gottlieb_sound_r2_device::nmi_state_update()
-{
-	// update the NMI line state based on the enable and state
-	m_speechcpu->set_input_line(INPUT_LINE_NMI, (m_nmi_state && (m_speech_control & 1)) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  speech_data_r - read the input command latch
-//  from the audio CPU
-//-------------------------------------------------
-
-uint8_t gottlieb_sound_r2_device::audio_data_r()
-{
-	if (!machine().side_effects_disabled())
-		m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	return m_audiocpu_latch;
-}
-
-
-//-------------------------------------------------
-//  speech_data_r - read the input command latch
-//  from the speech CPU
-//-------------------------------------------------
-
-uint8_t gottlieb_sound_r2_device::speech_data_r()
-{
-	if (!machine().side_effects_disabled())
-		m_speechcpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	return m_speechcpu_latch;
-}
-
-
-//-------------------------------------------------
-//  signal_audio_nmi_r - signal an NMI from the
-//  speech CPU to the audio CPU
-//-------------------------------------------------
-
-uint8_t gottlieb_sound_r2_device::signal_audio_nmi_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
-	return 0xff;
-}
-
-
-//-------------------------------------------------
-//  signal_audio_nmi_w - signal an NMI from the
-//  speech CPU to the audio CPU
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::signal_audio_nmi_w(uint8_t data)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  nmi_rate_w - adjust the NMI rate on the speech
-//  CPU
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::nmi_rate_w(uint8_t data)
-{
-	// the new rate is picked up when the previous timer expires
-	m_nmi_rate = data;
 }
 
 
@@ -600,18 +583,7 @@ void gottlieb_sound_r2_device::speech_control_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  psg_latch_w - store an 8-bit value in the PSG
-//  latch register
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::psg_latch_w(uint8_t data)
-{
-	m_psg_latch = data;
-}
-
-
-//-------------------------------------------------
-//  psg_latch_w - store an 8-bit value in the
+//  sp0250_latch_w - store an 8-bit value in the
 //  SP0250 latch register
 //-------------------------------------------------
 
@@ -625,8 +597,9 @@ void gottlieb_sound_r2_device::sp0250_latch_w(uint8_t data)
 //  sound CPU address map
 //-------------------------------------------------
 
-void gottlieb_sound_r2_device::gottlieb_sound_r2_map(address_map &map)
+void gottlieb_sound_r2_device::r2_dmap(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x03ff).mirror(0x3c00).ram();
 	map(0x4000, 0x4000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::data_w));
 	map(0x4001, 0x4001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::data_w));
@@ -636,11 +609,12 @@ void gottlieb_sound_r2_device::gottlieb_sound_r2_map(address_map &map)
 
 
 //-------------------------------------------------
-//  sppech CPU address map
+//  speech CPU address map
 //-------------------------------------------------
 
-void gottlieb_sound_r2_device::gottlieb_speech_r2_map(address_map &map)
+void gottlieb_sound_r2_device::r2_ymap(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
 	map(0x2000, 0x2000).mirror(0x1fff).w(FUNC(gottlieb_sound_r2_device::sp0250_latch_w));
 	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(gottlieb_sound_r2_device::speech_control_w));
@@ -659,13 +633,10 @@ void gottlieb_sound_r2_device::gottlieb_speech_r2_map(address_map &map)
 
 INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_START("SB2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB2:1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB2:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB2:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB2:4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB2:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB2:6")
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:7")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB2:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB2:2")
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_sound_r2_device, speech_drq_custom_r)
@@ -679,22 +650,22 @@ INPUT_PORTS_END
 void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
 {
 	// audio CPUs
-	M6502(config, m_audiocpu, SOUND2_CLOCK/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::gottlieb_sound_r2_map);
+	M6502(config, m_dcpu, SOUND2_CLOCK/4);
+	m_dcpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::r2_dmap);
 
-	M6502(config, m_speechcpu, SOUND2_CLOCK/4);
-	m_speechcpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::gottlieb_speech_r2_map);
+	M6502(config, m_ycpu, SOUND2_CLOCK/4);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::r2_ymap);
 
 	// sound hardware
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.075); // unknown DAC
-	DAC_8BIT_R2R(config, "dacvol", 0)
+	AD7528(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // Dac A adjusts the ref voltage of DAC B, which in turn makes the sound
+	AD7528(config, "dacvol", 0)
 		.set_output_range(0, 1)
 		.add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI)
-		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 
-	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);
+	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
 
-	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);
+	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
 
 	SP0250(config, m_sp0250, SOUND2_SPEECH_CLOCK).add_route(ALL_OUTPUTS, *this, 1.0);
 }
@@ -717,14 +688,292 @@ ioport_constructor gottlieb_sound_r2_device::device_input_ports() const
 
 void gottlieb_sound_r2_device::device_start()
 {
+	gottlieb_sound_p4_device::device_start();
+
+	// disable the non-speech CPU for cobram3
+	if (m_cobram3_mod)
+		m_dcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	// register for save states
+	save_item(NAME(m_sp0250_latch));
+}
+
+
+//**************************************************************************
+//  PIN4 SOUND BOARD: 6502 + 2 x DAC + 2 x AY-8913
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p4_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p4_device::gottlieb_sound_p4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p4_device(mconfig, GOTTLIEB_SOUND_PIN4, tag, owner, clock)
+{
+}
+
+gottlieb_sound_p4_device::gottlieb_sound_p4_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_dcpu(*this, "audiocpu")
+	, m_dcpu2(*this, "dcpu2")
+	, m_ycpu(*this, "speechcpu")
+	, m_ay1(*this, "ay1")
+	, m_ay2(*this, "ay2")
+	, m_nmi_timer(nullptr)
+	, m_nmi_rate(0)
+	, m_nmi_state(0)
+	, m_dcpu_latch(0)
+	, m_ycpu_latch(0)
+	, m_speech_control(0)
+	, m_last_command(0)
+	, m_psg_latch(0)
+	, m_psg_data_latch(0)
+	, m_dcpu2_latch(0)
+{
+}
+
+
+//-------------------------------------------------
+//  write - handle an external command write
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::write(u8 data)
+{
+	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
+	if (data != 0xff)
+	{
+		// latch data on a timer
+		synchronize(TID_SOUND_LATCH_WRITE, data);
+
+		// if the previous data was 0xff, clock an IRQ on each
+		if (m_last_command == 0xff)
+		{
+			m_dcpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_ycpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			if (m_dcpu2)
+				m_dcpu2->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		}
+	}
+	m_last_command = data;
+}
+
+
+//-------------------------------------------------
+//  nmi_timer_adjust - adjust the NMI timer to
+//  fire based on its configured rate
+//-------------------------------------------------
+
+inline void gottlieb_sound_p4_device::nmi_timer_adjust()
+{
+	// adjust timer to go off in the future based on the current rate
+	m_nmi_timer->adjust(attotime::from_hz(SOUND2_CLOCK/16) * (256 * (256 - m_nmi_rate)));
+}
+
+
+//-------------------------------------------------
+//  nmi_state_update - update the NMI state based
+//  on the timer firing and the enable control
+//-------------------------------------------------
+
+inline void gottlieb_sound_p4_device::nmi_state_update()
+{
+	// update the NMI line state based on the enable and state
+	m_ycpu->set_input_line(INPUT_LINE_NMI, (m_nmi_state && (m_speech_control & 1)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  speech_data_r - read the input command latch
+//  from the audio CPU
+//-------------------------------------------------
+
+uint8_t gottlieb_sound_p4_device::audio_data_r()
+{
+	if (!machine().side_effects_disabled())
+		m_dcpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	return m_dcpu_latch;
+}
+
+
+//-------------------------------------------------
+//  speech_data_r - read the input command latch
+//  from the speech CPU
+//-------------------------------------------------
+
+uint8_t gottlieb_sound_p4_device::speech_data_r()
+{
+	if (!machine().side_effects_disabled())
+		m_ycpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	return m_ycpu_latch;
+}
+
+
+//-------------------------------------------------
+//  signal_audio_nmi_r - signal an NMI from the
+//  speech CPU to the audio CPU
+//-------------------------------------------------
+
+uint8_t gottlieb_sound_p4_device::signal_audio_nmi_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_dcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_dcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		if (m_dcpu2)
+		{
+			m_dcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_dcpu2->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		}
+	}
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  signal_audio_nmi_w - signal an NMI from the
+//  speech CPU to the audio CPU
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::signal_audio_nmi_w(uint8_t data)
+{
+	m_dcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_dcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if (m_dcpu2)
+	{
+		m_dcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_dcpu2->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  nmi_rate_w - adjust the NMI rate on the speech
+//  CPU
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::nmi_rate_w(uint8_t data)
+{
+	// the new rate is picked up when the previous timer expires
+	m_nmi_rate = data;
+}
+
+
+//-------------------------------------------------
+//  speech_control_w - primary audio control
+//  register on the speech board
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::speech_ctrl_w(uint8_t data)
+{
+	uint8_t previous = m_speech_control;
+	m_speech_control = data;
+
+	// bit 0 enables/disables the NMI line
+	nmi_state_update();
+
+	// bit 1 controls a LED on the sound board
+
+	// bits 2-4 control the AY-8913
+	// bit 2 goes to 8913 BDIR pin
+	if ((previous & 0x04) != 0 && (data & 0x04) == 0)
+	{
+		// bit 3 selects which of the two 8913 to enable
+		// bit 4 goes to the 8913 BC1 pin
+		if ((data & 0x08) != 0)
+			m_ay1->data_address_w(data >> 4, m_psg_latch);
+		else
+			m_ay2->data_address_w(data >> 4, m_psg_latch);
+	}
+}
+
+
+//-------------------------------------------------
+//  psg_latch_w - store an 8-bit value in the PSG
+//  latch register
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::psg_latch_w(uint8_t data)
+{
+	m_psg_latch = data;
+}
+
+
+//-------------------------------------------------
+//  sound CPU address map
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::p4_dmap(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4000).mirror(0x3fff).r(FUNC(gottlieb_sound_p4_device::audio_data_r));
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x8000, 0xffff).rom();
+}
+
+
+//-------------------------------------------------
+//  speech CPU address map
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::p4_ymap(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x1800).ram(); // 6116 @ H3
+	map(0x2000, 0x2000).mirror(0x1fff).nopw(); // unemulated variable butterworth filter (HC592, LS74, MF-4)
+	map(0x4000, 0x4000).nopr();
+	map(0x6000, 0x6000).mirror(0x07ff).w(FUNC(gottlieb_sound_p4_device::nmi_rate_w));
+	map(0x6800, 0x6800).mirror(0x07ff).r(FUNC(gottlieb_sound_p4_device::speech_data_r));
+	map(0x7000, 0x7000).mirror(0x07ff).rw(FUNC(gottlieb_sound_p4_device::signal_audio_nmi_r), FUNC(gottlieb_sound_p4_device::signal_audio_nmi_w));
+	map(0x8000, 0x8000).mirror(0x1fff).w(FUNC(gottlieb_sound_p4_device::psg_latch_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(gottlieb_sound_p4_device::speech_ctrl_w));
+	map(0x8000, 0xffff).rom();
+}
+
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::device_add_mconfig(machine_config &config)
+{
+	// audio CPUs
+	M6502(config, m_dcpu, SOUND2_CLOCK/2);
+	m_dcpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p4_device::p4_dmap);
+
+	M6502(config, m_ycpu, SOUND2_CLOCK/2);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p4_device::p4_ymap);
+
+	// sound hardware
+	AD7528(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	AD7528(config, "dacvol", 0)
+		.set_output_range(0, 1)
+		.add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI)
+		.add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
+
+	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
+
+	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.5);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gottlieb_sound_p4_device::device_start()
+{
 	// set up the NMI timer
 	m_nmi_timer = timer_alloc(TID_NMI_GENERATE);
 	m_nmi_rate = 0;
 	nmi_timer_adjust();
-
-	// disable the non-speech CPU for cobram3
-	if (m_cobram3_mod)
-		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	// register for save states
 	save_item(NAME(m_nmi_rate));
@@ -733,7 +982,7 @@ void gottlieb_sound_r2_device::device_start()
 	save_item(NAME(m_last_command));
 	save_item(NAME(m_psg_latch));
 	save_item(NAME(m_psg_data_latch));
-	save_item(NAME(m_sp0250_latch));
+	save_item(NAME(m_dcpu2_latch));
 }
 
 
@@ -741,7 +990,7 @@ void gottlieb_sound_r2_device::device_start()
 //  device_timer - handle timer-based behaviors
 //-------------------------------------------------
 
-void gottlieb_sound_r2_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+void gottlieb_sound_p4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -765,9 +1014,180 @@ void gottlieb_sound_r2_device::device_timer(emu_timer &timer, device_timer_id id
 
 		case TID_SOUND_LATCH_WRITE:
 			// each CPU has its own latch
-			m_audiocpu_latch = param;
-			m_speechcpu_latch = param;
+			m_dcpu_latch = param;
+			m_ycpu_latch = param;
+			if (m_dcpu2)
+				m_dcpu2_latch = param;
 			break;
 	}
 }
 
+
+//**************************************************************************
+//  PIN5 SOUND BOARD: same as p4 + YM2151
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p5_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p5_device::gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p4_device(mconfig, GOTTLIEB_SOUND_PIN5, tag, owner, clock)
+	, m_ym2151(*this, "ym2151")
+{
+}
+
+gottlieb_sound_p5_device::gottlieb_sound_p5_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: gottlieb_sound_p4_device(mconfig, type, tag, owner, clock)
+	, m_ym2151(*this, "ym2151")
+{
+}
+
+void gottlieb_sound_p5_device::p5_ymap(address_map &map)
+{
+	gottlieb_sound_p4_device::p4_ymap(map);
+	map.unmap_value_high();
+	map(0x4000, 0x4000).mirror(0x1fff).lw8(NAME([this] (u8 data)
+		{ if (BIT(m_speech_control, 7)) m_ym2151->data_w(data); else m_ym2151->address_w(data); } ));
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p5_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_p4_device::device_add_mconfig(config);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p5_device::p5_ymap);
+
+	YM2151(config, m_ym2151, SOUND2_CLOCK).add_route(ALL_OUTPUTS, *this, 0.5);
+}
+
+void gottlieb_sound_p5_device::device_start()
+{
+	gottlieb_sound_p4_device::device_start();
+}
+
+
+//**************************************************************************
+//  PIN6 SOUND BOARD: same as p5 + extra 6502 + AD7528
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p6_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p6_device::gottlieb_sound_p6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p5_device(mconfig, GOTTLIEB_SOUND_PIN6, tag, owner, clock)
+{
+}
+
+
+uint8_t gottlieb_sound_p6_device::d2_data_r()
+{
+	if (!machine().side_effects_disabled())
+		m_dcpu2->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	return m_dcpu2_latch;
+}
+
+void gottlieb_sound_p6_device::p6_dmap(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4000).mirror(0x3fff).r(FUNC(gottlieb_sound_p6_device::d2_data_r));
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol2", FUNC(dac_byte_interface::data_w));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac2", FUNC(dac_byte_interface::data_w));
+	map(0x8000, 0xffff).rom();
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p6_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_p5_device::device_add_mconfig(config);
+
+	// extra cpu + dac
+	M6502(config, m_dcpu2, SOUND2_CLOCK/2);
+	m_dcpu2->set_addrmap(AS_PROGRAM, &gottlieb_sound_p6_device::p6_dmap);
+
+	AD7528(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	AD7528(config, "dacvol2", 0)
+		.set_output_range(0, 1)
+		.add_route(0, "dac2", 1.0, DAC_INPUT_RANGE_HI)
+		.add_route(0, "dac2", -1.0, DAC_INPUT_RANGE_LO);
+}
+
+void gottlieb_sound_p6_device::device_start()
+{
+	gottlieb_sound_p5_device::device_start();
+}
+
+
+//**************************************************************************
+//  PIN7 SOUND BOARD: same as p5 + MSM6295
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_p7_device - constructor
+//-------------------------------------------------
+
+gottlieb_sound_p7_device::gottlieb_sound_p7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gottlieb_sound_p5_device(mconfig, GOTTLIEB_SOUND_PIN7, tag, owner, clock)
+	, m_oki(*this, "oki")
+{
+}
+
+void gottlieb_sound_p7_device::y_ctrl_w(uint8_t data)
+{
+	gottlieb_sound_p4_device::speech_ctrl_w(data);
+
+	if (BIT(m_speech_control, 5))
+		m_msm_latch2 = m_msm_latch1;
+	if (!BIT(m_msm_latch2, 2))
+		m_oki->write(m_msm_latch1);
+	m_oki->set_pin7(BIT(m_msm_latch2, 4));
+	u8 t = BIT(m_msm_latch2, 6) | (BIT(m_msm_latch2, 3) << 1);
+	m_oki->set_rom_bank(t);
+}
+
+void gottlieb_sound_p7_device::y_latch_w(uint8_t data)
+{
+	m_msm_latch1 = data;
+	if (!BIT(m_msm_latch2, 2))
+		m_oki->write(m_msm_latch1);
+}
+
+void gottlieb_sound_p7_device::p7_ymap(address_map &map)
+{
+	gottlieb_sound_p5_device::p5_ymap(map);
+	map.unmap_value_high();
+	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(gottlieb_sound_p7_device::y_latch_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(gottlieb_sound_p7_device::y_ctrl_w));
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void gottlieb_sound_p7_device::device_add_mconfig(machine_config &config)
+{
+	gottlieb_sound_p5_device::device_add_mconfig(config);
+	m_ycpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_p7_device::p7_ymap);
+
+	OKIM6295(config, m_oki, 4_MHz_XTAL/4, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, *this, 1.0);
+}
+
+void gottlieb_sound_p7_device::device_start()
+{
+	gottlieb_sound_p5_device::device_start();
+	save_item(NAME(m_msm_latch1));
+	save_item(NAME(m_msm_latch2));
+}

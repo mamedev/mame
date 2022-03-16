@@ -2215,6 +2215,10 @@ end
 --------------------------------------------------
 -- Sharp SM510 series
 --@src/devices/cpu/sm510/sm510.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm511.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm530.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm590.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm5a.h,CPUS["SM510"] = true
 --------------------------------------------------
 
 if CPUS["SM510"] then

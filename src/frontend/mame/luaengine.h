@@ -123,6 +123,8 @@ private:
 	struct addr_space;
 	class tap_helper;
 	class addr_space_change_notif;
+	class symbol_table_wrapper;
+	class expression_wrapper;
 
 	struct save_item {
 		void *base;

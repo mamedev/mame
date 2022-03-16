@@ -12499,6 +12499,7 @@ bmclubmx                        // GX993 (c) 2000 (Japan)
 bmcmxaac                        // GX858 (c) 1999 (Asia)
 bmcompm2                        // GX988 (c) 2000 (Japan)
 bmcompmx                        // GX858 (c) 1999 (Japan)
+bmcompmxb                       // GX858 (c) 1999 (Japan)
 bmcorerm                        // GXA05 (c) 1999 (Japan)
 bmdct                           // GX995 (c) 2000 (Japan)
 bmfinal                         // GXC01 (c) 2002 (Japan)
@@ -13627,7 +13628,8 @@ eva11                           //
 eva24                           //
 
 @source:evmbug.cpp
-evmbug                          //
+evmbug                          // TI TMAM6095
+tms9995bb                       // TMS9995 breadboard
 
 @source:ews4800.cpp
 ews4800_310                     // NEC EWS4800/310
@@ -16613,6 +16615,9 @@ ktopgun                         // Konami
 kvakazad                        // Elektronika
 morataka                        // Elektronika
 nochnyev                        // Elektronika
+nsmb3                           // Nelsonic
+nsmw                            // Nelsonic
+nstarfox                        // Nelsonic
 nummunch                        // VTech
 nupogodi                        // Elektronika
 okhota                          // Elektronika
@@ -19847,6 +19852,7 @@ hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
 jppyex98                        // 1998 - Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)
+kicknkick                       // 2001 - Kick & Kick (GNA36 VER. EAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -23974,6 +23980,7 @@ desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
 doab                            // 1996.12 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
+doaab                           // 1996.11 Dead or Alive (Revision A)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -32199,7 +32206,7 @@ starbladj                       // (c) 1991 (Japan)
 driveyes                        // (c) 1992?
 
 @source:namcos22.cpp
-acedrvrw                        // (c) 1994
+acedrive                        // (c) 1994
 adillor                         // (c) 1997
 adillorj                        // (c) 1997
 airco22b                        // (c) 1995
@@ -32218,22 +32225,25 @@ dirtdasha                       // (c) 1995
 dirtdashj                       // (c) 1995
 propcycl                        // (c) 1996
 propcyclj                       // (c) 1996
-raveracj                        // (c) 1995
-raveracja                       // (c) 1995
-raveracw                        // (c) 1995
+raverace                        // (c) 1995
+raveracej                       // (c) 1995
+raveraceja                      // (c) 1995
 ridgera2                        // (c) 1994
+ridgera28                       // (c) 1994
 ridgera2j                       // (c) 1994
 ridgera2ja                      // (c) 1994
 ridgerac                        // (c) 1993
-ridgerac3                       // (c) 1993
+ridgeraca                       // (c) 1993
 ridgeracb                       // (c) 1993
+ridgeracc                       // (c) 1993
 ridgeracf                       // (c) 1993
 ridgeracj                       // (c) 1993
 timecris                        // (c) 1995
 timecrisa                       // (c) 1995
 tokyowar                        // (c) 1996
 tokyowarj                       // (c) 1996
-victlapw                        // (c) 1996
+victlap                         // (c) 1996
+victlapa                        // (c) 1996
 victlapj                        // (c) 1996
 
 @source:namcos23.cpp
@@ -43779,6 +43789,7 @@ wy50                            // WY-50
 wy75                            // WY-75
 
 @source:wy55.cpp
+wy185es                         // WY-185ES
 wy55                            // WY-55
 wy65                            // WY-65
 

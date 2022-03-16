@@ -114,7 +114,7 @@ P Hyper Bishi Bashi Champ                       1998.07    GC876 EA          (no
 P Hyper Bishi Bashi Champ - 2 Player            1999.08    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
 P *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
-? *Kick & Kick                                  2001
+K *Kick & Kick                                  2001       GNA36 EA          (no CD)
 P Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
 P Konami 80's AC Special                        1998       GC826 UA          826 UA A01
 D *Mambo a GoGo                                 2001.06
@@ -125,10 +125,11 @@ P Salary Man Champ - 2 Player                   2001.02    GCA18 JA          A18
 P *Step Champ                                   1999.12
 
 P: plain System573
-A: uses ext. analog I/O board
-D: uses ext. digital sound and I/O board
-N: uses network PCB unit + ext. digital sound and I/O board
+A: uses ext. analog I/O board GX700-PWB(F)
+D: uses ext. digital sound and I/O board GX894-PWB(B)
+N: uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
 G: gun mania only, drives air soft gun (this game uses real BB bullet)
+K: uses alt. ext. analog I/O board GX700-PWB(K)
 
   Note:
        Not all games listed above are confirmed to run on System 573.
@@ -289,6 +290,47 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
         CN5 - To control lever unit (1P). uses 9 pins out of 15 pins of B15P-SHF-1AA
         CN6 - To control lever unit (2P). uses 9 pins out of 14 pins of B14P-SHF-1AA
         (CN4, CN3, CN2 is printed pattern only, no actual connector)
+
+
+GX700-PWB(K)A (C)2000 KONAMI
+|-----------------------------|
+|    CN9        CN4	        |
+|         CN3          CN5    |
+|                             |
+|   U2 U1                     |
+|                             |-----------------|
+|                                    CN6        |
+|         U3   U4 U5   U6                       |
+|   U7    U8         				 U9-U16       |
+|               U17  U18                        |
+|                                               |
+|    U19                                        |
+|         U20   U21            CN1              |
+|        CN7   CN8             CN2              |
+|-----------------------------------------------|
+Notes: (all ICs shown)
+
+		CN1        - (bottom) Connector joining this PCB to the MAIN PCB
+		CN2        - (unpopulated custom 80-pin)
+		CN3        - JST ??12
+		CN4        - JST ??12
+		CN5        - JST ??12
+		CN6        - JST ??10
+		CN7        - (unpopulated 5-pin)
+		CN8        - (unpopulated 8-pin)
+		CN9        - (unpopulated 4-pin)
+		U1         - Maxim DS2401 (SOIC6)
+		U2         - (unpopulated SOIC8)
+		U3         - Motorola 74LS74A (SOIC14)
+		U4,U5,U6   - Motorola 74LS244 (SOIC20)
+		U7         - (unpopulated 4-pad)
+		U8         - AMD PALCE16V8Q-15, stamped 'X700K01' (DIP20)
+		U9-16      - Sharp PC817XF (DIP4)
+		U17        - TI 74LV245A (SOIC20)
+		U18        - Motorola 74LS273 (SOIC20)
+		U19        - (unpopulated PLCC44 socket)
+		U20        - (unpopulated SOIC16)
+		U21        - (unpopulated SOIC16)
 
 
   PCMCIA Flash Card
@@ -503,7 +545,10 @@ public:
 		m_gunx(*this, "GUNX"),
 		m_sensor(*this, "SENSOR"),
 		m_encoder(*this, "ENCODER"),
-		m_gunmania_id(*this, "gunmania_id"),
+		m_kicksensor1(*this, "KICK_SENSOR1"),
+		m_kicksensor2(*this, "KICK_SENSOR2"),
+		m_kicksensor3(*this, "KICK_SENSOR3"),
+		m_ds2401_id(*this, "ds2401_id"),
 		m_duart(*this, "mb89371"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_sys573_jvs_host(*this, "sys573_jvs_host")
@@ -530,11 +575,11 @@ public:
 	void mamboagga(machine_config &config);
 	void gunmania(machine_config &config);
 	void hypbbc2p(machine_config &config);
-	void gtrfrk2m(machine_config& config);
-	void gtrfrk2ml(machine_config& config);
+	void gtrfrk2m(machine_config &config);
+	void gtrfrk2ml(machine_config &config);
 	void gtrfrk5m(machine_config &config);
 	void ddrs2k(machine_config &config);
-	void stepchmp(machine_config& config);
+	void stepchmp(machine_config &config);
 	void animechmp(machine_config &config);
 	void salarymc(machine_config &config);
 	void gbbchmp(machine_config &config);
@@ -558,9 +603,11 @@ public:
 	void dsem2(machine_config &config);
 	void dmx(machine_config &config);
 	void drmn(machine_config &config);
+	void kicknkick(machine_config &config);
 	void k573d(machine_config &config);
 	void k573k(machine_config &config);
 	void k573a(machine_config &config);
+	void k573ak(machine_config &config);
 	void pccard1_16mb(machine_config &config);
 	void pccard1_32mb(machine_config &config);
 	void pccard2_32mb(machine_config &config);
@@ -645,6 +692,8 @@ private:
 	void ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gx700pwbf_io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gx700pwbk_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gx700pwbk_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gunmania_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
@@ -676,6 +725,7 @@ private:
 	void gbbchmp_map(address_map &map);
 	void konami573_map(address_map &map);
 	void konami573a_map(address_map &map);
+	void konami573ak_map(address_map &map);
 	void konami573d_map(address_map &map);
 	void konami573k_map(address_map &map);
 
@@ -756,7 +806,10 @@ private:
 	optional_ioport m_gunx;
 	optional_ioport m_sensor;
 	optional_ioport m_encoder;
-	optional_device<ds2401_device> m_gunmania_id;
+	optional_ioport m_kicksensor1;
+	optional_ioport m_kicksensor2;
+	optional_ioport m_kicksensor3;
+	optional_device<ds2401_device> m_ds2401_id;
 	optional_device<mb89371_device> m_duart;
 	output_finder<2> m_lamps;
 
@@ -813,6 +866,12 @@ void ksys573_state::konami573a_map(address_map &map)
 	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::gx700pwbf_io_r), FUNC(ksys573_state::gx700pwbf_io_w));
 }
 
+void ksys573_state::konami573ak_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::gx700pwbk_io_r), FUNC(ksys573_state::gx700pwbk_io_w));
+}
+
 void ksys573_state::fbaitbc_map(address_map &map)
 {
 	konami573_map(map);
@@ -825,7 +884,7 @@ void ksys573_state::gunmania_map(address_map &map)
 	map(0x1f640000, 0x1f6400ff).rw(FUNC(ksys573_state::gunmania_r), FUNC(ksys573_state::gunmania_w));
 }
 
-void ksys573_state::gbbchmp_map(address_map& map)
+void ksys573_state::gbbchmp_map(address_map &map)
 {
 	konami573_map(map);
 	// The game waits until transmit is ready, but the chip may not actually be present.
@@ -1270,6 +1329,46 @@ void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func
 	m_gx700pwfbf_output_callback = output_callback_func;
 
 	save_item( NAME( m_gx700pwbf_output_data ) );
+}
+
+/*
+
+GX700-PWB(K)
+
+Analogue I/O board
+
+*/
+
+uint16_t ksys573_state::gx700pwbk_io_r(offs_t offset, uint16_t mem_mask)
+{
+	uint32_t data = 0;
+
+	switch (offset)
+	{
+	case 0x40:
+		data = m_kicksensor1->read();
+		break;
+
+	case 0x48:
+		data = m_kicksensor2->read();
+		break;
+
+	case 0x50:
+		data = m_kicksensor3->read();
+		break;
+	}
+
+	return data;
+}
+
+void ksys573_state::gx700pwbk_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	switch (offset)
+	{
+	case 0x60:
+		m_ds2401_id->write(!BIT(data, 15));
+		break;
+	}
 }
 
 /*
@@ -2208,7 +2307,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	switch( offset )
 	{
 	case 0x4c:
-		m_gunmania_id->write( ( data >> 5 ) & 1 );
+		m_ds2401_id->write( ( data >> 5 ) & 1 );
 		break;
 
 	case 0x54:
@@ -2440,6 +2539,12 @@ void ksys573_state::k573a(machine_config &config)
 {
 	konami573(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573a_map);
+}
+
+void ksys573_state::k573ak(machine_config &config)
+{
+   konami573(config);
+   m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573ak_map);
 }
 
 void ksys573_state::pccard1_16mb(machine_config &config)
@@ -2741,14 +2846,14 @@ void ksys573_state::gtrfrks(machine_config &config)
 	cassx(config);
 }
 
-void ksys573_state::gtrfrk2m(machine_config& config)
+void ksys573_state::gtrfrk2m(machine_config &config)
 {
 	k573a(config);
 	cassyi(config);
 	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
 }
 
-void ksys573_state::gtrfrk2ml(machine_config& config)
+void ksys573_state::gtrfrk2ml(machine_config &config)
 {
 	k573a(config);
 	cassyi(config);
@@ -2847,7 +2952,7 @@ void ksys573_state::animechmp(machine_config &config)
 	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config("game", [this](device_t* device) { animechmp_cassette_install(device); });
 }
 
-void ksys573_state::stepchmp(machine_config& config)
+void ksys573_state::stepchmp(machine_config &config)
 {
 	konami573(config);
 	cassyi(config);
@@ -2863,7 +2968,7 @@ void ksys573_state::salarymc(machine_config &config)
 	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { salarymc_cassette_install(device); } );
 }
 
-void ksys573_state::gbbchmp(machine_config& config)
+void ksys573_state::gbbchmp(machine_config &config)
 {
 	animechmp(config);
 	MB89371(config, m_duart, 0);
@@ -2901,7 +3006,7 @@ void ksys573_state::gunmania(machine_config &config)
 	konami573(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::gunmania_map);
 
-	DS2401( config, "gunmania_id" );
+	DS2401( config, "ds2401_id" );
 	pccard2_32mb(config);
 }
 
@@ -2925,6 +3030,12 @@ void ksys573_state::mamboagga(machine_config &config)
 {
 	mamboagg(config);
 	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+}
+
+void ksys573_state::kicknkick(machine_config &config)
+{
+	DS2401(config, "ds2401_id");
+	k573ak(config);
 }
 
 static INPUT_PORTS_START( konami573 )
@@ -3264,7 +3375,7 @@ static INPUT_PORTS_START( gunmania )
 
 	PORT_START( "GUNX" )
 	PORT_BIT( 0x7f, 0x2f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_MINMAX( 0x00,0x5f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "gunmania_id", ds2401_device, read )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "ds2401_id", ds2401_device, read )
 
 	PORT_START( "GUNY" )
 	PORT_BIT( 0x7f, 0x1f, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_MINMAX( 0x00,0x3f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 )
@@ -3447,6 +3558,51 @@ static INPUT_PORTS_START( gchgchmp )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON4 */
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON5 */
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kicknkick )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY( "IN2" )
+	PORT_BIT( 0xffff5ffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) // Skips data verification on boot
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER( 1 ) PORT_NAME( "Select L" )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_PLAYER( 1 ) PORT_NAME( "Select R" )
+
+	PORT_MODIFY( "IN3" )
+	PORT_BIT( 0xfffffbff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "KICK_SENSOR1" )
+	PORT_BIT( 0xffff02ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 1 ) PORT_NAME( "F1" )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 1 ) PORT_NAME( "F2" )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "F3" )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 1 ) PORT_NAME( "F4" )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER( 1 ) PORT_NAME( "H10" )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER( 1 ) PORT_NAME( "H9" )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "ds2401_id", ds2401_device, read )
+
+	PORT_START( "KICK_SENSOR2" )
+	PORT_BIT( 0xffff00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER( 1 ) PORT_NAME( "H8" )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 ) PORT_NAME( "H7" )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER( 1 ) PORT_NAME( "H6" )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER( 1 ) PORT_NAME( "H5" )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 1 ) PORT_NAME( "H4" )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "H3" )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 1 ) PORT_NAME( "H2" )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 1 ) PORT_NAME( "H1" )
+
+	PORT_START( "KICK_SENSOR3" )
+	PORT_BIT( 0xffff00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER( 1 ) PORT_NAME( "V8" )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 ) PORT_NAME( "V7" )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER( 1 ) PORT_NAME( "V6" )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER( 1 ) PORT_NAME( "V5" )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 1 ) PORT_NAME( "V4" )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "V3" )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 1 ) PORT_NAME( "V2" )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 1 ) PORT_NAME( "V1" )
 INPUT_PORTS_END
 
 #define SYS573_BIOS_A \
@@ -5195,7 +5351,7 @@ ROM_END
 ROM_START( gunmania )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x000008, "gunmania_id", 0 ) /* digital board id */     \
+	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */     \
 	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
 	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
@@ -5931,6 +6087,30 @@ ROM_START( strgchmp )
 	ROM_LOAD( "710uaa.22h",   0x000000, 0x002000, CRC(a3e93d49) SHA1(630daa1a02320433a068eb5214f6b30acc06df76) )
 ROM_END
 
+ROM_START( kicknkick )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */     \
+	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31m",   0x000000, 0x200000, CRC(f7461ee1) SHA1(60898894237ef2c478eb91c1d11e0f2beda7d55c) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27m",   0x000000, 0x200000, CRC(80379c73) SHA1(9e226c258570efc6c45b76b277010c23527ce480) )
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31l",   0x000000, 0x200000, CRC(a1129729) SHA1(50b8134b2fd6fd82ad1e95db39633f1e338174ea) )
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27l",   0x000000, 0x200000, CRC(8f489306) SHA1(d5a27ed048139fd46404cb11e5d42a813989e0ab) )
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31j",   0x000000, 0x200000, CRC(4608ab06) SHA1(033e30f0a866bcedd9b718d234e788c8919f7f3a) )
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27j",   0x000000, 0x200000, CRC(1f75eb84) SHA1(c54c4221a2fa0668b688ec2479abf1838461493a) )
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.31h",   0x000000, 0x200000, CRC(6475da5f) SHA1(6b1de2ed06504583bfa3e5b11851c459d227e6d8) )
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
+	ROM_LOAD( "a36eaa.27h",   0x000000, 0x200000, CRC(1179ab7b) SHA1(19a316cacb6eb87b905884091820e6b53aef64b7) )
+ROM_END
+
 
 GAME( 1997, sys573,    0,        konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
 
@@ -6047,6 +6227,7 @@ GAME( 2001, pcnfrk4mk, pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_ini
 GAME( 2001, drmn4m,    pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 4th Mix (G*A25 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk5m,  sys573,   gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, kicknkick, sys573,   kicknkick,  kicknkick, ksys573_state, empty_init,    ROT0,  "Konami", "Kick & Kick (GNA36 VER. EAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, mamboagg,  sys573,   mamboagg,   mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, mamboagga, mamboagg, mamboagga,  mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go e-Amusement (GQA40 VER. JRB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */

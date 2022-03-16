@@ -25,7 +25,6 @@ Items with * are in the list, but are bad dumps or incomplete.
 
 
                             Title                                           Publisher              Release date  Media
-2069 AD                                                             Mahou (Nihon Home Data)           1991/11    FD×03
 ADPCM Kaihatsu Shien Library V1.1                                   Fujitsu                           1991/7     FD
 ADPCM Kaihatsu Shien Library V2.1                                   Fujitsu                           1992/6     FD
 AgentNet V1.0 (V1.1)                                                CSK Research Institute (CRI)      1990/12    FD
@@ -142,7 +141,6 @@ Music Pro-Towns (MIDI)                                              Musical Plan
 Natya                                                               Rimshot                           1990/6     FD×02
 Nihongo Microsoft Windows V3.0 Multimedia Kaihatsu Kit              Fujitsu                           1992/12    FD×03
 Nihongo Microsoft Windows V3.0 Multimedia Kaihatsu Kit              Fujitsu                           1992/12    FD×03
-Nihongo MS-DOS V3.1 (Basic)                                         Fujitsu                           1992/11    FD
 Nihongo MS-DOS V3.1 (Extended)                                      Fujitsu                           1992/7     FD
 * Nihongo MS-DOS V5.0 (Basic)                                       Fujitsu                           1992/11    FD
 Nihongo MS-DOS V5.0 (Extended)                                      Fujitsu                           1993/6     FD
@@ -175,7 +173,6 @@ Shisetsu Sengoku Jidai                                              Tensui Softw
 Shougakkou Sansuu Simulation 4-nen                                  Tokyo Shoseki                     1991/9     FD
 Shougakkou Sansuu Simulation 5-nen                                  Tokyo Shoseki                     1991/9     FD
 Shougakkou Sansuu Simulation 6-nen                                  Tokyo Shoseki                     1991/9     FD
-Shougi Shouten                                                      Mahou (Nihon Home Data)           1992/4     FD×02
 Shougi Taishou V2                                                   Shoudai Sangyou                   1993/1     FD×02
 Shougi Taishoui                                                     Shoudai Sangyou                   1992/12    FD×02
 SimCity Terrain Editor                                              Fujitsu                           1992/6     FD
@@ -238,14 +235,39 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 
 -->
 
-	<!-- Power-Up Kit works, but Map Construction asks for the system disk and fails to recognize it -->
-	<software name="aressh4m" supported="partial">
+	<software name="2069ad">
+		<description>2069 AD</description>
+		<year>1991</year>
+		<publisher>ホームデータ (Home Data)</publisher>
+		<info name="release" value="199111xx" />
+		<info name="usage" value="Requires 2 MB RAM" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3445795">
+				<rom name="2069ad_disk_a.mfm" size="3445795" crc="3ada0314" sha1="20d0f2b7a7948dbe6764cfc8c28c6d62dfc72891"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="2069ad_disk_b.hdm" size="1261568" crc="7e590551" sha1="e9c64057356a0811404548529006951224f59074"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="2069ad_disk_c.hdm" size="1261568" crc="b0e32279" sha1="44deb06020f3a727c095abc99fc3664a44b8a04b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aressh4m">
 		<description>AIV - A Ressha de Ikou 4 - Map Construction + Power-Up Kit</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="A列車で行こう4 マップコンストラクション＋パワーアップキット" />
 		<info name="release" value="199404xx" />
-		<info name="usage" value="Requires 4 MB RAM and HDD installation. To install, boot TownsOS, insert the original A4 CD and run the INSTALL.EXP (Power-Up Kit) or INSTALLM.EXP (Map Construction) files from the Construction Disk." />
+		<info name="usage" value="Requires 2 MB RAM (4 for HDD version). To run directly, insert the Construction Disk (for Power-Up Kit) or System Disk (for Map Construction) and boot from the original A4 CD. To install to HDD, boot TownsOS, insert the original A4 CD and run the INSTALL.EXP (Power-Up Kit) or INSTALLM.EXP (Map Construction) files from the Construction Disk." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Construction Disk" />
 			<dataarea name="flop" size="1261568">
@@ -254,8 +276,8 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="a4_powerup_system_disk.hdm" size="1261568" crc="da6ab3b4" sha1="10318fb89945ba4a46a90ae659cf69753c17e447"/>
+			<dataarea name="flop" size="3444704">
+				<rom name="a4_powerup_system_disk.mfm" size="3444704" crc="6b6e695d" sha1="0aaf138a59a479fa7dfdfd469f3fb07b71952dd9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
@@ -875,6 +897,27 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<!--
+	    Compatible with FMR-50, Panacom M353 and FM Towns, according to the box.
+
+	    The original disk was already installed with the system files from the FMR version of DOS. This causes the installer to not work
+	    anymore with the FM Towns version of DOS due to SYS.EXE not finding the correct system files and the disk having the wrong boot sector.
+	    It's possible to run the executable files directly, but the game gets stuck at a screen that says "I do not know how to play the fortress".
+	    It's unclear if this is due to the protection check or something else.
+	-->
+	<software name="fortress" supported="no">
+		<description>Fortress</description>
+		<year>1989</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="serial" value="F-3551"/>
+		<info name="alt_title" value="フォートレス" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3445220">
+				<rom name="fortress.mfm" size="3445220" crc="b177ee69" sha1="b75c4d95306099ab43da20c9866627a30bde256f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Bundled with "Oh! FM Towns Shinsoukan No.1" magazine -->
 	<software name="futoph01">
 		<description>Futoppara FD Heisei 1-gou</description>
@@ -1446,6 +1489,26 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<software name="msdos31l36">
+		<description>Nihongo MS-DOS V3.1 L36 (Kihon Kinou)</description>
+		<year>1992</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276A300"/>
+		<info name="alt_title" value="日本語ＭＳ－ＤＯＳ　Ｖ３．１　Ｌ３６　（基本機能）" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos_3.1_l36_system_disk.hdm" size="1261568" crc="ef63fa10" sha1="73502af426b16d6884614e8f8ccfb7aeb43e1bc8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Utility Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos_3.1_l36_utility_disk.hdm" size="1261568" crc="f0c5bbce" sha1="65b068ddebe05fd02cb8e732c1287ac50e0a5f65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Missing several disks -->
 	<software name="msdos50" supported="no">
 		<description>Nihongo MS-DOS V5.0 L10 (Kihon Kinou)</description>
@@ -1635,6 +1698,19 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="ongaku_kyoushitsu_ver_2.0.hdm" size="1261568" crc="ec54ffee" sha1="0e651ea22241fa163d39be2b5bba4f0795f9f245"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This disk updates Para Para Paradise to version 1.10. It is untested, as the game itself cannot be installed in MAME. -->
+	<software name="paraparau" supported="no">
+		<description>Para Para Paradise Update Disk</description>
+		<year>1997</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="ぱらＰＡＲＡ　パラダイス　あっぷでーとディスク" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="para_para_paradise_update_disk.hdm" size="1261568" crc="4ca23415" sha1="ca3633f621a1f06662b910125e96398f4a7bc448"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2014,6 +2090,26 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
 				<rom name="shangrlia2_specialdisk_b.hdm" size="1261568" crc="9c8bc65b" sha1="ccf291f71dfa6a31b9d6e06aee706775c5e5fb3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shogisei">
+		<description>Shougi Seiten</description>
+		<year>1992</year>
+		<publisher>ホームデータ (Home Data)</publisher>
+		<info name="alt_title" value="将棋・聖天" />
+		<info name="release" value="199204xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3444655">
+				<rom name="shougi_seiten_system_disk.mfm" size="3444655" crc="a37b0a9d" sha1="dcfc5c602bf358b23cb954afc8a50e40b2db237a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shougi_seiten_data_disk.hdm" size="1261568" crc="c07b9317" sha1="b469b083feec58b4b6ed06b167b6e174762d131a"/>
 			</dataarea>
 		</part>
 	</software>

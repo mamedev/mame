@@ -36,6 +36,7 @@ void sm510_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_pagemask = 0x3f;
 
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
@@ -55,16 +56,14 @@ void sm510_base_device::device_start()
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
-	m_sbl = false;
-	m_sbm = false;
+	m_bmask = 0;
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
 	m_r = 0;
 	m_r_out = 0;
 	m_div = 0;
-	m_1s = false;
-	m_1s_rise = false;
+	m_gamma = 0;
 	m_ext_wakeup = false;
 	m_l = 0;
 	m_x = 0;
@@ -89,16 +88,14 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
-	save_item(NAME(m_sbl));
-	save_item(NAME(m_sbm));
+	save_item(NAME(m_bmask));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
 	save_item(NAME(m_r));
 	save_item(NAME(m_r_out));
 	save_item(NAME(m_div));
-	save_item(NAME(m_1s));
-	save_item(NAME(m_1s_rise));
+	save_item(NAME(m_gamma));
 	save_item(NAME(m_ext_wakeup));
 	save_item(NAME(m_l));
 	save_item(NAME(m_x));
@@ -152,8 +149,7 @@ void sm510_base_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
-	m_sbl = false;
-	m_sbm = false;
+	m_bmask = 0;
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
@@ -175,7 +171,7 @@ void sm510_base_device::device_reset()
 inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
-	if (ram == nullptr || m_bc || !m_bp)
+	if (ram == nullptr || m_bc || !(m_bp & 1))
 		return 0;
 
 	u16 rowdata = 0;
@@ -191,14 +187,14 @@ void sm510_base_device::lcd_update()
 	for (int h = 0; h < 4; h++)
 	{
 		// 16 segments per row from upper part of RAM
-		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a));
+		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b));
+		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c));
 
 		// bs output from L/X and Y regs
 		u8 blink = (m_div & 0x4000) ? m_y : 0;
 		u8 bs = ((m_l & ~blink) >> h & 1) | ((m_x*2) >> h & 2);
-		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
+		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !(m_bp & 1)) ? 0 : bs);
 	}
 }
 
@@ -224,12 +220,9 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
 	m_div = (m_div + 1) & 0x7fff;
 
-	// 1S signal on overflow(falling edge of F1)
+	// 1S(gamma) signal on overflow(falling edge of F1)
 	if (m_div == 0)
-	{
-		m_1s_rise = !m_1s;
-		m_1s = true;
-	}
+		m_gamma |= 1;
 
 	clock_melody();
 }
@@ -237,7 +230,8 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 void sm510_base_device::init_divider()
 {
 	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
-	m_div_timer->adjust(attotime::from_ticks(1, unscaled_clock()), 0, attotime::from_ticks(1, unscaled_clock()));
+	attotime period = attotime::from_ticks(1, unscaled_clock());
+	m_div_timer->adjust(period, 0, period);
 }
 
 
@@ -273,30 +267,26 @@ void sm510_base_device::increment_pc()
 {
 	// PL(program counter low 6 bits) is a simple LFSR: newbit = (bit0==bit1)
 	// PU,PM(high bits) specify page, PL specifies steps within page
-	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x20;
-	m_pc = feed | (m_pc >> 1 & 0x1f) | (m_pc & ~0x3f);
+	int msb = m_pagemask >> 1 ^ m_pagemask;
+	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : msb;
+	m_pc = feed | (m_pc >> 1 & m_pagemask >> 1) | (m_pc & ~m_pagemask);
 }
 
 void sm510_base_device::execute_run()
 {
-	bool prev_1s = m_1s_rise;
-
 	while (m_icount > 0)
 	{
-		// in halt mode, wake up after 1S signal or K input
-		bool wakeup = m_ext_wakeup || m_1s_rise;
-		m_1s_rise = false;
-
+		// in halt mode, wake up after gamma signal or K input
 		if (m_halt)
 		{
-			if (!wakeup)
+			if (m_ext_wakeup || m_gamma)
+				do_interrupt();
+			else
 			{
 				// got nothing to do
 				m_icount = 0;
 				return;
 			}
-			else
-				do_interrupt();
 		}
 
 		m_icount--;
@@ -327,10 +317,5 @@ void sm510_base_device::execute_run()
 		}
 		else
 			execute_one();
-
-		// if CEND triggered at the same time as 1S signal, make sure it still wakes up
-		if (m_halt)
-			m_1s_rise = prev_1s;
-		prev_1s = false;
 	}
 }

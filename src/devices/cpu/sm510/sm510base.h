@@ -37,21 +37,24 @@ class sm510_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-		: cpu_device(mconfig, type, tag, owner, clock)
-		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_stack_levels(stack_levels)
-		, m_r_mask_option(RMASK_DIRECT)
-		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
-		, m_write_segs(*this)
-		, m_melody_rom(*this, "melody")
-		, m_read_k(*this)
-		, m_read_ba(*this), m_read_b(*this)
-		, m_write_s(*this)
-		, m_write_r(*this)
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+		cpu_device(mconfig, type, tag, owner, clock),
+		m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
+		m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+		m_prgwidth(prgwidth),
+		m_datawidth(datawidth),
+		m_stack_levels(stack_levels),
+		m_r_mask_option(RMASK_DIRECT),
+		m_lcd_ram_a(*this, "lcd_ram_a"),
+		m_lcd_ram_b(*this, "lcd_ram_b"),
+		m_lcd_ram_c(*this, "lcd_ram_c"),
+		m_write_segs(*this),
+		m_melody_rom(*this, "melody"),
+		m_read_k(*this),
+		m_read_ba(*this),
+		m_read_b(*this),
+		m_write_s(*this),
+		m_write_r(*this)
 	{ }
 
 	// For SM510, SM500, SM5A, R port output is selected with a mask option,
@@ -61,7 +64,7 @@ public:
 	void set_r_mask_option(int bit) { m_r_mask_option = bit; }
 	static constexpr int RMASK_DIRECT = -1;
 
-	// 4-bit K input port (pull-down)
+	// 4/8-bit K input port (pull-down)
 	auto read_k() { return m_read_k.bind(); }
 
 	// 1-bit BA(aka alpha) input pin (pull-up)
@@ -70,15 +73,17 @@ public:
 	// 1-bit B(beta) input pin (pull-up)
 	auto read_b() { return m_read_b.bind(); }
 
-	// 8-bit S strobe output port
+	// 4/8-bit S strobe output port
 	auto write_s() { return m_write_s.bind(); }
 
-	// 1/2/4-bit R (buzzer/melody) output port
+	// 1/2-bit R (buzzer/melody) output port
+	// may also be called F(frequency?) or SO(sound out)
+	// SM590 has 4 R ports, don't use this one, see sm590.h
 	auto write_r() { return m_write_r.bind(); }
 
-	// LCD segment outputs, SM51X: H1-4 as offset(low), a/b/c 1-16 as data d0-d15,
+	// LCD segment outputs, SM51x: H1-4 as offset(low), a/b/c 1-16 as data d0-d15,
 	// bs output is same as above, but only up to 2 bits used.
-	// SM500/SM5A: H1/2 as a0, O group as a1-a4, O data as d0-d3
+	// SM500/SM5A/SM530: H1/2 as a0, O group as a1-a4, O data as d0-d3
 	auto write_segs() { return m_write_segs.bind(); }
 
 protected:
@@ -113,6 +118,7 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
+	int m_pagemask;
 
 	u16 m_pc, m_prev_pc;
 	u16 m_op, m_prev_op;
@@ -124,8 +130,7 @@ protected:
 	u8 m_acc;
 	u8 m_bl;
 	u8 m_bm;
-	bool m_sbm;
-	bool m_sbl;
+	u8 m_bmask;
 	u8 m_c;
 	bool m_skip;
 	u8 m_w;
@@ -165,11 +170,10 @@ protected:
 	// divider
 	emu_timer *m_div_timer;
 	u16 m_div;
-	bool m_1s;
-	bool m_1s_rise;
+	u8 m_gamma;
 
 	virtual void init_divider();
-	TIMER_CALLBACK_MEMBER(div_timer_cb);
+	virtual TIMER_CALLBACK_MEMBER(div_timer_cb);
 
 	// other i/o handlers
 	devcb_read8 m_read_k;
@@ -193,7 +197,6 @@ protected:
 	// opcode handlers
 	virtual void op_lb();
 	virtual void op_lbl();
-	virtual void op_sbl();
 	virtual void op_sbm();
 	virtual void op_exbla();
 	virtual void op_incb();
