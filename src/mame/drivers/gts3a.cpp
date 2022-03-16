@@ -6,40 +6,42 @@ PINBALL
 Gottlieb System 3
 Dot Matrix Display
 
+Setting up must be done before you can play. Press NUM-0, press Left Flipper 3 times, press Right
+ Flipper, Press 1 to accept Factory Settings, press 1, quit and restart.
+
 Here are the key codes to enable play:
 
 Game                                     NUM  Start game                           End ball
 --------------------------------------------------------------------------------------------------
-Super Mario Brothers                     733
-Cue Ball Wizard                          734
-Street Fighter II                        735
-Tee'd Off                                736
-Gladiators                               737
-Wipe Out                                 738
-Rescue 911                               740
-World Challenge Soccer                   741
-Stargate                                 742
-Shaq Attack                              743
-Freddy A Nightmare on Elm Street         744
-Frank Thomas Big Hurt                    745
-Waterworld                               746
-Mario Andretti                           747
-Barb Wire                                748
+Super Mario Brothers                     733  (not working)
+Cue Ball Wizard                          734  Hit 1, press YZ (black screen)       YZ
+Street Fighter II                        735  (not working)
+Tee'd Off                                736  Hit 1, press EM (bad gfx)            EM
+Gladiators                               737  Hit 1, press LT                      L
+Wipe Out                                 738  Hit 1, press MU                      M
+Rescue 911                               740  Hit 1, press LT                      L
+World Challenge Soccer                   741  Hit 1, press GO                      jiggle GO
+Stargate                                 742  (not working)
+Shaq Attack                              743  Hit 1, press LM                      M
+Freddy A Nightmare on Elm Street         744  Hit 1, press KL                      L
+Frank Thomas Big Hurt                    745  Hit 1, press EM                      jiggle EM
+Waterworld                               746  Hit 1, press RS                      R
+Mario Andretti                           747  Hit 1, press FN                      N
+Barb Wire                                748  Hit 1, press GO                      G
 Brooks & Dunn                            749  (unfinished prototype)
-Super Mario Brothers Mushroom World     N105
-Strikes n Spares                        N111
-Machina Zois
+Super Mario Brothers Mushroom World     N105  (not working)
+Strikes n Spares                        N111  (not working, press F3 to see the screen)
+Machina Zois                                  Hit 1, press LM                      M
 
 Status:
-- Nothing works - on some games there's a sound when coin is inserted.
-- Display shows rubbish
+- Some machines are playable
 
 ToDo:
-- Make it work
-- Make display show something sensible
+- Fix the non-workers
+- Only one video plane is emulated, needs to be understood. Various gfx elements missing.
 - There's an undumped GAL 16V8-25L on the DMD board (position U8)
-- Strikes n Spares: sound
-- Brooks & Dunn: roms are missing. Program was never finished.
+- Strikes n Spares: sound, needs 2 DMD screens.
+- Brooks & Dunn: roms are missing. Program was not finished, game will never work.
 
 *****************************************************************************************************/
 
@@ -65,13 +67,13 @@ public:
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_dmdcpu(*this, "dmdcpu")
+		, m_bank1(*this, "bank1")
 		, m_crtc(*this, "crtc")
 		, m_vram(*this, "vram")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
 		, m_p7_sound(*this, "p7sound")
 		, m_io_keyboard(*this, "X%d", 0U)
-		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -100,9 +102,6 @@ private:
 	void dmd_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_dispclk = 0;
-	bool m_lampclk = 0;
-	u8 m_digit = 0U;
 	u8 m_row = 0U; // for lamps and switches
 	u8 m_segment = 0U;
 	u8 m_u4b = 0U;
@@ -110,13 +109,13 @@ private:
 	virtual void machine_start() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
+	required_memory_bank    m_bank1;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<u8> m_vram;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
 	optional_device<gottlieb_sound_p7_device> m_p7_sound;
 	required_ioport_array<12> m_io_keyboard;
-	output_finder<40> m_digits;
 	output_finder<128> m_io_outputs;   // 32 solenoids + 96 lamps
 };
 
@@ -128,7 +127,7 @@ void gts3a_state::mem_map(address_map &map)
 	map(0x2010, 0x201f).mirror(0x1f80).m(m_u5, FUNC(via6522_device::map));
 	map(0x2020, 0x207f).nopr();
 	map(0x2020, 0x2020).mirror(0x1f8c).w(FUNC(gts3a_state::segbank_w));
-	map(0x2021, 0x2021).mirror(0x1f8c).nopw();   // reset the dmd cpu if it stalls
+	map(0x2021, 0x2021).mirror(0x1f8c).lw8(NAME([this] (u8 data) { m_dmdcpu->reset(); } ));   // reset the dmd cpu if it stalls
 	map(0x2030, 0x2033).mirror(0x1f8c).w(FUNC(gts3a_state::solenoid_w));
 	map(0x2040, 0x2040).mirror(0x1f80).w(FUNC(gts3a_state::lampret_w));
 	map(0x2041, 0x207f).mirror(0x1f80).nopw();   // AUX: purpose unknown
@@ -137,11 +136,12 @@ void gts3a_state::mem_map(address_map &map)
 
 void gts3a_state::dmd_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().share("vram");
-	map(0x2000, 0x2000).mirror(0x77e).r(m_crtc, FUNC(mc6845_device::status_r));
-	map(0x2001, 0x2001).mirror(0x77e).r(m_crtc, FUNC(mc6845_device::register_r));
-	map(0x2800, 0x2800).mirror(0x77e).w(m_crtc, FUNC(mc6845_device::address_w));
-	map(0x2801, 0x2801).mirror(0x77e).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().share("vram");
+	map(0x2000, 0x2000).mirror(0x7fe).r(m_crtc, FUNC(mc6845_device::status_r));
+	map(0x2001, 0x2001).mirror(0x7fe).r(m_crtc, FUNC(mc6845_device::register_r));
+	map(0x2800, 0x2800).mirror(0x7fe).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).mirror(0x7fe).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0x3000, 0x37ff).r(FUNC(gts3a_state::dmd_r));
 	map(0x3800, 0x3fff).w(FUNC(gts3a_state::dmd_w));
 	map(0x4000, 0x7fff).bankr("bank1");
@@ -150,83 +150,83 @@ void gts3a_state::dmd_map(address_map &map)
 
 static INPUT_PORTS_START( gts3a )
 	PORT_START("TTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") PORT_CHANGED_MEMBER(DEVICE_SELF, gts3a_state, test_inp, 1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt") PORT_CHANGED_MEMBER(DEVICE_SELF, gts3a_state, test_inp, 1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Tilt") PORT_CODE(KEYCODE_9)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Left Advance")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right Advance")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("INP06")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("INP07")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Tournament")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Front Door")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("INP10")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("INP11")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("INP12")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("INP13")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("INP14")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("INP15")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INP16")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("INP17")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("INP11")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("INP12")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("INP13")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("INP14")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("INP15")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("INP16")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("INP17")
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("INP20")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("INP21")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("INP22")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("INP23")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("INP24")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("INP25")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("INP26")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("INP27")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INP20")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("INP21")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("INP22")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("INP23")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("INP24")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("INP25")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("INP26")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("INP27")
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("INP30")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("INP31")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("INP32")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("INP33")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("INP34")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("INP35")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("INP36")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("INP37")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("INP30")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("INP31")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("INP32")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("INP33")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("INP34")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("INP35")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("INP36")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("INP37")
 
 	PORT_START("X4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP40")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP41")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP42")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP43")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP44")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP45")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP46")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP47")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("INP40")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("INP41")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP42")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP43")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP44")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP45")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP46")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP47")
 
 	PORT_START("X5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP50")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP51")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP52")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_UP) PORT_NAME("INP54")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP55")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP56")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP57")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP50")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP51")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP52")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP53")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP54")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP55")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_UP) PORT_NAME("INP56")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP57")
 
 	PORT_START("X6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP60")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("INP61")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("INP62")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("INP63")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("INP64")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP60")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP61")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP62")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP63")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_END) PORT_NAME("INP64")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP65")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP66")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP67")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP67")
 
 	PORT_START("X7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_END) PORT_NAME("INP70")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP71")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("INP70")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F2) PORT_NAME("INP71")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP72")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP73")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP74")
@@ -235,21 +235,21 @@ static INPUT_PORTS_START( gts3a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP77")
 
 	PORT_START("X8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP80")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP81")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP82")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP83")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP84")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP85")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP86")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP87")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("INP80")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("INP81")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("INP82")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("INP83")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("INP84")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("INP85")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("INP86")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("INP87")
 
 	PORT_START("X9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP90")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP91")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP92")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP93")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP94")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("INP90")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("INP91")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("INP92")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LALT) PORT_NAME("INP93")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP94")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP95")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP96")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("INP97")
@@ -315,26 +315,15 @@ void gts3a_state::segbank_w(u8 data)
 
 void gts3a_state::u4b_w(u8 data)
 {
-	m_u4b = data & 0x47;
-	bool clk_bit = BIT(data, 6);
-	if ((!m_dispclk) && clk_bit) // 0->1 is valid
-	{
-		if (BIT(data, 5))
-			m_digit = 0;
-		else
-			m_digit++;
-	}
-	m_dispclk = clk_bit;
-
-	clk_bit = BIT(data, 1);
-	if ((!m_lampclk) && clk_bit) // 0->1 is valid
+	bool clk_bit = BIT(data, 1);
+	if ((!BIT(m_u4b, 1)) && clk_bit) // 0->1 is valid
 	{
 		if (BIT(data, 0))
 			m_row = 0;
 		else
 			m_row++;
 	}
-	m_lampclk = clk_bit;
+	m_u4b = (m_u4b & 0xa0) | (data & 0x47);
 }
 
 u8 gts3a_state::u4a_r()
@@ -347,7 +336,7 @@ u8 gts3a_state::u4a_r()
 
 u8 gts3a_state::u4b_r()
 {
-	return m_u4b | (ioport("TTS")->read() & 0x18);
+	return (m_u4b & 0xa0) | (ioport("TTS")->read() & 0x18);
 }
 
 void gts3a_state::u5a_w(u8 data)
@@ -360,7 +349,7 @@ void gts3a_state::init_gts3a()
 {
 	u8 *dmd = memregion("dmdcpu")->base();
 
-	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
+	m_bank1->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
 
 u8 gts3a_state::dmd_r()
@@ -371,9 +360,8 @@ u8 gts3a_state::dmd_r()
 
 void gts3a_state::dmd_w(u8 data)
 {
-	//printf("dmd_w=%X ",data);
-	membank("bank1")->set_entry(data & 0x1f);
-	m_u4b = (m_u4b & 0x5f) | ((data & 0xa0) ? 0x20 : 0) | (BIT(data, 6) << 7);
+	m_bank1->set_entry(data & 0x1f);
+	m_u4b = (m_u4b & 0x47) | (data & 0x20) | ((data & 0x40) << 1);
 }
 
 void gts3a_state::palette_init(palette_device &palette)
@@ -385,19 +373,19 @@ void gts3a_state::palette_init(palette_device &palette)
 MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	ma/=8;
-	// only 17 lines show, but y can range to 33.
-	// The game "Strikes and Spares" has 2 DMDs, but we have no schematic.
-	// Perhaps the base code normally handles 2 DMDs, but how one or the other is selected is unknown.
-	if (y < 17)
+	u16 offset = (BIT(ra, 0) << 4) | (BIT(ma, 7, 7) << 5);
+
+	if ((offset < 0x400) || (offset > 0x5f0))
+		return;
+
+	if (y < 32)
 	{
 		u32 *p = &bitmap.pix(y);
-		for (u8 x = 0; x < x_count/8; x++)
+		for (u8 x = 0; x < 16; x++)
 		{
-			u16 mem = (ma+x) & 0x1fff;
+			u16 mem = offset+x;
 			u8 gfx = m_vram[mem];
 
-			// display 8 bits by using MA (RA is not used)
 			*p++ = palette[BIT(gfx, 7)];
 			*p++ = palette[BIT(gfx, 6)];
 			*p++ = palette[BIT(gfx, 5)];
@@ -419,11 +407,8 @@ WRITE_LINE_MEMBER( gts3a_state::crtc_vs )
 
 void gts3a_state::machine_start()
 {
-	m_digits.resolve();
 	m_io_outputs.resolve();
 
-	save_item(NAME(m_dispclk));
-	save_item(NAME(m_lampclk));
 	save_item(NAME(m_segment));
 	save_item(NAME(m_row));
 	save_item(NAME(m_u4b));
@@ -434,8 +419,7 @@ void gts3a_state::machine_reset()
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
-	m_digit = 0;
-	m_dispclk = 0;
+	m_bank1->set_entry(31);
 }
 
 void gts3a_state::p0(machine_config &config)
