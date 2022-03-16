@@ -46514,6 +46514,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="ducktaleup1" cloneof="ducktale">
+		<description>DuckTales (USA, 19890205 prototype)</description>
+		<year>1989</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="ducktales (feb 5, 1989 prototype).prg" size="131072" crc="2c26736b" sha1="e9709c15728cec9a6fed73b1064782bd5ded7ee4" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ducktal2p" cloneof="ducktal2">
 		<description>Disney's DuckTales 2 (Euro, Prototype)</description>
 		<year>1993</year>
@@ -46967,6 +46984,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="free fall (usa) (proto).prg" size="65536" crc="12be47da" sha1="41f6f581c7da9f90c18e0eb2442df7a6adbe3e76" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freefrcep" cloneof="freefrce">
+		<description>Freedom Force (USA, 19871229 prototype)</description>
+		<year>1987</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="131072">
+				<rom name="0.prg" size="131072" crc="fc74faaa" sha1="283d37fe7af138b4bcf1c943f374767eb30c7b53" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="chr 12-26" size="131072" crc="c175dc2e" sha1="46feb78e639a20b143573e88d7a3f0b8d2147d83" />
 			</dataarea>
 		</part>
 	</software>
@@ -48787,6 +48822,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metalstrce" cloneof="metalstr">
+		<description>Metal Storm Collector's Edition</description>
+		<year>2019</year>
+		<publisher>retro-bit</publisher>
+		<info name="alt_title" value="Gravity Trooper Metal Storm"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="metal storm (2019).prg" size="524288" crc="1be6552c" sha1="618854ca960cd8a3b35ed4d2b482c528f26423d9" status="baddump" /> <!-- TODO: is there missing undumped, albeit unused, data on the cartridge? -->
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
 			</dataarea>
 		</part>
 	</software>
@@ -67390,6 +67442,23 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+	<software name="hotsamba">
+		<description>Hot Dance with Samba (Asia)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bnrom" /> <!-- FIXME: probably should be something similar but with PCB selected mirroring; see baseball graphics glitches -->
+			<feature name="mirroring" value="vertical" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="1048576">
+				<rom name="hot dance with samba.prg" size="1048576" crc="fb25a5d4" sha1="7a0d4da4940e98215eb3a3c820b9c3bfa6e0e022" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="impjudge" supported="partial">
 		<description>Impartial Judge (Chi, Decrypted WXN)</description>
 		<year>19??</year>
@@ -79875,6 +79944,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="rhythmld">
+		<description>8Bit Rhythm Land</description>
+		<year>2019</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="release" value="20190221"/>
+		<info name="alt_title" value="8BITリズムランド"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="8bit rhythm land.prg" size="524288" crc="81dd11d5" sha1="7e257de8dd5103067c66fb13806084d48b028ed5" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="8bit rhythm land.chr" size="262144" crc="884b021f" sha1="2dfffa356308eddbb002cce1a7fdec72dc5c2cae" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This release is nearly identical to the prototype 1 set but with rebranding -->
 	<software name="airballr" cloneof="airball">
 		<description>Airball (RetroZone)</description>
@@ -80155,6 +80241,25 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbbrite">
+		<description>Rainbow Brite - Journey to Rainbow Land</description>
+		<year>2019</year>
+		<publisher>PixelHeart</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="rainbow brite - journey to rainbow land.prg" size="524288" crc="660750fe" sha1="acad918691f4346c15d0d991a14059dc2ea5a6f6" status="baddump" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
