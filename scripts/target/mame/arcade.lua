@@ -138,7 +138,7 @@ CPUS["HMCS40"] = true
 --CPUS["E0C6200"] = true
 --CPUS["MELPS4"] = true
 --CPUS["HPHYBRID"] = true
---CPUS["SM510"] = true
+CPUS["SM510"] = true
 CPUS["ST62XX"] = true
 CPUS["DSPP"] = true
 CPUS["HPC"] = true
@@ -2464,8 +2464,6 @@ files {
 	MAME_DIR .. "src/mame/includes/fastfred.h",
 	MAME_DIR .. "src/mame/video/fastfred.cpp",
 	MAME_DIR .. "src/mame/drivers/fastlane.cpp",
-	MAME_DIR .. "src/mame/includes/fastlane.h",
-	MAME_DIR .. "src/mame/video/fastlane.cpp",
 	MAME_DIR .. "src/mame/drivers/finalizr.cpp",
 	MAME_DIR .. "src/mame/includes/finalizr.h",
 	MAME_DIR .. "src/mame/video/finalizr.cpp",
@@ -2473,8 +2471,6 @@ files {
 	MAME_DIR .. "src/mame/machine/midikbd.cpp",
 	MAME_DIR .. "src/mame/machine/midikbd.h",
 	MAME_DIR .. "src/mame/drivers/flkatck.cpp",
-	MAME_DIR .. "src/mame/includes/flkatck.h",
-	MAME_DIR .. "src/mame/video/flkatck.cpp",
 	MAME_DIR .. "src/mame/drivers/gberet.cpp",
 	MAME_DIR .. "src/mame/includes/gberet.h",
 	MAME_DIR .. "src/mame/video/gberet.cpp",
@@ -3953,8 +3949,6 @@ createMAMEProjects(_target, _subtarget, "suna")
 files {
 	MAME_DIR .. "src/mame/drivers/go2000.cpp",
 	MAME_DIR .. "src/mame/drivers/goindol.cpp",
-	MAME_DIR .. "src/mame/includes/goindol.h",
-	MAME_DIR .. "src/mame/video/goindol.cpp",
 	MAME_DIR .. "src/mame/drivers/suna8.cpp",
 	MAME_DIR .. "src/mame/includes/suna8.h",
 	MAME_DIR .. "src/mame/audio/suna8.cpp",
@@ -4505,8 +4499,6 @@ files {
 	MAME_DIR .. "src/mame/includes/nova2001.h",
 	MAME_DIR .. "src/mame/video/nova2001.cpp",
 	MAME_DIR .. "src/mame/drivers/xxmissio.cpp",
-	MAME_DIR .. "src/mame/includes/xxmissio.h",
-	MAME_DIR .. "src/mame/video/xxmissio.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "valadon")

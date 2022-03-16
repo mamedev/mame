@@ -220,6 +220,22 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+void vsnes_state::vsnes_ppu1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr(m_chr_banks[0]);
+	map(0x0000, 0x1fff).view(m_chr_view);
+	m_chr_view[0](0x0000, 0x1fff).ram();
+	map(0x2000, 0x2fff).mirror(0x1000).ram();
+	map(0x3f00, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+}
+
+void vsnes_state::vsnes_ppu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr(m_chr_banks[1]);
+	map(0x2000, 0x2fff).mirror(0x1000).ram();
+	map(0x3f00, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+}
+
 
 
 uint8_t vsnes_state::vsnes_bootleg_z80_address_r(offs_t offset)
@@ -304,6 +320,13 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 
 	map(0x4000, 0x5fff).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
 	map(0x6000, 0x7fff).rw(FUNC(vsnes_state::vsnes_bootleg_z80_address_r), FUNC(vsnes_state::vssmbbl_sn_w));
+}
+
+void vsnes_state::vsnes_ppu_bootleg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr(m_chr_banks[0]);
+	map(0x2000, 0x27ff).mirror(0x1800).ram();
+	map(0x3f00, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
 /******************************************************************************/
@@ -1742,6 +1765,7 @@ void vsnes_state::vsnes(machine_config &config)
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -1786,6 +1810,7 @@ void vsnes_state::topgun(machine_config &config)
 	vsnes(config);
 
 	PPU_2C05_04(config.replace(), m_ppu1);
+	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -1816,11 +1841,13 @@ void vsnes_state::vsdual(machine_config &config)
 	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	PPU_2C04(config, m_ppu2);
+	m_ppu2->set_addrmap(0, &vsnes_state::vsnes_ppu2_map);
 	m_ppu2->set_screen("screen2");
 	m_ppu2->set_cpu_tag(m_subcpu);
 	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
@@ -1860,6 +1887,7 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04C(config, m_ppu1);
+	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu_bootleg_map);
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);

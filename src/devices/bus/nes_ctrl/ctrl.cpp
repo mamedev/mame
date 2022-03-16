@@ -199,6 +199,11 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("vboy", NES_VBOYCTRL);
 }
 
+void nes_control_special_devices(device_slot_interface &device)
+{
+	device.option_add("rob", NES_ROB);
+}
+
 void fc_control_port1_devices(device_slot_interface &device)
 {
 	device.option_add("joypad", NES_JOYPAD);

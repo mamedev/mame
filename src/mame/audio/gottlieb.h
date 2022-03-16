@@ -63,7 +63,7 @@ private:
 	required_device<m6502_device>       m_cpu;
 	required_device<mos6530_device>     m_r6530;
 
-	uint8_t m_sndcmd;
+	uint8_t m_sndcmd = 0;
 
 	uint8_t r6530b_r();
 };
@@ -92,7 +92,7 @@ private:
 	required_device<m6502_device>       m_cpu;
 	required_device<mos6530_device>     m_r6530;
 
-	uint8_t m_sndcmd;
+	uint8_t m_sndcmd = 0;
 
 	uint8_t r6530b_r();
 	void r6530b_w(u8);
@@ -224,16 +224,16 @@ protected:
 	required_device<ay8913_device>  m_ay2;
 
 	// internal state
-	emu_timer * m_nmi_timer;
-	uint8_t       m_nmi_rate;
-	uint8_t       m_nmi_state;
-	uint8_t       m_dcpu_latch;
-	uint8_t       m_ycpu_latch;
-	uint8_t       m_speech_control;
-	uint8_t       m_last_command;
-	uint8_t       m_psg_latch;
-	uint8_t       m_psg_data_latch;
-	uint8_t       m_dcpu2_latch;
+	emu_timer * m_nmi_timer = 0;
+	uint8_t       m_nmi_rate = 0;
+	uint8_t       m_nmi_state = 0;
+	uint8_t       m_dcpu_latch = 0;
+	uint8_t       m_ycpu_latch = 0;
+	uint8_t       m_speech_control = 0;
+	uint8_t       m_last_command = 0;
+	uint8_t       m_psg_latch = 0;
+	uint8_t       m_psg_data_latch = 0;
+	uint8_t       m_dcpu2_latch = 0;
 };
 
 
@@ -269,8 +269,8 @@ private:
 	optional_device<sp0250_device>  m_sp0250;
 
 	// internal state
-	bool     m_cobram3_mod;
-	uint8_t  m_sp0250_latch;
+	bool     m_cobram3_mod = 0;
+	uint8_t  m_sp0250_latch = 0;
 };
 
 
@@ -338,8 +338,8 @@ private:
 	void p7_ymap(address_map &map);
 	void y_ctrl_w(u8);
 	void y_latch_w(u8);
-	uint8_t m_msm_latch1;
-	uint8_t m_msm_latch2;
+	uint8_t m_msm_latch1 = 0;
+	uint8_t m_msm_latch2 = 0;
 	optional_device<okim6295_device> m_oki;
 };
 

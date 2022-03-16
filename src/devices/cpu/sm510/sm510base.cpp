@@ -36,6 +36,7 @@ void sm510_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_pagemask = 0x3f;
 
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
@@ -266,8 +267,9 @@ void sm510_base_device::increment_pc()
 {
 	// PL(program counter low 6 bits) is a simple LFSR: newbit = (bit0==bit1)
 	// PU,PM(high bits) specify page, PL specifies steps within page
-	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x20;
-	m_pc = feed | (m_pc >> 1 & 0x1f) | (m_pc & ~0x3f);
+	int msb = m_pagemask >> 1 ^ m_pagemask;
+	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : msb;
+	m_pc = feed | (m_pc >> 1 & m_pagemask >> 1) | (m_pc & ~m_pagemask);
 }
 
 void sm510_base_device::execute_run()

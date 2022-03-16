@@ -30,78 +30,6 @@ struct wrap_textbuf
 };
 
 
-class symbol_table_wrapper
-{
-public:
-	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
-
-	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
-		: m_table(machine, parent ? &parent->table() : nullptr, device)
-		, m_parent(parent)
-	{
-	}
-
-	symbol_table &table() { return m_table; }
-	symbol_table const &table() const { return m_table; }
-	std::shared_ptr<symbol_table_wrapper> const &parent() { return m_parent; }
-
-	symbol_entry &add(char const *name) { return m_table.add(name, symbol_table::READ_WRITE); }
-	symbol_entry &add(char const *name, u64 value) { return m_table.add(name, value); }
-	symbol_entry *find(char const *name) const { return m_table.find(name); }
-	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
-
-	u64 value(const char *symbol) { return m_table.value(symbol); }
-	void set_value(const char *symbol, u64 value) { m_table.set_value(symbol, value); }
-
-private:
-	symbol_table m_table;
-	std::shared_ptr<symbol_table_wrapper> const m_parent;
-};
-
-
-class expression_wrapper
-{
-public:
-	expression_wrapper(expression_wrapper const &) = delete;
-	expression_wrapper &operator=(expression_wrapper const &) = delete;
-
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable)
-		: m_expression(symtable->table())
-		, m_symbols(symtable)
-	{
-	}
-
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
-		: m_expression(symtable->table(), expression, default_base)
-		, m_symbols(symtable)
-	{
-	}
-
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
-		: m_expression(symtable->table(), expression)
-		, m_symbols(symtable)
-	{
-	}
-
-	void set_default_base(int base) { m_expression.set_default_base(base); }
-	void parse(char const *string) { m_expression.parse(string); }
-	u64 execute() { return m_expression.execute(); }
-	bool is_empty() const { return m_expression.is_empty(); }
-	char const *original_string() const { return m_expression.original_string(); }
-	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
-
-	void set_symbols(std::shared_ptr<symbol_table_wrapper> const &symtable)
-	{
-		m_expression.set_symbols(symtable->table());
-		m_symbols = symtable;
-	}
-
-private:
-	parsed_expression m_expression;
-	std::shared_ptr<symbol_table_wrapper> m_symbols;
-};
-
-
 template <bool Enable>
 sol::object do_breakpoint_enable(device_debug &dev, sol::this_state s, sol::object index)
 {
@@ -154,6 +82,81 @@ sol::object do_watchpoint_enable(device_debug &dev, sol::this_state s, sol::obje
 }
 
 } // anonymous namespace
+
+
+class lua_engine::symbol_table_wrapper
+{
+public:
+	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
+
+	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+		: m_table(machine, parent ? &parent->table() : nullptr, device)
+		, m_parent(parent)
+	{
+	}
+
+	symbol_table &table() { return m_table; }
+	symbol_table const &table() const { return m_table; }
+	std::shared_ptr<symbol_table_wrapper> const &parent() { return m_parent; }
+
+	symbol_entry &add(char const *name) { return m_table.add(name, symbol_table::READ_WRITE); }
+	symbol_entry &add(char const *name, u64 value) { return m_table.add(name, value); }
+	symbol_entry *find(char const *name) const { return m_table.find(name); }
+	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
+
+	u64 value(const char *symbol) { return m_table.value(symbol); }
+	void set_value(const char *symbol, u64 value) { m_table.set_value(symbol, value); }
+
+	u64 read_memory(addr_space &space, offs_t address, int size, bool translate) { return m_table.read_memory(space.space, address, size, translate); }
+	void write_memory(addr_space &space, offs_t address, u64 data, int size, bool translate) { m_table.write_memory(space.space, address, data, size, translate); }
+
+private:
+	symbol_table m_table;
+	std::shared_ptr<symbol_table_wrapper> const m_parent;
+};
+
+
+class lua_engine::expression_wrapper
+{
+public:
+	expression_wrapper(expression_wrapper const &) = delete;
+	expression_wrapper &operator=(expression_wrapper const &) = delete;
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable)
+		: m_expression(symtable->table())
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
+		: m_expression(symtable->table(), expression, default_base)
+		, m_symbols(symtable)
+	{
+	}
+
+	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
+		: m_expression(symtable->table(), expression)
+		, m_symbols(symtable)
+	{
+	}
+
+	void set_default_base(int base) { m_expression.set_default_base(base); }
+	void parse(char const *string) { m_expression.parse(string); }
+	u64 execute() { return m_expression.execute(); }
+	bool is_empty() const { return m_expression.is_empty(); }
+	char const *original_string() const { return m_expression.original_string(); }
+	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
+
+	void set_symbols(std::shared_ptr<symbol_table_wrapper> const &symtable)
+	{
+		m_expression.set_symbols(symtable->table());
+		m_symbols = symtable;
+	}
+
+private:
+	parsed_expression m_expression;
+	std::shared_ptr<symbol_table_wrapper> m_symbols;
+};
 
 
 void lua_engine::initialize_debug(sol::table &emu)
@@ -213,7 +216,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, nullptr); },
 				[] (device_t &device)
 				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
-	symbol_table_type["set_memory_modified_func"] =
+	symbol_table_type.set_function("set_memory_modified_func",
 			[this] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
@@ -222,7 +225,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
-			};
+			});
 	symbol_table_type["add"] = sol::overload(
 			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *)>(&symbol_table_wrapper::add),
 			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *, u64)>(&symbol_table_wrapper::add),
@@ -261,24 +264,24 @@ void lua_engine::initialize_debug(sol::table &emu)
 							return result ? *result : 0;
 						});
 			});
-	symbol_table_type["find"] = &symbol_table_wrapper::find;
-	symbol_table_type["find_deep"] = &symbol_table_wrapper::find_deep;
-	symbol_table_type["value"] = &symbol_table_wrapper::value;
-	symbol_table_type["set_value"] = &symbol_table_wrapper::set_value;
-	symbol_table_type["memory_value"] =
+	symbol_table_type.set_function("find", &symbol_table_wrapper::find);
+	symbol_table_type.set_function("find_deep", &symbol_table_wrapper::find_deep);
+	symbol_table_type.set_function("value", &symbol_table_wrapper::value);
+	symbol_table_type.set_function("set_value", &symbol_table_wrapper::set_value);
+	symbol_table_type.set_function("memory_value",
 			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, bool disable_se)
 			{
 				expression_space const es = s_expression_space_parser(space);
 				return st.table().memory_value(name, es, offset, size, disable_se);
-			};
-	symbol_table_type["set_memory_value"] =
+			});
+	symbol_table_type.set_function("set_memory_value",
 			[] (symbol_table_wrapper &st, char const *name, char const *space, u32 offset, int size, u64 value, bool disable_se)
 			{
 				expression_space const es = s_expression_space_parser(space);
 				st.table().set_memory_value(name, es, offset, size, value, disable_se);
-			};
-	//symbol_table_type["read_memory"] = &symbol_table::read_memory; crashes if you try to use it, need to work out why
-	//symbol_table_type["write_memory"] = &symbol_table::write_memory; crashes if you try to use it, need to work out why
+			});
+	symbol_table_type.set_function("read_memory", &symbol_table_wrapper::read_memory);
+	symbol_table_type.set_function("write_memory", &symbol_table_wrapper::write_memory);
 	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
 	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
 
@@ -289,9 +292,9 @@ void lua_engine::initialize_debug(sol::table &emu)
 				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &),
 				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *, int),
 				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *)>());
-	parsed_expression_type["set_default_base"] = &expression_wrapper::set_default_base;
-	parsed_expression_type["parse"] = &expression_wrapper::parse;
-	parsed_expression_type["execute"] = &expression_wrapper::execute;
+	parsed_expression_type.set_function("set_default_base", &expression_wrapper::set_default_base);
+	parsed_expression_type.set_function("parse", &expression_wrapper::parse);
+	parsed_expression_type.set_function("execute", &expression_wrapper::execute);
 	parsed_expression_type["is_empty"] = sol::property(&expression_wrapper::is_empty);
 	parsed_expression_type["original_string"] = sol::property(&expression_wrapper::original_string);
 	parsed_expression_type["symbols"] = sol::property(&expression_wrapper::symbols, &expression_wrapper::set_symbols);
@@ -306,7 +309,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 
 	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", sol::no_constructor);
-	debugger_type["command"] = [] (debugger_manager &debug, std::string const &cmd) { debug.console().execute_command(cmd, false); };
+	debugger_type.set_function("command", [] (debugger_manager &debug, std::string const &cmd) { debug.console().execute_command(cmd, false); });
 	debugger_type["consolelog"] = sol::property([] (debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); });
 	debugger_type["errorlog"] = sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); });
 	debugger_type["visible_cpu"] = sol::property(
@@ -340,23 +343,23 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 
 	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", sol::no_constructor);
-	device_debug_type["step"] =
+	device_debug_type.set_function("step",
 			[] (device_debug &dev, sol::object num)
 			{
 				int steps = 1;
 				if (num.is<int>())
 					steps = num.as<int>();
 				dev.single_step(steps);
-			};
-	device_debug_type["go"] = &device_debug::go;
-	device_debug_type["bpset"] =
+			});
+	device_debug_type.set_function("go", &device_debug::go);
+	device_debug_type.set_function("bpset",
 			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
 			{
 				int result(dev.breakpoint_set(address, cond, act));
 				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 				return result;
-			};
+			});
 	device_debug_type["bpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -374,24 +377,24 @@ void lua_engine::initialize_debug(sol::table &emu)
 				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 			});
-	device_debug_type["bpenable"] = &do_breakpoint_enable<true>;
-	device_debug_type["bpdisable"] = &do_breakpoint_enable<false>;
-	device_debug_type["bplist"] =
+	device_debug_type.set_function("bpenable", &do_breakpoint_enable<true>);
+	device_debug_type.set_function("bpdisable", &do_breakpoint_enable<false>);
+	device_debug_type.set_function("bplist",
 			[this] (device_debug &dev)
 			{
 				sol::table table = sol().create_table();
 				for (auto const &bpp : dev.breakpoint_list())
 					table[bpp.second->index()] = sol::make_reference(sol(), bpp.second.get());
 				return table;
-			};
-	device_debug_type["wpset"] =
+			});
+	device_debug_type.set_function("wpset",
 			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
 			{
 				read_or_write const wptype = s_read_or_write_parser(type);
 				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
 				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 				return result;
-			};
+			});
 	device_debug_type["wpclear"] = sol::overload(
 			[] (device_debug &dev, int index)
 			{
@@ -405,16 +408,16 @@ void lua_engine::initialize_debug(sol::table &emu)
 				dev.watchpoint_clear_all();
 				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 			});
-	device_debug_type["wpenable"] = &do_watchpoint_enable<true>;
-	device_debug_type["wpdisable"] = &do_watchpoint_enable<false>;
-	device_debug_type["wplist"] =
+	device_debug_type.set_function("wpenable", &do_watchpoint_enable<true>);
+	device_debug_type.set_function("wpdisable", &do_watchpoint_enable<false>);
+	device_debug_type.set_function("wplist",
 			[this] (device_debug &dev, addr_space &sp)
 			{
 				sol::table table = sol().create_table();
 				for (auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
 					table[wpp->index()] = sol::make_reference(sol(), wpp.get());
 				return table;
-			};
+			});
 
 
 	auto breakpoint_type = sol().registry().new_usertype<debug_breakpoint>("breakpoint", sol::no_constructor);

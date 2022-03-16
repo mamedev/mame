@@ -3047,6 +3047,14 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.h",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",   GEN_DIR .. "emu/layout/nes_rob.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "nes_rob"),
+	}
 end
 
 ---------------------------------------------------

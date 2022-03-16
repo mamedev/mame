@@ -82,8 +82,8 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// max 8 4-bit R ports
-	template <std::size_t Bit> auto read_r() { return m_read_r[Bit].bind(); }
-	template <std::size_t Bit> auto write_r() { return m_write_r[Bit].bind(); }
+	template <std::size_t N> auto read_r() { return m_read_r[N].bind(); }
+	template <std::size_t N> auto write_r() { return m_write_r[N].bind(); }
 
 	// 16-bit discrete
 	auto read_d() { return m_read_d.bind(); }

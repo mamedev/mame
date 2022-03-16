@@ -4,6 +4,7 @@
 
     Nintendo Family Computer & Entertainment System Zapper Lightgun
     Nintendo Family Computer Bandai Hyper Shot Lightgun
+    Nintendo R.O.B.
 
 **********************************************************************/
 
@@ -14,6 +15,7 @@
 
 
 #include "ctrl.h"
+#include "cpu/sm510/sm590.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -70,8 +72,37 @@ private:
 };
 
 
+// ======================> nes_rob_device
+
+class nes_rob_device : public nes_zapper_device
+{
+public:
+	// construction/destruction
+	nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual u8 read_exp(offs_t offset) override { return 0; }
+
+private:
+	required_device<sm590_device> m_maincpu;
+	output_finder<6> m_motor_out;
+	output_finder<> m_led_out;
+
+	u8 input_r();
+	void output_w(offs_t offset, u8 data);
+};
+
+
 // device type definition
-DECLARE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device)
+DECLARE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device)
 DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
+DECLARE_DEVICE_TYPE(NES_ROB, nes_rob_device)
 
 #endif // MAME_BUS_NES_CTRL_ZAPPER
