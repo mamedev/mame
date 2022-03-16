@@ -585,7 +585,7 @@ Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
 	</software>
 
 	<software name="senjokama" cloneof="senjokam">
-		<description>Senjou no Ookami (UNEPROM board)</description>
+		<description>Senjou no Ookami (UNEPROM PCB)</description>
 		<year>1986</year>
 		<publisher>Capcom</publisher>
 		<info name="alt_title" value="戦場の狼"/>
