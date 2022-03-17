@@ -6,6 +6,7 @@
 
 This is the single-chip evolution of Rockwell's older PPS-4 CPU. It is similar,
 but a lot of things were simplified, the ALU instructions are less diverse.
+It also has a lot in common with Rockwell's previous MCU series (A/B5000).
 
 Part numbers:
 - A75xx = MM75    - 28 pin dip
