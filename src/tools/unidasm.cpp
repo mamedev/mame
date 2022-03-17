@@ -28,7 +28,7 @@ using util::BIT;
 #include "cpu/arm7/arm7dasm.h"
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
-#include "cpu/b5000/b5000.h"
+#include "cpu/b5000/b5000d.h"
 #include "cpu/bcp/bcpdasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
