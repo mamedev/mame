@@ -32,7 +32,6 @@ protected:
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_one() = 0;
-	void increment_pc();
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -48,6 +47,9 @@ protected:
 	int m_datawidth; // "
 	u16 m_prgmask; // "
 	u16 m_datamask; // "
+
+	void cycle();
+	void increment_pc();
 
 	u16 m_pc;
 	u16 m_prev_pc;
