@@ -4,13 +4,13 @@
     Chameleon 24
 
     driver by Mariusz Wojcieszek
-    uses NES emulaton by Brad Olivier
+    uses NES emulation by Brad Olivier
 
     Notes:
     - NES hardware is probably implemented on FPGA
     - Atmel mcu probably controls coins and timer - since these are not emulated
       game is marked as 'not working'
-    - 72-in-1 mapper (found on NES pirate carts) is used for bank switching
+    - 72-in-1 mapper 225 (found on NES pirate carts) is used for bank switching
     - code at 0x0f8000 in 24-2.u2 contains English version of menu, code at 0x0fc000 contains
     other version (Asian language), is this controlled by mcu?
 
@@ -71,7 +71,10 @@ public:
 	cham24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ppu(*this, "ppu") { }
+		m_ppu(*this, "ppu"),
+		m_prg_banks(*this, "prg%u", 0U),
+		m_chr_bank(*this, "chr")
+	{ }
 
 	void cham24(machine_config &config);
 
@@ -82,6 +85,11 @@ protected:
 private:
 	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
+
+	required_memory_bank_array<2> m_prg_banks;
+	required_memory_bank m_chr_bank;
+
+	uint8_t m_prg_chunks;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
 	uint8_t* m_nt_page[4];
@@ -96,7 +104,7 @@ private:
 	void cham24_IN0_w(uint8_t data);
 	uint8_t cham24_IN1_r();
 	void cham24_mapper_w(offs_t offset, uint8_t data);
-	void cham24_set_mirroring( int mirroring );
+	void cham24_set_mirroring(int mirroring);
 	void cham24_map(address_map &map);
 	void cham24_ppu_map(address_map &map);
 };
@@ -186,42 +194,17 @@ uint8_t cham24_state::cham24_IN1_r()
 
 void cham24_state::cham24_mapper_w(offs_t offset, uint8_t data)
 {
-	uint32_t gfx_bank = offset & 0x3f;
-	uint32_t prg_16k_bank_page = (offset >> 6) & 0x01;
-	uint32_t prg_bank = (offset >> 7) & 0x1f;
-	uint32_t prg_bank_page_size = (offset >> 12) & 0x01;
-	uint32_t gfx_mirroring = (offset >> 13) & 0x01;
-
-	uint8_t* dst = memregion("maincpu")->base();
-	uint8_t* src = memregion("user1")->base();
+	// switch PRG bank
+	uint8_t prg_bank = BIT(offset, 6, 6);
+	uint8_t prg_mode = !BIT(offset, 12);
+	m_prg_banks[0]->set_entry(prg_bank & ~prg_mode);
+	m_prg_banks[1]->set_entry(prg_bank | prg_mode);
 
 	// switch PPU VROM bank
-	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * gfx_bank));
+	m_chr_bank->set_entry(offset & 0x3f);
 
 	// set gfx mirroring
-	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	// switch PRG bank
-	if (prg_bank_page_size == 0)
-	{
-		// 32K
-		memcpy(&dst[0x8000], &src[prg_bank * 0x8000], 0x8000);
-	}
-	else
-	{
-		if (prg_16k_bank_page == 1)
-		{
-			// upper half of 32K page
-			memcpy(&dst[0x8000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000);
-			memcpy(&dst[0xC000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000);
-		}
-		else
-		{
-			// lower half of 32K page
-			memcpy(&dst[0x8000], &src[(prg_bank * 0x8000)], 0x4000);
-			memcpy(&dst[0xC000], &src[(prg_bank * 0x8000)], 0x4000);
-		}
-	}
+	cham24_set_mirroring(BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 void cham24_state::cham24_map(address_map &map)
@@ -231,12 +214,13 @@ void cham24_state::cham24_map(address_map &map)
 	map(0x4014, 0x4014).w(FUNC(cham24_state::sprite_dma_w));
 	map(0x4016, 0x4016).rw(FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
 	map(0x4017, 0x4017).r(FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
-	map(0x8000, 0xffff).rom().w(FUNC(cham24_state::cham24_mapper_w));
+	map(0x8000, 0xbfff).bankr(m_prg_banks[0]).w(FUNC(cham24_state::cham24_mapper_w));
+	map(0xc000, 0xffff).bankr(m_prg_banks[1]).w(FUNC(cham24_state::cham24_mapper_w));
 }
 
 void cham24_state::cham24_ppu_map(address_map &map)
 {
-	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x0000, 0x1fff).bankr(m_chr_bank);
 	map(0x2000, 0x3eff).rw(FUNC(cham24_state::nt_r), FUNC(cham24_state::nt_w));
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
@@ -266,21 +250,24 @@ INPUT_PORTS_END
 
 void cham24_state::machine_start()
 {
-	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
+	// need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+
+	// set up code banking to be done in 16K chunks
+	m_prg_chunks = memregion("user1")->bytes() / 0x4000;
+	m_prg_banks[0]->configure_entries(0, m_prg_chunks, memregion("user1")->base(), 0x4000);
+	m_prg_banks[1]->configure_entries(0, m_prg_chunks, memregion("user1")->base(), 0x4000);
+
+	// gfx banking always done in 8K chunks
+	m_chr_bank->configure_entries(0, memregion("gfx1")->bytes() / 0x2000, memregion("gfx1")->base(), 0x2000);
 }
 
 void cham24_state::machine_reset()
 {
-	/* switch PRG rom */
-	uint8_t* dst = memregion("maincpu")->base();
-	uint8_t* src = memregion("user1")->base();
-
-	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
-	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
-
-	/* uses 8K swapping, all ROM!*/
-	membank("bank1")->set_base(memregion("gfx1")->base());
+	// switch to main menu PRG and CHR
+	m_prg_banks[0]->set_entry(m_prg_chunks - 2);
+	m_prg_banks[1]->set_entry(m_prg_chunks - 2);
+	m_chr_bank->set_entry(0);
 
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
