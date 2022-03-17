@@ -144,13 +144,14 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
+	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 	rectangle get_screen_area() override;
-	void spectrum_update_screen(bool eof = false, bool border_only = false) override;
-	void tsconf_UpdateZxScreenBitmap();
-	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
-	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
+	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tsconf_palette(palette_device &palette) const;
-	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
 
 	void tsconf_port_7ffd_w(u8 data);
@@ -206,13 +207,12 @@ private:
 	gluk_ext m_port_f7_ext;
 	u8 m_port_f7_gluk_reg;
 
-	u16 m_rendering_gfx_y_offset;
+	s16 m_gfx_y_frame_offset;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_ts_tilemap[3];
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	u16 m_previous_tsu_vpos;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

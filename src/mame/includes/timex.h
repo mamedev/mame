@@ -41,20 +41,19 @@ protected:
 
 	u8 port_ff_r();
 
+	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	rectangle get_screen_area() override;
-	void hires_scanline(int y, int borderlines);
-	void _64col_scanline(int y, int borderlines, unsigned short inkcolor);
-	void lores_scanline(int y, int borderlines, int screen);
+	void hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
+	void _64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
+	void lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);
 
 private:
 	void port_ff_w(offs_t offset, u8 data);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void tc2048_io(address_map &map);
 	void tc2048_mem(address_map &map);
 
-	inline void spectrum_plot_pixel(int x, int y, uint32_t color);
+	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 };
 
 class ts2068_state : public tc2048_state
@@ -87,8 +86,6 @@ private:
 	u8 port_f4_r();
 	void port_f4_w(u8 data);
 	void port_ff_w(offs_t offset, u8 data);
-
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	int m_dock_cart_type, m_ram_chunks;

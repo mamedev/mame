@@ -700,7 +700,6 @@ void ts2068_state::ts2068(machine_config &config)
 	// timings not confirmed! now same as spec128 but doubled for hires
 	m_screen->set_raw(XTAL(14'112'000) / 2, 456 * 2, 311, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(60);
-	m_screen->set_screen_update(FUNC(ts2068_state::screen_update));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
 
@@ -739,7 +738,6 @@ void tc2048_state::tc2048(machine_config &config)
 	// timings not confirmed! now same as spec48 but doubled for hires
 	m_screen->set_raw(X1 / 2, 448 * 2, 312, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(50);
-	m_screen->set_screen_update(FUNC(tc2048_state::screen_update));
 
 	/* internal ram */
 	m_ram->set_default_size("48K");

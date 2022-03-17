@@ -98,7 +98,7 @@ protected:
 	{
 		TIMER_IRQ_ON,
 		TIMER_IRQ_OFF,
-		TIMER_SCANLINE
+		TIMER_SCANLINE // tsconf assumes it last know. if need more add above or fix references in clones
 	};
 
 	int m_port_fe_data;
@@ -108,9 +108,7 @@ protected:
 	int m_port_f4_data; /* Horizontal Select Register */
 
 	/* video support */
-	int m_frame_invert_count;
-	int m_frame_number;    /* Used for handling FLASH 1 */
-	int m_flash_invert;
+	int m_frame_invert_count; /* Used for handling FLASH 1 */
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
@@ -136,11 +134,8 @@ protected:
 	uint8_t spectrum_clone_port_r(offs_t offset);
 
 	void spectrum_palette(palette_device &palette) const;
-	virtual uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
+	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
-
-	unsigned int m_previous_screen_x, m_previous_screen_y;
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -183,11 +178,11 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
-	virtual u16 get_border_color();
+	virtual u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0);
 	// Defines position of main screen excluding border
 	virtual rectangle get_screen_area();
-	virtual void spectrum_update_screen(bool eof = false, bool border_only = false);
-	void to_area(rectangle area, unsigned int &x, unsigned int &y);
+	virtual void spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// snapshot helpers
 	void update_paging();

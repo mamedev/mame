@@ -213,7 +213,7 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 			return;
 
 	if ((m_port_7ffd_data ^ data) & 0x08)
-		spectrum_update_screen();
+		m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -291,22 +291,19 @@ void spectrum_128_state::machine_reset()
 	spectrum_128_update_memory();
 }
 
-/* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,           /* 8 x 8 characters */
+	96,             /* 96 characters */
+	1,              /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
+	{STEP8(0, 1)},  /* x offsets */
+	{STEP8(0, 8)},  /* y offsets */
+	8*8             /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( spec128 )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 rectangle spectrum_128_state::get_screen_area()

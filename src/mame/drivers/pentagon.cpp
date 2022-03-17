@@ -62,18 +62,13 @@ private:
 void pentagon_state::pentagon_update_memory()
 {
 	uint8_t *messram = m_ram->pointer();
-
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	if (strcmp(machine().system().name, "pent1024") != 0)
-	{
 		m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
-	}
 	else
-	{
 		// currently 512Kb ram expansion supported
 		m_bank4->set_base(messram + (((m_port_7ffd_data & 0x07) | ((m_port_7ffd_data & 0xc0) >> 3)) * 0x4000));
-	}
 
 	if (m_beta->started() && m_beta->is_active() && !( m_port_7ffd_data & 0x10 ) )
 	{
@@ -98,7 +93,7 @@ void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
 		return;
 
 	if ((m_port_7ffd_data ^ data) & 0x08)
-		spectrum_update_screen();
+		m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -109,21 +104,22 @@ void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
 
 void pentagon_state::pentagon_scr_w(offs_t offset, uint8_t data)
 {
-	spectrum_update_screen();
+	m_screen->update_now();
 	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
 void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 {
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
-		spectrum_update_screen();
+		m_screen->update_now();
 
 	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
 rectangle pentagon_state::get_screen_area()
 {
-	return rectangle{136, 136 + 255, 80, 80 + 191};
+	//TODO Possible because of incorrect z80 we have to adjust x+1 to make AccrossTheEdge look nicer
+	return rectangle{137, 137 + 255, 80, 80 + 191};
 }
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
@@ -223,30 +219,22 @@ void pentagon_state::machine_reset()
 void pentagon_state::video_start()
 {
 	m_frame_invert_count = 16;
-	m_frame_number = 0;
-	m_flash_invert = 0;
-
-	m_previous_screen_x = m_previous_screen_y = 0;
-
 	m_screen_location = m_ram->pointer() + (5 << 14);
 }
 
-/* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,           /* 8 x 8 characters */
+	96,             /* 96 characters */
+	1,              /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
+	{STEP8(0, 1)},  /* x offsets */
+	{STEP8(0, 8)},  /* y offsets */
+	8*8             /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( gfx_pentagon )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 
@@ -363,6 +351,6 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY      FULLNAME           FLAGS
-COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 128K",   0 )
-COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 1024SL", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY             FULLNAME           FLAGS
+COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
+COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
