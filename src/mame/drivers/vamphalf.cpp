@@ -55,7 +55,7 @@ TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
 - misncrft: sound dies during stage 1-5;
-- wyvernsg: fails a protection check after ~1 hour of play?
+- wyvernsg: fails a protection check after ~1 hour of play? (PC=f6ac)
 
 *********************************************************************/
 
@@ -277,6 +277,8 @@ private:
 
 	u32 wyvernwg_prot_r();
 	void wyvernwg_prot_w(u32 data);
+	u32 wyvernwg_parallel_prot_r();
+	void wyvernwg_parallel_prot_w(u32 data);
 
 	void yorijori_eeprom_w(u32 data);
 
@@ -394,6 +396,20 @@ u32 vamphalf_qdsp_state::wyvernwg_prot_r()
 		m_semicom_prot_idx--;
 	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) >> m_semicom_prot_idx;
 }
+
+// tested with 16 words seed after ~1 hour
+// Looks a similar pattern to Mission Craft except parallel instead of serial
+// TODO: it changes seed depending on number of credits being inserted
+u32 vamphalf_qdsp_state::wyvernwg_parallel_prot_r()
+{
+	return 0x08;
+}
+
+void vamphalf_qdsp_state::wyvernwg_parallel_prot_w(u32 data)
+{
+	printf("%04x\n", data);
+}
+
 
 void vamphalf_qdsp_state::wyvernwg_prot_w(u32 data)
 {
@@ -684,6 +700,7 @@ void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 	map(0x2800, 0x2803).portr("P1_P2");
 	map(0x3000, 0x3003).portr("SYSTEM");
 	map(0x5400, 0x5403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x6000, 0x6003).rw(FUNC(vamphalf_qdsp_state::wyvernwg_parallel_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_parallel_prot_w));
 	map(0x7000, 0x7003).w(FUNC(vamphalf_state::eeprom32_w));
 	map(0x7c00, 0x7c03).r(FUNC(vamphalf_state::eeprom32_r));
 }
