@@ -28,7 +28,14 @@ protected:
 	// opcode mnemonics
 	enum e_mnemonics
 	{
-		em_ILL, em_NOP
+		em_ILL,
+		em_NOP, em_RSC, em_SC, em_TC, em_TAM,
+		em_LAX, em_ADX, em_COMP, em_ATB, em_ATBZ,
+		em_LDA, em_EXC0, em_EXCP, em_EXCM, em_ADD,
+		em_LB0, em_LB7, em_LB8, em_LB9, em_LB10, em_LB11,
+		em_RSM, em_SM, em_TM,
+		em_TL, em_TRA0, em_TRA1, em_RET,
+		em_TKB, em_TKBS, em_TDIN, em_READ, em_KSEG, em_MTD
 	};
 
 	static const char *const s_name[];
@@ -52,6 +59,19 @@ public:
 
 private:
 	static const u8 b5000_opmap[0x100];
+
+};
+
+class b5900_disassembler : public b5000_common_disassembler
+{
+public:
+	b5900_disassembler() = default;
+	virtual ~b5900_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 b5900_opmap[0x100];
 
 };
 

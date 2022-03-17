@@ -325,6 +325,8 @@ if (BUSES["ARCHIMEDES_ECONET"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/econet/slot.h",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.h",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/midi.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/midi.h",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.h",
 	}
@@ -374,6 +376,8 @@ if (BUSES["ARCHIMEDES_PODULE"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/podule/lark.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/nexus.cpp",

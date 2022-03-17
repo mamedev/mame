@@ -109,7 +109,7 @@ offs_t cops1_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 	}
 
 	// disassemble it
-	util::stream_format(stream, "%-8s ", s_name[instr]);
+	util::stream_format(stream, "%-8s", s_name[instr]);
 	if (mask > 0)
 	{
 		if (mask < 16)
