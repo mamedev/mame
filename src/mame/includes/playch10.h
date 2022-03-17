@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "bus/nes_ctrl/zapper_sensor.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
@@ -23,6 +24,7 @@ public:
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_sensor(*this, "sensor")
 		, m_prg_banks(*this, "prg%u", 0U)
 		, m_prg_view(*this, "prg_view")
 		, m_vrom_region(*this, "gfx2")
@@ -149,6 +151,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram_8w;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<nes_zapper_sensor_device> m_sensor;
 
 	void init_prg_banking();
 	void prg32(int bank);

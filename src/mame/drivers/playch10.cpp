@@ -808,6 +808,8 @@ void playch10_state::playch10(machine_config &config)
 	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
 	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
+	NES_ZAPPER_SENSOR(config, m_sensor, 0).set_screen_tag("bottom");
+
 	SPEAKER(config, "mono").front_center();
 	m_cartcpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 

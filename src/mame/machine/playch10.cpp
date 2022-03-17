@@ -207,44 +207,8 @@ uint8_t playch10_state::pc10_in1_r()
 	if (m_pc10_gun_controller)
 	{
 		int trigger = ioport("P1")->read();
-		int x = ioport("GUNX")->read();
-		int y = ioport("GUNY")->read();
 
-		// radius of circle picked up by gun's photodiode
-		constexpr int radius = 5;
-		// brightness threshold
-		constexpr int bright = 0xc0;
-		// # of CRT scanlines that sustain brightness
-		constexpr int sustain = 22;
-
-		int vpos = m_ppu->screen().vpos();
-		int hpos = m_ppu->screen().hpos();
-
-		// update the screen if necessary
-		if (!m_ppu->screen().vblank())
-			if (vpos > y - radius || (vpos == y - radius && hpos >= x - radius))
-				m_ppu->screen().update_now();
-
-		int sum = 0;
-		int scanned = 0;
-
-		// sum brightness of pixels nearby the gun position
-		for (int i = x - radius; i <= x + radius; i++)
-			for (int j = y - radius; j <= y + radius; j++)
-				// look at pixels within circular sensor
-				if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius)
-				{
-					rgb_t pix = m_ppu->screen().pixel(i, j);
-
-					// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
-					// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
-					if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
-						sum += pix.r() + pix.g() + pix.b();
-					scanned++;
-				}
-
-		// light not detected if average brightness is below threshold (default bit 3 is 0: light detected)
-		if (sum < bright * scanned)
+		if (!m_sensor->detect_light(ioport("GUNX")->read(), ioport("GUNY")->read()))
 			ret |= 0x08;
 
 		// now, add the trigger if not masked
