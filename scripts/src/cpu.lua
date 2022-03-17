@@ -2853,6 +2853,26 @@ if opt_tool(CPUS, "SUPERFX") then
 end
 
 --------------------------------------------------
+-- Rockwell B5000 family
+--@src/devices/cpu/b5000/b5000.h,CPUS["B5000"] = true
+--------------------------------------------------
+
+if CPUS["B5000"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/b5000/b5000base.cpp",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000base.h",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000.cpp",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000.h",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "B5000") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.h")
+end
+
+--------------------------------------------------
 -- Rockwell PPS-4
 --@src/devices/cpu/pps4/pps4.h,CPUS["PPS4"] = true
 --------------------------------------------------

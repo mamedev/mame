@@ -120,6 +120,7 @@ CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
 CPUS["PPS4"] = true
 --CPUS["PPS41"] = true
+--CPUS["B5000"] = true
 CPUS["UPD7725"] = true
 CPUS["HD61700"] = true
 CPUS["LC8670"] = true
@@ -4592,8 +4593,6 @@ files {
 	MAME_DIR .. "src/mame/includes/paradise.h",
 	MAME_DIR .. "src/mame/video/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
-	MAME_DIR .. "src/mame/includes/yunsung8.h",
-	MAME_DIR .. "src/mame/video/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
 	MAME_DIR .. "src/mame/includes/yunsun16.h",
 	MAME_DIR .. "src/mame/video/yunsun16.cpp",
