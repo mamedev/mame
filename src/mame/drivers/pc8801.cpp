@@ -1483,32 +1483,35 @@ void pc8801_state::pcg8100_w(offs_t offset, uint8_t data)
 	logerror("%s: Possible write to PCG-8100 %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-uint8_t pc8801_state::kanji_r(offs_t offset)
+/*
+ * $e8-$eb kanji LV1
+ * $ec-$ef kanji LV2
+ *
+ */
+template <unsigned kanji_level> uint8_t pc8801_state::kanji_r(offs_t offset)
 {
 	if((offset & 2) == 0)
-		return m_kanji_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
+	{
+		const u32 kanji_base = kanji_level ? 0x10000 : 0;
+		const u32 kanji_address = (m_knj_addr[kanji_level] + kanji_base) * 2 + ((offset & 1) ^ 1);
+		return m_kanji_rom[kanji_address];
+	}
 
 	return 0xff;
 }
 
-void pc8801_state::kanji_w(offs_t offset, uint8_t data)
+template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_t data)
 {
 	if((offset & 2) == 0)
-		m_knj_addr[0] = ((offset & 1) == 0) ? ((m_knj_addr[0]&0xff00)|(data&0xff)) : ((m_knj_addr[0]&0x00ff)|(data<<8));
-}
-
-uint8_t pc8801_state::kanji_lv2_r(offs_t offset)
-{
-	if((offset & 2) == 0)
-		return m_kanji_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
-
-	return 0xff;
-}
-
-void pc8801_state::kanji_lv2_w(offs_t offset, uint8_t data)
-{
-	if((offset & 2) == 0)
-		m_knj_addr[1] = ((offset & 1) == 0) ? ((m_knj_addr[1]&0xff00)|(data&0xff)) : ((m_knj_addr[1]&0x00ff)|(data<<8));
+	{
+		m_knj_addr[kanji_level] = (
+			((offset & 1) == 0) ?
+			((m_knj_addr[kanji_level] & 0xff00) | (data & 0xff)) :
+			((m_knj_addr[kanji_level] & 0x00ff) | (data << 8))
+		);
+	}
+	// TODO: document and implement what the upper two regs does
+	// read latches on write?
 }
 
 void pc8801_state::rtc_w(uint8_t data)
@@ -1703,8 +1706,8 @@ void pc8801_state::main_io(address_map &map)
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
 #endif
 //  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
-	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r), FUNC(pc8801_state::kanji_w));
-	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_lv2_r), FUNC(pc8801_state::kanji_lv2_w));
+	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
+	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
 //  map(0xf0, 0xf1) dictionary bank (8801MA and later)
 //  map(0xf3, 0xf3) DMA floppy (unknown)
 //  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)

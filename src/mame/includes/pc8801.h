@@ -200,10 +200,8 @@ private:
 	void alu_ctrl1_w(uint8_t data);
 	void alu_ctrl2_w(uint8_t data);
 	void pcg8100_w(offs_t offset, uint8_t data);
-	uint8_t kanji_r(offs_t offset);
-	void kanji_w(offs_t offset, uint8_t data);
-	uint8_t kanji_lv2_r(offs_t offset);
-	void kanji_lv2_w(offs_t offset, uint8_t data);
+	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
+	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 	void rtc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
