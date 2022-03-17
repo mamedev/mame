@@ -95,18 +95,6 @@ template <> struct is_container<image_interface_formats> : std::true_type { };
 template <> struct is_container<plugin_options_plugins> : std::true_type { };
 
 
-sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
-{
-	return new sol::buffer(stack::get<int>(L, index), L);
-}
-
-int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
-{
-	delete value;
-	return 1;
-}
-
-
 template <typename T>
 struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_collection_helper<lua_engine::devenum<T>, T>
 {
@@ -834,7 +822,15 @@ void lua_engine::initialize()
 					}
 					new (&file) emu_file(path, flags);
 				}));
-	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
+	file_type.set("read",
+			[] (emu_file &file, sol::this_state s, size_t len)
+			{
+				buffer_helper buf(s);
+				auto space = buf.prepare(len);
+				space.add(file.read(space.get(), len));
+				buf.push();
+				return sol::stack::pop<sol::object>(s);
+			});
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
 	file_type.set("puts", &emu_file::puts);
 	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
@@ -1001,16 +997,18 @@ void lua_engine::initialize()
 			}
 			return sol::make_object(sol(), ret);
 		});
-	item_type.set("read_block", [](save_item &item, int offset, sol::buffer *buff) {
-			if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
+	item_type.set("read_block", [](save_item &item, sol::this_state s, int offset, size_t len) {
+			buffer_helper buf(s);
+			auto space = buf.prepare(len);
+			if(!item.base || ((offset + len) > (item.size * item.count)))
 			{
-				buff->set_len(0);
+				space.add(0);
 			}
 			else
 			{
 				const uint32_t blocksize = item.size * item.valcount;
-				uint32_t remaining = buff->get_len();
-				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
+				size_t remaining = len;
+				uint8_t *dest = reinterpret_cast<uint8_t *>(space.get());
 				while(remaining)
 				{
 					const uint32_t blockno = offset / blocksize;
@@ -1022,8 +1020,10 @@ void lua_engine::initialize()
 					remaining -= chunk;
 					dest += chunk;
 				}
+				space.add(len);
 			}
-			return buff;
+			buf.push();
+			return sol::stack::pop<sol::object>(s);
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
