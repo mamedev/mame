@@ -376,6 +376,8 @@ if (BUSES["ARCHIMEDES_PODULE"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/podule/lark.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/nexus.cpp",
