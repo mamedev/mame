@@ -142,6 +142,44 @@ MACHINE_RESET_MEMBER(vsnes_state,vsnes)
  *
  *************************************/
 
+void vsnes_state::init_prg_banking()
+{
+	u8 *base = memregion("prg")->base();
+	m_prg_chunks = memregion("prg")->bytes() / 0x2000;
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_prg_banks[i]->configure_entries(0, m_prg_chunks, base, 0x2000);
+		m_prg_banks[i]->set_entry(m_prg_chunks - 4 + i);
+	}
+
+	m_prg_view.select(0);
+}
+
+// safe banking helpers (only work when PRG size is a power of 2, i.e. not Gumshoe)
+
+void vsnes_state::prg32(int bank)
+{
+	bank = (bank << 2) & (m_prg_chunks - 1);
+
+	for (int i = 0; i < 4; i++)
+		m_prg_banks[i]->set_entry(bank + i);
+}
+
+void vsnes_state::prg16(int slot, int bank)
+{
+	bank = (bank << 1) & (m_prg_chunks - 1);
+	slot = (slot & 1) << 1;
+
+	for (int i = 0; i < 2; i++)
+		m_prg_banks[slot + i]->set_entry(bank + i);
+}
+
+void vsnes_state::prg8(int slot, int bank)
+{
+	m_prg_banks[slot & 0x03]->set_entry(bank & (m_prg_chunks - 1));
+}
+
 void vsnes_state::v_set_videorom_bank(int start, int count, int vrom_start_bank)
 {
 	assert(start + count <= 8);
@@ -200,27 +238,27 @@ MACHINE_START_MEMBER(vsnes_state, bootleg)
  *
  **********************************************************************************/
 
-/**********************************************************************************/
-/* Most games: VROM Banking in controller 0 write */
+//**********************************************************************************
+// Most games: VROM Banking in controller 0 write
 
-void vsnes_state::vsnormal_vrom_banking(uint8_t data)
+void vsnes_state::vsnormal_vrom_banking(u8 data)
 {
-	/* switch vrom */
+	// switch vrom
 	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
 
-	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
+	// bit 1 ( data & 2 ) enables writes to extra ram, we ignore it
 
-	/* move along */
+	// move along
 	vsnes_in0_w(data);
 }
 
 void vsnes_state::init_vsnormal()
 {
-	/* vrom switching is enabled with bit 2 of $4016 */
+	// vrom switching is enabled with bit 2 of $4016
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnormal_vrom_banking)));
 }
 
-/**********************************************************************************/
+//**********************************************************************************
 // Gun games: VROM Banking in controller 0 write
 
 void vsnes_state::vsnes_gun_in0_w(uint8_t data)
@@ -237,202 +275,151 @@ void vsnes_state::init_vsgun()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnes_gun_in0_w)));
 }
 
-/**********************************************************************************/
-/* Konami games: ROMs bankings at $8000-$ffff */
+//**********************************************************************************
+// Konami VRC1 games: ROM banking at $8000-$ffff
 
-void vsnes_state::vskonami_rom_banking(offs_t offset, uint8_t data)
+void vsnes_state::vskonami_rom_banking(offs_t offset, u8 data)
 {
-	int reg = (offset >> 12) & 0x07;
-	int bankoffset = (data & 7) * 0x2000 + 0x10000;
+	int reg = BIT(offset, 12, 3);
 
 	switch (reg)
 	{
-		case 0: /* code bank 0 */
-		case 2: /* code bank 1 */
-		case 4: /* code bank 2 */
-		{
-			uint8_t *prg = memregion("maincpu")->base();
-			memcpy(&prg[0x08000 + reg * 0x1000], &prg[bankoffset], 0x2000);
-		}
-		break;
+		case 0: // prg bank 0
+		case 2: // prg bank 1
+		case 4: // prg bank 2
+			prg8(reg >> 1, data);
+			break;
 
-		case 6: /* vrom bank 0 */
+		case 6: // vrom bank 0
 			v_set_videorom_bank(0, 4, data * 4);
-		break;
+			break;
 
-		case 7: /* vrom bank 1 */
+		case 7: // vrom bank 1
 			v_set_videorom_bank(4, 4, data * 4);
-		break;
+			break;
 	}
 }
 
 void vsnes_state::init_vskonami()
 {
-	/* We do manual banking, in case the code falls through */
-	/* Copy the initial banks */
-	uint8_t *prg = memregion("maincpu")->base();
-	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
+	// point program banks to last 32K
+	init_prg_banking();
 
-	/* banking is done with writes to the $8000-$ffff area */
+	// banking is done with writes to the $8000-$ffff area
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::vskonami_rom_banking)));
 }
 
-/***********************************************************************/
-/* Vs. Gumshoe */
+//**********************************************************************************
+// Vs. Gumshoe
 
-void vsnes_state::vsgshoe_gun_in0_w(uint8_t data)
+void vsnes_state::vsgshoe_gun_in0_w(u8 data)
 {
-	if ((data & 0x04) != m_old_bank)
-	{
-		uint8_t *prg = memregion("maincpu")->base();
-		m_old_bank = data & 0x04;
-		int addr = m_old_bank ? 0x12000: 0x10000;
-		memcpy(&prg[0x08000], &prg[addr], 0x2000);
-	}
-
-	vsnes_gun_in0_w(data);
+	// Gumshoe uniquely has a bankable 16K EPROM in addition to the normal unbanked 8K slots
+	m_prg_banks[0]->set_entry(BIT(data, 2));
+	gun_in0_w(data);
 }
 
 void vsnes_state::init_vsgshoe()
 {
-	/* set up the default bank */
-	uint8_t *prg = memregion("maincpu")->base();
-	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
+	// point program banks to last 32K
+	init_prg_banking();
 
-	/* vrom switching is enabled with bit 2 of $4016 */
+	// vrom switching is enabled with bit 2 of $4016
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsgshoe_gun_in0_w)));
 }
 
-/**********************************************************************************/
-/* Dr Mario: ROMs bankings at $8000-$ffff */
+//**********************************************************************************
+// MMC1 (Dr Mario): ROM banking at $8000-$ffff
 
-
-void vsnes_state::drmario_rom_banking(offs_t offset, uint8_t data)
+void vsnes_state::drmario_rom_banking(offs_t offset, u8 data)
 {
-	/* basically, a MMC1 mapper from the nes */
-
-	int reg = (offset >> 13);
-
-	/* reset mapper */
+	// reset mapper
 	if (data & 0x80)
 	{
-		m_drmario_shiftreg = m_drmario_shiftcount = 0;
-
-		m_size16k = 1;
-
-		m_switchlow = 1;
-		m_vrom4k = 0;
+		m_mmc1_shiftreg = 0;
+		m_mmc1_shiftcount = 0;
+		m_mmc1_prg16k = 1;
+		m_mmc1_switchlow = 1;
+		m_mmc1_chr4k = 0;
 
 		return;
 	}
 
-	/* see if we need to clock in data */
-	if (m_drmario_shiftcount < 5)
+	// see if we need to clock in data
+	if (m_mmc1_shiftcount < 5)
 	{
-		m_drmario_shiftreg >>= 1;
-		m_drmario_shiftreg |= (data & 1) << 4;
-		m_drmario_shiftcount++;
+		m_mmc1_shiftreg = m_mmc1_shiftreg >> 1 | (data & 1) << 4;
+		m_mmc1_shiftcount = (m_mmc1_shiftcount + 1) % 5;
 	}
 
-	/* are we done shifting? */
-	if (m_drmario_shiftcount == 5)
+	// are we done shifting?
+	if (!m_mmc1_shiftcount)
 	{
-		/* reset count */
-		m_drmario_shiftcount = 0;
-
-		/* apply data to registers */
-		switch (reg)
+		// apply data to registers
+		switch (BIT(offset, 13, 2))
 		{
-			case 0:     /* mirroring and options */
-				{
-					m_vrom4k = m_drmario_shiftreg & 0x10;
-					m_size16k = m_drmario_shiftreg & 0x08;
-					m_switchlow = m_drmario_shiftreg & 0x04;
-					// 0x03: mirroring bits unused on VS
-				}
-			break;
+			case 0: // mirroring and options
+				m_mmc1_chr4k = m_mmc1_shiftreg & 0x10;
+				m_mmc1_prg16k = m_mmc1_shiftreg & 0x08;
+				m_mmc1_switchlow = m_mmc1_shiftreg & 0x04;
+				// 0x03: mirroring bits unused on VS
+				break;
 
-			case 1: /* video rom banking - bank 0 - 4k or 8k */
-				v_set_videorom_bank(0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
-			break;
+			case 1: // video rom banking - bank 0 - 4k or 8k
+				if (m_mmc1_chr4k)
+					v_set_videorom_bank(0, 4, m_mmc1_shiftreg * 4);
+				else
+					v_set_videorom_bank(0, 8, (m_mmc1_shiftreg & ~1) * 4);
+				break;
 
-			case 2: /* video rom banking - bank 1 - 4k only */
-				if (m_vrom4k)
-					v_set_videorom_bank(4, 4, m_drmario_shiftreg * 4);
-			break;
+			case 2: // video rom banking - bank 1 - 4k only
+				if (m_mmc1_chr4k)
+					v_set_videorom_bank(4, 4, m_mmc1_shiftreg * 4);
+				break;
 
-			case 3: /* program banking */
-				{
-					int bank = (m_drmario_shiftreg & 0x03) * 0x4000;
-					uint8_t *prg = memregion("maincpu")->base();
-
-					if (!m_size16k)
-					{
-						/* switch 32k */
-						memcpy(&prg[0x08000], &prg[0x010000 + bank], 0x8000);
-					}
-					else
-					{
-						/* switch 16k */
-						if (m_switchlow)
-						{
-							/* low */
-							memcpy(&prg[0x08000], &prg[0x010000 + bank], 0x4000);
-						}
-						else
-						{
-							/* high */
-							memcpy(&prg[0x0c000], &prg[0x010000 + bank], 0x4000);
-						}
-					}
-				}
-			break;
+			case 3: // program banking
+				if (m_mmc1_prg16k)
+					prg16(!m_mmc1_switchlow, m_mmc1_shiftreg);
+				else
+					prg32(m_mmc1_shiftreg >> 1);
+				break;
 		}
-
-		m_drmario_shiftreg = 0;
 	}
 }
 
 void vsnes_state::init_drmario()
 {
-	/* We do manual banking, in case the code falls through */
-	/* Copy the initial banks */
-	uint8_t *prg = memregion("maincpu")->base();
-	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
-	memcpy(&prg[0x0c000], &prg[0x1c000], 0x4000);
+	// point program banks to last 32K
+	init_prg_banking();
 
-	/* MMC1 mapper at writes to $8000-$ffff */
+	// MMC1 mapper at $8000-$ffff
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::drmario_rom_banking)));
 
-	m_drmario_shiftreg = 0;
-	m_drmario_shiftcount = 0;
+	m_mmc1_shiftreg = 0;
+	m_mmc1_shiftcount = 0;
 }
 
-/**********************************************************************************/
-/* Games with VRAM instead of graphics ROMs: ROMs bankings at $8000-$ffff */
+//**********************************************************************************
+// (UNROM) Games with VRAM instead of graphics ROMs: ROM banking at $8000-$ffff
 
-void vsnes_state::vsvram_rom_banking(uint8_t data)
+void vsnes_state::vsvram_rom_banking(u8 data)
 {
-	int rombank = 0x10000 + (data & 7) * 0x4000;
-	uint8_t *prg = memregion("maincpu")->base();
-
-	memcpy(&prg[0x08000], &prg[rombank], 0x4000);
+	prg16(0, data);
 }
 
 void vsnes_state::init_vsvram()
 {
-	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	uint8_t *prg = memregion("maincpu")->base();
-	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
+	// point program banks to last 32K
+	init_prg_banking();
 
-	/* banking is done with writes to the $8000-$ffff area */
+	// banking is done with writes to the $8000-$ffff area
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(vsnes_state::vsvram_rom_banking)));
 }
 
-/**********************************************************************************/
+//**********************************************************************************
+// (Namco) 108 (MMC3 predecessor) games
 
-
-void vsnes_state::vs108_rom_banking(offs_t offset, uint8_t data)
+void vsnes_state::vs108_rom_banking(offs_t offset, u8 data)
 {
 	switch (offset & 0x6001)
 	{
@@ -450,11 +437,7 @@ void vsnes_state::vs108_rom_banking(offs_t offset, uint8_t data)
 					v_set_videorom_bank(m_108_reg + 2, 1, data);
 					break;
 				case 6: case 7:
-					{
-						uint8_t *prg = memregion("maincpu")->base();
-						int addr = m_108_reg == 6 ? 0x8000 : 0xa000;
-						memcpy(&prg[addr], &prg[0x2000 * (data & m_108_prg_mask) + 0x10000], 0x2000);
-					}
+					prg8(m_108_reg - 6, data);
 					break;
 			}
 			break;
@@ -469,115 +452,87 @@ void vsnes_state::vs108_rom_banking(offs_t offset, uint8_t data)
 
 void vsnes_state::init_vs108()
 {
-	uint8_t *prg = memregion("maincpu")->base();
-	int prg_chunks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	// point program banks to last 32K
+	init_prg_banking();
 
 	m_108_reg = 0;
-	m_108_prg_mask = (prg_chunks << 1) - 1;
-
-	memcpy(&prg[0x8000], &prg[(prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
-	memcpy(&prg[0xa000], &prg[(prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
-	memcpy(&prg[0xc000], &prg[(prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
-	memcpy(&prg[0xe000], &prg[(prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
 
 	// 108 chip at $8000-$9fff
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::vs108_rom_banking)));
 }
 
-/* Vs. RBI Baseball */
-
-uint8_t vsnes_state::rbi_hack_r(offs_t offset)
+// Vs. RBI Baseball
+// rbibb uses a protection chip labeled '127'
+// Tests indicate that '127' uses a LFSR with taps: 23, 18, 0
+// It is still unknown how bits are then shuffled for readback at 0x5601/0x5e01
+u8 vsnes_state::rbibb_prot_r(offs_t offset)
 {
-	/* Supplied by Ben Parnell <xodnizel@home.com> of FCE Ultra fame */
-
+	static constexpr u8 prot_data[32] = {
+		0xff, 0xfd, 0xf5, 0xf4, 0xb4, 0xb4, 0xa6, 0x2e,
+		0x2f, 0x6f, 0x6f, 0x7d, 0xd5, 0xd4, 0x94, 0x94,
+		0x86, 0x2e, 0x2f, 0x6f, 0x6b, 0x79, 0xd1, 0xd0,
+		0x92, 0x92, 0x8d, 0x65, 0x64, 0x34, 0xb0, 0xa2
+	};
 
 	if (offset == 0)
 	{
-		m_VSindex=0;
-		return 0xFF;
-
+		m_prot_index = 0;
+		return 0;
 	}
-	else
-	{
-		switch(m_VSindex++)
-		{
-			case 9:
-				return 0x6F;
 
-			case 14:
-				return 0x94;
-
-			default:
-				return 0xB4;
-		}
-	}
+	return prot_data[m_prot_index++];
 }
 
 void vsnes_state::init_rbibb()
 {
 	init_vs108();
 
-	/* RBI Base ball hack */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::rbi_hack_r)));
+	// RBI Base ball protection, address full decoded except A11
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5600, 0x5601, read8sm_delegate(*this, FUNC(vsnes_state::rbibb_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::rbibb_prot_r)));
 }
 
-/* Vs. Super Xevious */
+// Vs. Super Xevious
 
-
-uint8_t vsnes_state::supxevs_read_prot_1_r()
+u8 vsnes_state::supxevs_prot_1_r()
 {
+	m_prot_index ^= 1;
 	return 0x05;
 }
 
-uint8_t vsnes_state::supxevs_read_prot_2_r()
+u8 vsnes_state::supxevs_prot_2_r()
 {
-	if (m_supxevs_prot_index)
-		return 0;
-	else
-		return 0x01;
+	return m_prot_index ? 0x01 : 0x00;
 }
 
-uint8_t vsnes_state::supxevs_read_prot_3_r()
+u8 vsnes_state::supxevs_prot_3_r()
 {
-	if (m_supxevs_prot_index)
-		return 0xd1;
-	else
-		return 0x89;
+	return m_prot_index ? 0x89 : 0xd1;
 }
 
-uint8_t vsnes_state::supxevs_read_prot_4_r()
+u8 vsnes_state::supxevs_prot_4_r()
 {
-	if (m_supxevs_prot_index)
-	{
-		m_supxevs_prot_index = 0;
-		return 0x3e;
-	}
-	else
-	{
-		m_supxevs_prot_index = 1;
-		return 0x37;
-	}
+	return m_prot_index ? 0x37 : 0x3e;
 }
-
 
 void vsnes_state::init_supxevs()
 {
 	init_vs108();
 
-	/* Vs. Super Xevious Protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x54ff, 0x54ff, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5678, 0x5678, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x578f, 0x578f, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_3_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5567, 0x5567, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_4_r)));
+	// Vs. Super Xevious Protection
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x54ff, 0x54ff, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_prot_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5678, 0x5678, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_prot_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x578f, 0x578f, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_prot_3_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5567, 0x5567, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_prot_4_r)));
 
-	m_supxevs_prot_index = 0;
+	m_prot_index = 0;
 }
 
-/* Vs. TKO Boxing */
-
-uint8_t vsnes_state::tko_security_r(offs_t offset)
+// Vs. TKO Boxing
+// tkoboxng uses a protection chip labeled '128'
+u8 vsnes_state::tkoboxng_prot_r(offs_t offset)
 {
-	static const uint8_t security_data[] = {
+	static constexpr u8 prot_data[32] = {
 		0xff, 0xbf, 0xb7, 0x97, 0x97, 0x17, 0x57, 0x4f,
 		0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90, 0x94, 0x14,
 		0x56, 0x4e, 0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90,
@@ -586,23 +541,22 @@ uint8_t vsnes_state::tko_security_r(offs_t offset)
 
 	if (offset == 0)
 	{
-		m_security_counter = 0;
+		m_prot_index = 0;
 		return 0;
 	}
 
-	return security_data[(m_security_counter++)];
-
+	return prot_data[m_prot_index++];
 }
 
 void vsnes_state::init_tkoboxng()
 {
 	init_vs108();
 
-	/* security device at $5e00-$5e01 */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::tko_security_r)));
+	// security device at $5e00-$5e01
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::tkoboxng_prot_r)));
 }
 
-/* Vs. Freedom Force */
+// Vs. Freedom Force
 
 void vsnes_state::init_vsfdf()
 {
@@ -611,10 +565,10 @@ void vsnes_state::init_vsfdf()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::gun_in0_w)));
 }
 
-/**********************************************************************************/
-/* Platoon rom banking */
+//**********************************************************************************
+// Sunsoft-3 (Platoon) rom banking
 
-void vsnes_state::sunsoft3_rom_banking(offs_t offset, uint8_t data)
+void vsnes_state::sunsoft3_rom_banking(offs_t offset, u8 data)
 {
 	switch (offset & 0x7800)
 	{
@@ -623,34 +577,28 @@ void vsnes_state::sunsoft3_rom_banking(offs_t offset, uint8_t data)
 		case 0x2800:
 		case 0x3800:
 			v_set_videorom_bank((offset >> 11) & 0x06, 2, data * 2);
-		break;
+			break;
 
 		case 0x7800:
-		{
-			uint8_t *prg = memregion("maincpu")->base();
-			memcpy(&prg[0x08000], &prg[0x10000 + data * 0x4000], 0x4000);
-		}
-		break;
-
+			prg16(0, data);
+			break;
 	}
 
 }
 
 void vsnes_state::init_platoon()
 {
-	/* when starting a mapper 67 game the first 16K ROM bank in the cart is loaded into $8000
-	the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
-
-	uint8_t *prg = memregion("maincpu")->base();
-	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
-	memcpy(&prg[0x0c000], &prg[0x2c000], 0x4000);
+	// point program banks to last 32K
+	init_prg_banking();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::sunsoft3_rom_banking)));
 }
 
-/**********************************************************************************/
-/* Vs. Raid on Bungeling Bay (Japan) */
+//**********************************************************************************
+// Vs. Raid on Bungeling Bay (Japan)
 
+// FIXME: this is a bad hack! The unused 8K ROM in the driver supposedly runs on the main CPU (protection?)
+// and does some sort of handshake (with IRQs) with the game running on the sub CPU.
 void vsnes_state::set_bnglngby_irq_w(uint8_t data)
 {
 	m_ret = data;
@@ -674,42 +622,42 @@ void vsnes_state::init_bnglngby()
 	init_vsnormal();
 }
 
-/**********************************************************************************/
-/* VS Dualsystem */
+//**********************************************************************************
+// VS Dualsystem
 
-void vsnes_state::vsdual_vrom_banking_main(uint8_t data)
+void vsnes_state::vsdual_vrom_banking_main(u8 data)
 {
-	/* switch vrom */
+	// switch vrom
 	m_chr_banks[0]->set_entry(BIT(data, 2));
 
-	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
+	// bit 1 ( data & 2 ) triggers irq on the other cpu
 	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
-	/* move along */
+	// move along
 	vsnes_in0_w(data);
 }
 
-void vsnes_state::vsdual_vrom_banking_sub(uint8_t data)
+void vsnes_state::vsdual_vrom_banking_sub(u8 data)
 {
-	/* switch vrom */
+	// switch vrom
 	m_chr_banks[1]->set_entry(BIT(data, 2));
 
-	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
+	// bit 1 ( data & 2 ) triggers irq on the other cpu
 	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
-	/* move along */
+	// move along
 	vsnes_in0_1_w(data);
 }
 
 void vsnes_state::init_vsdual()
 {
-	/* vrom switching is enabled with bit 2 of $4016 */
+	// vrom switching is enabled with bit 2 of $4016
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsdual_vrom_banking_main)));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsdual_vrom_banking_sub)));
 }
 
-/**********************************************************************************/
-/* Vs. Super Mario Bros (Bootleg) */
+//**********************************************************************************
+// Vs. Super Mario Bros (Bootleg)
 
 void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
 {
@@ -722,11 +670,11 @@ void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
 	}
 }
 
-uint8_t vsnes_state::vsnes_bootleg_ppudata()
+u8 vsnes_state::vsnes_bootleg_ppudata()
 {
 	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
 	m_chr_banks[0]->set_entry(1);
-	uint8_t data = m_ppu1->read(0x2007);
+	u8 data = m_ppu1->read(0x2007);
 	m_chr_banks[0]->set_entry(0);
 
 	return data;
