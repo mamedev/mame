@@ -16,8 +16,98 @@
 
 #include <lua.hpp>
 
+#include <cassert>
 #include <system_error>
 
+
+
+class lua_engine::buffer_helper
+{
+private:
+	class proxy
+	{
+	private:
+		buffer_helper &m_host;
+		char *m_space;
+		size_t const m_size;
+
+	public:
+		proxy(proxy const &) = delete;
+		proxy &operator=(proxy const &) = delete;
+
+		proxy(proxy &&that) : m_host(that.m_host), m_space(that.m_space), m_size(that.m_size)
+		{
+			that.m_space = nullptr;
+		}
+
+		proxy(buffer_helper &host, size_t size) : m_host(host), m_space(luaL_prepbuffsize(&host.m_buffer, size)), m_size(size)
+		{
+			m_host.m_prepared = true;
+		}
+
+		~proxy()
+		{
+			if (m_space)
+			{
+				assert(m_host.m_prepared);
+				luaL_addsize(&m_host.m_buffer, 0U);
+				m_host.m_prepared = false;
+			}
+		}
+
+		char *get()
+		{
+			return m_space;
+		}
+
+		void add(size_t size)
+		{
+			assert(m_space);
+			assert(size <= m_size);
+			assert(m_host.m_prepared);
+			m_space = nullptr;
+			luaL_addsize(&m_host.m_buffer, size);
+			m_host.m_prepared = false;
+		}
+	};
+
+	luaL_Buffer m_buffer;
+	bool m_valid;
+	bool m_prepared;
+
+public:
+	buffer_helper(buffer_helper const &) = delete;
+	buffer_helper &operator=(buffer_helper const &) = delete;
+
+	buffer_helper(lua_State *L)
+	{
+		luaL_buffinit(L, &m_buffer);
+		m_valid = true;
+		m_prepared = false;
+	}
+
+	~buffer_helper()
+	{
+		assert(!m_prepared);
+		if (m_valid)
+			luaL_pushresult(&m_buffer);
+	}
+
+	void push()
+	{
+		assert(m_valid);
+		assert(!m_prepared);
+		luaL_pushresult(&m_buffer);
+		m_valid = false;
+	}
+
+	proxy prepare(size_t size)
+	{
+		assert(m_valid);
+		assert(!m_prepared);
+		return proxy(*this, size);
+	}
+};
 
 
 template <typename T>
@@ -40,51 +130,8 @@ struct lua_engine::tag_object_ptr_map
 
 namespace sol {
 
-class buffer
-{
-public:
-	// sol does lua_settop(0), save userdata buffer in registry if necessary
-	buffer(int size, lua_State *L)
-	{
-		ptr = luaL_buffinitsize(L, &buff, size);
-		len = size;
-		if(buff.b != buff.initb)
-		{
-			lua_pushvalue(L, -1);
-			lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
-		}
-	}
-	~buffer()
-	{
-		lua_State *L = buff.L;
-		if(lua_getfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp") != LUA_TNIL)
-		{
-			lua_pushnil(L);
-			lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
-		}
-		else
-			lua_pop(L, -1);
-
-		luaL_pushresultsize(&buff, len);
-	}
-
-	void set_len(int size) { len = size; }
-	int get_len() { return len; }
-	char *get_ptr() { return ptr; }
-
-private:
-	luaL_Buffer buff;
-	int len;
-	char *ptr;
-};
-
-
-// don't convert core_optons to a table directly
+// don't convert core_options to a table directly
 template <> struct is_container<core_options> : std::false_type { };
-
-// buffer customisation
-sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking);
-int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
 
 
 // these things should be treated as containers

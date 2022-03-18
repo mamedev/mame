@@ -88,6 +88,7 @@
 #include "machine/pic8259.h"
 #include "bus/rs232/rs232.h"
 #include "bus/multibus/multibus.h"
+#include "bus/multibus/isbc202.h"
 
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     8_MHz_XTAL
@@ -113,9 +114,13 @@ private:
 	void ipclocpic_w(offs_t offset, uint8_t data);
 
 	virtual void driver_start() override;
+	virtual void driver_reset() override;
 
 	void ipc_io_map(address_map &map);
 	void ipc_mem_map(address_map &map);
+
+	u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
+	void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
 
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;
@@ -125,24 +130,39 @@ private:
 	required_device<ls259_device> m_ipcctrl;
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<imds2ioc_device> m_ioc;
+	required_device<multibus_device> m_bus;
 	required_device<multibus_slot_device> m_slot;
 
-	std::vector<uint8_t> m_ipc_ram;
-
-	bool in_ipc_rom(offs_t offset) const;
-
-	// IPC ROM content
-	required_region_ptr<uint8_t> m_ipc_rom;
+	required_shared_ptr<u8> m_ram;
+	memory_view m_boot;
 };
 
 void imds2_state::ipc_mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
+	map(0x0000, 0xffff).ram().share("ram");
+
+	// selectively map the boot/diagnostic segment
+	map(0x0000, 0xefff).view(m_boot);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 0
+	m_boot[0](0x0000, 0x07ff).rom().region("ipcrom", 0);
+	m_boot[0](0xe800, 0xefff).rom().region("ipcrom", 0);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 1
+	m_boot[1](0xe800, 0xefff).rom().region("ipcrom", 0);
+
+	// monitor segment
+	map(0xf800, 0xffff).rom().region("ipcrom", 0x800);
 }
 
 void imds2_state::ipc_io_map(address_map &map)
 {
 	map.unmap_value_low();
+
+	// map PIO to Multibus by default
+	map(0x00, 0xff).rw(FUNC(imds2_state::bus_pio_r), FUNC(imds2_state::bus_pio_w));
+
+	// local bus PIO
 	map(0xc0, 0xc1).rw(m_ioc, FUNC(imds2ioc_device::dbb_master_r), FUNC(imds2ioc_device::dbb_master_w));
 	map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf4, 0xf5).rw(m_ipcusart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -163,25 +183,11 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcctrl(*this, "ipcctrl"),
 	m_serial(*this, "serial%u", 0U),
 	m_ioc(*this, "ioc"),
-	m_slot(*this, "slot"),
-	m_ipc_rom(*this, "ipcrom")
+	m_bus(*this, "slot"),
+	m_slot(*this, "slot:1"),
+	m_ram(*this, "ram"),
+	m_boot(*this, "boot")
 {
-}
-
-uint8_t imds2_state::ipc_mem_read(offs_t offset)
-{
-	if (in_ipc_rom(offset)) {
-		return m_ipc_rom[ (offset & 0x07ff) | ((offset & 0x1000) >> 1) ];
-	} else {
-		return m_ipc_ram[ offset ];
-	}
-}
-
-void imds2_state::ipc_mem_write(offs_t offset, uint8_t data)
-{
-	if (!in_ipc_rom(offset)) {
-		m_ipc_ram[ offset ] = data;
-	}
 }
 
 void imds2_state::ipc_control_w(uint8_t data)
@@ -190,6 +196,13 @@ void imds2_state::ipc_control_w(uint8_t data)
 	// b3 is ~(bit to be written)
 	// b2-b0 is ~(no. of bit to be written)
 	m_ipcctrl->write_bit(~data & 7, BIT(~data, 3));
+
+	// SEL_BOOT/ == 0
+	if (!m_ipcctrl->q3_r())
+		// START_UP/
+		m_boot.select(m_ipcctrl->q5_r());
+	else
+		m_boot.disable();
 }
 
 WRITE_LINE_MEMBER(imds2_state::ipc_intr_w)
@@ -219,39 +232,22 @@ void imds2_state::ipclocpic_w(offs_t offset, uint8_t data)
 
 void imds2_state::driver_start()
 {
-	// Allocate 64k for IPC RAM
-	m_ipc_ram.resize(0x10000);
-
-	m_slot->install_io_rw(m_ipccpu->space(AS_IO));
-	m_slot->install_mem_rw(m_ipccpu->space(AS_PROGRAM));
+	// share local RAM on Multibus
+	m_bus->space(AS_PROGRAM).install_ram(0x0000, 0xffff, m_ram.target());
 }
 
-bool imds2_state::in_ipc_rom(offs_t offset) const
+void imds2_state::driver_reset()
 {
-	offs_t masked_offset = offset & 0xf800;
-	bool start_up = m_ipcctrl->q5_r();
-	bool sel_boot = m_ipcctrl->q3_r();
-
-	// Region 0000-07ff is in ROM when START_UP/ == 0 && SEL_BOOT/ == 0
-	if (masked_offset == 0x0000 && !start_up && !sel_boot) {
-		return true;
-	}
-
-	// Region e800-efff is in ROM when SEL_BOOT/ == 0
-	if (masked_offset == 0xe800 && !sel_boot) {
-		return true;
-	}
-
-	// Region f800-ffff is always in ROM
-	if (masked_offset == 0xf800) {
-		return true;
-	}
-
-	return false;
+	m_boot.select(0);
 }
 
 static INPUT_PORTS_START(imds2)
 INPUT_PORTS_END
+
+static void imds2_cards(device_slot_interface &device)
+{
+	device.option_add("isbc202", ISBC202);
+}
 
 void imds2_state::imds2(machine_config &config)
 {
@@ -307,7 +303,8 @@ void imds2_state::imds2(machine_config &config)
 	m_ioc->master_intr_cb().set(m_ipclocpic, FUNC(pic8259_device::ir6_w));
 	m_ioc->parallel_int_cb().set(m_ipclocpic, FUNC(pic8259_device::ir5_w));
 
-	MULTIBUS_SLOT(config , m_slot , 0);
+	MULTIBUS(config, m_bus, 9'830'400);
+	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
 }
 
 ROM_START(imds2)

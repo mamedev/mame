@@ -165,7 +165,7 @@ private:
 
 	void drive_w(offs_t offset, u8 data);
 
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<i8257_device> m_dma;

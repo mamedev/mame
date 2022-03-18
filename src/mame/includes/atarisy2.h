@@ -78,14 +78,14 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 	required_region_ptr<uint16_t> m_slapstic_region;
 
-	uint8_t           m_interrupt_enable;
+	uint8_t           m_interrupt_enable = 0U;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_shared_ptr<uint16_t> m_xscroll;
 	required_shared_ptr<uint16_t> m_yscroll;
 
-	int8_t            m_pedal_count;
+	int8_t            m_pedal_count = 0U;
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
@@ -93,10 +93,10 @@ private:
 	required_device_array<pokey_device, 2> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
 
-	bool            m_scanline_int_state;
-	bool            m_video_int_state;
-	bool            m_p2portwr_state;
-	bool            m_p2portrd_state;
+	bool            m_scanline_int_state = 0;
+	bool            m_video_int_state = 0;
+	bool            m_p2portwr_state = 0;
+	bool            m_p2portrd_state = 0;
 
 	required_memory_bank_array<2> m_rombank;
 	required_device<atari_slapstic_device> m_slapstic;
@@ -104,19 +104,19 @@ private:
 	required_shared_ptr<uint16_t> m_playfieldt;
 	required_shared_ptr<uint16_t> m_playfieldb;
 
-	uint8_t           m_sound_reset_state;
+	uint8_t         m_sound_reset_state = 0U;
 
-	emu_timer *     m_yscroll_reset_timer;
-	uint32_t          m_playfield_tile_bank[2];
+	emu_timer *     m_yscroll_reset_timer = 0;
+	uint32_t        m_playfield_tile_bank[2]{};
 
 	// 720 fake joystick
-	double          m_joy_last_angle;
-	int             m_joy_rotations;
+	double          m_joy_last_angle = 0;
+	int             m_joy_rotations = 0;
 
 	// 720 fake spinner
-	uint32_t          m_spin_last_rotate_count;
-	int32_t           m_spin_pos;                 /* track fake position of spinner */
-	uint32_t          m_spin_center_count;
+	uint32_t        m_spin_last_rotate_count = 0U;
+	int32_t         m_spin_pos = 0;                 /* track fake position of spinner */
+	uint32_t        m_spin_center_count = 0U;
 
 	output_finder<2> m_leds;
 

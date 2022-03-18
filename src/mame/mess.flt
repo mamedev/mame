@@ -657,6 +657,7 @@ mk1forth.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
+mk98.cpp
 mkit09.cpp
 ml20.cpp
 mmd1.cpp

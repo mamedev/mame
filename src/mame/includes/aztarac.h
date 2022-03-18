@@ -34,9 +34,9 @@ public:
 
 	required_shared_ptr<uint16_t> m_vectorram;
 
-	int m_sound_status;
-	int m_xcenter;
-	int m_ycenter;
+	int m_sound_status = 0;
+	int m_xcenter = 0;
+	int m_ycenter = 0;
 
 	void nvram_store_w(uint16_t data);
 	uint16_t joystick_r();

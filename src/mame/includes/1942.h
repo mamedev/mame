@@ -72,12 +72,12 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int m_palette_bank;
-	uint8_t m_scroll[2];
+	tilemap_t *m_fg_tilemap = 0;
+	tilemap_t *m_bg_tilemap = 0;
+	int m_palette_bank = 0;
+	uint8_t m_scroll[2]{};
 	void create_palette(palette_device &palette) const;
-	uint8_t m_sprite_bufs[2][512];
+	uint8_t m_sprite_bufs[2][512]{};
 };
 
 class _1942p_state : public _1942_state

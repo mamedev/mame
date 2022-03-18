@@ -58,6 +58,7 @@
 #include "pachinko.h"
 #include "partytap.h"
 #include "powerpad.h"
+#include "rob.h"
 #include "snesadapter.h"
 #include "suborkey.h"
 #include "turbofile.h"
@@ -197,6 +198,11 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("4score_p2p4", NES_4SCORE_P2P4);
 	device.option_add("snes_adapter", NES_SNESADAPTER);
 	device.option_add("vboy", NES_VBOYCTRL);
+}
+
+void nes_control_special_devices(device_slot_interface &device)
+{
+	device.option_add("rob", NES_ROB);
 }
 
 void fc_control_port1_devices(device_slot_interface &device)

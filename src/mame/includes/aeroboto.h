@@ -45,21 +45,21 @@ public:
 	required_shared_ptr<uint8_t> m_bgcolor;
 
 	/* stars layout */
-	uint8_t * m_stars_rom;
-	int     m_stars_length;
+	uint8_t * m_stars_rom = 0U;
+	int     m_stars_length = 0;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	int     m_charbank;
-	int     m_starsoff;
-	int     m_sx;
-	int     m_sy;
-	uint8_t   m_ox;
-	uint8_t   m_oy;
+	tilemap_t *m_bg_tilemap = 0;
+	int     m_charbank = 0;
+	int     m_starsoff = 0;
+	int     m_sx = 0;
+	int     m_sy = 0;
+	uint8_t   m_ox = 0U;
+	uint8_t   m_oy = 0U;
 
 	/* misc */
-	int m_count;
-	int m_disable_irq;
+	int m_count = 0;
+	int m_disable_irq = 0;
 	uint8_t aeroboto_201_r();
 	uint8_t aeroboto_irq_ack_r();
 	uint8_t aeroboto_2973_r();

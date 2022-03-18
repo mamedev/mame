@@ -88,7 +88,7 @@ offs_t amis2000_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	u8 op = opcodes.r8(pc);
 	u8 instr = s2000_mnemonic[op];
 
-	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-6s", s_mnemonics[instr]);
 
 	// opcode parameter
 	int mask = s_bits[instr];

@@ -2215,6 +2215,10 @@ end
 --------------------------------------------------
 -- Sharp SM510 series
 --@src/devices/cpu/sm510/sm510.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm511.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm530.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm590.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm5a.h,CPUS["SM510"] = true
 --------------------------------------------------
 
 if CPUS["SM510"] then
@@ -2846,6 +2850,26 @@ end
 if opt_tool(CPUS, "SUPERFX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.h")
+end
+
+--------------------------------------------------
+-- Rockwell B5000 family
+--@src/devices/cpu/b5000/b5000.h,CPUS["B5000"] = true
+--------------------------------------------------
+
+if CPUS["B5000"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/b5000/b5000base.cpp",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000base.h",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000.cpp",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000.h",
+		MAME_DIR .. "src/devices/cpu/b5000/b5000op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "B5000") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.h")
 end
 
 --------------------------------------------------

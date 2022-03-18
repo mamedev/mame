@@ -106,28 +106,28 @@ protected:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_register;
 
-	tilemap_t  *m_alpha1_tilemap;
-	tilemap_t  *m_alpha2_tilemap;
-	tilemap_t  *m_field_tilemap;
+	tilemap_t  *m_alpha1_tilemap = 0;
+	tilemap_t  *m_alpha2_tilemap = 0;
+	tilemap_t  *m_field_tilemap = 0;
 
 	/* sound-related */
-	int m_ctrld;
-	int m_sign_x_1;
-	int m_sign_y_1;
-	int m_sign_x_2;
-	int m_sign_y_2;
-	int m_sign_x_3;
-	int m_sign_y_3;
-	int m_sign_x_4;
-	int m_sign_y_4;
-	int m_counter_x_in0;
-	int m_counter_y_in0;
-	int m_counter_x_in0b;
-	int m_counter_y_in0b;
-	int m_counter_x_in2;
-	int m_counter_y_in2;
-	int m_counter_x_in2b;
-	int m_counter_y_in2b;
+	int m_ctrld = 0;
+	int m_sign_x_1 = 0;
+	int m_sign_y_1 = 0;
+	int m_sign_x_2 = 0;
+	int m_sign_y_2 = 0;
+	int m_sign_x_3 = 0;
+	int m_sign_y_3 = 0;
+	int m_sign_x_4 = 0;
+	int m_sign_y_4 = 0;
+	int m_counter_x_in0 = 0;
+	int m_counter_y_in0 = 0;
+	int m_counter_x_in0b = 0;
+	int m_counter_y_in0b = 0;
+	int m_counter_x_in2 = 0;
+	int m_counter_y_in2 = 0;
+	int m_counter_x_in2b = 0;
+	int m_counter_y_in2b = 0;
 };
 
 //----------- defined in audio/atarifb.cpp -----------

@@ -30,24 +30,34 @@ Of the solid-state games, Asteroid Annie is single-player - the others are 4-pla
 
 Game List: (the ROM letter is stamped onto the personality prom)
 
-Number  ROM  Name
-409     A    Cleopatra
-412SS   B    Sinbad
-417SS   C    Joker Poker
-419SS   D    Dragon
-421SS   E    Solar Ride
-422SS   F    Countdown
-424SS   G    Close Encounters of the third kind
-425SS   H    Charlie's Angels
-427SS   I    Pinball Pool
-429SS   J    Totem
-433SS   K    The Incredible Hulk
-435     L    Genie
-437     N    Buck Rogers
-438     P    Torch
-440     R    Roller Disco
-442     S    Asteroid Annie and the Aliens
-        T    Test Prom
+Game                                  NUM    ROM
+------------------------------------------------
+Cleopatra                             409     A
+Sinbad                                412SS   B
+Joker Poker                           417SS   C
+Dragon                                419SS   D
+Solar Ride                            421SS   E
+Countdown                             422SS   F
+Close Encounters of the third kind    424SS   G
+Charlie's Angels                      425SS   H
+Pinball Pool                          427SS   I
+Totem                                 429SS   J
+The Incredible Hulk                   433SS   K
+Genie                                 435     L
+Buck Rogers                           437     N
+Torch                                 438     P
+Roller Disco                          440     R
+Asteroid Annie and the Aliens         442     S
+Test Prom                                     T
+**** Other Manufacturer ****
+Hell's Queen
+Sky Warrior
+Tiger Woman
+L'Hexagone
+Sahara Love
+Movie
+Jungle Queen
+
 
 The personality prom is programmed in PGOL (pinball-game oriented language).
 
@@ -659,7 +669,7 @@ u8 gts1_state::gts1_lamp_apm_r(offs_t offset) // Think this works - dips seem to
 			if (m_z30_out < 3)
 				data = BIT(m_dips[m_z30_out]->read(),0,4);
 			break;
-		case 1: // group B switches S05-S08, S09-S12, S17-S20
+		case 1: // group B switches S05-S08, S13-S16, S21-S24
 			if (m_z30_out < 3)
 				data = BIT(m_dips[m_z30_out]->read(),4,4);
 			break;
@@ -1051,31 +1061,31 @@ ROM_END
 } // Anonymous namespace
 
 GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // chimes
-GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  dragon,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  solaride, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  countdwn, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  dragon,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  solaride, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  countdwn, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // NE555 beeper
-GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound card
-GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  hulk,     gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  geniep,   gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  buckrgrs, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  torch,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  roldisco, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  astannie, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  hulk,     gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  geniep,   gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  buckrgrs, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  torch,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  roldisco, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  astannie, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-// homebrew
-GAME(1984,  sahalove, sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
-GAME(1986,  hexagone, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)
+// other manufacturer
+GAME(1984,  sahalove, sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  hexagone, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

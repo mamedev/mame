@@ -56,10 +56,10 @@ protected:
 	virtual void machine_reset() override;
 
 	/* video-related */
-	uint8_t      m_priority;
+	uint8_t      m_priority = 0U;
 
 	/* misc */
-	int        m_firq_enable;
+	int        m_firq_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

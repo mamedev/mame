@@ -49,7 +49,7 @@ private:
 	void program_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = 0;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;

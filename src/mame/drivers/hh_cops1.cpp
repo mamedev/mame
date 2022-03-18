@@ -125,7 +125,7 @@ namespace {
   Mattel Basketball (model 2437)
   * PCB label: MA 6017/18/19
   * MM5799 MCU die bonded directly to PCB (die label MM4799 C NCX)
-  * 4001 and 74145, also bonded to PCB
+  * 4001 and 74154, also bonded to PCB
   * 2-digit 7seg led display, 21 leds, 2-bit sound
 
   Mattel Soccer (model 2678)

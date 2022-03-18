@@ -1402,7 +1402,9 @@ ROM_START( bonzeadv )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // banked
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	// no ADPCM-A samples
+	
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1427,7 +1429,9 @@ ROM_START( bonzeadvo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // banked
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	// no ADPCM-A samples
+	
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1452,7 +1456,9 @@ ROM_START( bonzeadvu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // banked
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	// no ADPCM-A samples
+	
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1477,7 +1483,9 @@ ROM_START( jigkmgri )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // banked
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	// no ADPCM-A samples
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1511,7 +1519,9 @@ ROM_START( bonzeadvp ) // Labels consists of hand written checksum values of the
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump // banked
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	// no ADPCM-A samples
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "6089.ic17",  0x00000, 0x20000, CRC(b092783c) SHA1(e13f765e2884b6194926bf982595de18376ffef9) ) // these 4 == b41-04.48 but split
 	ROM_LOAD( "2e1f.ic14",  0x20000, 0x20000, CRC(df1f87c0) SHA1(ad3df38c22f1bb7bdc449922bd3c2a5c78aa87f8) ) // ^
 	ROM_LOAD( "f66e.ic11",  0x40000, 0x20000, CRC(c6df1b3e) SHA1(84d6ad3e3af565060aa4324c6e3e91e4dc5089b6) ) // ^
