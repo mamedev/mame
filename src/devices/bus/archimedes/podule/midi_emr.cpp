@@ -70,7 +70,7 @@ protected:
 
 void arc_midi2_emr_device::ioc_map(address_map &map)
 {
-	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 11) & 0x7800) ^ 0x4000]; })).umask32(0x000000ff);
+	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | (((m_rom_page << 11) & 0x7800) ^ 0x4000)]; })).umask32(0x000000ff);
 	map(0x1000, 0x1000).lw8(NAME([this](u8 data) { m_rom_page = data; }));
 	map(0x2000, 0x203f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0x000000ff);
 }
