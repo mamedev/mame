@@ -134,6 +134,9 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	int m_pcwidth;      // Program Counter bit-width
 	int m_prgwidth;
 	int m_datawidth;
@@ -151,7 +154,6 @@ protected:
 	int m_eint_line;    // which input_line caused an interrupt
 	int m_halt;         // internal HLT state
 	u8 m_prescaler;     // internal timer prescaler
-	int m_icount;
 
 	u16 m_pc;           // Program Counter
 	u16 m_prev_pc;

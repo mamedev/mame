@@ -110,7 +110,6 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		{
 			switch (param ^ 2)
 			{
-
 				case 1: stream << "S"; break; // 0,1
 				case 2: stream << "C"; break; // 1,0
 				case 3: stream << "C,S"; break; // 1,1
@@ -167,9 +166,9 @@ offs_t b5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 }
 
 
-// B5900/B6100 disasm (for A5xxx, the only difference is ATBZ = MTD)
+// B5500/B6100 disasm (for A5xxx, the only difference is ATBZ = MTD)
 
-const u8 b5900_disassembler::b5900_opmap[0x100] =
+const u8 b5500_disassembler::b5500_opmap[0x100] =
 {
 /*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
 	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   em_SC,   em_RSC,  0,       0,       // 0
@@ -193,7 +192,7 @@ const u8 b5900_disassembler::b5900_opmap[0x100] =
 	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
 };
 
-offs_t b5900_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t b5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return common_disasm(b5900_opmap, stream, pc, opcodes, params);
+	return common_disasm(b5500_opmap, stream, pc, opcodes, params);
 }

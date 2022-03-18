@@ -177,11 +177,11 @@ void pps41_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
 
 	m_state_count = 0;
-	state_add(++m_state_count, "PC", m_pc).formatstr("%03X");
-	state_add(++m_state_count, "A", m_a).formatstr("%01X");
-	state_add(++m_state_count, "C", m_c_in).formatstr("%01X");
-	state_add(++m_state_count, "B", m_b).formatstr("%02X");
-	state_add(++m_state_count, "S", m_s).formatstr("%01X");
+	state_add(++m_state_count, "PC", m_pc).formatstr("%03X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
+	state_add(++m_state_count, "C", m_c_in).formatstr("%01X"); // 3
+	state_add(++m_state_count, "B", m_b).formatstr("%02X"); // 4
+	state_add(++m_state_count, "S", m_s).formatstr("%01X"); // 5
 
 	set_icountptr(m_icount);
 }

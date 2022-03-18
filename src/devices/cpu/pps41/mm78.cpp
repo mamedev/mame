@@ -91,7 +91,7 @@ void mm78_device::device_start()
 	mm76_device::device_start();
 	m_stack_levels = 2;
 
-	state_add(++m_state_count, "X", m_x).formatstr("%01X");
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 6
 }
 
 void mm78_device::device_reset()

@@ -120,12 +120,14 @@ protected:
 	int m_datamask;
 	int m_pagemask;
 
+	int m_icount;
+	int m_state_count;
+
 	u16 m_pc, m_prev_pc;
 	u16 m_op, m_prev_op;
 	u8 m_param;
 	int m_stack_levels;
 	u16 m_stack[4]; // max 4
-	int m_icount;
 
 	u8 m_acc;
 	u8 m_bl;

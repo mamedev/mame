@@ -62,16 +62,16 @@ private:
 
 };
 
-class b5900_disassembler : public b5000_common_disassembler
+class b5500_disassembler : public b5000_common_disassembler
 {
 public:
-	b5900_disassembler() = default;
-	virtual ~b5900_disassembler() = default;
+	b5500_disassembler() = default;
+	virtual ~b5500_disassembler() = default;
 
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const u8 b5900_opmap[0x100];
+	static const u8 b5500_opmap[0x100];
 
 };
 
