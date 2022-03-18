@@ -3613,7 +3613,7 @@ license:CC0
 
 	<software name="win95a">
 		<description>Windows 95 OSR1 (en 4.00.950.osr1)</description> <!-- aka Windows 95A -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3625,7 +3625,7 @@ license:CC0
 
 	<software name="win95b">
 		<description>Windows 95 OSR2 (en 4.00.1111.osr2)</description> <!-- aka Windows 95B -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3637,7 +3637,7 @@ license:CC0
 
 	<software name="win95c">
 		<description>Windows 95 OSR2.5 (en 4.03.1216.osr2.5)</description> <!-- aka Windows 95C -->
-		<year>1995</year>
+		<year>1997</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3661,7 +3661,7 @@ license:CC0
 
 	<software name="win98se">
 		<description>Windows 98 Second Edition (en 4.10.2222) (Retail Full)</description>
-		<year>1998</year>
+		<year>1999</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3671,9 +3671,32 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98sejp">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 98SE.ccd" size="772" crc="65e992be" sha1="b869a3e83459f562966739caa22b46b5204e20cb"/>
+		<rom name="Microsoft Windows 98SE.cue" size="84" crc="a529c2b7" sha1="050dc1be1c9aeafd7e4d7ce7235285b8296f9eee"/>
+		<rom name="Microsoft Windows 98SE.img" size="546019152" crc="cbaea25b" sha1="6b1689232640632a7cc6e5de4967b922637c055d"/>
+		<rom name="Microsoft Windows 98SE.sub" size="22286496" crc="6dec77e2" sha1="41843630fb1a58131b5ecf6dd187884fb29e6685"/>
+		-->
+		<description>Windows 98 Second Edition (jp 4.10.2222) (Retail Full)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="alt_title" value="マイクロソフト ウィンドウズ 98 オペレイティング システム SECOND EDITION" />
+		<info name="serial" value="X04-67430"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="winme">
 		<description>Windows ME (en 4.90.3000) (Retail Full)</description> <!-- aka Millennium Edition -->
-		<year>1999</year>
+		<year>2000</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
