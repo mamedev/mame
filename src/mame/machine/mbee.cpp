@@ -2,12 +2,10 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    mbee.cpp
+Microbee machine driver
+Originally written by Juergen Buchmueller, Jan 2000
 
-    machine driver
-    Originally written by Juergen Buchmueller, Jan 2000
-
-    Rewritten by Robbbert (see notes in driver file).
+Rewritten by Robbbert (see notes in driver file).
 
 ****************************************************************************/
 

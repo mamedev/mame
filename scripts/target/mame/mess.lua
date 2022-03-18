@@ -123,6 +123,7 @@ CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
 CPUS["PPS4"] = true
 CPUS["PPS41"] = true
+CPUS["B5000"] = true
 CPUS["UPD7725"] = true
 CPUS["HD61700"] = true
 CPUS["LC8670"] = true
@@ -482,6 +483,7 @@ MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AM9519"] = true
 MACHINES["AMIGAFDC"] = true
+MACHINES["AMIGA_COPPER"] = true
 MACHINES["APPLEPIC"] = true
 MACHINES["ARM_IOMD"] = true
 MACHINES["AT_KEYBC"] = true
@@ -830,6 +832,7 @@ MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
 MACHINES["BITMAP_PRINTER"] = true
+MACHINES["NS32382"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -895,6 +898,7 @@ BUSES["ELECTRON_CART"] = true
 BUSES["ELECTRON"] = true
 BUSES["EP64"] = true
 BUSES["EPSON_SIO"] = true
+BUSES["EPSON_QX"] = true
 BUSES["FMT_SCSI"] = true
 BUSES["GAMATE"] = true
 BUSES["GAMEBOY"] = true
@@ -1020,6 +1024,7 @@ BUSES["ZORRO"] = true
 FORMATS["2D_DSK"] = true
 FORMATS["A26_CAS"] = true
 FORMATS["A5105_DSK"] = true
+FORMATS["ABC1600_DSK"] = true
 FORMATS["ABC800_DSK"] = true
 FORMATS["ABCFD2_DSK"] = true
 FORMATS["ACE_TAP"] = true
@@ -1058,6 +1063,7 @@ FORMATS["CD90_640_DSK"] = true
 FORMATS["CGENIE_DSK"] = true
 FORMATS["CGEN_CAS"] = true
 FORMATS["COCO_CAS"] = true
+FORMATS["COCO_RAWDSK"] = true
 FORMATS["COMX35_DSK"] = true
 FORMATS["CONCEPT_DSK"] = true
 FORMATS["COUPEDSK"] = true
@@ -2173,6 +2179,7 @@ files {
 createMESSProjects(_target, _subtarget, "conic")
 files {
 	MAME_DIR .. "src/mame/drivers/conic_cchess2.cpp",
+	MAME_DIR .. "src/mame/drivers/conic_cchess3.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "consumenta")
@@ -2363,6 +2370,7 @@ files {
 	MAME_DIR .. "src/mame/machine/ms7004.h",
 	MAME_DIR .. "src/mame/drivers/mk85.cpp",
 	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/mk98.cpp",
 	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.h",
@@ -3826,6 +3834,7 @@ createMESSProjects(_target, _subtarget, "siemens")
 files {
 	MAME_DIR .. "src/mame/drivers/bitel.cpp",
 	MAME_DIR .. "src/mame/drivers/pcd.cpp",
+	MAME_DIR .. "src/mame/drivers/pcmx2.cpp",
 	MAME_DIR .. "src/mame/machine/pcd_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pcd_kbd.h",
 	MAME_DIR .. "src/mame/video/pcd.cpp",
@@ -4475,7 +4484,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/iskr103x.cpp",
 	MAME_DIR .. "src/mame/drivers/mc1502.cpp",
 	MAME_DIR .. "src/mame/machine/kb_7007_3.h",
-	MAME_DIR .. "src/mame/includes/mc1502.h",
 	MAME_DIR .. "src/mame/drivers/poisk1.cpp",
 	MAME_DIR .. "src/mame/machine/kb_poisk1.h",
 }
@@ -4597,8 +4605,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
 	MAME_DIR .. "src/mame/drivers/digilog320.cpp",
-	MAME_DIR .. "src/mame/machine/digilog320_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/digilog320_kbd.h",
+	MAME_DIR .. "src/mame/drivers/digilog400.cpp",
+	MAME_DIR .. "src/mame/machine/digilog_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/digilog_kbd.h",
 	MAME_DIR .. "src/mame/drivers/digijet.cpp",
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
@@ -4626,6 +4635,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
+	MAME_DIR .. "src/mame/drivers/freedom120.cpp",
 	MAME_DIR .. "src/mame/drivers/fs3216.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
@@ -4663,7 +4673,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/jonos.cpp",
 	MAME_DIR .. "src/mame/drivers/juku.cpp",
 	MAME_DIR .. "src/mame/drivers/junior80.cpp",
-	MAME_DIR .. "src/mame/drivers/krokha.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
 	MAME_DIR .. "src/mame/drivers/lee1214.cpp",
 	MAME_DIR .. "src/mame/drivers/lee1220.cpp",

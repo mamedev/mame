@@ -38,7 +38,6 @@ void nscsi_s1410_device::scsi_command()
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 	case SC_REZERO:
-	case SC_FORMAT_UNIT: // TODO does not support starting LBA
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
@@ -55,6 +54,20 @@ void nscsi_s1410_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
+	case SC_FORMAT_UNIT:
+		LOG("command FORMAT UNIT\n");
+		{
+			hard_disk_info *info = hard_disk_get_info(harddisk);
+			auto block = std::make_unique<uint8_t[]>(info->sectorbytes);
+			memset(&block[0], 0x6c, info->sectorbytes);
+			lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+			for(; lba < (info->cylinders * info->heads * info->sectors); lba++) {
+				hard_disk_write(harddisk, lba, block.get());
+			}
+		}
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	case SC_FORMAT_TRACK: {
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
@@ -65,10 +78,10 @@ void nscsi_s1410_device::scsi_command()
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 		int track_length = blocks*bytes_per_sector;
-		std::vector<uint8_t> data(track_length);
-		memset(&data[0], 0xc6, track_length);
+		auto block = std::make_unique<uint8_t[]>(track_length);
+		memset(&block[0], 0x6c, track_length);
 
-		if(!hard_disk_write(harddisk, lba, &data[0])) {
+		if(!hard_disk_write(harddisk, lba, &block[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
 		} else {

@@ -56,17 +56,17 @@ protected:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	uint8_t m_videoram[0x1000];
-	uint8_t m_workram[0x1000];
+	uint8_t m_videoram[0x1000]{};
+	uint8_t m_workram[0x1000]{};
 
 	optional_region_ptr<uint8_t> m_prom;
 	optional_region_ptr<uint8_t> m_rom;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = 0;
 
 	/* sound-related */
-	uint8_t m_soundlatch;
+	uint8_t m_soundlatch = 0U;
 };
 
 class unk_gambl_state : public _4enraya_state
@@ -80,6 +80,7 @@ public:
 	void unkpacg(machine_config &config);
 	void unkpacga(machine_config &config);
 	void tourpgum(machine_config &config);
+	void chicgum(machine_config &config);
 
 private:
 	void unkpacg_main_map(address_map &map);

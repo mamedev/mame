@@ -18,6 +18,16 @@ The IOS board common to all games provides sound effects through the CDP1863.
 - Mad Race uses a Sound Board IV (same as MPU-3 and later), but I/O ports
   that talk to it are unknown.
 
+Test mode:
+- Hold down NUM-0 and hit F3. The displays will show the digits one at a time.
+    The number of any stuck switch will show in the credit area. Pressing Start
+    will do a test of the solenoids (04 will show during this test). Press F3 to
+    exit.
+
+Adjustments:
+- While game is over, press NUM-0. Keep pressing to go through the bookkeeping
+    and the setup. See the manual for specifics.
+
 Status:
 - antar, storm, evlfight, attack, blkfever: Working
 - Mad Race: J is the outhole. Working, no sound.
@@ -122,7 +132,7 @@ private:
 	u8 psg_r();
 	void psg_w(u8 data);
 	u8 sound_in_r();
-	u8 m_psg_latch = 0;
+	u8 m_psg_latch = 0U;
 	required_device<ay8910_device> m_ay;
 };
 

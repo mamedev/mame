@@ -118,7 +118,7 @@ public:
 	bool ready_r();
 	void set_ready(bool state);
 	double get_pos();
-	virtual void tfsel_w(int state) { };    // 35SEL line for Apple Sony drives
+	virtual void tfsel_w(int state) { }    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
@@ -159,7 +159,7 @@ protected:
 		floppy_image_device *m_fid;
 		const fs::manager_t *m_manager;
 
-		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {};
+		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {}
 
 		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;

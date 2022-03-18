@@ -48,16 +48,16 @@ public:
 	void tnzs_eof();
 
 	// position kludges for seta.cpp & srmp2.cpp
-	void set_fg_xoffsets(int flip, int noflip) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; };
-	void set_fg_yoffsets(int flip, int noflip) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; };
-	void set_bg_yoffsets(int flip, int noflip) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; };
-	void set_bg_xoffsets(int flip, int noflip) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; };
+	void set_fg_xoffsets(int flip, int noflip) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; }
+	void set_fg_yoffsets(int flip, int noflip) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; }
+	void set_bg_yoffsets(int flip, int noflip) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; }
+	void set_bg_xoffsets(int flip, int noflip) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; }
 
-	void set_colorbase(int base) { m_colorbase = base; };
-	void set_spritelimit(int limit) { m_spritelimit = limit; };
-	void set_transpen(int pen) { m_transpen = pen; };
+	void set_colorbase(int base) { m_colorbase = base; }
+	void set_spritelimit(int limit) { m_spritelimit = limit; }
+	void set_transpen(int pen) { m_transpen = pen; }
 
-	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); };
+	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); }
 
 protected:
 	virtual void device_start() override;

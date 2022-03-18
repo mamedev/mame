@@ -155,7 +155,7 @@ protected:
 	void tick_envelope(struct SOUND &snd);
 	void update_state();
 	bool dac_enabled(struct SOUND &snd);
-	virtual void corrupt_wave_ram() { };
+	virtual void corrupt_wave_ram() { }
 	uint64_t noise_period_cycles();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 };

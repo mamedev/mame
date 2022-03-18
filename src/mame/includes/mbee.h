@@ -83,15 +83,15 @@ public:
 	void remove_carts(machine_config &config);
 	void remove_quick(machine_config &config);
 
-	void init_mbee()     { m_features = 0x00; };
-	void init_mbeett()   { m_features = 0x0d; };
-	void init_mbeeppc()  { m_features = 0x09; };
-	void init_mbeepp()   { m_features = 0x39; };
-	void init_mbeeic()   { m_features = 0x01; };
-	void init_mbee56()   { m_features = 0x03; };
-	void init_mbee128()  { m_features = 0x11; };
-	void init_mbee128p() { m_features = 0x19; };
-	void init_mbee256()  { m_features = 0x2d; };
+	void init_mbee()     { m_features = 0x00; }
+	void init_mbeett()   { m_features = 0x0d; }
+	void init_mbeeppc()  { m_features = 0x09; }
+	void init_mbeepp()   { m_features = 0x39; }
+	void init_mbeeic()   { m_features = 0x01; }
+	void init_mbee56()   { m_features = 0x03; }
+	void init_mbee128()  { m_features = 0x11; }
+	void init_mbee128p() { m_features = 0x19; }
+	void init_mbee256()  { m_features = 0x2d; }
 
 private:
 	void port04_w(u8 data);

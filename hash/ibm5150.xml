@@ -13000,7 +13000,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="Disc 2" />
+			<feature name="part_id" value="Disc 2" />
 			<dataarea name="flop" size = "2156467">
 				<rom name="midwinter_disk2.mfm" size="2156467" crc="e8677966" sha1="ed1103bc0bc02c4ff10cf9f389ed93e90e60125e"/>
 			</dataarea>

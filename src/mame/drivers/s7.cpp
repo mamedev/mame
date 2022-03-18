@@ -5,19 +5,22 @@
 PINBALL
 Williams System 7
 
-Differences to system 6/6a:
+Differences to system 6:
 - Extra PIA at 0x2100 to handle sound and more solenoids.
 - Diag digit
+- Leading zero suppression
+- Commas
+- 7 digits for each player
 
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
 
-- Setup: NUM-6 must be in auto/up position. Press NUM-1 to enter setup mode, press
-   NUM-6 to change direction.
+- Setup: NUM-2 must be in auto/up position. Press NUM-1 to enter setup mode, press
+   NUM-2 to change direction.
 
-- Tests: NUM-6 must be in manual/down position. Press NUM-1 twice and tests will
-   begin. Press NUM-1 and NUM-6 together to get from test 1 to test 2. Press NUM-6
+- Tests: NUM-2 must be in manual/down position. Press NUM-1 twice and tests will
+   begin. Press NUM-1 and NUM-2 together to get from test 1 to test 2. Press NUM-2
    to switch between auto/manual stepping.
 
 - Auto Diag Test: Set Dips to SW6. Press NUM-0. Press NUM-ENTER. Press NUM-1. Tests
@@ -32,37 +35,48 @@ and start playing.
 
 Most games are multiball - here are the key codes:
 
-Game              NUM  Start game                End ball
+Game                              NUM  Start game                End ball
 -----------------------------------------------------------------------------------------------
-Black Knight      500  ASD hit 1                 Hit X, hold A, hit X, hold S, hit X, hit D
-Cosmic Gunfight   502  AS hit 1                  AS
-Jungle Lord       503  AS hit 1                  Hit X, hold A, hit X, hit S
-Pharaoh           504  AS hit 1                  AS
-Solar Fire        507  ASD hit 1                 ASD
-Thunderball       508  1                         unknown
-HyperBall         509  1                         unknown
-Barracora         510  ASD hit 1                 ASD
-Varkon            512  AX hit 1                  AX
-Time Fantasy      515  1                         X
-Warlok            516  1                         X
-Defender          517  hold up,left,right,hit 1  Hit X, hold Left, hit X, hold Up, Hit X, hit Right.
-Joust             519  ABCD hit 1                unknown
-Laser Cue         520  1                         X
-Firepower II      521  AS hit 1                  AS
-Wild Texas      *(521) AS hit 1                  AS
-Starlight         530  AS hit 1                  AS
+Black Knight                      500  ASD hit 1                 Hit X, hold A, hit X, hold S, hit X, hit D
+Cosmic Gunfight (Dragonfly)       502  AS hit 1                  AS
+Jungle Lord                       503  AS hit 1                  Hit X, hold A, hit X, hit S
+Pharaoh                           504  AS hit 1                  AS
+Cyclone (unreleased)              505
+Black Knight Limited Edition      506  (600 produced)
+Solar Fire                        507  ASD hit 1                 ASD
+Thunderball                       508  1                         unknown
+HyperBall                         509  1                         unknown
+Barracora                         510  ASD hit 1                 ASD
+Varkon                            512  AX hit 1                  AX
+Spellbinder (unreleased)          513  (mnw)
+Reflex (unreleased)               514
+Time Fantasy                      515  1                         X
+Warlok                            516  1                         X
+Defender                          517  hold up,left,right,hit 1  Hit X, hold Left, hit X, hold Up, Hit X, hit Right.
+Joust                             519  ABCD hit 1                unknown
+Laser Cue                         520  1                         X
+Firepower II                      521  AS hit 1                  AS
+Wild Texas                      *(521) AS hit 1                  AS
+Guardian (unreleased)             523
+Star Fighter (unreleased)         524
+Rat Race                          527 (10 produced, see s9.cpp)
+Light Speed (unreleased)          528
+Starlight                         530  AS hit 1                  AS
 
 *Wild Texas is a clone/bootleg of Firepower II, and shows the same game number.
 
 Status:
-- All machines are playable
+- All machines are playable (except Spellbinder).
 - Thunderball: turn Speech DIP off, or you get corrupt sound.
 
 ToDo:
 - Some games have an additional alphanumeric display, or different display arrangements
 - Mechanical sounds vary per machine
 - Hyperball, status display is different
-
+- Spellbinder, appears to be a non-working beta, runs into the weeds. If num-0 pressed it
+     fills everything with FF and freezes. Uses another PIA at 4000. Display is bad. If
+     game started it will soon end by itself. Makes random loud noises even in attract
+     mode. Doesn't display the game number on first boot, unlike every other game.
 
 *****************************************************************************************/
 
@@ -98,7 +112,7 @@ public:
 	{ }
 
 	void s7(machine_config &config);
-	void init_1() { m_game = 1; }
+	void init_1() { m_game = 1U; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
@@ -124,25 +138,26 @@ private:
 	void nvram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	void main_map(address_map &map);
 
-	u8 m_strobe = 0;
-	u8 m_row = 0;
+	u8 m_strobe = 0U;
+	u8 m_row = 0U;
+	u8 m_comma = 0U;
 	u8 m_nvram[0x100]{};
 	bool m_data_ok = 0;
-	u8 m_lamp_data = 0;
+	u8 m_lamp_data = 0U;
 	bool m_memprotect = 0;
-	u8 m_game = 0;
-	emu_timer* m_irq_timer;
+	u8 m_game = 0U;
+	emu_timer* m_irq_timer = 0;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s6_sound_device> m_s6sound;
@@ -154,7 +169,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 	required_ioport_array<2> m_dips;
 	output_finder<61> m_digits;
-	output_finder<88> m_io_outputs; // 24 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s7_state::main_map(address_map &map)
@@ -169,6 +184,7 @@ void s7_state::main_map(address_map &map)
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x4000, 0x4003).nopw();  // splbn writes here
 	map(0x5000, 0x7fff).rom().region("maincpu", 0 );
 }
 
@@ -244,9 +260,9 @@ static INPUT_PORTS_START( s7 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Coin Door") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_coin, 1) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Coin Door") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_coin, 1) PORT_TOGGLE
 
 	PORT_START("DS1") // DS1 switches exist but do nothing
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -519,10 +535,8 @@ void s7_state::sol1_w(u8 data)
 
 void s7_state::sol2_w(u8 data)
 {
+	m_comma = data & 0xc0;
 	m_pia21->ca1_w(BIT(data, 5));
-	// PB0-4 solenoids
-	for (u8 i = 0; i < 5; i++)
-		m_io_outputs[16U+i] = BIT(data, i);
 }
 
 void s7_state::sound_w(u8 data)
@@ -530,9 +544,6 @@ void s7_state::sound_w(u8 data)
 	u8 t = m_game ? 0x3f : 0x1f;
 	u8 t3 = (data & t) | ~t;
 	m_s6sound->write(t3);
-
-	// PA7 solenoid
-	m_io_outputs[23] = BIT(data, 7);
 }
 
 void s7_state::lamp0_w(u8 data)
@@ -546,7 +557,7 @@ void s7_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[24U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s7_state::dig0_w(u8 data)
@@ -560,11 +571,11 @@ void s7_state::dig0_w(u8 data)
 
 void s7_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
-		m_digits[m_strobe+16] = patterns[data&15];
-		m_digits[m_strobe] = patterns[data>>4];
+		m_digits[m_strobe+16] = patterns[data & 15] | (BIT(m_comma, 6) ? 0xc000 : 0);
+		m_digits[m_strobe] = patterns[data >> 4] | (BIT(m_comma, 7) ? 0xc000 : 0);
 	}
 	m_data_ok = false;
 }
@@ -654,6 +665,7 @@ void s7_state::machine_start()
 	save_item(NAME(m_memprotect));
 	save_item(NAME(m_nvram));
 	save_item(NAME(m_game));
+	save_item(NAME(m_comma));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
@@ -683,8 +695,8 @@ void s7_state::s7(machine_config &config)
 
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
-	m_pia21->readpa_handler().set_constant(0xff);
-	m_pia21->readpb_handler().set_constant(0x3f);
+	m_pia21->readpa_handler().set_constant(0xff); // PA7 unknown input
+	m_pia21->readpb_handler().set_constant(0x3f); // PB0-4 unknown inputs
 	m_pia21->writepa_handler().set(FUNC(s7_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s7_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s7_state::pia21_ca2_w));
@@ -737,7 +749,7 @@ void s7_state::s7(machine_config &config)
 
 
 /*----------------------------
-/ Black Knight - Sys.7 (Game #500)
+/ Black Knight (#500)
 /----------------------------*/
 ROM_START(bk_l4)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -785,7 +797,7 @@ ROM_START(bk_l3)
 ROM_END
 
 /*-----------------------------------
-/ Cosmic Gunfight - Sys.7 (Game #502)
+/ Cosmic Gunfight (#502)
 /-----------------------------------*/
 ROM_START(csmic_l1)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -799,7 +811,7 @@ ROM_START(csmic_l1)
 ROM_END
 
 /*--------------------------------
-/ Jungle Lord - Sys.7 (Game #503)
+/ Jungle Lord (#503)
 /--------------------------------*/
 ROM_START(jngld_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -830,7 +842,7 @@ ROM_START(jngld_l1)
 ROM_END
 
 /*--------------------------------
-/ Pharaoh - Sys.7 (Game #504)
+/ Pharaoh (#504)
 /--------------------------------*/
 ROM_START(pharo_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -848,7 +860,7 @@ ROM_START(pharo_l2)
 ROM_END
 
 /*-----------------------------------
-/ Solar Fire - Sys.7 (Game #507)
+/ Solar Fire (#507)
 /-----------------------------------*/
 ROM_START(solar_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -862,7 +874,7 @@ ROM_START(solar_l2)
 ROM_END
 
 /*-----------------------------------
-/ Thunderball - Sys.7 (Game #508) - Prototype
+/ Thunderball (#508) - Prototype
 /-----------------------------------*/
 ROM_START(thund_p1)  // dated 1982-06-22
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -908,7 +920,7 @@ ROM_END
 
 
 /*-------------------------------
-/ Hyperball - Sys.7 - (Game #509)
+/ Hyperball (#509)
 /-------------------------------*/
 ROM_START(hypbl_l4)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -942,7 +954,7 @@ ROM_END
 
 
 /*----------------------------
-/ Barracora- Sys.7 (Game #510)
+/ Barracora (#510)
 /----------------------------*/
 ROM_START(barra_l1)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -956,7 +968,7 @@ ROM_START(barra_l1)
 ROM_END
 
 /*----------------------------
-/ Varkon- Sys.7 (Game #512)
+/ Varkon (#512)
 /----------------------------*/
 ROM_START(vrkon_l1)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -966,11 +978,26 @@ ROM_START(vrkon_l1)
 	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
 
 	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(d13db2bb) SHA1(862546bbdd1476906948f7324b7434c29df79baa))
+	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(d13db2bb) SHA1(862546bbdd1476906948f7324b7434c29df79baa) )
+ROM_END
+
+/*----------------------------------------------------------------------
+/ Spellbinder (#513) Not-working beta.
+/ Reconstructed from the source by jessakey
+/ No soundrom supplied, using one from hyperball (as PinMAME has done).
+/----------------------------------------------------------------------*/
+ROM_START(splbn_l0)
+	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("ic20.532",     0x0000, 0x1000, CRC(ff765ebf) SHA1(14d42735291c3f6e112f19bd49a39e00059cf907) )
+	ROM_LOAD("ic14.532",     0x1000, 0x1000, CRC(940a817a) SHA1(2583ff6f6b6985d3ac85b4f120ebb002a10b65af) )
+	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(b38fde72) SHA1(17ef3ca354431307b6a79992c50cb2491b8a7631) )
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("sound12.532",  0x4000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93) )
 ROM_END
 
 /*-----------------------------
-/ Time Fantasy - Sys.7 (Game #515)
+/ Time Fantasy (#515)
 /-----------------------------*/
 ROM_START(tmfnt_l5)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -984,7 +1011,7 @@ ROM_START(tmfnt_l5)
 ROM_END
 
 /*----------------------------
-/ Warlok- Sys.7 (Game #516)
+/ Warlok (#516)
 /----------------------------*/
 ROM_START(wrlok_l3)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -998,7 +1025,7 @@ ROM_START(wrlok_l3)
 ROM_END
 
 /*----------------------------
-/ Defender - Sys.7 (Game #517)
+/ Defender (#517)
 /----------------------------*/
 // Multiplex solenoid requires custom solenoid handler.
 ROM_START(dfndr_l4)
@@ -1012,7 +1039,7 @@ ROM_START(dfndr_l4)
 ROM_END
 
 /*---------------------------
-/ Joust - Sys.7 (Game #519)
+/ Joust (#519)
 /--------------------------*/
 ROM_START(jst_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -1037,7 +1064,7 @@ ROM_START(jst_l1)
 ROM_END
 
 /*---------------------------
-/ Laser Cue - Sys.7 (Game #520)
+/ Laser Cue (#520)
 /--------------------------*/
 ROM_START(lsrcu_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -1051,7 +1078,7 @@ ROM_START(lsrcu_l2)
 ROM_END
 
 /*--------------------------------
-/ Firepower II- Sys.7 (Game #521)
+/ Firepower II (#521)
 /-------------------------------*/
 ROM_START(fpwr2_l2)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -1080,7 +1107,7 @@ ROM_START(wldtexas)
 ROM_END
 
 /*-----------------------------
-/ Star Light - Sys.7 (Game #530)
+/ Star Light (#530)
 /-----------------------------*/
 ROM_START(strlt_l1)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
@@ -1111,6 +1138,7 @@ GAME( 1981, hypbl_l3, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams
 GAME( 1981, hypbl_l2, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, barra_l1, 0,        s7, barra, s7_state, empty_init, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, vrkon_l1, 0,        s7, vrkon, s7_state, empty_init, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982, splbn_l0, 0,        s7, s7,    s7_state, empty_init, ROT0, "Williams",  "Spellbinder (L-0)",                 MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, tmfnt_l5, 0,        s7, tmfnt, s7_state, empty_init, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, wrlok_l3, 0,        s7, wrlok, s7_state, empty_init, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, dfndr_l4, 0,        s7, dfndr, s7_state, empty_init, ROT0, "Williams",  "Defender (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL )

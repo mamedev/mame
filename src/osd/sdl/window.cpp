@@ -92,25 +92,55 @@ bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 
-	// initialize the drawers
-
-	switch (video_config.mode)
-	{
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::init(machine());
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::init(machine());
-			break;
+	// initialize the renderer
+	const int fallbacks[VIDEO_MODE_COUNT] = {
+		-1,						// NONE -> no fallback
+		-1,						// No GDI on Linux
+#if defined(USE_OPENGL) && USE_OPENGL
+		VIDEO_MODE_OPENGL,		// BGFX -> OpenGL
+		VIDEO_MODE_SDL2ACCEL,	// OpenGL -> SDL2Accel
+#else
+		VIDEO_MODE_SDL2ACCEL,	// BGFX -> SDL2Accel
 #endif
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl2::init(machine());
+		VIDEO_MODE_SOFT,		// SDL2ACCEL -> SOFT
+		-1,						// No D3D on Linux
+		-1,						// SOFT -> no fallback
+	};
+
+	int current_mode = video_config.mode;
+	while (current_mode != VIDEO_MODE_NONE)
+	{
+		bool error = false;
+		switch(current_mode)
+		{
+			case VIDEO_MODE_BGFX:
+				renderer_bgfx::init(machine());
+				break;
+#if defined(USE_OPENGL) && USE_OPENGL
+			case VIDEO_MODE_OPENGL:
+				renderer_ogl::init(machine());
+				break;
+#endif
+			case VIDEO_MODE_SDL2ACCEL:
+				renderer_sdl2::init(machine());
+				break;
+			case VIDEO_MODE_SOFT:
+				renderer_sdl1::init(machine());
+				break;
+			default:
+				fatalerror("Unknown video mode.");
+				break;
+		}
+		if (error)
+		{
+			current_mode = fallbacks[current_mode];
+		}
+		else
+		{
 			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::init(machine());
-			break;
+		}
 	}
+	video_config.mode = current_mode;
 
 	/* We may want to set a number of the hints SDL2 provides.
 	 * The code below will document which hints were set.

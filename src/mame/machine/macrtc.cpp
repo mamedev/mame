@@ -352,12 +352,14 @@ void rtc3430042_device::nvram_default()
 	memset(m_pram, 0, 0x100);
 }
 
-void rtc3430042_device::nvram_read(emu_file &file)
+bool rtc3430042_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_pram, 0x100);
+	size_t actual;
+	return !file.read(m_pram, 0x100, actual) && actual == 0x100;
 }
 
-void rtc3430042_device::nvram_write(emu_file &file)
+bool rtc3430042_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_pram, 0x100);
+	size_t actual;
+	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
 }

@@ -79,7 +79,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual bool is_6809() { return true; };
+	virtual bool is_6809() { return true; }
 
 	// addressing modes
 	enum

@@ -209,11 +209,11 @@ void contra_state::machine_reset()
 void contra_state::contra(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); /* 3000000? (HD63C09EP) */
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); /* (HD63C09EP) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &contra_state::contra_map);
 	m_maincpu->set_vblank_int("screen", FUNC(contra_state::contra_interrupt));
 
-	MC6809E(config, m_audiocpu, XTAL(24'000'000)/8); /* 3000000? (HD68B09EP) */
+	MC6809E(config, m_audiocpu, XTAL(3'579'545) / 2 ); /* (HD68B09EP) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));  /* enough for the sound CPU to read all commands */

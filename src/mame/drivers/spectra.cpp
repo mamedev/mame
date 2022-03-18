@@ -49,6 +49,7 @@ ToDo:
 
 #include "spectra.lh"
 
+namespace {
 
 class spectra_state : public genpin_class
 {
@@ -311,5 +312,6 @@ ROM_START(spectra)
 	ROM_LOAD("spect_u3.dat", 0x0c00, 0x0400, CRC(9ca7510f) SHA1(a87849f16903836158063d593bb4a2e90c7473c8))
 ROM_END
 
+} // anonymous namespace
 
 GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

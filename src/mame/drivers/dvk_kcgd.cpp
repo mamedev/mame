@@ -63,7 +63,7 @@ static constexpr int KCGD_PAGE_1 = 005574;
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)

@@ -2,7 +2,10 @@
 // copyright-holders:Jonas Jago
 /*******************************************************************************
 
-Beyond Kung-Fu - Irem M62-based unreleased Kung-Fu Master sequel
+Beyond Kung-Fu
+
+Irem M62-based unreleased Kung-Fu Master sequel
+video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 
 TODO:
 - finish background gfx emulation, supposedly via an (undumped) MCU
@@ -18,6 +21,7 @@ class m62_bkungfu_state : public m62_state
 public:
 	m62_bkungfu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m62_state(mconfig, type, tag)
+		, m_bkungfu_tileram(*this, "tileram", 64*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
 		, m_blittercmdram(*this, "blittercmdram")
 	{ }
@@ -34,7 +38,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
-	std::vector<uint8_t> m_bkungfu_tileram;
+	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
 	required_shared_ptr<uint8_t> m_blittercmdram;
@@ -61,10 +65,6 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 
 VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 {
-	// tileram is private to blitter
-	m_bkungfu_tileram.resize(64*32*2);
-	save_item(NAME(m_bkungfu_tileram));
-
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 64, 32);
 }
 
@@ -128,7 +128,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			{
 				m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
 				m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x001];
-				m_bg_tilemap->mark_tile_dirty((position &0xfff) >> 1);
 			}
 		}
 		else if (data == 0x02)
@@ -172,6 +171,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			//logerror("%s: blitter: unknown\n", machine().describe_context());
 		}
+		m_bg_tilemap->mark_all_dirty();
 	}
 	else
 	{
@@ -195,90 +195,12 @@ void m62_bkungfu_state::mem_map(address_map& map)
 
 void m62_bkungfu_state::io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
-	map(0x01, 0x01).portr("P1").w(FUNC(m62_bkungfu_state::m62_flipscreen_w));  /* + coin counters */
-	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2");
-	map(0x81, 0x81).w(FUNC(m62_bkungfu_state::m62_hscroll_high_w));
+	kungfum_io_map(map);
 	map(0x80, 0x80).w(FUNC(m62_bkungfu_state::m62_hscroll_low_w));
+	map(0x81, 0x81).w(FUNC(m62_bkungfu_state::m62_hscroll_high_w));
 	map(0x83, 0x83).w(FUNC(m62_bkungfu_state::kidniki_background_bank_w));
 	//map(0x84, 0x84).nopw();
 }
-
-
-
-/*******************************************************************************
-    Input Ports
-*******************************************************************************/
-
-static INPUT_PORTS_START( bkungfu )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(19)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion Mode (Cheat)" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze (Cheat)" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Level Selection Mode (Cheat)" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x02, 0x02, "Energy Loss" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, "Slow" )
-	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	IREM_Z80_COINAGE_TYPE_3_LOC(SW1)
-INPUT_PORTS_END
 
 
 
@@ -362,4 +284,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT     CLASS              INIT        ROT     COMPANY  FULLNAME                          FLAGS
-GAME( 1987, bkungfu, 0,      bkungfu, bkungfu,  m62_bkungfu_state, empty_init, ROT0,   "Irem",  "Beyond Kung-Fu (location test)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, bkungfu, 0,      bkungfu, kungfum,  m62_bkungfu_state, empty_init, ROT0,   "Irem",  "Beyond Kung-Fu (location test)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

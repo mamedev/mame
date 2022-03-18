@@ -232,7 +232,7 @@ public:
 
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
-	u32 get_background_pen() { return m_palette->pen(m_background_color); };
+	u32 get_background_pen() { return m_palette->pen(m_background_color); }
 
 	void v2_map(address_map &map);
 };

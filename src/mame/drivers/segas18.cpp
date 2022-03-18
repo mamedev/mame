@@ -1228,6 +1228,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( wwally )
 	PORT_INCLUDE( system18_generic )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) // only bit 01 for P1 Button1 is used
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) // only bit 01 for P2 Button1 is used
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1238,6 +1244,56 @@ static INPUT_PORTS_START( wwally )
 	PORT_DIPNAME( 0x04, 0x04, "Coin Chute" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
+	//"SW2:4" unused
+	//"SW2:5" unused
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	//"SW2:8" unused
+
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+
+	PORT_START("TRACKX2")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_REVERSE
+
+	PORT_START("TRACKY2")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( wwally3p )
+	PORT_INCLUDE( system18_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x04, EQUALS, 0x04) // use switches based on Coin Chute Common/Individual
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x04, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_CONDITION("DSW", 0x04, EQUALS, 0x00) // use switches based on Coin Chute Common/Individual
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x04, EQUALS, 0x04)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED ) // only bit 01 for P1 Button1 and bit 04 for P3 Button1 are used
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) // only bit 01 for P2 Button1 is used
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Chute" ) PORT_DIPLOCATION("SW2:3") // Opposite of the 2 player version
+	PORT_DIPSETTING(    0x00, "Common" )
+	PORT_DIPSETTING(    0x04, "Individual" )
 	//"SW2:4" unused
 	//"SW2:5" unused
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
@@ -3150,6 +3206,39 @@ ROM_START( wwallyjad )
 ROM_END
 
 
+/**************************************************************************************************************************
+    Wally wo Sagase! (Where's Wally?) - 3 players, Sega System 18
+    CPU: FD1094 317-0198A
+    GAME BD: 833-8775-01 WALLY 3P
+*/
+
+ROM_START( wwallyja3p )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0198A
+	ROM_LOAD16_BYTE( "epr-14730a.a4", 0x000000, 0x40000, CRC(d897bcc6) SHA1(15f0b602eb3ac870241f53246a4251c07b27fb27) )
+	ROM_LOAD16_BYTE( "epr-14731a.a6", 0x000001, 0x40000, CRC(64328385) SHA1(7220d285762ec9d3656cb958cc71b43094aa4052) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
+	ROM_LOAD( "317-0198a.key", 0x0000, 0x2000, CRC(32d313a4) SHA1(bb7a651c34a9e925d5a9928fabb77ca8724009f2) )
+
+	ROM_REGION( 0x0c0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "mpr-14719.c1", 0x000000, 0x40000, CRC(8b58c743) SHA1(ee50baa184d68558d62d1817b2b9c138226ed25a) )
+	ROM_LOAD( "mpr-14720.c2", 0x040000, 0x40000, CRC(f96d19f4) SHA1(e350b551db8d01062397cd9a0c952a7b5dbf3fe6) )
+	ROM_LOAD( "mpr-14721.c3", 0x080000, 0x40000, CRC(c4ced91d) SHA1(4c8a070959ca10e2dddf407ddbba212415d78727) )
+
+	ROM_REGION16_BE( 0x500000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "mpr-14726.c10", 0x000001, 0x100000, CRC(7213d1d3) SHA1(b70346a1dd3aa112bc696a7f4dd9ca908c3e5afa) )
+	ROM_LOAD16_BYTE( "mpr-14732.a10", 0x000000, 0x100000, CRC(04ced549) SHA1(59fd6510f0e14613d830ac6527f12ccc0b9351a5) )
+	ROM_LOAD16_BYTE( "mpr-14727.c11", 0x200001, 0x100000, CRC(3b74e0f0) SHA1(40432dbbbf75dae1e5e32b7cc2c4884f5e9e3bf5) )
+	ROM_LOAD16_BYTE( "mpr-14733.a11", 0x200000, 0x100000, CRC(6da0444f) SHA1(80c32895af19bda3277376fdbd1c163f0ed25665) )
+	ROM_LOAD16_BYTE( "mpr-14728.c12", 0x400001, 0x080000, CRC(5b921587) SHA1(2779dc658bb7a51f2399af5a6463ccb2dd388e88) )
+	ROM_LOAD16_BYTE( "mpr-14734.a12", 0x400000, 0x080000, CRC(6f3f5ed9) SHA1(01972c8bd5bfde58715bc0adc7dea73bf6350a26) )
+
+	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
+	ROM_LOAD( "epr-14725.c7",   0x000000, 0x20000, CRC(2b29684f) SHA1(b83962a4f475f9b3e79d4f7ff577b170c4043156) )
+	ROM_LOAD( "mpr-14724.c6",   0x080000, 0x80000, CRC(47cbea86) SHA1(c70d1fed2912c7c05223ce0bb0941706f957295f) )
+	ROM_LOAD( "mpr-14723.c5",   0x100000, 0x80000, CRC(bc5adc27) SHA1(09405002b940a3d3eb0f1258f37af51e0b7581b9) )
+	ROM_LOAD( "mpr-14722.c4",   0x180000, 0x80000, CRC(1bd081f8) SHA1(e5b0b5d8334486f813d7c430bb7fce3f69605a21) )
+ROM_END
 
 /*************************************
  *
@@ -3248,8 +3337,9 @@ GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, 
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
 
-GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the ROMs do contain an english logo so maybe there is a world / us set too
-GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
+GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan, 2 players) (FD1094 317-0197B)", 0 ) // the ROMs do contain an English logo so maybe there is a world / us set too
+GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan, 2 players) (FD1094 317-0197A)", 0 )
+GAME( 1992, wwallyja3p,wwallyj,  wwally_fd1094,        wwally3p, segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan, 3 players) (FD1094 317-0198A)", 0 )
 
 // decrypted bootleg sets
 

@@ -304,6 +304,7 @@ public:
 	void victoryc(machine_config &config);
 	void frogg(machine_config &config);
 	void mandingarf(machine_config &config);
+	void mandinka(machine_config &config);
 	void thepitm(machine_config &config);
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
@@ -361,6 +362,7 @@ protected:
 	void konami_sound_portmap(address_map &map);
 	void kong_map(address_map &map);
 	void mandingarf_map(address_map &map);
+	void mandinka_map(address_map &map);
 	void mimonkey_map(address_map &map);
 	void mimonscr_map(address_map &map);
 	void mooncrst_map(address_map &map);

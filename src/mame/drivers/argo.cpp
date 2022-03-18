@@ -27,18 +27,22 @@ ToDo:
 ****************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/i8251.h"
-#include "machine/pit8253.h"
-#include "machine/i8257.h"
-#include "video/i8275.h"
 #include "imagedev/cassette.h"
-//#include "sound/spkrdev.h"
-#include "speaker.h"
+#include "machine/i8251.h"
+#include "machine/i8257.h"
+#include "machine/pit8253.h"
 #include "machine/timer.h"
+//#include "sound/spkrdev.h"
+#include "video/i8275.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
+
+namespace {
 
 class argo_state : public driver_device
 {
@@ -76,7 +80,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -426,20 +430,22 @@ void argo_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void argo_state::machine_start()
@@ -517,6 +523,8 @@ ROM_START( argo )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

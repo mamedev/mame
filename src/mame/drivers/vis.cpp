@@ -2,16 +2,18 @@
 // copyright-holders:Carl
 
 #include "emu.h"
+#include "machine/at.h"
+
 #include "bus/isa/isa_cards.h"
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
-#include "machine/at.h"
 #include "machine/ds6417.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "video/pc_vga.h"
-#include "speaker.h"
+
 #include "softlist_dev.h"
+#include "speaker.h"
 
 
 class vis_audio_device : public device_t,
@@ -262,6 +264,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface(mconfig, *this)
 {
 	set_screen(*this, "screen");
+	set_vram_size(0x100000);
 }
 
 void vis_vga_device::device_add_mconfig(machine_config &config)

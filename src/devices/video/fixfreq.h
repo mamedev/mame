@@ -38,7 +38,7 @@ struct fixedfreq_monitor_desc
 	{}
 
 	uint32_t monitor_clock() const noexcept { return m_monitor_clock; }
-	double clock_period() const noexcept { return 1.0 / (double) m_monitor_clock; };
+	double clock_period() const noexcept { return 1.0 / (double) m_monitor_clock; }
 
 	int minh() const noexcept { return (m_hbackporch - m_hsync) * m_hscale; }
 	int maxh() const noexcept { return (m_hbackporch - m_hsync + m_hvisible) * m_hscale - 1; }

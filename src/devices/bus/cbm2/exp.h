@@ -93,8 +93,8 @@ public:
 	// construction/destruction
 	virtual ~device_cbm2_expansion_card_interface();
 
-	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; };
-	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { };
+	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; }
+	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { }
 
 protected:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);

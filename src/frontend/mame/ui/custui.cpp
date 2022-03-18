@@ -17,6 +17,7 @@
 
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "uiinput.h"
 
 #include "corestr.h"

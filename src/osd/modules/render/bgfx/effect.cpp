@@ -25,6 +25,7 @@ bgfx_effect::bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx:
 			delete uniforms[i];
 			continue;
 		}
+		uniforms[i]->create();
 		m_uniforms[uniforms[i]->name()] = uniforms[i];
 	}
 }

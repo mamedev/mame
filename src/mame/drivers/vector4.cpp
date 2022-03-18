@@ -42,13 +42,16 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "machine/pit8253.h"
 #include "machine/i8255.h"
-#include "bus/rs232/rs232.h"
+#include "machine/pit8253.h"
 
+
+namespace {
 
 class vector4_state : public driver_device
 {
@@ -66,7 +69,7 @@ private:
 	void vector4_io(address_map &map);
 	void vector4_mem(address_map &map);
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -112,20 +115,22 @@ void vector4_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xefff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xe000, 0xefff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 
@@ -203,6 +208,8 @@ ROM_START( vector4 )
 	ROM_LOAD( "chargen1.bin", 0x0000, 0x0800, NO_DUMP )
 	ROM_LOAD( "chargen2.bin", 0x0800, 0x0800, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

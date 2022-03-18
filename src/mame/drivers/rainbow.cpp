@@ -874,8 +874,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 
 void rainbow_base_state::floppy_formats(format_registration &fr)
 {
-	fr.add_pc_formats();
+	// this order is important as there is a DS 40track 400KB pc format that is the same size as the SS 80track rx50 format
 	fr.add(FLOPPY_RX50IMG_FORMAT);
+	fr.add_pc_formats();
 }
 
 static void rainbow_floppies(device_slot_interface &device)

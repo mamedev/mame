@@ -9,6 +9,7 @@ Differences to system 7:
 - PIA at 0x2200 removed
 - Dip switches removed
 - Crystals changed from 3.58 to 4MHz
+- Special solenoids cannot be computer-activated (so not included in io_outputs)
 
 Games:
 - Sorcerer (#532)
@@ -19,13 +20,15 @@ Games:
 
 The first time run, the display will show the model number. Press F3 to clear this.
 
-Rat Race is played in a one-player cocktail cabinet, the player uses a joystick
-to tilt the board, to coax the ball into following lit arrows in a maze. After
-a successful navigation, the maze changes to something else faster and harder.
-It's almost an arcade game done mechanically. Obviously there is no way to emulate it
-in its intended form. Probably would have been a nice game, but it never passed the
-prototype stage. Currently it runs but the player display flashes randoms ones while
-a sound is produced every couple of seconds. Bad byte at "maincpu" D7FF.
+Rat Race is played in a cocktail cabinet, the player uses a joystick to tilt the
+ board, to coax the ball into following lit arrows in a maze. After a successful
+ navigation, the maze changes to something else faster and harder. It's almost an
+ arcade game done mechanically. Obviously there is no way to emulate it in its intended
+ form. Probably would have been a nice game, but it never passed the prototype stage.
+ Currently it runs but the player display flashes randoms ones while a sound is produced
+ every couple of seconds. Bad byte at "maincpu" D7FF. Technically the machine is a
+ mixture of sys7 and sys9, so it will require more work.
+
 
 Here are the key codes to enable play:
 
@@ -71,6 +74,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
+	void init_rr() { m_game = 1; }
 	void s9(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
@@ -85,24 +89,27 @@ private:
 	void dig1_w(u8 data);
 	void lamp0_w(u8 data);
 	void lamp1_w(u8 data);
-	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
+	void sol2_w(u8 data); // solenoids 8-15
 	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	u8 switch_r();
 	void switch_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
 	void main_map(address_map &map);
 
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
+	bool m_game = 0;
+	bool m_comma12 = 0;
+	bool m_comma34 = 0;
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0U;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = 0;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;
@@ -112,7 +119,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<61> m_digits;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s9_state::main_map(address_map &map)
@@ -197,7 +204,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s9_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sorcr )
@@ -243,6 +250,17 @@ READ_LINE_MEMBER( s9_state::pia21_ca1_r )
 	return 1;
 }
 
+void s9_state::sol2_w(u8 data)
+{
+	if (m_game)
+	{
+		m_comma12 = BIT(data, 7);
+		m_comma34 = BIT(data, 6);
+	}
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[16U+i] = BIT(data, i);
+}
+
 void s9_state::lamp0_w(u8 data)
 {
 	m_lamp_data = data ^ 0xff;
@@ -254,7 +272,7 @@ void s9_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s9_state::dig0_w(u8 data)
@@ -268,11 +286,11 @@ void s9_state::dig0_w(u8 data)
 
 void s9_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
-		m_digits[m_strobe+16] = patterns[data&15];
-		m_digits[m_strobe] = patterns[data>>4];
+		m_digits[m_strobe+16] = patterns[data & 15] | (m_comma34 ? 0xc000 : 0);
+		m_digits[m_strobe] = patterns[data >> 4] | (m_comma12 ? 0xc000 : 0);
 	}
 	m_data_ok = false;
 }
@@ -341,6 +359,8 @@ void s9_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
+	save_item(NAME(m_comma12));
+	save_item(NAME(m_comma34));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -407,7 +427,6 @@ void s9_state::s9(machine_config &config)
 
 /*-----------------------------------------------------------------------------
 / Rat Race - Sys.9 (Game #527)- Prototype (displays as #500L1)
-/ IMPD shows this as System 7, however the writes to 0x2200 indicate System 9.
 /-----------------------------------------------------------------------------*/
 ROM_START(ratrc_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
@@ -509,7 +528,7 @@ ROM_END
 } // Anonymous namespace
 
 // Novelty
-GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, init_rr,    ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
 
 // Pinball
 GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )

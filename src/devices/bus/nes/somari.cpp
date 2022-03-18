@@ -37,18 +37,18 @@ DEFINE_DEVICE_TYPE(NES_SOMARI, nes_somari_device, "nes_somari", "NES Cart Team S
 DEFINE_DEVICE_TYPE(NES_HUANG2, nes_huang2_device, "nes_huang2", "NES Cart Huang-2 PCB")
 
 
-nes_somari_device::nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board_mode(0), m_mmc1_count(0), m_mmc1_latch(0), m_mmc1_prg_shift(type == NES_HUANG2), m_vrc_mirror(0)
+nes_somari_device::nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mmc1_prg_shift)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board_mode(0), m_mmc1_count(0), m_mmc1_latch(0), m_mmc1_prg_shift(mmc1_prg_shift), m_vrc_mirror(0)
 {
 }
 
 nes_somari_device::nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_somari_device(mconfig, NES_SOMARI, tag, owner, clock)
+	: nes_somari_device(mconfig, NES_SOMARI, tag, owner, clock, 0)
 {
 }
 
 nes_huang2_device::nes_huang2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_somari_device(mconfig, NES_HUANG2, tag, owner, clock)
+	: nes_somari_device(mconfig, NES_HUANG2, tag, owner, clock, 1)
 {
 }
 

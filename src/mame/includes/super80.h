@@ -19,8 +19,10 @@
 #include "sound/samples.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 /* Bits in m_portf0 variable:
     d5 cassette LED
@@ -84,7 +86,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80pio_device> m_pio;
@@ -99,11 +101,12 @@ protected:
 	output_finder<> m_cass_led;
 
 private:
-
 	void machine_reset() override;
 	void machine_start() override;
+
 	void portf1_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
+
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

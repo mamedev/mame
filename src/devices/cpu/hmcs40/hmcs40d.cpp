@@ -199,7 +199,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	}
 	else
 	{
-		util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
+		util::stream_format(stream, "%-8s", s_mnemonics[instr]);
 
 		// opcode parameter
 		if (bits != 0)

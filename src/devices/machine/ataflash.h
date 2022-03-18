@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual attotime seek_time() override;
-	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); };
+	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); }
 
 private:
 	uint8_t m_cis[512];

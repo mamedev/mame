@@ -114,7 +114,7 @@ protected:
 	void generate_ulaw(es550x_voice *voice, s32 *dest);
 	void generate_pcm(es550x_voice *voice, s32 *dest);
 	inline void generate_irq(es550x_voice *voice, int v);
-	virtual void generate_samples(std::vector<write_stream_view> &outputs) {};
+	virtual void generate_samples(std::vector<write_stream_view> &outputs) {}
 
 	inline void update_index(es550x_voice *voice) { m_voice_index = voice->index; }
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }

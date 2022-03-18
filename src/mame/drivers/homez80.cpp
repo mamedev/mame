@@ -2,21 +2,21 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Homebrew Z80 Computer by Kun-Szabo Marton
+Homebrew Z80 Computer by Kun-Szabo Marton
 
-            http://digitarworld.uw.hu/z80.htm
+http://digitarworld.uw.hu/z80.htm
 
-        31/10/2010 Initial driver by Miodrag Milanovic
+2010-10-31 Initial driver by Miodrag Milanovic
 
-        All commands must be entered in uppercase, and since the capslock
-        doesn't work, you need to hold the shift key down.
+All commands must be entered in uppercase, and since the capslock
+ doesn't work, you need to hold the shift key down.
 
-        There is next to no error checking, for example the T command
-        is to set the time. Entering T by itself will set the time to
-        99:99:99, while G will cause a jump to 9999 and so forth. Also
-        the parameter must be right next to the command, spaces will cause
-        invalid input. Example M1234 will display a byte of memory at 1234,
-        while M 1234 will display memory at 9123.
+There is next to no error checking, for example the T command
+ is to set the time. Entering T by itself will set the time to
+ 99:99:99, while G will cause a jump to 9999 and so forth. Also
+ the parameter must be right next to the command, spaces will cause
+ invalid input. Example M1234 will display a byte of memory at 1234,
+ while M 1234 will display memory at 9123.
 
 ****************************************************************************/
 
@@ -47,7 +47,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	bool m_irq;
+	bool m_irq = 0;
 	void machine_reset() override;
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;

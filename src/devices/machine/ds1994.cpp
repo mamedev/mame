@@ -751,13 +751,15 @@ void ds1994_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void ds1994_device::nvram_read(emu_file &file)
+bool ds1994_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_rom,  ROM_SIZE);
-	file.read(m_ram,  SPD_SIZE);
-	file.read(m_sram, DATA_SIZE);
-	file.read(m_rtc,  RTC_SIZE);
-	file.read(m_regs, REGS_SIZE);
+	size_t actual;
+	bool result =      !file.read(m_rom,  ROM_SIZE,  actual) && actual == ROM_SIZE;
+	result = result && !file.read(m_ram,  SPD_SIZE,  actual) && actual == SPD_SIZE;
+	result = result && !file.read(m_sram, DATA_SIZE, actual) && actual == DATA_SIZE;
+	result = result && !file.read(m_rtc,  RTC_SIZE,  actual) && actual == RTC_SIZE;
+	result = result && !file.read(m_regs, REGS_SIZE, actual) && actual == REGS_SIZE;
+	return result;
 }
 
 //-------------------------------------------------
@@ -765,11 +767,13 @@ void ds1994_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void ds1994_device::nvram_write(emu_file &file)
+bool ds1994_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_rom,  ROM_SIZE);
-	file.write(m_ram,  SPD_SIZE);
-	file.write(m_sram, DATA_SIZE);
-	file.write(m_rtc,  RTC_SIZE);
-	file.write(m_regs, REGS_SIZE);
+	size_t actual;
+	bool result =      !file.write(m_rom,  ROM_SIZE,  actual) && actual == ROM_SIZE;
+	result = result && !file.write(m_ram,  SPD_SIZE,  actual) && actual == SPD_SIZE;
+	result = result && !file.write(m_sram, DATA_SIZE, actual) && actual == DATA_SIZE;
+	result = result && !file.write(m_rtc,  RTC_SIZE,  actual) && actual == RTC_SIZE;
+	result = result && !file.write(m_regs, REGS_SIZE, actual) && actual == REGS_SIZE;
+	return result;
 }

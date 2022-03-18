@@ -2842,8 +2842,8 @@ mightguy:
 
 cosmica:
 cosmica1:
-cosmica2:
-cosmica3:
+cosmica22:
+cosmica2a:
 @:maincpu,program,400e,3,00,00
 
 
@@ -3527,6 +3527,7 @@ mshvsfu1d:
 ;megamn2d:******Mega Man 2: The Power Fighters (USA 960708 Phoenix Edition) (bootleg)
 megaman2:
 megaman2a:
+megaman2h:
 megamn2d:
 rockman2j:
 @:maincpu,program,ffefc0,118,00,02
@@ -3907,13 +3908,6 @@ crshrace2:
 
 
 ;@s:cv1k.cpp
-
-;***** saves todays top scores (others are saved in nvram) ******
-akatana:
-@:maincpu,program,cb2fa9c,343,00,52
-@:maincpu,program,cb30e4c,343,00,4a
-@:maincpu,program,cb30474,343,00,44
-
 
 dfkbl:
 @:maincpu,program,ca02028,2fcb,08,56
@@ -6126,7 +6120,7 @@ galaxiac:
 ;(zero time)
 asideral:
 astrians:
-devilfsg:
+devilfshgb:
 galaktron:
 galap1:
 galap4:
@@ -6194,6 +6188,7 @@ eagle:
 eagle2:
 eagle3:
 fantazia:
+floritas:
 mooncmw:
 mooncptc:
 mooncreg:
@@ -6212,7 +6207,6 @@ mouncrst:
 sirio2:
 smooncrs:
 spcdrag:
-spcdraga:
 sstarcrs:
 starfgmc:
 stera:
@@ -7591,12 +7585,18 @@ gtmr2u:
 ;gtmra:******1000 Miglia: Great 1000 Miles Rally (94/06/13)
 gtmr:
 gtmra:
-@:maincpu,program,102df2,19e,59,80
+@:maincpu,program,102df2,1a0,59,01
+
+
+;******1000 Miglia: Great 1000 Miles Rally (94/05/..)
+gtmrb:
+gtmro:
+@:maincpu,program,102dee,1a0,59,01
 
 
 gtmre:
 gtmrusa:
-@:maincpu,program,1035fa,19e,59,80
+@:maincpu,program,1035fa,1a0,59,01
 
 
 ;@s:kangaroo.cpp
@@ -7860,8 +7860,8 @@ ladybugb2:
 
 
 ;******Space Raider
-sraider:
 mrsdyna:
+sraider:
 @:maincpu,program,6010,9f,00,21
 
 
@@ -8878,8 +8878,8 @@ demoderb:
 
 ;@s:mcr68.cpp
 
-basketbal:
 archrivl:
+basketbal:
 @:maincpu,program,62cf1,319,09,05
 @:maincpu,program,61ed5,1,03,03
 
@@ -14500,6 +14500,13 @@ sonsonj:
 
 
 ;@s:source not found
+
+;***** saves todays top scores (others are saved in nvram) ******
+akatana:  ; missing
+@:maincpu,program,cb2fa9c,343,00,52
+@:maincpu,program,cb30e4c,343,00,4a
+@:maincpu,program,cb30474,343,00,44
+
 
 ;by Ziller 
 kong2600:  ; missing

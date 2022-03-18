@@ -260,8 +260,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	u8 *const get_user_rom() const { return &m_user_rom[0]; }
 	virtual u8 get_mask_options() const = 0;

@@ -74,8 +74,8 @@ private:
 	required_device<tea1002_device> m_tea1002;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_scrambler;
-	tilemap_t *m_tilemap;
+	uint8_t m_scrambler = 0U;
+	tilemap_t *m_tilemap = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

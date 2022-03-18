@@ -46,16 +46,16 @@ void buffered_ram_device::nvram_default()
 	std::fill_n(m_mem.get(), m_size, 0x00);
 }
 
-void buffered_ram_device::nvram_read(emu_file &file)
+bool buffered_ram_device::nvram_read(util::read_stream &file)
 {
-	if (m_buffered)
-		file.read(m_mem.get(), m_size);
+	size_t actual;
+	return !file.read(m_mem.get(), m_size, actual) && actual == m_size;
 }
 
-void buffered_ram_device::nvram_write(emu_file &file)
+bool buffered_ram_device::nvram_write(util::write_stream &file)
 {
-	if (m_buffered)
-		file.write(m_mem.get(), m_size);
+	size_t actual;
+	return !file.write(m_mem.get(), m_size, actual) && actual == m_size;
 }
 
 } // end namespace bus::ti99::internal

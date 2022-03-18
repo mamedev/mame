@@ -20,12 +20,13 @@ Games:
 - Petaco (older hardware) is in peyper.cpp
 
 Status:
-- petaco2,faeton,halley,halleya,aqualand,america,olympus,lortium,pimbal: Playable
+- All games are Playable
 - Pimbal is multiball, so press XY to end a ball.
+- petacon, petacona: There is no ball digit, it's a set of 5 lamps like EM machines.
+    The ball digit segments E,F,G,H indicate which player's turn, by flashing.
 
 ToDo:
 - Mechanical sounds
-- faeton6d,petacon,petacona: 6-digit displays
 
 *******************************************************************************************************/
 
@@ -60,6 +61,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
+	void init_6d() { m_game = 1; }
 	void jp(machine_config &config);
 	void jps(machine_config &config);
 
@@ -88,6 +90,7 @@ private:
 
 	u32 m_disp_data = 0U;
 	bool m_adpcm_ff = 0;
+	bool m_game = 0;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -231,14 +234,14 @@ static INPUT_PORTS_START( jp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP70")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP71")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP73")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP74")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP75")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP76")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP77")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP77")
 INPUT_PORTS_END
 
 void jp_state::out1_w(offs_t offset, u8 data)
@@ -286,24 +289,44 @@ WRITE_LINE_MEMBER(jp_state::disp_strobe_w)
 
 void jp_state::update_display()
 {
-	u8 segment, t = (m_disp_data >> 24) & 15;
-	if (t == 8)
-	{ // ball number
-		segment = m_disp_data >> 6;
-		m_digits[94] = bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff;
-	}
-	else if (t < 8)
-	{ // main displays
-		if (t == 7)
-			segment = 128;
+	if (m_game)  // 6-digit display
+	{
+		u8 segment = BIT(m_disp_data, 24, 8);
+		if (segment == 0)
+		{ // ball number
+			u8 segment = BIT(m_disp_data, 6, 8);
+			m_digits[94] = bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff;
+		}
 		else
-			segment = 1 << (6-t);
-
-		for (u8 i = 0; i < 32; i++)
-			if (BIT(m_disp_data, i))
-				m_digits[i] = m_digits[i] & ~segment;
+		{
+			for (u8 i = 0; i < 24; i++)
+				if (BIT(m_disp_data, i))
+					m_digits[i] = m_digits[i] & ~segment;
+				else
+					m_digits[i] = m_digits[i] | segment;
+		}
+	}
+	else
+	{       // 7-segment display
+		u8 segment, t = BIT(m_disp_data, 24, 4);
+		if (t == 8)
+		{ // ball number
+			segment = BIT(m_disp_data, 6, 8);
+			m_digits[94] = bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff;
+		}
+		else
+		{ // main displays
+			if (t == 7)
+				segment = 128;
 			else
-				m_digits[i] = m_digits[i] | segment;
+				segment = 1 << (6-t);
+
+			for (u8 i = 0; i < 32; i++)
+				if (BIT(m_disp_data, i))
+					m_digits[i] = m_digits[i] & ~segment;
+				else
+					m_digits[i] = m_digits[i] | segment;
+		}
 	}
 }
 
@@ -357,6 +380,8 @@ void jp_state::machine_reset()
 	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
+	for (u8 i = 24; i < 32; i++)
+		m_digits[i] = 0;
 
 	//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_digits[96] = 0x3f;
@@ -649,12 +674,12 @@ ROM_END
 
 } // Anonymous namespace
 
-// 6-digit display - not working
-GAME(1985,  petacon,  0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  petacona, 0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
+// 6-digit display
+GAME(1985,  petacon,  0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  petacona, 0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
 
-// 7-digit display - working
+// 7-digit display
 GAME(1985,  petaco2,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1985,  faeton,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1986,  halley,   0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL )

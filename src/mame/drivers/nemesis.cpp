@@ -2770,7 +2770,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.52kHz
 
-      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64)
+      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64, ULA)
 
 
 Bottom PCB

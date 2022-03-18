@@ -43,20 +43,20 @@ public:
 	optional_shared_ptr<uint8_t> m_protram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	uint8_t    m_gfxbank;
-	uint8_t    m_palettebank;
+	tilemap_t  *m_bg_tilemap = 0;
+	uint8_t    m_gfxbank = 0U;
+	uint8_t    m_palettebank = 0U;
 
 	/* input-related */
-	uint8_t    m_paddle_select;   // selected by d008 bit 2
+	uint8_t    m_paddle_select = 0U;   // selected by d008 bit 2
 
 	/* bootleg related */
-	int      m_bootleg_id;
-	uint8_t    m_bootleg_cmd;
+	int      m_bootleg_id = 0;
+	uint8_t    m_bootleg_cmd = 0U;
 
 	/* hexaa */
-	uint8_t m_hexaa_from_main;
-	uint8_t m_hexaa_from_sub;
+	uint8_t m_hexaa_from_main = 0U;
+	uint8_t m_hexaa_from_sub = 0U;
 
 	/* devices */
 	optional_ioport_array<2> m_muxports;

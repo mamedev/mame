@@ -115,6 +115,7 @@ protected:
 	inline int POP();
 	void t11_check_irqs();
 	void take_interrupt(uint8_t vector);
+	void trap_to(uint16_t vector);
 
 	typedef void ( t11_device::*opcode_func )(uint16_t op);
 	static const opcode_func s_opcode_table[65536 >> 3];
@@ -122,6 +123,7 @@ protected:
 	void op_0000(uint16_t op);
 	void halt(uint16_t op);
 	void illegal(uint16_t op);
+	void illegal4(uint16_t op);
 	void jmp_rgd(uint16_t op);
 	void jmp_in(uint16_t op);
 	void jmp_ind(uint16_t op);

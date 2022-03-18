@@ -49,7 +49,6 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/ripple_counter.h"
-#include "sound/dac.h"
 #include "speaker.h"
 
 #include "shuffle4.lh"
@@ -239,7 +238,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, shuffle_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("DS1")
@@ -519,11 +518,10 @@ void shuffle_state::s4(machine_config &config)
 void shuffle_state::s9(machine_config &config)
 {
 	s4(config);
-	config.device_remove("maincpu");
 	config.device_remove("pia22");
 	config.device_remove("s4sound");
 
-	M6802(config, m_maincpu, XTAL(4'000'000));
+	M6802(config.replace(), m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shuffle_state::s9_map);
 
 	config.set_default_layout(layout_shuffle9);

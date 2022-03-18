@@ -45,11 +45,11 @@
 #include "screen.h"
 
 
-#define VC_TOTAL_HORZ 678
-#define VC_DISP_HORZ  512
+static constexpr int VC_TOTAL_HORZ = 678;
+static constexpr int VC_DISP_HORZ = 512;
 
-#define VC_TOTAL_VERT 312
-#define VC_DISP_VERT  256
+static constexpr int VC_TOTAL_VERT = 312;
+static constexpr int VC_DISP_VERT = 256;
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -57,7 +57,7 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -78,8 +78,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_p_videoram(*this, "videoram")
 		, m_screen(*this, "screen")
-	{
-	}
+	{ }
 
 	void eurocom2(machine_config &config);
 	void microtrol(machine_config &config);
@@ -302,7 +301,7 @@ void waveterm_state::pia3_pb_w(uint8_t data)
 
 uint8_t waveterm_state::waveterm_adc()
 {
-	return m_screen->frame_number() % 255; // XXX
+	return m_screen->frame_number() % 255; // FIXME
 }
 
 

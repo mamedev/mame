@@ -114,7 +114,7 @@ offs_t pps41_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		param++;
 
 	// disassemble it
-	util::stream_format(stream, "%-6s ", s_name[instr]);
+	util::stream_format(stream, "%-8s", s_name[instr]);
 	if (mask > 0)
 	{
 		if (bits & 0x10)

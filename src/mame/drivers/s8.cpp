@@ -114,7 +114,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
@@ -127,7 +127,7 @@ private:
 	u8 m_row = 0U;
 	bool m_data_ok = 0;
 	u8 m_lamp_data = 0U;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = 0;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -138,7 +138,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<61> m_digits;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 };
 
 void s8_state::main_map(address_map &map)
@@ -201,10 +201,10 @@ static INPUT_PORTS_START( s8 )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, audio_nmi, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( s8_state::main_nmi )
@@ -258,7 +258,7 @@ void s8_state::lamp1_w(u8 data)
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[16U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
 }
 
 void s8_state::dig0_w(u8 data)

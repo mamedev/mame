@@ -58,7 +58,7 @@ static INPUT_PORTS_START( s11c )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
@@ -131,7 +131,7 @@ static INPUT_PORTS_START( s11c )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, audio_nmi, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
 	PORT_CONFSETTING( 0x00, "German" )
 	PORT_CONFSETTING( 0x10, "English" )
@@ -201,6 +201,8 @@ void s11c_state::s11c(machine_config &config)
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11c_state::s11b_pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11c_state::s11b_pia2c_pb_w));
+	m_pia2c->ca2_handler().set(FUNC(s11c_state::pia2c_ca2_w));
+	m_pia2c->cb2_handler().set(FUNC(s11c_state::pia2c_cb2_w));
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
@@ -208,6 +210,7 @@ void s11c_state::s11c(machine_config &config)
 	m_pia30->readpa_handler().set(FUNC(s11c_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11c_state::switch_w));
+	m_pia30->ca2_handler().set(FUNC(s11c_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s11c_state::pia30_cb2_w));
 	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
@@ -215,6 +218,7 @@ void s11c_state::s11c(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11c_state::s11b_pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11c_state::pia34_pb_w));
+	m_pia34->ca2_handler().set_nop();
 	m_pia34->cb2_handler().set(FUNC(s11c_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));

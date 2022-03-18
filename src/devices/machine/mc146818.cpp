@@ -12,8 +12,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "coreutil.h"
 #include "machine/mc146818.h"
+
+#include "coreutil.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -277,13 +278,18 @@ void mc146818_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_read(emu_file &file)
+bool mc146818_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	if (file.read(&m_data[0], size, actual) || actual != size)
+		return false;
 
 	set_base_datetime();
 	update_timer();
 	update_irq();
+
+	return true;
 }
 
 
@@ -292,9 +298,11 @@ void mc146818_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_write(emu_file &file)
+bool mc146818_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	return !file.write(&m_data[0], size, actual) && actual == size;
 }
 
 

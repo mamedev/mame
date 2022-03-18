@@ -50,6 +50,7 @@ ToDo:
 #define VERBOSE    1
 #include "logmacro.h"
 
+namespace {
 
 class recel_state : public genpin_class
 {
@@ -75,8 +76,8 @@ private:
 	void lamps_w(offs_t offset, u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	u8 bic_r(offs_t offset);
-	void bic_w(offs_t offset, u8 data);
+	[[maybe_unused]]u8 bic_r(offs_t offset);
+	[[maybe_unused]]void bic_w(offs_t offset, u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -501,6 +502,8 @@ ROM_START(r_blackm4)
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
 	ROM_LOAD("b4.c5",   0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
 ROM_END
+
+} // anonymous namespace
 
 GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel Bios",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 

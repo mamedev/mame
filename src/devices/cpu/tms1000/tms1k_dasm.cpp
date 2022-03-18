@@ -259,7 +259,7 @@ offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 
 	// convert to mnemonic/param
 	u16 instr = m_lut_mnemonic[op];
-	util::stream_format(stream, "%-8s ", s_mnemonic[instr]);
+	util::stream_format(stream, "%-8s", s_mnemonic[instr]);
 
 	switch( s_addressing[instr] )
 	{

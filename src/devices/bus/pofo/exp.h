@@ -109,8 +109,8 @@ public:
 	bool pdet_r() { return (m_card != nullptr) ? m_card->pdet() : 0; }
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	uint8_t iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; };
-	uint8_t eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; };
+	uint8_t iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; }
+	uint8_t eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; }
 
 	uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(offset, data, iom, bcom, ncc1) : data; }
 	void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(offset, data, iom, bcom, ncc1); }

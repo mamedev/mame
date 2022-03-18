@@ -45,6 +45,7 @@ protected:
 	required_memory_bank_array<6> m_dmdbanks;
 
 	// driver_device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	static const device_timer_id TIMER_VBLANK = 0;
@@ -61,13 +62,41 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	uint16_t m_vblank_count;
-	uint32_t m_irq_count;
-	uint8_t m_bankmask;
-	uint8_t m_ram[0x3000];
-	uint8_t m_dmdram[0x2000];
+	uint16_t m_vblank_count = 0U;
+	uint32_t m_irq_count = 0U;
+	uint8_t m_bankmask = 0U;
+	uint8_t m_ram[0x3000]{};
+	uint8_t m_dmdram[0x2000]{};
 	emu_timer* m_vblank_timer;
 	emu_timer* m_irq_timer;
+};
+
+class wpc_flip1_state : public wpc_dot_state
+{
+public:
+	wpc_flip1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: wpc_dot_state(mconfig, type, tag)
+	{ }
+
+	void init_wpc_flip1();
+	void wpc_flip1(machine_config &config);
+
+protected:
+	void wpc_flip1_map(address_map &map);
+};
+
+class wpc_flip2_state : public wpc_flip1_state
+{
+public:
+	wpc_flip2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: wpc_flip1_state(mconfig, type, tag)
+	{ }
+
+	void init_wpc_flip2();
+	void wpc_flip2(machine_config &config);
+
+protected:
+	void wpc_flip2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_WPC_DOT_H

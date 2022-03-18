@@ -145,7 +145,6 @@ protected:
 	int m_LastFrameStartTime;
 	int m_CyclesPerLine;
 
-	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
@@ -211,7 +210,7 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
-	void spectrum_UpdateBorderBitmap();
+	virtual void spectrum_UpdateBorderBitmap();
 	virtual u16 get_border_color();
 	virtual void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);

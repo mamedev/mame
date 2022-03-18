@@ -41,7 +41,7 @@
     - XTAL 3.6864 MHz
 
     TODO:
-	- Finish floppy hookup
+    - Finish floppy hookup
     - SCC interrupts
     - Unknown DUART inputs/outputs
     - RS232
@@ -57,7 +57,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9519.h"
-#include "machine/digilog320_kbd.h"
+#include "machine/digilog_kbd.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
@@ -382,7 +382,6 @@ void digilog320_state::digilog320(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
-	m_duart->a_tx_cb().set("kbd", FUNC(digilog320_kbd_hle_device::rx_w));
 	m_duart->outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	m_duart->outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
@@ -399,7 +398,7 @@ void digilog320_state::digilog320(machine_config &config)
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("digilog320");
 
-	digilog320_kbd_hle_device &kbd(DIGILOG320_KBD_HLE(config, "kbd"));
+	digilog_kbd_device &kbd(DIGILOG_KBD(config, "kbd"));
 	kbd.tx_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 }
 

@@ -95,10 +95,10 @@ protected:
 	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); };
-	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); };
-	uint16_t sega_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_segaic16road->segaic16_road_control_0_r(); };
-	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16road->segaic16_road_control_0_w(offset,data,mem_mask); };
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); }
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); }
+	uint16_t sega_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_segaic16road->segaic16_road_control_0_r(); }
+	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16road->segaic16_road_control_0_w(offset,data,mem_mask); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 

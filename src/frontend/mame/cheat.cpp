@@ -81,6 +81,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 
 #include <cstring>
 #include <iterator>
@@ -1400,7 +1401,7 @@ void cheat_manager::load_cheats(std::string const &filename)
 	emu_file cheatfile(std::move(searchstr), OPEN_FLAG_READ);
 	try
 	{
-		// loop over all instrances of the files found in our search paths
+		// loop over all instances of the files found in our search paths
 		for (std::error_condition filerr = cheatfile.open(filename + ".xml"); !filerr; filerr = cheatfile.open_next())
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());

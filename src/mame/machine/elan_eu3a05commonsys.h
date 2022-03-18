@@ -60,7 +60,7 @@ private:
 	uint8_t elan_eu3a05_pal_ntsc_r();
 	void elan_eu3a05_500b_unk_w(uint8_t data);
 
-	uint8_t radica_5009_unk_r() { return machine().rand(); };
+	uint8_t radica_5009_unk_r() { return machine().rand(); }
 
 	emu_timer *m_unk_timer;
 	static const device_timer_id TIMER_UNK = 0;

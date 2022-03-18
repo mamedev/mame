@@ -350,11 +350,14 @@ void msm58321_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void msm58321_device::nvram_read(emu_file &file)
+bool msm58321_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_reg.data(), m_reg.size());
+	size_t actual;
+	if (file.read(m_reg.data(), m_reg.size(), actual) || actual != m_reg.size())
+		return false;
 
 	clock_updated();
+	return true;
 }
 
 
@@ -363,9 +366,10 @@ void msm58321_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void msm58321_device::nvram_write(emu_file &file)
+bool msm58321_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_reg.data(), m_reg.size());
+	size_t actual;
+	return !file.write(m_reg.data(), m_reg.size(), actual) && actual == m_reg.size();
 }
 
 //-------------------------------------------------
