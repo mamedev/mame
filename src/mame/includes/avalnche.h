@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_latch;
 
-	uint8_t m_avalance_video_inverted;
+	uint8_t m_avalance_video_inverted = 0U;
 
 	DECLARE_WRITE_LINE_MEMBER(video_invert_w);
 	void catch_coin_counter_w(uint8_t data);

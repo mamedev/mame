@@ -33,16 +33,16 @@ public:
 	{ }
 
 	/* video-related */
-	int         m_sprite_colorbase;
-	int         m_layer_colorbase[4];
-	int         m_layerpri[3];
-	uint16_t      m_spritebank;
-	int         m_tilebanks[4];
-	int         m_spritebanks[4];
+	int         m_sprite_colorbase = 0;
+	int         m_layer_colorbase[4]{};
+	int         m_layerpri[3]{};
+	uint16_t      m_spritebank = 0U;
+	int         m_tilebanks[4]{};
+	int         m_spritebanks[4]{};
 
 	/* misc */
-	uint8_t       m_cur_control2;
-	uint16_t      m_prot[2];
+	uint8_t       m_cur_control2 = 0U;
+	uint16_t      m_prot[2]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

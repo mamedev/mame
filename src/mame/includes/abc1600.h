@@ -143,25 +143,25 @@ public:
 	void scc_irq_w(int state) { m_scc_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
 
 	// DMA
-	int m_dmadis;
-	int m_sysscc;
-	int m_sysfs;
-	int m_partst;               // parity test
+	int m_dmadis = 0;
+	int m_sysscc = 0;
+	int m_sysfs = 0;
+	int m_partst = 0;               // parity test
 
 	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
 
 	// peripherals
-	int m_cs7;                  // card select address bit 7
-	int m_bus0;                 // BUS 0 selected
-	uint8_t m_csb;                // card select
-	int m_atce;                 // V.24 channel A external clock enable
-	int m_btce;                 // V.24 channel B external clock enable
-	bool m_sccrq_a;
-	bool m_sccrq_b;
-	int m_scc_irq;
-	int m_dart_irq;
+	int m_cs7 = 0;                  // card select address bit 7
+	int m_bus0 = 0;                 // BUS 0 selected
+	uint8_t m_csb = 0U;             // card select
+	int m_atce = 0;                 // V.24 channel A external clock enable
+	int m_btce = 0;                 // V.24 channel B external clock enable
+	bool m_sccrq_a = 0;
+	bool m_sccrq_b = 0;
+	int m_scc_irq = 0;
+	int m_dart_irq = 0;
 };
 
 
