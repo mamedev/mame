@@ -137,6 +137,7 @@ private:
 
 		virtual meta_data metadata() override;
 		virtual dir_t root() override;
+		virtual void format(const meta_data &meta) override;
 
 	private:
 		volume_header   m_volume_header;
@@ -148,6 +149,7 @@ private:
 	};
 
 	static std::string pick_os9_string(std::string_view raw_string);
+	static std::string to_os9_string(std::string_view s, size_t length);
 	static u32 pick_integer_be(const u8 *data, int length);
 	static bool validate_filename(std::string_view name);
 	static bool is_ignored_filename(std::string_view name);

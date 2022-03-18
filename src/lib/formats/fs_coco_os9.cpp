@@ -66,7 +66,7 @@ void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const s
 
 bool coco_os9_image::can_format() const
 {
-	return false;
+	return true;
 }
 
 
@@ -197,6 +197,22 @@ std::string coco_os9_image::pick_os9_string(std::string_view raw_string)
 		result.append(1, *iter & 0x7F);
 	return result;
 
+}
+
+
+//-------------------------------------------------
+//  to_os9_string
+//-------------------------------------------------
+
+std::string coco_os9_image::to_os9_string(std::string_view s, size_t length)
+{
+	std::string result(length, '\0');
+	for (auto i = 0; i < std::min(length, s.size()); i++)
+	{
+		result[i] = (s[i] & 0x7F)
+			| (i == s.size() ? 0x80 : 0x00);
+	}
+	return result;
 }
 
 
@@ -374,6 +390,116 @@ filesystem_t::dir_t coco_os9_image::impl::root()
 void coco_os9_image::impl::drop_root_ref()
 {
 	m_root = nullptr;
+}
+
+
+//-------------------------------------------------
+//  impl::format
+//-------------------------------------------------
+
+void coco_os9_image::impl::format(const meta_data &meta)
+{
+	// for some reason, the OS-9 world favored filling with 0xE5
+	m_blockdev.fill(0xE5);
+
+	u8 sectors = 18;		// TODO - we need a definitive technique to get the floppy geometry
+	u8 heads = 1;			// TODO - we need a definitive technique to get the floppy geometry
+	u16 sector_bytes = 256;	// TODO - we need a definitive technique to get the floppy geometry
+	std::string volume_title = meta.get_string(meta_name::name, "UNTITLED");
+	u32 tracks = m_blockdev.block_count() / sectors / heads;
+
+	u32 lsn_count = m_blockdev.block_count();
+	u16 cluster_size = 1;
+	u16 owner_id = 1;
+	u16 disk_id = 1;
+	u8 attributes = 0;
+	u32 allocation_bitmap_bits = lsn_count / cluster_size;
+	u32 allocation_bitmap_lsns = (allocation_bitmap_bits / 8 + sector_bytes - 1) / sector_bytes;
+	u8 format_flags = ((heads > 1) ? 0x01 : 0x00) | ((tracks > 40) ? 0x02 : 0x00);
+
+	// volume header
+	auto volume_header = m_blockdev.get(0);
+	volume_header.w24b(0, lsn_count);								// total secctors
+	volume_header.w8(3, sectors);									// track size in sectors
+	volume_header.w16b(4, (allocation_bitmap_bits + 7) / 8);		// allocation bitmap in bytes
+	volume_header.w16b(6, cluster_size);							// cluster size
+	volume_header.w24b(8, 1 + allocation_bitmap_lsns);				// root directory LSN
+	volume_header.w16b(11, owner_id);								// owner ID
+	volume_header.w8(13, attributes);								// attributes
+	volume_header.w16b(14, disk_id);								// disk ID
+	volume_header.w8(16, format_flags);								// format flags
+	volume_header.w16b(17, sectors);								// sectors per track
+	volume_header.wstr(31, to_os9_string(volume_title, 32));		// title
+	volume_header.w16b(103, sector_bytes / 256);					// sector bytes
+
+	// path descriptor options
+	volume_header.w8(0x3f + 0x00, 1);								// device class
+	volume_header.w8(0x3f + 0x01, 1);								// drive number
+	volume_header.w8(0x3f + 0x03, 0x20);							// device type
+	volume_header.w8(0x3f + 0x04, 1);								// density capability
+	volume_header.w16b(0x3f + 0x05, tracks);						// number of tracks
+	volume_header.w8(0x3f + 0x07, heads);							// number of sides
+	volume_header.w16b(0x3f + 0x09, sectors);						// sectors per track
+	volume_header.w16b(0x3f + 0x0b, sectors);						// sectors on track zero
+	volume_header.w8(0x3f + 0x0d, 3);								// sector interleave factor
+	volume_header.w8(0x3f + 0x0e, 8);								// default sectors per allocation
+
+	// allocation bitmap
+	u32 total_allocated_sectors = 1 + allocation_bitmap_lsns + 1 + 7;
+	std::vector<u8> abblk_bytes;
+	abblk_bytes.resize(sector_bytes);
+	for (u32 i = 0; i < allocation_bitmap_lsns; i++)
+	{
+		for (u32 j = 0; j < sector_bytes; j++)
+		{
+			u32 pos = i * 8 + j;
+			if (pos + 8 < total_allocated_sectors)
+				abblk_bytes[j] = 0xFF;
+			else if (pos >= total_allocated_sectors)
+				abblk_bytes[j] = 0x00;
+			else
+				abblk_bytes[j] = ~((1 << (total_allocated_sectors - pos)) - 1);
+		}
+
+		auto abblk = m_blockdev.get(1 + i);
+		abblk.copy(0, abblk_bytes.data(), sector_bytes);
+	}
+
+	// time
+	time_t t;
+	time(&t);
+	struct tm *ltime = localtime(&t);
+
+	// root directory header
+	auto roothdr_blk = m_blockdev.get(1 + allocation_bitmap_lsns);
+	roothdr_blk.fill(0x00);
+	roothdr_blk.w8(0x00, 0xBF);
+	roothdr_blk.w8(0x01, 0x00);
+	roothdr_blk.w8(0x02, 0x00);
+	roothdr_blk.w8(0x03, (u8)ltime->tm_year);
+	roothdr_blk.w8(0x04, (u8)ltime->tm_mon + 1);
+	roothdr_blk.w8(0x05, (u8)ltime->tm_mday);
+	roothdr_blk.w8(0x06, (u8)ltime->tm_hour);
+	roothdr_blk.w8(0x07, (u8)ltime->tm_min);
+	roothdr_blk.w8(0x08, 0x02);
+	roothdr_blk.w8(0x09, 0x00);
+	roothdr_blk.w8(0x0A, 0x00);
+	roothdr_blk.w8(0x0B, 0x00);
+	roothdr_blk.w8(0x0C, 0x40);
+	roothdr_blk.w8(0x0D, (u8)(ltime->tm_year % 100));
+	roothdr_blk.w8(0x0E, (u8)ltime->tm_mon);
+	roothdr_blk.w8(0x0F, (u8)ltime->tm_mday);
+	roothdr_blk.w24b(0x10, 1 + allocation_bitmap_lsns + 1);
+	roothdr_blk.w16b(0x13, 8);
+
+	// root directory data
+	auto rootdata_blk = m_blockdev.get(1 + allocation_bitmap_lsns + 1);
+	rootdata_blk.fill(0x00);
+	rootdata_blk.w8(0x00, 0x2E);
+	rootdata_blk.w8(0x01, 0xAE);
+	rootdata_blk.w8(0x1F, 1 + allocation_bitmap_lsns);
+	rootdata_blk.w8(0x20, 0xAE);
+	rootdata_blk.w8(0x3F, 1 + allocation_bitmap_lsns);
 }
 
 
