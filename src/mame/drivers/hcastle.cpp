@@ -232,7 +232,7 @@ void hcastle_state::hcastle(machine_config &config)
 	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI); /* from schematic; NMI handler is just a retn */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 
-	K051649(config, "k051649", 3579545/2).add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, "k051649", 3579545).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 /***************************************************************************/

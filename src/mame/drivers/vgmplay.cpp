@@ -2982,9 +2982,12 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		if (setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161) ||
-			setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161))
-			osd_printf_warning("Warning: file requests an unsupported Konami SCC\n");
+		setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161);
+		setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161);
+
+		// HACK: Some VGMs contain the halved clock speed of the sound core inside the SCC
+		m_k051649[0]->set_clock_scale(m_k051649[0]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
+		m_k051649[1]->set_clock_scale(m_k051649[1]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
 
 		setup_device(*m_k054539[0], 0, CT_K054539, 0xa0, 0x161);
 		setup_device(*m_k054539[1], 1, CT_K054539, 0xa0, 0x161);
