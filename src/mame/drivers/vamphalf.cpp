@@ -180,11 +180,6 @@ protected:
 	u32 finalgdr_prot_r();
 	void finalgdr_prot_w(u32 data);
 
-	u32 m_misncrft_prot_seed[2];
-	u8 m_misncrft_prot_retval;
-	u16 misncrft_prot_r(offs_t offset);
-	void misncrft_prot_w(offs_t offset, u16 data);
-
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -258,19 +253,18 @@ public:
 	{
 	}
 
-	void misncrft(machine_config &config);
 	void wyvernwg(machine_config &config);
 	void yorijori(machine_config &config);
 
-	void init_misncrft();
 	void init_wyvernwg();
 	void init_yorijori();
+
+protected:
+	void install_qdsp();
 
 private:
 	required_device<i8052_device> m_qdsp_cpu;
 
-	u16 misncrft_speedup_r();
-	u16 misncrfta_speedup_r();
 	u32 wivernwg_speedup_r();
 	u32 wyvernwg_speedup_r();
 	u32 wyvernwga_speedup_r();
@@ -282,10 +276,38 @@ private:
 
 	void yorijori_eeprom_w(u32 data);
 
-	void misncrft_io(address_map &map);
 	void wyvernwg_io(address_map &map);
 	void yorijori_32bit_map(address_map &map);
 	void yorijori_io(address_map &map);
+};
+
+class misncrft_state : public vamphalf_qdsp_state
+{
+public:
+	misncrft_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vamphalf_qdsp_state(mconfig, type, tag)
+	{
+	}
+
+	void misncrft(machine_config &config);
+	void init_misncrft();
+	void init_misncrfta();
+
+private:
+	u8 prot_value_check(std::vector<std::vector<u8>> &prot_table, int seed_size);
+
+	u16 misncrft_speedup_r();
+	u16 misncrfta_speedup_r();
+
+	u8 m_prot_seed[16];
+	u8 m_prot_retval;
+	int m_prot_idx;
+	bool m_prot_armed;
+
+	u16 misncrft_prot_r(offs_t offset);
+	template <int seed_size> void misncrft_prot_w(offs_t offset, u16 data);
+
+	void misncrft_io(address_map &map);
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -547,68 +569,119 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 /*
  * Mission Craft tests protection device on two places:
  * 1. at POST on $680 (PC=0xf81c)
- * 2. If check one is successful it attempts two new checks after ~15 minutes,
- * \- first tries 0x5fd8988e / 0x1f3f37ee at $680,
- * \- then it tries 0xcfddfbbf / 0xeefff6e7 at $340 (PC=f9d6)
- * If protection check fails then game intentionally add massive refresh hiccups
- * after aforementioned 15 minutes.
- * It doesn't seem to matter if game is being played or is left in attract during this time.
+ * 2. If check one is successful it attempts two new checks after about 15 minutes at $680 and $340,
+ *    both seeds depends on number_of_credits % 3 inserted up to an arbitrary point in time
+ *    (i.e. credit insertion is definitely disarmed after about 14 minutes)
+ * If protection check fails then game intentionally add massive refresh hiccups after aforementioned 15 minutes.
+ * It doesn't seem to matter if game(s) is being played, is left in attract or on title screen during this time.
  */
-u16 vamphalf_state::misncrft_prot_r(offs_t offset)
+u16 misncrft_state::misncrft_prot_r(offs_t offset)
 {
 	if (offset)
 	{
-		u8 retval = (m_misncrft_prot_retval >> (7 - m_semicom_prot_idx)) & 1;
+		u8 retval = (m_prot_retval >> (7 - m_prot_idx)) & 1;
 		if (!machine().side_effects_disabled())
-			m_semicom_prot_idx ++;
+			m_prot_idx ++;
 		return retval ? 0xffff : 0;
 	}
 	return 0;
 }
 
-void vamphalf_state::misncrft_prot_w(offs_t offset, u16 data)
+u8 misncrft_state::prot_value_check(std::vector<std::vector<u8>> &prot_table, int seed_size)
+{
+	const int prot_size = prot_table.size();
+	int i;
+
+	for (i = 0; i < prot_size; i++)
+	{
+		bool result = true;
+
+		for (int j = 0; j < seed_size; j ++)
+		{
+			if (prot_table[i][j] != m_prot_seed[j])
+			{
+				result = false;
+				break;
+			}
+		}
+
+		if (result == true)
+			return (u8)prot_table[i][seed_size];
+	}
+
+	std::ostringstream outbuffer;
+	util::stream_format(outbuffer, "%s: unhandled protection seed {", machine().describe_context());
+	for (i = 0; i < seed_size; i++)
+		util::stream_format(outbuffer, "0x%02x, ", m_prot_seed[i]);
+	util::stream_format(outbuffer, "},\n");
+
+	logerror(outbuffer.str());
+	//std::cout << outbuffer.str();
+	// tested up to 3 hours, leave this in anyway for checking out if any inp testing triggers here.
+	machine().debug_break();
+	return 0x00;
+}
+
+
+template <int seed_size> void misncrft_state::misncrft_prot_w(offs_t offset, u16 data)
 {
 	if (offset)
 	{
 		// Seed uploads with a 0xffff -> 1 byte x 8 times -> 0xffff
 		// This should be used as a commit/reset chip mechanism,
 		// likely in a flip-flop transition with any of the upper bits.
+		// Note: the $340 version actually checks for 16 times instead of 8
 		// Also note: return value is read 8 times but only first 4 bits are compared against, why?
 		if (data == 0xffff)
 		{
-			m_semicom_prot_idx = 0;
-			
-			if (m_misncrft_prot_seed[0] == 0x806b4bfb && m_misncrft_prot_seed[1] == 0xe3fb55f6)
-				m_misncrft_prot_retval = 0xf0;
-			else if (m_misncrft_prot_seed[0] == 0xdf7c1de1 && m_misncrft_prot_seed[1] == 0x8701be31)
-				m_misncrft_prot_retval = 0xe0;
-			else if (m_misncrft_prot_seed[0] == 0x57730e47 && m_misncrft_prot_seed[1] == 0x67678758)
-				m_misncrft_prot_retval = 0xa0;
-			else if (m_misncrft_prot_seed[0] == 0x893c59ea && m_misncrft_prot_seed[1] == 0x57127bd2)
-				m_misncrft_prot_retval = 0x00;
-			else if (m_misncrft_prot_seed[0] == 0xa1d83c54 && m_misncrft_prot_seed[1] == 0x542f36af)
-				m_misncrft_prot_retval = 0x80;
-			else if (m_misncrft_prot_seed[0] == 0x5fd8988e && m_misncrft_prot_seed[1] == 0x1f3f37ee)
-				m_misncrft_prot_retval = 0x20;
-			else if (m_misncrft_prot_seed[0] == 0xcfddfbbf && m_misncrft_prot_seed[1] == 0xeefff6e7)
-				m_misncrft_prot_retval = 0xa0;
-			else if (m_misncrft_prot_seed[0] != 0 && m_misncrft_prot_seed[1] != 0)
+			m_prot_idx = 0;
+
+			if (m_prot_armed)
 			{
-				logerror("%s: unhandled protection seed %08x %08x\n", machine().describe_context(), m_misncrft_prot_seed[0], m_misncrft_prot_seed[1]);
-				//printf("else if (m_misncrft_prot_seed[0] == 0x%08x && m_misncrft_prot_seed[1] == 0x%08x)\n",m_misncrft_prot_seed[0], m_misncrft_prot_seed[1]);
-				m_misncrft_prot_retval = 0x00;
-				// tested up to 3 hours, leave this in anyway for checking out if any inp testing triggers here.
-				machine().debug_break();
+				if (seed_size == 8)
+				{
+					std::vector<std::vector<u8>> prot_table_8 = {
+						{ 0x80, 0x6b, 0x4b, 0xfb, 0xe3, 0xfb, 0x55, 0xf6, 0xf0 },
+						{ 0xdf, 0x7c, 0x1d, 0xe1, 0x87, 0x01, 0xbe, 0x31, 0xe0 },
+						{ 0x57, 0x73, 0x0e, 0x47, 0x67, 0x67, 0x87, 0x58, 0xa0 },
+						{ 0x89, 0x3c, 0x59, 0xea, 0x57, 0x12, 0x7b, 0xd2, 0x00 },
+						{ 0xa1, 0xd8, 0x3c, 0x54, 0x54, 0x2f, 0x36, 0xaf, 0x80 },
+						// 15 minutes checks (PC=f81c):
+						// 0 credits
+						{ 0x5f, 0xd8, 0x98, 0x8e, 0x1f, 0x3f, 0x37, 0xee, 0x20 },
+						// 1 credit
+						{ 0xda, 0x03, 0x78, 0x99, 0xcd, 0xe2, 0x1b, 0x77, 0x90 },
+					};
+					m_prot_retval = prot_value_check(prot_table_8, seed_size);
+				}
+				else
+				{
+					std::vector<std::vector<u8>> prot_table_16 = {
+						{
+							0x4d, 0x4d, 0xfa, 0xbe, 0xa6, 0x5a, 0xa4, 0x86,
+							0x8e, 0xdc, 0x09, 0x2d, 0x4e, 0xef, 0x56, 0xe1, 0xa0
+						},
+						// 2 credits
+						{
+							0xd9, 0xd9, 0x8f, 0x5f, 0x3f, 0xb6, 0xee, 0xc3,
+							0xf8, 0x4d, 0x0d, 0xea, 0xbe, 0xa6, 0xda, 0x64, 0xc0
+						},
+					};
+					m_prot_retval = prot_value_check(prot_table_16, seed_size);
+				}
 			}
 
-			for (int i = 0; i < 2; i++)
-				m_misncrft_prot_seed[i] = 0;
+			// clear write latches
+			for (int i = 0; i < seed_size; i++)
+				m_prot_seed[i] = 0;
+			m_prot_armed = false;
 		}
 		else
 		{
-			//printf("%02x %d\n", data & 0xff, m_semicom_prot_idx);
-			m_misncrft_prot_seed[(m_semicom_prot_idx & 4) >> 2] |= ((data & 0xff) << ((3 - (m_semicom_prot_idx & 3)) * 8));
-			m_semicom_prot_idx ++;
+			//printf("%02x %d\n", data & 0xff, m_prot_idx);
+			m_prot_seed[m_prot_idx] = data & 0xff;
+			m_prot_armed = true;
+			m_prot_idx ++;
 		}
 	}
 }
@@ -650,16 +723,16 @@ void vamphalf_state::vamphalf_io(address_map &map)
 	map(0x608, 0x60b).w(FUNC(vamphalf_state::eeprom_w));
 }
 
-void vamphalf_qdsp_state::misncrft_io(address_map &map)
+void misncrft_state::misncrft_io(address_map &map)
 {
-	map(0x100, 0x103).w(FUNC(vamphalf_state::flipscreen_w));
+	map(0x100, 0x103).w(FUNC(misncrft_state::flipscreen_w));
 	map(0x200, 0x203).portr("P1_P2");
 	map(0x240, 0x243).portr("SYSTEM");
-	map(0x340, 0x343).rw(FUNC(vamphalf_qdsp_state::misncrft_prot_r), FUNC(vamphalf_qdsp_state::misncrft_prot_w));
-	map(0x3c0, 0x3c3).w(FUNC(vamphalf_state::eeprom_w));
+	map(0x340, 0x343).rw(FUNC(misncrft_state::misncrft_prot_r), FUNC(misncrft_state::misncrft_prot_w<16>));
+	map(0x3c0, 0x3c3).w(FUNC(misncrft_state::eeprom_w));
 	map(0x400, 0x403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x580, 0x583).r(FUNC(vamphalf_state::eeprom_r));
-	map(0x680, 0x683).rw(FUNC(vamphalf_qdsp_state::misncrft_prot_r), FUNC(vamphalf_qdsp_state::misncrft_prot_w));
+	map(0x580, 0x583).r(FUNC(misncrft_state::eeprom_r));
+	map(0x680, 0x683).rw(FUNC(misncrft_state::misncrft_prot_r), FUNC(misncrft_state::misncrft_prot_w<8>));
 }
 
 void vamphalf_state::coolmini_io(address_map &map)
@@ -1316,13 +1389,13 @@ void vamphalf_state::vamphalf(machine_config &config)
 	sound_ym_oki(config);
 }
 
-void vamphalf_qdsp_state::misncrft(machine_config &config)
+void misncrft_state::misncrft(machine_config &config)
 {
 	common(config);
 	GMS30C2116(config.replace(), m_maincpu, XTAL(50'000'000)); /* 50 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_map);
-	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
-	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &misncrft_state::common_map);
+	m_maincpu->set_addrmap(AS_IO, &misncrft_state::misncrft_io);
+	m_maincpu->set_vblank_int("screen", FUNC(misncrft_state::irq1_line_hold));
 
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 31, 350, 264, 16, 251); // not measured, assume 59.18 Hz like others
 
@@ -3101,7 +3174,7 @@ u16 vamphalf_state::vamphafk_speedup_r()
 	return m_wram[0x4a648 / 2];
 }
 
-u16 vamphalf_qdsp_state::misncrft_speedup_r()
+u16 misncrft_state::misncrft_speedup_r()
 {
 	if (m_maincpu->pc() == 0xff5a)
 	{
@@ -3114,7 +3187,7 @@ u16 vamphalf_qdsp_state::misncrft_speedup_r()
 	return m_wram[0x741e8 / 2];
 }
 
-u16 vamphalf_qdsp_state::misncrfta_speedup_r()
+u16 misncrft_state::misncrfta_speedup_r()
 {
 	if (m_maincpu->pc() == 0xecd6)
 	{
@@ -3473,16 +3546,29 @@ void vamphalf_state::init_vamphafk()
 	m_flip_bit = 0x80;
 }
 
-void vamphalf_qdsp_state::init_misncrft()
+void vamphalf_qdsp_state::install_qdsp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, read16smo_delegate(*this, FUNC(vamphalf_qdsp_state::misncrft_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, read16smo_delegate(*this, FUNC(vamphalf_qdsp_state::misncrfta_speedup_r)));
-	m_palshift = 0;
-	m_flip_bit = 1;
-
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+}
+
+void misncrft_state::init_misncrft()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, read16smo_delegate(*this, FUNC(misncrft_state::misncrft_speedup_r)));
+	m_palshift = 0;
+	m_flip_bit = 1;
+
+	install_qdsp();
+}
+
+void misncrft_state::init_misncrfta()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, read16smo_delegate(*this, FUNC(misncrft_state::misncrfta_speedup_r)));
+	m_palshift = 0;
+	m_flip_bit = 1;
+
+	install_qdsp();
 }
 
 void vamphalf_state::init_coolmini()
@@ -3563,9 +3649,7 @@ void vamphalf_qdsp_state::init_wyvernwg()
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
-	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+	install_qdsp();
 
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
@@ -3587,9 +3671,7 @@ void vamphalf_qdsp_state::init_yorijori()
 	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
 	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
-	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
-	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+	install_qdsp();
 }
 
 void vamphalf_nvram_state::init_finalgdr()
@@ -3754,8 +3836,8 @@ GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state,      init
 
 GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
-GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2000, misncrft,   0,        misncrft,  common,   misncrft_state,      init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,   misncrft_state,      init_misncrfta, ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 2000, mrdig,      0,        mrdig,     common,   vamphalf_state,      init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
 
