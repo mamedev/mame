@@ -50,6 +50,11 @@ public:
 		, m_opna(*this, "opna")
 		, m_opn(*this, "opn")
 		, m_palette(*this, "palette")
+		, m_n80rom(*this, "n80rom")
+		, m_n88rom(*this, "n88rom")
+		, m_cg_rom(*this, "cgrom")
+		, m_kanji_rom(*this, "kanji")
+		, m_kanji_lv2_rom(*this, "kanji_lv2")
 	{ }
 
 	void pc8801(machine_config &config);
@@ -82,6 +87,11 @@ protected:
 	required_device<ym2608_device> m_opna;
 	required_device<ym2203_device> m_opn;
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_n80rom;
+	required_region_ptr<u8> m_n88rom;
+	required_region_ptr<u8> m_cg_rom;
+	required_region_ptr<u8> m_kanji_rom;
+	required_region_ptr<u8> m_kanji_lv2_rom;
 
 	uint8_t m_gfx_ctrl;
 
@@ -108,10 +118,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
-	uint8_t *m_n80rom;
-	uint8_t *m_n88rom;
-	uint8_t *m_kanji_rom;
-	uint8_t *m_cg_rom;
 
 	uint8_t m_i8255_0_pc;
 	uint8_t m_i8255_1_pc;
