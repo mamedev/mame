@@ -253,10 +253,8 @@ public:
 	{
 	}
 
-	void wyvernwg(machine_config &config);
 	void yorijori(machine_config &config);
 
-	void init_wyvernwg();
 	void init_yorijori();
 
 protected:
@@ -265,18 +263,8 @@ protected:
 private:
 	required_device<i8052_device> m_qdsp_cpu;
 
-	u32 wivernwg_speedup_r();
-	u32 wyvernwg_speedup_r();
-	u32 wyvernwga_speedup_r();
-
-	u32 wyvernwg_prot_r();
-	void wyvernwg_prot_w(u32 data);
-	u32 wyvernwg_parallel_prot_r();
-	void wyvernwg_parallel_prot_w(u32 data);
-
 	void yorijori_eeprom_w(u32 data);
 
-	void wyvernwg_io(address_map &map);
 	void yorijori_32bit_map(address_map &map);
 	void yorijori_io(address_map &map);
 };
@@ -308,6 +296,40 @@ private:
 	template <int seed_size> void misncrft_prot_w(offs_t offset, u16 data);
 
 	void misncrft_io(address_map &map);
+};
+
+class wyvernwg_state : public vamphalf_qdsp_state
+{
+public:
+	wyvernwg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vamphalf_qdsp_state(mconfig, type, tag)
+	{
+	}
+
+	void wyvernwg(machine_config &config);
+	void init_wivernwg();
+	void init_wyvernwg();
+	void init_wyvernwga();
+
+private:
+	void init_common();
+
+	u32 wivernwg_speedup_r();
+	u32 wyvernwg_speedup_r();
+	u32 wyvernwga_speedup_r();
+
+	u32 wyvernwg_prot_r();
+	void wyvernwg_prot_w(u32 data);
+	u32 wyvernwg_parallel_prot_r();
+	void wyvernwg_parallel_prot_w(u32 data);
+
+	u8 prot_value_check(std::vector<std::vector<u16>> &prot_table, int seed_size);
+	u16 m_prot_seed[16];
+	u8 m_prot_retval;
+	int m_prot_idx;
+	bool m_prot_armed;
+
+	void wyvernwg_io(address_map &map);
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -412,31 +434,11 @@ void vamphalf_state::jmpbreak_flipscreen_w(u16 data)
 }
 
 
-u32 vamphalf_qdsp_state::wyvernwg_prot_r()
+u32 wyvernwg_state::wyvernwg_prot_r()
 {
 	if (!machine().side_effects_disabled())
 		m_semicom_prot_idx--;
 	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) >> m_semicom_prot_idx;
-}
-
-// tested with 16 words seed after ~1 hour
-// Looks a similar pattern to Mission Craft except parallel instead of serial
-// TODO: it changes seed depending on number of credits being inserted
-u32 vamphalf_qdsp_state::wyvernwg_parallel_prot_r()
-{
-	return 0x08;
-}
-
-void vamphalf_qdsp_state::wyvernwg_parallel_prot_w(u32 data)
-{
-	printf("%04x\n", data);
-}
-
-
-void vamphalf_qdsp_state::wyvernwg_prot_w(u32 data)
-{
-	m_semicom_prot_which = data & 1;
-	m_semicom_prot_idx = 8;
 }
 
 u32 vamphalf_state::finalgdr_prot_r()
@@ -622,7 +624,6 @@ u8 misncrft_state::prot_value_check(std::vector<std::vector<u8>> &prot_table, in
 	return 0x00;
 }
 
-
 template <int seed_size> void misncrft_state::misncrft_prot_w(offs_t offset, u16 data)
 {
 	if (offset)
@@ -684,6 +685,143 @@ template <int seed_size> void misncrft_state::misncrft_prot_w(offs_t offset, u16
 			m_prot_idx ++;
 		}
 	}
+}
+
+// tested with 16 words seed after ~1 hour
+// Looks a similar pattern to Mission Craft except parallel instead of serial
+// TODO: remove duplication (convert to device?)
+u8 wyvernwg_state::prot_value_check(std::vector<std::vector<u16>> &prot_table, int seed_size)
+{
+	const int prot_size = prot_table.size();
+	int i;
+
+	for (i = 0; i < prot_size; i++)
+	{
+		bool result = true;
+
+		for (int j = 0; j < seed_size; j ++)
+		{
+			if (prot_table[i][j] != m_prot_seed[j])
+			{
+				result = false;
+				break;
+			}
+		}
+
+		if (result == true)
+			return (u8)prot_table[i][seed_size];
+	}
+
+	std::ostringstream outbuffer;
+	util::stream_format(outbuffer, "%s: unhandled protection seed { ", machine().describe_context());
+	for (i = 0; i < seed_size; i++)
+		util::stream_format(outbuffer, "0x%04x, ", m_prot_seed[i]);
+	util::stream_format(outbuffer, "},\n");
+
+	logerror(outbuffer.str());
+	//std::cout << outbuffer.str();
+	machine().debug_break();
+	return 0x00;
+}
+
+u32 wyvernwg_state::wyvernwg_parallel_prot_r()
+{
+	// PC=f6b4
+	return m_prot_retval;
+}
+
+void wyvernwg_state::wyvernwg_parallel_prot_w(u32 data)
+{
+	const int seed_size = 16;
+	if (data == 0xffff)
+	{
+		m_prot_idx = 0;
+
+		if (m_prot_armed)
+		{
+			std::vector<std::vector<u16>> prot_table = {
+				// PC=1bb74 subroutine
+				// expected value is stored from PC=f5f4 in L20 at PC=f664
+				// $b5f78 initially contains the number of credits inserted
+				// (gets modified on the fly for obfuscation reasons)
+				// 0
+				{
+					0x53dc, 0x2704, 0x5664, 0x0daa, 0x421e, 0x3eac, 0x4d1c, 0x2f5a,
+					0x20da, 0x2fe4, 0x69ac, 0x161a, 0x261e, 0x525e, 0x6512, 0x7e70, 0x00
+				},
+				// 1
+				{
+					0x167e, 0x2781, 0x446a, 0x794a, 0x15fa, 0x59e2, 0x1cfa, 0x3f55,
+					0x0ff7, 0x0abd, 0x31de, 0x237c, 0x2f1c, 0x7de1, 0x4487, 0x6200, 0x08
+				},
+				// 2
+				{
+					0x5920, 0x27fe, 0x3272, 0x64ec, 0x69d6, 0x7518, 0x6cd9, 0x4f4f,
+					0x7f13, 0x6594, 0x7a12, 0x30dc, 0x381b, 0x2963, 0x23fc, 0x4592, 0x0f
+				},
+				// 3
+				{
+					0x1bc2, 0x287d, 0x2078, 0x508e, 0x3db4, 0x104d, 0x3cb6, 0x5f49,
+					0x6e2e, 0x406d, 0x4246, 0x3e3d, 0x4118, 0x54e4, 0x0371, 0x2925, 0x0d
+				},
+				// 4
+				{
+					0x5e66, 0x28fa, 0x0e7e, 0x3c2e, 0x1190, 0x2b83, 0x0c95, 0x6f43,
+					0x5d4a, 0x1b44, 0x0a78, 0x4b9d, 0x4a17, 0x0066, 0x62e4, 0x0cb5, 0x0e
+				},
+				// 5
+				{
+					0x2108, 0x2979, 0x7c84, 0x27d0, 0x656d, 0x46b8, 0x5c72, 0x7f3c,
+					0x4c69, 0x761d, 0x52ac, 0x58fd, 0x5315, 0x2be9, 0x4259, 0x7047, 0x0e
+				},
+				// 6
+				{
+					0x63aa, 0x29f6, 0x6a8c, 0x1372, 0x3949, 0x61ec, 0x2c51, 0x0f36,
+					0x3b85, 0x50f4, 0x1adf, 0x665e, 0x5c14, 0x576b, 0x21cf, 0x53d8, 0x0c
+				},
+				// 7
+				{
+					0x264e, 0x2a75, 0x5892, 0x7f12, 0x0d25, 0x7d23, 0x7c2e, 0x1f30,
+					0x2aa0, 0x2bcd, 0x6313, 0x73be, 0x6513, 0x02ed, 0x0142, 0x3768, 0x0a
+				},
+				// 8
+				{
+					0x68f0, 0x2af2, 0x4698, 0x6ab4, 0x6101, 0x1857, 0x4c0d, 0x2f2a,
+					0x19bc, 0x06a4, 0x2b47, 0x011f, 0x6e10, 0x2e6e, 0x60b7, 0x1afa, 0x0c
+				},
+				// 9
+				{
+					0x2b92, 0x2b6f, 0x349e, 0x5656, 0x34df, 0x338d, 0x1beb, 0x3f25,
+					0x08d9, 0x617d, 0x7379, 0x0e7f, 0x770f, 0x59f0, 0x402a, 0x7e8a, 0x07
+				},
+				// 10
+				{
+					0x6e36, 0x2bec, 0x22a6, 0x41f7, 0x08ba, 0x4ec2, 0x6bc8, 0x4f1f,
+					0x77f7, 0x3c54, 0x3bad, 0x1be1, 0x000d, 0x0573, 0x1fa1, 0x621d, 0x03
+				},
+			};
+			m_prot_retval = prot_value_check(prot_table, seed_size);
+		}
+
+		// clear write latches
+		for (int i = 0; i < seed_size; i++)
+			m_prot_seed[i] = 0;
+		m_prot_armed = false;
+	}
+	else
+	{
+		//printf("%02x %d\n", data & 0xffff, m_prot_idx);
+		m_prot_seed[m_prot_idx] = data & 0xffff;
+		m_prot_armed = true;
+		m_prot_idx ++;
+	}
+}
+
+
+void wyvernwg_state::wyvernwg_prot_w(u32 data)
+{
+	m_semicom_prot_which = data & 1;
+	m_semicom_prot_idx = 8;
 }
 
 void vamphalf_state::common_map(address_map &map)
@@ -766,16 +904,16 @@ void vamphalf_state::suplup_io(address_map &map)
 	map(0x100, 0x103).r(FUNC(vamphalf_state::eeprom_r));
 }
 
-void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
+void wyvernwg_state::wyvernwg_io(address_map &map)
 {
-	map(0x1800, 0x1803).rw(FUNC(vamphalf_qdsp_state::wyvernwg_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_prot_w));
-	map(0x2000, 0x2003).w(FUNC(vamphalf_state::flipscreen32_w));
+	map(0x1800, 0x1803).rw(FUNC(wyvernwg_state::wyvernwg_prot_r), FUNC(wyvernwg_state::wyvernwg_prot_w));
+	map(0x2000, 0x2003).w(FUNC(wyvernwg_state::flipscreen32_w));
 	map(0x2800, 0x2803).portr("P1_P2");
 	map(0x3000, 0x3003).portr("SYSTEM");
 	map(0x5400, 0x5403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
-	map(0x6000, 0x6003).rw(FUNC(vamphalf_qdsp_state::wyvernwg_parallel_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_parallel_prot_w));
-	map(0x7000, 0x7003).w(FUNC(vamphalf_state::eeprom32_w));
-	map(0x7c00, 0x7c03).r(FUNC(vamphalf_state::eeprom32_r));
+	map(0x6000, 0x6003).rw(FUNC(wyvernwg_state::wyvernwg_parallel_prot_r), FUNC(wyvernwg_state::wyvernwg_parallel_prot_w));
+	map(0x7000, 0x7003).w(FUNC(wyvernwg_state::eeprom32_w));
+	map(0x7c00, 0x7c03).r(FUNC(wyvernwg_state::eeprom32_r));
 }
 
 void vamphalf_nvram_state::finalgdr_io(address_map &map)
@@ -1464,13 +1602,13 @@ void vamphalf_state::mrdig(machine_config &config)
 	sound_ym_oki(config);
 }
 
-void vamphalf_qdsp_state::wyvernwg(machine_config &config)
+void wyvernwg_state::wyvernwg(machine_config &config)
 {
 	common(config);
 	E132T(config.replace(), m_maincpu, XTAL(50'000'000));    /* 50 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_32bit_map);
-	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
-	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &wyvernwg_state::common_32bit_map);
+	m_maincpu->set_addrmap(AS_IO, &wyvernwg_state::wyvernwg_io);
+	m_maincpu->set_vblank_int("screen", FUNC(wyvernwg_state::irq1_line_hold));
 
 	sound_qs1000(config);
 }
@@ -3304,7 +3442,7 @@ u16 vamphalf_state::puzlbanga_speedup_r()
 	return m_wram[0x113ecc / 2];
 }
 
-u32 vamphalf_qdsp_state::wivernwg_speedup_r()
+u32 wyvernwg_state::wivernwg_speedup_r()
 {
 	if (m_maincpu->pc() == 0x10766)
 	{
@@ -3317,7 +3455,7 @@ u32 vamphalf_qdsp_state::wivernwg_speedup_r()
 	return m_wram32[0xb4cc4 / 4];
 }
 
-u32 vamphalf_qdsp_state::wyvernwg_speedup_r()
+u32 wyvernwg_state::wyvernwg_speedup_r()
 {
 	if (m_maincpu->pc() == 0x10766)
 	{
@@ -3330,7 +3468,7 @@ u32 vamphalf_qdsp_state::wyvernwg_speedup_r()
 	return m_wram32[0xb56f4 / 4];
 }
 
-u32 vamphalf_qdsp_state::wyvernwga_speedup_r()
+u32 wyvernwg_state::wyvernwga_speedup_r()
 {
 	if (m_maincpu->pc() == 0x10766)
 	{
@@ -3637,11 +3775,8 @@ void vamphalf_state::init_puzlbang()
 	/* no flipscreen */
 }
 
-void vamphalf_qdsp_state::init_wyvernwg()
+void wyvernwg_state::init_common()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wivernwg_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wyvernwg_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b74f0, 0x00b74f3, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wyvernwga_speedup_r)));
 	m_palshift = 0;
 	m_flip_bit = 1;
 
@@ -3654,6 +3789,28 @@ void vamphalf_qdsp_state::init_wyvernwg()
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
+
+void wyvernwg_state::init_wivernwg()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, read32smo_delegate(*this, FUNC(wyvernwg_state::wivernwg_speedup_r)));
+
+	init_common();
+}
+
+void wyvernwg_state::init_wyvernwg()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, read32smo_delegate(*this, FUNC(wyvernwg_state::wyvernwg_speedup_r)));
+
+	init_common();
+}
+
+void wyvernwg_state::init_wyvernwga()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b74f0, 0x00b74f3, read32smo_delegate(*this, FUNC(wyvernwg_state::wyvernwga_speedup_r)));
+
+	init_common();
+}
+
 
 void vamphalf_qdsp_state::init_yorijori()
 {
@@ -3850,9 +4007,9 @@ GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_nvram_state,init
 
 GAME( 2001, toyland,    0,        coolmini,  common,   vamphalf_state,      init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
-GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,   wyvernwg_state,      init_wivernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   wyvernwg_state,      init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   wyvernwg_state,      init_wyvernwga, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state,      init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
 
