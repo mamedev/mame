@@ -17,7 +17,7 @@
         (uses external minidisk), other misc banking bits.
       - refactor memory banking to use address maps;
       - double check dipswitches;
-      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. (partially done)
+      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. **partially done**
         Also notice that there are common points with SPC-1000 and TF-20 FDDs;
       - backport/merge what is portable to PC-8001;
       - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
@@ -60,10 +60,7 @@
             ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
 
     per-game specific TODO (move to XML):
-    - Belloncho Shintai Kensa: hangs
-    - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
-    - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
     - Can Can Bunny Superior: black screen during the intro
@@ -77,10 +74,6 @@
     - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-    - Star Cruiser: bad kanji data?
-    - Star Cruiser: reads at i/o 0x8e?
-    - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
-    - WerDragon: no BGMs
     - Xevious: game is too fast (parent pc8801 only)
 
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
@@ -1690,6 +1683,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
+//	map(0x8e, 0x8e).r accessed by scruiser on boot, unknown purpose (board ID?)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  // Sound Board II

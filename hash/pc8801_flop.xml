@@ -4526,7 +4526,9 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<software name="bishojbg">
+	<!-- wrong masking effect on Pasoket logo -->
+	<!-- Eventually hangs after title screen with stuck BGM note -->
+	<software name="bishojbg" supported="no">
 		<description>Bishoujo Baseball Gakuen</description>
 		<year>1989</year>
 		<publisher>パソケット (Pasoket)</publisher>
@@ -32662,7 +32664,9 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<software name="scruiser">
+	<!-- bad kanji data? (old note, cannot reproduce) -->
+	<!-- No BGMs -->
+	<software name="scruiser" supported="no">
 		<description>Star Cruiser</description>
 		<year>1988</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
@@ -39960,7 +39964,8 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="yojukiko">
+	<!-- Sound irq misfires pretty often -->
+	<software name="yojukiko" supported="no">
 		<description>Yoju Kikohei - Wer Dragon</description>
 		<year>1989</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
@@ -40368,10 +40373,12 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save -->
+		<!-- (loading it gives a final boss save with every stat as maximum except ring=150 on easy difficulty) -->
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="411472">
-				<rom name="ys 3 (user).d88" size="411472" crc="6cabccbe" sha1="6d2fa49febbc3f7103f9272bed0b6b4ca99d745e"/>
+				<rom name="ys 3 (user).d88" size="411472" crc="6cabccbe" sha1="6d2fa49febbc3f7103f9272bed0b6b4ca99d745e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
