@@ -34,8 +34,8 @@ license:CC0
 		<year>19??</year>
 		<publisher>Roland</publisher>
 		<part name="cart" interface="roland_tnsc1">
-			<dataarea name="rom" size="0x40000">
-				<rom name="rolandtnsc103.bin" size="0x40000" crc="57d57ed6" sha1="4074ca0e4a82f33154b911ad3753a031f9ab61de"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc103.bin" size="0x8000" crc="856b233b" sha1="b01dec3807d9e98085e5849fce897d13ff4556ff"/>
 			</dataarea>
 		</part>
 	</software>
