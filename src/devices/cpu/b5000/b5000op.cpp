@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// B5000 opcode handlers
+// B5000 common opcode handlers
 
 #include "emu.h"
 #include "b5000.h"
@@ -9,19 +9,19 @@
 
 // internal helpers
 
-inline u8 b5000_cpu_device::ram_r()
+u8 b5000_cpu_device::ram_r()
 {
 	return m_data->read_byte(m_ram_addr) & 0xf;
 }
 
-inline void b5000_cpu_device::ram_w(u8 data)
+void b5000_cpu_device::ram_w(u8 data)
 {
 	m_data->write_byte(m_ram_addr, data & 0xf);
 }
 
 void b5000_cpu_device::set_pc(u8 pu, u8 pl)
 {
-	m_pc = ((pu << 6 & 0x3c0) | (pl & 0x3f)) & m_prgmask;
+	m_pc = ((pu << 6) | (pl & 0x3f)) & m_prgmask;
 }
 
 void b5000_cpu_device::set_bu(u8 bu)

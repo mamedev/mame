@@ -32,7 +32,8 @@ b5000_base_device::b5000_base_device(const machine_config &mconfig, device_type 
 	m_read_kb(*this),
 	m_read_din(*this),
 	m_write_str(*this),
-	m_write_seg(*this)
+	m_write_seg(*this),
+	m_write_spk(*this)
 { }
 
 
@@ -52,6 +53,7 @@ void b5000_base_device::device_start()
 	m_read_din.resolve_safe(0);
 	m_write_str.resolve_safe();
 	m_write_seg.resolve_safe();
+	m_write_spk.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

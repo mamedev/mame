@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B5000 MCU core implementation
+  Rockwell B5000 MCU
 
 */
 
@@ -25,6 +25,8 @@ public:
 	b5000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	b5000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -37,8 +39,8 @@ protected:
 	virtual u8 sr_page() { return 0; }
 	virtual u16 decode_digit(u8 data);
 
-	void data_map(address_map &map);
-	void program_map(address_map &map);
+	void program_448x8(address_map &map);
+	void data_45x4(address_map &map);
 
 	// opcode helpers
 	u8 ram_r();

@@ -33,6 +33,9 @@ public:
 	// 7/8/10 segment outputs
 	auto write_seg() { return m_write_seg.bind(); }
 
+	// speaker output line
+	auto write_spk() { return m_write_spk.bind(); }
+
 protected:
 	// construction/destruction
 	b5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -105,6 +108,7 @@ protected:
 	devcb_read8 m_read_din;
 	devcb_write16 m_write_str;
 	devcb_write16 m_write_seg;
+	devcb_write_line m_write_spk;
 };
 
 
