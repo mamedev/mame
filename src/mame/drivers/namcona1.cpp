@@ -1547,7 +1547,6 @@ GAME(1993, emeraldaja, emeralda, namcona1,  namcona1_joy,  namcona1_state, init_
 GAME(1993, tinklpit,   0,        namcona1,  namcona1_joy,  namcona1_state, init_tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
 // NA-2 (C70 MCU)
-GAME(199?, bbbingo,    0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
 GAME(1992, knckhead,   0,        namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1992, knckheadj,  knckhead, namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1992, knckheadjp, knckhead, namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
@@ -1558,3 +1557,4 @@ GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
 GAME(1994, zelost,     0,        zelos,     zelost,        namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // no way to insert medal. Maybe needs communication with main unit?
+GAME(1996, bbbingo,    0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
