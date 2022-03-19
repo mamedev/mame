@@ -33,7 +33,9 @@ protected:
 
 	virtual bool op_canskip(u8 op) override;
 	virtual bool op_is_lb(u8 op);
-	virtual u16 reset_vector() override { return 0x1c0; }
+	virtual void reset_pc() override { set_pc(7, 0); }
+	virtual u8 sr_page() { return 0; }
+	virtual u16 decode_digit(u8 data);
 
 	void data_map(address_map &map);
 	void program_map(address_map &map);
@@ -41,16 +43,14 @@ protected:
 	// opcode helpers
 	u8 ram_r();
 	void ram_w(u8 data);
-	void pop_pc();
-	void push_pc();
+	void set_pc(u8 pu, u8 pl);
 	void set_bu(u8 bu);
 	void op_illegal();
 
 	// opcode handlers
 	virtual void op_tl();
-	virtual void op_tra1(u8 step) override;
-	virtual void op_tra0(u8 step) override;
-	virtual void op_ret(u8 step) override;
+	virtual void op_tra() override;
+	virtual void op_ret() override;
 	virtual void op_nop();
 
 	virtual void op_lb(u8 bl);
@@ -73,9 +73,9 @@ protected:
 	virtual void op_tc();
 
 	virtual void op_kseg();
-	virtual void op_atbz(u8 step) override;
+	virtual void op_atbz() override;
 	virtual void op_tkb();
-	virtual void op_tkbs(u8 step) override;
+	virtual void op_tkbs() override;
 	virtual void op_read();
 	virtual void op_tdin();
 };

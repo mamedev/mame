@@ -19,14 +19,9 @@ inline void b5000_cpu_device::ram_w(u8 data)
 	m_data->write_byte(m_ram_addr, data & 0xf);
 }
 
-void b5000_cpu_device::pop_pc()
+void b5000_cpu_device::set_pc(u8 pu, u8 pl)
 {
-	m_pc = m_s;
-}
-
-void b5000_cpu_device::push_pc()
-{
-	m_s = m_pc;
+	m_pc = ((pu << 6 & 0x3c0) | (pl & 0x3f)) & m_prgmask;
 }
 
 void b5000_cpu_device::set_bu(u8 bu)
@@ -50,22 +45,70 @@ void b5000_cpu_device::op_illegal()
 
 void b5000_cpu_device::op_tl()
 {
-	// x
+	// TL z: set Pu to z
+	set_pc(m_op & 0xf, m_pc);
+
+	// S is actually only 6-bit
+	m_s = (m_pc & ~0x3f) | (m_s & 0x3f);
 }
 
-void b5000_cpu_device::op_tra1(u8 step)
+void b5000_cpu_device::op_tra()
 {
-	// x
+	// TRA 0/1,x: call/jump to x (multi step)
+	switch (m_tra_step)
+	{
+		// step 1: skip next opcode
+		// TL is unskippable, that's how it does long jumps
+		case 1:
+			m_skip = true;
+			break;
+
+		// step 2: handle the call/jump
+		case 2:
+			if (!m_sr && ~m_prev_op & 0x40)
+			{
+				// call: push P to save register
+				m_sr = true;
+				m_s = (m_s & ~0x3f) | (m_prev_pc & 0x3f);
+			}
+			if (m_sr)
+			{
+				// SR set: set Pu to subroutine page
+				set_pc(sr_page() ^ BIT(m_prev_op, 6), m_pc);
+			}
+
+			// set Pl to x
+			set_pc(m_pc >> 6, m_prev_op);
+			m_tra_step = 0;
+			return;
+
+		default:
+			break;
+	}
+	m_tra_step++;
 }
 
-void b5000_cpu_device::op_tra0(u8 step)
+void b5000_cpu_device::op_ret()
 {
-	// x
-}
+	// RET: return from subroutine (multi step)
+	switch (m_ret_step)
+	{
+		// step 1: skip next opcode
+		case 1:
+			m_skip = true;
+			break;
 
-void b5000_cpu_device::op_ret(u8 step)
-{
-	// x
+		// step 2: handle the ret
+		case 2:
+			m_pc = m_s;
+			m_sr = false;
+			m_ret_step = 0;
+			return;
+
+		default:
+			break;
+	}
+	m_ret_step++;
 }
 
 void b5000_cpu_device::op_nop()
@@ -170,7 +213,7 @@ void b5000_cpu_device::op_adx()
 {
 	// ADX x: add x to A, skip on no overflow
 	m_a += ~m_op & 0xf;
-	m_skip = !(m_a & 0x10);
+	m_skip = !BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -212,31 +255,77 @@ void b5000_cpu_device::op_tc()
 void b5000_cpu_device::op_kseg()
 {
 	// KSEG: reset segment outputs
+	m_write_seg(m_seg = 0);
 }
 
-void b5000_cpu_device::op_atbz(u8 step)
+void b5000_cpu_device::op_atbz()
 {
 	// ATBZ (aka ATB on B5xxx): ATB + load strobe (multi step)
-	if (step)
-		m_atbz_step++;
+	switch (m_atbz_step)
+	{
+		// step 1: ATB + KSEG
+		case 1:
+			op_atb();
+			op_kseg();
+			break;
+
+		// step 3: disable strobe
+		case 3:
+			m_write_str(0);
+			break;
+
+		// step 4: load strobe from Bl
+		case 4:
+			m_write_str(1 << (m_ram_addr & 0xf));
+			m_atbz_step = 0;
+			return;
+
+		default:
+			break;
+	}
+	m_atbz_step++;
 }
 
 void b5000_cpu_device::op_tkb()
 {
-	// x
+	// TKB: skip next if any KB is high
+	m_skip = (m_read_kb() & 0xf) != 0;
 }
 
-void b5000_cpu_device::op_tkbs(u8 step)
+void b5000_cpu_device::op_tkbs()
 {
-	// x
+	// TKBS: TKB + load segments (multi step)
+	switch (m_tkbs_step)
+	{
+		// step 1: TKB
+		case 1:
+			op_tkb();
+			break;
+
+		// step 2: load segments from RAM
+		case 2:
+			// note: SEG0(DP) from C flag is delayed 2 cycles
+			m_seg |= decode_digit(ram_r()) << 1 | m_prev2_c;
+			m_write_seg(m_seg);
+			m_tkbs_step = 0;
+			return;
+
+		default:
+			break;
+	}
+	m_tkbs_step++;
 }
 
 void b5000_cpu_device::op_read()
 {
-	// x
+	// READ: add _KB to A, skip next on no overflow
+	m_a += (~m_read_kb() & 0xf);
+	m_skip = !BIT(m_a, 4);
+	m_a &= 0xf;
 }
 
 void b5000_cpu_device::op_tdin()
 {
-	// x
+	// TDIN x: skip next if DIN x is high
+	m_skip = bool(BIT(m_read_din(), (m_op - 1) & 3));
 }

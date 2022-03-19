@@ -7,7 +7,8 @@
 This MCU series sits between A4000 and the more publicly available PPS4/1.
 Known part numbers: A/B5000, A/B5300, A/B5500, A/B5900, B6000, B6100.
 The latter two were manufactured for Mattel, with small modifications
-useful for making handheld games.
+useful for making handheld games. In fact, the programmer of the first
+Mattel handheld games was a circuit designer at Rockwell.
 
 The main difference between Axxxx and Bxxxx is that B runs on low power,
 there's also a small change with the way they output LEDs.
@@ -27,7 +28,11 @@ b5000_base_device::b5000_base_device(const machine_config &mconfig, device_type 
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
 	m_prgwidth(prgwidth),
-	m_datawidth(datawidth)
+	m_datawidth(datawidth),
+	m_read_kb(*this),
+	m_read_din(*this),
+	m_write_str(*this),
+	m_write_seg(*this)
 { }
 
 
@@ -43,7 +48,10 @@ void b5000_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	//..
+	m_read_kb.resolve_safe(0);
+	m_read_din.resolve_safe(0);
+	m_write_str.resolve_safe();
+	m_write_seg.resolve_safe();
 
 	// zerofill
 	m_pc = 0;
@@ -63,12 +71,13 @@ void b5000_base_device::device_start()
 	m_c = 0;
 	m_prev_c = 0;
 	m_prev2_c = 0;
+	m_sr = false;
 	m_skip = false;
+	m_seg = 0;
 
 	m_atbz_step = 0;
 	m_tkbs_step = 0;
-	m_tra0_step = 0;
-	m_tra1_step = 0;
+	m_tra_step = 0;
 	m_ret_step = 0;
 
 	// register for savestates
@@ -89,12 +98,13 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_prev_c));
 	save_item(NAME(m_prev2_c));
+	save_item(NAME(m_sr));
 	save_item(NAME(m_skip));
+	save_item(NAME(m_seg));
 
 	save_item(NAME(m_atbz_step));
 	save_item(NAME(m_tkbs_step));
-	save_item(NAME(m_tra0_step));
-	save_item(NAME(m_tra1_step));
+	save_item(NAME(m_tra_step));
 	save_item(NAME(m_ret_step));
 
 	// register state for debugger
@@ -126,20 +136,20 @@ device_memory_interface::space_config_vector b5000_base_device::memory_space_con
 
 void b5000_base_device::device_reset()
 {
-	m_pc = reset_vector();
-	m_prev_pc = 0;
-	m_s = 0;
+	reset_pc();
+	m_prev_pc = m_pc;
+	m_s = m_pc;
 	m_op = 0;
 	m_prev_op = 0;
 
-	m_skip = false;
 	m_bl_delay = false;
 	m_bu_delay = false;
+	m_sr = false;
+	m_skip = false;
 
 	m_atbz_step = 0;
 	m_tkbs_step = 0;
-	m_tra0_step = 0;
-	m_tra1_step = 0;
+	m_tra_step = 0;
 	m_ret_step = 0;
 }
 
@@ -186,12 +196,11 @@ void b5000_base_device::execute_run()
 			execute_one();
 
 		// some opcodes have multiple steps and will run in parallel with next ones,
-		// eg. it may fetch in order A,B and then execute in order B,A
-		op_atbz(m_atbz_step);
-		op_tkbs(m_tkbs_step);
-		op_tra0(m_tra0_step);
-		op_tra1(m_tra1_step);
-		op_ret(m_ret_step);
+		// eg. it may fetch in order A,B and parts executed in order B,A
+		if (m_atbz_step) op_atbz();
+		if (m_tkbs_step) op_tkbs();
+		if (m_tra_step) op_tra();
+		if (m_ret_step) op_ret();
 
 		// some opcodes delay RAM address adjustment for 1 cycle
 		m_ram_addr = (m_bu << 4 & 0x30) | (m_bl & 0xf);
@@ -206,7 +215,5 @@ void b5000_base_device::execute_run()
 			m_ram_addr = (m_ram_addr & ~0xf) | (m_prev_bl & 0xf);
 			m_bl_delay = false;
 		}
-
-		execute_one();
 	}
 }
