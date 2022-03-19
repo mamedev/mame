@@ -316,7 +316,9 @@ void vsnes_state::vsgshoe_gun_in0_w(u8 data)
 {
 	// Gumshoe uniquely has a bankable 16K EPROM in addition to the normal unbanked 8K slots
 	m_prg_banks[0]->set_entry(BIT(data, 2));
-	gun_in0_w(data);
+
+	// otherwise bank like the other gun games
+	vsnes_gun_in0_w(data);
 }
 
 void vsnes_state::init_vsgshoe()
@@ -487,7 +489,7 @@ void vsnes_state::init_rbibb()
 {
 	init_vs108();
 
-	// RBI Base ball protection, address full decoded except A11
+	// RBI Baseball protection, address fully decoded except A11
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5600, 0x5601, read8sm_delegate(*this, FUNC(vsnes_state::rbibb_prot_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::rbibb_prot_r)));
 }
