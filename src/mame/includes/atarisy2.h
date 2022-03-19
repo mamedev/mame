@@ -106,7 +106,7 @@ private:
 
 	uint8_t         m_sound_reset_state = 0U;
 
-	emu_timer *     m_yscroll_reset_timer = 0;
+	emu_timer *     m_yscroll_reset_timer = nullptr;
 	uint32_t        m_playfield_tile_bank[2]{};
 
 	// 720 fake joystick

@@ -70,8 +70,8 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap = 0;
-	tilemap_t  *m_bg_tilemap = 0;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_bg_tilemap = nullptr;
 	int m_scroll_x = 0;
 	int m_priority = 0;
 

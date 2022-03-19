@@ -75,7 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	uint8_t m_scrambler = 0U;
-	tilemap_t *m_tilemap = 0;
+	tilemap_t *m_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

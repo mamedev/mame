@@ -71,7 +71,7 @@ public:
 	uint8_t m_video_config = 0U;
 	uint8_t m_sparkle[4]{};
 	char m_totalword[256]{};
-	char *m_totalword_ptr = 0;
+	char *m_totalword_ptr = nullptr;
 	char m_oldword[256]{};
 	int m_plural = 0;
 	uint8_t m_ram_write_enable = 0U;
@@ -82,8 +82,8 @@ public:
 	uint8_t m_interrupt_scanline = 0U;
 	uint8_t m_vertical_feedback = 0U;
 	uint8_t m_horizontal_feedback = 0U;
-	emu_timer *m_scanline_timer = 0;
-	emu_timer *m_intoff_timer = 0;
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_intoff_timer = nullptr;
 	uint8_t m_colors[8]{};
 	uint8_t m_colorsplit = 0U;
 	uint8_t m_bgdata = 0U;

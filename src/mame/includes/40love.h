@@ -36,7 +36,11 @@ public:
 	{ }
 
 	virtual void driver_init() override;
+	void common(machine_config &config);
+	void _40love(machine_config &config);
+	void undoukai(machine_config &config);
 
+private:
 	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );
@@ -44,15 +48,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void common(machine_config &config);
-	void _40love(machine_config &config);
-	void undoukai(machine_config &config);
-
 	void _40love_map(address_map &map);
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);
 
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

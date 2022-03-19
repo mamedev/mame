@@ -32,6 +32,10 @@ public:
 		m_k053251(*this, "k053251")
 	{ }
 
+	void asterix(machine_config &config);
+	void init_asterix();
+
+private:
 	/* video-related */
 	int         m_sprite_colorbase = 0;
 	int         m_layer_colorbase[4]{};
@@ -55,7 +59,6 @@ public:
 	void sound_irq_w(uint16_t data);
 	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void init_asterix();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,7 +67,6 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
 
-	void asterix(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 protected:

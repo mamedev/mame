@@ -259,13 +259,13 @@ protected:
 	/* keyboard state */
 	uint16_t m_ikbd_keylatch = 0U;
 	uint8_t m_ikbd_mouse = 0U;
-	uint8_t m_ikbd_mouse_x = 0U;
-	uint8_t m_ikbd_mouse_y = 0U;
-	uint8_t m_ikbd_mouse_px = 0U;
-	uint8_t m_ikbd_mouse_py = 0U;
-	uint8_t m_ikbd_mouse_pc = 0U;
+	uint8_t m_ikbd_mouse_x;
+	uint8_t m_ikbd_mouse_y;
+	uint8_t m_ikbd_mouse_px;
+	uint8_t m_ikbd_mouse_py;
+	uint8_t m_ikbd_mouse_pc;
 	int m_ikbd_tx = 0;
-	int m_ikbd_joy = 0;
+	int m_ikbd_joy;
 	int m_midi_tx = 0;
 
 	/* floppy state */
@@ -321,15 +321,15 @@ protected:
 	uint32_t m_blitter_srcbuf = 0U;
 
 	/* timers */
-	emu_timer *m_mouse_timer = 0;
-	emu_timer *m_glue_timer = 0;
-	emu_timer *m_shifter_timer = 0;
+	emu_timer *m_mouse_timer = nullptr;
+	emu_timer *m_glue_timer = nullptr;
+	emu_timer *m_shifter_timer = nullptr;
 
 	bitmap_rgb32 m_bitmap = 0;
 
 	static void floppy_formats(format_registration &fr);
 
-	int m_monochrome = 0;
+	int m_monochrome;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 

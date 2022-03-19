@@ -52,8 +52,8 @@ private:
 
 	uint16_t m_collision_address;
 	uint8_t m_collision_address_clear;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_irq_mask;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0U;
 	void pc3092_w(offs_t offset, uint8_t data);
 	uint8_t pc3259_r(offs_t offset);
 	void port_sound_w(uint8_t data);

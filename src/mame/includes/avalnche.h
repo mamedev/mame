@@ -19,6 +19,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_latch(*this, "latch") { }
 
+	void avalnche_base(machine_config &config);
+	void acatch(machine_config &config);
+	void acatch_sound(machine_config &config);
+	void avalnche(machine_config &config);
+	void avalnche_sound(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_device<discrete_device> m_discrete;
 	required_device<cpu_device> m_maincpu;
@@ -37,11 +44,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(catch_aud0_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud1_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud2_w);
-	void avalnche_base(machine_config &config);
-	void acatch(machine_config &config);
-	void acatch_sound(machine_config &config);
-	void avalnche(machine_config &config);
-	void avalnche_sound(machine_config &config);
 	void catch_map(address_map &map);
 	void main_map(address_map &map);
 };

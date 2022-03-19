@@ -62,17 +62,17 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_ball_screen_collision_cause;
-	uint8_t m_car_ball_collision_x;
-	uint8_t m_car_ball_collision_y;
-	uint8_t m_car_car_collision_cause;
-	uint8_t m_car_goal_collision_cause;
-	uint8_t m_car_ball_collision_cause;
-	uint8_t m_car_border_collision_cause;
-	uint8_t m_priority_0_extension;
-	uint8_t m_last_wheel_value[4];
-	int m_ls153_za;
-	int m_ls153_zb;
+	uint8_t m_ball_screen_collision_cause = 0U;
+	uint8_t m_car_ball_collision_x = 0U;
+	uint8_t m_car_ball_collision_y = 0U;
+	uint8_t m_car_car_collision_cause = 0U;
+	uint8_t m_car_goal_collision_cause = 0U;
+	uint8_t m_car_ball_collision_cause = 0U;
+	uint8_t m_car_border_collision_cause = 0U;
+	uint8_t m_priority_0_extension = 0U;
+	uint8_t m_last_wheel_value[4]{};
+	int m_ls153_za = 0;
+	int m_ls153_zb = 0;
 	required_device<m6502_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
 	required_device<ttl153_device> m_ttl74153_1k;

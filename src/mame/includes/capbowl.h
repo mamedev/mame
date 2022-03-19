@@ -35,6 +35,11 @@ public:
 		m_rowaddress(*this, "rowaddress")
 	{ }
 
+	void init_capbowl();
+	void bowlrama(machine_config &config);
+	void capbowl(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -47,12 +52,12 @@ public:
 	required_shared_ptr<uint8_t> m_rowaddress;
 
 	/* video-related */
-	offs_t m_blitter_addr;
+	offs_t m_blitter_addr = 0U;
 
 	/* input-related */
-	uint8_t m_last_trackball_val[2];
+	uint8_t m_last_trackball_val[2]{};
 
-	emu_timer *m_update_timer;
+	emu_timer *m_update_timer = nullptr;
 
 	// common
 	uint8_t track_0_r();
@@ -69,7 +74,6 @@ public:
 	void bowlrama_blitter_w(offs_t offset, uint8_t data);
 	uint8_t bowlrama_blitter_r(offs_t offset);
 
-	void init_capbowl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -79,8 +83,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
-	void bowlrama(machine_config &config);
-	void capbowl(machine_config &config);
 	void bowlrama_map(address_map &map);
 	void capbowl_map(address_map &map);
 	void sound_map(address_map &map);

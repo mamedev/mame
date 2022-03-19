@@ -28,6 +28,17 @@ public:
 		, m_blitter_base(*this, "gfx")
 	{ }
 
+	void init_shtstar();
+	void init_cheesech();
+	void init_ultennis();
+	void init_stonebal();
+	void cheesech(machine_config &config);
+	void artmagic(machine_config &config);
+	void shtstar(machine_config &config);
+	void stonebal(machine_config &config);
+	DECLARE_READ_LINE_MEMBER(prot_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<tms34010_device> m_tms;
@@ -56,8 +67,8 @@ public:
 	int m_is_stoneball = 0;
 	uint16_t m_blitter_data[8]{};
 	uint8_t m_blitter_page = 0U;
-	attotime m_blitter_busy_until;
-	emu_timer * m_irq_off_timer = 0;
+	attotime m_blitter_busy_until{};
+	emu_timer * m_irq_off_timer = nullptr;
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ultennis_hack_r();
 	void protection_bit_w(offs_t offset, uint16_t data);
@@ -67,11 +78,6 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	DECLARE_READ_LINE_MEMBER(prot_r);
-	void init_shtstar();
-	void init_cheesech();
-	void init_ultennis();
-	void init_stonebal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -81,10 +87,6 @@ public:
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
-	void cheesech(machine_config &config);
-	void artmagic(machine_config &config);
-	void shtstar(machine_config &config);
-	void stonebal(machine_config &config);
 	void main_map(address_map &map);
 	void shtstar_guncpu_io_map(address_map &map);
 	void shtstar_guncpu_map(address_map &map);

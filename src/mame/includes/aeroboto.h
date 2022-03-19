@@ -33,6 +33,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void formatz(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -49,7 +52,7 @@ public:
 	int     m_stars_length = 0;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 	int     m_charbank = 0;
 	int     m_starsoff = 0;
 	int     m_sx = 0;
@@ -79,7 +82,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void formatz(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

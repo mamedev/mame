@@ -29,6 +29,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	void c80(machine_config &config);
+
+private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<cassette_image_device> m_cassette;
@@ -43,17 +48,14 @@ public:
 	void pio1_pa_w(uint8_t data);
 	void pio1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	/* keyboard state */
-	int m_keylatch;
+	int m_keylatch = 0;
 
 	/* display state */
-	int m_digit;
-	int m_pio1_a5;
-	int m_pio1_brdy;
-	void c80(machine_config &config);
+	int m_digit = 0;
+	int m_pio1_a5 = 0;
+	int m_pio1_brdy = 0;
 	void c80_io(address_map &map);
 	void c80_mem(address_map &map);
 };

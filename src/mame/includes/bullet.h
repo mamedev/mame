@@ -148,6 +148,9 @@ public:
 	{
 	}
 
+	void bulletf(machine_config &config);
+
+private:
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
 	void xdma0_w(uint8_t data);
@@ -163,7 +166,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
-	void bulletf(machine_config &config);
 	void bulletf_io(address_map &map);
 	void bulletf_mem(address_map &map);
 protected:

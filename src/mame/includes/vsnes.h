@@ -124,25 +124,25 @@ private:
 
 	memory_bank_array_creator<4> m_prg_banks;
 	memory_view m_prg_view;
-	int m_prg_chunks;
+	int m_prg_chunks = 0;
 
 	memory_bank_array_creator<8> m_chr_banks;
 	memory_view m_chr_view;
-	int m_chr_chunks;
+	int m_chr_chunks = 0;
 
-	int m_coin;
-	int m_input_latch[4];
-	int m_input_strobe[2];
-	int m_mmc1_shiftreg;
-	int m_mmc1_shiftcount;
-	int m_mmc1_prg16k;
-	int m_mmc1_switchlow;
-	int m_mmc1_chr4k;
-	int m_108_reg;
-	int m_prot_index;
-	int m_ret;
+	int m_coin = 0;
+	int m_input_latch[4]{};
+	int m_input_strobe[2]{};
+	int m_mmc1_shiftreg = 0;
+	int m_mmc1_shiftcount = 0;
+	int m_mmc1_prg16k = 0;
+	int m_mmc1_switchlow = 0;
+	int m_mmc1_chr4k = 0;
+	int m_108_reg = 0;
+	int m_prot_index = 0;
+	int m_ret = 0;
 
-	u8 m_bootleg_sound_offset;
-	u8 m_bootleg_sound_data;
-	int m_bootleg_latched_scanline;
+	u8 m_bootleg_sound_offset = 0U;
+	u8 m_bootleg_sound_data = 0U;
+	int m_bootleg_latched_scanline = 0;
 };

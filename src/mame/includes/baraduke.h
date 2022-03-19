@@ -26,6 +26,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void init_baraduke();
+	void baraduke(machine_config &config);
+
+private:
 	void inputport_select_w(uint8_t data);
 	uint8_t inputport_r();
 	void baraduke_lamps_w(uint8_t data);
@@ -39,7 +43,6 @@ public:
 	void baraduke_scroll1_w(offs_t offset, uint8_t data);
 	uint8_t baraduke_spriteram_r(offs_t offset);
 	void baraduke_spriteram_w(offs_t offset, uint8_t data);
-	void init_baraduke();
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
@@ -51,7 +54,6 @@ public:
 	void scroll_w(int layer, int offset, int data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
-	void baraduke(machine_config &config);
 	void baraduke_map(address_map &map);
 	void mcu_map(address_map &map);
 
