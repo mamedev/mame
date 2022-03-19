@@ -34,10 +34,10 @@ public:
 	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int     m_scroll_x;
-	int     m_priority;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int     m_scroll_x = 0;
+	int     m_priority = 0;
 
 	uint8_t m_nmi_mask;
 	void scroll_w(uint8_t data);

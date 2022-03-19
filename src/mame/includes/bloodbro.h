@@ -52,15 +52,15 @@ private:
 	required_shared_ptr<uint16_t> m_fgvideoram;
 	required_shared_ptr<uint16_t> m_txvideoram;
 
-	uint16_t m_scrollram[6];
-	uint16_t m_layer_en;
+	uint16_t m_scrollram[6]{};
+	uint16_t m_layer_en = 0U;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
-	bool m_weststry_opl_irq;
-	bool m_weststry_soundnmi_mask;
+	bool m_weststry_opl_irq = false;
+	bool m_weststry_soundnmi_mask = false;
 
 	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

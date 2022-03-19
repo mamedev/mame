@@ -69,18 +69,18 @@ private:
 	void postload();
 	void set_bank(int bank);
 
-	uint8_t m_porta;
-	uint8_t m_video_scroll;
-	uint8_t m_portc;
+	uint8_t m_porta = 0U;
+	uint8_t m_video_scroll = 0U;
+	uint8_t m_portc = 0U;
 
-	uint8_t m_video_page;
+	uint8_t m_video_page = 0U;
 
-	uint8_t m_romdisk_lsb;
-	uint8_t m_romdisk_msb;
+	uint8_t m_romdisk_lsb = 0U;
+	uint8_t m_romdisk_msb = 0U;
 
-	uint8_t m_color[4];
-	uint8_t m_localmachine;
-	uint8_t m_vblank_state;
+	uint8_t m_color[4]{};
+	uint8_t m_localmachine = 0U;
+	uint8_t m_vblank_state = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;

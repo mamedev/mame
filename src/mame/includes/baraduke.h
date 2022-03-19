@@ -58,8 +58,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	int m_inputport_selected;
-	int m_counter;
+	int m_inputport_selected = 0;
+	int m_counter = 0;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
@@ -70,9 +70,9 @@ protected:
 	required_device<palette_device> m_palette;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap[2];
-	int m_xscroll[2];
-	int m_yscroll[2];
-	int m_copy_sprites;
+	int m_xscroll[2]{};
+	int m_yscroll[2]{};
+	int m_copy_sprites = 0;
 	output_finder<2> m_lamps;
 };
 

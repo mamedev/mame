@@ -49,11 +49,11 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	int     m_gfx_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int     m_gfx_bank = 0;
 
 	/* misc */
-	int     m_dipsw;
+	int     m_dipsw = 0;
 
 	uint8_t blueprnt_sh_dipsw_r();
 	uint8_t grasspin_sh_dipsw_r();

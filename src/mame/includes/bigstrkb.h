@@ -24,6 +24,9 @@ public:
 		m_vidreg2(*this, "vidreg2")
 	{ }
 
+	void bigstrkb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -35,9 +38,9 @@ public:
 	required_shared_ptr<uint16_t> m_vidreg1;
 	required_shared_ptr<uint16_t> m_vidreg2;
 
-	tilemap_t *m_tilemap;
-	tilemap_t *m_tilemap2;
-	tilemap_t *m_tilemap3;
+	tilemap_t *m_tilemap = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
+	tilemap_t *m_tilemap3 = nullptr;
 
 	void videoram_w(offs_t offset, uint16_t data);
 	void videoram2_w(offs_t offset, uint16_t data);
@@ -52,7 +55,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void bigstrkb(machine_config &config);
 	void bigstrkb_map(address_map &map);
 };
 
