@@ -349,6 +349,8 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 	{
 		// compensate for leftover cycles
 		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
 		cycles = snd.cycles_left >> 2;
 		snd.cycles_left &= 3;
@@ -417,6 +419,8 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	{
 		// compensate for left over cycles
 		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
 		cycles = (snd.cycles_left >> 1);
 		snd.cycles_left &= 1;
@@ -452,35 +456,21 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 
 void gameboy_sound_device::update_noise_channel(struct SOUND &snd, uint64_t cycles)
 {
-	if (cycles >= snd.cycles_left)
+	snd.cycles_left += cycles;
+	uint64_t period = noise_period_cycles();
+	while (snd.cycles_left >= period)
 	{
-		cycles -= snd.cycles_left;
-		uint64_t    period = noise_period_cycles();
-		uint64_t    counter = 1 + cycles / period, i = 0;
-		uint16_t    start = snd.noise_lfsr;
-		while (i < counter) {
-			/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
-			 Mode 4 has a 15 bit counter so we need to shift the
-			 bits around accordingly */
-			uint16_t feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
-			snd.noise_lfsr = (snd.noise_lfsr >> 1) | (feedback << 14);
-			if (snd.noise_short)
-			{
-				snd.noise_lfsr = (snd.noise_lfsr & ~(1 << 6)) | (feedback << 6);
-			}
-			i += 1;
-			if (snd.noise_lfsr == start)
-			{
-				counter %= i;
-				i = 0;
-			}
+		snd.cycles_left -= period;
+
+		// Using a Polynomial Counter (aka Linear Feedback Shift Register)
+		// Mode 4 has a 15 bit counter so we need to shift the bits around accordingly.
+		uint16_t feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
+		snd.noise_lfsr = (snd.noise_lfsr >> 1) | (feedback << 14);
+		if (snd.noise_short)
+		{
+			snd.noise_lfsr = (snd.noise_lfsr & ~(1 << 6)) | (feedback << 6);
 		}
 		snd.signal = (snd.noise_lfsr & 1) ? -1 : 1;
-		snd.cycles_left = period - cycles % period;
-	}
-	else
-	{
-		snd.cycles_left -= cycles;
 	}
 }
 
