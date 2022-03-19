@@ -99,7 +99,7 @@ u8 spectrum_state::get_border_color(u16 hpos, u16 vpos)
 u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle scr = get_screen_area();
-	rectangle vis = m_screen->visible_area();
+	rectangle vis = screen.visible_area();
 	if (vis != scr) {
 		rectangle bsides[4] = {
 			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),

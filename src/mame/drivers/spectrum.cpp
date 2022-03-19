@@ -705,10 +705,15 @@ INPUT_PORTS_START( spec_plus )
 INPUT_PORTS_END
 
 /* Machine initialization */
-
 void spectrum_state::init_spectrum()
 {
 	m_specmem->space(AS_PROGRAM).install_ram(0x5b00, m_ram->size() + 0x3fff, m_ram->pointer() + 0x1b00);
+}
+
+void spectrum_state::machine_start()
+{
+	save_item(NAME(m_port_fe_data));
+	//TODO more
 }
 
 void spectrum_state::machine_reset()

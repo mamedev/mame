@@ -149,7 +149,7 @@ void tsconf_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &b
 
 		if (BIT(m_regs[TS_CONFIG], 7))
 		{
-			// draw_sprites(bitmap, cliprect);
+			// draw_sprites(screen, bitmap, cliprect);
 			//  Avoid frequent expensive updates for now. Currently once per frame
 			if (cliprect.bottom() == get_screen_area().bottom() && cliprect.right() == get_screen_area().right())
 				draw_sprites(screen, bitmap, get_screen_area());
