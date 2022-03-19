@@ -9,7 +9,7 @@
     OS-9 Level 2 Technical Reference, Chapter 5, Random Block File Manager,
     page 2
 
-    http://www.colorcomputerarchive.com/coco/Documents/Manuals/Operating Systems/OS-9 Level 2 Manual (Tandy).pdf
+    https://colorcomputerarchive.com/repo/Documents/Manuals/Operating%20Systems/OS-9%20Level%202%20Manual%20(Tandy).pdf
 
 ***************************************************************************/
 
@@ -118,6 +118,7 @@ std::vector<meta_description> coco_os9_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
+	results.emplace_back(meta_description(meta_name::creation_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
 	return results;
 }
 
@@ -230,6 +231,38 @@ u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
 
 
 //-------------------------------------------------
+//  from_os9_date
+//-------------------------------------------------
+
+util::arbitrary_datetime coco_os9_image::from_os9_date(u32 os9_date, u16 os9_time)
+{
+	util::arbitrary_datetime dt;
+	memset(&dt, 0, sizeof(dt));
+	dt.year			= ((os9_date >> 16) & 0xFF) + 1900;
+	dt.month		= (os9_date >> 8) & 0xFF;
+	dt.day_of_month	= (os9_date >> 0) & 0xFF;
+	dt.hour			= (os9_time >> 8) & 0xFF;
+	dt.minute		= (os9_time >> 0) & 0xFF;
+	return dt;
+}
+
+
+//-------------------------------------------------
+//  to_os9_date
+//-------------------------------------------------
+
+std::tuple<u32, u16> coco_os9_image::to_os9_date(const util::arbitrary_datetime &datetime)
+{
+	u32 os9_date = ((datetime.year - 1900) & 0xFF) >> 16
+		| (datetime.month & 0xFF) >> 8
+		| (datetime.day_of_month & 0xFF) >> 0;
+	u16 os9_time = (datetime.hour & 0xFF) >> 8
+		| (datetime.minute & 0xFF) >> 0;
+	return std::make_tuple(os9_date, os9_time);
+}
+
+
+//-------------------------------------------------
 //  validate_filename
 //-------------------------------------------------
 
@@ -292,12 +325,7 @@ coco_os9_image::file_header::file_header(fsblk_t::block_t &&block)
 
 util::arbitrary_datetime coco_os9_image::file_header::creation_date() const
 {
-	util::arbitrary_datetime dt;
-	memset(&dt, 0, sizeof(dt));
-	dt.year         = 1900 + m_block.r8(13);
-	dt.month        = m_block.r8(14);
-	dt.day_of_month = m_block.r8(15);
-	return dt;
+	return from_os9_date(m_block.r24b(13));
 }
 
 
@@ -402,11 +430,17 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	// for some reason, the OS-9 world favored filling with 0xE5
 	m_blockdev.fill(0xE5);
 
-	u8 sectors = 18;		// TODO - we need a definitive technique to get the floppy geometry
-	u8 heads = 1;			// TODO - we need a definitive technique to get the floppy geometry
-	u16 sector_bytes = 256;	// TODO - we need a definitive technique to get the floppy geometry
-	std::string volume_title = meta.get_string(meta_name::name, "UNTITLED");
+	// identify geometry info
+	u8 sectors = 18;				// TODO - we need a definitive technique to get the floppy geometry
+	u8 heads = 1;					// TODO - we need a definitive technique to get the floppy geometry
+	u16 sector_bytes = 256;			// TODO - we need a definitive technique to get the floppy geometry
+	bool is_double_density = true;	// TODO - we need a definitive technique to get the floppy geometry
 	u32 tracks = m_blockdev.block_count() / sectors / heads;
+
+	// get attributes from metadata
+	std::string volume_title					= meta.get_string(meta_name::name, "UNTITLED");
+	util::arbitrary_datetime creation_datetime	= meta.get_date(meta_name::creation_date);
+	auto [creation_os9date, creation_os9time] = to_os9_date(creation_datetime);
 
 	u32 lsn_count = m_blockdev.block_count();
 	u16 cluster_size = 1;
@@ -415,21 +449,25 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	u8 attributes = 0;
 	u32 allocation_bitmap_bits = lsn_count / cluster_size;
 	u32 allocation_bitmap_lsns = (allocation_bitmap_bits / 8 + sector_bytes - 1) / sector_bytes;
-	u8 format_flags = ((heads > 1) ? 0x01 : 0x00) | ((tracks > 40) ? 0x02 : 0x00);
+	u8 format_flags = ((heads > 1) ? 0x01 : 0x00)
+		| (is_double_density ? 0x02 : 0x00);
 
 	// volume header
 	auto volume_header = m_blockdev.get(0);
-	volume_header.w24b(0, lsn_count);								// total secctors
-	volume_header.w8(3, sectors);									// track size in sectors
-	volume_header.w16b(4, (allocation_bitmap_bits + 7) / 8);		// allocation bitmap in bytes
-	volume_header.w16b(6, cluster_size);							// cluster size
-	volume_header.w24b(8, 1 + allocation_bitmap_lsns);				// root directory LSN
-	volume_header.w16b(11, owner_id);								// owner ID
-	volume_header.w8(13, attributes);								// attributes
-	volume_header.w16b(14, disk_id);								// disk ID
-	volume_header.w8(16, format_flags);								// format flags
-	volume_header.w16b(17, sectors);								// sectors per track
-	volume_header.wstr(31, to_os9_string(volume_title, 32));		// title
+	volume_header.fill(0x00);
+	volume_header.w24b(0, lsn_count);								// DD.TOT - total secctors
+	volume_header.w8(3, sectors);									// DD.TKS - track size in sectors
+	volume_header.w16b(4, (allocation_bitmap_bits + 7) / 8);		// DD.MAP - allocation bitmap in bytes
+	volume_header.w16b(6, cluster_size);							// DD.BIT - cluster size
+	volume_header.w24b(8, 1 + allocation_bitmap_lsns);				// DD.DIR - root directory LSN
+	volume_header.w16b(11, owner_id);								// DD.OWN - owner ID
+	volume_header.w8(13, attributes);								// DD.ATT - Dattributes
+	volume_header.w16b(14, disk_id);								// DD.DSK - disk ID
+	volume_header.w8(16, format_flags);								// DD.FMT - format flags
+	volume_header.w16b(17, sectors);								// DD.SPT - sectors per track
+	volume_header.w24b(26, creation_os9date);						// DD.DAT - date of creation
+	volume_header.w24b(29, creation_os9time);						// DD.DAT - time of creation
+	volume_header.wstr(31, to_os9_string(volume_title, 32));		// DD.NAM - title
 	volume_header.w16b(103, sector_bytes / 256);					// sector bytes
 
 	// path descriptor options
@@ -452,7 +490,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	{
 		for (u32 j = 0; j < sector_bytes; j++)
 		{
-			u32 pos = i * 8 + j;
+			u32 pos = (i * sector_bytes + j) * 8;
 			if (pos + 8 < total_allocated_sectors)
 				abblk_bytes[j] = 0xFF;
 			else if (pos >= total_allocated_sectors)
@@ -465,30 +503,20 @@ void coco_os9_image::impl::format(const meta_data &meta)
 		abblk.copy(0, abblk_bytes.data(), sector_bytes);
 	}
 
-	// time
-	time_t t;
-	time(&t);
-	struct tm *ltime = localtime(&t);
-
 	// root directory header
 	auto roothdr_blk = m_blockdev.get(1 + allocation_bitmap_lsns);
 	roothdr_blk.fill(0x00);
 	roothdr_blk.w8(0x00, 0xBF);
 	roothdr_blk.w8(0x01, 0x00);
 	roothdr_blk.w8(0x02, 0x00);
-	roothdr_blk.w8(0x03, (u8)ltime->tm_year);
-	roothdr_blk.w8(0x04, (u8)ltime->tm_mon + 1);
-	roothdr_blk.w8(0x05, (u8)ltime->tm_mday);
-	roothdr_blk.w8(0x06, (u8)ltime->tm_hour);
-	roothdr_blk.w8(0x07, (u8)ltime->tm_min);
+	roothdr_blk.w24b(0x03, creation_os9date);
+	roothdr_blk.w16b(0x06, creation_os9time);
 	roothdr_blk.w8(0x08, 0x02);
 	roothdr_blk.w8(0x09, 0x00);
 	roothdr_blk.w8(0x0A, 0x00);
 	roothdr_blk.w8(0x0B, 0x00);
 	roothdr_blk.w8(0x0C, 0x40);
-	roothdr_blk.w8(0x0D, (u8)(ltime->tm_year % 100));
-	roothdr_blk.w8(0x0E, (u8)ltime->tm_mon);
-	roothdr_blk.w8(0x0F, (u8)ltime->tm_mday);
+	roothdr_blk.w24b(0x0D, creation_os9date);
 	roothdr_blk.w24b(0x10, 1 + allocation_bitmap_lsns + 1);
 	roothdr_blk.w16b(0x13, 8);
 
