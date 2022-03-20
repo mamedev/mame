@@ -30494,6 +30494,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the weather machine (4am crack) disk 2a (boot).dsk" size="143360" crc="382babb9" sha1="8162acc9ea4244d0ca7dba8385191b6df7fa3de0" />
 			</dataarea>
@@ -39254,6 +39255,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="scott adams graphic adventure 13 - the sorcerer of claymorgue castle v2.2-122 (4am crack) side b (boot).dsk" size="143360" crc="c09ae2dc" sha1="9ffcdf7f78f394ff57d0bf92fca3beac02714a77"/>
 			</dataarea>
