@@ -8271,7 +8271,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 	</software>
 
 	<software name="deganmas">
-		<description>Degan no Maseki</description>
+		<description>Digan no Maseki</description>
 		<year>1988</year>
 		<publisher>アーテック (Artec)</publisher>
 		<!-- PC8801mk2SR -->
