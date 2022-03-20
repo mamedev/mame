@@ -105,7 +105,6 @@ the Neogeo Pocket.
 #include "sound/t6w28.h"
 #include "sound/dac.h"
 #include "video/k1ge.h"
-#include "fileio.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -217,8 +216,8 @@ private:
 	required_ioport m_io_power;
 
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 };
 
 
@@ -811,16 +810,22 @@ void ngp_state::nvram_default()
 }
 
 
-void ngp_state::nvram_read(emu_file &file)
+bool ngp_state::nvram_read(util::read_stream &file)
 {
-	file.read(m_mainram, 0x3000);
-	m_nvram_loaded = true;
+	size_t actual;
+	if (!file.read(m_mainram, 0x3000, actual) && actual == 0x3000)
+	{
+		m_nvram_loaded = true;
+		return true;
+	}
+	return false;
 }
 
 
-void ngp_state::nvram_write(emu_file &file)
+bool ngp_state::nvram_write(util::write_stream &file)
 {
-	file.write(m_mainram, 0x3000);
+	size_t actual;
+	return !file.write(m_mainram, 0x3000, actual) && actual == 0x3000;
 }
 
 

@@ -10,25 +10,35 @@ A blend of arcade video game and pinball. It has the shape of
  ball is injected from between the flippers; there's no shooter.
  There's flipper buttons on the sides, and a joystick on the
  control panel.
+Granny has an additional "Power" button, it's a gun to shoot
+ the alligators, if you have collected ammo. You need money to
+ pass the toll gates.
 
+List of BY133 games:
 
-Games:
-- Baby Pacman (#1299)
-- Granny & the Gators (#1369)
+Game                              NUM         Sound Board
+-----------------------------------------------------------------------------------------------
+Baby Pacman (1982)               1299         The vidiot board contains the cheap squeak circuit
+Grand Slam (1983)                1311         AS-2518-51 (in by35.cpp)
+Gold Ball (1983)                 1314 (0371)  A084-91495-A371/A360,AS-2518-51 (in by35.cpp)
+Granny & the Gators (1984)       1369 (0369)  Cheap Squeak
+Big Bat (1984)                   ----         AS-2518-61 (in by35.cpp)
 
 Babypac uses a MPU4 board containing the main cpu, and a Vidiot
 board containing the video and sound cpus, and the video controller
 and the sound DAC and amp.
 
 Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
-video, and a Cheap Squeek sound board. The manual incorrectly
+video, and a Cheap Squeak sound board. The manual incorrectly
 describes the babypac vidiot board. Unable to locate a schematic.
 
 Status:
-- All machines are playable.
+- Both machines are playable.
+- To exit the pinball back to the video:
+    Babypac: press O or P;
+    Granny: press X.
 
 ToDo: (all)
-- Sound. It gets stuck waiting for "input capture interrupt".
 - Beeper needs to be replaced by a red LED.
 
 ToDo (granny):
@@ -46,8 +56,8 @@ ToDo (granny):
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+#include "audio/bally.h"
 #include "sound/beep.h"
-#include "sound/dac.h"
 #include "video/tms9928a.h"
 #include "speaker.h"
 
@@ -61,7 +71,9 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videocpu(*this, "videocpu")
-		, m_audiocpu(*this, "audiocpu")
+		, m_cheap_squeak(*this, "cheap_squeak")
+		, m_sound_select_handler(*this)
+		, m_sound_int_handler(*this)
 		, m_pia_u7(*this, "pia_u7")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
@@ -83,11 +95,10 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
-	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
-	void babypac(machine_config &config);
+	void by133(machine_config &config);
 	void granny(machine_config &config);
 
 private:
@@ -95,25 +106,27 @@ private:
 	virtual void machine_reset() override;
 	u8 m_mpu_to_vid = 0U;
 	u8 m_vid_to_mpu = 0U;
-	u8 m_u7_a = 0U;
-	u8 m_u7_b = 0U;
-	bool m_u7_cb2 = 0;
-	u8 m_u10_a = 0U;
-	u8 m_u10_b = 0U;
+	u8 m_u7a = 0U;
+	u8 m_u7b = 0U;
+	u8 m_u10a = 0U;
+	u8 m_u10b = 0U;
 	bool m_u10_cb2 = 0;
-	u8 m_u11_a = 0U;
-	u8 m_u11_b = 0U;
+	bool m_u11_cb2 = 0;
+	u8 m_u11a = 0U;
+	u8 m_u11b = 0U;
 	bool m_u10_timer = 0;
 	bool m_u11_timer = 0;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<mc6809_device> m_videocpu;
-	required_device<m6803_cpu_device> m_audiocpu;
+	required_device<bally_cheap_squeak_device> m_cheap_squeak;
+	devcb_write8 m_sound_select_handler;
+	devcb_write_line m_sound_int_handler;
 	required_device<pia6821_device> m_pia_u7;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_device<tms9928a_device> m_crtc;
 	optional_device<tms9928a_device> m_crtc2; // for Granny only
-	optional_device<beep_device> m_beep; // temp
+	required_device<beep_device> m_beep; // temp
 	required_ioport m_io_test;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
@@ -129,8 +142,6 @@ private:
 
 	u8 sound_data_r();
 	void sound_data_w(u8 data);
-	u8 m6803_port2_r();
-	void m6803_port2_w(u8 data);
 	u8 u7_a_r();
 	void u7_a_w(u8 data);
 	u8 u7_b_r();
@@ -155,7 +166,6 @@ private:
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
-	void audio_map(address_map &map);
 	void video_map(address_map &map);
 };
 
@@ -195,22 +205,11 @@ void by133_state::granny_map(address_map &map)
 	map(0x4000, 0xffff).rom();
 }
 
-void by133_state::audio_map(address_map &map)
-{ // U27 Vidiot
-	map(0xc000, 0xffff).rom();
-}
-
 
 INPUT_CHANGED_MEMBER( by133_state::video_test )
 {
 	if(newval)
 		m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-INPUT_CHANGED_MEMBER( by133_state::sound_test )
-{
-	if(newval)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::activity_test )
@@ -227,7 +226,6 @@ INPUT_CHANGED_MEMBER( by133_state::self_test )
 static INPUT_PORTS_START( babypac )
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
 
@@ -380,10 +378,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( granny )
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Video Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, video_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Power")  // Also 2P start
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Power")  // Also 2P start
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
@@ -558,20 +555,6 @@ void by133_state::sound_data_w(u8 data)
 	m_vid_to_mpu = data;
 }
 
-u8 by133_state::m6803_port2_r()
-{
-	u8 data = ((m_u7_b << 1) & 0x1f) | 0x40 | m_u7_cb2;
-	m_u7_cb2 = false;
-	return data;
-}
-
-void by133_state::m6803_port2_w(u8 data)
-{
-	//m_u7_b = data >> 1;
-	m_beep->set_clock(600);
-	m_beep->set_state(BIT(data, 0));
-}
-
 WRITE_LINE_MEMBER( by133_state::u7_ca2_w )
 {
 	// comms out
@@ -592,8 +575,7 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	// red led
 	m_beep->set_clock(950);
 	m_beep->set_state(state);
-	if (state)
-		m_u7_cb2 = true;
+	m_sound_int_handler(state);
 }
 
 WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
@@ -605,89 +587,93 @@ WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
 WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
 {
 	// solenoid-sound selector
+
+	m_u11_cb2 = state;
 }
 
 u8 by133_state::u7_a_r()
 {
-	return m_u7_a;
+	return m_u7a;
 }
 
 void by133_state::u7_a_w(u8 data)
 {
-	m_u7_a = data;
+	m_u7a = data;
 }
 
 u8 by133_state::u7_b_r()
 {
-	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
-		m_u7_b |= m_io_joy->read();
+	if (BIT(m_u7a, 7)) // bits 6 and 7 work; pinmame uses 7
+		m_u7b |= m_io_joy->read();
 
-	if (BIT(m_u7_a, 6)) // Granny has a "power" button - used to shoot your gun. Is also 2-player start.
-		m_u7_b = m_io_test->read() & 0x80;
+	if (BIT(m_u7a, 6)) // Granny has a "power" button - used to shoot your gun. Is also 2-player start.
+		m_u7b = m_io_test->read() & 0x80;
 
-	return m_u7_b;
+	return m_u7b;
 }
 
 void by133_state::u7_b_w(u8 data)
 {
 	//machine().scheduler().synchronize();
-	m_u7_b = data;
+	m_u7b = data;
+	// Handle sound
+	m_sound_select_handler(data & 0x1f);
 }
 
 u8 by133_state::u10_a_r()
 {
-	return m_u10_a;
+	return m_u10a;
 }
 
 void by133_state::u10_a_w(u8 data)
 {
-	m_u10_a = data;
-	if (BIT(m_u11_a, 2) == 0)
+	m_u10a = data;
+	if (BIT(m_u11a, 2) == 0)
 		m_mpu_to_vid = data ^ 0x0f;
 	// Lamps
 	if (!m_u10_cb2)
 	{
-		if (!BIT(m_u10_a, 6))
+		if (!BIT(m_u10a, 6))
 			for (u8 i = 0; i < 16; i++)
-				m_io_outputs[16+u8(m_u10_timer)*16+i] = ((m_u10_a & 15) == i);
-		if (!BIT(m_u10_a, 7))
+				m_io_outputs[16+u8(m_u10_timer)*16+i] = ((m_u10a & 15) == i);
+		if (!BIT(m_u10a, 7))
 			for (u8 i = 0; i < 16; i++)
-				m_io_outputs[48+u8(m_u10_timer)*16+i] = ((m_u10_a & 15) == i);
+				m_io_outputs[48+u8(m_u10_timer)*16+i] = ((m_u10a & 15) == i);
 	}
 }
 
 u8 by133_state::u10_b_r()
 {
-	if (BIT(m_u11_a, 3) == 0)
-		return ~m_u7_a & 0x03;
+	if (BIT(m_u11a, 3) == 0)
+		return ~m_u7a & 0x03;
 
-	if (BIT(m_u11_a, 1) == 0)
+	if (BIT(m_u11a, 1) == 0)
 		return m_vid_to_mpu;
 
 	u8 data = 0;
 
-	if (BIT(m_u10_a, 0))
+	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
 
-	if (BIT(m_u10_a, 1))
+	if (BIT(m_u10a, 1))
 		data |= m_io_x1->read();
 
-	if (BIT(m_u10_a, 2))
+	if (BIT(m_u10a, 2))
 		data |= m_io_x2->read();
 
-	if (BIT(m_u10_a, 3))
+	if (BIT(m_u10a, 3))
 		data |= m_io_x3->read();
 
-	if (BIT(m_u10_a, 4))
+	if (BIT(m_u10a, 4))
 		data |= m_io_x4->read(); // granny only
 
-	if (BIT(m_u10_a, 5))
+	if (BIT(m_u10a, 5))
 		data |= m_io_dsw0->read();
 
-	if (BIT(m_u10_a, 6))
+	if (BIT(m_u10a, 6))
 		data |= m_io_dsw1->read();
 
-	if (BIT(m_u10_a, 7))
+	if (BIT(m_u10a, 7))
 		data |= m_io_dsw2->read();
 
 	if (m_u10_cb2)
@@ -698,29 +684,29 @@ u8 by133_state::u10_b_r()
 
 void by133_state::u10_b_w(u8 data)
 {
-	m_u10_b = data;
+	m_u10b = data;
 }
 
 u8 by133_state::u11_a_r()
 {
-	return m_u11_a;
+	return m_u11a;
 }
 
 void by133_state::u11_a_w(u8 data)
 {
-	m_u11_a = data;
+	m_u11a = data;
 	m_pia_u7->ca1_w(BIT(data, 1));
 	m_pia_u7->ca2_w(BIT(data, 2));
 }
 
 u8 by133_state::u11_b_r()
 {
-	return m_u11_b;
+	return m_u11b;
 }
 
 void by133_state::u11_b_w(u8 data)
 {
-	m_u11_b = data;
+	m_u11b = data;
 	if (data == 0xB1)
 		m_samples->start(5, 5); // outhole
 	// Bits 0,1,2 go to 74LS138 to select one solenoid
@@ -749,18 +735,20 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 void by133_state::machine_start()
 {
 	genpin_class::machine_start();
+	m_sound_select_handler.resolve();
+	m_sound_int_handler.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_mpu_to_vid));
 	save_item(NAME(m_vid_to_mpu));
-	save_item(NAME(m_u7_a));
-	save_item(NAME(m_u7_b));
-	save_item(NAME(m_u7_cb2));
-	save_item(NAME(m_u10_a));
-	save_item(NAME(m_u10_b));
+	save_item(NAME(m_u7a));
+	save_item(NAME(m_u7b));
+	save_item(NAME(m_u10a));
+	save_item(NAME(m_u10b));
 	save_item(NAME(m_u10_cb2));
-	save_item(NAME(m_u11_a));
-	save_item(NAME(m_u11_b));
+	save_item(NAME(m_u11_cb2));
+	save_item(NAME(m_u11a));
+	save_item(NAME(m_u11b));
 	save_item(NAME(m_u10_timer));
 	save_item(NAME(m_u11_timer));
 }
@@ -771,13 +759,13 @@ void by133_state::machine_reset()
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
-	m_u7_a = 0;
-	m_u7_b = 1; // select mode 2 of mc6803 on /reset (not emulated yet by the cpu)
-	m_u10_a = 0;
-	m_u10_b = 0;
+	m_u7a = 0;
+	m_u7b = 1; // select mode 2 of mc6803 on /reset (not emulated yet by the cpu)
+	m_u10a = 0;
+	m_u10b = 0;
 	m_u10_cb2 = 0;
-	m_u11_a = 0;
-	m_u11_b = 0;
+	m_u11a = 0;
+	m_u11b = 0;
 	m_mpu_to_vid = 0;
 	m_vid_to_mpu = 0;
 	m_beep->set_state(0);
@@ -793,7 +781,7 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-void by133_state::babypac(machine_config &config)
+void by133_state::by133(machine_config &config)
 {
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(3'579'545)/4); // no xtal, just 2 chips
@@ -801,12 +789,6 @@ void by133_state::babypac(machine_config &config)
 
 	MC6809(config, m_videocpu, XTAL(3'579'545));
 	m_videocpu->set_addrmap(AS_PROGRAM, &by133_state::video_map);
-
-	M6803(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::audio_map);
-	m_audiocpu->out_p1_cb().set("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
-	m_audiocpu->in_p2_cb().set(FUNC(by133_state::m6803_port2_r)); // P20-P24 sound command in
-	m_audiocpu->out_p2_cb().set(FUNC(by133_state::m6803_port2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -850,8 +832,13 @@ void by133_state::babypac(machine_config &config)
 
 	/* sound hardware */
 	genpin_audio(config);
-	SPEAKER(config, "speaker").front_center();
-	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // U32 (Vidiot) or U6 (Cheap Squeak)
+	SPEAKER(config, "mono").front_center();
+
+	BALLY_CHEAP_SQUEAK(config, m_cheap_squeak);
+	m_cheap_squeak->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sound_select_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_select));
+	m_sound_int_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_int));
+	m_cheap_squeak->sound_ack_w_handler().set(m_pia_u11, FUNC(pia6821_device::cb2_w));
 
 	SPEAKER(config, "beee").front_center();
 	BEEP(config, m_beep, 600).add_route(ALL_OUTPUTS, "beee", 0.10);
@@ -859,7 +846,7 @@ void by133_state::babypac(machine_config &config)
 
 void by133_state::granny(machine_config &config)
 {
-	babypac(config);
+	by133(config);
 
 	MC6809(config.replace(), m_videocpu, XTAL(8'000'000)); // MC68B09P (XTAL value hard to read)
 	m_videocpu->set_addrmap(AS_PROGRAM, &by133_state::granny_map);
@@ -886,8 +873,8 @@ ROM_START(babypac)
 	ROM_LOAD( "891-05-u11.764", 0xc000, 0x2000, CRC(0a5967a4) SHA1(26d56ddea3f39d41e382449007bf7ba113c0285f))
 	ROM_LOAD( "891-06-u12.764", 0xe000, 0x2000, CRC(58cfe542) SHA1(e024d14019866bd460d1da6b901f9b786a76a181))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD( "891-12-u29.764", 0xe000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_LOAD( "891-12-u29.764", 0xc000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
 ROM_END
 
 ROM_START(babypac2)
@@ -901,8 +888,8 @@ ROM_START(babypac2)
 	ROM_LOAD( "891-05-u11.764", 0xc000, 0x2000, CRC(0a5967a4) SHA1(26d56ddea3f39d41e382449007bf7ba113c0285f))
 	ROM_LOAD( "891-06-u12.764", 0xe000, 0x2000, CRC(58cfe542) SHA1(e024d14019866bd460d1da6b901f9b786a76a181))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD( "891-12-u29.764", 0xe000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_LOAD( "891-12-u29.764", 0xc000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
 ROM_END
 
 /*-----------------------------------------------------------------
@@ -921,13 +908,13 @@ ROM_START(granny)
 	ROM_LOAD( "vid_u8.764", 0xc000, 0x2000, CRC(a442bc01) SHA1(2c01123dc5799561ae9e7c5d6db588b82b5ae59c))
 	ROM_LOAD( "vid_u9.764", 0xe000, 0x2000, CRC(6b67a1f7) SHA1(251c2b941898363bbd6ee1a94710e2b2938ec851))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD( "cs_u3.764", 0xe000, 0x2000, CRC(0a39a51d) SHA1(98342ba38e48578ce9870f2ee85b553d46c0e35f))
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_LOAD( "cs_u3.764", 0xc000, 0x2000, CRC(0a39a51d) SHA1(98342ba38e48578ce9870f2ee85b553d46c0e35f))
 ROM_END
 
 } // Anonymous namespace
 
 
-GAME( 1982, babypac,  0,       babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, babypac2, babypac, babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982, babypac,  0,       by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982, babypac2, babypac, by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_IS_SKELETON_MECHANICAL )

@@ -35,7 +35,6 @@ TODO:
  - venom    : gfx glitches on second level
  - wldgunsb : dipswitches
  - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
- - fatfurspb: ROMs are identical to the SNES version. Mods provided by security chip?
 
 ***************************************************************************
 
@@ -189,7 +188,6 @@ public:
 	void init_rushbets();
 	void init_venom();
 	void init_wldgunsb();
-	void init_fatfurspb();
 
 private:
 	optional_shared_ptr_array<int8_t, 2> m_shared_ram;
@@ -999,20 +997,6 @@ void snesb_state::init_kinstb()
 	init_snes_hirom();
 }
 
-void snesb_state::init_fatfurspb()
-{
-	uint8_t *rom = memregion("user3")->base();
-
-	for (uint32_t i = 0; i < 0x400000; i++)
-	{
-		rom[i] = bitswap<8>(rom[i], 5, 0, 6, 1, 7, 4, 3, 2); // Same as kinstb
-	}
-
-	// Data is 100% same as Fatal Fury Special (U). Patches applied by protection device for coinage, etc?
-
-	init_snes_hirom();
-}
-
 void snesb_state::init_ffight2b()
 {
 	uint8_t *rom = memregion("user3")->base();
@@ -1057,6 +1041,13 @@ void snesb_state::init_ffight3b()
 	// boot vector. TODO: this is the same as the console version, but needs to be verified
 	rom[0xfffc] = 0x00;
 	rom[0xfffd] = 0xfe;
+
+	// patch out protection
+	rom[0xfe33] = 0x5c;
+	rom[0xfe34] = 0x00;
+	rom[0xfe35] = 0x00;
+	rom[0xfe36] = 0xc0;
+	rom[0xfeab] = 0x60;
 
 	init_snes_hirom();
 }
@@ -1636,20 +1627,12 @@ ROM_START( wldgunsb )
 	ROM_LOAD( "c20.bin", 0x080000, 0x080000, CRC(62ae4acb) SHA1(62aa320bcc7eeedb00c70baa909ac0230256c9a4) )
 ROM_END
 
-ROM_START( fatfurspb )
-	ROM_REGION( 0x400000, "user3", 0 )
-	ROM_LOAD( "1.u14", 0x000000, 0x100000, CRC(7cb9192c) SHA1(0247e303902e86eaa9443f2a39d352430df5f46f) )
-	ROM_LOAD( "2.u15", 0x100000, 0x100000, CRC(440e3017) SHA1(7d1a2077032c761676bff7f841ab1fc669d322fa) )
-	ROM_LOAD( "3.u16", 0x200000, 0x100000, CRC(dbbe10de) SHA1(27c590bff5a762a2528d0819b7544914ab6cae7c) )
-	ROM_LOAD( "4.u17", 0x300000, 0x100000, CRC(a356e60c) SHA1(c403eff4e7c7deefed68a34a0dbeefadac8c7a0e) )
-ROM_END
-
 } // Anonymous namespace
 
 
 GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,        ffight2b,     ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg)",                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version? protected?
+GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg)",                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version? protection isn't figured out
 GAME( 1996, iron,         0,        extrainp,     iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib,      0,        extrainp,     denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib2,     denseib,  extrainp,     denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -1661,4 +1644,3 @@ GAME( 1996, legendsb,     0,        extrainp,     kinstb,   snesb_state, init_le
 GAME( 1997, rushbets,     0,        rushbets,     rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, fatfurspb,    0,        base,         venom,    snesb_state, init_fatfurspb, ROT0, "bootleg",  "Fatal Fury Special (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // coinage, etc. handled by protection device

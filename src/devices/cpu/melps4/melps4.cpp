@@ -96,13 +96,6 @@ void melps4_cpu_device::state_string_export(const device_state_entry &entry, std
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	MELPS4_PC=1, MELPS4_A, MELPS4_B, MELPS4_E,
-	MELPS4_Y, MELPS4_X, MELPS4_Z,
-	MELPS4_H, MELPS4_L, MELPS4_C, MELPS4_V, MELPS4_W
-};
-
 void melps4_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -218,19 +211,20 @@ void melps4_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%9s").noshow();
 
-	state_add(MELPS4_PC, "PC", m_pc).formatstr("%04X");
-	state_add(MELPS4_A, "A", m_a).formatstr("%2d"); // show in decimal
-	state_add(MELPS4_B, "B", m_b).formatstr("%2d"); // "
-	state_add(MELPS4_E, "E", m_e).formatstr("%02X");
-	state_add(MELPS4_Y, "Y", m_y).formatstr("%1X");
-	state_add(MELPS4_X, "X", m_x).formatstr("%1d");
-	state_add(MELPS4_Z, "Z", m_z).formatstr("%1d");
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%2d"); // 2 - show in decimal
+	state_add(++m_state_count, "B", m_b).formatstr("%2d"); // 3 - "
+	state_add(++m_state_count, "E", m_e).formatstr("%02X"); // 4
+	state_add(++m_state_count, "Y", m_y).formatstr("%1X"); // 5
+	state_add(++m_state_count, "X", m_x).formatstr("%1d"); // 6
+	state_add(++m_state_count, "Z", m_z).formatstr("%1d"); // 7
 
-	state_add(MELPS4_H, "H", m_h).formatstr("%1X");
-	state_add(MELPS4_L, "L", m_l).formatstr("%1X");
-	state_add(MELPS4_C, "C", m_c).formatstr("%1X");
-	state_add(MELPS4_V, "V", m_v).formatstr("%1X");
-	state_add(MELPS4_W, "W", m_w).formatstr("%1X");
+	state_add(++m_state_count, "H", m_h).formatstr("%1X"); // 8
+	state_add(++m_state_count, "L", m_l).formatstr("%1X"); // 9
+	state_add(++m_state_count, "C", m_c).formatstr("%1X"); // 10
+	state_add(++m_state_count, "V", m_v).formatstr("%1X"); // 11
+	state_add(++m_state_count, "W", m_w).formatstr("%1X"); // 12
 
 	set_icountptr(m_icount);
 }

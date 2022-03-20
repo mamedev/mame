@@ -264,7 +264,7 @@ DE-0318-4
 |    C1060  | 45|                                       |
 |-----------|---|---------------------------------------|
 Notes:
-      49        - Unknown DIP40 ASIC (no clock input so not an MCU)
+      49        - NEC DIP40 ULA (no clock input)
       47        - Unknown SDIP52 ASIC (no clock input so not an MCU)
       45        - HuC6280 sound CPU in disguise as Data East custom chip #45. Clock input 21.4772MHz on pin 10
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH

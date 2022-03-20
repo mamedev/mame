@@ -262,9 +262,9 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "bloom level 6 weight (1/4 smaller that level 5 target)" },
 	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "bloom level 7 weight (1/4 smaller that level 6 target)" },
 	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              OPTION_FLOAT,      "bloom level 8 weight (1/4 smaller that level 7 target)" },
-	{ WINOPTION_LUT_TEXTURE,                                    "",                  OPTION_STRING,     "3D LUT texture filename for screen, PNG format" },
+	{ WINOPTION_LUT_TEXTURE,                                    "lut-default.png",   OPTION_STRING,     "3D LUT texture filename for screen, PNG format" },
 	{ WINOPTION_LUT_ENABLE,                                     "0",                 OPTION_BOOLEAN,    "Enables 3D LUT to be applied to screen after post-processing" },
-	{ WINOPTION_UI_LUT_TEXTURE,                                 "",                  OPTION_STRING,     "3D LUT texture filename of UI, PNG format" },
+	{ WINOPTION_UI_LUT_TEXTURE,                                 "lut-default.png",   OPTION_STRING,     "3D LUT texture filename of UI, PNG format" },
 	{ WINOPTION_UI_LUT_ENABLE,                                  "0",                 OPTION_BOOLEAN,    "enable 3D LUT to be applied to UI and artwork after post-processing" },
 
 	// full screen options

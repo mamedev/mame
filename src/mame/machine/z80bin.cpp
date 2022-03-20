@@ -10,12 +10,12 @@
 
 image_init_result z80bin_load_file(device_image_interface &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
 {
-	int ch;
-	uint16_t args[3];
-	uint16_t i=0, j, size;
-	uint8_t data;
-	char pgmname[256];
-	char message[512];
+	int ch = 0;
+	uint16_t args[3]{};
+	uint16_t i = 0U, j = 0U, size = 0U;
+	uint8_t data = 0U;
+	char pgmname[256]{};
+	char message[512]{};
 
 	image.fseek(7, SEEK_SET);
 

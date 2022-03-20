@@ -2,18 +2,32 @@
 // copyright-holders:Robbbert, Quench
 /********************************************************************************************
 
-    PINBALL
-    Bally MPU AS-2518-17
+PINBALL
+Bally MPU AS-2518-17
 
-    These are some very early and well known Solid State machines, such as 'Eight Ball'.
+Games:
+**** Bally ****
+- Bow and Arrow (#1033)
+- Freedom (#1066)
+- Night Rider (#1074)
+- Black Jack (#1092)
+- Evel Knievel (#1094)
+- Mata Hari (#1104)
+- Eight Ball (#1118)
+- Bobby Orr Power Play (#1120)
+- Strikes and Spares (#1135)
+**** Other ****
+- 301/Bull's Eye
+- Stellar Airship
+- Super Zeus
+- Verspiel Dein Wasser Nicht!
 
-    They have orange digital 6 digit displays, and a mechanical chime unit for sounds.
+They have orange digital 6 digit displays, and a mechanical chime unit for sounds.
 
 
 ToDo:
 - Bow & Arrow fails the PIA test and doesn't boot
 - Dips, Inputs, Solenoids vary per game
-- Mechanical
 
 *********************************************************************************************/
 
@@ -75,19 +89,19 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_u10a;
-	uint8_t m_u10b;
-	uint8_t m_u11a;
-	uint8_t m_u11b;
-	bool m_u10_ca2;
-	bool m_u10_cb1;
-	bool m_u10_cb2;
-	bool m_u11_ca1;
-	bool m_u11_cb2;
-	uint8_t m_segment[6];
-	uint8_t m_lamp_decode;
-	uint8_t m_solenoid_features[20][4];
-	uint8_t m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
+	uint8_t m_u10a = 0U;
+	uint8_t m_u10b = 0U;
+	uint8_t m_u11a = 0U;
+	uint8_t m_u11b = 0U;
+	bool m_u10_ca2 = 0;
+	bool m_u10_cb1 = 0;
+	bool m_u10_cb2 = 0;
+	bool m_u11_ca1 = 0;
+	bool m_u11_cb2 = 0;
+	uint8_t m_segment[6]{};
+	uint8_t m_lamp_decode = 0U;
+	uint8_t m_solenoid_features[20][4]{};
+	uint8_t m_io_hold_x[5]{};       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -296,57 +310,57 @@ static INPUT_PORTS_START( by17 )
 
 	PORT_START("X0")
 	// custom
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP01")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP02")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP03")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP04")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP05")
 	// standard
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
+//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, outhole_x0<0x07>)  //  PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP15")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	// custom
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP24")
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP32")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP40")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( matahari )
@@ -972,6 +986,20 @@ void by17_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
+
+	save_item(NAME(m_u10a));
+	save_item(NAME(m_u10b));
+	save_item(NAME(m_u11a));
+	save_item(NAME(m_u11b));
+	save_item(NAME(m_u10_ca2));
+	save_item(NAME(m_u10_cb1));
+	save_item(NAME(m_u10_cb2));
+	save_item(NAME(m_u11_ca1));
+	save_item(NAME(m_u11_cb2));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_lamp_decode));
+	save_item(NAME(m_solenoid_features));
+	save_item(NAME(m_io_hold_x));
 }
 
 void by17_state::machine_reset()
@@ -1127,7 +1155,7 @@ ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold ti
 ROM_END
 
 /*--------------------------------
-/ Power Play #1120
+/ Bobby Orr Power Play #1120
 /-------------------------------*/
 ROM_START(pwerplay)
 	ROM_REGION(0x1000, "roms", 0)
@@ -1145,7 +1173,7 @@ ROM_START(stk_sprs)
 ROM_END
 
 /*--------------------------------------------------------------
-/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1981)
+/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1979)
 /---------------------------------------------------------------*/
 
 } // anonymous namespace

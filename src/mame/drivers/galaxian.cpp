@@ -3597,6 +3597,33 @@ static INPUT_PORTS_START( spacbatt )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( spacempr )
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x40, "4000" )
+	PORT_DIPSETTING(    0x80, "5000" )
+	PORT_DIPSETTING(    0xc0, "7000" )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( batman2 )
 	PORT_INCLUDE(galaxian)
 
@@ -13204,6 +13231,26 @@ ROM_START( froggers3 )
 ROM_END
 
 
+ROM_START( froggert ) // KT-4108-1 + KT-4108-2, 834-0222 sticker
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-1398.2c", 0x0000, 0x1000, CRC(cd6d3b43) SHA1(f08a429aeb1e3ba05a58d921f13fd63cce26be26) )
+	ROM_LOAD( "epr-1399.2e", 0x1000, 0x1000, CRC(71c365d4) SHA1(9ec04c8b5e9afbd02607ebce12e120d3f992de2c) )
+	ROM_LOAD( "epr-1400.2f", 0x2000, 0x1000, CRC(5bd230b5) SHA1(898e8cb82817966573ea6355939ecde5b34f9e84) )
+	ROM_LOAD( "epr-1401.2h", 0x3000, 0x1000, CRC(4e94d34f) SHA1(39794442a842618bfe2dd014fcb228d8c55d6df3) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "epr-1402.5c", 0x0000, 0x1000, CRC(12890497) SHA1(4cae5480ab94cea5af4d2da2eb54bde1805f0fbe) )
+	ROM_LOAD( "epr-1403.5d", 0x1000, 0x1000, CRC(1d4d1083) SHA1(cb3883cb14b0b90d1c2090708449229b96466049) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "epr-1391.5f", 0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) )
+	ROM_LOAD( "epr-1392.5h", 0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-91.6e", 0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
+ROM_END
+
+
 ROM_START( froggermc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-1031.15",  0x0000, 0x1000, CRC(4b7c8d11) SHA1(9200b33cac0ef5a6647c95ebd25237fa62fcdf30) )
@@ -13301,11 +13348,11 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-/* Hermatic Frogger, found on a Video Dens PCB */
+// Hermatic Frogger, found on a Video Dens PCB
 ROM_START( froggervd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
-	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) BAD_DUMP ) // 2716 (hand-patched at XX0)
+	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) ) // 2716
 	ROM_LOAD( "frogvd_r3-libro-s3.af9", 0x1000, 0x0800, CRC(637a2ff8) SHA1(e9b9fc692ca5d8deb9cd30d9d73ad25c8d8bafe1) ) // 2716
 	ROM_LOAD( "frogvd_r4-libro-s4.ah9", 0x1800, 0x0800, CRC(1dc9ab15) SHA1(94b327dd2eaf0ffb19fee86a2a890a0012d52849) ) // 2716
 	ROM_LOAD( "frogvd_r5-libro-s5.aj9", 0x2000, 0x0800, CRC(35e11cd2) SHA1(c2d01324c052d79ad9de00d13ddc4322f9c44292) ) // 2716
@@ -13313,7 +13360,7 @@ ROM_START( froggervd )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "frogvd_r11-ot1.bc5", 0x0000, 0x0800, CRC(79326efe) SHA1(087cd61ba9c09be6ff71be8f89933a4a0f620650) ) // 2716
-	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) BAD_DUMP ) // 2716 (hand-patched at XXe)
+	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) ) // 2716
 	ROM_LOAD( "frogvd_r13-ot3.be5", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -13748,11 +13795,11 @@ ROM_START( mandinka )
 	ROM_LOAD( "2b_sonido.bin", 0x1000, 0x1000, BAD_DUMP CRC(e8af1d77) SHA1(d05d7c015962989651a90f4bf9e64cd98c2ddd38) ) // FIXED BITS (xxx1xxxx)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "9.bin",  0x0000, 0x0800, BAD_DUMP CRC(cba03b26) SHA1(9aa307db69bac1f7b14194b68ea969a547e6f92f) ) // bitrot
-	ROM_LOAD( "10.bin", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+	ROM_LOAD( "9.bin",         0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) )
+	ROM_LOAD( "10.bin",        0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6e.bin", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // Not dumped on this set
+	ROM_LOAD( "7603-5.bin",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
 ROM_START( olmandingo )
@@ -15670,7 +15717,7 @@ GAME( 1980, gteikokub2,  uniwars,  pisces,     gteikokub2, pisces_state,   init_
 GAME( 1980, gteikokub3,  uniwars,  pisces,     superg,     pisces_state,   init_pisces,     ROT90,  "bootleg (Honly)",            "Gingateikoku no Gyakushu (bootleg set 3)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbatt,    uniwars,  pisces,     spacbatt,   pisces_state,   init_pisces,     ROT90,  "bootleg",                    "Space Battle (bootleg set 1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbat2,    uniwars,  pisces,     spacbatt,   pisces_state,   init_pisces,     ROT90,  "bootleg",                    "Space Battle (bootleg set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacempr,    uniwars,  pisces,     spacbatt,   pisces_state,   init_pisces,     ROT90,  "bootleg",                    "Space Empire (bootleg)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacempr,    uniwars,  pisces,     spacempr,   pisces_state,   init_pisces,     ROT90,  "bootleg",                    "Space Empire (bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1980, skyraidr,    uniwars,  pisces,     superg,     pisces_state,   init_pisces,     ROT90,  "bootleg",                    "Sky Raider (Uniwars bootleg)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galemp,      uniwars,  pisces,     superg,     pisces_state,   init_pisces,     ROT90,  "bootleg (Taito do Brasil)",  "Galaxy Empire (bootleg?)",                         MACHINE_SUPPORTS_SAVE ) // Clearly a hack, but was it licensed?
 GAME( 1980, asideral,    uniwars,  pisces,     asideral,   pisces_state,   init_pisces,     ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)",     MACHINE_SUPPORTS_SAVE )
@@ -15843,6 +15890,8 @@ GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_
 GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)",              "Turpin",                                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "600",                                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Turpin (bootleg on Super Cobra hardware)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+
+GAME( 1981, froggert,    frogger,  turtles,    frogger,    galaxian_state, init_quaak,      ROT90,  "Konami (Sega license)",              "Frogger (Turtles hardware)",                                     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                                         MACHINE_SUPPORTS_SAVE )

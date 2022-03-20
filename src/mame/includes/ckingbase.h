@@ -29,6 +29,7 @@ public:
 		m_display_maxx(0)
 	{ }
 
+private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
@@ -38,9 +39,9 @@ public:
 	output_finder<0x20> m_out_digit;
 
 	// misc common
-	u16 m_inp_mux;                  // multiplexed keypad mask
-	u16 m_led_select;
-	u16 m_led_data;
+	u16 m_inp_mux = 0U;                  // multiplexed keypad mask
+	u16 m_led_select = 0U;
+	u16 m_led_data = 0U;
 
 	u16 read_inputs(int columns);
 
@@ -53,9 +54,9 @@ public:
 	int m_display_maxy;             // display matrix number of rows
 	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 
-	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
-	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u8 m_display_decay[0x20][0x20]; // (internal use)
+	u32 m_display_state[0x20]{};      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20]{};    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u8 m_display_decay[0x20][0x20]{}; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();

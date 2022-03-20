@@ -101,7 +101,7 @@ private:
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
 
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_ram;

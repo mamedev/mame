@@ -2,17 +2,21 @@
 // copyright-holders:Robbbert
 /*********************************************************************
 
-    PINBALL
-    Zaccaria Prototype
+PINBALL
+Zaccaria Prototype
 
-    These use the INS8060 (SC/MP) processor, and are Zaccaria's first
-    digital machines.
+These use the INS8060 (SC/MP) processor, and are Zaccaria's first
+  digital machines.
 
-    After starting a game, press X, wait for the sound of the ball
-    being ejected, then press Z. Now you can get a score.
+After starting a game, press X, wait for the sound of the ball
+ being ejected, then press Z. Now you can get a score.
 
-    The ball number is how many balls are left. 1 = last ball.
+The ball number is how many balls are left. 1 = last ball.
 
+Games:
+- Strike
+- Ski Jump
+- Space City
 
 Status:
 - All games are working.
@@ -214,20 +218,20 @@ INPUT_PORTS_END
 void zac_proto_state::out0_w(offs_t offset, uint8_t data)
 {
 	data &= 0x3f;
-	uint16_t t = data | (offset << 6);
+	uint16_t t = data << (offset*6);
 
 	switch (t)
 	{
-		case 1:
+		case 0x01:
 			m_samples->start(0, 5); // outhole
 			break;
-		case 2:
-		case 4:
+		case 0x02:
+		case 0x04:
 			m_samples->start(4, 7); // slings
 			break;
-		case 8:
-		case 16:
-		case 32:
+		case 0x08:
+		case 0x10:
+		case 0x20:
 			m_samples->start(5, 0); // bumpers
 			break;
 	}
@@ -362,6 +366,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

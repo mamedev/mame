@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "machine/nvram.h"
 
-#include "fileio.h"
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -104,12 +102,13 @@ void nvram_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void nvram_device::nvram_read(emu_file &file)
+bool nvram_device::nvram_read(util::read_stream &file)
 {
 	// make sure we have a valid base pointer
 	determine_final_base();
 
-	file.read(m_base, m_length);
+	size_t actual;
+	return !file.read(m_base, m_length, actual) && actual == m_length;
 }
 
 
@@ -118,9 +117,10 @@ void nvram_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void nvram_device::nvram_write(emu_file &file)
+bool nvram_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_base, m_length);
+	size_t actual;
+	return !file.write(m_base, m_length, actual) && actual == m_length;
 }
 
 

@@ -46,6 +46,7 @@ ToDo:
 - Sound - All machines have a B605/C605 sound card containing a 6840 and many other chips
 - Sound - Games 126,128-151,165 have a A720 voice synthesizer with a 'CRC' CPU and many other chips
 - Dips, Inputs, Solenoids vary per game
+- Mechanical sounds
 
 *********************************************************************************************/
 
@@ -88,6 +89,7 @@ public:
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -152,6 +154,7 @@ private:
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
 	output_finder<47> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<96> m_io_outputs;   // 32 solenoids + 64 lamps
 };
 
@@ -411,7 +414,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 
 WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 
 	if (m_s14001a && state)
 	{
@@ -576,6 +579,7 @@ void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_u10a));
@@ -1138,13 +1142,13 @@ ROM_END
 } // Anonymous namespace
 
 
-// 6-digit working
+// 6-digit
 GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_IS_SKELETON_MECHANICAL)
 
-// 7-digit working
+// 7-digit
 GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",                 MACHINE_IS_SKELETON_MECHANICAL)
@@ -1154,7 +1158,7 @@ GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_m
 GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_IS_SKELETON_MECHANICAL)
 
-// multiball, unusable
+// multiball
 GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_IS_SKELETON_MECHANICAL)

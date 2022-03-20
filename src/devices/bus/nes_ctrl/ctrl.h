@@ -94,6 +94,7 @@ DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 
 void nes_control_port1_devices(device_slot_interface &device);
 void nes_control_port2_devices(device_slot_interface &device);
+void nes_control_special_devices(device_slot_interface &device);
 void fc_control_port1_devices(device_slot_interface &device);
 void fc_control_port2_devices(device_slot_interface &device);
 void fc_expansion_devices(device_slot_interface &device);

@@ -1,21 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:JJ Stacino
-/////////////////////////////////////////////////////////////////////////
-/*      Hector 2HR+
-        Victor
-        Hector 2HR
-        Hector HRX
-        Hector MX40c
-        Hector MX80c
-        Hector 1
-        Interact
+/********************************************************************************************
+Systems supported:
+- Hector 2HR+
+- Victor
+- Hector 2HR
+- Hector HRX
+- Hector MX40c
+- Hector MX80c
+- Hector 1
+- Interact
 
-        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-        31/06/2009 Video - Robbbert
+2009-05-12 Skeleton driver - Micko
+2009-06-30 Preliminary video - Robbbert
 
-        29/10/2009 Update skeleton to functional machine
-                        by yo_fr       (jj.stac@aliceadsl.fr)
-
+2009-10-29 Update skeleton to functional machine by yo_fr (jj.stac@aliceadsl.fr)
                 => add Keyboard,
                 => add color,
                 => add cassette,
@@ -24,19 +23,19 @@
                 => add BR/HR switching
                 => add bank switch for HRX
                 => add device MX80c and bank switching for the ROM
-        03/01/2010 Update and clean prog by yo_fr       (jj.stac @ aliceadsl.fr)
+2010-01-03 Update and clean prog by yo_fr       (jj.stac @ aliceadsl.fr)
                 => add the port mapping for keyboard
-        28/09/2010 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
+2010-09-28 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
                 => Note that the DISK II boots and loads CP/M, but CP/M doesn't yet work.
-        20/11/2010 : synchronization between uPD765 and Z80 is now OK, CP/M works. JJStacino
-        11/11/2011 : add the minidisk support (3.5" drive)  JJStacino
-        19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
+2010-11-20 : synchronization between uPD765 and Z80 is now OK, CP/M works. JJStacino
+2011-11-11 : add the minidisk support (3.5" drive)  JJStacino
+2012-02-19 : few adjustments for the hrp and hr machine - JJStacino
 
-    More information:
-    - http://dchector.free.fr/
-    - http://hectorvictor.free.fr/
+More information:
+- http://dchector.free.fr/
+- http://hectorvictor.free.fr/
 
-*/
+**********************************************************************************************/
 
 #include "emu.h"
 #include "includes/hec2hrp.h"

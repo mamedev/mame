@@ -28,11 +28,12 @@ Status:
 - All games are working without sound, except:
 - gwarfare stops responding to inputs after a while
 - mbossy rom missing, black screen
-- andromep, andromepa, cyclopes, cyclopes1 cannot be started with the credit button
+- andromep, andromepa, cyclopes, cyclopes1: To start, hold CX hit 1. End ball, CX
 
 
 ToDo:
 - Sound
+- Mechanical sounds
 - Inputs vary per machine
 
 ******************************************************************************************/
@@ -69,6 +70,7 @@ public:
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -99,6 +101,7 @@ private:
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
 	output_finder<40> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<64> m_io_outputs;   // 16 solenoids + 48 lamps
 };
 
@@ -520,15 +523,14 @@ void gp_2_state::porta_w(u8 data)
 
 void gp_2_state::portc_w(u8 data)
 {
-	output().set_value("led0", !BIT(data, 3));
+	m_io_leds[0] = BIT(data, 3) ? 0 : 1;
 	m_digit = data & 7;
 }
 
 void gp_2_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_u14));
@@ -539,7 +541,6 @@ void gp_2_state::machine_start()
 
 void gp_2_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	m_u14 = 0;
 	m_digit = 0xff;
 	m_last_solenoid = 15;
@@ -851,8 +852,6 @@ GAME( 1984, agent777,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game
 GAME( 1985, cpthook,   0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Captain Hook",              MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, ladyshot,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, ladyshota, ladyshot, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-
-// credit (start) button not working
 GAME( 1985, andromep,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, andromepa, andromep, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, cyclopes,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes (12/85)",  MACHINE_IS_SKELETON_MECHANICAL)

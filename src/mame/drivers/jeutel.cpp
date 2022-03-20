@@ -69,6 +69,7 @@ private:
 	u8 ppi0b_r() { u8 data = 0xff; for (u8 i = 0; i < 5; i++) if (!BIT(m_row, i)) data &= m_io_keyboard[i]->read(); return data; }
 	void ppi0c_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }
 	void ppi1a_w(u8 data);
+	u16 seg8to14(u16 data);
 	void ppi1b_w(u8 data);
 	void ppi1c_w(u8 data) { m_lamp_data = data; }
 	void ppi2a_w(u8 data);
@@ -349,14 +350,13 @@ void jeutel_state::ppi1a_w(u8 data)
 {
 	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x81,0x79,0x38,0x3e,0x1e,0 }; // 6331 (letters are T,E,L,U,J,blank)
 	bool blank = !BIT(data, 7);
+	u16 segment = seg8to14(patterns[data & 15]);
 
 	if (BIT(data, 6))
 	{
-		m_digits[40+m_digit] = patterns[data&15];
-		return;
+		m_digits[40+m_digit] = segment;
 	}
-	u16 segment = patterns[data & 15];
-	if (BIT(data, 4))
+	else if (BIT(data, 4))
 	{
 		m_digits[m_digit] = (blank) ? 0 : segment;
 	}
@@ -364,6 +364,12 @@ void jeutel_state::ppi1a_w(u8 data)
 	{
 		m_digits[20+m_digit] = (blank) ? 0 : segment;
 	}
+}
+
+u16 jeutel_state::seg8to14(u16 data)
+{
+	// convert custom 8seg digit to MAME 14seg digit
+	return bitswap<10>(data,7,7,6,6,5,4,3,2,1,0);
 }
 
 void jeutel_state::ppi1b_w(u8 data)

@@ -34,6 +34,10 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+	void crimfght(machine_config &config);
+
+private:
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -57,16 +61,13 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void banking_callback(uint8_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 
-	void crimfght(machine_config &config);
 	void bank0000_map(address_map &map);
 	void crimfght_map(address_map &map);
 	void crimfght_sound_map(address_map &map);
-private:
-	int m_woco;
-	int m_rmrd;
-	int m_init;
+	int m_woco = 0;
+	int m_rmrd = 0;
+	int m_init = 0;
 };
 
 #endif // MAME_INCLUDES_CRIMFGHT_H

@@ -37,26 +37,51 @@ public:
 	{
 	}
 
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
+	void init_block2();
+	void init_arkblock();
+	void init_hexa();
+	void init_hexaa();
+	void init_paddle2();
+	void init_tetrsark();
+	void init_tetrsark2();
+	void init_arkgcbl();
+	void init_arkangc2();
+	void init_arkbloc2();
+	void init_arkangc();
+	void init_brixian();
+	void arkanoid_bootleg_init(  );
+
+	void bootleg(machine_config &config);
+	void p3mcuay(machine_config &config);
+	void aysnd(machine_config &config);
+	void hexa(machine_config &config);
+	void brixian(machine_config &config);
+	void hexaa(machine_config &config);
+	void p3mcu(machine_config &config);
+	void arkanoid(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_protram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	uint8_t    m_gfxbank;
-	uint8_t    m_palettebank;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	uint8_t    m_gfxbank = 0U;
+	uint8_t    m_palettebank = 0U;
 
 	/* input-related */
-	uint8_t    m_paddle_select;   // selected by d008 bit 2
+	uint8_t    m_paddle_select = 0U;   // selected by d008 bit 2
 
 	/* bootleg related */
-	int      m_bootleg_id;
-	uint8_t    m_bootleg_cmd;
+	int      m_bootleg_id = 0;
+	uint8_t    m_bootleg_cmd = 0U;
 
 	/* hexaa */
-	uint8_t m_hexaa_from_main;
-	uint8_t m_hexaa_from_sub;
+	uint8_t m_hexaa_from_main = 0U;
+	uint8_t m_hexaa_from_sub = 0U;
 
 	/* devices */
 	optional_ioport_array<2> m_muxports;
@@ -64,7 +89,6 @@ public:
 	optional_device<arkanoid_mcu_device_base> m_mcuintf;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
 
 	uint8_t arkanoid_bootleg_f000_r();
 	uint8_t arkanoid_bootleg_f002_r();
@@ -79,20 +103,7 @@ public:
 	void hexaa_f000_w(uint8_t data);
 	void hexaa_sub_80_w(uint8_t data);
 	uint8_t hexaa_sub_90_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	uint8_t input_mux_r();
-	void init_block2();
-	void init_arkblock();
-	void init_hexa();
-	void init_hexaa();
-	void init_paddle2();
-	void init_tetrsark();
-	void init_tetrsark2();
-	void init_arkgcbl();
-	void init_arkangc2();
-	void init_arkbloc2();
-	void init_arkangc();
-	void init_brixian();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -100,16 +111,6 @@ public:
 	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void arkanoid_bootleg_init(  );
-
-	void bootleg(machine_config &config);
-	void p3mcuay(machine_config &config);
-	void aysnd(machine_config &config);
-	void hexa(machine_config &config);
-	void brixian(machine_config &config);
-	void hexaa(machine_config &config);
-	void p3mcu(machine_config &config);
-	void arkanoid(machine_config &config);
 	void arkanoid_map(address_map &map);
 	void bootleg_map(address_map &map);
 	void brixian_map(address_map &map);

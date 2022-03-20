@@ -278,7 +278,7 @@ zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
 @source:gamemachine.cpp
-2001tgm                         //
+gamemach                        //
 
 @source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977

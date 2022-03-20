@@ -3654,7 +3654,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_ppu->set_9845_boot_mode(true);
 	m_ppu->set_rw_cycles(6 , 6);
 	m_ppu->set_relative_mode(true);
-	m_ppu->int_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
+	m_ppu->set_int_cb(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);

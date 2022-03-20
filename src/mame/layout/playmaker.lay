@@ -48,9 +48,9 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="2.2" right="35" top="-2" bottom="38" />
+		<bounds left="2.1" right="35" top="-2" bottom="38" />
 
 		<group ref="display1"><bounds x="12" y="0" width="21" height="36" /><orientation rotate="270" /></group>
-		<group ref="display2"><bounds x="4.2" y="14" width="3.8" height="8" /><orientation rotate="270" /></group>
+		<group ref="display2"><bounds x="4.1" y="14" width="3.9" height="8" /><orientation rotate="270" /></group>
 	</view>
 </mamelayout>
