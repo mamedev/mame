@@ -215,8 +215,6 @@ private:
 	void sound_board_w(offs_t offset, uint8_t data);
 	uint8_t opna_r(offs_t offset);
 	void opna_w(offs_t offset, uint8_t data);
-	uint8_t unk_r();
-	void unk_w(uint8_t data);
 
 	uint8_t pixel_clock(void);
 	void dynamic_res_change(void);

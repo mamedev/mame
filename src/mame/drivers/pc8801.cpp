@@ -1567,17 +1567,6 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t pc8801_state::unk_r()
-{
-	logerror("Read port 0x33\n");
-	return 0xff;
-}
-
-void pc8801_state::unk_w(uint8_t data)
-{
-	logerror("Write port 0x33\n");
-}
-
 /*
  * PC8801FH overrides (CPU clock switch)
  */
@@ -1661,7 +1650,8 @@ void pc8801_state::main_io(address_map &map)
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
-	map(0x33, 0x33).rw(FUNC(pc8801_state::unk_r), FUNC(pc8801_state::unk_w));
+//	map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
+	// TODO: ALU not installed on pre-mkIISR machines
 	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
