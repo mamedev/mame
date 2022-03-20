@@ -3589,6 +3589,7 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_b5000.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_pps41.cpp",
 }
 

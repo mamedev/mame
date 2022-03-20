@@ -16435,6 +16435,9 @@ hexionb                         // bootleg
 @source:hh_amis2k.cpp
 wildfire                        // Parker Bros
 
+@source:hh_b5000.cpp
+rw18r                           // Rockwell
+
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
 ctstein                         // Castle Toy

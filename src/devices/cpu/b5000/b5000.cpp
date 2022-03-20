@@ -5,6 +5,8 @@
   Rockwell B5000 MCU
 
 TODO:
+- only one device dumped (Rockwell 8R) and it doesn't work at all
+- is unmapped ram mirrored? (that goes for subdevices too)
 - fix digit segment decoder, there should be a minus sign in it
 
 */
@@ -31,7 +33,8 @@ b5000_cpu_device::b5000_cpu_device(const machine_config &mconfig, const char *ta
 // internal memory maps
 void b5000_cpu_device::program_448x8(address_map &map)
 {
-	map(0x000, 0x1ff).rom();
+	map(0x000, 0x07f).rom();
+	map(0x0c0, 0x1ff).rom();
 }
 
 void b5000_cpu_device::data_45x4(address_map &map)
