@@ -25,6 +25,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_sensor(*this, "sensor")
+		, m_nt_page(*this, "nt_page%u", 0U)
 		, m_prg_banks(*this, "prg%u", 0U)
 		, m_prg_view(*this, "prg_view")
 		, m_vrom_region(*this, "gfx2")
@@ -86,8 +87,6 @@ private:
 	void pc10_in0_w(uint8_t data);
 	uint8_t pc10_in0_r();
 	uint8_t pc10_in1_r();
-	void pc10_nt_w(offs_t offset, uint8_t data);
-	uint8_t pc10_nt_r(offs_t offset);
 	void pc10_chr_w(offs_t offset, uint8_t data);
 	uint8_t pc10_chr_r(offs_t offset);
 	void mmc1_rom_switch_w(offs_t offset, uint8_t data);
@@ -153,6 +152,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<nes_zapper_sensor_device> m_sensor;
 
+	required_memory_bank_array<4> m_nt_page;
+	std::unique_ptr<u8[]> m_nt_ram;
+	std::unique_ptr<u8[]> m_cart_nt_ram;
+
 	void init_prg_banking();
 	void prg32(int bank);
 	void prg16(int slot, int bank);
@@ -182,9 +185,6 @@ private:
 	int m_MMC2_bank_latch[2];
 	uint8_t* m_vrom;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t* m_nametable[4];
-	std::unique_ptr<uint8_t[]> m_nt_ram;
-	std::unique_ptr<uint8_t[]> m_cart_nt_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;

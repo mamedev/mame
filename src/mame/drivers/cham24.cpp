@@ -72,6 +72,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
+		m_nt_page(*this, "nt_page%u", 0U),
 		m_prg_banks(*this, "prg%u", 0U),
 		m_chr_bank(*this, "chr")
 	{ }
@@ -86,19 +87,17 @@ private:
 	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
+	required_memory_bank_array<4> m_nt_page;
 	required_memory_bank_array<2> m_prg_banks;
 	required_memory_bank m_chr_bank;
 
 	uint8_t m_prg_chunks;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
-	uint8_t* m_nt_page[4];
 	uint32_t m_in_0;
 	uint32_t m_in_1;
 	uint32_t m_in_0_shift;
 	uint32_t m_in_1_shift;
-	void nt_w(offs_t offset, uint8_t data);
-	uint8_t nt_r(offs_t offset);
 	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t cham24_IN0_r();
 	void cham24_IN0_w(uint8_t data);
@@ -111,49 +110,20 @@ private:
 
 
 
-void cham24_state::cham24_set_mirroring( int mirroring )
+void cham24_state::cham24_set_mirroring(int mirroring)
 {
-	switch(mirroring)
+	switch (mirroring)
 	{
-	case PPU_MIRROR_LOW:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
-		break;
-	case PPU_MIRROR_HIGH:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_HORZ:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get();
-		m_nt_page[2] = m_nt_ram.get() + 0x400;
-		m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_VERT:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get() + 0x400;
-		m_nt_page[2] = m_nt_ram.get();
-		m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_NONE:
-	default:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get() + 0x400;
-		m_nt_page[2] = m_nt_ram.get() + 0x800;
-		m_nt_page[3] = m_nt_ram.get() + 0xc00;
-		break;
+		case PPU_MIRROR_HORZ:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(BIT(i, 1));
+			break;
+		case PPU_MIRROR_VERT:
+		default:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(i & 1);
+			break;
 	}
-}
-
-void cham24_state::nt_w(offs_t offset, uint8_t data)
-{
-	int page = ((offset & 0xc00) >> 10);
-	m_nt_page[page][offset & 0x3ff] = data;
-}
-
-uint8_t cham24_state::nt_r(offs_t offset)
-{
-	int page = ((offset & 0xc00) >> 10);
-	return m_nt_page[page][offset & 0x3ff];
-
 }
 
 void cham24_state::sprite_dma_w(address_space &space, uint8_t data)
@@ -221,7 +191,10 @@ void cham24_state::cham24_map(address_map &map)
 void cham24_state::cham24_ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_chr_bank);
-	map(0x2000, 0x3eff).rw(FUNC(cham24_state::nt_r), FUNC(cham24_state::nt_w));
+	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
+	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
+	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
+	map(0x2c00, 0x2fff).mirror(0x1000).bankrw(m_nt_page[3]);
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
@@ -250,8 +223,9 @@ INPUT_PORTS_END
 
 void cham24_state::machine_start()
 {
-	// need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+	for (int i = 0; i < 4; i++)
+		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	// set up code banking to be done in 16K chunks
 	m_prg_chunks = memregion("user1")->bytes() / 0x4000;
@@ -269,10 +243,7 @@ void cham24_state::machine_reset()
 	m_prg_banks[1]->set_entry(m_prg_chunks - 2);
 	m_chr_bank->set_entry(0);
 
-	m_nt_page[0] = m_nt_ram.get();
-	m_nt_page[1] = m_nt_ram.get() + 0x400;
-	m_nt_page[2] = m_nt_ram.get() + 0x800;
-	m_nt_page[3] = m_nt_ram.get() + 0xc00;
+	cham24_set_mirroring(PPU_MIRROR_VERT);
 }
 
 
