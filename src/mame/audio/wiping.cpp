@@ -2,9 +2,15 @@
 // copyright-holders:Allard van der Bas
 /***************************************************************************
 
-    Wiping sound driver (quick hack of the Namco sound driver)
+    Wiping sound driver
+
+    Nichibutsu / Woodplace Inc. custom part?
 
     used by wiping.cpp and clshroad.cpp
+
+    TODO:
+    - Identify actual part, sound device was originally based off
+      Namco customs (on which involvement seems pretty thin here);
 
 ***************************************************************************/
 
@@ -17,8 +23,8 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
-	m_sound_prom(nullptr),
-	m_sound_rom(nullptr),
+	m_sound_prom(*this, "soundproms"),
+	m_sound_rom(*this, "samples"),
 	m_num_voices(0),
 	m_sound_enable(0),
 	m_stream(nullptr)
@@ -37,17 +43,14 @@ void wiping_sound_device::device_start()
 	wp_sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = stream_alloc(0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()); // 48000 Hz
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer.resize(clock()/2);
+	m_mixer_buffer.resize(clock());
 
 	/* extract globals from the interface */
 	m_num_voices = 8;
 	m_last_channel = m_channel_list + m_num_voices;
-
-	m_sound_rom = machine().root_device().memregion("samples")->base();
-	m_sound_prom = machine().root_device().memregion("soundproms")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = 1;
@@ -63,14 +66,11 @@ void wiping_sound_device::device_start()
 
 	save_item(NAME(m_soundregs));
 
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
-		save_item(NAME(m_channel_list[i].frequency), i);
-		save_item(NAME(m_channel_list[i].counter), i);
-		save_item(NAME(m_channel_list[i].volume), i);
-		save_item(NAME(m_channel_list[i].oneshot), i);
-		save_item(NAME(m_channel_list[i].oneshotplaying), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, counter));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, oneshot));
+	save_item(STRUCT_MEMBER(m_channel_list, oneshotplaying));
 }
 
 /********************************************************************************/

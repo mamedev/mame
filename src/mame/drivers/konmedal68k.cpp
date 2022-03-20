@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class konmedal68k_state : public driver_device
 {
 public:
@@ -43,13 +46,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_ymz(*this, "ymz")
+		m_ymz(*this, "ymz"),
+		m_vbl_scanline(240)
 	{ }
 
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
-	void slot(machine_config &config);
+	void pwrchanc(machine_config &config);
 	void spcpokan(machine_config &config);
 	void gs662(machine_config &config);
 
@@ -58,9 +63,32 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	void common_main(address_map &map);
+
+	uint16_t vrom_r(offs_t offset)
+	{
+		if (m_control2 & 0x10)
+		{
+			offset |= 0x1000;
+		}
+
+		return m_k056832->piratesh_rom_r(offset);
+	}
+
+	virtual void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int i);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k055555_device> m_k055555;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ymz280b_device> m_ymz;
+
+	int m_vbl_scanline;
+
 private:
-	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
+	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -81,15 +109,6 @@ private:
 	}
 	void control2_w(uint16_t data) { m_control2 = data & 0xff; }
 
-	uint16_t vrom_r(offs_t offset)
-	{
-		if (m_control2 & 0x10)
-		{
-			offset |= 0x1000;
-		}
-
-		return m_k056832->piratesh_rom_r(offset);
-	}
 
 	uint16_t vrom_spcpokan_r(offs_t offset)
 	{
@@ -114,22 +133,34 @@ private:
 		return m_k056832->rom_word_r(offset);
 	}
 
-	void common_main(address_map &map);
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
-	void slot_main(address_map &map);
+	void pwrchanc_main(address_map &map);
 	void spcpokan_main(address_map &map);
 	void gs662_main(address_map &map);
 
 	static constexpr int NUM_LAYERS = 4;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k055555_device> m_k055555;
-	required_device<palette_device> m_palette;
-	required_device<ymz280b_device> m_ymz;
 
 	u8 m_control, m_control2;
+};
+
+class konmedal68k_slot_state : public konmedal68k_state
+{
+public:
+	konmedal68k_slot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		konmedal68k_state(mconfig, type, tag)
+	{ }
+
+	void slot(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+	virtual void tilemap_draw(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int layer, int i) override;
+
+private:
+	void slot_main(address_map &map);
 };
 
 void konmedal68k_state::video_start()
@@ -138,19 +169,30 @@ void konmedal68k_state::video_start()
 	m_k056832->set_layer_offs(1, 12, 8);    // konami logo on title screen
 	m_k056832->set_layer_offs(2, 6, -8);
 	m_k056832->set_layer_offs(3, 6, -8);
+	m_vbl_scanline = 240;
 }
+
+void konmedal68k_slot_state::video_start()
+{
+	m_k056832->set_layer_offs(0, 0, -11);
+	m_k056832->set_layer_offs(1, 2, -11); // overlay for moving parts
+	m_k056832->set_layer_offs(2, 4, -11); // main layer?
+	m_k056832->set_layer_offs(3, 6, -11);
+	m_vbl_scanline = 480;
+}
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(konmedal68k_state::scanline)
 {
 	int scanline = param;
 
-	if ((scanline == 240) && (m_control & 0x8))
+	if ((scanline == m_vbl_scanline) && (m_control & 0x8))
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 
 	}
 
-	if ((scanline == 255) && (m_control & 0x10))
+	if ((scanline == m_vbl_scanline+15) && (m_control & 0x10))
 	{
 		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
@@ -161,7 +203,7 @@ K056832_CB_MEMBER(konmedal68k_state::tile_callback)
 }
 
 // modified from version in mame/video/k054338.cpp
-void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode)
+void konmedal68k_state::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pen_idx, int mode)
 {
 	if ((mode & 0x02) == 0) // solid fill
 	{
@@ -169,8 +211,9 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 	else
 	{
-		uint16_t *dst_ptr = &bitmap.pix(cliprect.min_y);
+		uint32_t *dst_ptr = &bitmap.pix(cliprect.min_y);
 		int const dst_pitch = bitmap.rowpixels();
+		pen_t const *const paldata = m_palette->pens();
 
 		if ((mode & 0x01) == 0) // vertical gradient fill
 		{
@@ -179,7 +222,7 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 			{
 				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{
-					dst_ptr[x] = pen_idx;
+					dst_ptr[x] = paldata[pen_idx];
 				}
 
 				pen_idx++;
@@ -194,7 +237,7 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 			{
 				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{
-					dst_ptr[x] = pen_idx;
+					dst_ptr[x] = paldata[pen_idx];
 				}
 				dst_ptr += dst_pitch;
 			}
@@ -202,7 +245,18 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 }
 
-uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void konmedal68k_state::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int i)
+{
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, 0, 1 << i);
+}
+
+void konmedal68k_slot_state::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int i)
+{
+	m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, layer, 0, 1 << i);
+}
+
+
+uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int order[4] = { 3, 2, 0, 1 };
 	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
@@ -217,7 +271,7 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 
 		if (enables & (K55_INP_VRAM_A << layer))
 		{
-			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, 0, 1 << i);
+			tilemap_draw(screen, bitmap, cliprect, layer, 1 << i);
 		}
 	}
 
@@ -264,14 +318,26 @@ void konmedal68k_state::koropens_main(address_map &map)
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_koropens_r));
 }
 
-void konmedal68k_state::slot_main(address_map &map)
+void konmedal68k_state::pwrchanc_main(address_map &map)
+{
+	koropens_main(map);
+	map(0xa04000, 0xa05fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa06000, 0xa07fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+}
+
+void konmedal68k_slot_state::slot_main(address_map &map)
 {
 	common_main(map);
+
+	// 900000 region more per-game I/O?
+
 	map(0xb00000, 0xb03fff).ram().lrw16(
 		NAME([this](offs_t offset) -> u16 { return (offset & 1) ? m_palette->read16(offset / 2) : 0; }),
 		NAME([this](offs_t offset, u16 data) { if (offset & 1) m_palette->write16(offset / 2, data); })
 	).share("palette");
-	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
+	map(0xb04000, 0xb0ffff).ram();
+
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_slot_state::vrom_r));
 }
 
 void konmedal68k_state::gs662_main(address_map &map)
@@ -364,6 +430,183 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kattobas )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x1000, 0x0000, "Player Assist" )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x2000, 0x0000, "Start Time" )         PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x0000, "Quick" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Normal ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spcpokan )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x3000, 0x0000, "Play Timer" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x0000, "36 sec" )
+	PORT_DIPSETTING(    0x1000, "30 sec" )
+	PORT_DIPSETTING(    0x2000, "24 sec" )
+	PORT_DIPSETTING(    0x3000, "18 sec" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( crossmg2 )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0000, "IN1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("OUT")
+	//PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0000, "DSW" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 void konmedal68k_state::machine_start()
 {
 	save_item(NAME(m_control));
@@ -385,13 +628,12 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.62);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(40, 400-1, 16, 240-1);
-	screen.set_screen_update(FUNC(konmedal68k_state::screen_update_konmedal68k));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.62);  /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 400-1, 16, 240-1);
+	m_screen->set_screen_update(FUNC(konmedal68k_state::screen_update_konmedal68k));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 8192).enable_shadows();
 
@@ -407,8 +649,8 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	YMZ280B(config, m_ymz, XTAL(33'868'800)/2); // 33.8688 MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "lspeaker", 0.75);
+	m_ymz->add_route(1, "rspeaker", 0.75);
 }
 
 void konmedal68k_state::koropens(machine_config &config)
@@ -417,6 +659,13 @@ void konmedal68k_state::koropens(machine_config &config)
 
 	M68000(config.replace(), m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
+}
+
+void konmedal68k_state::pwrchanc(machine_config &config)
+{
+	koropens(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::pwrchanc_main);
 }
 
 void konmedal68k_state::spcpokan(machine_config &config)
@@ -441,19 +690,21 @@ void konmedal68k_state::gs662(machine_config &config)
 	screen.set_size(64 * 8, 32 * 8);
 	screen.set_visarea(0, 360 - 1, 16, 240 - 1);
 	screen.set_screen_update(FUNC(konmedal68k_state::screen_update_konmedal68k));
-	screen.set_palette("palette");
 
 	PALETTE(config.replace(), "palette").set_format(palette_device::xBGR_888, 32768).enable_shadows();
 }
 
-void konmedal68k_state::slot(machine_config &config)
+void konmedal68k_slot_state::slot(machine_config &config)
 {
 	kzaurus(config);
 
 	M68000(config.replace(), m_maincpu, XTAL(33'868'800) / 4);    // 33.8688 MHz crystal verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::slot_main);
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_slot_state::slot_main);
 
 	PALETTE(config.replace(), "palette").set_format(palette_device::xBGR_444, 4096).enable_shadows();
+
+	m_screen->set_size(64*8, 64*8);
+	m_screen->set_visarea(40, 360-1, 16, 62*8-1);
 }
 
 ROM_START( kzaurus )
@@ -550,7 +801,7 @@ ROM_START(spcpokan)
 	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
 ROM_END
 
-ROM_START(unkkonmd)
+ROM_START(unkkonmd) // probably Dragon Palace
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP("662-unk-2n.bin", 0x000000, 0x080000, CRC(e6168538) SHA1(093153adc97bc4add67bb1477b9ad3b25fee26f0))
 
@@ -562,9 +813,9 @@ ROM_START(unkkonmd)
 	ROM_LOAD("662-unk-2d.bin", 0x000000, 0x080000, CRC(8133c41c) SHA1(c0ee21d3d8def86221ef9be008b910d1a58796b0))
 ROM_END
 
-// GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
+// GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM
 // at 1st boot press Service1 to initialise NVRAM
-ROM_START( konslot )
+ROM_START( crossmg2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "669-a05-2n.bin", 0x000000, 0x080000, CRC(3330848e) SHA1(24c2ac03fe5d099659081d1f9611c707c746c768) )
 
@@ -575,7 +826,7 @@ ROM_START( konslot )
 	ROM_LOAD( "669-a01-2d.bin", 0x000000, 0x080000, CRC(08438dad) SHA1(b4ef8fc37deca5b6537cc581fc99968c86e6ec2c) )
 ROM_END
 
-ROM_START( konslot2 )
+ROM_START( fruitsmg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "660-a05.2n", 0x000000, 0x080000, CRC(d7460250) SHA1(490588181b3b558e03752f4c6cbdadb807b990b3) )
 
@@ -587,14 +838,18 @@ ROM_START( konslot2 )
 	ROM_LOAD( "660-a02.1f", 0x080000, 0x080000, CRC(e3199b0d) SHA1(8805be14388c73c5a8e0b2eb98fb8efb5def1714) )
 ROM_END
 
+} // Anonymous namespace
 
-GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, konslot,  0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, konslot2, 0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, unkkonmd, 0, gs662,    kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, spcpokan, 0, spcpokan, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+
+GAME( 1995, kzaurus,  0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dobouchn, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, unkkonmd, 0, gs662,    kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1997, koropens, 0, koropens, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+
+// Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors.
+GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
+GAME( 1996, fruitsmg,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Fruits Magic - The Magic Party", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )

@@ -79,7 +79,7 @@ To summarize, known MCU chip ROM serials+year:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

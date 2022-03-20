@@ -1512,8 +1512,9 @@ void r4000_base_device::cp0_tlbr()
 
 		m_cp0[CP0_PageMask] = entry.mask;
 		m_cp0[CP0_EntryHi] = entry.vpn;
-		m_cp0[CP0_EntryLo0] = entry.pfn[0];
-		m_cp0[CP0_EntryLo1] = entry.pfn[1];
+		u64 const global = (entry.vpn & EH_G) ? EL_G : 0x0;
+		m_cp0[CP0_EntryLo0] = entry.pfn[0] | global;
+		m_cp0[CP0_EntryLo1] = entry.pfn[1] | global;
 	}
 }
 

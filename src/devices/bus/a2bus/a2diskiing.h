@@ -14,9 +14,13 @@
 #pragma once
 
 #include "a2bus.h"
-#include "imagedev/floppy.h"
-#include "formats/flopimg.h"
+#include "a2diskii.h"
+
 #include "machine/wozfdc.h"
+#include "imagedev/floppy.h"
+
+#include "formats/flopimg.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,6 +58,8 @@ class a2bus_diskiing_device: public diskiing_device
 {
 public:
 	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &A2BUS_DISKII; }
 };
 
 class a2bus_diskiing13_device: public diskiing_device

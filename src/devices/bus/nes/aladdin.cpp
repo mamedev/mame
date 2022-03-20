@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(NES_ALADDIN_SLOT, nes_aladdin_slot_device, "nes_ade_slot", "N
 
 nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_ALADDIN_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<aladdin_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -141,16 +141,16 @@ std::string nes_aladdin_slot_device::get_default_card_software(get_default_card_
 {
 	if (hook.image_file())
 	{
-		const char *slot_string = "algn";
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		uint8_t mapper;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		mapper = (rom[6] & 0xf0) >> 4;
-		mapper |= rom[7] & 0xf0;
+		uint8_t const mapper = ((rom[6] & 0xf0) >> 4) | (rom[7] & 0xf0);
 
+		const char *slot_string = "algn";
 //      if (mapper == 71)
 //          slot_string = "algn";
 		if (mapper == 232)
@@ -158,8 +158,8 @@ std::string nes_aladdin_slot_device::get_default_card_software(get_default_card_
 
 		return std::string(slot_string);
 	}
-	else
-		return software_get_default_slot("algn");
+
+	return software_get_default_slot("algn");
 }
 
 

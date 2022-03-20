@@ -18,7 +18,7 @@ struct mame_formats_enumerator {
 	virtual void category(const char *name) = 0;
 	virtual void add(const cassette_image::Format *const *formats) = 0;
 	virtual void add(floppy_format_type format) = 0;
-	virtual void add(const filesystem_manager_t &fs) = 0;
+	virtual void add(const fs::manager_t &fs) = 0;
 };
 
 void mame_formats_full_list(mame_formats_enumerator &en);

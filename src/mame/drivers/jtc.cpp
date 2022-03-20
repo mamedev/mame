@@ -56,7 +56,7 @@ protected:
 	u8 p3_r();
 	void p3_w(u8 data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -106,7 +106,7 @@ private:
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);
 	void banksel_w(u8 data);
-	u8 m_video_bank;
+	u8 m_video_bank = 0U;
 
 	memory_share_creator<uint8_t> m_video_ram_40;
 	memory_share_creator<uint8_t> m_color_ram_r;
@@ -597,22 +597,22 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 	{
 		if (quick_length < 0x0088)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.seterror(image_error::INVALIDIMAGE, "File too short");
 			image.message(" File too short");
 		}
 		else
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
 		{
 			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread( &quick_data[0], quick_length);
+			u16 read_ = image.fread(&quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else
@@ -621,7 +621,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
 				if (image.length() != quick_length)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid file header");
+					image.seterror(image_error::INVALIDIMAGE, "Invalid file header");
 					image.message(" Invalid file header");
 				}
 				else
@@ -643,7 +643,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
@@ -652,7 +652,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 			u16 read_ = image.fread( &quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else

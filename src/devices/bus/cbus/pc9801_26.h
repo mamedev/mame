@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+    NEC PC-9801-26 sound card
 
 ***************************************************************************/
 
@@ -39,12 +39,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual u16 read_io_base() override;
 
 private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2203_device>  m_opn;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	u32 m_rom_base;
 };
 
 

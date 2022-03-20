@@ -1261,6 +1261,18 @@ a certain item) -->
 		</part>
 	</software>
 
+<!-- This prototype doesn't work on real hardware, nor in MAME, due to a timing issue in its initialization code. It can be made to work by changing the instruction at $02E41 (EI) to 0x00 (NOP). -->
+	<software name="brkthru" supported="no">
+		<description>BreakThru! (prototype)</description>
+		<year>1994</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="breakthru [proto].bin" size="131072" crc="64d7a694" sha1="571bd543320bc67c4103630c804705955bc5250a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobl">
 		<description>Bubble Bobble (Euro, USA)</description>
 		<year>1994</year>
@@ -8821,6 +8833,18 @@ a certain item) -->
 			<feature name="ic1" value="MPR-15665" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15665.ic1" size="524288" crc="0b618409" sha1="2804b355347bda6e2903078ba30ed6b3a289ebba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sor2p" cloneof="sor2">
+		<description>Streets of Rage II ~ Bare Knuckle II - Shitou e no Chingonka (prototype)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="streets of rage ii [proto].bin" size="524288" crc="6c395a69" sha1="15589214eb8570c9b2bf2ede14803d08c77c29f8"/>
 			</dataarea>
 		</part>
 	</software>

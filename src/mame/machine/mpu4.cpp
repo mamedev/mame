@@ -693,7 +693,7 @@ void mpu4_state::ic24_setup()
 }
 
 
-void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -796,9 +796,9 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	{
 		m_ic4_input_b |= 0x02; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
 	}
-	#ifdef UNUSED_FUNCTION
+#if 0
 	if ( lamp_undercurrent ) m_ic4_input_b |= 0x01;
-	#endif
+#endif
 
 	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",machine().describe_context(),m_ic4_input_b));
 	return m_ic4_input_b;

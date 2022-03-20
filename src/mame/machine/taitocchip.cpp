@@ -12,7 +12,7 @@ Chip contains 4 dies:
 1 - uPD78C11 MCU w/ 4kx8 mask rom (assumed to be the same between games)
 2 - uPD27C64 8kx8 EPROM (assumed to be different between games)
 3 - uPD4464 8kx8 SRAM
-4 - ASIC of some sort
+4 - ASIC (NEC ULA)
 
 
                          +---------\_/---------+

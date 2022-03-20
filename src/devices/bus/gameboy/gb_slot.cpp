@@ -138,7 +138,7 @@ void device_gb_cart_interface::ram_map_setup(uint8_t banks)
 //-------------------------------------------------
 gb_cart_slot_device_base::gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_gb_cart_interface>(mconfig, *this),
 	m_type(GB_MBC_UNKNOWN),
 	m_cart(nullptr)
@@ -267,7 +267,7 @@ image_init_result gb_cart_slot_device_base::call_load()
 			/* Verify that the file contains 16kb blocks */
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size\n");
+				seterror(image_error::INVALIDIMAGE, "Invalid ROM file size\n");
 				return image_init_result::FAIL;
 			}
 		}
@@ -584,21 +584,21 @@ std::string gb_cart_slot_device_base::get_default_card_software(get_default_card
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size(), offset = 0;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
+		uint32_t offset = 0;
 		if ((len % 0x4000) == 512)
 			offset = 512;
-
 		if (get_mmm01_candidate(&rom[offset], len - offset))
 			offset += (len - 0x8000);
 
-		type = get_cart_type(&rom[offset], len - offset);
-		slot_string = gb_get_slot(type);
+		int const type = get_cart_type(&rom[offset], len - offset);
+		char const *const slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

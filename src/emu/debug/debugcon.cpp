@@ -10,13 +10,20 @@
 
 #include "emu.h"
 #include "debugcon.h"
+
 #include "debugcpu.h"
 #include "debugvw.h"
 #include "textbuf.h"
+
 #include "debugger.h"
+#include "fileio.h"
+
 #include "corestr.h"
+
 #include <cctype>
 #include <fstream>
+#include <iterator>
+
 
 /***************************************************************************
     CONSTANTS
@@ -65,8 +72,8 @@ debugger_console::debugger_console(running_machine &machine)
 	m_machine.add_logerror_callback(std::bind(&debugger_console::errorlog_write_line, this, _1));
 
 	/* register our own custom-command help */
-	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
-	register_command("condump", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_console::execute_condump, this, _1, _2));
+	register_command("helpcustom", CMDFLAG_NONE, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1));
+	register_command("condump", CMDFLAG_NONE, 1, 1, std::bind(&debugger_console::execute_condump, this, _1));
 
 	/* first CPU is visible by default */
 	for (device_t &device : device_enumerator(m_machine.root_device()))
@@ -80,10 +87,14 @@ debugger_console::debugger_console(running_machine &machine)
 	}
 }
 
+debugger_console::~debugger_console()
+{
+}
 
-/*-------------------------------------------------
-    exit - frees the console system
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  exit - frees the console system
+//-------------------------------------------------
 
 void debugger_console::exit()
 {
@@ -106,28 +117,41 @@ void debugger_console::exit()
 
 ***************************************************************************/
 
-debugger_console::debug_command::debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler)
-	: params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), ref(_ref), minparams(_minparams), maxparams(_maxparams)
+inline bool debugger_console::debug_command::compare::operator()(const debug_command &a, const debug_command &b) const
 {
-	strcpy(command, _command);
+	return a.command < b.command;
+}
+
+inline bool debugger_console::debug_command::compare::operator()(const char *a, const debug_command &b) const
+{
+	return strcmp(a, b.command.c_str()) < 0;
+}
+
+inline bool debugger_console::debug_command::compare::operator()(const debug_command &a, const char *b) const
+{
+	return strcmp(a.command.c_str(), b) < 0;
 }
 
 
-/*------------------------------------------------------------
-    execute_help_custom - execute the helpcustom command
-------------------------------------------------------------*/
-
-void debugger_console::execute_help_custom(int ref, const std::vector<std::string> &params)
+debugger_console::debug_command::debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler)
+	: command(_command), params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), minparams(_minparams), maxparams(_maxparams)
 {
-	char buf[64];
+}
+
+
+//------------------------------------------------------------
+//  execute_help_custom - execute the helpcustom command
+//------------------------------------------------------------
+
+void debugger_console::execute_help_custom(const std::vector<std::string> &params)
+{
 	for (const debug_command &cmd : m_commandlist)
 	{
 		if (cmd.flags & CMDFLAG_CUSTOM_HELP)
 		{
-			snprintf(buf, 63, "%s help", cmd.command);
-			buf[63] = 0;
-			char *temp_params[1] = { buf };
-			internal_execute_command(true, 1, &temp_params[0]);
+			std::string buf = cmd.command + " help";
+			std::vector<std::string_view> temp_params = { buf };
+			internal_execute_command(true, temp_params);
 		}
 	}
 }
@@ -136,7 +160,7 @@ void debugger_console::execute_help_custom(int ref, const std::vector<std::strin
     execute_condump - execute the condump command
 ------------------------------------------------------------*/
 
-void debugger_console::execute_condump(int ref, const std::vector<std::string>& params)
+void debugger_console::execute_condump(const std::vector<std::string>& params)
 {
 	std::string filename = params[0];
 	const char* mode;
@@ -181,169 +205,145 @@ symbol_table &debugger_console::visible_symtable()
 
 
 
-/*-------------------------------------------------
-    trim_parameter - executes a
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  trim_parameter - trim spaces and quotes around
+//  a command parameter
+//-------------------------------------------------
 
-void debugger_console::trim_parameter(char **paramptr, bool keep_quotes)
+std::string_view debugger_console::trim_parameter(std::string_view param, bool keep_quotes)
 {
-	char *param = *paramptr;
-	size_t len = strlen(param);
+	std::string_view::size_type len = param.length();
 	bool repeat;
 
-	/* loop until all adornments are gone */
+	// loop until all adornments are gone
 	do
 	{
 		repeat = false;
 
-		/* check for begin/end quotes */
+		// check for begin/end quotes
 		if (len >= 2 && param[0] == '"' && param[len - 1] == '"')
 		{
 			if (!keep_quotes)
 			{
-				param[len - 1] = 0;
-				param++;
+				param = param.substr(1, len - 2);
 				len -= 2;
 			}
 		}
 
-		/* check for start/end braces */
+		// check for start/end braces
 		else if (len >= 2 && param[0] == '{' && param[len - 1] == '}')
 		{
-			param[len - 1] = 0;
-			param++;
+			param = param.substr(1, len - 2);
 			len -= 2;
 			repeat = true;
 		}
 
-		/* check for leading spaces */
+		// check for leading spaces
 		else if (len >= 1 && param[0] == ' ')
 		{
-			param++;
+			param.remove_prefix(1);
 			len--;
 			repeat = true;
 		}
 
-		/* check for trailing spaces */
+		// check for trailing spaces
 		else if (len >= 1 && param[len - 1] == ' ')
 		{
-			param[len - 1] = 0;
+			param.remove_suffix(1);
 			len--;
 			repeat = true;
 		}
 	} while (repeat);
 
-	*paramptr = param;
+	return param;
 }
 
 
-/*-------------------------------------------------
-    internal_execute_command - executes a
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  internal_execute_command - executes a
+//  command
+//-------------------------------------------------
 
-CMDERR debugger_console::internal_execute_command(bool execute, int params, char **param)
+CMDERR debugger_console::internal_execute_command(bool execute, std::vector<std::string_view> &params)
 {
-	int i, foundcount = 0;
-	char *p, *command;
-	size_t len;
-
-	/* no params is an error */
-	if (params == 0)
+	// no params is an error
+	if (params.empty())
 		return CMDERR::none();
 
-	/* the first parameter has the command and the real first parameter; separate them */
-	for (p = param[0]; *p && isspace(u8(*p)); p++) { }
-	for (command = p; *p && !isspace(u8(*p)); p++) { }
-	if (*p != 0)
-	{
-		*p++ = 0;
-		for ( ; *p && isspace(u8(*p)); p++) { }
-		if (*p != 0)
-			param[0] = p;
-		else
-			params = 0;
-	}
+	// the first parameter has the command and the real first parameter; separate them
+	std::string_view command_param = params[0];
+	std::string_view::size_type pos = 0;
+	while (pos < command_param.length() && !isspace(u8(command_param[pos])))
+		pos++;
+	const std::string command(strmakelower(command_param.substr(0, pos)));
+	while (pos < command_param.length() && isspace(u8(command_param[pos])))
+		pos++;
+	if (pos == command_param.length() && params.size() == 1)
+		params.clear();
 	else
+		params[0].remove_prefix(pos);
+
+	// search the command list
+	auto const found = m_commandlist.lower_bound(command.c_str());
+
+	// error if not found
+	if (m_commandlist.end() == found || std::string_view(command) != std::string_view(found->command).substr(0, command.length()))
+		return CMDERR::unknown_command(0);
+	if (found->command.length() > command.length())
 	{
-		params = 0;
-		param[0] = nullptr;
+		auto const next = std::next(found);
+		if (m_commandlist.end() != next && std::string_view(command) == std::string_view(next->command).substr(0, command.length()))
+			return CMDERR::ambiguous_command(0);
 	}
 
-	/* search the command list */
-	len = strlen(command);
-	debug_command *found = nullptr;
-	for (debug_command &cmd : m_commandlist)
-		if (!core_strnicmp(command, cmd.command, len))
-		{
-			foundcount++;
-			found = &cmd;
-			if (strlen(cmd.command) == len)
-			{
-				foundcount = 1;
-				break;
-			}
-		}
+	// now go back and trim quotes and braces and any spaces they reveal
+	for (std::string_view &param : params)
+		param = trim_parameter(param, found->flags & CMDFLAG_KEEP_QUOTES);
 
-	/* error if not found */
-	if (!found)
-		return CMDERR::unknown_command(0);
-	if (foundcount > 1)
-		return CMDERR::ambiguous_command(0);
-
-	/* NULL-terminate and trim space around all the parameters */
-	for (i = 1; i < params; i++)
-		*param[i]++ = 0;
-
-	/* now go back and trim quotes and braces and any spaces they reveal*/
-	for (i = 0; i < params; i++)
-		trim_parameter(&param[i], found->flags & CMDFLAG_KEEP_QUOTES);
-
-	/* see if we have the right number of parameters */
-	if (params < found->minparams)
+	// see if we have the right number of parameters
+	if (params.size() < found->minparams)
 		return CMDERR::not_enough_params(0);
-	if (params > found->maxparams)
+	if (params.size() > found->maxparams)
 		return CMDERR::too_many_params(0);
 
-	/* execute the handler */
+	// execute the handler
 	if (execute)
 	{
-		std::vector<std::string> params_vec(param, param + params);
-		found->handler(found->ref, params_vec);
+		std::vector<std::string> params_vec(params.begin(), params.end());
+		found->handler(params_vec);
 	}
 	return CMDERR::none();
 }
 
 
-/*-------------------------------------------------
-    internal_parse_command - parses a command
-    and either executes or just validates it
--------------------------------------------------*/
+//-------------------------------------------------
+//  internal_parse_command - parses a command
+//  and either executes or just validates it
+//-------------------------------------------------
 
-CMDERR debugger_console::internal_parse_command(const std::string &original_command, bool execute)
+CMDERR debugger_console::internal_parse_command(std::string_view command, bool execute)
 {
-	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
-	char *params[MAX_COMMAND_PARAMS] = { nullptr };
-	char *command_start;
-	char *p, c = 0;
+	std::string_view::size_type pos = 0;
+	std::string_view::size_type len = command.length();
 
-	/* make a copy of the command */
-	strcpy(command, original_command.c_str());
-
-	/* loop over all semicolon-separated stuff */
-	for (p = command; *p != 0; )
+	while (pos < len)
 	{
-		int paramcount = 0, parendex = 0;
+		std::string parens;
+		std::vector<std::string_view> params;
 		bool foundend = false, instring = false, isexpr = false;
 
-		/* find a semicolon or the end */
-		for (params[paramcount++] = p; !foundend; p++)
+		// skip leading spaces
+		while (pos < len && isspace(u8(command[pos])))
+			pos++;
+		std::string_view::size_type startpos = pos;
+
+		// find a semicolon or the end
+		for (params.push_back(command.substr(pos)); !foundend && pos < len; pos++)
 		{
-			c = *p;
+			char c = command[pos];
 			if (instring)
 			{
-				if (c == '"' && p[-1] != '\\')
+				if (c == '"' && command[pos - 1] != '\\')
 					instring = false;
 			}
 			else
@@ -353,47 +353,42 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 					case '"':   instring = true; break;
 					case '(':
 					case '[':
-					case '{':   parens[parendex++] = c; break;
-					case ')':   if (parendex == 0 || parens[--parendex] != '(') return CMDERR::unbalanced_parens(p - command); break;
-					case ']':   if (parendex == 0 || parens[--parendex] != '[') return CMDERR::unbalanced_parens(p - command); break;
-					case '}':   if (parendex == 0 || parens[--parendex] != '{') return CMDERR::unbalanced_parens(p - command); break;
-					case ',':   if (parendex == 0) params[paramcount++] = p; break;
-					case ';':   if (parendex == 0) foundend = true; break;
-					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = true; *p = c; break;
-					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = true; *p = c; break;
-					case '=':   if (parendex == 0 && paramcount == 1) isexpr = true; *p = c; break;
-					case 0:     foundend = true; break;
-					default:    *p = c; break;
+					case '{':   parens.push_back(c); break;
+					case ')':   if (parens.empty() || parens.back() != '(') return CMDERR::unbalanced_parens(pos); parens.pop_back(); break;
+					case ']':   if (parens.empty() || parens.back() != '[') return CMDERR::unbalanced_parens(pos); parens.pop_back(); break;
+					case '}':   if (parens.empty() || parens.back() != '{') return CMDERR::unbalanced_parens(pos); parens.pop_back(); break;
+					case ',':   if (parens.empty()) { params.back().remove_suffix(len - pos); params.push_back(command.substr(pos + 1)); } break;
+					case ';':   if (parens.empty()) { params.back().remove_suffix(len - pos); foundend = true; } break;
+					case '-':   if (parens.empty() && params.size() == 1 && pos > 0 && command[pos - 1] == '-') isexpr = true; break;
+					case '+':   if (parens.empty() && params.size() == 1 && pos > 0 && command[pos - 1] == '+') isexpr = true; break;
+					case '=':   if (parens.empty() && params.size() == 1) isexpr = true; break;
+					default:    break;
 				}
 			}
 		}
 
-		/* check for unbalanced parentheses or quotes */
+		// check for unbalanced parentheses or quotes
 		if (instring)
-			return CMDERR::unbalanced_quotes(p - command);
-		if (parendex != 0)
-			return CMDERR::unbalanced_parens(p - command);
+			return CMDERR::unbalanced_quotes(pos);
+		if (!parens.empty())
+			return CMDERR::unbalanced_parens(pos);
 
-		/* NULL-terminate if we ended in a semicolon */
-		p--;
-		if (c == ';') *p++ = 0;
+		// process the command
+		std::string_view command_or_expr = params[0];
 
-		/* process the command */
-		command_start = params[0];
-
-		/* allow for "do" commands */
-		if (tolower(u8(command_start[0])) == 'd' && tolower(u8(command_start[1])) == 'o' && isspace(u8(command_start[2])))
+		// allow for "do" commands
+		if (command_or_expr.length() > 3 && tolower(u8(command_or_expr[0])) == 'd' && tolower(u8(command_or_expr[1])) == 'o' && isspace(u8(command_or_expr[2])))
 		{
 			isexpr = true;
-			command_start += 3;
+			command_or_expr.remove_prefix(3);
 		}
 
-		/* if it smells like an assignment expression, treat it as such */
-		if (isexpr && paramcount == 1)
+		// if it smells like an assignment expression, treat it as such
+		if (isexpr && params.size() == 1)
 		{
 			try
 			{
-				parsed_expression(visible_symtable(), command_start).execute();
+				parsed_expression(visible_symtable(), command_or_expr).execute();
 			}
 			catch (expression_error &err)
 			{
@@ -402,29 +397,29 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 		}
 		else
 		{
-			const CMDERR result = internal_execute_command(execute, paramcount, &params[0]);
+			const CMDERR result = internal_execute_command(execute, params);
 			if (result.error_class() != CMDERR::NONE)
-				return CMDERR(result.error_class(), command_start - command);
+				return CMDERR(result.error_class(), startpos);
 		}
 	}
 	return CMDERR::none();
 }
 
 
-/*-------------------------------------------------
-    execute_command - execute a command string
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_command - execute a command string
+//-------------------------------------------------
 
-CMDERR debugger_console::execute_command(const std::string &command, bool echo)
+CMDERR debugger_console::execute_command(std::string_view command, bool echo)
 {
-	/* echo if requested */
+	// echo if requested
 	if (echo)
 		printf(">%s\n", command);
 
-	/* parse and execute */
+	// parse and execute
 	const CMDERR result = internal_parse_command(command, true);
 
-	/* display errors */
+	// display errors
 	if (result.error_class() != CMDERR::NONE)
 	{
 		if (!echo)
@@ -433,7 +428,7 @@ CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 		printf("%s\n", cmderr_to_string(result));
 	}
 
-	/* update all views */
+	// update all views
 	if (echo)
 	{
 		m_machine.debug_view().update_all();
@@ -443,11 +438,11 @@ CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 }
 
 
-/*-------------------------------------------------
-    validate_command - validate a command string
--------------------------------------------------*/
+//-------------------------------------------------
+//  validate_command - validate a command string
+//-------------------------------------------------
 
-CMDERR debugger_console::validate_command(const char *command)
+CMDERR debugger_console::validate_command(std::string_view command)
 {
 	return internal_parse_command(command, false);
 }
@@ -457,15 +452,16 @@ CMDERR debugger_console::validate_command(const char *command)
     register_command - register a command handler
 -------------------------------------------------*/
 
-void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
+void debugger_console::register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler)
 {
 	if (m_machine.phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");
 	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
 		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
-	assert(strlen(command) < 32);
-	m_commandlist.emplace_front(command, flags, ref, minparams, maxparams, handler);
+	auto const ins = m_commandlist.emplace(command, flags, minparams, maxparams, std::move(handler));
+	if (!ins.second)
+		osd_printf_error("error: Duplicate debugger command %s registered\n", command);
 }
 
 

@@ -25,7 +25,7 @@
 #include "bus/rs232/terminal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -99,7 +99,7 @@ private:
 	int m_signal_count;
 	uint8_t m_nmi_enabled;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -153,7 +153,7 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -467,7 +467,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
 				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)

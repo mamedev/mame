@@ -359,7 +359,6 @@ uint32_t v60_device::v60_update_psw_for_exception(int is_interrupt, int target_l
 uint32_t v60_device::opUNHANDLED()
 {
 	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(PC), PC);
-	//return 0; /* never reached, fatalerror won't return */
 }
 
 // Opcode jump table
@@ -497,7 +496,6 @@ void v60_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
-	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).callimport().formatstr("%7s").noshow();
 
 	set_icountptr(m_icount);

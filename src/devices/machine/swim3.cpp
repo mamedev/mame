@@ -300,7 +300,7 @@ void swim3_device::index_callback(floppy_image_device *floppy, int state)
 		run(false, true);
 	}
 }
-void swim3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void swim3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	sync();
 	run(true, false);

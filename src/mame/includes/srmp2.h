@@ -44,7 +44,7 @@ private:
 	uint8_t m_color_bank;
 	uint8_t m_gfx_bank;
 	uint8_t m_adpcm_bank;
-	uint8_t m_adpcm_data;
+	int16_t m_adpcm_data;
 	uint32_t m_adpcm_sptr;
 	uint32_t m_adpcm_eptr;
 	iox_t m_iox;

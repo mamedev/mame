@@ -36,12 +36,12 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SCANLINE:
-		scanline_timer_cb(ptr, param);
+		scanline_timer_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in midvunit_state::device_timer");
@@ -358,7 +358,7 @@ void midvunit_renderer::process_dma_queue()
 	}
 
 	/* set up the object data for this triangle */
-	midvunit_object_data &objectdata = object_data_alloc();
+	midvunit_object_data &objectdata = object_data().next();
 	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
 	objectdata.texbase = (uint8_t *)m_state.m_textureram.target() + (m_state.m_dma_data[14] * 256);
 	objectdata.pixdata = pixdata;

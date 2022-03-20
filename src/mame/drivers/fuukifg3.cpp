@@ -481,7 +481,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

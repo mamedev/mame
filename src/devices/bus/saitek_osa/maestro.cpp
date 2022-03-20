@@ -37,7 +37,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 DEFINE_DEVICE_TYPE(OSA_MAESTRO, saitekosa_maestro_device, "osa_maestro", "Maestro B-D")
@@ -224,10 +224,6 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 	// video hardware
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-
-	auto *screen = subdevice<screen_device>("^screen");
-	screen->set_size(6 * 16 + 3, 16);
-	screen->set_visarea_full();
 }
 
 

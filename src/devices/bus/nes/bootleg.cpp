@@ -13,6 +13,9 @@
 
  TODO:
  - review all PCBs and fix the starting banks (which are often the main problem of not working games)
+ - SMB2 bootlegs all seem to have timing issues. This is apparent on worlds A-D as the bottom of the
+   world letter scrolls. Hardware footage of the mapper 50 version shows the letter bottoms flickering
+   (though it could be a video/compression artifact).
 
  ***********************************************************************************************************/
 
@@ -37,17 +40,19 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_AX5705,         nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_SC127,          nes_sc127_device,     "nes_sc127",     "NES Cart SC-127 PCB")
 DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "NES Cart Mario Baby Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device,     "nes_smb3p",     "NES Cart Super Mario Bros. 3 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_BTL_CONTRAJ,    nes_btl_cj_device,    "nes_btl_cj",    "NES Cart Contra Japan Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "NES Cart DragonNinja Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_N32_4IN1,       nes_n32_4in1_device,  "nes_n32_4in1",  "NES Cart N-32 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_L001,           nes_l001_device,      "nes_l001",      "NES Cart L-001 PCB")
 DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "NES Cart Palthena no Kagami Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
@@ -58,27 +63,23 @@ DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "N
 DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
 DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH42,           nes_lh42_device,      "nes_lh42",      "NES Cart LH42 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH51,           nes_lh51_device,      "nes_lh51",      "NES Cart LH51 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH53 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "NES Cart AC08 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "NES Cart Super Mario Bros. Malee 2 Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
+DEFINE_DEVICE_TYPE(NES_YUNG08,         nes_yung08_device,    "nes_yung08",    "NES Cart Super Mario Bros. 2 YUNG-08 PCB")
 
-
-nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_AX5705, tag, owner, clock)
-{
-}
 
 nes_sc127_device::nes_sc127_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SC127, tag, owner, clock), m_irq_count(0), m_irq_enable(0)
 {
 }
 
-nes_mbaby_device::nes_mbaby_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_MARIOBABY, tag, owner, clock), m_latch(0), m_irq_enable(0), irq_timer(nullptr)
+nes_mbaby_device::nes_mbaby_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_MARIOBABY, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 {
 }
 
@@ -92,23 +93,38 @@ nes_smb3p_device::nes_smb3p_device(const machine_config &mconfig, const char *ta
 {
 }
 
+nes_btl_cj_device::nes_btl_cj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BTL_CONTRAJ, tag, owner, clock)
+{
+}
+
 nes_btl_dn_device::nes_btl_dn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BTL_DNINJA, tag, owner, clock), m_irq_count(0)
 {
 }
 
-nes_smb2j_device::nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_smb2j_device::nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SMB2J, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SMB2JA, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_SMB2JB, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bank67)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), m_bank67(bank67), irq_timer(nullptr)
+{
+}
+
+nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_smb2jb_device(mconfig, NES_SMB2JB, tag, owner, clock, 0x0f)
+{
+}
+
+nes_n32_4in1_device::nes_n32_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_smb2jb_device(mconfig, NES_N32_4IN1, tag, owner, clock, 0x07)
 {
 }
 
@@ -119,6 +135,11 @@ nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag,
 
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
+{
+}
+
+nes_l001_device::nes_l001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_L001, tag, owner, clock), m_irq_count(0), irq_timer(nullptr)
 {
 }
 
@@ -167,6 +188,11 @@ nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+nes_lh42_device::nes_lh42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_LH42, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_lg25_device::nes_lg25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_LG25, tag, owner, clock), m_latch(0)
 {
@@ -202,40 +228,18 @@ nes_mmalee_device::nes_mmalee_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_SHUIGUAN, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-{
-}
-
 nes_rt01_device::nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_RT01, tag, owner, clock)
 {
 }
 
-
-
-
-void nes_ax5705_device::device_start()
+nes_yung08_device::nes_yung08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_YUNG08, tag, owner, clock), m_irq_count(0), m_irq_latch(0), irq_timer(nullptr)
 {
-	common_start();
-	save_item(NAME(m_mmc_prg_bank));
-	save_item(NAME(m_mmc_vrom_bank));
 }
 
-void nes_ax5705_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 
-	m_mmc_prg_bank[0] = 0;
-	m_mmc_prg_bank[1] = 1;
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-	prg8_cd(0xfe);
-	prg8_ef(0xff);
 
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
 
 void nes_sc127_device::device_start()
 {
@@ -258,20 +262,20 @@ void nes_mbaby_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->reset();
-	timer_freq = clocks_to_attotime(24576);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
 	save_item(NAME(m_latch));
 }
 
 void nes_mbaby_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
+	m_irq_count = 0;
 	m_latch = 0;
 }
 
@@ -332,6 +336,12 @@ void nes_batmanfs_device::pcb_reset()
 	m_irq_count = 0;
 }
 
+void nes_btl_cj_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // Last 8K bank is fixed, the rest are swappable
+	chr8(0, CHRROM);
+}
+
 void nes_btl_dn_device::device_start()
 {
 	common_start();
@@ -360,12 +370,11 @@ void nes_smb2j_device::device_start()
 
 void nes_smb2j_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 	prg8_89(1);
 	prg8_ab(0);
-	prg8_cd(0);
+	prg8_cd(4);    // switchable bank
 	prg8_ef(9);
+	chr8(0, CHRROM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -383,12 +392,11 @@ void nes_smb2ja_device::device_start()
 
 void nes_smb2ja_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg8_89(0xfc);
-	prg8_ab(0xfd);
-	prg8_cd(0xfe);
-	prg8_ef(0xff);
-	chr8(0, m_chr_source);
+	prg8_89(4);
+	prg8_ab(5);
+	prg8_cd(0);    // switchable bank
+	prg8_ef(7);
+	chr8(0, CHRROM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -402,19 +410,29 @@ void nes_smb2jb_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_reg));
 }
 
 void nes_smb2jb_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg8_89(0x08);
 	prg8_ab(0x09);
-	prg8_cd(0);
+	prg8_cd(0);    // switchable bank
 	prg8_ef(0x0b);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_reg = 0;
+}
+
+void nes_n32_4in1_device::pcb_reset()
+{
+	// Powers up in menu, but soft reset does not touch banks (so each game returns to its own title). Is this correct?
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_reg = 0;
 }
 
 void nes_0353_device::device_start()
@@ -451,6 +469,23 @@ void nes_09034a_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_reg = 0;
+}
+
+void nes_l001_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_count));
+}
+
+void nes_l001_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);
+	chr8(0, CHRROM);
+
+	m_irq_count = 0;
 }
 
 void nes_palthena_device::device_start()
@@ -514,6 +549,21 @@ void nes_lh32_device::pcb_reset()
 	m_latch = 0xf;
 }
 
+void nes_lh42_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_lh42_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+}
+
 void nes_lg25_device::device_start()
 {
 	common_start();
@@ -547,11 +597,6 @@ void nes_lh10_device::pcb_reset()
 
 	m_latch = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
-}
-
-void nes_lh51_device::device_start()
-{
-	common_start();
 }
 
 void nes_lh51_device::pcb_reset()
@@ -625,30 +670,6 @@ void nes_mmalee_device::pcb_reset()
 	prg32(0);
 }
 
-void nes_shuiguan_device::device_start()
-{
-	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	// always running and checking for IRQ every 114 cycles? or resetting every frame?
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(114));
-
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_shuiguan_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32((m_prg_chunks << 1) - 1);
-	chr8(0, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_count = 0;
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
-
-
 void nes_rt01_device::device_start()
 {
 	common_start();
@@ -664,83 +685,32 @@ void nes_rt01_device::pcb_reset()
 	prg16_cdef(0);
 }
 
+void nes_yung08_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
+}
+
+void nes_yung08_device::pcb_reset()
+{
+	prg8_89(1);
+	prg8_ab(0);
+	prg8_cd(0);    // switchable bank
+	prg8_ef(8);
+	chr8(0, CHRROM);
+
+	m_irq_count = 0;
+	m_irq_latch = 0;
+}
+
 
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Board UNL-AX5705
-
- Games: Super Mario Bros. Pocker Mali (Crayon Shin-chan pirate hack)
-
- NES 2.0: mapper 530
-
- In MAME: Supported.
-
- -------------------------------------------------*/
-
-void nes_ax5705_device::set_prg()
-{
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-}
-
-void nes_ax5705_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t bank;
-	LOG_MMC(("ax5705 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x700f)
-	{
-		case 0x0000:
-			m_mmc_prg_bank[0] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-		case 0x0008:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x2000:
-			m_mmc_prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-			/* CHR banks 0, 1, 4, 5 */
-		case 0x2008:
-		case 0x200a:
-		case 0x4008:
-		case 0x400a:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x2009:
-		case 0x200b:
-		case 0x4009:
-		case 0x400b:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-			/* CHR banks 2, 3, 6, 7 */
-		case 0x4000:
-		case 0x4002:
-		case 0x6000:
-		case 0x6002:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x4001:
-		case 0x4003:
-		case 0x6001:
-		case 0x6003:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-	}
-}
 
 /*-------------------------------------------------
 
@@ -763,7 +733,7 @@ void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
 		if (!blanked && (m_irq_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			hold_irq_line();
+			set_irq_line(ASSERT_LINE);
 			m_irq_enable = 0;
 		}
 	}
@@ -798,6 +768,7 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 			break;
 		case 0x4002:
 			m_irq_enable = 0;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x4003:
 			m_irq_enable = 1;
@@ -823,16 +794,21 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
-		hold_irq_line();
-		irq_timer->adjust(attotime::never);
+		if (m_irq_enable)
+		{
+			m_irq_count = (m_irq_count + 1) & 0x7fff;  // unverified 15-bit counter based on FCEUX
+
+			if (m_irq_count >= 0x6000)
+				set_irq_line(ASSERT_LINE);
+		}
 	}
 }
 
-void nes_mbaby_device::write_h(offs_t offset, uint8_t data)
+void nes_mbaby_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("Mario Baby write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -847,23 +823,18 @@ void nes_mbaby_device::write_h(offs_t offset, uint8_t data)
 				set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 			case 0x02:
-				/* Check if IRQ is being enabled */
-				if (!m_irq_enable && (data & 0x02))
+				m_irq_enable = BIT(data, 1);
+				if (!m_irq_enable)
 				{
-					m_irq_enable = 1;
-					irq_timer->adjust(timer_freq);
-				}
-				if (!(data & 0x02))
-				{
-					m_irq_enable = 0;
-					irq_timer->adjust(attotime::never);
+					m_irq_count = 0;
+					set_irq_line(CLEAR_LINE);
 				}
 				break;
 		}
 	}
 }
 
-uint8_t nes_mbaby_device::read_m(offs_t offset)
+u8 nes_mbaby_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Mario Baby read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000) + (offset & 0x1fff)];
@@ -910,7 +881,7 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -957,6 +928,48 @@ void nes_smb3p_device::write_h(offs_t offset, u8 data)
 			m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
 			m_irq_enable = 1;
 			break;
+	}
+}
+
+/*-------------------------------------------------
+
+ BTL-CONTRAJ
+
+ Games: Contra (J) pirate
+
+ NES 2.0: mapper 326
+
+ This PCB has swappable 8K banks at 0x8000-0x9fff,
+ 0xa000-0xbfff, and 0xc000-0xdfff and associated
+ registers in those ranges. Selectable 1K banks for
+ both CHRROM and CIRAM are also in registers across
+ upper memory, 0x8000-0xffff, with mask 0x8010.
+
+ In MAME: Supported.
+
+ TODO: Find out why this crashes in the intro story.
+ Bootleggers missed the bug? Bad dump? This differs
+ only in a couple hundred bytes from contraj, so there
+ aren't that many places for the problem to hide.
+
+ -------------------------------------------------*/
+
+void nes_btl_cj_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("btl_cj write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 4))
+	{
+		if (BIT(offset, 3))
+			set_nt_page(offset & 0x03, CIRAM, data & 1, 1);
+		else
+			chr1_x(offset & 0x07, data, CHRROM);
+	}
+	else
+	{
+		offset = (offset >> 13) & 0x03;
+		if (offset != 3)
+			prg8_x(offset, data & 0x0f);
 	}
 }
 
@@ -1077,7 +1090,7 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 
  Bootleg Board SMB2J
 
- Games: Super Mario Bros. 2 Pirate (LF36)
+ Games: Super Mario Bros. 2 Pirates (TONY-I, YS-612)
 
  iNES: mapper 43
 
@@ -1085,60 +1098,65 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 
  -------------------------------------------------*/
 
-void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_count == 0xfff)
-			{
-				hold_irq_line();
-				m_irq_enable = 0;
-				m_irq_count = 0;
-			}
-			else
-				m_irq_count++;
+			m_irq_count = (m_irq_count + 1) & 0xfff;
+			if (!m_irq_count)
+				set_irq_line(ASSERT_LINE);
 		}
 	}
 }
 
-void nes_smb2j_device::write_l(offs_t offset, uint8_t data)
+void nes_smb2j_device::update_irq(u8 data)
 {
-	LOG_MMC(("smb2j write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
-
-	if (offset == 0x122)    // $4122
-		m_irq_enable = data & 3;    // maybe also m_irq_count = 0?!?
-}
-
-void nes_smb2j_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("smb2j write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset == 0x122)    // $8122 too?
-		m_irq_enable = data & 3;
-}
-
-void nes_smb2j_device::write_ex(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("smb2j write_ex, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset == 2)
+	m_irq_enable = BIT(data, 0);
+	if (!m_irq_enable)
 	{
-		int temp;
-
-		// According to hardware tests
-		if (data & 1)
-			temp = 3;
-		else
-			temp = 4 + ((data & 7) >> 1);
-
-		prg8_cd(temp);
+		set_irq_line(CLEAR_LINE);
+		m_irq_count = 0;
 	}
 }
 
-uint8_t nes_smb2j_device::read_l(offs_t offset)
+void nes_smb2j_device::write_45(offs_t offset, u8 data)
+{
+	static const u8 bank[8] = {4, 3, 4, 4, 4, 7, 5, 6};
+
+	switch (offset & 0x71ff)
+	{
+		case 0x4022:
+			prg8_cd(bank[data & 0x07]);
+			break;
+		case 0x4122:
+			nes_smb2j_device::update_irq(data);
+			break;
+	}
+}
+
+void nes_smb2j_device::write_ex(offs_t offset, u8 data)
+{
+	LOG_MMC(("smb2j write_ex, offset: %04x, data: %02x\n", offset, data));
+	nes_smb2j_device::write_45(offset + 0x4020, data);
+}
+
+void nes_smb2j_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("smb2j write_l, offset: %04x, data: %02x\n", offset, data));
+	nes_smb2j_device::write_45(offset + 0x4100, data);
+}
+
+void nes_smb2j_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("smb2j write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset == 0x122)    // $8122 is also IRQ for YS-612, mask unknown
+		nes_smb2j_device::update_irq(data);
+}
+
+u8 nes_smb2j_device::read_l(offs_t offset)
 {
 	LOG_MMC(("smb2j read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -1146,10 +1164,10 @@ uint8_t nes_smb2j_device::read_l(offs_t offset)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
-uint8_t nes_smb2j_device::read_m(offs_t offset)
+u8 nes_smb2j_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2j read_m, offset: %04x\n", offset));
 	return m_prg[0x4000 + offset];
@@ -1157,9 +1175,9 @@ uint8_t nes_smb2j_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
- BTL-SMB2A
+ BTL-SMB2JA
 
- Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
+ Games: Super Mario Bros. 2 Pirates (LF36, Hey Sung, 1990 SMB4)
 
  iNES: mapper 40
 
@@ -1167,25 +1185,22 @@ uint8_t nes_smb2j_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_count == 0xfff)
-			{
-				hold_irq_line();
-				m_irq_enable = 0;
-				m_irq_count = 0;
-			}
-			else
-				m_irq_count++;
+			m_irq_count = (m_irq_count + 1) & 0x1fff;    // 13-bit counter
+			if (BIT(m_irq_count, 12))
+				set_irq_line(ASSERT_LINE);
+			else if (!m_irq_count)
+				set_irq_line(CLEAR_LINE);            // CD4020 acknowledges on overflow
 		}
 	}
 }
 
-void nes_smb2ja_device::write_h(offs_t offset, uint8_t data)
+void nes_smb2ja_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("smb2ja write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1194,6 +1209,7 @@ void nes_smb2ja_device::write_h(offs_t offset, uint8_t data)
 		case 0x0000:
 			m_irq_enable = 0;
 			m_irq_count = 0;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x2000:
 			m_irq_enable = 1;
@@ -1204,80 +1220,122 @@ void nes_smb2ja_device::write_h(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_smb2ja_device::read_m(offs_t offset)
+u8 nes_smb2ja_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2ja read_m, offset: %04x\n", offset));
-	return m_prg[(0xfe * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[0x06 * 0x2000 + offset];    // fixed 8K bank
 }
 
 /*-------------------------------------------------
 
- BTL-SMB2B
+ BTL-SMB2JB (PCB 761214)
 
- Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
+ Games: Super Mario Bros. 2 Pirate (N-32)
 
  This was marked as Alt. Levels. is it true?
 
  iNES: mapper 50
 
- In MAME: Partially supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_count == 0xfff)
-			{
-				hold_irq_line();
-				m_irq_enable = 0;
-				m_irq_count = 0;
-			}
-			else
-				m_irq_count++;
+			if (BIT(++m_irq_count, 12))
+				set_irq_line(ASSERT_LINE);
 		}
 	}
 }
 
-void nes_smb2jb_device::write_l(offs_t offset, uint8_t data)
+void nes_smb2jb_device::write_45(offs_t offset, u8 data)
 {
-	uint8_t prg;
-	LOG_MMC(("smb2jb write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
-
-	switch (offset & 0x1e0)
+	switch (offset & 0x4120)
 	{
-		case 0x020:
-		case 0x0a0:
-			prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
-			prg8_cd(prg);
+		case 0x4020:
+			m_reg = bitswap<4>(data, 3, 0, 2, 1);
+			prg8_cd(m_reg);
 			break;
-		case 0x120:
-		case 0x1a0:
-			m_irq_enable = data & 0x01;
+		case 0x4120:
+			m_irq_enable = BIT(data, 0);
+			if (!m_irq_enable)
+			{
+				set_irq_line(CLEAR_LINE);
+				m_irq_count = 0;
+			}
 			break;
 	}
 }
 
-uint8_t nes_smb2jb_device::read_m(offs_t offset)
+void nes_smb2jb_device::write_ex(offs_t offset, u8 data)
 {
-	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[((0x0f * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
+	LOG_MMC(("smb2jb write_ex, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4020, data);
 }
 
-/* This goes to 0x4020-0x403f & 0x40a0-0x40bf */
-void nes_smb2jb_device::write_ex(offs_t offset, uint8_t data)
+void nes_smb2jb_device::write_l(offs_t offset, u8 data)
 {
-	uint8_t prg;
-	LOG_MMC(("smb2jb write_ex, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("smb2jb write_l, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4100, data);
+}
 
-	if ((offset < 0x20) || (offset >= 0x80 && offset < 0xa0))
+u8 nes_smb2jb_device::read_m(offs_t offset)
+{
+	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
+	return m_prg[(m_bank67 * 0x2000 + offset) & (m_prg_size - 1)];
+}
+
+/*-------------------------------------------------
+
+ BMC-N32-4IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 4 in 1
+
+ This multicart contains the mapper 50 version of SMB2.
+ There are changes to bank locations compared to that
+ game, but otherwise we rely on the existing SMB2JB
+ emulation (unless other differences are discovered?)
+
+ NES 2.0: mapper 416
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_n32_4in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("n32_4in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
 	{
-		prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
-		prg8_cd(prg);
+		if (BIT(data, 3))    // NROM games
+		{
+			u8 bank = bitswap<3>(data, 3, 7, 5);
+			u8 mode = BIT(data, 7);
+			if (data & 0xc0)
+			{
+				prg16_89ab(bank & ~mode);
+				prg16_cdef(bank | mode);
+			}
+			else
+				for (int i = 0; i < 4; i++)
+					prg8_x(i, bank << 1);
+		}
+		else                 // SMB2 only
+		{
+			prg8_89(0);
+			prg8_ab(1);
+			prg8_cd(m_reg);
+			prg8_ef(3);
+		}
+
+		chr8((data >> 1) & 0x03, CHRROM);
+		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
 
@@ -1331,7 +1389,7 @@ void nes_0353_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1386,6 +1444,64 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
+ Board L-001
+
+ Games: Sangokushi III (Sangokushi II bootleg)
+
+ This board has swappable 8K PRG banks at 0x8000, 0xa000,
+ and 0xc000, while 0xe000 is fixed to the final bank.
+ CHRROM and CIRAM are also swappable in 1K banks.
+ The board has a 16-bit IRQ counter with the enable bit
+ acting as the MSB. The enhanced audio of the original
+ Namco 163 board is not retained.
+
+ NES 2.0: mapper 330
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (BIT(m_irq_count, 15))
+		{
+			if (++m_irq_count == 0)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_l001_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("l-001 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6400)
+	{
+		case 0x0000:
+		case 0x2000:
+			chr1_x((offset >> 11) & 0x07, data, CHRROM);
+			break;
+		case 0x0400:
+			m_irq_count = (m_irq_count & 0xff00) | data;
+			break;
+		case 0x2400:
+			m_irq_count = (m_irq_count & 0x00ff) | data << 8;
+			set_irq_line(CLEAR_LINE);
+			break;
+		case 0x4000:
+			set_nt_page((offset >> 11) & 0x03, CIRAM, data & 1, 1);
+			break;
+		case 0x6000:
+			if (offset < 0x7800)
+				prg8_x((offset >> 11) & 0x03, data & 0x1f);
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
  BTL-BATMANFS
 
  Games: Batman "Fine Studio" pirate
@@ -1396,7 +1512,7 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1601,6 +1717,42 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ UNL-LH42
+
+ Games: Highway Star (Whirlwind Manu bootleg)
+
+ NES 2.0: mapper 418
+
+ In MAME: Preliminary supported.
+
+ TODO: Investigate garbage tiles on bottom half of
+ course map screens. This should be car dashboard?
+
+ -------------------------------------------------*/
+
+void nes_lh42_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("lh42 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 0))
+	{
+		switch (m_latch)
+		{
+			case 1:
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				break;
+			case 2:
+			case 3:
+				prg8_x(m_latch & 1, data & 0x0f);
+				break;
+		}
+	}
+	else
+		m_latch = data & 0x03;
+}
+
+/*-------------------------------------------------
+
  UNL-LG25
 
  Games: Moero TwinBee Cinnamon Hakase o Sukue! (FDS conversion)
@@ -1741,7 +1893,7 @@ void nes_lh51_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1939,91 +2091,6 @@ void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- BTL-SHUIGUANPIPE
-
- Games: Shui Guan Pipe (Gimmick Pirate)
-
- iNES: mapper 183
-
- In MAME: Supported, but there are glitches (PPU or IRQ?)
-
- -------------------------------------------------*/
-
-// timer always running and checking IRQ every 114 CPU cycles?
-void nes_shuiguan_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_IRQ)
-	{
-		m_irq_count++;
-		m_irq_count &= 0xff;
-
-		if (m_irq_enable && !m_irq_count)
-			hold_irq_line();
-	}
-}
-
-void nes_shuiguan_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank;
-	LOG_MMC(("shuiguan write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x7000)
-	{
-		case 0x0000:
-			if (offset & 0x800 && !(offset & 0x0c)) // 0x8800-0x8803 + N*0x10
-				prg8_89(data);
-			break;
-		case 0x1000:
-			if (offset & 0x800 && !(offset & 0x0c)) // 0x9800-0x9803 + N*0x10
-			{
-				switch (data & 0x03)
-				{
-					case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
-					case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-					case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
-					case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				}
-			}
-			break;
-		case 0x2000:
-			if (!(offset & 0x800) && !(offset & 0x0c))  // 0xa000-0xa003 + N*0x10
-				prg8_cd(data);
-			if (offset & 0x800 && !(offset & 0x0c)) // 0xa800-0xa803 + N*0x10
-				prg8_ab(data);
-			break;
-		case 0x3000:
-		case 0x4000:
-		case 0x5000:
-		case 0x6000:
-			bank = (((offset + 0x1000) >> 11) | (offset >> 3)) & 0x07;
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x7000:
-			switch (offset & 0x0c)
-			{
-				case 0x00: m_irq_count = (m_irq_count & 0xf0) | ((data & 0x0f) << 0); break;
-				case 0x04: m_irq_count = (m_irq_count & 0x0f) | ((data & 0x0f) << 4); break;
-				case 0x08: m_irq_enable= data; break;
-				case 0x0c: break;
-			}
-			break;
-	}
-}
-
-uint8_t nes_shuiguan_device::read_m(offs_t offset)
-{
-	// always first bank??
-	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
-	return m_prg[offset & 0x1fff];
-}
-
-
-/*-------------------------------------------------
-
  RT-01
 
  Games: Russian test cart
@@ -2048,4 +2115,74 @@ uint8_t nes_rt01_device::read_h(offs_t offset)
 		return 0xf2 | (machine().rand() & 0x0d);
 
 	return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
+ YUNG-08
+
+ Games: Super Mario Bros. 2 Pirate (YUNG-08)
+
+ NES 2.0: mapper 368
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_yung08_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (BIT(m_irq_latch, 0))
+		{
+			m_irq_count = (m_irq_count + 1) & 0x0fff;
+			if (!m_irq_count)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_yung08_device::write_45(offs_t offset, u8 data)
+{
+	switch (offset & 0x51ff)
+	{
+		case 0x4022:
+			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x07) >> 1));
+			break;
+		case 0x4122:
+			m_irq_latch = data & 0x35;
+			if (!BIT(m_irq_latch, 0))
+			{
+				set_irq_line(CLEAR_LINE);
+				m_irq_count = 0;
+			}
+			break;
+	}
+}
+
+void nes_yung08_device::write_ex(offs_t offset, u8 data)
+{
+	LOG_MMC(("yung08 write_ex, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4020, data);
+}
+
+void nes_yung08_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("yung08 write_l, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4100, data);
+}
+
+u8 nes_yung08_device::read_l(offs_t offset)
+{
+	LOG_MMC(("yung08 read_l, offset: %04x\n", offset));
+	offset += 0x100;
+	if ((offset & 0x11ff) == 0x0122)    // 0x4122
+		return m_irq_latch | 0x8a;
+	return get_open_bus();
+}
+
+u8 nes_yung08_device::read_m(offs_t offset)
+{
+	LOG_MMC(("yung08 read_m, offset: %04x\n", offset));
+	return m_prg[0x02 * 0x2000 + offset];    // fixed to bank #2
 }

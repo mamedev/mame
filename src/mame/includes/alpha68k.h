@@ -62,21 +62,21 @@ protected:
 	optional_ioport_array<7> m_in;
 	optional_memory_bank m_audiobank;
 
-	int           m_flipscreen;
+	int           m_flipscreen = 0;
 
 	// MCU sims
 	void alpha_microcontroller_w(offs_t offset, u16 data, u16 mem_mask);
-	int           m_invert_controls;
-	int           m_microcontroller_id;
-	unsigned      m_game_id;  // see below
-	unsigned      m_deposits1;
-	unsigned      m_deposits2;
-	unsigned      m_credits;
-	unsigned      m_coinvalue;
-	int           m_coin_id;
-	unsigned      m_microcontroller_data;
-	unsigned      m_trigstate;
-	int           m_latch;
+	int           m_invert_controls = 0;
+	int           m_microcontroller_id = 0;
+	unsigned      m_game_id = 0U;  // see below
+	unsigned      m_deposits1 = 0U;
+	unsigned      m_deposits2 = 0U;
+	unsigned      m_credits = 0U;
+	unsigned      m_coinvalue = 0U;
+	int           m_coin_id = 0;
+	unsigned      m_microcontroller_data = 0U;
+	unsigned      m_trigstate = 0U;
+	int           m_latch = 0;
 
 	void set_screen_raw_params(machine_config &config);
 
@@ -118,8 +118,8 @@ protected:
 	void sound_bank_w(u8 data);
 	void flipscreen_w(int flip);
 	void porta_w(u8 data);
-	u8       m_sound_nmi_mask;
-	u8       m_sound_pa_latch;
+	u8       m_sound_nmi_mask = 0U;
+	u8       m_sound_pa_latch = 0U;
 
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
@@ -131,8 +131,8 @@ protected:
 	u16 alpha_II_trigger_r(offs_t offset);
 
 	/* video-related */
-	tilemap_t     *m_fix_tilemap;
-	int           m_bank_base;
+	tilemap_t     *m_fix_tilemap = 0;
+	int           m_bank_base = 0;
 
 	void outlatch_w(offs_t offset, u8 data = 0);
 	u16 control_1_r();
@@ -266,9 +266,9 @@ protected:
 	void sound_iomap(address_map &map);
 
 private:
-	u16 m_tile_transchar;
-	int m_tile_bankshift;
-	bool m_is_super_stingray;
+	u16 m_tile_transchar = 0U;
+	int m_tile_bankshift = 0;
+	bool m_is_super_stingray = 0;
 };
 
 class sstingray_state : public alpha68k_N_state
@@ -296,10 +296,10 @@ private:
 	void sound_map(address_map &map);
 
 	required_device<mcs48_cpu_device> m_alpha8511;
-	u8 m_alpha8511_address;
-	u8 m_alpha8511_control;
-	bool m_alpha8511_read_mode;
-	emu_timer *m_alpha8511_sync_timer;
+	u8 m_alpha8511_address = 0U;
+	u8 m_alpha8511_control = 0U;
+	bool m_alpha8511_read_mode = 0;
+	emu_timer *m_alpha8511_sync_timer = 0;
 };
 
 class kyros_state : public alpha68k_N_state
@@ -322,6 +322,7 @@ public:
 
 	void jongbou(machine_config &config);
 	void init_jongbou();
+	void init_jongbou2();
 
 private:
 	void main_map(address_map &map);
@@ -349,7 +350,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	int m_yshift;
+	int m_yshift = 0;
 };
 
 class paddlemania_state : public alpha68k_I_state

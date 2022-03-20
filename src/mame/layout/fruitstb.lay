@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders: Grull Osgo, Roberto Fresca.
+
+  Fruit Star Bonus control panel
+
+-->
+<mamelayout version="2">
+
+	<!-- define button-lamps -->
+
+	<element name="stop1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+	
+	<element name="stop4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+	
+
+	<element name="take" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.43" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.4" green="0.17" blue="0.0" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.25" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1." blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.5" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+	<!-- define basic elements -->
+
+	<element name="cpanel">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="stop_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.4" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="bet_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.4" green="0.4" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="take_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.3" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.28" green="0.12" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.18" blue="0.0" />
+		</rect>
+	</element>
+
+
+	<!-- define cpanel degradee elements -->
+
+	<element name="cpanel1">
+		<rect>
+			<color red="0.20" green="0.20" blue="0.20" />
+		</rect>
+	</element>
+
+	<element name="cpanel2">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+	</element>
+
+	<element name="cpanel3">
+		<rect>
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+	</element>
+
+	<element name="cpanel4">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+
+	<!-- define cpanel layout -->
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<element ref="cpanel">
+			<bounds left="0" right="4" top="3" bottom="3.50" />
+		</element>
+
+		<element ref="cpanel1">
+			<bounds left="0" right="4" top="3.01" bottom="3.49" />
+		</element>
+
+		<element ref="cpanel2">
+			<bounds left="0" right="4" top="3.02" bottom="3.48" />
+		</element>
+
+		<element ref="cpanel3">
+			<bounds left="0" right="4" top="3.03" bottom="3.47" />
+		</element>
+
+		<element ref="cpanel4">
+			<bounds left="0" right="4" top="3.04" bottom="3.46" />
+		</element>
+
+		<element ref="cpanel">
+			<bounds left="0" right="4" top="3.05" bottom="3.45" />
+		</element>
+
+
+
+		<element name="lamp0" ref="stop_b" inputtag="IN1" inputmask="0x04">
+			<bounds x="2.37" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp0" ref="stop3" inputtag="IN1" inputmask="0x04">
+			<bounds x="2.39" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp1" ref="take_b" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.75" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp1" ref="take" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.77" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp2" ref="stop_b" inputtag="IN1" inputmask="0x08">
+			<bounds x="2.91" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp2" ref="stop4" inputtag="IN1" inputmask="0x08">
+			<bounds x="2.93" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp3" ref="stop_b" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.29" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp3" ref="stop1" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.31" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp4" ref="start_b" inputtag="IN1" inputmask="0x10">
+			<bounds x="3.45" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp4" ref="start" inputtag="IN1" inputmask="0x10">
+			<bounds x="3.47" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp5" ref="bet_b" inputtag="IN1" inputmask="0x40">
+			<bounds x="0.21" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp5" ref="bet" inputtag="IN1" inputmask="0x40">
+			<bounds x="0.23" y="3.10" width="0.30" height="0.30" />
+		</element>
+
+		<element name="lamp6" ref="stop_b" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.83" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp6" ref="stop2" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.85" y="3.10" width="0.30" height="0.30" />
+		</element>		
+
+
+	</view>
+</mamelayout>

@@ -64,13 +64,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
 		, m_ram(*this, RAM_TAG)
-		, m_trom(*this, "saa5050_%u", 1)
-		, m_pia(*this, "pia%u", 0)
+		, m_trom(*this, "saa5050_%u", 1U)
+		, m_pia(*this, "pia%u", 0U)
 		, m_adlc(*this, "mc6854")
 		, m_ptm(*this, "ptm")
 		, m_irqs(*this, "irqs")
 //      , m_kr2376(*this, "kr2376")
-		, m_kbd(*this, "X%u", 0)
+		, m_kbd(*this, "X%u", 0U)
 		, m_modifiers(*this, "MODIFIERS")
 		, m_speaker(*this, "speaker")
 		, m_user(*this, "user")
@@ -140,12 +140,12 @@ private:
 	required_shared_ptr<uint8_t> m_dat;
 	optional_device<acia6850_device> m_acia;
 	optional_device<clock_device> m_acia_clock;
-	uint8_t m_video_pa, m_video_pb;
-	uint8_t m_term_data;
+	uint8_t m_video_pa = 0U, m_video_pb = 0U;
+	uint8_t m_term_data = 0U;
 
 	inline offs_t physical(offs_t offset);
 
-	int m_dat_bank;
+	int m_dat_bank = 0;
 };
 
 
@@ -155,7 +155,7 @@ public:
 	polydev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: poly_state(mconfig, type, tag)
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "fdc:%u", 0)
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_current_floppy(nullptr)
 	{
 	}

@@ -37,6 +37,8 @@ public:
 	void tigeroad(machine_config &config);
 	void f1dream_comad(machine_config &config);
 
+	void init_tigeroadb();
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

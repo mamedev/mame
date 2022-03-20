@@ -17,7 +17,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -51,7 +51,7 @@ protected:
 		TIMER_PRC
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -1516,14 +1516,14 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too small");
 		return image_init_result::FAIL;
 	}
 
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too big");
 		return image_init_result::FAIL;
 	}
 
@@ -1696,7 +1696,7 @@ void pokemini_state::machine_start()
 }
 
 
-void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

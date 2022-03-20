@@ -1931,24 +1931,22 @@ char *i386_disassembler::hexstring64(uint32_t lo, uint32_t hi)
 	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
 }
 
-char *i386_disassembler::hexstringpc(uint64_t pc)
+std::string i386_disassembler::hexstringpc(uint64_t pc)
 {
 	if (m_config->get_mode() == 64)
-		return hexstring64((uint32_t)pc, (uint32_t)(pc >> 32));
+		return hexstring64(uint32_t(pc), uint32_t(pc >> 32));
 	else
-		return hexstring((uint32_t)pc, 0);
+		return hexstring(uint32_t(pc), 0);
 }
 
-char *i386_disassembler::shexstring(uint32_t value, int digits, bool always)
+std::string i386_disassembler::shexstring(uint32_t value, int digits, bool always)
 {
-	static char buffer[20];
 	if (value >= 0x80000000)
-		sprintf(buffer, "-%s", hexstring(-value, digits));
+		return util::string_format("-%s", hexstring(-value, digits));
 	else if (always)
-		sprintf(buffer, "+%s", hexstring(value, digits));
+		return util::string_format("+%s", hexstring(value, digits));
 	else
 		return hexstring(value, digits);
-	return buffer;
 }
 
 void i386_disassembler::handle_sib_byte(std::ostream &stream, uint8_t mod, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)

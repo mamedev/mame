@@ -503,7 +503,7 @@ void mc68901_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id >= TIMER_A && id <= TIMER_D)
 		timer_count(id);

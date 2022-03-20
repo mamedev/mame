@@ -5,9 +5,8 @@
     Tape support for RK format
 
 */
-#include "rk_cas.h"
 
-#include <cassert>
+#include "rk_cas.h"
 
 
 #define RK_WAV_FREQUENCY    44000

@@ -102,7 +102,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
 	virtual void plus3_update_memory() { }
@@ -145,7 +145,6 @@ protected:
 	int m_LastFrameStartTime;
 	int m_CyclesPerLine;
 
-	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
@@ -153,13 +152,15 @@ protected:
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
 
-	void spectrum_port_fe_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_port_fe_r(offs_t offset);
-	uint8_t spectrum_port_ula_r(offs_t offset);
-	uint8_t spectrum_clone_port_ula_r();
+	void spectrum_ula_w(offs_t offset, uint8_t data);
+	uint8_t spectrum_ula_r(offs_t offset);
+	void spectrum_port_w(offs_t offset, uint8_t data);
+	virtual uint8_t spectrum_port_r(offs_t offset);
+	virtual uint8_t floating_bus_r();
+	uint8_t spectrum_clone_port_r(offs_t offset);
 
 	void spectrum_palette(palette_device &palette) const;
-	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 
@@ -209,8 +210,9 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
-	void spectrum_UpdateBorderBitmap();
-	void spectrum_UpdateScreenBitmap(bool eof = false);
+	virtual void spectrum_UpdateBorderBitmap();
+	virtual u16 get_border_color();
+	virtual void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
@@ -237,8 +239,6 @@ protected:
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
-
-	uint8_t floating_bus_r();
 };
 
 class spectrum_128_state : public spectrum_state
@@ -261,7 +261,9 @@ private:
 	void spectrum_128_bank1_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_128_bank1_r(offs_t offset);
 	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_128_ula_r();
+	virtual uint8_t spectrum_port_r(offs_t offset) override;
+	virtual uint8_t floating_bus_r() override;
+	//uint8_t spectrum_128_ula_r();
 
 	void spectrum_128_io(address_map &map);
 	void spectrum_128_mem(address_map &map);

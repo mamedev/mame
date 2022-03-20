@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Gordon Jefferyes
 /******************************************************************************
+
     uPD7002 Analogue to Digital Converter
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
 
 ******************************************************************************/
 
@@ -72,7 +68,7 @@ READ_LINE_MEMBER( upd7002_device::eoc_r )
 }
 
 
-void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

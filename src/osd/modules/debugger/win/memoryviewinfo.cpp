@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "memoryviewinfo.h"
 
-#include "debug/dvmemory.h"
-
 #include "strconv.h"
 
 
@@ -25,7 +23,7 @@ memoryview_info::~memoryview_info()
 }
 
 
-uint8_t memoryview_info::data_format() const
+debug_view_memory::data_format memoryview_info::data_format() const
 {
 	return view<debug_view_memory>()->get_data_format();
 }
@@ -48,13 +46,18 @@ bool memoryview_info::physical() const
 	return view<debug_view_memory>()->physical();
 }
 
+int memoryview_info::address_radix() const
+{
+	return view<debug_view_memory>()->address_radix();
+}
+
 
 void memoryview_info::set_expression(const std::string &string)
 {
 	view<debug_view_memory>()->set_expression(string);
 }
 
-void memoryview_info::set_data_format(uint8_t dataformat)
+void memoryview_info::set_data_format(debug_view_memory::data_format dataformat)
 {
 	view<debug_view_memory>()->set_data_format(dataformat);
 }
@@ -72,6 +75,11 @@ void memoryview_info::set_reverse(bool reverse)
 void memoryview_info::set_physical(bool physical)
 {
 	view<debug_view_memory>()->set_physical(physical);
+}
+
+void memoryview_info::set_address_radix(int radix)
+{
+	view<debug_view_memory>()->set_address_radix(radix);
 }
 
 
@@ -97,7 +105,7 @@ void memoryview_info::update_context_menu(HMENU menu)
 		{
 			// get the last known PC to write to this memory location
 			debug_view_xy const pos = memview.cursor_position();
-			offs_t const address = memview.addressAtCursorPosition(pos);
+			offs_t const address = space->byte_to_address(memview.addressAtCursorPosition(pos));
 			offs_t a = address & space->logaddrmask();
 			if (!space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, a))
 			{
@@ -121,7 +129,10 @@ void memoryview_info::update_context_menu(HMENU menu)
 						memval);
 				if (pc != offs_t(-1))
 				{
-					m_lastpc = util::string_format("Address %x written at PC=%x", address, pc);
+					if (space->is_octal())
+						m_lastpc = util::string_format("Address %o written at PC=%o", address, pc);
+					else
+						m_lastpc = util::string_format("Address %x written at PC=%x", address, pc);
 					enable = true;
 				}
 				else

@@ -70,14 +70,14 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_bg_tilemap;
-	int m_scroll_x;
-	int m_priority;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int m_scroll_x = 0;
+	int m_priority = 0;
 
 	/* sound-related */
-	uint32_t   m_adpcm_data;
-	uint32_t   m_adpcm_address;
+	uint32_t   m_adpcm_data = 0U;
+	uint32_t   m_adpcm_address = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -85,7 +85,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<msm5205_device> m_msm;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0U;
 };
 
 #endif // MAME_INCLUDES_APPOOOH_H

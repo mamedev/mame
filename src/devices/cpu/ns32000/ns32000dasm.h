@@ -43,8 +43,10 @@ protected:
 	};
 
 	s32 displacement(offs_t pc, data_buffer const &opcodes, unsigned &bytes);
+	std::string displacement_string(offs_t pc, data_buffer const &opcodes, unsigned &bytes, std::string const zero = "");
 	void decode(addr_mode *mode, offs_t pc, data_buffer const &opcodes, unsigned &bytes);
 	std::string reglist(u8 imm);
+	std::string config(u8 imm);
 };
 
 #endif // MAME_CPU_NS32000_NS32000DASM_H

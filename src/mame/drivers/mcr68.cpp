@@ -965,8 +965,8 @@ void mcr68_state::spyhunt2(machine_config &config)
 	mcr68(config);
 
 	// Basic machine hardware
-	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	ADC0844(config, m_adc);
 	m_adc->ch1_callback().set_ioport("AN1");
@@ -1178,6 +1178,9 @@ ROM_START( blasted ) // Service mode shows "prod. code v.1" and the date 4/27/88
 	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) // marked HSYNC in manual
 	// According to the manual this PAL is located on the "Sounds Good" board
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) // marked SG01R0 in manual, pal type not specified
+
+	ROM_REGION( 0x34, "plds_monoboard", 0 ) // Specific PLD for the Monoboard version
+	ROM_LOAD( "pal12h6.14e",  0x00, 0x34, CRC(6b46dd6d) SHA1(36b89e13fd5be9aac3e3761752a84497d66bd828) )
 ROM_END
 
 ROM_START( intlaser ) // Service mode shows "TOP SECRET PROJ. #F01" and the date 10/01/87

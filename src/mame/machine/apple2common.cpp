@@ -453,9 +453,16 @@ static const struct dasm_data gs_tools[] =
 	{ 0x1A23, "MIDIMessage(Dest,nBytes,Message,Byte1,Byte2)" }, { 0x1B23, "LocateEnd(@seqBuffer):@End" }, { 0x1C23, "Merge(@Buffer1,@Buffer2)" }, { 0x1D23, "DeleteTrack(TrackNum,@Seq)" },
 	{ 0x1E23, "SetMetro(Volume,Freq,@Wave)" }, { 0x1F23, "GetMSData():Reserved/4,@DirPage" }, { 0x2023, "ConvertToTime(TkPerBt,BtPerMsr,BeatNum,MsrNum):Ticks/4" }, { 0x2123, "ConvertToMeasure(TkPerBt,BtPerMsr,Ticks/4):Ticks,Beat,Msr" },
 	{ 0x2223, "MSSuspend()" }, { 0x2323, "MSResume()" }, { 0x2423, "SetTuningTable(@Table)" }, { 0x2523, "GetTuningTable(@Buffer)" }, { 0x2623, "SetTrackOut(TrackNum,PathVal)" },
-	{ 0x2723, "InitMIDIDriver(Slot,Internal,UserID,@Driver)" }, { 0x2823, "RemoveMIDIDriver()" }, { 0x0126, "MCBootInit()" }, { 0x0226, "MCStartUp(MemID)" }, { 0x0326, "MCShutDown()" },
-	{ 0x0426, "MCVersion():Vers" }, { 0x0526, "MCReset()" }, { 0x0626, "MCStatus():ActFlg" }, { 0x0926, "MCGetErrorMsg(mcErrorNo,@PStringBuff)" }, { 0x0A26, "MCLoadDriver(mcChannelNo)" },
-	{ 0x0B26, "MCUnLoadDriver(mcChannelNo)" }, { 0x0C26, "MCTimeToBin(mcTimeValue/4):result/4" }, { 0x0D26, "MCBinToTime(mcBinVal/4):result/4" }, { 0x0E26, "MCGetTrackTitle(mcDiskID/4,mcTrackNo,@PStringBuff)" },
+	{ 0x2723, "InitMIDIDriver(Slot,Internal,UserID,@Driver)" }, { 0x2823, "RemoveMIDIDriver()" }, { 0x0125, "AnimBootInit()" }, { 0x0225, "AnimStartUp(MemID,DPage,ModeFlag,@PatchTbl)" },
+	{ 0x0325, "AnimShutDown()" }, { 0x0425, "AnimVersion():Vers" }, { 0x0525, "AnimReset()" }, { 0x0625, "AnimStatus():Status" },
+	{ 0x0725, "CleanExit() "}, { 0x0825, "AnimIdleDebug()" }, { 0x0925, "StartScene(Mode, @Rect)" }, { 0x0A25, "StopScene()" }, { 0x0B25, "StartFrameTimer(Interval)" },
+	{ 0x0C25, "StopFrameTimer()" }, { 0x0D25, "SetBackGndPort()" }, { 0x0E25, "RefreshBackCall()" }, { 0x0F25, "StartCharCall(PassX, PassY, PassMaxP/PassFlag, PassMinP/PassDir, LPassChar)" },
+	{ 0x1025, "MoveCharCall(PassIter, PassDY/PassIter, PassDX/PassFlag, LPassChar)" }, { 0x1125, "GetCharRecPtr(CharNum):CharRecPtr" },
+	{ 0x1225, "KillCharCall(CharNum)" }, { 0x1325, "LoadActor(@ActorPtr, CharNum)" }, { 0x1425, "SetCharScript(@theScript, CharNum)" }, { 0x1525, "RunAnimScripts()" },
+	{ 0x1625, "FillAddressTbl(@TablePtr)" }, { 0x1725, "CreateReblitCode(@RectPtr, GenFlags)" }, { 0x1825, "StartTockTask(thePtr, theData, theID, theCount)" }, { 0x1925, "FireTockTask()" },
+	{ 0x0126, "MCBootInit()" }, { 0x0226, "MCStartUp(MemID)" }, { 0x0326, "MCShutDown()" }, { 0x0426, "MCVersion():Vers" }, { 0x0526, "MCReset()" }, { 0x0626, "MCStatus():ActFlg" },
+	{ 0x0926, "MCGetErrorMsg(mcErrorNo,@PStringBuff)" }, { 0x0A26, "MCLoadDriver(mcChannelNo)" }, { 0x0B26, "MCUnLoadDriver(mcChannelNo)" }, { 0x0C26, "MCTimeToBin(mcTimeValue/4):result/4" },
+	{ 0x0D26, "MCBinToTime(mcBinVal/4):result/4" }, { 0x0E26, "MCGetTrackTitle(mcDiskID/4,mcTrackNo,@PStringBuff)" },
 	{ 0x0F26, "MCSetTrackTitle(mcDiskID/4,TrackNum,@title)" }, { 0x1026, "MCGetProgram(mcDiskID/4,@resultBuff)" }, { 0x1126, "MCSetProgram(mcDiskID/4,@mcProg)" },
 	{ 0x1226, "MCGetDiscTitle(mcDiskID/4,@PStringBuff)" }, { 0x1326, "MCSetDiscTitle(mcDiskID/4,@title)" }, { 0x1426, "MCDStartUp(mcChannelNo,@portName,userID)" },
 	{ 0x1526, "MCDShutDown(mcChannelNo)" }, { 0x1626, "MCGetFeatures(mcChannelNo,mcFeatSel):result/4" }, { 0x1726, "MCPlay(mcChannelNo)" }, { 0x1826, "MCPause(mcChannelNo)" },
@@ -496,6 +503,35 @@ static const struct dasm_data gs_tools[] =
 	{ 0x6236, "TCPIPGetDestination(ipid,@destRecPtr)" }, { 0x6336, "TCPIPGetUserEventTrigger(triggerNumber,ipid):triggerProcPtr/4" }, { 0x6436, "TCPIPSetUserEventTrigger(triggerNumber,ipid,@triggerProcPtr)" },
 	{ 0x6536, "TCPIPGetSysEventTrigger(triggerNumber):triggerProcPtr/4" }, { 0x6636, "TCPIPSetSysEventTrigger(triggerNumber,@triggerProcPtr)" }, { 0x6736, "TCPIPGetDNRTimeouts(@dnrTimeoutsBuffPtr)" },
 	{ 0x6836, "TCPIPSetDNRTimeouts(@dnrTimeoutsBuffPtr)" },
+
+	{ 0xffff, "" }
+};
+
+static const struct dasm_data gsos_calls[] =
+{
+	{ 0x0001, "CREATE" }, { 0x0002, "DESTROY" }, { 0x0004, "CHANGE_PATH" }, { 0x0005, "SET_FILE_INFO" },
+	{ 0x0006, "GET_FILE_INFO" }, { 0x0008, "VOLUME" }, { 0x0009, "SET_PREFIX" }, { 0x000A, "GET_PREFIX" },
+	{ 0x000B, "CLEAR_BACKUP_BIT" }, { 0x0010, "OPEN" }, { 0x0011, "NEWLINE" }, { 0x0012, "READ" },
+	{ 0x0013, "WRITE" }, { 0x0014, "CLOSE" }, { 0x0015, "FLUSH" }, { 0x0016, "SET_MARK" },
+	{ 0x0017, "GET_MARK" }, { 0x0018, "SET_EOF" }, { 0x0019, "GET_EOF" }, { 0x001A, "SET_LEVEL" },
+	{ 0x001B, "GET_LEVEL" }, { 0x001C, "GET_DIR_ENTRY" }, { 0x0020, "GET_DEV_NUM" }, { 0x0021, "GET_LAST_DEV" },
+	{ 0x0022, "READ_BLOCK" }, { 0x0023, "WRITE_BLOCK" }, { 0x0024, "FORMAT" }, { 0x0025, "ERASE_DISK" },
+	{ 0x0027, "GET_NAME" }, { 0x0028, "GET_BOOT_VOL" }, { 0x0029, "QUIT" }, { 0x002A, "GET_VERSION" },
+	{ 0x002C, "D_INFO" }, { 0x0031, "ALLOC_INTERRUPT" }, { 0x0032, "DEALLOC_INTERRUPT" }, { 0x2001, "CreateGS" },
+	{ 0x2002, "DestroyGS" }, { 0x2003, "OSShutdownGS" }, { 0x2004, "ChangePathGS" }, { 0x2005, "SetFileInfoGS" },
+	{ 0x2006, "GetFileInfoGS" }, { 0x2007, "JudgeNameGS" }, { 0x2008, "VolumeGS" }, { 0x2009, "SetPrefixGS" },
+	{ 0x200A, "GetPrefixGS" }, { 0x200B, "ClearBackupGS" }, { 0x200C, "SetSysPrefsGS" }, { 0x200D, "NullGS" },
+	{ 0x200E, "ExpandPathGS" }, { 0x200F, "GetSysPrefsGS" }, { 0x2010, "OpenGS" }, { 0x2011, "NewLineGS" },
+	{ 0x2012, "ReadGS" }, { 0x2013, "WriteGS" }, { 0x2014, "CloseGS" }, { 0x2015, "FlushGS" },
+	{ 0x2016, "SetMarkGS" }, { 0x2017, "GetMarkGS" }, { 0x2018, "SetEOFGS" }, { 0x2019, "GetEOFGS" },
+	{ 0x201A, "SetLevelGS" }, { 0x201B, "GetLevelGS" }, { 0x201C, "GetDirEntryGS" }, { 0x201D, "BeginSessionGS" },
+	{ 0x201E, "EndSessionGS" }, { 0x201F, "SessionStatusGS" }, { 0x2020, "GetDevNumberGS" }, { 0x2024, "FormatGS" },
+	{ 0x2025, "EraseDiskGS" }, { 0x2026, "ResetCacheGS" }, { 0x2027, "GetNameGS" }, { 0x2028, "GetBootvolGS" },
+	{ 0x2029, "QuitGS" }, { 0x202A, "GetVersionGS" }, { 0x202B, "GetFSTInfoGS" }, { 0x202C, "DInfoGS" },
+	{ 0x202D, "DStatusGS" }, { 0x202E, "DControlGS" }, { 0x202F, "DReadGS" }, { 0x2030, "DWriteGS" },
+	{ 0x2031, "BindIntGS" }, { 0x2032, "UnbindIntGS" }, { 0x2033, "FSTSpecificGS" }, { 0x2034, "AddNotifyProcGS" },
+	{ 0x2035, "DelNotifyProcGS" }, { 0x2036, "DRenameGS" }, { 0x2037, "GetStdRefNumGS" }, { 0x2038, "GetRefNumGS" },
+	{ 0x2039, "GetRefInfoGS" }, { 0x203A, "SetStdRefNumGS" },
 
 	{ 0xffff, "" }
 };
@@ -761,24 +797,53 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 					item++;
 				}
 			}
-			else
+			break;
+
+		case 0x22:  // JSL
 			{
-				u32 vec = opcodes.r32(pc) >> 8;
-				int item = 0;
-				while (gs_vectors[item].addr != 0xffff)
+				u32 operand = opcodes.r32(pc) >> 8;
+				if (operand == 0xe100a8)
 				{
-					if (gs_tools[item].addr == vec)
+					u16 call = opcodes.r8(pc + 4);
+					u32 params = opcodes.r16(pc + 6) & 0xffffff;
+					int item = 0;
+
+					while (gsos_calls[item].addr != 0xffff)
 					{
-						util::stream_format(stream, "jsl %s (%06x)", gs_tools[item].name, vec);
-						return 4 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
+						if (gsos_calls[item].addr == call)
+						{
+							util::stream_format(stream, "_%s %06x", gsos_calls[item].name, params);
+							return 10 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
+						}
+						item++;
 					}
-					item++;
+				}
+				offs_t rv = com_long_op(stream, pc, opcodes, "jsl");
+
+				if (rv > 0)
+					return rv | util::disasm_interface::STEP_OVER;
+
+				// jsl to inline debug name?
+				if (opcodes.r8(operand) == 0x82 && opcodes.r16(operand + 3) == 0x7771)
+				{
+					int n = opcodes.r8(operand + 5);
+					std::string name;
+					for (int i = 0; i < n; ++i)
+						name.push_back(opcodes.r8(operand + 6 + i));
+
+					util::stream_format(stream, "jsl %s (%06x)", name.c_str(), operand);
+					return 4 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
 				}
 			}
 			break;
+		case 0x5c: // JML
+			return com_long_op(stream, pc, opcodes, "jml");
 
 		case 0x8f:  // STA long
 			return com_long_op(stream, pc, opcodes, "sta");
+
+		case 0xaf:  // LDA long
+			return com_long_op(stream, pc, opcodes, "lda");
 
 		// on IIgs, this is more likely to refer to some non-Monitor direct page, so don't do these that way
 		// (we need a m_maincpu so we can check the D register for a smarter version of this)
@@ -792,6 +857,28 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 		case 0xe6:  // INC ZP
 			return dasm_override(stream, pc, opcodes, params);
 
+
+		case 0x82:  // BRL
+			if (opcodes.r16(pc + 3) == 0x7771)
+			{
+				// inline debug name format:
+				// 82 xx xx      brl past name
+				// 71 77         signature
+				// nn xx xx xxx  pascal string
+				//               pastname
+				s16 operand = opcodes.r16(pc + 1);
+				int n = opcodes.r8(pc + 5);
+				if (operand >= n)
+				{
+					std::string name;
+					for (int i = 0; i < n; ++i)
+						name.push_back(opcodes.r8(pc + 6 + i));
+
+					stream << name;
+					return (operand + 3) | util::disasm_interface::SUPPORTED;
+				}
+			}
+			break;
 
 		default:
 			break;

@@ -17,11 +17,14 @@
 #ifndef MAME_EMU_IOPORT_H
 #define MAME_EMU_IOPORT_H
 
+#include "ioprocs.h"
+
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <list>
+#include <memory>
 #include <vector>
 
 
@@ -334,7 +337,6 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
-		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MNG,
 		IPT_UI_RECORD_AVI,
 		IPT_UI_TOGGLE_CHEAT,
@@ -354,13 +356,13 @@ enum ioport_type
 		IPT_UI_CLEAR,
 		IPT_UI_ZOOM_IN,
 		IPT_UI_ZOOM_OUT,
+		IPT_UI_ZOOM_DEFAULT,
 		IPT_UI_PREV_GROUP,
 		IPT_UI_NEXT_GROUP,
 		IPT_UI_ROTATE,
 		IPT_UI_SHOW_PROFILER,
 		IPT_UI_TOGGLE_UI,
 		IPT_UI_RELEASE_POINTER,
-		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
@@ -369,8 +371,7 @@ enum ioport_type
 		IPT_UI_DATS,
 		IPT_UI_FAVORITES,
 		IPT_UI_EXPORT,
-		IPT_UI_AUDIT_FAST,
-		IPT_UI_AUDIT_ALL,
+		IPT_UI_AUDIT,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -661,116 +662,6 @@ typedef device_delegate<void (ioport_field &, u32, ioport_value, ioport_value)> 
 typedef device_delegate<float (float)> ioport_field_crossmap_delegate;
 
 
-// ======================> inp_header
-
-// header at the front of INP files
-class inp_header
-{
-public:
-	// parameters
-	static constexpr unsigned MAJVERSION = 3;
-	static constexpr unsigned MINVERSION = 0;
-
-	bool read(emu_file &f)
-	{
-		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-	bool write(emu_file &f) const
-	{
-		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
-	}
-
-	bool check_magic() const
-	{
-		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	u64 get_basetime() const
-	{
-		return
-				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
-	}
-	unsigned get_majversion() const
-	{
-		return m_data[OFFS_MAJVERSION];
-	}
-	unsigned get_minversion() const
-	{
-		return m_data[OFFS_MINVERSION];
-	}
-	std::string get_sysname() const
-	{
-		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
-	}
-	std::string get_appdesc() const
-	{
-		return get_string<OFFS_APPDESC, OFFS_END>();
-	}
-
-	void set_magic()
-	{
-		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
-	}
-	void set_basetime(u64 time)
-	{
-		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
-	}
-	void set_version()
-	{
-		m_data[OFFS_MAJVERSION] = MAJVERSION;
-		m_data[OFFS_MINVERSION] = MINVERSION;
-	}
-	void set_sysname(std::string const &name)
-	{
-		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
-	}
-	void set_appdesc(std::string const &desc)
-	{
-		set_string<OFFS_APPDESC, OFFS_END>(desc);
-	}
-
-private:
-	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
-	{
-		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
-		std::memcpy(m_data + BEGIN, str.c_str(), used);
-		if ((END - BEGIN) > used)
-			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
-	}
-	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
-	{
-		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
-		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
-	}
-
-	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
-	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
-	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
-	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
-																// 0x02 bytes reserved
-	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
-	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
-	static constexpr std::size_t    OFFS_END         = 0x40;
-
-	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
-
-	u8                              m_data[OFFS_END];
-};
-
-
 // ======================> input_device_default
 
 // device defined default input settings
@@ -797,26 +688,29 @@ public:
 	ioport_group group() const noexcept { return m_group; }
 	u8 player() const noexcept { return m_player; }
 	const char *token() const noexcept { return m_token; }
-	const char *name() const noexcept { return m_name; }
+	std::string name() const;
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) noexcept { return m_defseq[seqtype]; }
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_seq[seqtype]; }
+	const std::string &cfg(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_cfg[seqtype]; }
 
 	// setters
 	void restore_default_seq() noexcept;
 	void set_seq(input_seq_type seqtype, const input_seq &seq) noexcept { m_seq[seqtype] = seq; }
+	template <typename... T> void set_cfg(input_seq_type seqtype, T &&... cfg) { m_cfg[seqtype].assign(std::forward<T>(cfg)...); }
 	void replace_code(input_code oldcode, input_code newcode) noexcept;
 	void configure_osd(const char *token, const char *name) noexcept;
 
 private:
 	// internal state
-	ioport_type         m_type;             // IPT_* for this entry
-	ioport_group        m_group;            // which group the port belongs to
-	u8                  m_player;           // player number (0 is player 1)
-	const char *        m_token;            // token used to store settings
-	const char *        m_name;             // user-friendly name
-	std::array<input_seq, SEQ_TYPE_TOTAL> m_defseq; // default input sequence
-	std::array<input_seq, SEQ_TYPE_TOTAL> m_seq; // currently configured sequences
+	ioport_type                             m_type;     // IPT_* for this entry
+	ioport_group                            m_group;    // which group the port belongs to
+	u8                                      m_player;   // player number (0 is player 1)
+	const char *                            m_token;    // token used to store settings
+	const char *                            m_name;     // user-friendly name
+	std::array<input_seq, SEQ_TYPE_TOTAL>   m_defseq;   // default input sequence
+	std::array<input_seq, SEQ_TYPE_TOTAL>   m_seq;      // currently configured sequences
+	std::array<std::string, SEQ_TYPE_TOTAL> m_cfg;      // configuration strings
 };
 
 
@@ -910,6 +804,7 @@ public:
 	{
 		m_condition = condition;
 		m_tag = tag;
+		m_port = nullptr;
 		m_mask = mask;
 		m_value = value;
 	}
@@ -1021,6 +916,7 @@ public:
 	u8 player() const { return m_player; }
 	bool digital_value() const { return m_digital_value; }
 	void set_value(ioport_value value);
+	void clear_value();
 
 	bool optional() const { return ((m_flags & FIELD_FLAG_OPTIONAL) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
@@ -1032,7 +928,7 @@ public:
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	u8 impulse() const noexcept { return m_impulse; }
-	const char *name() const;
+	std::string name() const;
 	const char *specific_name() const noexcept { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
@@ -1086,14 +982,15 @@ public:
 	{
 		ioport_value    value = 0;              // for DIP switches
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
+		std::string     cfg[SEQ_TYPE_TOTAL];    // configuration strings of all types
 		s32             sensitivity = 0;        // for analog controls
 		s32             delta = 0;              // for analog controls
 		s32             centerdelta = 0;        // for analog controls
 		bool            reverse = false;        // for analog controls
 		bool            toggle = false;         // for non-analog controls
 	};
-	void get_user_settings(user_settings &settings) const noexcept;
-	void set_user_settings(const user_settings &settings) noexcept;
+	void get_user_settings(user_settings &settings) const;
+	void set_user_settings(const user_settings &settings);
 
 private:
 	void expand_diplocation(const char *location, std::string &errorbuf);
@@ -1162,6 +1059,7 @@ struct ioport_field_live
 	digital_joystick::direction_t joydir;       // digital joystick direction index
 	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
+	std::string             cfg[SEQ_TYPE_TOTAL];// configuration strings
 };
 
 
@@ -1236,7 +1134,7 @@ private:
 class analog_field
 {
 	friend class ioport_manager;
-	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings) noexcept;
+	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings);
 
 public:
 	// construction/destruction
@@ -1255,8 +1153,9 @@ public:
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 
-	// setters
+	// programmatic override (for script bindings)
 	void set_value(s32 value);
+	void clear_value();
 
 private:
 	// helpers
@@ -1273,6 +1172,7 @@ private:
 	s32                 m_adjdefvalue;          // adjusted default value from the config
 	s32                 m_adjmin;               // adjusted minimum value from the config
 	s32                 m_adjmax;               // adjusted maximum value from the config
+	s32                 m_adjoverride;          // programmatically set adjusted value
 
 	// live values of configurable parameters
 	s32                 m_sensitivity;          // current live sensitivity (100=normal)
@@ -1284,7 +1184,6 @@ private:
 	s32                 m_accum;                // accumulated value (including relative adjustments)
 	s32                 m_previous;             // previous adjusted value
 	s32                 m_previousanalog;       // previous analog value
-	s32                 m_prog_analog_value;    // programmatically set analog value
 
 	// parameters for modifying live values
 	s32                 m_minimum;              // minimum adjusted value
@@ -1306,7 +1205,7 @@ private:
 	bool                m_single_scale;         // scale joystick differently if default is between min/max
 	bool                m_interpolate;          // should we do linear interpolation for mid-frame reads?
 	bool                m_lastdigital;          // was the last modification caused by a digital form?
-	bool                m_was_written;          // was the last modification caused programmatically?
+	bool                m_use_adjoverride;      // override what will be read from the field
 };
 
 
@@ -1375,7 +1274,7 @@ public:
 	// type helpers
 	const std::vector<input_type_entry> &types() const noexcept { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
-	const char *type_name(ioport_type type, u8 player) const noexcept;
+	std::string type_name(ioport_type type, u8 player) const;
 	ioport_group type_group(ioport_type type, int player) const noexcept;
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq) noexcept;
@@ -1404,12 +1303,11 @@ private:
 
 	void load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void load_remap_table(util::xml::data_node const &parentnode);
-	bool load_default_config(int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
-	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
-	void load_system_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
+	bool load_default_config(int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
+	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
+	void load_system_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
 
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
-	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(util::xml::data_node &parentnode);
 	void save_game_inputs(util::xml::data_node &parentnode);
@@ -1425,10 +1323,6 @@ private:
 	void record_end(const char *message = nullptr);
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
-
-	template<typename Type> void timecode_write(Type value);
-	void timecode_init();
-	void timecode_end(const char *message = nullptr);
 
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
@@ -1447,16 +1341,15 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (nullptr if not recording)
-	emu_file                m_playback_file;        // playback file (nullptr if not recording)
+	std::unique_ptr<emu_file> m_record_file;        // recording file (nullptr if not recording)
+	std::unique_ptr<emu_file> m_playback_file;      // playback file (nullptr if not recording)
+	util::write_stream::ptr m_record_stream;        // recording stream (nullptr if not recording)
+	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback
 	u32                     m_playback_accumulated_frames; // accumulated frames during playback
-	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
-	int                     m_timecode_count;
-	attotime                m_timecode_last_time;
 
 	// storage for inactive configuration
-	util::xml::file *       m_deselected_card_config; // using smart pointer would pull xmlfile.h into emu.h
+	std::unique_ptr<util::xml::file> m_deselected_card_config;
 };
 
 
@@ -1488,6 +1381,7 @@ public:
 	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
 	ioport_configurer& field_set_impulse(u8 impulse) { m_curfield->m_impulse = impulse; return *this; }
 	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
+	[[deprecated("PORT_RESET is deprecated; manage counter state explicitly")]]
 	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
 	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
 	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }

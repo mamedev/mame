@@ -14,6 +14,7 @@
 #include "dsd4432.h"
 #include "pc11.h"
 #include "qtx.h"
+#include "dvk_kgd.h"
 
 
 void qbus_cards(device_slot_interface &device)
@@ -21,6 +22,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
 	device.option_add("qts1", TTI_QTS1);
 	device.option_add("dsd4432", DSD4432);
+	device.option_add("kgd", DVK_KGD);
 }
 
 
@@ -90,7 +92,7 @@ qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_
 	device_t(mconfig, QBUS, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_z80daisy_interface(mconfig, *this),
-	m_program_config("QBUS A18", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor()),
+	m_program_config("a18", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor()),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_out_birq4_cb(*this),
 	m_out_birq5_cb(*this),

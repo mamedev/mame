@@ -127,6 +127,7 @@ private:
 	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ad1847_r(offs_t offset);
 	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -501,11 +502,9 @@ void mediagx_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
-#endif
 
 uint8_t mediagx_state::io20_r(offs_t offset)
 {

@@ -54,9 +54,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_disp_1;
-	uint8_t m_disp_2;
-	u8 m_digit;
+	uint8_t m_disp_1 = 0U;
+	uint8_t m_disp_2 = 0U;
+	u8 m_digit = 0U;
 	uint8_t bit_to_dec(uint8_t val);
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -129,6 +129,7 @@ void k1003_state::seg_w(uint8_t data)
 void k1003_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
+	map.global_mask(0x1f);
 	map(0x00, 0x00).r(FUNC(k1003_state::key_r));
 	map(0x02, 0x02).r(FUNC(k1003_state::port2_r));
 

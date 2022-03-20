@@ -6,7 +6,7 @@ local exports = {}
 exports.name = "layout"
 exports.version = "0.0.1"
 exports.description = "Layout helper plugin"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local layout = exports

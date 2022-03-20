@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/memcard.h"
 
 class hyperscan_card_device : public device_t,
-				public device_image_interface
+				public device_memcard_image_interface
 {
 public:
 	hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,17 +25,13 @@ protected:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "hyperscan_card"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 private:
 	uint16_t calc_crc(std::vector<uint8_t> const &data);

@@ -3373,7 +3373,7 @@ void toaplan2_state::ghox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on pcb
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5); // verified on pcb
 }
 
 /* probably dogyuun, vfive and kbash use the same decryption table;
@@ -3821,7 +3821,7 @@ void toaplan2_state::vfive(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on PCB
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5); // verified on PCB
 }
 
 
@@ -3863,10 +3863,10 @@ void toaplan2_state::batsugun(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.4);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/8, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
 void toaplan2_state::pwrkick(machine_config &config)
@@ -3998,10 +3998,10 @@ void toaplan2_state::snowbro2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -4095,11 +4095,11 @@ void toaplan2_state::bgaregga(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.7);
 }
 
 
@@ -4162,15 +4162,15 @@ void toaplan2_state::batrider(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch3");
 	GENERIC_LATCH_8(config, "soundlatch4");
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5); // 4MHz, 32MHz Oscillator (verified)
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25); // 4MHz, 32MHz Oscillator (verified)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[1], 32_MHz_XTAL/10, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &toaplan2_state::raizing_oki<1>);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

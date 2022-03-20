@@ -35,7 +35,7 @@ Data Link Controller
 
 #pragma once
 
-#include "osdcore.h"
+#include "osdfile.h"
 
 
 class mb89374_device : public device_t,

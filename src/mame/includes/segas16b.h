@@ -114,7 +114,6 @@ public:
 	void init_hwchamp_5521();
 	void init_sdi_5358_small();
 	void init_fpointbla();
-	void init_altbeasj_5521();
 	void init_snapper();
 	void init_shinobi4_5521();
 	void init_defense_5358_small();
@@ -161,8 +160,8 @@ protected:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); };
-	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); };
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); }
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); }
 
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
@@ -212,14 +211,12 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
 
 	// i8751 simulations
-	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
-	void altbeasj_i8751_sim();
 	void tturf_i8751_sim();
 	void wb3_i8751_sim();
 

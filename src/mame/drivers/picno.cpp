@@ -28,6 +28,7 @@ Can't do anything until the internal ROM is dumped.
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 //#include "sound/multipcm.h"
 //#include "screen.h"

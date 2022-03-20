@@ -11,15 +11,43 @@
 #include "emu.h"
 #include "computereyes2.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#include "imagedev/picture.h"
+
+#include "bitmap.h"
+
+
+namespace {
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_COMPUTEREYES2, a2bus_computereyes2_device, "a2ceyes2", "Digital Vision ComputerEyes/2")
+class a2bus_computereyes2_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_computereyes2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_computereyes2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+private:
+	required_device<picture_image_device> m_picture;
+	int m_x, m_y, m_cer0, m_cer1, m_cer2;
+	u8 m_a2_bitmap[280*193];
+	u8 m_threshold;
+	bool m_bActive;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -230,3 +258,12 @@ void a2bus_computereyes2_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_COMPUTEREYES2, device_a2bus_card_interface, a2bus_computereyes2_device, "a2ceyes2", "Digital Vision ComputerEyes/2")

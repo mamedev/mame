@@ -17,6 +17,7 @@
 #include "ui/uimain.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "romload.h"
 #include "speaker.h"
 #include "screen.h"
@@ -42,7 +43,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -113,7 +114,7 @@ public:
 			void pr8210(machine_config &config);
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -185,15 +186,15 @@ chd_file *ldplayer_state::get_disc()
 		{
 			// open the file itself via our search path
 			emu_file image_file(machine().options().media_path(), OPEN_FLAG_READ);
-			osd_file::error filerr = image_file.open(dir->name);
-			if (filerr == osd_file::error::NONE)
+			std::error_condition filerr = image_file.open(dir->name);
+			if (!filerr)
 			{
 				std::string fullpath(image_file.fullpath());
 				image_file.close();
 
 				// try to open the CHD
 
-				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
+				if (!machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()))
 				{
 					m_filename.assign(dir->name);
 					found = true;
@@ -204,7 +205,8 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == false) {
+	if (!found)
+	{
 		machine().ui().popup_time(10, "No valid image file found!\n");
 		return nullptr;
 	}
@@ -293,7 +295,7 @@ void ldplayer_state::process_commands()
 }
 
 
-void ldplayer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ldplayer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -350,7 +352,7 @@ void pr8210_state::add_command(uint8_t command)
 }
 
 
-void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -390,7 +392,7 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		// others to the parent class
 		default:
-			ldplayer_state::device_timer(timer, id, param, ptr);
+			ldplayer_state::device_timer(timer, id, param);
 			break;
 	}
 }

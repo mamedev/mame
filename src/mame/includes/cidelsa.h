@@ -79,7 +79,7 @@ public:
 	void destryera_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -90,13 +90,13 @@ protected:
 	output_finder<3> m_leds;
 
 	// cpu state
-	int m_reset;
+	int m_reset = 0;
 
 	// video state
-	int m_cdp1802_q;
-	int m_cdp1869_pcb;
+	int m_cdp1802_q = 0;
+	int m_cdp1869_pcb = 0;
 
-	uint8_t *m_pageram;
+	uint8_t *m_pageram = nullptr;
 	std::unique_ptr<uint8_t[]> m_pcbram;
 	std::unique_ptr<uint8_t[]> m_charram;
 };
@@ -133,8 +133,8 @@ protected:
 
 	required_device<ay8910_device> m_psg;
 	// sound state
-	int m_sound;
-	int m_psg_latch;
+	int m_sound = 0;
+	int m_psg_latch = 0;
 };
 
 #endif // MAME_INCLUDES_CIDELSA_H

@@ -47,6 +47,12 @@ public:
 		m_scroll_register(*this, "scroll_register")
 	{ }
 
+	void atarifb4(machine_config &config);
+	void atarifb(machine_config &config);
+	void soccer(machine_config &config);
+	void abaseb(machine_config &config);
+
+private:
 	void intack_w(uint8_t data);
 	void atarifb_out1_w(uint8_t data);
 	void atarifb4_out1_w(uint8_t data);
@@ -73,10 +79,6 @@ public:
 	void draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset );
 	void draw_sprites_atarifb( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_soccer( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void atarifb4(machine_config &config);
-	void atarifb(machine_config &config);
-	void soccer(machine_config &config);
-	void abaseb(machine_config &config);
 	void abaseb_map(address_map &map);
 	void atarifb4_map(address_map &map);
 	void atarifb_map(address_map &map);
@@ -87,6 +89,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
@@ -106,28 +109,28 @@ protected:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_register;
 
-	tilemap_t  *m_alpha1_tilemap;
-	tilemap_t  *m_alpha2_tilemap;
-	tilemap_t  *m_field_tilemap;
+	tilemap_t  *m_alpha1_tilemap = nullptr;
+	tilemap_t  *m_alpha2_tilemap = nullptr;
+	tilemap_t  *m_field_tilemap = nullptr;
 
 	/* sound-related */
-	int m_ctrld;
-	int m_sign_x_1;
-	int m_sign_y_1;
-	int m_sign_x_2;
-	int m_sign_y_2;
-	int m_sign_x_3;
-	int m_sign_y_3;
-	int m_sign_x_4;
-	int m_sign_y_4;
-	int m_counter_x_in0;
-	int m_counter_y_in0;
-	int m_counter_x_in0b;
-	int m_counter_y_in0b;
-	int m_counter_x_in2;
-	int m_counter_y_in2;
-	int m_counter_x_in2b;
-	int m_counter_y_in2b;
+	int m_ctrld = 0;
+	int m_sign_x_1 = 0;
+	int m_sign_y_1 = 0;
+	int m_sign_x_2 = 0;
+	int m_sign_y_2 = 0;
+	int m_sign_x_3 = 0;
+	int m_sign_y_3 = 0;
+	int m_sign_x_4 = 0;
+	int m_sign_y_4 = 0;
+	int m_counter_x_in0 = 0;
+	int m_counter_y_in0 = 0;
+	int m_counter_x_in0b = 0;
+	int m_counter_y_in0b = 0;
+	int m_counter_x_in2 = 0;
+	int m_counter_y_in2 = 0;
+	int m_counter_x_in2b = 0;
+	int m_counter_y_in2b = 0;
 };
 
 //----------- defined in audio/atarifb.cpp -----------

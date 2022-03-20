@@ -7,6 +7,7 @@
 
 
 #include "machine/74259.h"
+#include "sound/ay8910.h"
 #include "sound/tms5110.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -26,13 +27,12 @@ public:
 		m_colorram(*this, "colorram")
 	{ }
 
-	void botanic(machine_config &config);
 	void sbagman(machine_config &config);
 	void bagman(machine_config &config);
-	void pickin(machine_config &config);
 	void sbagmani(machine_config &config);
 
 	void init_bagmans3();
+	void init_botanic2();
 
 protected:
 	// common
@@ -67,9 +67,7 @@ protected:
 	void bagman_base(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
-	void pickin_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -77,30 +75,53 @@ private:
 	optional_device<tmsprom_device> m_tmsprom;
 	optional_device<ls259_device> m_tmslatch;
 
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	bool m_irq_mask;
-	bool m_video_enable;
+	bool m_irq_mask = false;
+	bool m_video_enable = false;
 
 	/*table holds outputs of all ANDs (after AND map)*/
-	uint8_t m_andmap[64];
+	uint8_t m_andmap[64]{};
 
 	/*table holds inputs (ie. not x, x, not q, q) to the AND map*/
-	uint8_t m_columnvalue[32];
+	uint8_t m_columnvalue[32]{};
 
 	/*8 output pins (actually 6 output and 2 input/output)*/
-	uint8_t m_outvalue[8];
+	uint8_t m_outvalue[8]{};
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 
-class squaitsa_state : public bagman_state
+class pickin_state : public bagman_state
+{
+public:
+	pickin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bagman_state(mconfig, type, tag),
+		m_aysnd(*this, {"aysnd", "ay2"})
+	{ }
+
+	void pickin(machine_config &config);
+	void botanic(machine_config &config);
+
+private:
+	uint8_t aysnd_r();
+	void aysnd_w(offs_t offset, uint8_t data);
+
+	void pickin_map(address_map &map);
+	void pickin_portmap(address_map &map);
+
+	required_device_array<ay8910_device, 2> m_aysnd;
+};
+
+
+class squaitsa_state : public pickin_state
 {
 public:
 	squaitsa_state(const machine_config &mconfig, device_type type, const char *tag) :
-		bagman_state(mconfig, type, tag),
+		pickin_state(mconfig, type, tag),
 		m_dial(*this, "DIAL_P%u", 1),
 		m_res{ 0, 0 },
 		m_old_val{ 0, 0 }

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "coreutil.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -73,7 +72,6 @@ struct genesis_z80_vars
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;
 
-	void init_megadriv_c2();
 	void init_megadrie();
 	void init_megadriv();
 	void init_megadrij();

@@ -127,7 +127,7 @@ public:
 	virtual void update() = 0;
 	virtual void complete_destroy() = 0;
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 	virtual bool win_has_menu() = 0;
 #endif
 
@@ -226,9 +226,9 @@ public:
 	virtual std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
-	virtual void save() { };
-	virtual void record() { };
-	virtual void toggle_fsfx() { };
+	virtual void save() { }
+	virtual void record() { }
+	virtual void toggle_fsfx() { }
 	virtual bool sliders_dirty() { return m_sliders_dirty; }
 
 	static std::unique_ptr<osd_renderer> make_for_type(int mode, std::shared_ptr<osd_window> window, int extra_flags = FLAG_NONE);

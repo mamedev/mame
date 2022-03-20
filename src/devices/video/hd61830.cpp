@@ -21,7 +21,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
-decltype(HD61830) HD61830B = HD61830;
 
 
 // default address map
@@ -138,7 +137,7 @@ void hd61830_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// clear busy flag
 	m_bf = false;

@@ -80,6 +80,18 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
+
+	configuration { "gmake or ninja" }
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
+
+	else
+		buildoptions_c {
+			"-Wno-maybe-uninitialized", -- expat in GCC 11.1
+		}
+	end
+end
+
 	configuration { }
 
 	files {
@@ -104,7 +116,7 @@ project "zlib"
 	kind "StaticLib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android")) then
 		configuration { "gmake or ninja" }
 		if (version >= 30700) then
 			buildoptions {
@@ -573,11 +585,6 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "winstore*" }
-		defines {
-			"NO_GETENV"
-		}
-
 	configuration { }
 
 	files {
@@ -665,12 +672,6 @@ end
 	configuration { "mingw-clang" }
 		buildoptions {
 			"-include stdint.h"
-		}
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-enum-conversion",
-			"-Wno-unused-function",
 		}
 
 	configuration { }
@@ -774,11 +775,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
-
 	configuration { }
 		defines {
 			"_7ZIP_PPMD_SUPPPORT",
@@ -867,25 +863,15 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h",
-		}
-
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
 		defines {
 			"LUA_USE_POSIX",
-		}
-	end
-	if ("pnacl" == _OPTIONS["gcc"]) then
-		defines {
-			"LUA_32BITS",
 		}
 	end
 
@@ -953,11 +939,6 @@ project "lualibs"
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
 		}
 
-	configuration { "pnacl"}
-		buildoptions {
-			"-Wno-char-subscripts",
-		}
-
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -965,22 +946,14 @@ project "lualibs"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
-	}
-if (_OPTIONS["osd"] ~= "uwp") then
-	includedirs {
 		MAME_DIR .. "3rdparty/linenoise",
 	}
-end
+
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
 		ext_includedir("sqlite3"),
 	}
-
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
 
 	configuration {}
 
@@ -988,16 +961,8 @@ end
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
-	}
-if (_OPTIONS["osd"] == "uwp") then
-	files {
-		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
-	}
-else
-	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
-end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -1008,17 +973,24 @@ project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
 		}
-if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 		buildoptions_c {
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 		}
+	else
+		buildoptions_c {
+			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+		}
+	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
@@ -1026,16 +998,6 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-implicit-int-float-conversion",
 		}
 end
-	configuration { "winstore*" }
-		defines {
-			"SQLITE_OS_WINRT",
-		}
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-unused-variable",
-		}
 
 	configuration { }
 
@@ -1160,7 +1122,7 @@ project "bx"
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1228,7 +1190,7 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1241,6 +1203,11 @@ project "bimg"
 	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "gmake or ninja" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
 		}
 
 	configuration { }
@@ -1300,12 +1267,6 @@ project "bgfx"
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-unneeded-internal-declaration",
-			"-Wno-unused-const-variable",
-		}
-
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -1321,12 +1282,8 @@ end
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bimg/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
-
-	configuration { "not steamlink"}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-		}
 
 	configuration { "android-*"}
 		buildoptions {
@@ -1342,7 +1299,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx* or xcode4" }
+	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -1364,14 +1321,6 @@ end
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
 		}
-	configuration { "rpi" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
-		}
-		defines {
-			"__STDC_VERSION__=199901L",
-		}
 
 	configuration { }
 
@@ -1390,6 +1339,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
 				"-Wno-int-to-pointer-cast",
+				"-Wno-ignored-attributes", -- many instances in ImGui
 			}
 		end
 	end
@@ -1416,7 +1366,6 @@ end
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
-		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
@@ -1445,6 +1394,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_agc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
@@ -1453,17 +1403,19 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_webgpu.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/vertexlayout.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_tables.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
@@ -1508,15 +1460,6 @@ project "portaudio"
 			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 	end
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-missing-braces",
-			"-Wno-switch",
-			"-Wno-unused-function",
-			"-Wno-unused-variable",
-		}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
@@ -1682,12 +1625,6 @@ if _OPTIONS["targetos"]=="android" then
 		end
 		if _OPTIONS["PLATFORM"]=="arm64" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
-		end
-		if _OPTIONS["PLATFORM"]=="mips" then
-			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
-		end
-		if _OPTIONS["PLATFORM"]=="mips64" then
-			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
 		end
 		if _OPTIONS["PLATFORM"]=="x86" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
@@ -2171,7 +2108,6 @@ end
 -- linenoise library
 --------------------------------------------------
 
-if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
@@ -2193,7 +2129,6 @@ project "linenoise"
 		MAME_DIR .. "3rdparty/linenoise/utf8.c",
 		MAME_DIR .. "3rdparty/linenoise/linenoise.c",
 	}
-end
 
 
 --------------------------------------------------
@@ -2206,7 +2141,7 @@ project "utf8proc"
 	kind "StaticLib"
 
 	defines {
-		"UTF8PROC_DLLEXPORT="
+		"UTF8PROC_STATIC",
 	}
 
 	configuration "Debug"
@@ -2220,9 +2155,6 @@ project "utf8proc"
 		}
 
 	configuration { }
-		defines {
-			"ZLIB_CONST",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"
@@ -2313,30 +2245,65 @@ project "asmjit"
 	end
 
 	files {
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit-scope-begin.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit-scope-end.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64archtraits_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64assembler.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64assembler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64builder.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64builder.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64compiler.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emithelper_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64emitter.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64formatter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64formatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64func.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64func_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64globals.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instapi.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instapi_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64instdb_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64operand.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64operand.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64utils.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armglobals.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armoperand.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-build_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-config.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/arch.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/arch.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archcommons.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archtraits.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archtraits.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/assembler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/assembler.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/callconv.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/callconv.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codebuffer.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codebufferwriter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codewriter.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codewriter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compiler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/compilerdefs.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/constpool.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/constpool.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/cpuinfo.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/cpuinfo.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/datatypes.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emithelper_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitter.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/emitterutils.cpp",
@@ -2345,11 +2312,13 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/environment.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/errorhandler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/errorhandler.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/features.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/formatter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/func.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/func.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/funcargscontext.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/funcargscontext_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/globals.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/globals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/inst.cpp",
@@ -2398,29 +2367,26 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonetree.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonevector.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/zonevector.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archdata.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archdata_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86archtraits_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86assembler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86assembler.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86builder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86builder.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86callconv.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86callconv_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86compiler.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86compiler.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emithelper.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emithelper_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86emitter.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86features.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86features.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86formatter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86formatter_p.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86func.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86func_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86globals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instapi.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instapi_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86instdb_p.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86internal.cpp",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86internal_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86opcode_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86operand.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/x86/x86operand.h",

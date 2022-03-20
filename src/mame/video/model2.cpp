@@ -771,7 +771,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 {
 	model2_renderer *poly = m_state.m_poly.get();
-	m2_poly_extra_data& extra = poly->object_data_alloc();
+	m2_poly_extra_data& extra = poly->object_data().next();
 	u8 renderer;
 
 	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
@@ -2420,7 +2420,7 @@ u32 *model2_state::geo_code_upload( geo_state *geo, u32 opcode, u32 *input )
 
 	for( i = 0; i < count; i++ )
 	{
-		u64  code;
+		[[maybe_unused]] u64  code;
 
 		/* read the top part of the opcode */
 		code = *input++;

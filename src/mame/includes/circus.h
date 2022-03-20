@@ -44,10 +44,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	int m_clown_x;
-	int m_clown_y;
-	int m_clown_z;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int m_clown_x = 0;
+	int m_clown_y = 0;
+	int m_clown_z = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

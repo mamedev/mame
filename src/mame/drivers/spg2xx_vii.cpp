@@ -6,6 +6,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 
 class vii_state : public spg2xx_game_state
@@ -28,7 +29,7 @@ private:
 	virtual void machine_reset() override;
 
 	static const device_timer_id TIMER_CTRL_POLL = 0;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void vii_portb_w(uint16_t data);
 
@@ -47,7 +48,7 @@ private:
 };
 
 
-void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -153,7 +154,7 @@ DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 
 	if (size < 0x800000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

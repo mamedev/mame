@@ -79,7 +79,7 @@ void dp8573_device::save_registers()
 	m_ram[REG_SAVE_MONTH]  = m_ram[REG_MONTH];
 }
 
-void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if ((m_pfr & PFR_OSF) || !(m_ram[REG_RTMR] & RTMR_CSS))
 	{
@@ -346,13 +346,18 @@ void dp8573_device::nvram_default()
 	sync_time();
 }
 
-void dp8573_device::nvram_read(emu_file &file)
+bool dp8573_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_ram, 32);
+	size_t actual;
+	if (file.read(m_ram, 32, actual) || actual != 32)
+		return false;
+
 	sync_time();
+	return true;
 }
 
-void dp8573_device::nvram_write(emu_file &file)
+bool dp8573_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_ram, 32);
+	size_t actual;
+	return !file.write(m_ram, 32, actual) && actual == 32;
 }

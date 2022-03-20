@@ -49,6 +49,9 @@ public:
 		m_spindis(1)
 	{ }
 
+	void adam(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
 	required_device<tms9928a_device> m_vdc;
@@ -97,18 +100,17 @@ public:
 	uint8_t m_an;
 
 	// DMA state
-	uint16_t m_ba;
+	uint16_t m_ba = 0U;
 	int m_dma;
 	int m_bwr;
-	uint8_t m_data_in;
-	uint8_t m_data_out;
+	uint8_t m_data_in = 0U;
+	uint8_t m_data_out = 0U;
 
 	// paddle state
 	int m_spindis;
 
 	// video state
-	int m_vdp_nmi;
-	void adam(machine_config &config);
+	int m_vdp_nmi = 0;
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
 	void m6801_mem(address_map &map);

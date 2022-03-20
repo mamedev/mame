@@ -213,7 +213,7 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 // isbc202_device
 isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig , ISBC202 , tag , owner , multibus_slot_device::BUS_CLOCK / 4)
+	: cpu_device(mconfig , ISBC202 , tag , owner , DERIVED_CLOCK(1, 4))
 	, device_multibus_interface(mconfig , *this)
 	, m_mcu(*this , "mcu")
 	, m_cpes(*this , "cpe%u" , 0)
@@ -225,16 +225,6 @@ isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, d
 
 isbc202_device::~isbc202_device()
 {
-}
-
-void isbc202_device::install_io_rw(address_space& space)
-{
-	space.install_readwrite_handler(0x78 , 0x7f , read8m_delegate(*this , FUNC(isbc202_device::io_r)) , write8m_delegate(*this , FUNC(isbc202_device::io_w)));
-}
-
-void isbc202_device::install_mem_rw(address_space& space)
-{
-	m_mem_space = &space;
 }
 
 uint8_t isbc202_device::io_r(address_space &space, offs_t offset)
@@ -417,6 +407,9 @@ void isbc202_device::device_start()
 	m_timeout_timer = timer_alloc(TIMEOUT_TMR_ID);
 	m_byte_timer = timer_alloc(BYTE_TMR_ID);
 	m_f_timer = timer_alloc(F_TMR_ID);
+
+	m_mem_space = &m_bus->space(AS_PROGRAM);
+	m_bus->space(AS_IO).install_readwrite_handler(0x78, 0x7f, read8m_delegate(*this, FUNC(isbc202_device::io_r)), write8m_delegate(*this, FUNC(isbc202_device::io_w)));
 }
 
 void isbc202_device::device_reset()
@@ -445,7 +438,7 @@ void isbc202_device::device_reset()
 	m_f_timer->reset();
 }
 
-void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id) {
 	case TIMEOUT_TMR_ID:

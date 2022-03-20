@@ -281,7 +281,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %u", size).c_str());
+		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %u", size).c_str());
 		return image_init_result::FAIL;
 	}
 
@@ -289,7 +289,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 	{
 		if ( image.fread( pos, size ) != size )
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
+			image.seterror(image_error::INVALIDIMAGE, "Read error");
 			return image_init_result::FAIL;
 		}
 	}
@@ -891,7 +891,7 @@ void thomson_state::to7_game_reset()
 /* IMPORTANT NOTE:
    The following is experimental and not compiled in by default.
    It relies on the existence of an hypothetical "character device" API able
-   to transmit bytes between the MESS driver and the outside world
+   to transmit bytes between the MAME driver and the outside world
    (using, e.g., character device special files on some UNIX).
 */
 
@@ -1389,7 +1389,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %d", size).c_str());
+		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %d", size).c_str());
 		return image_init_result::FAIL;
 	}
 
@@ -1397,7 +1397,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 	{
 		if ( image.fread(pos, size ) != size )
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
+			image.seterror(image_error::INVALIDIMAGE, "Read error");
 			return image_init_result::FAIL;
 		}
 	}

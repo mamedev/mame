@@ -9,14 +9,14 @@ driver by Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 
 Custom ICs:
 ----------
-11XX     gfx data shifter and mixer (16-bit in, 4-bit out) [1]
-15XX     sound control
-16XX     I/O control
-CUS20    tilemap and sprite address generator
-CUS21    sprite generator
-CUS26    starfield generator
-CUS29    sprite line buffer and sprite/tilemap mixer
-CUS33    timing generator
+11XX     ULA gfx data shifter and mixer (16-bit in, 4-bit out) [1]
+15XX     ULA sound control
+16XX     ULA I/O control
+CUS20    ULA tilemap and sprite address generator
+CUS21    ULA sprite generator
+CUS26    ULA starfield generator
+CUS29    ULA sprite line buffer and sprite/tilemap mixer
+CUS33    ULA timing generator
 CUS34    address decoder
 56XX     I/O
 58XX     I/O
@@ -210,15 +210,15 @@ void gaplus_base_state::machine_reset()
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_NAMCOIO0_RUN:
-		namcoio0_run(ptr, param);
+		namcoio0_run(param);
 		break;
 	case TIMER_NAMCOIO1_RUN:
-		namcoio1_run(ptr, param);
+		namcoio1_run(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in gaplus_base_state::device_timer");

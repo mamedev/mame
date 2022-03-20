@@ -37,6 +37,7 @@
 #include "osdcomm.h"
 #include "coretmpl.h"
 #include "bitmap.h"
+#include "endianness.h"
 #include "strformat.h"
 #include "vecstream.h"
 
@@ -77,6 +78,21 @@ using util::BIT;
 using util::bitswap;
 using util::iabs;
 using util::string_format;
+
+using endianness_t = util::endianness;
+
+using util::BYTE_XOR_BE;
+using util::BYTE_XOR_LE;
+using util::BYTE4_XOR_BE;
+using util::BYTE4_XOR_LE;
+using util::WORD_XOR_BE;
+using util::WORD_XOR_LE;
+using util::BYTE8_XOR_BE;
+using util::BYTE8_XOR_LE;
+using util::WORD2_XOR_BE;
+using util::WORD2_XOR_LE;
+using util::DWORD_XOR_BE;
+using util::DWORD_XOR_LE;
 
 
 // pen_t is used to represent pixel values in bitmaps
@@ -150,21 +166,9 @@ union PAIR64
 //  COMMON CONSTANTS
 //**************************************************************************
 
-// constants for expression endianness
-enum endianness_t
-{
-	ENDIANNESS_LITTLE,
-	ENDIANNESS_BIG
-};
-
-extern const char *const endianness_names[2];
-
-// declare native endianness to be one or the other
-#ifdef LSB_FIRST
-const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_LITTLE;
-#else
-const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
-#endif
+constexpr endianness_t ENDIANNESS_LITTLE = util::endianness::little;
+constexpr endianness_t ENDIANNESS_BIG    = util::endianness::big;
+constexpr endianness_t ENDIANNESS_NATIVE = util::endianness::native;
 
 
 // M_PI is not part of the C/C++ standards and is not present on
@@ -174,15 +178,19 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #endif
 
 
-// orientation of bitmaps
-constexpr int ORIENTATION_FLIP_X   = 0x0001;  // mirror everything in the X direction
-constexpr int ORIENTATION_FLIP_Y   = 0x0002;  // mirror everything in the Y direction
-constexpr int ORIENTATION_SWAP_XY  = 0x0004;  // mirror along the top-left/bottom-right diagonal
+/// \name Image orientation flags
+/// \{
+
+constexpr int ORIENTATION_FLIP_X   = 0x0001;  ///< Mirror horizontally (in the X direction)
+constexpr int ORIENTATION_FLIP_Y   = 0x0002;  ///< Mirror vertically (in the Y direction)
+constexpr int ORIENTATION_SWAP_XY  = 0x0004;  ///< Mirror along the top-left/bottom-right diagonal
 
 constexpr int ROT0                 = 0;
-constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  // rotate clockwise 90 degrees
-constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   // rotate 180 degrees
-constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  // rotate counter-clockwise 90 degrees
+constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  ///< Rotate 90 degrees clockwise
+constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   ///< Rotate 180 degrees
+constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  ///< Rotate 90 degrees anti-clockwise (270 degrees clockwise)
+
+/// \}
 
 
 // these are UTF-8 encoded strings for common characters
@@ -262,16 +270,6 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 // macros to convert radians to degrees and degrees to radians
 template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
 template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
-
-
-// endian-based value: first value is if 'endian' is little-endian, second is if 'endian' is big-endian
-#define ENDIAN_VALUE_LE_BE(endian,leval,beval)  (((endian) == ENDIANNESS_LITTLE) ? (leval) : (beval))
-
-// endian-based value: first value is if native endianness is little-endian, second is if native is big-endian
-#define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)  ENDIAN_VALUE_LE_BE(ENDIANNESS_NATIVE, leval, beval)
-
-// endian-based value: first value is if 'endian' matches native, second is if 'endian' doesn't match native
-#define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
 //**************************************************************************

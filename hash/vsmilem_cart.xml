@@ -137,7 +137,7 @@ Language:
 |   XX   | 80-084324(GE)     | TinkerBell                                                                                |
 |   XX   | 80-084325(FR)     | La fée Clochette                                                                          |
 |        | 80-084326(PT)     | Sininho (84336 on cart)                                                                   |
-|        | 80-084327(SP)     | Campanilla                                                                                |
+|   XX   | 80-084327(SP)     | Campanilla                                                                                |
 +========+===================+===========================================================================================+
 |   XX   | 80-084340(US)     | Up!                                                                                       |
 |        | 80-084342(NL)     | Up!                                                                                       |
@@ -171,7 +171,7 @@ Language:
 |   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084420(US)     | Toy Story 3                                                                               |
-|        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
+|   **   | 80-084421(US)     | Toy Story 3 (pocket version, same ROM as 084420(US))                                      |
 |        |          (IT)     | Toy Story 3 (EAN 8033836704196, GP470419?)                                                |
 |        | 80-084422(NL)     | Toy Story 3                                                                               |
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
@@ -209,7 +209,7 @@ Language:
 |        | 80-084520(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084540(US)     | Super Why to the Rescue! - The Beach Day Mystery                                          |
-|        | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version)                         |
+|   **   | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version, same ROM as 084540(US)  |
 +========+===================+===========================================================================================+
 |        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
@@ -1399,6 +1399,19 @@ Language:
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="084325 - La Fee Clochette (Motion) (FR).bin" size="8388608" crc="0b2645fd" sha1="8ad3b1f8082852c947c1c5a22a82e954861a0cc5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinkermsp" cloneof="tinkerm">
+		<description>Campanilla (Spain)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084327(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084327 - Campanilla (SPAIN).bin" size="8388608" crc="dc99e5b3" sha1="9104605d6a5f2828bdccbf719de255c45511dc99" />
 			</dataarea>
 		</part>
 	</software>

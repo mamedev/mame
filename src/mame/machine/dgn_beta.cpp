@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-  machine\dgn_beta.c (machine.c)
+  machine/dgn_beta.cpp
 
     Moved out of dragon.c, 2005-05-05, P.Harvey-Smith.
 
@@ -57,21 +57,22 @@
 
 ***************************************************************************/
 
-#include <functional>
+#include "emu.h"
+#include "includes/dgn_beta.h"
+
+#include "includes/coco.h" // for CoCo OS-9 disassembler enhancements
+
+#include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
+#include "machine/6821pia.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+
+#include "debug/debugcon.h"
+#include "debugger.h"
 
 #include <cmath>
-#include "emu.h"
-#include "debug/debugcon.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "includes/dgn_beta.h"
-#include "includes/coco.h"
-#include "machine/mos6551.h"
-#include "imagedev/floppy.h"
-
-#include "debugger.h"
-#include "debug/debugcon.h"
-#include "machine/ram.h"
+#include <functional>
 
 #define VERBOSE 0
 
@@ -118,13 +119,10 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	int                 bank_start;
 	int                 bank_end;
 	int                 MapPage;
-	char                page_num[10];
 
 	LOG_BANK_UPDATE(("\n\n%s Updating banks %d to %d\n", machine().describe_context(), first, last));
 	for(Page=first;Page<=last;Page++)
 	{
-		sprintf(page_num,"bank%d",Page+1);
-
 		bank_start  = Page < 16 ? Page * 0x1000 : 0xff00;
 		bank_end    = Page < 15 ? bank_start + 0xfff : Page == 15 ? 0xfbff : 0xffff;
 
@@ -748,20 +746,20 @@ void dgn_beta_state::dgn_beta_frame_interrupt (int data)
 	ScanInKeyboard();
 }
 
-#ifdef UNUSED_FUNCTION
-void dgn_beta_state::dgn_beta_line_interrupt (int data)
+void dgn_beta_state::dgn_beta_line_interrupt(int data)
 {
-//  /* Set PIA line, so it recognises interrupt */
-//  if (data)
-//  {
-//      m_pia_0->cb1_w(ASSERT_LINE);
-//  }
-//  else
-//  {
-//      m_pia_0->cb1_w(CLEAR_LINE);
-//  }
-}
+#if 0
+	/* Set PIA line, so it recognises interrupt */
+	if (data)
+	{
+		m_pia_0->cb1_w(ASSERT_LINE);
+	}
+	else
+	{
+		m_pia_0->cb1_w(CLEAR_LINE);
+	}
 #endif
+}
 
 
 /********************************* Machine/Driver Initialization ****************************************/
@@ -807,8 +805,8 @@ void dgn_beta_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_dat_log, this, _1, _2));
-		machine().debugger().console().register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_key_dump, this, _1, _2));
+		machine().debugger().console().register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, std::bind(&dgn_beta_state::execute_beta_dat_log, this, _1));
+		machine().debugger().console().register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, std::bind(&dgn_beta_state::execute_beta_key_dump, this, _1));
 	}
 	m_LogDatWrites = false;
 	m_wd2797_written = 0;
@@ -824,14 +822,14 @@ offs_t dgn_beta_state::dgnbeta_dasm_override(std::ostream &stream, offs_t pc, co
 	return coco_state::os9_dasm_override(stream, pc, opcodes, params);
 }
 
-void dgn_beta_state::execute_beta_dat_log(int ref, const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_dat_log(const std::vector<std::string> &params)
 {
 	m_LogDatWrites = !m_LogDatWrites;
 
 	machine().debugger().console().printf("DAT register write info set : %d\n", m_LogDatWrites);
 }
 
-void dgn_beta_state::execute_beta_key_dump(int ref, const std::vector<std::string> &params)
+void dgn_beta_state::execute_beta_key_dump(const std::vector<std::string> &params)
 {
 	for (int idx = 0; idx < NoKeyrows; idx++)
 	{

@@ -200,6 +200,8 @@ Notes:
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -720,6 +722,9 @@ void amstrad_pc_state::pc200(machine_config &config)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("pc200");
 }
 
 void amstrad_pc_state::pc2086(machine_config &config)

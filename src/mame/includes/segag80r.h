@@ -14,10 +14,12 @@
 #include "audio/segag80r.h"
 #include "audio/segaspeech.h"
 #include "audio/segausb.h"
+
 #include "machine/i8255.h"
 #include "machine/segag80.h"
 #include "sound/samples.h"
 #include "sound/sn76496.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -189,7 +191,7 @@ private:
 	void sindbadm_portmap(address_map &map);
 	void sindbadm_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	emu_timer *m_vblank_latch_clear_timer;
 };
 

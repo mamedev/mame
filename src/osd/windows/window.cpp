@@ -8,9 +8,6 @@
 
 #define LOG_TEMP_PAUSE      0
 
-// Needed for RAW Input
-#define WM_INPUT 0x00FF
-
 // standard C headers
 #include <process.h>
 
@@ -33,11 +30,6 @@
 #include "strconv.h"
 
 #include "modules/monitor/monitor_common.h"
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#include <agile.h>
-using namespace Windows::UI::Core;
-#endif
 
 #include "modules/render/drawbgfx.h"
 #include "modules/render/drawnone.h"
@@ -138,6 +130,7 @@ bool windows_osd_interface::window_init()
 	window_thread = GetCurrentThread();
 	window_threadid = main_threadid;
 
+	// initialize the renderer
 	const int fallbacks[VIDEO_MODE_COUNT] = {
 		-1,                 // NONE -> no fallback
 		VIDEO_MODE_NONE,    // GDI -> NONE
@@ -159,7 +152,7 @@ bool windows_osd_interface::window_init()
 	{
 		bool error = false;
 		switch(current_mode)
-	{
+		{
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;
@@ -309,9 +302,12 @@ win_window_info::win_window_info(
 	, m_targetview(0)
 	, m_targetorient(0)
 	, m_targetvismask(0)
+	, m_targetscalemode(0)
+	, m_targetkeepaspect(machine.options().keep_aspect())
 	, m_lastclicktime(std::chrono::steady_clock::time_point::min())
 	, m_lastclickx(0)
 	, m_lastclicky(0)
+	, m_last_surrogate(0)
 	, m_attached_mode(false)
 {
 	m_non_fullscreen_bounds.left = 0;
@@ -324,8 +320,6 @@ win_window_info::win_window_info(
 }
 
 POINT win_window_info::s_saved_cursor_pos = { -1, -1 };
-
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 void win_window_info::capture_pointer()
 {
@@ -360,35 +354,6 @@ void win_window_info::show_pointer()
 	while (ShowCursor(TRUE) < 1) {};
 	ShowCursor(FALSE);
 }
-
-#else
-
-CoreCursor^ win_window_info::s_cursor = nullptr;
-
-void win_window_info::capture_pointer()
-{
-	platform_window<Platform::Agile<CoreWindow^>>()->SetPointerCapture();
-}
-
-void win_window_info::release_pointer()
-{
-	platform_window<Platform::Agile<CoreWindow^>>()->ReleasePointerCapture();
-}
-
-void win_window_info::hide_pointer()
-{
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	win_window_info::s_cursor = window->PointerCursor;
-	window->PointerCursor = nullptr;
-}
-
-void win_window_info::show_pointer()
-{
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	window->PointerCursor = win_window_info::s_cursor;
-}
-
-#endif
 
 //============================================================
 //  winwindow_process_events_periodic
@@ -709,7 +674,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	// if we should hide the mouse cursor, then do it
 	// rules are:
 	//   1. we must have focus before hiding the cursor
-	//   2. we also hide the cursor in full screen mode and when tshe window doesn't have a menu
+	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
 	if (winwindow_has_focus() && (
@@ -818,12 +783,17 @@ void win_window_info::update()
 	int const targetorient = target()->orientation();
 	render_layer_config const targetlayerconfig = target()->layer_config();
 	u32 const targetvismask = target()->visibility_mask();
-	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
+	int const targetscalemode = target()->scale_mode();
+	bool const targetkeepaspect = target()->keepaspect();
+	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask ||
+		targetscalemode != m_targetscalemode || targetkeepaspect != m_targetkeepaspect)
 	{
 		m_targetview = targetview;
 		m_targetorient = targetorient;
 		m_targetlayerconfig = targetlayerconfig;
 		m_targetvismask = targetvismask;
+		m_targetscalemode = targetscalemode;
+		m_targetkeepaspect = targetkeepaspect;
 
 		// in window mode, reminimize/maximize
 		if (!fullscreen())
@@ -1140,6 +1110,21 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			return DefWindowProc(wnd, message, wparam, lparam);
 		break;
 
+	// input device change: handle RawInput device connection/disconnection
+	case WM_INPUT_DEVICE_CHANGE:
+		switch (wparam)
+		{
+		case GIDC_ARRIVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_ARRIVAL, &lparam);
+			break;
+		case GIDC_REMOVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_REMOVAL, &lparam);
+			break;
+		default:
+			return DefWindowProc(wnd, message, wparam, lparam);
+		}
+		break;
+
 	// input: handle the raw input
 	case WM_INPUT:
 		downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_RAWINPUT, &lparam);
@@ -1194,7 +1179,34 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		break;
 
 	case WM_CHAR:
-		window->machine().ui_input().push_char_event(window->target(), (char32_t) wparam);
+		{
+			char16_t const ch = char16_t(wparam);
+			if ((0xd800 <= ch) && (0xdbff >= ch))
+			{
+				window->m_last_surrogate = ch;
+			}
+			else if ((0xdc00 <= ch) && (0xdfff >= ch))
+			{
+				if (window->m_last_surrogate)
+				{
+					char32_t const uch = 0x10000 + ((ch & 0x03ff) | ((window->m_last_surrogate & 0x03ff) << 10));
+					window->machine().ui_input().push_char_event(window->target(), uch);
+				}
+				window->m_last_surrogate = 0;
+			}
+			else
+			{
+				window->machine().ui_input().push_char_event(window->target(), char32_t(ch));
+				window->m_last_surrogate = 0;
+			}
+		}
+		break;
+
+	case WM_UNICHAR:
+		if (UNICODE_NOCHAR == wparam)
+			return TRUE;
+		else
+			window->machine().ui_input().push_char_event(window->target(), char32_t(wparam));
 		break;
 
 	case WM_MOUSEWHEEL:
@@ -1202,8 +1214,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			UINT ucNumLines = 3; // default
 			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
 			window->machine().ui_input().push_mouse_wheel_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
-			break;
 		}
+		break;
 
 	// pause the system when we start a menu or resize
 	case WM_ENTERSIZEMOVE:
@@ -1488,6 +1500,10 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// compute the visible area based on the proposed rectangle
 	target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), viswidth, visheight);
 
+	// clamp visable area to the proposed rectangle
+	viswidth = std::min(viswidth, propwidth);
+	visheight = std::min(visheight, propheight);
+
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect.width();
 	adjheight = (visheight + extraheight) - rect.height();
@@ -1535,6 +1551,12 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 
 	// get the minimum target size
 	target()->compute_minimum_size(minwidth, minheight);
+
+	// check if visible area is bigger
+	int32_t viswidth, visheight;
+	target()->compute_visible_area(minwidth, minheight, monitor()->aspect(), target()->orientation(), viswidth, visheight);
+	minwidth = std::max(viswidth, minwidth);
+	minheight = std::max(visheight, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIMX)
@@ -1639,6 +1661,10 @@ void win_window_info::update_minmax_state()
 								(rect_height(&bounds) == minbounds.height());
 		m_ismaximized = (rect_width(&bounds) == maxbounds.width()) ||
 								(rect_height(&bounds) == maxbounds.height());
+
+		// We can't be maximized and minimized simultaneously
+		if (m_ismaximized)
+			m_isminimized = FALSE;
 	}
 	else
 	{

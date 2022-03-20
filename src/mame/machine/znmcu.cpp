@@ -96,7 +96,7 @@ WRITE_LINE_MEMBER(znmcu_device::write_clock)
 	}
 }
 
-void znmcu_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void znmcu_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_dsr_handler(param);
 

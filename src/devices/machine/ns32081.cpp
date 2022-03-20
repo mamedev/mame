@@ -83,7 +83,7 @@ enum size_code : unsigned
 
 ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32081, tag, owner, clock)
-	, ns32000_slave_interface(mconfig, *this)
+	, ns32000_slow_slave_interface(mconfig, *this)
 {
 }
 
@@ -630,7 +630,7 @@ void ns32081_device::execute()
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 }
 
-void ns32081_device::complete(void *buf, s32 param)
+void ns32081_device::complete(s32 param)
 {
 	m_out_scb(0);
 	m_out_scb(1);

@@ -46,10 +46,6 @@ class pmi80_state : public driver_device
 public:
 	pmi80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ledready(0)
-		, m_cassbit(0)
-		, m_cassold(0)
-		, m_cass_cnt(0)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi1(*this, "ppi1")
 		, m_cass(*this, "cassette")
@@ -70,10 +66,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_keyrow;
-	bool m_ledready;
-	bool m_cassbit,m_cassold;
-	u16 m_cass_cnt;
+	uint8_t m_keyrow = 0U;
+	bool m_ledready = 0;
+	bool m_cassbit = 0,m_cassold = 0;
+	u16 m_cass_cnt = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;

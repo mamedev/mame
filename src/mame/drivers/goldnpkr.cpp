@@ -139,9 +139,10 @@
   * Bonus Poker,                                      1984, Galanthis Inc.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
-  * "Unknown Sisteme France Poker",                   198?, Sisteme France.
+  * "Good Luck! poker (Sisteme France)",              198?, Sisteme France.
   * Bonne Chance! (Golden Poker prequel HW, set 1),   198?, Unknown.
   * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
+  * Boa Sorte! (Golden Poker prequel HW),             198?, Unknown.
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
   * unknown rocket/animal-themed poker,               199?, Unknown.
@@ -991,8 +992,11 @@
 #include "upndown.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
 
 class goldnpkr_state : public driver_device
@@ -1002,6 +1006,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
@@ -1015,7 +1020,6 @@ public:
 	void wildcrdb(machine_config &config);
 	void witchcrd(machine_config &config);
 	void mondial(machine_config &config);
-	void bchancep(machine_config &config);
 	void wcfalcon(machine_config &config);
 	void geniea(machine_config &config);
 	void genie(machine_config &config);
@@ -1026,6 +1030,7 @@ public:
 	void super21p(machine_config &config);
 	void caspoker(machine_config &config);
 	void icp_ext(machine_config &config);
+	void gldnirq0(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1049,6 +1054,7 @@ public:
 	void init_bchancep();
 	void init_bonuspkr();
 	void init_super98();
+	void init_pokersis();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
@@ -1072,6 +1078,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<discrete_device> m_discrete;
@@ -1082,14 +1089,6 @@ private:
 	uint8_t ay8910_data_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
-	void pia0_a_w(uint8_t data);
-	void pia0_b_w(uint8_t data);
-	void pia1_a_w(uint8_t data);
-	void pia1_b_w(uint8_t data);
-	uint8_t pia0_a_r();
-	uint8_t pia0_b_r();
-	uint8_t pia1_a_r();
-	uint8_t pia1_b_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
@@ -1101,7 +1100,6 @@ private:
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
 
-	void bchancep_map(address_map &map);
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
 	void mondial_map(address_map &map);
@@ -1595,47 +1593,6 @@ void goldnpkr_state::sound_w(uint8_t data)
 	m_discrete->write(NODE_10, data & 0x07);
 }
 
-void goldnpkr_state::pia0_a_w(uint8_t data)
-{
-	logerror("pia0_a_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia0_b_w(uint8_t data)
-{
-	logerror("pia0_b_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia1_a_w(uint8_t data)
-{
-	logerror("pia1_a_w: %2x\n", data);
-}
-
-void goldnpkr_state::pia1_b_w(uint8_t data)
-{
-	logerror("pia1_b_w: %2x\n", data);
-}
-
-
-uint8_t goldnpkr_state::pia0_a_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia0_b_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia1_a_r()
-{
-	return 0xff;
-}
-
-uint8_t goldnpkr_state::pia1_b_r()
-{
-	return 0xff;
-}
-
 
 /*********************************************
 *           Memory Map Information           *
@@ -1817,19 +1774,6 @@ void goldnpkr_state::mondial_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x4000, 0x7fff).bankr("bank1");
-}
-
-void goldnpkr_state::bchancep_map(address_map &map)
-{
-	map.global_mask(0x7fff);
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	map(0x2000, 0x7fff).rom();
 }
 
 void goldnpkr_state::super21p_map(address_map &map)
@@ -4342,12 +4286,9 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((39+1)*8, (31+1)*8);          // From MC6845 init, registers 00 & 04 (programmed with value-1).
-	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); // From MC6845 init, registers 01 & 06.
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
@@ -4410,6 +4351,7 @@ void goldnpkr_state::witchcrd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	// sound hardware
@@ -4500,6 +4442,7 @@ void goldnpkr_state::wcrdxtnd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	// video hardware
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
 	m_gfxdecode->set_info(gfx_wcrdxtnd);
 	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
@@ -4586,28 +4529,6 @@ void goldnpkr_state::mondial(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void goldnpkr_state::bchancep(machine_config &config)
-{
-	goldnpkr_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::bchancep_map);
-
-	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pia0_a_r));
-	m_pia[0]->readpb_handler().set(FUNC(goldnpkr_state::pia0_b_r));
-	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::pia0_a_w));
-	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::pia0_b_w));
-
-	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::pia1_a_r));
-	m_pia[1]->readpb_handler().set(FUNC(goldnpkr_state::pia1_b_r));
-	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::pia1_a_w));
-	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::pia1_b_w));
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
 
 void goldnpkr_state::caspoker(machine_config &config)
 {
@@ -4623,6 +4544,17 @@ void goldnpkr_state::caspoker(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+
+void goldnpkr_state::gldnirq0(machine_config &config)
+{
+	goldnpkr(config);
+
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 
 /*********************************************
@@ -4771,12 +4703,9 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((32)*8, (32)*8);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -5343,6 +5272,63 @@ ROM_START( ngoldb )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s129n.9c",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump needed
 ROM_END
+
+
+/*********************************************
+
+  Amstar Draw Poker
+  -----------------
+
+  PCB chips:
+
+  SY6502 main CPU
+  MC8621P x 2
+  MC6845P CRT Controller
+
+  TI NE555P precision timer
+  MB7051 BPROM
+
+  OSC: Unknown, no markings
+
+  8-switch dipswitch on PCB
+  6-switch dipswitch on riser board with 6502 CPU
+  Off/On slider switch
+
+  2x 2732 program ROMs
+  4x 2716 data/graphics? ROMs
+  1x MB7051 BPROM
+
+-----------------------------------------
+
+  Program 2000-3fff / A14 & A15 disconnected.
+
+  NMI  : 2DF0
+  Start: 2D36
+  Reset: 2F0B
+
+  There are code just before the vectors.
+  Curious about it... Will be analyzed.
+
+*********************************************/
+
+ROM_START( adpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.16a",   0x2000, 0x1000, CRC(8892fbd4) SHA1(22a27c0c3709ca4808a9afb8848233bc4124559f) )
+	ROM_LOAD( "2732.17a",   0x3000, 0x1000, CRC(b4db832f) SHA1(af1f26c5b703a9031690d4b63fb8555236cd6ddd) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "2716.8a",    0x1000, 0x0800, CRC(7ce15156) SHA1(13c604b4d97186f1cef2cffbc437e76990f7e4bb) )    // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716.4a",     0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "loson.6a",    0x0800, 0x0800, CRC(5afb7cc7) SHA1(334deb71f2d59dd7264150d1c15af01e49f9bd86) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "loson.7a",    0x1000, 0x0800, CRC(19fec412) SHA1(580a56d9a2ae94abf1185ed7fc0280d51e9d5964) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7052.9c",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 
 /**************************************** BUENA SUERTE SETS ****************************************/
@@ -11047,6 +11033,28 @@ ROM_START( bchanceq )
 	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( boasorte )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic32",  0x4000, 0x4000, CRC(ef0f1e65) SHA1(6a11722ca8089bb57d4e5648266c0f7de9a46303) )
+
+	ROM_REGION( 0x14000, "gfx", 0 )
+	ROM_LOAD( "ic34", 0x0000, 0x4000, CRC(6f23f224) SHA1(243617b9e1050b404020ea581c3e2acf8e5cca81) )    // chars ROM, different cardback logo
+	ROM_LOAD( "ic15", 0x4000, 0x8000, CRC(9b5a50ca) SHA1(07ab334421dfc119939314b7026a60132b02a054) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic24", 0xC000, 0x8000, CRC(805f1a73) SHA1(a2f275de377db5dd3b493d10572ac13d5a48c50f) )    // cards deck gfx, bitplane2
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL( 0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_COPY( "gfx", 0x0000,  0x1000, 0x0800 )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfx", 0x8000,  0x0000, 0x0800 )
+	ROM_COPY( "gfx", 0xC000,  0x0800, 0x0800 )
+	ROM_COPY( "gfx", 0x0800,  0x1000, 0x0800 )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 /*
 
   PCB marked "MONDIAL"
@@ -11102,7 +11110,7 @@ ROM_END
 
 ROM_START( pokersis )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // seems  to contains 4 selectable programs, but vectors lack of sense
-	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
+	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, BAD_DUMP CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
 
 	ROM_REGION( 0x18000, "gfx", 0 )
 	ROM_LOAD( "gs1.bin",  0x00000, 0x8000, CRC(47834a0b) SHA1(5fbc7443fe22ebb35a2449647259dc06420ba3fd) )
@@ -11815,6 +11823,40 @@ void goldnpkr_state::init_super98()
 }
 
 
+void goldnpkr_state::init_pokersis()
+{
+//  bad dump fix
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x5f26] = 0x20;
+	ROM[0x5f29] = 0x20;
+	ROM[0x5fff] = 0x48;
+	ROM[0x6001] = 0x48;
+	ROM[0x7000] = 0x00;
+	ROM[0x7001] = 0xa0;
+	ROM[0x7002] = 0x08;
+	ROM[0x7003] = 0xad;
+	ROM[0x7004] = 0x48;
+	ROM[0x7005] = 0x08;
+	ROM[0x7007] = 0x10;
+	ROM[0x700a] = 0xa0;
+	ROM[0x700b] = 0x07;
+	ROM[0x700c] = 0xa2;
+	ROM[0x7fbf] = 0x7d;
+	ROM[0x7fc0] = 0x60;
+	ROM[0x7fc1] = 0xb9;
+	ROM[0x7fc2] = 0x00;
+	ROM[0x7fc3] = 0x00;
+	ROM[0x7ffa] = 0xfd;
+	ROM[0x7ffb] = 0x5f;
+	ROM[0x7ffc] = 0x22;
+	ROM[0x7ffd] = 0x5f;
+}
+
+} // anonymous namespace
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -11844,6 +11886,7 @@ GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
+GAMEL( 198?, adpoker,   0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Amstar?",                  "Amstar Draw Poker",                          0,                layout_goldnpkr )
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
@@ -11941,9 +11984,10 @@ GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init
 GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.40 / 1995-02-27
 GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.25 / 1994-11-24
 
+
 /*************************************** OTHER SETS ***************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT  */
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT
 GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                   layout_pmpoker  )
 GAMEL( 1988, caspoker,  0,        caspoker, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM88-01-21, German)",   0,                   layout_pmpoker  )
 GAMEL( 1987, caspokera, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  0,                   layout_pmpoker  )
@@ -11965,16 +12009,25 @@ GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
-GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
-
-GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
-GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.
+GAMEL( 198?, pokersis,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_pokersis, ROT0,   "Sisteme France",           "Good Luck! poker (Sisteme France)",       0,                layout_goldnpkr )  // fix banking (4 prgs?)...
 
 GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )  // banked selectable program.
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
+
+/*************************************** SETS W/IRQ0 ***************************************/
+
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS      LAYOUT
+GAMEL( 198?, bchancep,  0,        gldnirq0, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 1)",     0,         layout_goldnpkr )
+GAMEL( 198?, bchanceq,  0,        gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 2)",     0,         layout_goldnpkr )
+GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Boa Sorte! (Golden Poker prequel HW)",               0,         layout_goldnpkr )
+
+
+/*************************************** SETS W/MCU ***************************************/
+
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", 0 )

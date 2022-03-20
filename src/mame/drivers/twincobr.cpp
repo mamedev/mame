@@ -108,7 +108,7 @@ KYUKYOKU TIGER
  |28MHz 74LS163          4016  YM3812 MB3730|
  |------------------------------------------|
 Notes:
-      68000  - Sygnetics SCN68000C8N64 68000 CPU. Clock 7.000MHz [28/4] (DIP64)
+      68000  - Signetics SCN68000C8N64 68000 CPU. Clock 7.000MHz [28/4] (DIP64)
       320C10 - Texas Instruments TMS320C10 microcontroller rebadged as a custom chip. Clock 14.000MHz [28/2]
                There are two versions, Japan & World/US regions and the internal ROM is different.
       Z80    - Zilog Z0840004PSC Z80 CPU. Clock 3.500MHz [28/8]
@@ -688,8 +688,10 @@ void twincobr_state::twincobr(machine_config &config)
 	crtc.set_char_width(2);
 
 	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(31, 15);
+	m_spritegen->set_pri_callback(FUNC(twincobr_state::pri_cb));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram16);
 

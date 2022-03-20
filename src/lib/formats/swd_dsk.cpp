@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/swd_dsk.h"
 
 swd_format::swd_format() : wd177x_format(formats)

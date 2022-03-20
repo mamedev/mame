@@ -59,7 +59,7 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -150,7 +150,7 @@ void saitek_stratos_state::set_cpu_freq()
 {
 	// known officially* released CPU speeds: 5MHz, 5.626MHz, 5.67MHz
 	// *not including reseller overclocks, user mods, or the "Turbo Kit"
-	static const XTAL xtal[3] = { 5.626_MHz_XTAL, 5.67_MHz_XTAL, 5_MHz_XTAL };
+	static const XTAL xtal[3] = { 5_MHz_XTAL, 5.626_MHz_XTAL, 5.67_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
 }
 

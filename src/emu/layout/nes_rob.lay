@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="text_m1"><text align="1" string="motor 1:"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_m2"><text align="1" string="motor 2:"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_m3"><text align="1" string="motor 3:"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="mstatus0">
+		<text state="1" align="1" string="DOWN"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="DOWN"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+	<element name="mstatus1">
+		<text state="1" align="1" string="UP"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="UP"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+	<element name="mstatus2">
+		<text state="1" align="1" string="CLOSE"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="CLOSE"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+	<element name="mstatus3">
+		<text state="1" align="1" string="OPEN"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="OPEN"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+	<element name="mstatus4">
+		<text state="1" align="1" string="RIGHT"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="RIGHT"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+	<element name="mstatus5">
+		<text state="1" align="1" string="LEFT"><color red="1.0" green="1.0" blue="0.2" /></text>
+		<text state="0" align="1" string="LEFT"><color red="0.2" green="0.2" blue="0.2" /></text>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.15" green="0.015" blue="0.017" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="4.5" right="17" top="7" bottom="14.25" />
+
+		<element ref="text_m1"><bounds x="5.5" y="10" width="5" height="1" /></element>
+		<element ref="text_m2"><bounds x="5.5" y="11.25" width="5" height="1" /></element>
+		<element ref="text_m3"><bounds x="5.5" y="12.5" width="5" height="1" /></element>
+
+		<element name="rob_motor.1" ref="mstatus1"><bounds x="10" y="10" width="5" height="1" /></element>
+		<element name="rob_motor.0" ref="mstatus0"><bounds x="13.5" y="10" width="5" height="1" /></element>
+		<element name="rob_motor.5" ref="mstatus5"><bounds x="10" y="11.25" width="5" height="1" /></element>
+		<element name="rob_motor.4" ref="mstatus4"><bounds x="13.5" y="11.25" width="5" height="1" /></element>
+		<element name="rob_motor.2" ref="mstatus2"><bounds x="10" y="12.5" width="5" height="1" /></element>
+		<element name="rob_motor.3" ref="mstatus3"><bounds x="13.5" y="12.5" width="5" height="1" /></element>
+
+		<element name="rob_led" ref="led"><bounds x="10" y="8" width="1" height="1" /></element>
+
+	</view>
+</mamelayout>

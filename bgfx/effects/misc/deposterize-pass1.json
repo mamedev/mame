@@ -3,35 +3,35 @@
 
 /*
    Hyllian's Deposterize Shader - Pass1
-   
+
    Copyright (C) 2011/2016 Hyllian/Jararaca - sergiogdb@gmail.com
 */
 
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
-    },
-    "depth": {
-    	"function": "always",
-    	"writeenable": false
-    },
-    "cull": {
-    	"mode": "none"
-    },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/misc/vs_deposterize-pass1",
-    "fragment": "chains/misc/fs_deposterize-pass1",
-    "uniforms": [
-    	{ "name": "decal",        "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "EQ_THRESH2",   "type": "vec4", "values": [ 0.01, 0.0, 0.0, 0.0 ] },
-    	{ "name": "DIFF_THRESH2", "type": "vec4", "values": [ 0.06, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_tex_size0",  "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/misc/vs_deposterize-pass1",
+	"fragment": "chains/misc/fs_deposterize-pass1",
+	"uniforms": [
+		{ "name": "decal",        "type": "int",  "values": [ 1.0 ] },
+		{ "name": "EQ_THRESH2",   "type": "vec4", "values": [ 0.01, 0.0, 0.0, 0.0 ] },
+		{ "name": "DIFF_THRESH2", "type": "vec4", "values": [ 0.06, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size0",  "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
+	]
 }

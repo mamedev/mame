@@ -17,10 +17,13 @@
 #include "sound/spkrdev.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"
 
+
+namespace {
 
 class apogee_state : public radio86_state
 {
@@ -33,9 +36,9 @@ public:
 	void apogee(machine_config &config);
 
 private:
-	uint8_t m_out0;
-	uint8_t m_out1;
-	uint8_t m_out2;
+	uint8_t m_out0 = 0U;
+	uint8_t m_out1 = 0U;
+	uint8_t m_out2 = 0U;
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
@@ -177,20 +180,22 @@ void apogee_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom+0x0800);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf000, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void apogee_state::machine_start()
@@ -305,6 +310,8 @@ ROM_START( apogee )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("apogee.fnt", 0x0000, 0x0800, CRC(fe5867f0) SHA1(82c5aca63ada5e4533eb0516384aaa7b77a1f8e2))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

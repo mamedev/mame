@@ -788,8 +788,8 @@ inline void sh34_base_device::PREFM(const uint16_t opcode)
 		if (m_sh4_mmu_enabled)
 		{
 			addr = addr & 0xFFFFFFE0;
-			dest = sh4_getsqremap(addr); // good enough for naomi-gd rom, probably not much else
-
+			// good enough for NAOMI GD-ROM, not much else
+			dest = sh4_getsqremap(addr);
 		}
 		else
 		{
@@ -1615,7 +1615,7 @@ void sh34_base_device::device_reset()
 	m_irln = 15;
 	m_sh2_state->sleep_mode = 0;
 
-	m_sh4_mmu_enabled = 0;
+	m_sh4_mmu_enabled = false;
 	m_cache_dirty = true;
 }
 

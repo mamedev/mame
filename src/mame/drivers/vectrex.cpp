@@ -19,7 +19,7 @@ Bruce Tomlin (hardware info)
 #include "sound/ay8910.h"
 #include "video/vector.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

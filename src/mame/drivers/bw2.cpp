@@ -28,7 +28,7 @@
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************

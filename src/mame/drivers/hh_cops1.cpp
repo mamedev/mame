@@ -29,6 +29,7 @@ TODO:
 #include "cambrp.lh"
 #include "mbaskb.lh"
 #include "mhockey.lh"
+#include "mhockeya.lh"
 #include "msoccer.lh"
 #include "qkracerm.lh"
 #include "qkspeller.lh"
@@ -47,6 +48,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<cops1_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -63,10 +68,6 @@ public:
 	int m_blk = false;
 
 	u8 read_inputs(int columns);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -123,8 +124,8 @@ namespace {
 
   Mattel Basketball (model 2437)
   * PCB label: MA 6017/18/19
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C NCX)
-  * 4001 and 74145, also bonded to PCB
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C NCX)
+  * 4001 and 74154, also bonded to PCB
   * 2-digit 7seg led display, 21 leds, 2-bit sound
 
   Mattel Soccer (model 2678)
@@ -138,9 +139,9 @@ namespace {
   Judging from videos online, there are two versions of Basketball. One where
   the display shows "12" at power-on(as on MAME), and one that shows "15".
 
-  There's also an other version of Hockey, presumably for the foreign market.
-  It plays more like Basketball/Soccer: no penalty boxes and you can't go
-  behind the goal.
+  There's also an older version of Hockey, it has the same ROM as Soccer.
+  This version wasn't sold in the USA. It is commonly known as the Canadian
+  version, though it was also released in Europe and Japan.
 
 ***************************************************************************/
 
@@ -151,16 +152,18 @@ public:
 		hh_cops1_state(mconfig, type, tag)
 	{ }
 
+	void mbaskb(machine_config &config);
+	void msoccer(machine_config &config);
+	void mhockey(machine_config &config);
+	void mhockeya(machine_config &config);
+
+private:
 	void update_display();
 	void write_do(u8 data);
 	void write_blk(int state);
 	void write_s(u8 data);
 	void write_f(u8 data);
 	u8 read_f();
-
-	void mbaskb(machine_config &config);
-	void msoccer(machine_config &config);
-	void mhockey(machine_config &config);
 };
 
 // handlers
@@ -211,7 +214,7 @@ void mbaskb_state::write_f(u8 data)
 u8 mbaskb_state::read_f()
 {
 	// F1: difficulty switch
-	// F2: N/C
+	// F2: N/C or tied high
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
@@ -233,9 +236,16 @@ static INPUT_PORTS_START( mbaskb )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mhockeya )
+	PORT_INCLUDE( mbaskb )
+
+	PORT_MODIFY("IN.2") // F2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // tied high to select Hockey
+INPUT_PORTS_END
+
 void mbaskb_state::mbaskb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 370000); // approximation
 	m_maincpu->write_do().set(FUNC(mbaskb_state::write_do));
 	m_maincpu->write_blk().set(FUNC(mbaskb_state::write_blk));
@@ -245,13 +255,13 @@ void mbaskb_state::mbaskb(machine_config &config)
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->read_inb().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(3, 0x7f);
 	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mbaskb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -273,6 +283,12 @@ void mbaskb_state::mhockey(machine_config &config)
 	config.set_default_layout(layout_mhockey);
 }
 
+void mbaskb_state::mhockeya(machine_config &config)
+{
+	msoccer(config);
+	config.set_default_layout(layout_mhockeya);
+}
+
 // roms
 
 ROM_START( mbaskb )
@@ -285,6 +301,15 @@ ROM_START( mbaskb )
 ROM_END
 
 ROM_START( msoccer )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mm4799_c_ndc", 0x0000, 0x0200, CRC(4b5ce604) SHA1(6b3d58f633b4b36f533e9a3b3ca091b2e5ea5018) )
+	ROM_CONTINUE(             0x0400, 0x0400 )
+
+	ROM_REGION( 254, "maincpu:opla", 0 )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+ROM_END
+
+ROM_START( mhockeya )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "mm4799_c_ndc", 0x0000, 0x0200, CRC(4b5ce604) SHA1(6b3d58f633b4b36f533e9a3b3ca091b2e5ea5018) )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -309,7 +334,7 @@ ROM_END
 /***************************************************************************
 
   National Semiconductor QuizKid Racer (MM5799 version)
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C DUZ)
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C DUZ)
   * DS8874 LED driver, die bonded to PCB as well
   * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
   * optional link cable to compete with another player (see patent US4051605)
@@ -327,6 +352,9 @@ public:
 		m_ds8874(*this, "ds8874")
 	{ }
 
+	void qkracerm(machine_config &config);
+
+private:
 	required_device<ds8874_device> m_ds8874;
 	void ds8874_output_w(u16 data);
 
@@ -336,7 +364,6 @@ public:
 	u8 read_f();
 	u8 read_k();
 	int read_si();
-	void qkracerm(machine_config &config);
 };
 
 // handlers
@@ -426,7 +453,7 @@ INPUT_PORTS_END
 
 void qkracerm_state::qkracerm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
@@ -436,14 +463,14 @@ void qkracerm_state::qkracerm(machine_config &config)
 	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
 	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
 
-	/* video hardware */
+	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
 	config.set_default_layout(layout_qkracerm);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -464,7 +491,7 @@ ROM_END
 /***************************************************************************
 
   National Semiconductor QuizKid Speller
-  * MM5799 MCU bonded directly to PCB (die label MM4799 C NDF)
+  * MM5799 MCU die bonded directly to PCB (die label MM4799 C NDF)
   * 2-digit 7seg led display, green led, red led, no sound
 
   The manual included 99 pictures for matching the words, with increased
@@ -484,13 +511,15 @@ public:
 		hh_cops1_state(mconfig, type, tag)
 	{ }
 
+	void qkspeller(machine_config &config);
+
+private:
 	void update_display();
 	void write_do(u8 data);
 	void write_s(u8 data);
 	void write_f(u8 data);
 	u8 read_f();
 	u8 read_k();
-	void qkspeller(machine_config &config);
 };
 
 // handlers
@@ -606,7 +635,7 @@ INPUT_PORTS_END
 
 void qkspeller_state::qkspeller(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->write_do().set(FUNC(qkspeller_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkspeller_state::write_s));
@@ -616,12 +645,12 @@ void qkspeller_state::qkspeller(machine_config &config)
 	m_maincpu->read_inb().set_ioport("TEST.0");
 	m_maincpu->read_do3().set_ioport("TEST.1");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_qkspeller);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -671,6 +700,9 @@ public:
 		m_ds8874(*this, "ds8874")
 	{ }
 
+	void cambrp(machine_config &config);
+
+private:
 	required_device<ds8874_device> m_ds8874;
 	void ds8874_output_w(u16 data);
 
@@ -679,7 +711,6 @@ public:
 	void write_s(u8 data);
 	u8 read_f();
 	u8 read_k();
-	void cambrp(machine_config &config);
 };
 
 // handlers
@@ -765,7 +796,7 @@ INPUT_PORTS_END
 
 void cambrp_state::cambrp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MM5799(config, m_maincpu, 200000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(4);
@@ -774,13 +805,13 @@ void cambrp_state::cambrp(machine_config &config)
 	m_maincpu->read_f().set(FUNC(cambrp_state::read_f));
 	m_maincpu->read_k().set(FUNC(cambrp_state::read_k));
 
-	/* video hardware */
+	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(cambrp_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_cambrp);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -805,9 +836,10 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***

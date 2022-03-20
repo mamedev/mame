@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Undumped cards:
+- SN-R8-03 "Sound Effects" 1989
+- SN-R8-04 "Electronic" 1989
+- SN-R8-05 "Jazz" 1989
+- SN-R8-06 "Ethnic Percussion" 1989
+- SN-R8-07 "Mallet" 1990
+- SN-R8-08 "Dry Drums" 1990
+- SN-R8-09 "Power Drums U.S.A." 1990
+- SN-R8-10 "Dance" 1992
+- SN-R8-11 "Metallic Percussion" 1992
+
+
+address/data line scrambling (same as SN-U110):
+
+     address              data
+external internal   external internal
+   A0 - - -  A0        D0 - - - D2
+   A1 - - -  A5        D1 - - - D7
+   A2 - - -  A4        D2 - - - D6
+   A3 - - -  A6        D3 - - - D4
+   A4 - - -  A1        D4 - - - D1
+   A5 - - -  A2        D5 - - - D3
+   A6 - - -  A3        D6 - - - D0
+   A7 - - - A15        D7 - - - D5
+   A8 - - - A13
+   A9 - - - A10
+  A10 - - - A14
+  A11 - - -  A7
+  A12 - - - A12
+  A13 - - - A11
+  A14 - - - A16
+  A15 - - -  A9
+  A16 - - -  A8
+  A17 - - - A17
+  A18 - - - A18
+-->
+
+<softwarelist name="r8_card" description="Roland R-8 PCM memory cards">
+	<software name="sn_r8_01">
+		<description>SN-R8-01 Contemporary Percussion</description>
+		<year>1989</year>
+		<publisher>Roland</publisher>
+		<part name="card" interface="r8_card">
+			<dataarea name="rom" size="0x80000">
+				<rom name="sn-r8-01.bin" size="0x80000" crc="2a9826a7" sha1="96d07c4a6507a06999d5563fb31c03ac8ed1bef7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sn_r8_02">
+		<description>SN-R8-02 Jazz Brush</description>
+		<year>1989</year>
+		<publisher>Roland</publisher>
+		<part name="card" interface="r8_card">
+			<dataarea name="rom" size="0x80000">
+				<rom name="sn-r8-02.bin" size="0x80000" crc="e7a87f57" sha1="ee248e0230f10a09b7524f5951ba87ae3756c26a"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

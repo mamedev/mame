@@ -21,10 +21,14 @@
 #include "ui/slider.h"
 #include "ui/text.h"
 
+#include <any>
+#include <cassert>
 #include <ctime>
-#include <functional>
+#include <map>
 #include <set>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -49,9 +53,9 @@ class laserdisc_device;
 #define UI_LINE_WIDTH           (1.0f / 500.0f)
 
 /* handy colors */
-#define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
-#define UI_YELLOW_COLOR         rgb_t(0xef,0x60,0x60,0x10)
-#define UI_RED_COLOR            rgb_t(0xf0,0x60,0x10,0x10)
+#define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
+#define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
+#define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)
@@ -61,7 +65,6 @@ class laserdisc_device;
 ***************************************************************************/
 
 class mame_ui_manager;
-typedef uint32_t (*ui_callback)(mame_ui_manager &, render_container &, uint32_t);
 
 enum class ui_callback_type
 {
@@ -146,8 +149,6 @@ public:
 	void initialize(running_machine &machine);
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
 
-	void set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback);
-
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
 	void update_and_render(render_container &container);
@@ -185,8 +186,6 @@ public:
 	void decrease_frameskip();
 	void request_quit();
 	void draw_fps_counter(render_container &container);
-	void draw_timecode_counter(render_container &container);
-	void draw_timecode_total(render_container &container);
 	void draw_profiler(render_container &container);
 	void start_save_state();
 	void start_load_state();
@@ -202,10 +201,7 @@ public:
 
 	// other
 	void process_natural_keyboard();
-	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
-
-	// word wrap
-	int wrap_text(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
+	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 
 	// draw an outlined box with given line color and filled with a texture
 	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -213,9 +209,25 @@ public:
 
 	virtual void menu_reset() override;
 
+	template <typename Owner, typename Data, typename... Param>
+	Data &get_session_data(Param &&... args)
+	{
+		auto const ins(m_session_data.try_emplace(typeid(Owner)));
+		assert(!ins.first->second.has_value() == ins.second);
+		if (ins.second)
+			return ins.first->second.emplace<Data>(std::forward<Param>(args)...);
+		Data *const result(std::any_cast<Data>(&ins.first->second));
+		assert(result);
+		return *result;
+	}
+
+	// helper for getting a general input setting - used for instruction text
+	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
+
 private:
-	using handler_callback_func = std::function<uint32_t (render_container &)>;
+	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
+	using session_data_map = std::map<std::type_index, std::any>;
 
 	// instance variables
 	std::unique_ptr<render_font> m_font;
@@ -243,19 +255,19 @@ private:
 	std::time_t             m_last_launch_time;
 	std::time_t             m_last_warning_time;
 
+	session_data_map        m_session_data;
+
 	// static variables
 	static std::string      messagebox_text;
 	static std::string      messagebox_poptext;
 
 	static std::vector<ui::menu_item> slider_list;
-	static slider_state     *slider_current;
 
 	// UI handlers
 	uint32_t handler_ingame(render_container &container);
-	uint32_t handler_load_save(render_container &container, uint32_t state);
-	uint32_t handler_confirm_quit(render_container &container);
 
 	// private methods
+	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);
 	void exit();
 	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
@@ -284,10 +296,10 @@ private:
 	int32_t slider_beam_dot_size(screen_device &screen, std::string *str, int32_t newval);
 	int32_t slider_beam_intensity_weight(screen_device &screen, std::string *str, int32_t newval);
 	std::string slider_get_screen_desc(screen_device &screen);
-	#ifdef MAME_DEBUG
+#ifdef MAME_DEBUG
 	int32_t slider_crossscale(ioport_field &field, std::string *str, int32_t newval);
 	int32_t slider_crossoffset(ioport_field &field, std::string *str, int32_t newval);
-	#endif
+#endif
 
 	std::vector<std::unique_ptr<slider_state>> m_sliders;
 };

@@ -73,7 +73,7 @@ BTANB:
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class rx78_state : public driver_device
@@ -115,15 +115,15 @@ private:
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-	u8 m_vram_read_bank = 0;
-	u8 m_vram_write_bank = 0;
-	u8 m_pal_reg[7];
-	u8 m_pri_mask = 0;
-	u8 m_key_mux = 0;
-	u8 m_background = 0;
+	u8 m_vram_read_bank = 0U;
+	u8 m_vram_write_bank = 0U;
+	u8 m_pal_reg[7]{};
+	u8 m_pri_mask = 0U;
+	u8 m_key_mux = 0U;
+	u8 m_background = 0U;
 	bool m_irq_en = 1;
-	u8 m_irq_slow = 0;
-	u8 m_irq_count = 0;
+	u8 m_irq_slow = 0U;
+	u8 m_irq_count = 0U;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -489,7 +489,7 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 
 	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

@@ -98,7 +98,7 @@ void ks0164_device::device_reset()
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
 
-void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_timer_interrupt = true;
 	if(m_irqen_76 & 0x40)
@@ -421,7 +421,7 @@ u16 ks0164_device::uncomp_8_16(u8 value)
 	s16 o = (0x10 | (value & 0xf)) << 10;
 	o = o >> xp;
 	if(value & 0x10)
-	  o = -o;
+		o = -o;
 	return o;
 }
 

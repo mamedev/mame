@@ -19,7 +19,7 @@ hd641016_device::hd641016_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, HD641016, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 24, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 10, 0, address_map_constructor(FUNC(hd641016_device::ram_map), this))
-	, m_io_config("I/O", ENDIANNESS_BIG, 32, 9, 0, address_map_constructor(FUNC(hd641016_device::io_map), this))
+	, m_io_config("io", ENDIANNESS_BIG, 32, 9, 0, address_map_constructor(FUNC(hd641016_device::io_map), this))
 	, m_pc(0)
 	, m_ssp(0)
 	, m_bsp(0)

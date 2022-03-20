@@ -36,15 +36,14 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CDROM; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
+	virtual const char *image_type_name() const noexcept override { return "cdrom"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "cdrm"; }
 
 	// specific implementation
 	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }

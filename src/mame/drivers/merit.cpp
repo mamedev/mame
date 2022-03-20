@@ -1690,6 +1690,21 @@ ROM_START( pitbossps ) /* Roms also found labeled as U5-0C, U6-0 & U7-0 */
 	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
+ROM_START( housecard ) /* Same exact games as pitbossps set above */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hcsd_u5b.u5", 0x0000, 0x2000, CRC(ecef424f) SHA1(9485be5d800b3ad79b3a6ddce86a174f9aae6bdf) ) /* Internal designation: HSC1REV0 */
+	ROM_LOAD( "hcsd_u6.u6",  0x2000, 0x2000, CRC(8fd6ae75) SHA1(6f2fc2903e0eebbe0f3c7bd2b6713046566fa488) ) /* Games included in this set are: */
+	ROM_LOAD( "hcsd_u7.u7",  0x4000, 0x2000, CRC(6adecfa1) SHA1(d6007fbf06cfc4c710a7134de688af439dddcf60) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Licensed By:    */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /*         Merit industries */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr4_u40.u40",   0x0000, 0x2000, CRC(f4c34a26) SHA1(67183237be6952b3be9ef444d2018bc94e714a66) )
+ROM_END
+
 ROM_START( mdchoice )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e4a1_u5.u5",   0x0000, 0x2000, CRC(bd77f8dc) SHA1(c9c85e3180be30e7a1d37abb6d4e7c777acfda81) ) /* Internal designation: E4A1REV0 */
@@ -1755,6 +1770,21 @@ ROM_START( casino5a ) /* Standard version, the rom set with 3315-02 U5-1 is the 
 	ROM_LOAD( "3315-02_u5-0.u5", 0x0000, 0x2000, CRC(abe240d8) SHA1(296eb3251dd51147d6984a8c08c3be22e5ed8e86) ) /* Internal designation: PCFS1 331502-0 */
 	ROM_LOAD( "3315-02_u6-0.u6", 0x2000, 0x4000, CRC(4d9f0c57) SHA1(d19b4b4f42d329ea35907d17c15a55b954b07295) )
 	ROM_LOAD( "3315-02_u7-0.u7", 0x6000, 0x4000, CRC(d3bc510d) SHA1(6222badabf629dd6334591867596f811883aed52) ) /* There is known to be a 3315-02 U7-0-A version (not dumped) */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+ROM_END
+
+ROM_START( casino5b )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program roms on a CTR-202A daughter card */
+	ROM_LOAD( "3315-12_u5-0.u5", 0x0000, 0x2000, CRC(50116e80) SHA1(3563a685cba25bf6d2b47280f17488d6427b3bd8) ) /* Internal designation: PCFSP 331502SP */
+	ROM_LOAD( "3315-12_u6-0.u6", 0x2000, 0x4000, CRC(7050ca92) SHA1(8ea351cee84812b31d7a6c3de77a7f43e8b077f8) )
+	ROM_LOAD( "3315-12_u7-0.u7", 0x6000, 0x4000, CRC(ddd97b53) SHA1(57f86efa3d87e8eb226506f4a37481c5132a5a6a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
@@ -2624,12 +2654,14 @@ GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state, empty_init, R
 GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A4)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* No labels, so use internal designation */
 GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, housecard,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "House of Cards (HSC1)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state, empty_init, ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
 GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M3C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1989, casino5,    0,        casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5b,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-12, U5-0)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state, empty_init, ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 

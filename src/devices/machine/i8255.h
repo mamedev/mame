@@ -142,7 +142,7 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8255, i8255_device)
-DECLARE_DEVICE_TYPE(I8255A, i8255_device)
+static auto &I8255A = I8255;
 DECLARE_DEVICE_TYPE(AMS40489_PPI, ams40489_ppi_device)
 
 #endif // MAME_MACHINE_I8255_H

@@ -152,6 +152,12 @@ class memory_view;
 // declared in emuopts.h
 class emu_options;
 
+// declared in fileio.h
+class emu_file;
+
+// declared in http.h
+class http_manager;
+
 // declared in gamedrv.h
 class game_driver;
 
@@ -193,9 +199,6 @@ class network_manager;
 class output_manager;
 
 // declared in render.h
-class layout_element;
-class layout_view;
-class layout_file;
 class render_container;
 class render_manager;
 class render_target;
@@ -203,6 +206,12 @@ class render_texture;
 
 // declared in rendfont.h
 class render_font;
+
+// declared in rendlay.h
+class layout_element;
+class layout_view_item;
+class layout_view;
+class layout_file;
 
 // declared in romentry.h
 class rom_entry;

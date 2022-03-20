@@ -287,7 +287,7 @@ void md_cons_state::machine_start()
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this));
 
 	m_vdp->stop_timers();
 
@@ -406,7 +406,7 @@ void md_cons_slot_state::ms_megadriv(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -416,7 +416,7 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -426,7 +426,7 @@ void md_cons_slot_state::ms_megadriv2(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -443,7 +443,7 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 //  has SD card slot instead?
-//  MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+//  MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 //  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -652,7 +652,7 @@ void md_cons_state::genesis_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -684,7 +684,7 @@ void md_cons_state::mdj_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -716,7 +716,7 @@ void md_cons_state::md_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -992,13 +992,16 @@ ROM_START( segacd2 )
 	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(2) )
 ROM_END
 
-/* All confirmed good dump by ElBarto */
+/* v2.00, v2.00w confirmed good dumps by ElBarto */
+/* v2.11x confirmed good dump by TwistedTom */
 ROM_START( megacd2 )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_SYSTEM_BIOS(0, "v200w", "v2.00W")
-	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(53f1757c) SHA1(67bf3970ca5a05fd5ce3d6c446789c5d971b98a4), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
-	ROM_SYSTEM_BIOS(1, "v200", "v2.00")
-	ROMX_LOAD( "mpr-15512.bin", 0x000000,  0x020000, CRC(cb76f114) SHA1(939f173cadc41e996a3c34498da1bf55e7e18ff8), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS(0, "v211x", "v2.11X")   // MK-4102A-50 Sony pcb
+	ROMX_LOAD( "mpr-15811-t.bin", 0x000000,  0x020000, CRC(391a80d2) SHA1(aa4bb1803b06714fbc04d8a209161876796dd511), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS(1, "v200w", "v2.00W")   // MK-4102-50 Funai pcb
+	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(53f1757c) SHA1(67bf3970ca5a05fd5ce3d6c446789c5d971b98a4), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS(2, "v200", "v2.00")     // ?
+	ROMX_LOAD( "mpr-15512.bin", 0x000000,  0x020000, CRC(cb76f114) SHA1(939f173cadc41e996a3c34498da1bf55e7e18ff8), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
 /* Confirmed good dump by ElBarto */
@@ -1185,7 +1188,7 @@ CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_s
 // Mega Drive Pack(PAC-S1)/Genesis Pack(PAC-S10) plugged into the Control Pack slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs
 CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer / Sega","LaserActive with Genesis Pack PAC-S10 (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
-//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, LD-ROM2 stuffs, but not emulated.
+//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, (Super/Arcade) CD-ROM2/TurboGrafx-CD, LD-ROM2 stuffs, but not emulated.
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

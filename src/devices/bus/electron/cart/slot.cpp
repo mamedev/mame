@@ -91,7 +91,7 @@ void device_electron_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_electron_cart_interface>(mconfig, *this),
 	m_cart(nullptr),
 	m_irq_handler(*this),
@@ -132,7 +132,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if (size % 0x2000)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -152,7 +152,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if ((upsize % 0x2000 && upsize != 0) || (losize % 0x2000 && losize != 0) || (romsize % 0x2000 && romsize != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 

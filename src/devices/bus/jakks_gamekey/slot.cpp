@@ -56,7 +56,7 @@ void device_jakks_gamekey_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 jakks_gamekey_slot_device::jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, JAKKS_GAMEKEY_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_jakks_gamekey_interface>(mconfig, *this),
 	m_type(JAKKS_GAMEKEY_PLAIN),
 	m_cart(nullptr)
@@ -182,17 +182,17 @@ std::string jakks_gamekey_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = jakks_gamekey_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = jakks_gamekey_get_slot(type);
 
-		printf("type: %s\n", slot_string);
+		//printf("type: %s\n", slot_string);
 
 		return std::string(slot_string);
 	}

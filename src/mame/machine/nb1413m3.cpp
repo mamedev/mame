@@ -8,7 +8,7 @@
 
 ******************************************************************************/
 /******************************************************************************
-Memo:
+Memo: The NB1413M3 is a Fujitsu ULA
 
 ******************************************************************************/
 
@@ -103,12 +103,12 @@ void nb1413m3_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 		case TIMER_CB:
-			timer_callback(ptr, param);
+			timer_callback(param);
 			break;
 		default:
 			throw emu_fatalerror("Unknown id in nb1413m3_device::device_timer");
@@ -202,8 +202,8 @@ uint8_t nb1413m3_device::sndrom_r(address_space &space, offs_t offset)
 {
 	int rombank;
 
-	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (space.device().state().state_int(Z80_BC) >> 8);
+	// get top 8 bits of the I/O port address (FIXME: do this the correct way with 16-bit addressing)
+	offset = (offset << 8) | (downcast<z80_device &>(space.device()).state_int(Z80_BC) >> 8);
 
 	switch (m_nb1413m3_type)
 	{

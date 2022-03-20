@@ -429,7 +429,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 
 	while ((fifo[index] & 0xffff0000) != 0x80000000 && index < m_3dfifo_ptr)
 	{
-		k001005_polydata& extra = object_data_alloc();
+		k001005_polydata& extra = object_data().next();
 
 		bool last_vertex = false;
 		bool is_quad = false;

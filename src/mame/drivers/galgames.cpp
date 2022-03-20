@@ -38,6 +38,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
@@ -45,10 +46,12 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+
+#include "dirom.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "dirom.h"
+
 
 /***************************************************************************
 

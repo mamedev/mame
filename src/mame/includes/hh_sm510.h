@@ -9,8 +9,17 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#pragma once
+
 #include "cpu/sm510/sm510.h"
+#include "cpu/sm510/sm511.h"
+#include "cpu/sm510/sm530.h"
+#include "cpu/sm510/sm5a.h"
 #include "sound/spkrdev.h"
+
+
+#define PORT_CHANGED_CB(x) \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
 
 
 class hh_sm510_state : public driver_device
@@ -86,6 +95,7 @@ protected:
 	void mcfg_cpu_sm510(machine_config &config);
 	void mcfg_cpu_sm511(machine_config &config);
 	void mcfg_cpu_sm512(machine_config &config);
+	void mcfg_cpu_sm530(machine_config &config);
 	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
 	void mcfg_sound_r1(machine_config &config);
 
@@ -94,6 +104,7 @@ protected:
 	void sm510_common(machine_config &config, u16 width, u16 height);
 	void sm511_common(machine_config &config, u16 width, u16 height);
 	//void sm512_common(machine_config &config, u16 width, u16 height);
+	void sm530_common(machine_config &config, u16 width, u16 height);
 
 	void sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
 	void dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);

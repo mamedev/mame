@@ -536,14 +536,16 @@ void m68705_device::nvram_default()
 {
 }
 
-void m68705_device::nvram_read(emu_file &file)
+bool m68705_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_user_rom[0], m_user_rom.bytes());
+	size_t actual;
+	return !file.read(&m_user_rom[0], m_user_rom.bytes(), actual) && actual == m_user_rom.bytes();
 }
 
-void m68705_device::nvram_write(emu_file &file)
+bool m68705_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_user_rom[0], m_user_rom.bytes());
+	size_t actual;
+	return !file.write(&m_user_rom[0], m_user_rom.bytes(), actual) && actual == m_user_rom.bytes();
 }
 
 void m6805_hmos_device::interrupt()

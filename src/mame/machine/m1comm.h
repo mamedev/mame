@@ -7,7 +7,7 @@
 
 #define M1COMM_SIMULATION
 
-#include "osdcore.h"
+#include "osdfile.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
 #include "machine/mb89374.h"

@@ -73,8 +73,6 @@ PER SECTOR ORGANIZATION:
 
 */
 
-#include <cassert>
-
 #include "formats/d81_dsk.h"
 
 d81_format::d81_format() : wd177x_format(formats)

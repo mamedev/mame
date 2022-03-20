@@ -12,6 +12,7 @@
 
 #include "emuopts.h"
 #include "romload.h"
+#include "softlist.h"
 
 #include <cstring>
 
@@ -32,7 +33,7 @@ DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nin
 
 vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
 	m_intcro(*this),
 	m_exp_space(*this, finder_base::DUMMY_TAG, -1, 32),
@@ -54,14 +55,14 @@ image_init_result vboy_cart_slot_device::call_load()
 	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 	if (loaded_through_softlist() && !romregion)
 	{
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Software list item has no 'rom' data area");
+		seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
 		return image_init_result::FAIL;
 	}
 
 	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
 	if ((0x0000'0003 & len) || (0x0100'0000 < len))
 	{
-		seterror(IMAGE_ERROR_UNSUPPORTED, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
+		seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
 		return image_init_result::FAIL;
 	}
 
@@ -72,7 +73,7 @@ image_init_result vboy_cart_slot_device::call_load()
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Error reading cartridge file");
+			seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
 			return image_init_result::FAIL;
 		}
 	}

@@ -13,6 +13,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "render.h"
 #include "rendutil.h"
 #include "screen.h"
@@ -189,7 +190,7 @@ void render_crosshair::create_bitmap()
 	if (!m_name.empty())
 	{
 		// look for user specified file
-		if (crossfile.open(m_name + ".png") == osd_file::error::NONE)
+		if (!crossfile.open(m_name + ".png"))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();
@@ -199,14 +200,14 @@ void render_crosshair::create_bitmap()
 	{
 		// look for default cross?.png in crsshair/game dir
 		std::string const filename = string_format("cross%d.png", m_player + 1);
-		if (crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)) == osd_file::error::NONE)
+		if (!crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();
 		}
 
 		// look for default cross?.png in crsshair dir
-		if (!m_bitmap->valid() && (crossfile.open(filename) == osd_file::error::NONE))
+		if (!m_bitmap->valid() && !crossfile.open(filename))
 		{
 			render_load_png(*m_bitmap, crossfile);
 			crossfile.close();

@@ -28,6 +28,8 @@ public:
 	// construction/destruction
 	pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	uint8_t opn3_r(offs_t offset);
 	void opn3_w(offs_t offset, uint8_t data);
 	uint8_t id_r(offs_t offset);
@@ -42,6 +44,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual u16 read_io_base() override;
 
 private:
 	required_device<pc9801_slot_device> m_bus;

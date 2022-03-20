@@ -21,7 +21,7 @@
 
 // various hardware
 #include "machine/ns32081.h"
-//#include "machine/ns32082.h"
+#include "machine/ns32082.h"
 #include "machine/mc68681.h"
 #include "machine/z80scc.h"
 #include "machine/m3002.h"
@@ -49,6 +49,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_fpu(*this, "fpu")
+		, m_mmu(*this, "mmu")
 		, m_ram(*this, "ram")
 		, m_uart(*this, "uart")
 		, m_serial(*this, "v24")
@@ -88,6 +89,7 @@ public:
 protected:
 	required_device<ns32032_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
+	required_device<ns32082_device> m_mmu;
 	required_device<ram_device> m_ram;
 
 	required_device<scn2681_device> m_uart;
@@ -282,7 +284,7 @@ INPUT_CHANGED_MEMBER(ceres1_state::mouse_x)
 	else if (delta < -0x80)
 		delta += 0x100;
 
-	m_mouse_x = std::max(0, std::min(m_mouse_x + delta, 1023));
+	m_mouse_x = std::clamp(m_mouse_x + delta, 0, 1023);
 }
 
 INPUT_CHANGED_MEMBER(ceres1_state::mouse_y)
@@ -294,7 +296,7 @@ INPUT_CHANGED_MEMBER(ceres1_state::mouse_y)
 	else if (delta < -0x80)
 		delta += 0x100;
 
-	m_mouse_y = std::max(0, std::min(m_mouse_y - delta, 799));
+	m_mouse_y = std::clamp(m_mouse_y - delta, 0, 799);
 }
 
 static INPUT_PORTS_START(ceres1)
@@ -340,6 +342,9 @@ void ceres1_state::ceres1(machine_config &config)
 
 	NS32081(config, m_fpu, 10_MHz_XTAL);
 	m_cpu->set_fpu(m_fpu);
+
+	NS32082(config, m_mmu, 10_MHz_XTAL);
+	m_cpu->set_mmu(m_mmu);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4MiB");

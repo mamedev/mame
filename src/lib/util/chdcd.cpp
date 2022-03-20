@@ -7,14 +7,18 @@
 
 ***************************************************************************/
 
-#include <cctype>
-#include <cstdlib>
-#include <cassert>
-#include "osdcore.h"
-#include "chd.h"
 #include "chdcd.h"
+
+#include "chd.h"
 #include "corefile.h"
 #include "corestr.h"
+
+#include "osdcore.h"
+
+#include <cassert>
+#include <cctype>
+#include <cerrno>
+#include <cstdlib>
 
 
 
@@ -230,8 +234,8 @@ static uint32_t parse_wav_sample(const char *filename, uint32_t *dataoffs)
 	uint64_t fsize = 0;
 	std::uint32_t actual;
 
-	osd_file::error filerr = osd_file::open(filename, OPEN_FLAG_READ, file, fsize);
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = osd_file::open(filename, OPEN_FLAG_READ, file, fsize);
+	if (filerr)
 	{
 		printf("ERROR: could not open (%s)\n", filename);
 		return 0;
@@ -449,7 +453,7 @@ uint64_t read_uint64(FILE *infile)
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  std::error_condition chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse nero.
  *
@@ -457,25 +461,24 @@ uint64_t read_uint64(FILE *infile)
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+std::error_condition chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	unsigned char buffer[12];
 	uint32_t chain_offs, chunk_size;
 	int done = 0;
 
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rb");
-	path = get_file_path(path);
-
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rb");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -489,7 +492,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 	{
 		printf("ERROR: Not a Nero 5.5 or later image!\n");
 		fclose(infile);
-		return CHDERR_UNSUPPORTED_VERSION;
+		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
 	chain_offs = buffer[11] | (buffer[10]<<8) | (buffer[9]<<16) | (buffer[8]<<24);
@@ -498,7 +501,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 	{
 		printf("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
 		fclose(infile);
-		return CHDERR_UNSUPPORTED_FORMAT;
+		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
 //  printf("NER5 detected, chain offset: %x\n", chain_offs);
@@ -559,12 +562,12 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 					case 0x0300:    // Mode 2 Form 1
 						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x0500:    // raw data
 						printf("ERROR: Raw data tracks not supported\n");
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x0600:    // 2352 byte mode 2 raw
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
@@ -579,22 +582,22 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 					case 0x0f00:    // raw data with sub-channel
 						printf("ERROR: Raw data tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1000:    // audio with sub-channel
 						printf("ERROR: Audio tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1100:    // raw Mode 2 Form 1 with sub-channel
 						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					default:
 						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
 						fclose(infile);
-						return CHDERR_UNSUPPORTED_FORMAT;
+						return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 
 				outtoc.tracks[track-1].datasize = size;
@@ -627,7 +630,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 
 	fclose(infile);
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------
@@ -635,7 +638,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  std::error_condition chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse ISO.
  *
@@ -643,21 +646,20 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+std::error_condition chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rb");
-	path = get_file_path(path);
-
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rb");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -693,7 +695,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		outinfo.track[0].swap = false;
 	} else {
 		printf("ERROR: Unrecognized track type\n");
-		return CHDERR_UNSUPPORTED_FORMAT;
+		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
 	outtoc.tracks[0].subtype = CD_SUB_NONE;
@@ -709,7 +711,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	outtoc.tracks[0].padframes = 0;
 
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------
@@ -717,7 +719,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 -------------------------------------------------*/
 
 /**
- * @fn  static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  static std::error_condition chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse GDI.
  *
@@ -725,23 +727,22 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+static std::error_condition chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	int i, numtracks;
 
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rt");
-	path = get_file_path(path);
-
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rt");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -841,7 +842,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	/* store the number of tracks found */
 	outtoc.numtrks = numtracks;
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------
@@ -849,7 +850,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  std::error_condition chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse cue.
  *
@@ -857,24 +858,24 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+std::error_condition chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	int i, trknum;
 	static char token[512];
 	std::string lastfname;
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rt");
-	path = get_file_path(path);
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rt");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -921,14 +922,14 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					{
 						fclose(infile);
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					}
 				}
 				else
 				{
 					fclose(infile);
 					printf("ERROR: Unhandled track type %s\n", token);
-					return CHDERR_UNSUPPORTED_FORMAT;
+					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 			}
 			else if (!strcmp(token, "TRACK"))
@@ -970,7 +971,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				{
 					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
-					return CHDERR_UNSUPPORTED_FORMAT;
+					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -1083,7 +1084,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
@@ -1094,7 +1095,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 					outtoc.tracks[trknum].frames = tlen;
@@ -1120,7 +1121,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if (!outtoc.tracks[trknum].frames)
 					{
 						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					}
 				}
 				else    /* data files are different */
@@ -1129,7 +1130,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 					outtoc.tracks[trknum].frames = tlen;
@@ -1140,7 +1141,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		//printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
 	}
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /*---------------------------------------------------------------------------------------
@@ -1161,17 +1162,17 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 bool chdcd_is_gdicue(const char *tocfname)
 {
-	FILE *infile;
 	bool has_rem_singledensity = false;
 	bool has_rem_highdensity = false;
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rt");
-	path = get_file_path(path);
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rt");
+	if (!infile)
 	{
 		return false;
 	}
+
+	path = get_file_path(path);
 
 	while (!feof(infile))
 	{
@@ -1195,7 +1196,7 @@ bool chdcd_is_gdicue(const char *tocfname)
 ------------------------------------------------------------------*/
 
 /**
- * @fn  chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  std::error_condition chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse cue.
  *
@@ -1203,7 +1204,7 @@ bool chdcd_is_gdicue(const char *tocfname)
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  *
  * Dreamcast discs have two images on a single disc. The first image is SINGLE-DENSITY and the second image
  * is HIGH-DENSITY. The SINGLE-DENSITY area starts 0 LBA and HIGH-DENSITY area starts 45000 LBA.
@@ -1218,9 +1219,8 @@ bool chdcd_is_gdicue(const char *tocfname)
  * layout from a TOSEC .gdi.
  */
 
-chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+std::error_condition chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	int i, trknum;
 	static char token[512];
 	std::string lastfname;
@@ -1229,12 +1229,13 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	enum gdi_area current_area = SINGLE_DENSITY;
 	enum gdi_pattern disc_pattern = TYPE_UNKNOWN;
 
-	infile = fopen(tocfname, "rt");
-	path = get_file_path(path);
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rt");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -1297,14 +1298,14 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 					{
 						fclose(infile);
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					}
 				}
 				else
 				{
 					fclose(infile);
 					printf("ERROR: Unhandled track type %s\n", token);
-					return CHDERR_UNSUPPORTED_FORMAT;
+					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 			}
 			else if (!strcmp(token, "TRACK"))
@@ -1349,7 +1350,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 				{
 					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
-					return CHDERR_UNSUPPORTED_FORMAT;
+					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -1462,7 +1463,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
@@ -1473,7 +1474,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 					outtoc.tracks[trknum].frames = tlen;
@@ -1499,7 +1500,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 					if (!outtoc.tracks[trknum].frames)
 					{
 						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
-						return CHDERR_INVALID_DATA;
+						return chd_file::error::INVALID_DATA;
 					}
 				}
 				else    /* data files are different */
@@ -1508,7 +1509,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());
-						return CHDERR_FILE_NOT_FOUND;
+						return std::errc::no_such_file_or_directory;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 					outtoc.tracks[trknum].frames = tlen;
@@ -1638,7 +1639,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	}
 #endif
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------
@@ -1646,7 +1647,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 -------------------------------------------------*/
 
 /**
- * @fn  chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ * @fn  std::error_condition chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
  *
  * @brief   Chdcd parse TOC.
  *
@@ -1654,12 +1655,11 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
  * @param [in,out]  outtoc  The outtoc.
  * @param [in,out]  outinfo The outinfo.
  *
- * @return  A chd_error.
+ * @return  A std::error_condition.
  */
 
-chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+std::error_condition chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
-	FILE *infile;
 	int i, trknum;
 	static char token[512];
 	char tocftemp[512];
@@ -1695,13 +1695,13 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 	std::string path = std::string(tocfname);
 
-	infile = fopen(tocfname, "rt");
-	path = get_file_path(path);
-
-	if (infile == (FILE *)nullptr)
+	FILE *infile = fopen(tocfname, "rt");
+	if (!infile)
 	{
-		return CHDERR_FILE_NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 	}
+
+	path = get_file_path(path);
 
 	/* clear structures */
 	memset(&outtoc, 0, sizeof(outtoc));
@@ -1817,7 +1817,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				{
 					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
-					return CHDERR_UNSUPPORTED_FORMAT;
+					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -1844,5 +1844,5 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	/* store the number of tracks found */
 	outtoc.numtrks = trknum + 1;
 
-	return CHDERR_NONE;
+	return std::error_condition();
 }

@@ -1242,6 +1242,16 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 
 /*****************************************************************************/
 
+// JP1 is for SXX2C only
+static INPUT_PORTS_START( sxx2c )
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" ) // "Only used when game-board is changed with a new game" in manual
+	PORT_DIPSETTING(    0x03, "Update" ) // "Changing game" in manual
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sxx2e )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1286,13 +1296,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_3button )
 	PORT_INCLUDE( sxx2e )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( sxx2c )
 INPUT_PORTS_END
 
 
@@ -1380,6 +1384,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_ejanhs )
 	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( sxx2c )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<3>)
@@ -1405,13 +1410,6 @@ static INPUT_PORTS_START( spi_ejanhs )
 
 	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2005,7 +2003,7 @@ void seibuspi_state::sys386f(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
 	/* sound hardware */
-	 // Single PCBs only output mono sound
+	// Single PCBs only output mono sound
 	SPEAKER(config, "mono").front_center();
 
 	YMZ280B(config, "ymz", XTAL(16'384'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2046,8 +2044,8 @@ void seibuspi_state::init_viprp1o()
 
 void seibuspi_state::init_ejanhs()
 {
-//  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
+	// idle skip doesn't work properly?
+	if (false && ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
@@ -2129,15 +2127,13 @@ u32 seibuspi_state::viprp1o_speedup_r()
 	return m_mainram[0x001d49c/4];
 }
 
-#ifdef UNUSED_FUNCTION
 // causes input problems?
 u32 seibuspi_state::ejanhs_speedup_r()
 {
-// osd_printf_debug("%08x\n",m_maincpu->pc());
 	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x002d224/4];
 }
-#endif
 
 u32 seibuspi_state::rdft_speedup_r()
 {

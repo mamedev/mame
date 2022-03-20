@@ -16,14 +16,16 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
-#if defined(__GNUC__) && (__GNUC__ > 6)
-#pragma GCC diagnostic ignored "-Wnoexcept-type"
-#endif
-
+#ifdef MAME_DEBUG
+#define SOL_ALL_SAFETIES_ON 1
+#else
 #define SOL_SAFE_USERTYPE 1
+#endif
 #include "sol/sol.hpp"
 
 struct lua_State;
@@ -32,6 +34,7 @@ class lua_engine
 {
 public:
 	// helper structures
+	class buffer_helper;
 	template <typename T> struct devenum;
 	template <typename T> struct simple_list_wrapper;
 	template <typename T> struct tag_object_ptr_map;
@@ -50,8 +53,8 @@ public:
 
 	bool frame_hook();
 
-	void menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list);
-	bool menu_callback(const std::string &menu, int index, const std::string &event);
+	std::optional<long> menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags);
+	std::pair<bool, std::optional<long> > menu_callback(const std::string &menu, int index, const std::string &event);
 
 	void set_machine(running_machine *machine);
 	std::vector<std::string> &get_menu() { return m_menu; }
@@ -123,6 +126,10 @@ private:
 	template<typename T, size_t SIZE> class enum_parser;
 
 	struct addr_space;
+	class tap_helper;
+	class addr_space_change_notif;
+	class symbol_table_wrapper;
+	class expression_wrapper;
 
 	struct save_item {
 		void *base;
@@ -161,7 +168,7 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
-	void resume(void *ptr, int nparam);
+	void resume(int nparam);
 	void register_function(sol::function func, const char *id);
 	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
 	bool execute_function(const char *id);

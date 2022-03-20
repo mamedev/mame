@@ -1,4 +1,4 @@
--- to use this get the package from http://greatstone.free.fr/hi2txt/
+-- to use this get the package from https://greatstoneex.github.io/hi2txt-doc/
 -- extract the hi2txt.zip and place it in your history path
 
 local dat = {}
@@ -547,7 +547,7 @@ function env.basechar(bytes, base)
 		end
 		return newbytes
 	end
-	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented\n")
+	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented")
 	return bytes
 end
 
@@ -566,7 +566,7 @@ function env.charset_conv(bytes, charset, aoffset)
 			end
 			return bytes
 		end
-		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
+		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented")
 		return bytes
 	end
 	for num, char in ipairs(bytes) do
@@ -1217,7 +1217,7 @@ function dat.check(set, softlist)
 
 	if curset == set then
 		if output then
-			return _("High Scores")
+			return _p("plugin-data", "High Scores")
 		else
 			return nil
 		end
@@ -1265,7 +1265,7 @@ function dat.check(set, softlist)
 		end
 	end
 	if output then
-		return _("High Scores")
+		return _p("plugin-data", "High Scores")
 	else
 		return nil
 	end

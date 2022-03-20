@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "machine/x2201.h"
+
 #include <algorithm>
 
 
@@ -96,9 +97,10 @@ void x2201_device::nvram_default()
 //  specified file
 //-------------------------------------------------
 
-void x2201_device::nvram_read(emu_file &file)
+bool x2201_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_eeprom[0], 1024 / 8);
+	size_t actual;
+	return !file.read(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
 }
 
 
@@ -107,9 +109,10 @@ void x2201_device::nvram_read(emu_file &file)
 //  specified file
 //-------------------------------------------------
 
-void x2201_device::nvram_write(emu_file &file)
+bool x2201_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_eeprom[0], 1024 / 8);
+	size_t actual;
+	return !file.write(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
 }
 
 

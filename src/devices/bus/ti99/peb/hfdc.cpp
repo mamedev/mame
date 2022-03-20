@@ -74,7 +74,7 @@
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+DEFINE_DEVICE_TYPE(TI99_HFDC, bus::ti99::peb::myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
 
 namespace bus::ti99::peb {
 
@@ -507,7 +507,7 @@ void myarc_hfdc_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Monoflop has gone back to the OFF state.
 */
-void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	set_floppy_motors_running(false);
 }

@@ -351,7 +351,7 @@ void tank8_state::tank8(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, tank8_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+	DISCRETE(config, m_discrete, tank8_discrete).add_route(ALL_OUTPUTS, "mono", 0.3);
 }
 
 

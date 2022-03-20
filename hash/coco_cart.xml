@@ -57,7 +57,8 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<!--software name="alphazoo">
+	<!--
+	<software name="alphazoo">
 	    <description>Alphabet Zoo</description>
 	    <year>1984</year>
 	    <publisher>Tandy</publisher>
@@ -68,7 +69,8 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	            <rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="16384" crc="dae0e23d" sha1="f27b97b81eccd0314f71894cbd2e0aed7ccab525"/>
 	        </dataarea>
 	    </part>
-	</software-->
+	</software>
+	-->
 
 	<software name="amazing">
 		<description>A Mazing World of Malcom Mortar</description>
@@ -229,7 +231,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3089" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="canyon climber (1982) (26-3089) (datasoft) [a1].rom" size="8192" crc="23e3869f" sha1="b064b863b0e621bdfece76a0ac7b11301b5d8528"/>
+				<rom name="canyon climber (1982) (26-3089) (datasoft) [a1].rom" size="8192" crc="41dd5a1a" sha1="2c20412111d315228b8ada24c3b4b02ad1a608c2"/>
 			</dataarea>
 		</part>
 	</software>

@@ -67,7 +67,7 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PLUS4_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_plus4_expansion_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_read_dma_cd(*this),
 	m_write_dma_cd(*this),
@@ -118,7 +118,7 @@ image_init_result plus4_expansion_slot_device::call_load()
 
 			if ((m_card->m_c1l_size & (m_card->m_c1l_size - 1)) || (m_card->m_c1h_size & (m_card->m_c1h_size - 1)) || (m_card->m_c2l_size & (m_card->m_c2l_size - 1)) || (m_card->m_c2h_size & (m_card->m_c2h_size - 1)))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "ROM size must be power of 2");
+				seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
 				return image_init_result::FAIL;
 			}
 		}

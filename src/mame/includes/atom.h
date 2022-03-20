@@ -88,12 +88,12 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 	/* keyboard state */
-	u8 m_keylatch;
+	u8 m_keylatch = 0U;
 
 	/* cassette state */
-	bool m_hz2400;
-	bool m_pc0;
-	bool m_pc1;
+	bool m_hz2400 = 0;
+	bool m_pc0 = 0;
+	bool m_pc1 = 0;
 
 	/* devices */
 	bool m_previous_i8271_int_state;

@@ -55,7 +55,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void acefruit_colorram_w(offs_t offset, uint8_t data);
@@ -108,7 +108,7 @@ void acefruit_state::acefruit_update_irq(int vpos)
 }
 
 
-void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int vpos = m_screen->vpos();
 

@@ -25,6 +25,11 @@ void h8_port_device::ddr_w(uint8_t data)
 	update_output();
 }
 
+uint8_t h8_port_device::ddr_r()
+{
+	return ddr;
+}
+
 void h8_port_device::dr_w(uint8_t data)
 {
 	//  logerror("dr_w %02x\n", data);

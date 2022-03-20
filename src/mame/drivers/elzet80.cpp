@@ -51,6 +51,8 @@ Status: Just a closet skeleton
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
 
+namespace {
+
 class elzet80_state : public driver_device
 {
 public:
@@ -64,7 +66,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		//, m_io_keyboard(*this, "LINE%u", 0)
+		//, m_io_keyboard(*this, "LINE%d", 0U)
 	{ }
 
 	void elzet80(machine_config &config);
@@ -175,6 +177,8 @@ ROM_START(elzet80p)
 	ROM_REGION(0x1000, "bcs", 0)
 	ROM_LOAD( "elzet80-bcs_cpuiec.bin",             0x0000, 0x1000, CRC(724fe45a) SHA1(b4b01c9bf11b35c48b0a4839d7530a18259b1ae9) )
 ROM_END
+
+} // Anonymous namespace
 
 //    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT             COMPANY          FULLNAME               FLAGS
 COMP( 1982, elzet80k,   elzet80p, 0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/K 80",        MACHINE_IS_SKELETON )

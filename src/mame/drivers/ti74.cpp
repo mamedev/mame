@@ -78,7 +78,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "ti74.lh"
 #include "ti95.lh"
@@ -148,7 +148,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
 	// max size is 32KB
 	if (size > 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
 		return image_init_result::FAIL;
 	}
 

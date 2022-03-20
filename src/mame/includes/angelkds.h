@@ -27,26 +27,31 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void init_angelkds();
+	void angelkds(machine_config &config);
+	void spcpostn(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgtopvideoram;
 	required_shared_ptr<uint8_t> m_bgbotvideoram;
 	required_shared_ptr<uint8_t> m_txvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t    *m_tx_tilemap;
-	tilemap_t    *m_bgbot_tilemap;
-	tilemap_t    *m_bgtop_tilemap;
-	int        m_txbank;
-	int        m_bgbotbank;
-	int        m_bgtopbank;
+	tilemap_t    *m_tx_tilemap = nullptr;
+	tilemap_t    *m_bgbot_tilemap = nullptr;
+	tilemap_t    *m_bgtop_tilemap = nullptr;
+	int        m_txbank = 0;
+	int        m_bgbotbank = 0;
+	int        m_bgtopbank = 0;
 
-	uint8_t      m_sound[4];
-	uint8_t      m_sound2[4];
-	uint8_t      m_layer_ctrl;
+	uint8_t      m_sound[4]{};
+	uint8_t      m_sound2[4]{};
+	uint8_t      m_layer_ctrl = 0;
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	uint8_t angeklds_ff_r() { return 0xff; };
+	uint8_t angeklds_ff_r() { return 0xff; }
 	void angelkds_cpu_bank_write(uint8_t data);
 	void angelkds_main_sound_w(offs_t offset, uint8_t data);
 	uint8_t angelkds_main_sound_r(offs_t offset);
@@ -61,7 +66,6 @@ public:
 	void angelkds_bgbotbank_write(uint8_t data);
 	void angelkds_bgbotscroll_write(uint8_t data);
 	void angelkds_layer_ctrl_write(uint8_t data);
-	void init_angelkds();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgbot_tile_info);
@@ -73,8 +77,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	void angelkds(machine_config &config);
-	void spcpostn(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);

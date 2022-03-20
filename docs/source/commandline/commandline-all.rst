@@ -1,10 +1,12 @@
-.. _universal-command-line:
+.. _mame-commandline-universal:
 
 Universal Commandline Options
 =============================
 
 This section contains configuration options that are applicable to *all* MAME
 sub-builds (both SDL and Windows native).
+
+.. contents:: :local:
 
 
 Commands and Verbs
@@ -16,6 +18,8 @@ distribution such as **romcmp** and **srcclean**.
 Verbs are actions to take upon something with the command (e.g.
 **mame -validate pacman** has *mame* as a command and *-validate* as a verb)
 
+
+.. _mame-commandline-patterns:
 
 Patterns
 --------
@@ -78,6 +82,8 @@ Terminal window, set the working directory to the location of the script
 (i.e. the folder containing MAME), and then start MAME.
 
 
+.. _mame-commandline-coreverbs:
+
 Core Verbs
 ----------
 
@@ -134,6 +140,9 @@ Core Verbs
             apple2_flop_orig.xml(137.3): mismatched tag
 
 
+
+.. _mame-commandline-configverbs:
+
 Configuration Verbs
 -------------------
 
@@ -172,6 +181,8 @@ Configuration Verbs
     not mentioned here, the short summary given by "mame -showusage" is usually
     a sufficient description.
 
+
+.. _mame-commandline-fronendverbs:
 
 Frontend Verbs
 --------------
@@ -662,8 +673,8 @@ overwritten.
             romset apple2_flop_orig:autobahn is good
             ...
 
-.. _osd-commandline-options:
 
+.. _mame-commandline-osdoptions:
 
 OSD-related Options
 -------------------
@@ -684,7 +695,7 @@ OSD-related Options
 
 .. _mame-commandline-uifontprovider:
 
-**-uifontprovider**
+**-uifontprovider** *<module>*
 
     Chooses provider for UI font rendering. The default setting is ``auto``.
 
@@ -727,7 +738,7 @@ Example:
 
 .. _mame-commandline-keyboardprovider:
 
-**-keyboardprovider**
+**-keyboardprovider** *<module>*
 
     Chooses how MAME will get keyboard input. The default is ``auto``.
 
@@ -779,7 +790,7 @@ Example:
 
 .. _mame-commandline-mouseprovider:
 
-**\-mouseprovider**
+**-mouseprovider** *<module>*
 
     Chooses how MAME will get mouse input. The default is ``auto``.
 
@@ -827,7 +838,7 @@ Example:
 
 .. _mame-commandline-lightgunprovider:
 
-**\-lightgunprovider**
+**-lightgunprovider** *<module>*
 
     Chooses how MAME will get light gun input. The default is ``auto``.
 
@@ -874,7 +885,7 @@ Example:
 
 .. _mame-commandline-joystickprovider:
 
-**\-joystickprovider**
+**-joystickprovider** *<module>*
 
     Chooses how MAME will get joystick input. The default is ``auto``.
 
@@ -917,14 +928,16 @@ Example:
          supporting both XInput and DirectInput controllers.
 
 
-OSD CLI Options
----------------
+.. _mame-commandline-cliverbs:
+
+OSD CLI Verbs
+-------------
 
 .. _mame-commandline-listmidi:
 
-**\-listmidi**
+**-listmidi**
 
-    Create a list of available MIDI I/O devices for use with emulation.
+    List available MIDI I/O devices for use with emulation.
 
     Example:
         .. code-block:: bash
@@ -938,9 +951,9 @@ OSD CLI Options
 
 .. _mame-commandline-listnetwork:
 
-**\-listnetwork**
+**-listnetwork**
 
-    Create a list of available Network Adapters for use with emulation.
+    List available network adapters for use with emulation.
 
     Example 1:
         .. code-block:: bash
@@ -958,6 +971,8 @@ OSD CLI Options
 .. Tip:: On Windows, you'll need the TAP driver from OpenVPN for MAME to see
          any network adapters.
 
+
+.. _mame-commandline-osdoutput:
 
 OSD Output Options
 ------------------
@@ -984,6 +999,8 @@ OSD Output Options
             led0 = 1
             led0 = 0
 
+
+.. _mame-commandline-configoptions:
 
 Configuration Options
 ---------------------
@@ -1022,6 +1039,8 @@ Configuration Options
 
             mame apple2ee -noreadconfig -sl6 diskii -sl7 cffa2 -hard1 TotalReplay.2mg
 
+
+.. _mame-commandline-pathoptions:
 
 Core Search Path Options
 ------------------------
@@ -1233,6 +1252,8 @@ Core Search Path Options
             mame -swpath c:\mame\software;c:\emu\mydisks
 
 
+.. _mame-commandline-coreoutdir:
+
 Core Output Directory Options
 -----------------------------
 
@@ -1360,6 +1381,8 @@ Core Output Directory Options
             mame -comment_directory c:\mame\comments
 
 
+.. _mame-commandline-savestate:
+
 Core State/Playback Options
 ---------------------------
 
@@ -1482,22 +1505,6 @@ Core State/Playback Options
          you should only record and playback with all configuration (.cfg),
          NVRAM (.nv), and memory card files deleted.
 
-.. _mame-commandline-recordtimecode:
-
-**-record_timecode**
-
-    Tells MAME to create a timecode file. It contains a line with elapsed times
-    on each press of timecode shortcut key (default is **F12**).  This option
-    works only when recording mode is enabled (**-record** option).  The
-    timecode file is saved in the ``inp`` folder.
-
-    By default, no timecode file is saved.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -record worldrecord -record_timecode
-
 .. _mame-commandline-mngwrite:
 
 **-mngwrite** *<filename>*
@@ -1544,12 +1551,12 @@ Core State/Playback Options
 
     The default is ``NULL`` (no recording).
 
-.. _mame-commandline-snapname:
-
     Example:
         .. code-block:: bash
 
             mame pacman -wavewrite pacsounds
+
+.. _mame-commandline-snapname:
 
 **-snapname** *<name>*
 
@@ -1720,6 +1727,8 @@ Core State/Playback Options
             mame neogeo -burnin
 
 
+.. _mame-commandline-perf:
+
 Core Performance Options
 ------------------------
 
@@ -1764,8 +1773,8 @@ Core Performance Options
     benchmarking and automated testing.  By combining this with a fixed set of
     other command line options, you can set up a consistent environment for
     benchmarking MAME's emulation performance.  In addition, upon exit, the
-    **-str** option will write a screenshot called ``final.png`` to the system's
-    snapshot directory.
+    **-str** option will write a screenshot to the system's snapshot directory
+    with the file name determined by the **-snapname** option.
 
     Example:
         .. code-block:: bash
@@ -1876,7 +1885,7 @@ Core Performance Options
 
 .. _mame-commandline-lowlatency:
 
-**-lowlatency**
+**-[no]lowlatency**
 
     This tells MAME to draw a new frame before throttling to reduce input
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
@@ -1891,6 +1900,8 @@ Core Performance Options
 
             mame bgaregga -lowlatency
 
+
+.. _mame-commandline-rotation:
 
 Core Rotation Options
 ---------------------
@@ -1991,6 +2002,8 @@ Core Rotation Options
 
             mame -flipy suprmrio
 
+
+.. _mame-commandline-videooptions:
 
 Core Video Options
 ------------------
@@ -2246,6 +2259,8 @@ Core Video Options
             mame dkong -nounevenstretch
 
 
+.. _mame-commandline-fullscreen:
+
 Core Full Screen Options
 ------------------------
 
@@ -2270,6 +2285,8 @@ Core Full Screen Options
 
             mame kof97 -video d3d -switchres -resolution 1280x1024
 
+
+.. _mame-commandline-windowoptions:
 
 Core Per-Window Options
 -----------------------
@@ -2436,6 +2453,8 @@ Core Per-Window Options
             mame contra -view native
 
 
+.. _mame-commandline-artwork:
+
 Core Artwork Options
 --------------------
 
@@ -2488,6 +2507,8 @@ Core Artwork Options
 
             mame galaga -override_artwork puckman
 
+
+.. _mame-commandline-screenoptions:
 
 Core Screen Options
 -------------------
@@ -2583,6 +2604,8 @@ Core Screen Options
             mame pacman -effect scanlines
 
 
+.. _mame-commandline-vectoroptions:
+
 Core Vector Options
 -------------------
 
@@ -2663,12 +2686,14 @@ Core Vector Options
             mame asteroid -flicker 0.15
 
 
-Core Video OpenGL Debugging Options
------------------------------------
+.. _mame-commandline-opengloptions:
+
+Core Video OpenGL Feature Options
+---------------------------------
 
 These options are for compatibility in **-video opengl**.  If you report
-rendering artifacts you may be asked to try messing with them by the devs, but
-normally they should be left at their defaults which results in the best
+rendering artifacts you may be asked to try messing with them by the developers,
+but normally they should be left at their defaults which results in the best
 possible video performance.
 
 .. Tip:: Examples are not provided for these options as MAMEdev will provide
@@ -2707,16 +2732,18 @@ possible video performance.
     The default is ON. (**-gl_pbo**)
 
 
+.. _mame-commandline-openglglsl:
+
 Core Video OpenGL GLSL Options
 ------------------------------
 
 .. _mame-commandline-glglsl:
 
-**-gl_glsl**
+**-[no]gl_glsl**
 
     Enable OpenGL GLSL, if available.
 
-    The default is OFF.
+    The default is OFF (**-nogl_glsl**).
 
     Example:
         .. code-block:: bash
@@ -2779,19 +2806,7 @@ Core Video OpenGL GLSL Options
             mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
 
-.. _mame-commandline-glglslvidattr:
-
-**-gl_glsl_vid_attr**
-
-    Enable OpenGL GLSL handling of brightness and contrast.
-    Better RGB system performance.
-
-    Default is ``on``.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -gl_glsl -gl_glsl_vid_attr off
+.. _mame-commandline-soundoptions:
 
 Core Sound Options
 ------------------
@@ -2823,6 +2838,20 @@ Core Sound Options
         .. code-block:: bash
 
             mame qbert -nosamples
+
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
 
 .. _mame-commandline-volume:
 
@@ -2904,7 +2933,7 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -2915,6 +2944,8 @@ Core Sound Options
 
             mame galaga -audio_latency 1
 
+
+.. _mame-commandline-inputoptions:
 
 Core Input Options
 ------------------
@@ -3256,7 +3287,7 @@ Core Input Options
 
 .. _mame-commandline-natural:
 
-**\-natural**
+**\-[no]natural**
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
@@ -3290,7 +3321,7 @@ Core Input Options
 
 .. _mame-commandline-joystickcontradictory:
 
-**-joystick_contradictory**
+**-[no]joystick_contradictory**
 
     Enable contradictory direction digital joystick input at the same time such
     as **Left and Right** or **Up and Down** at the same time.
@@ -3316,6 +3347,8 @@ Core Input Options
 
             mame contra -coin_impulse 1
 
+
+.. _mame-commandline-inputenable:
 
 Core Input Automatic Enable Options
 -----------------------------------
@@ -3367,6 +3400,8 @@ Core Input Automatic Enable Options
 .. Tip:: Note that these controls override the values of **-[no]mouse**,
          **-[no]joystick**, etc.
 
+
+.. _mame-commandline-debugging:
 
 Debugging Options
 -----------------
@@ -3431,9 +3466,10 @@ Debugging Options
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, the debugger is entered by
-    pressing the tilde (**~**) key during emulation. It is also entered
-    immediately at startup.
+    Activates the integrated debugger.  By default, pressing the backtick/tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also breaks
+    into the debugger after the initial soft reset on startup if the debugger is
+    active.  See :ref:`debugger` for information on using the debugger.
 
     The default is OFF (**-nodebug**).
 
@@ -3441,6 +3477,40 @@ Debugging Options
         .. code-block:: bash
 
             mame indy_4610 -debug
+
+.. _mame-commandline-debugger:
+
+**-debugger** *<module>*
+
+    Chooses the module to use for debugging the target system when the
+    :ref:`debug <mame-commandline-debug>` option is on.  Available debugger
+    modules depend on the host platform and build options.
+
+    Supported debugger modules:
+
+    windows
+        Win32 GUI debugger (default on Windows).  Only supported on Windows.
+    qt
+        Qt GUI debugger (default on Linux).  Supported on Windows, Linux and
+        macOS, but only included on Linux by default.  Set ``USE_QTDEBUG=1``
+        when compiling MAME to include the Qt debugger on Windows or macOS.
+    osx
+        Cocoa GUI debugger (default on macOS).  Only supported on macOS.
+    imgui
+        ImgUi GUI debugger displayed in first MAME window.  Requires
+        :ref:`video <mame-commandline-video>` option to be set to **bgfx**.
+        Supported on all platforms with BGFX video output support.
+    gdbstub
+        Acts as a remote debugging server for the GNU debugger (GDB).  Only a
+        small subset of the CPUs emulated by MAME are supported.  Use the
+        :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
+        listening port on the loopback interface.  Supported on all platforms
+        with TCP socket support.
+
+    Example:
+        .. code-block:: bash
+
+            mame ambush -debug -debugger qt
 
 .. _mame-commandline-debugscript:
 
@@ -3454,7 +3524,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame galaga -debugscript testscript.txt
+            mame galaga -debug -debugscript testscript.txt
 
 .. _mame-commandline-updateinpause:
 
@@ -3489,6 +3559,21 @@ Debugging Options
 
             mame ibm_5150 -watchdog 30
 
+.. _mame-commandline-debuggerport:
+
+**-debugger_port** *<port>*
+
+    Set the TCP port number to listen on for GDB connections when using the GDB
+    stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
+    option).
+
+    The default is ``23946``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_port 2159
+
 .. _mame-commandline-debuggerfont:
 
 **-debugger_font** *<fontname>* / **-dfont** *<fontname>*
@@ -3519,6 +3604,8 @@ Debugging Options
 
             mame marble -debug -debugger_font "Comic Sans MS" -debugger_font_size 16
 
+
+.. _mame-commandline-commoptions:
 
 Core Communication Options
 --------------------------
@@ -3595,6 +3682,8 @@ Core Communication Options
             mame arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
 
 
+.. _mame-commandline-miscoptions:
+
 Core Misc Options
 -----------------
 
@@ -3613,7 +3702,7 @@ Core Misc Options
 
 .. _mame-commandline-drcusec:
 
-**\-drc_use_c**
+**\-[no]drc_use_c**
 
     Force DRC to use the C code backend.
 
@@ -3626,7 +3715,7 @@ Core Misc Options
 
 .. _mame-commandline-drcloguml:
 
-**\-drc_log_uml**
+**\-[no]drc_log_uml**
 
     Write DRC UML disassembly log.
 
@@ -3639,7 +3728,7 @@ Core Misc Options
 
 .. _mame-commandline-drclognative:
 
-**\-drc_log_native**
+**\-[no]drc_log_native**
 
     Write DRC native disassembly log.
 
@@ -3738,7 +3827,7 @@ Core Misc Options
 
 .. _mame-commandline-confirmquit:
 
-**\-confirm_quit**
+**\-[no]confirm_quit**
 
     Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
@@ -3752,7 +3841,7 @@ Core Misc Options
 
 .. _mame-commandline-uimouse:
 
-**\-ui_mouse**
+**\-[no]ui_mouse**
 
     Displays a mouse cursor when using the built-in UI for MAME.
 
@@ -3790,6 +3879,8 @@ Core Misc Options
 
             mame galaga88 -nonvram_save
 
+
+.. _mame-commandline-scripting:
 
 Scripting Options
 -----------------
@@ -3880,8 +3971,11 @@ Scripting Options
             mame alcon -noplugin cheat
 
 
+.. _mame-commandline-webserver:
+
 HTTP Server Options
 -------------------
+
 .. _mame-commandline-http:
 
 **-[no]http**
@@ -3897,7 +3991,7 @@ HTTP Server Options
 
 .. _mame-commandline-httpport:
 
-**-http_port** *[port]*
+**-http_port** *<port>*
 
     Choose HTTP server port.
 
@@ -3910,7 +4004,7 @@ HTTP Server Options
 
 .. _mame-commandline-httproot:
 
-**-http_root** *[rootfolder]*
+**-http_root** *<rootfolder>*
 
     Choose HTTP server document root.
 
@@ -3922,10 +4016,12 @@ HTTP Server Options
             mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
 
 
+.. _mame-commandline-portaudio:
+
 PortAudio Options
 -----------------
 
-.. _mame-commandline-pa-api:
+.. _mame-commandline-paapi:
 
 **-pa_api** *API*
 
@@ -3981,7 +4077,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
 
-.. _mame-commandline-pa-device:
+.. _mame-commandline-padevice:
 
 **-pa_device** *device*
 
@@ -3995,7 +4091,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
 
-.. _mame-commandline-pa-latency:
+.. _mame-commandline-palatency:
 
 **-pa_latency** *latency*
 

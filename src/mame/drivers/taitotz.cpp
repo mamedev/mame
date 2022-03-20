@@ -1256,7 +1256,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 	int index = 0;
 	do
 	{
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int num_verts;
 
@@ -1417,7 +1417,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 	if (m_direct_fifo_ptr >= expected_size)
 	{
 		vertex_t v[8];
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int index = 4;
 		for (int i=0; i < num_verts; i++)

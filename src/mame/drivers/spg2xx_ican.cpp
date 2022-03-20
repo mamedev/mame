@@ -8,6 +8,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 
 class icanguit_state : public spg2xx_game_state
@@ -430,7 +431,7 @@ DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 
 	if (size < 0x800000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

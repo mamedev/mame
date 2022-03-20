@@ -35,7 +35,7 @@
 
 	if (action == @selector(showChunkSize:))
 	{
-		[item setState:((tag == memview->get_data_format()) ? NSOnState : NSOffState)];
+		[item setState:((tag == int(memview->get_data_format())) ? NSOnState : NSOffState)];
 		return YES;
 	}
 	else if (action == @selector(showPhysicalAddresses:))
@@ -56,6 +56,11 @@
 	else if (action == @selector(changeBytesPerLine:))
 	{
 		return (memview->chunks_per_row() + [item tag]) > 0;
+	}
+	else if (action == @selector(showAddressRadix:))
+	{
+		[item setState:((memview->address_radix() == [item tag]) ? NSOnState : NSOffState)];
+		return YES;
 	}
 	else
 	{
@@ -176,7 +181,7 @@
 
 
 - (IBAction)showChunkSize:(id)sender {
-	downcast<debug_view_memory *>(view)->set_data_format([sender tag]);
+	downcast<debug_view_memory *>(view)->set_data_format(debug_view_memory::data_format([sender tag]));
 }
 
 
@@ -184,6 +189,9 @@
 	downcast<debug_view_memory *>(view)->set_physical([sender tag]);
 }
 
+- (IBAction)showAddressRadix:(id)sender {
+	downcast<debug_view_memory *>(view)->set_address_radix([sender tag]);
+}
 
 - (IBAction)showReverseView:(id)sender {
 	downcast<debug_view_memory *>(view)->set_reverse([sender tag]);
@@ -206,7 +214,7 @@
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
 	node->set_attribute_int("reverse", memView->reverse() ? 1 : 0);
 	node->set_attribute_int("addressmode", memView->physical() ? 1 : 0);
-	node->set_attribute_int("dataformat", memView->get_data_format());
+	node->set_attribute_int("dataformat", int(memView->get_data_format()));
 	node->set_attribute_int("rowchunks", memView->chunks_per_row());
 }
 
@@ -216,43 +224,111 @@
 	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
 	memView->set_reverse(0 != node->get_attribute_int("reverse", memView->reverse() ? 1 : 0));
 	memView->set_physical(0 != node->get_attribute_int("addressmode", memView->physical() ? 1 : 0));
-	memView->set_data_format(node->get_attribute_int("dataformat", memView->get_data_format()));
+	memView->set_data_format(debug_view_memory::data_format(node->get_attribute_int("dataformat", int(memView->get_data_format()))));
 	memView->set_chunks_per_row(node->get_attribute_int("rowchunks", memView->chunks_per_row()));
 }
 
 
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	NSInteger tag;
-	for (tag = 1; tag <= 8; tag <<= 1) {
-		NSString    *title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
-		NSMenuItem  *chunkItem = [menu insertItemWithTitle:title
-													action:@selector(showChunkSize:)
-											 keyEquivalent:[NSString stringWithFormat:@"%ld", (long)tag]
-												   atIndex:index++];
-		[chunkItem setTarget:self];
-		[chunkItem setTag:tag];
-	}
+	NSMenuItem  *chunkItem1 = [menu insertItemWithTitle:@"1-byte Chunks (Hex)"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"1"
+												atIndex:index++];
+	[chunkItem1 setTarget:self];
+	[chunkItem1 setTag:int(debug_view_memory::data_format::HEX_8BIT)];
 
-	NSMenuItem  *chunkItem = [menu insertItemWithTitle:@"32-bit floats"
-		action:@selector(showChunkSize:)
-		keyEquivalent:@"F"
-		atIndex:index++];
-	[chunkItem setTarget:self];
-	[chunkItem setTag:9];
-
-	NSMenuItem *chunkItem2 = [menu insertItemWithTitle:@"64-bit floats"
-		action:@selector(showChunkSize:)
-		keyEquivalent:@"D"
-		atIndex:index++];
+	NSMenuItem  *chunkItem2 = [menu insertItemWithTitle:@"2-byte Chunks (Hex)"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"2"
+												atIndex:index++];
 	[chunkItem2 setTarget:self];
-	[chunkItem2 setTag:10];
+	[chunkItem2 setTag:int(debug_view_memory::data_format::HEX_16BIT)];
 
-	NSMenuItem *chunkItem3 = [menu insertItemWithTitle:@"80-bit floats"
-		action:@selector(showChunkSize:)
-		keyEquivalent:@"E"
-		atIndex:index++];
-	[chunkItem3 setTarget:self];
-	[chunkItem3 setTag:11];
+	NSMenuItem  *chunkItem4 = [menu insertItemWithTitle:@"4-byte Chunks (Hex)"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"4"
+												atIndex:index++];
+	[chunkItem4 setTarget:self];
+	[chunkItem4 setTag:int(debug_view_memory::data_format::HEX_32BIT)];
+
+	NSMenuItem  *chunkItem8 = [menu insertItemWithTitle:@"8-byte Chunks (Hex)"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"8"
+												atIndex:index++];
+	[chunkItem8 setTarget:self];
+	[chunkItem8 setTag:int(debug_view_memory::data_format::HEX_64BIT)];
+
+	NSMenuItem  *chunkItem12 = [menu insertItemWithTitle:@"1-byte Chunks (Octal)"
+												  action:@selector(showChunkSize:)
+										   keyEquivalent:@"3"
+												 atIndex:index++];
+	[chunkItem12 setTarget:self];
+	[chunkItem12 setTag:int(debug_view_memory::data_format::OCTAL_8BIT)];
+
+	NSMenuItem  *chunkItem13 = [menu insertItemWithTitle:@"2-byte Chunks (Octal)"
+												  action:@selector(showChunkSize:)
+										   keyEquivalent:@"5"
+												 atIndex:index++];
+	[chunkItem13 setTarget:self];
+	[chunkItem13 setTag:int(debug_view_memory::data_format::OCTAL_16BIT)];
+
+	NSMenuItem  *chunkItem14 = [menu insertItemWithTitle:@"4-byte Chunks (Octal)"
+												  action:@selector(showChunkSize:)
+										   keyEquivalent:@"7"
+												 atIndex:index++];
+	[chunkItem14 setTarget:self];
+	[chunkItem14 setTag:int(debug_view_memory::data_format::OCTAL_32BIT)];
+
+	NSMenuItem  *chunkItem15 = [menu insertItemWithTitle:@"8-byte Chunks (Octal)"
+												  action:@selector(showChunkSize:)
+										   keyEquivalent:@"9"
+												 atIndex:index++];
+	[chunkItem15 setTarget:self];
+	[chunkItem15 setTag:int(debug_view_memory::data_format::OCTAL_64BIT)];
+
+	NSMenuItem  *chunkItem9 = [menu insertItemWithTitle:@"32-bit Floating Point"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"F"
+												atIndex:index++];
+	[chunkItem9 setTarget:self];
+	[chunkItem9 setTag:int(debug_view_memory::data_format::FLOAT_32BIT)];
+
+	NSMenuItem *chunkItem10 = [menu insertItemWithTitle:@"64-bit Floating Point"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"D"
+												atIndex:index++];
+	[chunkItem10 setTarget:self];
+	[chunkItem10 setTag:int(debug_view_memory::data_format::FLOAT_64BIT)];
+
+	NSMenuItem *chunkItem11 = [menu insertItemWithTitle:@"80-bit Floating Point"
+												 action:@selector(showChunkSize:)
+										  keyEquivalent:@"E"
+												atIndex:index++];
+	[chunkItem11 setTarget:self];
+	[chunkItem11 setTag:int(debug_view_memory::data_format::FLOAT_80BIT)];
+
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
+
+	NSMenuItem *hexadecimalItem = [menu insertItemWithTitle:@"Hexadecimal Addresses"
+													 action:@selector(showAddressRadix:)
+											  keyEquivalent:@"H"
+													atIndex:index++];
+	[hexadecimalItem setTarget:self];
+	[hexadecimalItem setTag:16];
+
+	NSMenuItem *decimalItem = [menu insertItemWithTitle:@"Decimal Addresses"
+												 action:@selector(showAddressRadix:)
+										  keyEquivalent:@""
+												atIndex:index++];
+	[decimalItem setTarget:self];
+	[decimalItem setTag:10];
+
+	NSMenuItem *octalItem = [menu insertItemWithTitle:@"Octal Addresses"
+											   action:@selector(showAddressRadix:)
+										keyEquivalent:@"O"
+											  atIndex:index++];
+	[octalItem setTarget:self];
+	[octalItem setTag:8];
 
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 

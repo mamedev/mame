@@ -35,10 +35,10 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	bitmap_ind8 m_screen_bitmap;
-	int         m_video_ctrl;
-	int         m_cpu_control;  /* CPU interrupt control register */
+	tilemap_t     *m_bg_tilemap = nullptr;
+	bitmap_ind8 m_screen_bitmap = 0;
+	int         m_video_ctrl = 0;
+	int         m_cpu_control = 0;  /* CPU interrupt control register */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

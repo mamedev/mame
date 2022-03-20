@@ -661,9 +661,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
-	void chihiro_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string> &params);
+	void chihiro_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -778,7 +778,7 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
@@ -792,7 +792,7 @@ void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::stri
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -801,14 +801,14 @@ void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string>
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(int ref, const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 	if (params[0] == "jamdis")
-		jamtable_disasm_command(ref, params);
+		jamtable_disasm_command(params);
 	else
-		chihiro_help_command(ref, params);
+		chihiro_help_command(params);
 }
 
 void chihiro_state::hack_eeprom()
@@ -1839,7 +1839,7 @@ void chihiro_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1));
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
@@ -1912,12 +1912,12 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>("pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));

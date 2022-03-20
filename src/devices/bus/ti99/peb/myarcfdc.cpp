@@ -47,8 +47,8 @@
 #define WD1772_TAG "wd1772"
 #define PAL_TAG "pal"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
+DEFINE_DEVICE_TYPE(TI99_DDCC1, bus::ti99::peb::myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
+DEFINE_DEVICE_TYPE(DDCC1_PAL, bus::ti99::peb::ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
 
 namespace bus::ti99::peb {
 
@@ -84,7 +84,7 @@ bool myarc_fdc_device::card_selected()
 /*
     Provides the current address to the PAL.
 */
-uint16_t myarc_fdc_device::get_address()
+offs_t myarc_fdc_device::get_address()
 {
 	return m_address;
 }
@@ -94,7 +94,7 @@ uint16_t myarc_fdc_device::get_address()
 */
 void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset;
 	if (m_pal->ramsel())
 	{
@@ -104,7 +104,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	if (m_pal->romen())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
+		offs_t base = m_banksel? 0x1000 : 0;
 		*value = m_dsrrom[base | (m_address & 0x0fff)];
 	}
 	m_address = addrcopy;
@@ -115,7 +115,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 */
 void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset;
 	if (m_pal->ramsel())
 	{
@@ -145,7 +145,7 @@ void myarc_fdc_device::readz(offs_t offset, uint8_t *value)
 	if (m_pal->romen())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
+		offs_t base = m_banksel? 0x1000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x0fff)];
 		*value = *rom;
 
@@ -196,7 +196,7 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	const uint8_t dipswitch[] = { 0x00, 0x01, 0x02, 0x04, 0x08 };
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs251())
 	{
@@ -229,7 +229,7 @@ void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 */
 void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs259())
 	{
@@ -260,7 +260,7 @@ WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
 	// Do not start the motors when no drive is selected. However, motors
 	// can always be stopped.
 	if (m_selected_drive != 0 || state==1)
-		for (int i=0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
 }
 

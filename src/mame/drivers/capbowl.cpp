@@ -122,12 +122,12 @@ INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
  *
  *************************************/
 
-void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_UPDATE:
-		update(ptr, param);
+		update(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in capbowl_state::device_timer");

@@ -478,7 +478,7 @@ void c1551_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, param);
 

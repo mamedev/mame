@@ -13,6 +13,7 @@
 #include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
+#include "fileio.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
@@ -421,6 +422,7 @@ class debug_gdbstub : public osd_module, public debug_module
 public:
 	debug_gdbstub()
 	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
+		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
 		m_state(nullptr),
@@ -647,7 +649,8 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		if ( it == gdb_register_maps.end() )
 			fatalerror("gdbstub: cpuname %s not found in gdb stub descriptions\n", cpuname);
 
-		m_state = &m_maincpu->state();
+		m_maincpu->interface(m_state);
+		assert(m_state != nullptr);
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
 		m_debugger_cpu = &m_machine->debugger().cpu();
@@ -706,8 +709,8 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 #endif
 
 		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-		osd_file::error filerr = m_socket.open(socket_name);
-		if ( filerr != osd_file::error::NONE )
+		std::error_condition const filerr = m_socket.open(socket_name);
+		if ( filerr )
 			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
 		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 

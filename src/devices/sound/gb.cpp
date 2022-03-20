@@ -406,32 +406,18 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 	if (snd.on)
 	{
 		// compensate for leftover cycles
-		if (snd.cycles_left > 0)
-		{
-			// Emit sample(s)
-			if (cycles <= snd.cycles_left)
-			{
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
+		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
-		if (cycles & 3)
-		{
-			snd.cycles_left = 4 - (cycles & 3);
-		}
-		cycles >>= 2;
+		cycles = snd.cycles_left >> 2;
+		snd.cycles_left &= 3;
 		uint16_t    distance = 0x800 - snd.frequency_counter;
 		if (cycles >= distance)
 		{
 			cycles -= distance;
 			distance = 0x800 - snd.frequency;
-			uint64_t    counter = 1 + cycles / distance;
+			uint64_t counter = 1 + cycles / distance;
 
 			snd.duty_count = (snd.duty_count + counter) & 0x07;
 			snd.signal = wave_duty_table[snd.duty][snd.duty_count];
@@ -451,61 +437,35 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	if (snd.on)
 	{
 		// compensate for leftover cycles
-		if (snd.cycles_left > 0)
-		{
-			if (cycles <= snd.cycles_left)
-			{
-				// Emit samples
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				// Emit samples
-
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
+		snd.cycles_left += cycles;
 
 		const uint8_t level = snd.level & 3;
-		while (cycles > 0)
+		while (snd.cycles_left >= 2)
 		{
-			// Emit current sample
+			snd.cycles_left -= 2;
 
-			// cycles -= 2
-			if (cycles < 2)
+			// Calculate next state
+			snd.frequency_counter = (snd.frequency_counter + 1) & 0x7ff;
+			snd.sample_reading = false;
+			if (snd.frequency_counter == 0x7ff)
 			{
-				snd.cycles_left = 2 - cycles;
-				cycles = 0;
+				snd.offset = (snd.offset + 1) & 0x1f;
 			}
-			else
+			if (snd.frequency_counter == 0)
 			{
-				cycles -= 2;
-
-				// Calculate next state
-				snd.frequency_counter = (snd.frequency_counter + 1) & 0x7ff;
-				snd.sample_reading = false;
-				if (snd.frequency_counter == 0x7ff)
+				// Read next sample
+				snd.sample_reading = true;
+				snd.current_sample = m_wave_ram[0][(snd.offset/2)];
+				if (!(snd.offset & 0x01))
 				{
-					snd.offset = (snd.offset + 1) & 0x1f;
+					snd.current_sample >>= 4;
 				}
-				if (snd.frequency_counter == 0)
-				{
-					// Read next sample
-					snd.sample_reading = true;
-					snd.current_sample = m_wave_ram[0][(snd.offset/2)];
-					if (!(snd.offset & 0x01))
-					{
-						snd.current_sample >>= 4;
-					}
-					snd.current_sample = (snd.current_sample & 0x0f) - 8;
+				snd.current_sample = (snd.current_sample & 0x0f) - 8;
 
-					snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
+				snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
 
-					// Reload frequency counter
-					snd.frequency_counter = snd.frequency;
-				}
+				// Reload frequency counter
+				snd.frequency_counter = snd.frequency;
 			}
 		}
 	}
@@ -517,28 +477,12 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	if (snd.on)
 	{
 		// compensate for left over cycles
-		if (snd.cycles_left > 0)
-		{
-			if (cycles <= snd.cycles_left)
-			{
-				// Emit samples
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				// Emit samples
+		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
-
-		if (cycles & 1)
-		{
-			snd.cycles_left = 1;
-		}
-		cycles >>= 1;
+		cycles = (snd.cycles_left >> 1);
+		snd.cycles_left &= 1;
 		uint16_t      distance = 0x800 - snd.frequency_counter;
 		const uint8_t level = snd.level & 3;
 		if (cycles >= distance)
@@ -576,28 +520,12 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	{
 		const uint8_t level_table[8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
 		// compensate for left over cycles
-		if (snd.cycles_left > 0)
-		{
-			if (cycles <= snd.cycles_left)
-			{
-				// Emit samples
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				// Emit samples
+		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
-
-		if (cycles & 1)
-		{
-			snd.cycles_left = 1;
-		}
-		cycles >>= 1;
+		cycles = (snd.cycles_left >> 1);
+		snd.cycles_left &= 1;
 		uint16_t      distance = 0x800 - snd.frequency_counter;
 		const uint8_t level = level_table[snd.level];
 		if (cycles >= distance)
@@ -632,35 +560,21 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 
 void gameboy_sound_device::update_noise_channel(struct SOUND &snd, uint64_t cycles)
 {
-	if (cycles >= snd.cycles_left)
+	snd.cycles_left += cycles;
+	uint64_t period = noise_period_cycles();
+	while (snd.cycles_left >= period)
 	{
-		cycles -= snd.cycles_left;
-		uint64_t    period = noise_period_cycles();
-		uint64_t    counter = 1 + cycles / period, i = 0;
-		uint16_t    start = snd.noise_lfsr;
-		while (i < counter) {
-			/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
-			 Mode 4 has a 15 bit counter so we need to shift the
-			 bits around accordingly */
-			uint16_t feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
-			snd.noise_lfsr = (snd.noise_lfsr >> 1) | (feedback << 14);
-			if (snd.noise_short)
-			{
-				snd.noise_lfsr = (snd.noise_lfsr & ~(1 << 6)) | (feedback << 6);
-			}
-			i += 1;
-			if (snd.noise_lfsr == start)
-			{
-				counter %= i;
-				i = 0;
-			}
+		snd.cycles_left -= period;
+
+		// Using a Polynomial Counter (aka Linear Feedback Shift Register)
+		// Mode 4 has a 15 bit counter so we need to shift the bits around accordingly.
+		uint16_t feedback = ((snd.noise_lfsr >> 1) ^ snd.noise_lfsr) & 1;
+		snd.noise_lfsr = (snd.noise_lfsr >> 1) | (feedback << 14);
+		if (snd.noise_short)
+		{
+			snd.noise_lfsr = (snd.noise_lfsr & ~(1 << 6)) | (feedback << 6);
 		}
 		snd.signal = (snd.noise_lfsr & 1) ? -1 : 1;
-		snd.cycles_left = period - cycles % period;
-	}
-	else
-	{
-		snd.cycles_left -= cycles;
 	}
 }
 
@@ -1183,12 +1097,8 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				m_snd_3.length_counting = true;
 				m_snd_3.frequency = ((m_snd_3.reg[4] & 0x7) << 8) | m_snd_3.reg[3];
 				m_snd_3.frequency_counter = m_snd_3.frequency;
-				// There is a tiny bit of delay in starting up the wave channel(?)
-				//
-				// Results from older code where corruption of wave ram was triggered when sample_reading == true:
-				// 4 breaks test 09 (read wram), fixes test 10 (write trigger), breaks test 12 (write wram)
-				// 6 fixes test 09 (read wram), breaks test 10 (write trigger), fixes test 12 (write wram)
-				m_snd_3.cycles_left = 0 + 6;
+				// There is a tiny bit of delay in starting up the wave channel
+				m_snd_3.cycles_left = -6;
 				m_snd_3.sample_reading = false;
 
 				if (!dac_enabled(m_snd_3))

@@ -1725,15 +1725,15 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], 1000000);
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[0]->port_a_read_callback().set_ioport("DSW1");
 	m_ym2149[0]->port_b_read_callback().set_ioport("DSW2");
 
 	YM2149(config, m_ym2149[1], 1000000);
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[0], 12000000/6, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1791,17 +1791,17 @@ void kaneko16_state::bakubrkr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[0]->port_b_write_callback().set(FUNC(kaneko16_state::oki_bank0_w<7>)); /* outputs B:  OKI bank Switch */
 
 	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
 	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_cs_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1917,10 +1917,10 @@ void kaneko16_state::wingforc(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ymsnd, XTAL(16'000'000)/4);
-	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.4);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	OKIM6295(config, m_oki[0], XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
 }
 
@@ -2107,15 +2107,15 @@ void kaneko16_state::mgcrystl(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
-	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
 	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_cs_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -2228,11 +2228,11 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 
 	OKIM6295(config, m_oki[0], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki1_map);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[1], XTAL(16'000'000)/8, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::gtmr_oki2_map);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -3711,11 +3711,10 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
 ROM_END
 
-// Note: there is a known undumped older Japan set from http://gamesdbase.com/Media/SYSTEM/Arcade/PCB/big/Magical_Crystals_-_1991_-_Kaneko.jpg with code roms ending in -00 instead of -02
 ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_REGION( 0x040000*2, "maincpu", ROMREGION_ERASE )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "kaneko__mc100-u18j-02.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-02 */
-	ROM_LOAD16_BYTE( "kaneko__mc101-u19j-02.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-02 */
+	ROM_LOAD16_BYTE( "kaneko__mc100-u18j-00.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-00 */
+	ROM_LOAD16_BYTE( "kaneko__mc101-u19j-00.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-00 */
 
 	ROM_REGION( 0x280000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "kaneko__mc-000_0001.u38",  0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) ) // Mask rom

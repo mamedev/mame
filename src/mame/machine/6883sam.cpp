@@ -66,7 +66,7 @@
 
 #define VERBOSE (0)
 // #define VERBOSE (LOG_FBITS)
-// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_MBITS | LOG_RBITS)
+// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_TBITS | LOG_MBITS | LOG_RBITS)
 
 #include "logmacro.h"
 
@@ -93,13 +93,13 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SAM6883, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, sam6883_friend_device_interface(mconfig, *this, 4)
-	, m_ram_config("RAM", ENDIANNESS_BIG, 8, 16, 0)
-	, m_rom0_config("ROM0", ENDIANNESS_BIG, 8, 13, 0)
-	, m_rom1_config("ROM1", ENDIANNESS_BIG, 8, 13, 0)
-	, m_rom2_config("ROM2", ENDIANNESS_BIG, 8, 14, 0)
-	, m_io0_config("I/O0", ENDIANNESS_BIG, 8, 5, 0)
-	, m_io1_config("I/O1", ENDIANNESS_BIG, 8, 5, 0)
-	, m_io2_config("I/O2", ENDIANNESS_BIG, 8, 5, 0)
+	, m_ram_config("ram", ENDIANNESS_BIG, 8, 16, 0)
+	, m_rom0_config("rom0", ENDIANNESS_BIG, 8, 13, 0)
+	, m_rom1_config("rom1", ENDIANNESS_BIG, 8, 13, 0)
+	, m_rom2_config("rom2", ENDIANNESS_BIG, 8, 14, 0)
+	, m_io0_config("io0", ENDIANNESS_BIG, 8, 5, 0)
+	, m_io1_config("io1", ENDIANNESS_BIG, 8, 5, 0)
+	, m_io2_config("io2", ENDIANNESS_BIG, 8, 5, 0)
 	, m_boot_config("boot", ENDIANNESS_BIG, 8, 7, 0)
 {
 }
@@ -149,6 +149,8 @@ void sam6883_device::device_start()
 
 	// save state support
 	save_item(NAME(m_sam_state));
+	save_item(NAME(m_divider));
+	save_item(NAME(m_counter_mask));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_counter_xdiv));
 	save_item(NAME(m_counter_ydiv));
@@ -384,7 +386,6 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
 	{
-		/* Video frame buffer address changed */
 		LOGFBITS("%s: SAM F Address: $%04x\n",
 			machine().describe_context(),
 			display_offset());
@@ -392,7 +393,6 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
 	{
-		/* Video frame buffer address changed */
 		LOGVBITS("%s: SAM V Bits: $%02x\n",
 			machine().describe_context(),
 			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
@@ -400,7 +400,6 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 	if (xorval & (SAM_STATE_P1))
 	{
-		/* Video frame buffer address changed */
 		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
 			machine().describe_context(),
 			(m_sam_state & (SAM_STATE_P1)) >> 10);
@@ -408,23 +407,20 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 	if (xorval & (SAM_STATE_TY))
 	{
-		/* Video frame buffer address changed */
-		LOGTBITS("%s: SAM TY Bits: $%02x\n",
+		LOGTBITS("%s: SAM TY Bit: $%02x\n",
 			machine().describe_context(),
 			(m_sam_state & (SAM_STATE_TY)) >> 15);
 	}
 
 	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
 	{
-		/* Video frame buffer address changed */
 		LOGMBITS("%s: SAM M Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 13);
 	}
 
 	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
 	{
-		/* Video frame buffer address changed */
 		LOGRBITS("%s: SAM R Bits: $%02x\n",
 			machine().describe_context(),
 			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);

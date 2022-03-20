@@ -23,7 +23,7 @@
 #include "bus/cgenie/expansion/expansion.h"
 #include "bus/cgenie/parallel/parallel.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

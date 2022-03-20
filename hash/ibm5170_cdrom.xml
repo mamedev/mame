@@ -399,6 +399,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="alienodu" cloneof="alienody" supported="no">
+		<!--
+		    L384 9614 05921024 B51103-30 M1S4
+		    IFPI6100
+		-->
+		<description>Alien Odyssey (US)</description>
+		<year>1995</year>
+		<publisher>Philips / Argonaut Software LTD</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="310691059-2" sha1="4db3c0e2559d0b56c620ad34895d504f2cde5128" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
 	<!-- TODO: disc swap doesn't work properly -->
 	<software name="alienscb" supported="partial">
@@ -694,6 +710,23 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="back to baghdad (1996)(military simulations)" sha1="25e308bdde703282d7f79c2c0b782bff5cad5583" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from original media. size="1386496" crc="8B00FD46" sha1="5E85EAECDDBBD0D91B01F315F2E040247E36FA5A" -->
+	<!-- Originally released on two PC Booter 5.25" floppies and one 3.5" PC Booter floppy. Reprinted on CD by -->
+	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
+	<!-- Game can be run straight from the CD." -->
+	<software name="bad_dudescd">
+		<description>Bad Dudes (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad_dudes_cd" sha1="97d6a57218a1ffaf50f7d89071e21d784855381c" />
 			</diskarea>
 		</part>
 	</software>
@@ -2105,6 +2138,39 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1239040" crc="A9510DC8" sha1="609D186B01197D971D0C1A20DC8954F79DAC80D9" -->
+	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="heavybarrelcd">
+		<description>Heavy Barrel (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ignition" supported="no">
+		<!--
+		    FUTURE MEDIA / CA
+		    FM 16942 (CD-C95-1063-0/IN0002)
+		    IFPI 3V17
+		-->
+		<description>Ignition (US)</description>
+		<year>1997</year>
+		<publisher>Interplay</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd-c95-1063-0" sha1="48bad304857689acb3fc7fcc9e22c2c7e9d8b45f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ironbld">
 		<description>Iron Blood</description>
 		<year>1996</year>
@@ -2235,6 +2301,22 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from original media. size="931840" crc="25324098" sha1="15C4E7C307CCFC972A73C7C309E4104579D41287" -->
+	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="karnovcd">
+		<description>Karnov (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="karnov_cd" sha1="6fb90bf33a608b855b917c8dfe94c900b10c47a9" />
 			</diskarea>
 		</part>
 	</software>
@@ -2393,6 +2475,23 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
+	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
+	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
+	<software name="pipemaniacd">
+		<description>Pipe Mania (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="Pipe Dream" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pipemaniacd" sha1="be7d5677f92a9820b5114980f70ab153f9e9b7b7" />
 			</diskarea>
 		</part>
 	</software>
@@ -2640,6 +2739,19 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="skynet" supported="partial">
+		<description>SkyNET</description>
+		<year>1996</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skynet" sha1="0b9059f48d86c651bcd0e8b8112983b84fc489a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -2666,6 +2778,78 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1230848" crc="71FF88DB" sha1="5AA5CB751B6236892CF74AB37A8A7E3953E866E0" -->
+	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
+	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="tagteamcd">
+		<description>Tag Team Wrestling (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Low budget CD release of both games. Each can be installed separately. Also contains video demos for -->
+	<!-- Discoveries of the Deep, Eternam, Terminator 2: Chess Wars, Trolls and Wayne's World. -->
+	<software name="t2gmchess" supported="partial">
+		<description>Terminator 2: Judgment Day - Chess Wars / Grandmaster Chess</description>
+		<year>1993</year>
+		<publisher>Capstone Software</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="t2_cdrom" sha1="9bbb9362fe6a4895c7b1e3e34c179fdd7436c070" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for NCAA: Road to the Final Four 2 and Delta V. -->
+	<software name="term2029dx" supported="partial">
+		<description>The Terminator: 2029 - Deluxe CD Edition</description>
+		<year>1994</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2029_cd" sha1="8bcadedb9f8f24b699a0847edcb1bc1fa1222b7a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for The Elder Scrolls: Daggerfall, Xcar, and PBA Bowling. -->
+	<software name="termfs" supported="partial">
+		<description>The Terminator: Future Shock</description>
+		<year>1995</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="future_shock" sha1="db390639f1c7ae57f1aa43083bdd37c08c3e3e10" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains video demos for The Elder Scrolls: Arena and Delta V. -->
+	<software name="termramp" supported="partial">
+		<description>The Terminator: Rampage</description>
+		<year>1997</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="turricn2">
 		<description>Turrican II - The Final Fight</description>
@@ -3214,7 +3398,7 @@ license:CC0
 			<!-- Missing -->
 			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
 			<diskarea name="cdrom">
-				<disk name="bonuspak" status="nodump"/>
+				<disk name="bonus_pak" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3261,6 +3445,24 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ibm_os2_warp_4" sha1="4f296b68748882cd1207a555866cf509e01fdb38" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="paranasalibm">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Paranasal Sinuses & Anterior Skull Base.bin" size="725312112" crc="ddeb9c15" md5="883b0e0122e688d067ae6f96001bdc73"/>
+		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="128" crc="6dbd3a2c" md5="8de5a6d9098ba9629e0f14a673f63aa2"/>
+
+		This disc was sold in a package with the CD-i version. This requires Windows 3.1 and Video for Windows to be installed.
+		-->
+		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
+		<year>1993</year>
+		<publisher>Elsevier Science B.V.</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(windows 3.1 disc)" sha1="fddedb4f78bc5687d65f11fd4e18463e1fc4edda"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3411,7 +3613,7 @@ license:CC0
 
 	<software name="win95a">
 		<description>Windows 95 OSR1 (en 4.00.950.osr1)</description> <!-- aka Windows 95A -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3423,7 +3625,7 @@ license:CC0
 
 	<software name="win95b">
 		<description>Windows 95 OSR2 (en 4.00.1111.osr2)</description> <!-- aka Windows 95B -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3435,7 +3637,7 @@ license:CC0
 
 	<software name="win95c">
 		<description>Windows 95 OSR2.5 (en 4.03.1216.osr2.5)</description> <!-- aka Windows 95C -->
-		<year>1995</year>
+		<year>1997</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3459,7 +3661,7 @@ license:CC0
 
 	<software name="win98se">
 		<description>Windows 98 Second Edition (en 4.10.2222) (Retail Full)</description>
-		<year>1998</year>
+		<year>1999</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3469,9 +3671,32 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98sejp">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 98SE.ccd" size="772" crc="65e992be" sha1="b869a3e83459f562966739caa22b46b5204e20cb"/>
+		<rom name="Microsoft Windows 98SE.cue" size="84" crc="a529c2b7" sha1="050dc1be1c9aeafd7e4d7ce7235285b8296f9eee"/>
+		<rom name="Microsoft Windows 98SE.img" size="546019152" crc="cbaea25b" sha1="6b1689232640632a7cc6e5de4967b922637c055d"/>
+		<rom name="Microsoft Windows 98SE.sub" size="22286496" crc="6dec77e2" sha1="41843630fb1a58131b5ecf6dd187884fb29e6685"/>
+		-->
+		<description>Windows 98 Second Edition (jp 4.10.2222) (Retail Full)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="alt_title" value="マイクロソフト ウィンドウズ 98 オペレイティング システム SECOND EDITION" />
+		<info name="serial" value="X04-67430"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="winme">
 		<description>Windows ME (en 4.90.3000) (Retail Full)</description> <!-- aka Millennium Edition -->
-		<year>1999</year>
+		<year>2000</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">

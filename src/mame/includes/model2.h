@@ -222,7 +222,7 @@ protected:
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
+	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
 	void model2_3d_frame_start( void );
@@ -246,10 +246,10 @@ protected:
 	void scsp_map(address_map &map);
 
 	void debug_init();
-	void debug_commands( int ref, const std::vector<std::string> &params );
-	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
-	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
+	void debug_geo_dasm_command(const std::vector<std::string> &params);
+	void debug_tri_dump_command(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
 
 	virtual void video_start() override;
 

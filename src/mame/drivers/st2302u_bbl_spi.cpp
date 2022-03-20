@@ -59,7 +59,7 @@ private:
 
 	void bbl380_map(address_map &map);
 
-	required_device<st2xxx_device> m_maincpu;
+	required_device<st2205u_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void output_w(u8 data);
@@ -262,7 +262,7 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000); // unknown clock; type not confirmed
+	ST2302U(config, m_maincpu, 32000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
@@ -273,6 +273,14 @@ void bbl380_state::bbl380(machine_config &config)
 	// TODO, hook these up properly
 	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));
 	//m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(0, "mono", 1.00);
+	m_maincpu->add_route(1, "mono", 1.00);
+	m_maincpu->add_route(2, "mono", 1.00);
+	m_maincpu->add_route(3, "mono", 1.00);
+
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);
@@ -296,6 +304,14 @@ ROM_START(bbl380)
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("bbl 380 180 in 1.bin", 0x000000, 0x400000, CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad) BAD_DUMP)
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
+ROM_END
+
+ROM_START(mc_cb203)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets, including bbl380)
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("s25fl032.bin", 0x000000, 0x400000, CRC(33c4e67b) SHA1(5787db4c8ce4c2569a5f9e9054cbb1944c1b3092))
 ROM_END
 
 ROM_START(rhhc152)
@@ -349,6 +365,8 @@ ROM_END
 // older releases (primarily for Asian market?)
 
 CONS( 201?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Coolboy", "Coolboy RS-17 - 203 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 

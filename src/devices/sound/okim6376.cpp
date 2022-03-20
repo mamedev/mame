@@ -615,4 +615,7 @@ void okim6376_device::sound_stream_update(sound_stream &stream, std::vector<read
 			sampindex += samples;
 		}
 	}
+
+	for (int i = 0; i < outputs[0].samples(); i++)
+		outputs[0].put(i, std::clamp(outputs[0].getraw(i), -1.0f, 1.0f));
 }

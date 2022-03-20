@@ -52,7 +52,7 @@ void spg290_i2c_device::device_reset()
 	m_irq_cb(CLEAR_LINE);
 }
 
-void spg290_i2c_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg290_i2c_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (m_config & 0x40)
 		m_rdata = m_i2c_read_cb(m_port_addr);

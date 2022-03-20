@@ -13,9 +13,11 @@
 
 #pragma once
 
-#include "ioprocs.h"
+#include "utilfwd.h"
 
+#include <cstdint>
 #include <map>
+
 
 class hti_format_t
 {
@@ -71,8 +73,8 @@ public:
 	// Return number of tracks
 	unsigned no_of_tracks() const { return m_img_format == HTI_MANCHESTER_MOD ? 1 : 2; }
 
-	bool load_tape(io_generic *io);
-	void save_tape(io_generic *io);
+	bool load_tape(util::random_read &io);
+	void save_tape(util::random_read_write &io);
 	void clear_tape();
 
 	// Return physical length of a bit on tape
@@ -127,8 +129,8 @@ private:
 	// Image format
 	image_format_t m_img_format;
 
-	bool load_track(io_generic *io , uint64_t& offset , tape_track_t& track , bool old_format);
-	static void dump_sequence(io_generic *io , uint64_t& offset , tape_track_t::const_iterator it_start , unsigned n_words);
+	bool load_track(util::random_read &io , tape_track_t& track , bool old_format);
+	static void dump_sequence(util::random_read_write &io , tape_track_t::const_iterator it_start , unsigned n_words);
 
 	tape_pos_t word_end_pos(const track_iterator_t& it) const;
 	void adjust_it(tape_track_t& track , track_iterator_t& it , tape_pos_t pos) const;

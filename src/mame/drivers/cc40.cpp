@@ -94,7 +94,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "cc40.lh"
@@ -196,7 +196,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 	// max size is 4*32KB
 	if (size > 0x20000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
 		return image_init_result::FAIL;
 	}
 

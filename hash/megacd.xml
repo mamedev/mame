@@ -97,7 +97,7 @@ license:CC0
 		<rom name="Batman Returns (Europe) (Alt) (Track 20).bin" size="35658672" crc="728946aa" />
 		<rom name="Batman Returns (Europe) (Alt) (Track 21).bin" size="31427424" crc="a2fb531e" />
 		-->
-		<description>Batman Returns (Euro, Alt)</description>
+		<description>Batman Returns (Euro, alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4401"/>
@@ -975,7 +975,7 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 2) (Track 1).bin" size="567038976" crc="16cdf26d" />
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 2) (Track 2).bin" size="17124912" crc="d9b4b665" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro, Alt)</description>
+		<description>Slam City with Scottie Pippen (Euro, alt)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162035-50"/>
@@ -3478,7 +3478,7 @@ license:CC0
 		<rom name="Time Cop (PAL, Beta, Complete).cue" size="606" crc="7677dfb6" />
 		<rom name="Time Cop (PAL, Beta, Complete).bin" size="201693408" crc="8b53e357" />
 		-->
-		<description>Time Cop (Euro, Prototype)</description>
+		<description>Time Cop (Euro, prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3489,7 +3489,7 @@ license:CC0
 	</software>
 
 	<software name="timecope" cloneof="timecop">
-		<description>Time Cop (Euro, Early Prototype)</description>
+		<description>Time Cop (Euro, early prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3582,7 +3582,7 @@ license:CC0
 		<rom name="Mickey Mania (demo) (1994)(Disney Software - Sony Imagesoft)(PAL)(Track 27 of 28)[!][MegaSEGA].wav" size="2530796" crc="ccc93e14" />
 		<rom name="Mickey Mania (demo) (1994)(Disney Software - Sony Imagesoft)(PAL)(Track 28 of 28)[!][MegaSEGA].wav" size="2116844" crc="e571664c" />
 		-->
-		<description>Mickey Mania (Euro, Demo) [MegaSEGA]</description>
+		<description>Mickey Mania (Euro, demo) [MegaSEGA]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3631,7 +3631,7 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (demo) (1994)(Digital Pictures)(PAL)(Track 1 of 2)[!][Fingers].iso" size="406548480" crc="54137b81" />
 		<rom name="Slam City with Scottie Pippen (demo) (1994)(Digital Pictures)(PAL)(Track 2 of 2)[!][Fingers].wav" size="17124956" crc="5555431d" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro, Demo)</description>
+		<description>Slam City with Scottie Pippen (Euro, demo)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3649,7 +3649,7 @@ license:CC0
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(Track 3 of 4)[!].wav" size="40717868" crc="ce15592d" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(Track 4 of 4)[!].wav" size="10094828" crc="1304e834" />
 		-->
-		<description>Thunderhawk (Euro, Demo)</description>
+		<description>Thunderhawk (Euro, demo)</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3671,7 +3671,7 @@ license:CC0
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)(Track 4 of 5)[!][Mega Power - Issue 04].wav" size="10094828" crc="a9219f33" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)(Track 5 of 5)[!][Mega Power - Issue 04].wav" size="1900460" crc="5d53470e" />
 		-->
-		<description>Thunderhawk (Euro, Demo) [Mega Power - Issue 04]</description>
+		<description>Thunderhawk (Euro, demo) [Mega Power - Issue 04]</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3700,7 +3700,7 @@ license:CC0
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)(Track 14 of 15)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].wav" size="15633788" crc="8ebfd86d" />
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)(Track 15 of 15)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].wav" size="2455532" crc="e3042b2d" />
 		-->
-		<description>Microcosm, Puggsy and Wiz 'N' Liz (Euro, Demo) [Mega Power - Issue 06]</description>
+		<description>Microcosm, Puggsy and Wiz 'N' Liz (Euro, demo) [Mega Power - Issue 06]</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3718,7 +3718,7 @@ license:CC0
 		<rom name="Mega Power - Issue 10 - Disc 03 (1994)(Paragon Publishing)(PAL)(GB)(Track 3 of 4)[!][demo - SoulStar].wav" size="55302620" crc="35face1e" />
 		<rom name="Mega Power - Issue 10 - Disc 03 (1994)(Paragon Publishing)(PAL)(GB)(Track 4 of 4)[!][demo - SoulStar].wav" size="1234844" crc="c6ab7f6f" />
 		-->
-		<description>SoulStar (Euro, Demo) [Mega Power - Issue 10, Sega Pro CD - Issue 49]</description>
+		<description>SoulStar (Euro, demo) [Mega Power - Issue 10, Sega Pro CD - Issue 49]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3735,7 +3735,7 @@ license:CC0
 		<rom name="Mega Power - Issue 11 - Disc 04 (1994-05-19)(Paragon Publishing)(PAL)(GB)(Track 2 of 3)[!][demo - Battlecorps].wav" size="66646316" crc="f49e880d" />
 		<rom name="Mega Power - Issue 11 - Disc 04 (1994-05-19)(Paragon Publishing)(PAL)(GB)(Track 3 of 3)[!][demo - Battlecorps].wav" size="1234844" crc="38b44c7b" />
 		-->
-		<description>Battlecorps (Euro, Demo) [Mega Power - Issue 11, Sega Pro CD - Issue 50]</description>
+		<description>Battlecorps (Euro, demo) [Mega Power - Issue 11, Sega Pro CD - Issue 50]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3845,7 +3845,7 @@ license:CC0
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 95 of 96)[!][demo - Sensible Soccer v1.08].wav" size="40021676" crc="995261d2" />
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 96 of 96)[!][demo - Sensible Soccer v1.08].wav" size="1230140" crc="e257eba0" />
 		-->
-		<description>Sensible Soccer v1.08 (Euro, Demo) [Mega Power - Issue 12, Sega Pro CD - Issue 44]</description>
+		<description>Sensible Soccer v1.08 (Euro, demo) [Mega Power - Issue 12, Sega Pro CD - Issue 44]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3873,7 +3873,7 @@ license:CC0
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="4a61841d" />
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2152124" crc="6b57a164" />
 		-->
-		<description>FIFA International Soccer - CE (Euro, Demo) [Mega Power - Issue 13]</description>
+		<description>FIFA International Soccer - CE (Euro, demo) [Mega Power - issue 13]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3892,7 +3892,7 @@ license:CC0
 		<rom name="Mega Power - Issue 14 (1994)(Paragon Publishing)(PAL)(GB)(Track 4 of 5)[!][demos - Battlecorps, SoulStar].wav" size="55302620" crc="c86c66c3" />
 		<rom name="Mega Power - Issue 14 (1994)(Paragon Publishing)(PAL)(GB)(Track 5 of 5)[!][demos - Battlecorps, SoulStar].wav" size="1234844" crc="bdbc554c" />
 		-->
-		<description>Battlecorps and SoulStar (Euro, Demo) [Mega Power - Issue 14]</description>
+		<description>Battlecorps and SoulStar (Euro, demo) [Mega Power - issue 14]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3908,7 +3908,7 @@ license:CC0
 		<rom name="Mega Power - Issue 15 - Disc 07 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Star Wars - Rebel Assault].iso" size="27283456" crc="32cb8080" />
 		<rom name="Mega Power - Issue 15 - Disc 07 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Star Wars - Rebel Assault].wav" size="58324940" crc="4c111665" />
 		-->
-		<description>Star Wars - Rebel Assault (Euro, Demo) [Mega Power - Issue 15]</description>
+		<description>Star Wars - Rebel Assault (Euro, demo) [Mega Power - issue 15]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3924,7 +3924,7 @@ license:CC0
 		<rom name="Mega Power - Issue 16 - Disc 08-09 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Lawnmower Man, The].iso" size="63731712" crc="c494bfdd" />
 		<rom name="Mega Power - Issue 16 - Disc 08-09 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Lawnmower Man, The].wav" size="7949804" crc="d6ebdc33" />
 		-->
-		<description>The Lawnmower Man (Euro, Demo) [Mega Power - Issue 16]</description>
+		<description>The Lawnmower Man (Euro, demo) [Mega Power - issue 16]</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3966,7 +3966,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 40 (1994)(Paragon Publishing)(PAL)(GB)(Track 27 of 28)[!][demo - Mickey Mania].wav" size="2530796" crc="4ea7df22" />
 		<rom name="Sega Pro CD - Issue 40 (1994)(Paragon Publishing)(PAL)(GB)(Track 28 of 28)[!][demo - Mickey Mania].wav" size="1745228" crc="0a8b990c" />
 		-->
-		<description>Mickey Mania (Euro, Demo) [Mega Power - Issue 17, Sega Pro CD - Issue 40]</description>
+		<description>Mickey Mania (Euro, demo) [Mega Power - issue 17, Sega Pro CD - issue 40]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3983,7 +3983,7 @@ license:CC0
 		<rom name="BC Racers (demo) (1994)(Core)(PAL)(Track 2 of 3)[!][Mega Power - Issue 18].wav" size="31189916" crc="96895176" />
 		<rom name="BC Racers (demo) (1994)(Core)(PAL)(Track 3 of 3)[!][Mega Power - Issue 18].wav" size="1234844" crc="9f3b627d" />
 		-->
-		<description>BC Racers (Euro, Demo) [Mega Power - Issue 18]</description>
+		<description>BC Racers (Euro, demo) [Mega Power - issue 18]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4012,7 +4012,7 @@ license:CC0
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)(Track 14 of 15)[!][Mega Power - Issue 19].wav" size="5569580" crc="75ec889e" />
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)(Track 15 of 15)[!][Mega Power - Issue 19].wav" size="6508028" crc="3f59c835" />
 		-->
-		<description>Lethal Enforcers II - Gun Fighters (Euro, Demo) [Mega Power - Issue 19]</description>
+		<description>Lethal Enforcers II - Gun Fighters (Euro, demo) [Mega Power - issue 19]</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4028,7 +4028,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 01 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Star Wars - Rebel Assault].iso" size="22941696" crc="5cf5b35f" />
 		<rom name="Sega Pro CD - Issue 01 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Star Wars - Rebel Assault].wav" size="58324940" crc="374666eb" />
 		-->
-		<description>Star Wars - Rebel Assault (Euro, Demo) [Sega Pro CD - Issue 01]</description>
+		<description>Star Wars - Rebel Assault (Euro, demo) [Sega Pro CD - issue 01]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4043,7 +4043,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 02 (1994)(Paragon Publishing)(PAL)(GB)[!][demo - Novastorm].cue" size="168" crc="d2fb439b" />
 		<rom name="Sega Pro CD - Issue 02 (1994)(Paragon Publishing)(PAL)(GB)[!][demo - Novastorm].iso" size="369602560" crc="8711f408" />
 		-->
-		<description>Novastorm (Euro, Demo) [Sega Pro CD - Issue 02]</description>
+		<description>Novastorm (Euro, demo) [Sega Pro CD - issue 02]</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4083,7 +4083,7 @@ license:CC0
 		<rom name="Keio Flying Squadron (demo) (1994)(JVC)(PAL)(Track 25 of 26)[!][Sega Pro CD - Issue 03].wav" size="26556476" crc="45143565" />
 		<rom name="Keio Flying Squadron (demo) (1994)(JVC)(PAL)(Track 26 of 26)[!][Sega Pro CD - Issue 03].wav" size="9953708" crc="33aa35f9" />
 		-->
-		<description>Keio Flying Squadron (Euro, Demo) [Sega Pro CD - Issue 03]</description>
+		<description>Keio Flying Squadron (Euro, demo) [Sega Pro CD - issue 03]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4100,7 +4100,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 1 of 2)(Track 2 of 3)[!][demo - BC Racers].wav" size="43963628" crc="8ae2959e" />
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 1 of 2)(Track 3 of 3)[!][demo - BC Racers].wav" size="1234844" crc="128471a3" />
 		-->
-		<description>BC Racers (Euro, Demo) [Sega Pro CD - Issue 41]</description>
+		<description>BC Racers (Euro, demo) [Sega Pro CD - issue 41]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4124,7 +4124,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 2 of 2)(Track 09 of 10)[!][demo - Pitfall - The Mayan Adventure].wav" size="6404540" crc="52e11c71" />
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 2 of 2)(Track 10 of 10)[!][demo - Pitfall - The Mayan Adventure].wav" size="24032780" crc="fb5f8907" />
 		-->
-		<description>Pitfall - The Mayan Adventure (Euro, Demo) [Sega Pro CD - Issue 41]</description>
+		<description>Pitfall - The Mayan Adventure (Euro, demo) [Sega Pro CD - issue 41]</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4141,7 +4141,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)(Track 2 of 3)[!][demo - Flashback - The Quest for Identity].wav" size="36023276" crc="3e85e65f" />
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)(Track 3 of 3)[!][demo - Flashback - The Quest for Identity].wav" size="44161196" crc="3e5c56f2" />
 		-->
-		<description>Flashback - The Quest for Identity (Euro, Demo) [Sega Pro CD - Issue 42]</description>
+		<description>Flashback - The Quest for Identity (Euro, demo) [Sega Pro CD - issue 42]</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4169,7 +4169,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="5b548696" />
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2504924" crc="70dcbb79" />
 		-->
-		<description>FIFA International Soccer - CE (Euro, Demo) [Sega Pro CD - Issue 43]</description>
+		<description>FIFA International Soccer - CE (Euro, demo) [Sega Pro CD - issue 43]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4185,7 +4185,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - TimeCop].iso" size="4452352" crc="e20df99b" />
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - TimeCop].wav" size="12740828" crc="c84ee4bc" />
 		-->
-		<description>TimeCop (Euro, Demo) [Sega Pro CD - Issue 45]</description>
+		<description>TimeCop (Euro, demo) [Sega Pro CD - issue 45]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4207,7 +4207,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 46 (1995)(Paragon Publishing)(PAL)(GB)(Track 7 of 8)[!][demo - Fatal Fury Special].wav" size="19933244" crc="e7984b27" />
 		<rom name="Sega Pro CD - Issue 46 (1995)(Paragon Publishing)(PAL)(GB)(Track 8 of 8)[!][demo - Fatal Fury Special].wav" size="22050044" crc="c389429f" />
 		-->
-		<description>Fatal Fury Special (Euro, Demo) [Sega Pro CD - Issue 46]</description>
+		<description>Fatal Fury Special (Euro, demo) [Sega Pro CD - issue 46]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4251,7 +4251,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 47 (1995)(Paragon Publishing)(PAL)(GB)(Track 29 of 30)[!][demo - Samurai Shodown].wav" size="41367020" crc="792b66fb" />
 		<rom name="Sega Pro CD - Issue 47 (1995)(Paragon Publishing)(PAL)(GB)(Track 30 of 30)[!][demo - Samurai Shodown].wav" size="41719820" crc="8b4358ac" />
 		-->
-		<description>Samurai Shodown (Euro, Demo) [Sega Pro CD - Issue 47]</description>
+		<description>Samurai Shodown (Euro, demo) [Sega Pro CD - issue 47]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">

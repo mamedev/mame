@@ -2,9 +2,21 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Super Star (Recreativos Franco)
+Super Star (Recreativos Franco)
 
-    Skeleton driver for 8085-based pinball hardware.
+Skeleton driver for 8085-based pinball hardware.
+
+TODO:
+- The ROM for the sound cpu is a bad dump. The 8035 should set itself up,
+  then signal a rst(call 0024) to the 8085 which in turn sets up key
+  indicators in RAM and enabling the machine to begin. With the bad dump,
+  none of that can happen.
+- Display circuits: i8259, 74164, 74159 and other bits.
+- Default layout
+- Outputs (solenoids, lamps)
+- Inputs (switches)
+- NVRAM (5517 ram is battery-backed)
+- Manual is missing a couple of pages.
 
 ***************************************************************************/
 

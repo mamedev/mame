@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -226,6 +226,12 @@ namespace bx
 	}
 
 	template<bx::AllocatorI** AllocatorT>
+	inline void StringT<AllocatorT>::append(const char* _ptr, const char* _term)
+	{
+		append(StringView(_ptr, _term) );
+	}
+
+	template<bx::AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::clear()
 	{
 		if (0 != m_len)
@@ -234,6 +240,12 @@ namespace bx
 
 			StringView::clear();
 		}
+	}
+
+	template<bx::AllocatorI** AllocatorT>
+	inline const char* StringT<AllocatorT>::getCPtr() const
+	{
+		return getPtr();
 	}
 
 	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)
@@ -264,7 +276,7 @@ namespace bx
 
 			StringView line(curr.getPtr(), m_curr.getPtr() );
 
-			return strRTrim(line, "\n\r");
+			return strRTrim(strRTrim(line, "\n"), "\r");
 		}
 
 		return m_curr;
@@ -278,6 +290,22 @@ namespace bx
 	inline uint32_t LineReader::getLine() const
 	{
 		return m_line;
+	}
+
+	inline bool hasPrefix(const StringView& _str, const StringView& _prefix)
+	{
+		const int32_t len = _prefix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(_str, _prefix, len)
+			;
+	}
+
+	inline bool hasSuffix(const StringView& _str, const StringView& _suffix)
+	{
+		const int32_t len = _suffix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(StringView(_str.getTerm() - len, _str.getTerm() ), _suffix, len)
+			;
 	}
 
 } // namespace bx

@@ -24,7 +24,7 @@ known chips:
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
  @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
- *A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
+  A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster
@@ -82,6 +82,7 @@ known chips:
  *A86     HD44820  1983, Chess King Pocket Micro
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
+ *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
  *B55     HD44860  1987, Saitek Pro Bridge 100
@@ -92,6 +93,8 @@ known chips:
  *A14     HD44868  1985, SciSys Kasparov Plus
 
   (* means undumped unless noted, @ denotes it's in this driver)
+
+============================================================================
 
 ROM source notes when dumped from another publisher, but confident it's the same:
 - gckong: CGL Super Kong
@@ -113,7 +116,8 @@ TODO:
   games may manipulate VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
-- improve/redo SVGs of: bzaxxon, bpengo, bbtime, gscobra
+- improve/redo SVGs of: bzaxxon, bbtime
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
@@ -139,7 +143,7 @@ TODO:
 #include "msthawk.lh"
 #include "packmon.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -153,6 +157,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -160,22 +170,17 @@ public:
 	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
-	u8 m_r[8];                      // MCU R ports write data (optional)
-	u16 m_d;                        // MCU D port write data (optional)
-	u8 m_int[2];                    // MCU INT0/1 pins state
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u8 m_r[8] = { };                // MCU R ports write data (optional)
+	u16 m_d = 0;                    // MCU D port write data (optional)
+	u8 m_int[2] = { };              // MCU INT0/1 pins state
+	u16 m_inp_mux = 0;              // multiplexed inputs mask
 
-	u32 m_grid;                     // VFD current row data
-	u64 m_plate;                    // VFD current column data
+	u32 m_grid = 0;                 // VFD current row data
+	u64 m_plate = 0;                // VFD current column data
 
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int line, int state);
-	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -183,14 +188,6 @@ protected:
 
 void hh_hmcs40_state::machine_start()
 {
-	// zerofill
-	memset(m_r, 0, sizeof(m_r));
-	memset(m_int, 0, sizeof(m_int));
-	m_d = 0;
-	m_inp_mux = 0;
-	m_grid = 0;
-	m_plate = 0;
-
 	// register for savestates
 	save_item(NAME(m_r));
 	save_item(NAME(m_int));
@@ -280,10 +277,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bambball(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u8 input_r();
-	void bambball(machine_config &config);
 };
 
 // handlers
@@ -351,7 +350,7 @@ INPUT_PORTS_END
 
 void bambball_state::bambball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38750(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(bambball_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(bambball_state::plate_w));
@@ -359,7 +358,7 @@ void bambball_state::bambball(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(bambball_state::plate_w));
 	m_maincpu->write_d().set(FUNC(bambball_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
@@ -368,7 +367,7 @@ void bambball_state::bambball(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_bambball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -404,11 +403,13 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bmboxing(machine_config &config);
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u8 input_r();
-	void bmboxing(machine_config &config);
 };
 
 // handlers
@@ -449,7 +450,7 @@ u8 bmboxing_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P2 side *                                       * right = P1 side *
 
@@ -498,7 +499,7 @@ INPUT_PORTS_END
 
 void bmboxing_state::bmboxing(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38750(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(bmboxing_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(bmboxing_state::plate_w));
@@ -507,7 +508,7 @@ void bmboxing_state::bmboxing(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bmboxing_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.4");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 529);
@@ -515,7 +516,7 @@ void bmboxing_state::bmboxing(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -551,13 +552,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bfriskyt(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_int1();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
-	void bfriskyt(machine_config &config);
 };
 
 // handlers
@@ -628,7 +631,7 @@ INPUT_PORTS_END
 
 void bfriskyt_state::bfriskyt(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bfriskyt_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bfriskyt_state::plate_w));
@@ -636,7 +639,7 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(bfriskyt_state::plate_w));
 	m_maincpu->write_d().set(FUNC(bfriskyt_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 675);
@@ -644,7 +647,7 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 22);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -686,10 +689,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void packmon(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u16 input_r();
-	void packmon(machine_config &config);
 };
 
 // handlers
@@ -748,7 +753,7 @@ INPUT_PORTS_END
 
 void packmon_state::packmon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(packmon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(packmon_state::plate_w));
@@ -757,7 +762,7 @@ void packmon_state::packmon(machine_config &config)
 	m_maincpu->write_d().set(FUNC(packmon_state::grid_w));
 	m_maincpu->read_d().set(FUNC(packmon_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 680);
@@ -766,7 +771,7 @@ void packmon_state::packmon(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 	config.set_default_layout(layout_packmon);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -803,12 +808,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bzaxxon(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_int1();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
-	void bzaxxon(machine_config &config);
 };
 
 // handlers
@@ -876,7 +883,7 @@ INPUT_PORTS_END
 
 void bzaxxon_state::bzaxxon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 450000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bzaxxon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bzaxxon_state::plate_w));
@@ -885,7 +892,7 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bzaxxon_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.5");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(613, 1080);
@@ -893,7 +900,7 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(11, 20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -932,12 +939,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void zackman(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void zackman(machine_config &config);
 };
 
 // handlers
@@ -1001,7 +1010,7 @@ INPUT_PORTS_END
 
 void zackman_state::zackman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(zackman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(zackman_state::plate_w));
@@ -1012,7 +1021,7 @@ void zackman_state::zackman(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(zackman_state::plate_w));
 	m_maincpu->write_d().set(FUNC(zackman_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(487, 1080);
@@ -1020,7 +1029,7 @@ void zackman_state::zackman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 29);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1056,13 +1065,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bpengo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void bpengo(machine_config &config);
 };
 
 // handlers
@@ -1133,7 +1144,7 @@ INPUT_PORTS_END
 
 void bpengo_state::bpengo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bpengo_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bpengo_state::plate_w));
@@ -1145,7 +1156,7 @@ void bpengo_state::bpengo(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bpengo_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.5");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 759);
@@ -1153,7 +1164,7 @@ void bpengo_state::bpengo(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 25);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1165,8 +1176,8 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_REGION( 565069, "screen", 0)
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(fb25ffeb) SHA1(fb4db5120f1e35e39c7fb2da4af3aa63417efaf1) )
 ROM_END
 
 
@@ -1189,13 +1200,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bbtime(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void bbtime(machine_config &config);
 };
 
 // handlers
@@ -1263,7 +1276,7 @@ INPUT_PORTS_END
 
 void bbtime_state::bbtime(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bbtime_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bbtime_state::plate_w));
@@ -1274,7 +1287,7 @@ void bbtime_state::bbtime(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(bbtime_state::plate_w));
 	m_maincpu->write_d().set(FUNC(bbtime_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(379, 1080);
@@ -1282,7 +1295,7 @@ void bbtime_state::bbtime(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(6, 28);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1318,9 +1331,11 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bdoramon(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	void bdoramon(machine_config &config);
 };
 
 // handlers
@@ -1373,7 +1388,7 @@ INPUT_PORTS_END
 
 void bdoramon_state::bdoramon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bdoramon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bdoramon_state::plate_w));
@@ -1383,7 +1398,7 @@ void bdoramon_state::bdoramon(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bdoramon_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.2");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 668);
@@ -1391,7 +1406,7 @@ void bdoramon_state::bdoramon(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1427,9 +1442,11 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void bultrman(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	void bultrman(machine_config &config);
 };
 
 // handlers
@@ -1475,7 +1492,7 @@ INPUT_PORTS_END
 
 void bultrman_state::bultrman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 350000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bultrman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bultrman_state::plate_w));
@@ -1484,7 +1501,7 @@ void bultrman_state::bultrman(machine_config &config)
 	m_maincpu->write_d().set(FUNC(bultrman_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 673);
@@ -1492,7 +1509,7 @@ void bultrman_state::bultrman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1528,10 +1545,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void machiman(machine_config &config);
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	void machiman(machine_config &config);
 };
 
 // handlers
@@ -1574,7 +1593,7 @@ INPUT_PORTS_END
 
 void machiman_state::machiman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(machiman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(machiman_state::plate_w));
@@ -1584,7 +1603,7 @@ void machiman_state::machiman(machine_config &config)
 	m_maincpu->write_d().set(FUNC(machiman_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1534, 1080);
@@ -1592,7 +1611,7 @@ void machiman_state::machiman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(5, 19);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1635,6 +1654,9 @@ public:
 		m_soundlatch(*this, "soundlatch%u", 0)
 	{ }
 
+	void pairmtch(machine_config &config);
+
+private:
 	required_device<hmcs40_cpu_device> m_audiocpu;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
@@ -1646,7 +1668,6 @@ public:
 	void sound_w(u8 data);
 	void sound2_w(u8 data);
 	void speaker_w(u16 data);
-	void pairmtch(machine_config &config);
 };
 
 // handlers: maincpu side
@@ -1742,7 +1763,7 @@ INPUT_PORTS_END
 
 void pairmtch_state::pairmtch(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<2>().set(FUNC(pairmtch_state::plate_w));
 	m_maincpu->write_r<3>().set(FUNC(pairmtch_state::plate_w));
@@ -1760,11 +1781,11 @@ void pairmtch_state::pairmtch(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 12);
 	config.set_default_layout(layout_pairmtch);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -1806,10 +1827,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void alnattck(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u16 input_r();
-	void alnattck(machine_config &config);
 };
 
 // handlers
@@ -1875,7 +1898,7 @@ INPUT_PORTS_END
 
 void alnattck_state::alnattck(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(alnattck_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(alnattck_state::plate_w));
@@ -1884,7 +1907,7 @@ void alnattck_state::alnattck(machine_config &config)
 	m_maincpu->write_d().set(FUNC(alnattck_state::grid_w));
 	m_maincpu->read_d().set(FUNC(alnattck_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 700);
@@ -1892,7 +1915,7 @@ void alnattck_state::alnattck(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1929,27 +1952,26 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void cdkong(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume;
-	void cdkong(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
+	double m_speaker_volume = 0.0;
 	std::vector<double> m_speaker_levels;
 };
 
 void cdkong_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -2016,7 +2038,7 @@ INPUT_PORTS_END
 
 void cdkong_state::cdkong(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(cdkong_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(cdkong_state::plate_w));
@@ -2028,7 +2050,7 @@ void cdkong_state::cdkong(machine_config &config)
 	m_maincpu->write_d().set(FUNC(cdkong_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(605, 1080);
@@ -2036,7 +2058,7 @@ void cdkong_state::cdkong(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(11, 29);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -2087,13 +2109,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void cgalaxn(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
+
+private:
 	void update_display();
 	void grid_w(offs_t offset, u8 data);
 	void plate_w(u16 data);
 	u8 input_r();
-
-	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
-	void cgalaxn(machine_config &config);
 };
 
 // handlers
@@ -2166,7 +2190,7 @@ INPUT_PORTS_END
 
 void cgalaxn_state::cgalaxn(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cgalaxn_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cgalaxn_state::grid_w));
@@ -2174,7 +2198,7 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(cgalaxn_state::grid_w));
 	m_maincpu->write_d().set(FUNC(cgalaxn_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(526, 1080);
@@ -2182,7 +2206,7 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(12, 15);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -2219,7 +2243,7 @@ ROM_END
   - P1 Up:    Eat & Run
   - P1 Down:  Demo
 
-  BTANB note: 1st version doesn't show the whole maze on power-on
+  BTANB: 1st version doesn't show the whole maze on power-on
 
 ***************************************************************************/
 
@@ -2230,10 +2254,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void cpacman(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u8 input_r();
-	void cpacman(machine_config &config);
 };
 
 // handlers
@@ -2295,7 +2321,7 @@ INPUT_PORTS_END
 
 void cpacman_state::cpacman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cpacman_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cpacman_state::plate_w));
@@ -2306,7 +2332,7 @@ void cpacman_state::cpacman(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(cpacman_state::plate_w));
 	m_maincpu->write_d().set(FUNC(cpacman_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
@@ -2314,7 +2340,7 @@ void cpacman_state::cpacman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(11, 27);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -2355,7 +2381,7 @@ ROM_END
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
 
-  BTANB note: in demo-mode, she hardly ever walks to the upper two rows
+  BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
 ***************************************************************************/
 
@@ -2366,10 +2392,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void cmspacmn(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u8 input_r();
-	void cmspacmn(machine_config &config);
 };
 
 // handlers
@@ -2431,7 +2459,7 @@ INPUT_PORTS_END
 
 void cmspacmn_state::cmspacmn(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cmspacmn_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cmspacmn_state::plate_w));
@@ -2442,7 +2470,7 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(cmspacmn_state::plate_w));
 	m_maincpu->write_d().set(FUNC(cmspacmn_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
@@ -2450,7 +2478,7 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(12, 33);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -2490,11 +2518,13 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void egalaxn2(machine_config &config);
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u8 input_r();
-	void egalaxn2(machine_config &config);
 };
 
 // handlers
@@ -2567,7 +2597,7 @@ INPUT_PORTS_END
 
 void egalaxn2_state::egalaxn2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_r<0>().set(FUNC(egalaxn2_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(egalaxn2_state::plate_w));
@@ -2578,7 +2608,7 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(egalaxn2_state::plate_w));
 	m_maincpu->write_d().set(FUNC(egalaxn2_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(505, 1080);
@@ -2586,7 +2616,7 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(15, 24);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -2665,7 +2695,7 @@ void epacman2_state::epacman2(machine_config &config)
 {
 	egalaxn2(config);
 
-	/* video hardware */
+	// video hardware
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(505, 1080);
 	screen->set_visarea_full();
@@ -2716,11 +2746,13 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void einvader2(machine_config &config);
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u16 input_r();
-	void einvader2(machine_config &config);
 };
 
 // handlers
@@ -2783,7 +2815,7 @@ INPUT_PORTS_END
 
 void einvader2_state::einvader2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 450000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(einvader2_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(einvader2_state::plate_w));
@@ -2792,7 +2824,7 @@ void einvader2_state::einvader2(machine_config &config)
 	m_maincpu->write_d().set(FUNC(einvader2_state::grid_w));
 	m_maincpu->read_d().set(FUNC(einvader2_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(469, 1080);
@@ -2800,7 +2832,7 @@ void einvader2_state::einvader2(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(12, 14);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -2835,35 +2867,34 @@ class eturtles_state : public hh_hmcs40_state
 public:
 	eturtles_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_hmcs40_state(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu"),
-		m_cop_irq(0)
+		m_audiocpu(*this, "audiocpu")
 	{ }
+
+	void eturtles(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
+
+protected:
+	virtual void machine_start() override;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
+	void update_int();
 	virtual void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
-	u8 m_cop_irq;
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void cop_irq_w(u8 data);
 	u8 cop_latch_r();
 	u8 cop_ack_r();
 
-	void update_int();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
-	void eturtles(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
+	u8 m_cop_irq = 0;
 };
 
 void eturtles_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
-
-	// register for savestates
 	save_item(NAME(m_cop_irq));
 }
 
@@ -2972,7 +3003,7 @@ INPUT_PORTS_END
 
 void eturtles_state::eturtles(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
@@ -2992,7 +3023,7 @@ void eturtles_state::eturtles(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
@@ -3000,7 +3031,7 @@ void eturtles_state::eturtles(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(15, 30);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3040,9 +3071,11 @@ public:
 		eturtles_state(mconfig, type, tag)
 	{ }
 
+	void estargte(machine_config &config);
+
+private:
 	virtual void update_display() override;
 	u8 cop_data_r();
-	void estargte(machine_config &config);
 };
 
 // handlers (most of it is in eturtles_state above)
@@ -3095,26 +3128,26 @@ INPUT_PORTS_END
 
 void estargte_state::estargte(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<4>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<5>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
-	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
+	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(estargte_state::plate_w));
+	m_maincpu->write_d().set(FUNC(estargte_state::grid_w));
 
 	COP411(config, m_audiocpu, 190000); // approximation
 	m_audiocpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_audiocpu->write_sk().set(FUNC(eturtles_state::speaker_w));
-	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
+	m_audiocpu->write_sk().set(FUNC(estargte_state::speaker_w));
+	m_audiocpu->write_d().set(FUNC(estargte_state::cop_irq_w));
 	m_audiocpu->read_l().set(FUNC(estargte_state::cop_data_r));
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 854);
@@ -3122,7 +3155,7 @@ void estargte_state::estargte(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(14, 29);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3164,10 +3197,12 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void ghalien(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	u16 input_r();
-	void ghalien(machine_config &config);
 };
 
 // handlers
@@ -3234,7 +3269,7 @@ INPUT_PORTS_END
 
 void ghalien_state::ghalien(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(ghalien_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(ghalien_state::plate_w));
@@ -3243,7 +3278,7 @@ void ghalien_state::ghalien(machine_config &config)
 	m_maincpu->write_d().set(FUNC(ghalien_state::grid_w));
 	m_maincpu->read_d().set(FUNC(ghalien_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 699);
@@ -3251,7 +3286,7 @@ void ghalien_state::ghalien(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3291,12 +3326,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void gckong(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_int1();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
-	void gckong(machine_config &config);
 };
 
 // handlers
@@ -3366,7 +3403,7 @@ INPUT_PORTS_END
 
 void gckong_state::gckong(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gckong_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gckong_state::plate_w));
@@ -3375,7 +3412,7 @@ void gckong_state::gckong(machine_config &config)
 	m_maincpu->write_d().set(FUNC(gckong_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.5");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(479, 1080);
@@ -3384,7 +3421,7 @@ void gckong_state::gckong(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(11, 32);
 	config.set_default_layout(layout_gckong);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3411,8 +3448,14 @@ ROM_END
   * Hitachi QFP HD38820A32 MCU
   * cyan/red/green VFD display
 
-  There are 2 versions, a green one and a white one. They are assumed to have
-  the same MCU, the VFD has color differences though.
+  known releases:
+  - World: Super Cobra, published by Gakken
+  - USA: Cobra Super Copter, published by Tandy
+
+  There are 2 versions, a green one and a white one. They have the same MCU,
+  though the VFD has color differences and is more compact.
+
+  BTANB(green version): 1 rocket seems out of place at the top-right area
 
 ***************************************************************************/
 
@@ -3423,12 +3466,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void gscobra(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void gscobra(machine_config &config);
 };
 
 // handlers
@@ -3456,8 +3501,8 @@ void gscobra_state::grid_w(u16 data)
 		update_int0();
 	}
 
-	// D4-D15: vfd grid
-	m_grid = data >> 4 & 0xfff;
+	// D7-D15: vfd grid
+	m_grid = data >> 7 & 0x1ff;
 
 	// D1-D3: more plates (update display there)
 	plate_w(7, data >> 1 & 7);
@@ -3493,7 +3538,7 @@ INPUT_PORTS_END
 
 void gscobra_state::gscobra(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gscobra_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gscobra_state::plate_w));
@@ -3504,14 +3549,15 @@ void gscobra_state::gscobra(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(gscobra_state::plate_w));
 	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
 
-	/* video hardware */
-	//screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	//screen.set_refresh_hz(60);
-	config.set_default_layout(layout_hh_hmcs40_test);
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 852);
+	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(12, 31);
+	PWM_DISPLAY(config, m_display).set_size(9, 31);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3523,8 +3569,8 @@ ROM_START( gscobra )
 	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, CRC(7bbd130f) SHA1(91dd280e4108fad7ba99191355364bd3217b9d17) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "gscobra.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 232919, "screen", 0)
+	ROM_LOAD( "gscobra.svg", 0, 232919, CRC(5ceb4bfc) SHA1(77c9a45569d780838ebe75818acb2d2ced4bda00) )
 ROM_END
 
 
@@ -3547,12 +3593,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void gdigdug(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_int1();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
-	void gdigdug(machine_config &config);
 };
 
 // handlers
@@ -3618,7 +3666,7 @@ INPUT_PORTS_END
 
 void gdigdug_state::gdigdug(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gdigdug_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gdigdug_state::plate_w));
@@ -3629,7 +3677,7 @@ void gdigdug_state::gdigdug(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(gdigdug_state::plate_w));
 	m_maincpu->write_d().set(FUNC(gdigdug_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(476, 1080);
@@ -3637,7 +3685,7 @@ void gdigdug_state::gdigdug(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3677,12 +3725,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void mwcbaseb(machine_config &config);
+
+private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 	void speaker_w(u8 data);
 	u8 input_r();
-	void mwcbaseb(machine_config &config);
 };
 
 // handlers
@@ -3725,7 +3775,7 @@ u8 mwcbaseb_state::input_r()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
         (visitor team side)                                       (home team side)
     COMP PITCH                     [SCORE]       [INNING]
@@ -3788,7 +3838,7 @@ INPUT_PORTS_END
 
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<1>().set(FUNC(mwcbaseb_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(mwcbaseb_state::plate_w));
@@ -3798,7 +3848,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(mwcbaseb_state::plate_w));
 	m_maincpu->write_d().set(FUNC(mwcbaseb_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
@@ -3808,7 +3858,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	m_display->set_bri_levels(0.001); // cyan elements strobed very briefly?
 	config.set_default_layout(layout_mwcbaseb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 	static const double speaker_levels[] = { 0.0, 0.5, -0.5, 0.0, -0.5, 0.0, -1.0, -0.5 };
@@ -3851,13 +3901,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void msthawk(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void msthawk(machine_config &config);
 };
 
 // handlers
@@ -3931,7 +3983,7 @@ INPUT_PORTS_END
 
 void msthawk_state::msthawk(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
@@ -3939,7 +3991,7 @@ void msthawk_state::msthawk(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
 	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 696);
@@ -3948,7 +4000,7 @@ void msthawk_state::msthawk(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 21);
 	config.set_default_layout(layout_msthawk);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3984,9 +4036,11 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void pbqbert(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	void pbqbert(machine_config &config);
 };
 
 // handlers
@@ -4027,7 +4081,7 @@ INPUT_PORTS_END
 
 void pbqbert_state::pbqbert(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38820(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(pbqbert_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(pbqbert_state::plate_w));
@@ -4039,7 +4093,7 @@ void pbqbert_state::pbqbert(machine_config &config)
 	m_maincpu->write_d().set(FUNC(pbqbert_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.0");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(603, 1080);
@@ -4047,7 +4101,7 @@ void pbqbert_state::pbqbert(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 30);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -4083,13 +4137,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void tmtron(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_int1();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
-	void tmtron(machine_config &config);
 };
 
 // handlers
@@ -4157,7 +4213,7 @@ INPUT_PORTS_END
 
 void tmtron_state::tmtron(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(tmtron_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(tmtron_state::plate_w));
@@ -4165,7 +4221,7 @@ void tmtron_state::tmtron(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(tmtron_state::plate_w));
 	m_maincpu->write_d().set(FUNC(tmtron_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 662);
@@ -4173,7 +4229,7 @@ void tmtron_state::tmtron(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 23);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -4213,13 +4269,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void kingman(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-
-	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
-	void kingman(machine_config &config);
 };
 
 // handlers
@@ -4287,7 +4345,7 @@ INPUT_PORTS_END
 
 void kingman_state::kingman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_maincpu, 400000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(kingman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(kingman_state::plate_w));
@@ -4295,7 +4353,7 @@ void kingman_state::kingman(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(kingman_state::plate_w));
 	m_maincpu->write_d().set(FUNC(kingman_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(374, 1080);
@@ -4303,7 +4361,7 @@ void kingman_state::kingman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 23);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -4343,9 +4401,11 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
+	void vinvader(machine_config &config);
+
+private:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	void vinvader(machine_config &config);
 };
 
 // handlers
@@ -4391,7 +4451,7 @@ INPUT_PORTS_END
 
 void vinvader_state::vinvader(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38750(config, m_maincpu, 300000); // approximation
 	m_maincpu->read_r<0>().set_ioport("IN.0");
 	m_maincpu->write_r<1>().set(FUNC(vinvader_state::plate_w));
@@ -4400,7 +4460,7 @@ void vinvader_state::vinvader(machine_config &config)
 	m_maincpu->write_d().set(FUNC(vinvader_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(233, 1080);
@@ -4408,7 +4468,7 @@ void vinvader_state::vinvader(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -4465,11 +4525,11 @@ CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_in
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 

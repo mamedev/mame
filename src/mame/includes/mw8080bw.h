@@ -51,7 +51,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_main_ram(*this, "main_ram"),
 		m_discrete(*this, "discrete"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_int_enable(true)
 	{ }
 
 	void blueshrk(machine_config &config);
@@ -88,6 +89,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+
 	u8 mw8080bw_shift_result_rev_r();
 
 	int invaders_is_cabinet_cocktail();
@@ -116,6 +119,8 @@ private:
 	emu_timer   *m_maze_tone_timer;
 
 	attotime m_interrupt_time;
+
+	bool m_int_enable;
 
 	void tornbase_io_w(offs_t offset, uint8_t data);
 	void maze_coin_counter_w(uint8_t data);

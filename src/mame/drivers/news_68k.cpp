@@ -106,7 +106,7 @@ protected:
 	template <irq_number Number> void irq_w(int state);
 	void int_check();
 
-	void timer(void *ptr, s32 param);
+	void timer(s32 param);
 	void timer_w(u8 data);
 
 	u32 bus_error_r();
@@ -297,7 +297,7 @@ void news_68k_state::timer_w(u8 data)
 		m_cpu->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
 }
 
-void news_68k_state::timer(void *ptr, s32 param)
+void news_68k_state::timer(s32 param)
 {
 	m_cpu->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
 }

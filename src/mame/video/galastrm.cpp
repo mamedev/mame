@@ -403,7 +403,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	vert[3].p[0] = (float)(lx - 1) * 65536.0f;
 	vert[3].p[1] = 0.0;
 
-	gs_poly_data& extra = object_data_alloc();
+	gs_poly_data& extra = object_data().next();
 	extra.texbase = &srcbitmap;
 
 	render_polygon<4, 2>(clip, render_delegate(&galastrm_renderer::tc0610_draw_scanline, this), vert);

@@ -54,8 +54,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "coreutil.h"
-
 #include "critcrsh.lh"
 #include "segabill.lh"
 #include "segabillv.lh"
@@ -102,33 +100,33 @@ offsets:
 
 uint8_t stv_state::stv_ioga_r(offs_t offset)
 {
-	const char *const portg[] = { "PORTG.0", "PORTG.1", "PORTG.2", "PORTG.3" };
-
 	uint8_t res;
 
 	res = 0xff;
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Reading from mirror %08x?\n",offset * 2 + 1);
+		logerror("Reading from mirror %08x?\n",offset * 2 + 1);
 
 	offset &= 0x0f; // mirror?
 
-	switch(offset * 2 + 1)
+	switch((offset * 2) + 1)
 	{
-		case 0x01: res = ioport("PORTA")->read(); break; // P1
-		case 0x03: res = ioport("PORTB")->read(); break; // P2
-		case 0x05: res = ioport("PORTC")->read(); break; // SYSTEM
-		case 0x07: res = m_system_output; break; // port D, read-backs value written
-		case 0x09: res = ioport("PORTE")->read(); break; // P3
-		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x0d:
 			if (m_ioga_mode & 0x80) // PORT-G in counter mode
 			{
-				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);
-				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 7); // counter# is auto-incremented then read
+				uint8_t const sel = (m_ioga_portg >> 1) & 0x03;
+				res = ((m_ioga_counters[sel]->read() - m_ioga_count[sel]) >> ((~m_ioga_portg & 1) * 8) & 0xff);
+				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 0x07); // counter# is auto-incremented on read
+				break;
 			}
-			else
-				res = ioport("PORTG")->read();
+			[[fallthrough]];
+		case 0x01: // P1
+		case 0x03: // P2
+		case 0x05: // SYSTEM
+		case 0x09: // P3
+		case 0x0b: // P4
+			res = m_ioga_ports[offset]->read();
 			break;
+		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x1b: res = 0; break; // Serial COM READ status
 		case 0x1d: res = m_ioga_mode; break;
 	}
@@ -139,7 +137,7 @@ uint8_t stv_state::stv_ioga_r(offs_t offset)
 void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 {
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
+		logerror("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
 
 	offset &= 0x0f; // mirror?
 
@@ -159,7 +157,11 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 			m_billboard->write(data);
 			break;
 		case 0x0d:
-			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
+			if(!BIT(data, 7)) // when bit 7==0 reset counters
+			{
+				for(unsigned i = 0; m_ioga_counters.size() > i; ++i)
+					m_ioga_count[i] = m_ioga_counters[i]->read();
+			}
 			m_ioga_portg = data;
 			break;
 		case 0x1d:
@@ -170,10 +172,9 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 {
-	uint8_t res;
 	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
 
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
@@ -183,7 +184,9 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 			res = bitswap<8>(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
-		default: res = stv_ioga_r(offset); break;
+		default:
+			res = stv_ioga_r(offset);
+			break;
 	}
 
 	return res;
@@ -191,10 +194,10 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 
 void stv_state::critcrsh_ioga_w(offs_t offset, uint8_t data)
 {
+	static uint8_t const bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 }; // TODO: chip type unknown
 	switch (offset * 2 + 1)
 	{
 		case 0x0b:
-			static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 }; // TODO: chip type unknown
 			m_cc_digits[0] = bcd2hex[(data & 0xf0) >> 4];
 			m_cc_digits[1] = bcd2hex[data & 0x0f];
 			break;
@@ -238,27 +241,22 @@ void stv_state::magzun_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::stvmp_ioga_r(offs_t offset)
 {
-	const char *const mpnames[2][5] = {
-		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
-		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
-	uint8_t res;
-
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
 		case 0x01:
 		case 0x03:
-			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only select PORTE direction
+			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only selects PORTE direction
+			{
 				res = stv_ioga_r(offset);
+			}
 			else // mahjong panel select
 			{
-				int i;
-
-				for(i=0;i<5;i++)
+				for(unsigned i = 0; m_ioga_mahjong[i].size() > i; i++)
 				{
-					if(m_mux_data & 1 << i)
-						res = ioport(mpnames[offset][i])->read();
+					if(BIT(m_mux_data, i))
+						res &= m_ioga_mahjong[offset][i]->read();
 				}
 			}
 			break;
@@ -991,6 +989,12 @@ void stv_state::init_nameclv3()
 	init_stv();
 }
 
+void stv_state::init_stv_us()
+{
+	init_stv();
+	m_smpc_hle->set_region_code(4); // 4 - USA, configured via jumpers, should be added to input ports as DIPSW ?
+}
+
 void stv_state::stv_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0); // bios
@@ -1081,13 +1085,13 @@ void stv_state::stv_select_game(int gameno)
 
 uint8_t stv_state::pdr1_input_r()
 {
-	return (ioport("PDR1")->read() & 0x40) | 0x3f;
+	return (m_pdr[0]->read() & 0x40) | 0x3f;
 }
 
 
 uint8_t stv_state::pdr2_input_r()
 {
-	return (ioport("PDR2")->read() & ~0x19) | 0x18 | (m_eeprom->do_read()<<0);
+	return (m_pdr[1]->read() & ~0x19) | 0x18 | (m_eeprom->do_read() << 0);
 }
 
 
@@ -1131,7 +1135,7 @@ void stv_state::stv(machine_config &config)
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
 	m_smpc_hle->set_screen_tag("screen");
-	m_smpc_hle->set_region_code(0);
+	m_smpc_hle->set_region_code(1); // 1 - Japan, configured via jumpers, should be added to input ports as DIPSW ?
 	m_smpc_hle->pdr1_in_handler().set(FUNC(stv_state::pdr1_input_r));
 	m_smpc_hle->pdr2_in_handler().set(FUNC(stv_state::pdr2_input_r));
 	m_smpc_hle->pdr1_out_handler().set(FUNC(stv_state::pdr1_output_w));
@@ -1242,7 +1246,7 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 	if(ACCESSING_BITS_16_31)
 		m_rax->data_w(data >> 16);
 	if(ACCESSING_BITS_0_15)
-		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
+		logerror("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
 
 
@@ -1825,9 +1829,9 @@ static INPUT_PORTS_START( patocar )
 
 	// TODO: sense/delta values seems wrong
 	PORT_MODIFY("PORTG.0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 	PORT_MODIFY("PORTG.1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1)    PORT_NAME("10Yen")
@@ -2920,7 +2924,7 @@ Tatacot
 Sega, 1995.
 
 Japanese version of Critter Crusher. Like Critter Crusher this is also a conversion,
-but this time from a Ejihon Tantei Jimusyo cart.
+but this time from a Ejihon Tantei Jimusho cart.
 
 */
 
@@ -2967,7 +2971,6 @@ ROM_START( sfish2 )
 
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
-	ROM_FILL( 0x809c, 1, 'U' ) // TODO: hardcoded country code???
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18427.ic13",  0x0000001, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
@@ -2988,7 +2991,6 @@ ROM_START( sfish2j )
 
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
-	ROM_FILL( 0x809c, 1, 'J' ) // TODO: hardcoded country code???
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18344.a",      0x0000001, 0x0100000, CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )
@@ -3788,6 +3790,26 @@ ROM_START( fanzonem )
 	ROM_LOAD16_WORD_SWAP( "mpr-21444.ic8",    0x1c00000, 0x0400000, CRC(a82ff33b) SHA1(9559ee4cf1ec487c3847df40d10aa2a4eaee97d2) )
 ROM_END
 
+ROM_START( yattrmnp ) // ROM board stickered 837-13598
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-21122.ic13",    0x0000000, 0x0080000, CRC(49f56e32) SHA1(7d8bdaaf3a4edd9df90becc3ec5e94a69bb29ffc) ) // ST M27C4002-12F1
+	ROM_LOAD16_WORD_SWAP( "mpr-21125.ic02",    0x0400000, 0x0400000, CRC(40f5f119) SHA1(68fc634734ab05b54ff93256259969f16e26807d) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21130.ic03",    0x0800000, 0x0400000, CRC(84cb4e9c) SHA1(675464b0fdf80a3d6e39292e56528e906d388d3c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21126.ic04",    0x0c00000, 0x0400000, CRC(36095649) SHA1(cd06471943380d80887e389e04008d78c58d14b3) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21131.ic05",    0x1000000, 0x0400000, CRC(b1c860d8) SHA1(474539f86369f10df5f0e51fd5b44febbc846f98) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21127.ic06",    0x1400000, 0x0400000, CRC(f55901d7) SHA1(ab80d82b6707929af9cc5615319bc5b336c13f4a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21132.ic07",    0x1800000, 0x0400000, CRC(809b1b0e) SHA1(8404a03624ba735cc796a38a2b2b96bf9e37f5ee) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21128.ic08",    0x1c00000, 0x0400000, CRC(c2e2f72e) SHA1(299c60a74caf3ec6641b6369c823059ef2fbdc5e) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21133.ic09",    0x2000000, 0x0400000, CRC(2dc21956) SHA1(6fd7ab435127286a7b212e30b1f29a6f3fbd018b) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21129.ic10",    0x2400000, 0x0400000, CRC(997d67bd) SHA1(f588b4391982df4afe60fe8bf739cd510f98caa0) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21124.ic11",    0x2800000, 0x0400000, CRC(10f073ac) SHA1(8c16d8ad9c435d44a7b4dd327cd44ffd2f7e895c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21123.ic12",    0x2c00000, 0x0400000, CRC(491b9166) SHA1(f1d5e5b7bef4fc99862b1b8178759e96ba4cb29c) )
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-5930.ic19", 0x000, 0x117, CRC(d1201563) SHA1(a133b07240c0a4eb8bae4b438d98fc6148fb7f4f) )
+ROM_END
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
 
@@ -3805,7 +3827,7 @@ GAME( 1999, danchih,   stvbios, stvmp,    stvmp,    stv_state,   init_danchih,  
 GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   init_dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
-GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusho (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   init_elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge / Final Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge / Final Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3906,13 +3928,14 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs emulation of the medal specific hardware
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, dfeverg,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Dancing Fever Gold (J 000821 V2.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv_us,     ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME( 1995, sfish2j,   sfish2,  stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 /*
