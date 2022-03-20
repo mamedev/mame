@@ -399,19 +399,19 @@ void tipi_card_device::open_websocket()
 			m_wsclient = std::make_unique<webpp::ws_client>(shost);
 			webpp::ws_client* wsc = m_wsclient.get();
 			wsc->on_open =
-				[wsc,this]()
+				[this]()
 				{ websocket_opened(); };
 
 			wsc->on_message =
-				[wsc,this](std::shared_ptr<webpp::ws_client::Message> message)
+				[this](std::shared_ptr<webpp::ws_client::Message> message)
 				{  websocket_incoming(message); };
 
 			wsc->on_close =
-				[wsc,this](int i, const std::string& msg)
+				[this](int i, const std::string& msg)
 				{  websocket_closed(i, msg); };
 
 			wsc->on_error =
-				[wsc,this](const std::error_code& code)
+				[this](const std::error_code& code)
 				{  websocket_error(code); };
 
 			m_send_stream = std::make_shared<webpp::ws_client::SendStream>();
