@@ -92,7 +92,7 @@ protected:
 	u8 m_prev3_c;
 	bool m_sr;
 	bool m_skip;
-	u8 m_seg;
+	u16 m_seg;
 
 	u8 m_atbz_step;
 	u8 m_tkbs_step;

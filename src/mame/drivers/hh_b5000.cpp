@@ -8,6 +8,7 @@ Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
 
 ROM source notes when dumped from another model, but confident it's the same:
 - rw18r: Rockwell 8R
+- misatk: Mattel Space Alert
 
 TODO:
 - figure out why rw18r doesn't work (ROM dump is good)
@@ -27,7 +28,7 @@ TODO:
 // internal artwork
 #include "rw18r.lh"
 
-//#include "hh_b5000_test.lh" // common test-layout - use external artwork
+#include "hh_b5000_test.lh" // common test-layout - use external artwork
 
 
 class hh_b5000_state : public driver_device
@@ -106,6 +107,404 @@ u8 hh_b5000_state::read_inputs(int columns)
 ***************************************************************************/
 
 namespace {
+
+/***************************************************************************
+
+  Mattel Auto Race
+  * x
+
+***************************************************************************/
+
+class autorace_state : public hh_b5000_state
+{
+public:
+	autorace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_b5000_state(mconfig, type, tag)
+	{ }
+
+	void autorace(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+};
+
+// handlers
+
+void autorace_state::write_str(u16 data)
+{
+	m_display->write_my(data);
+}
+
+void autorace_state::write_seg(u16 data)
+{
+	m_display->write_mx(data);
+}
+
+// config
+
+static INPUT_PORTS_START( autorace )
+	PORT_START("IN.0") // KB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // DIN
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void autorace_state::autorace(machine_config &config)
+{
+	// basic machine hardware
+	B6000(config, m_maincpu, 240000); // approximation
+	m_maincpu->write_str().set(FUNC(autorace_state::write_str));
+	m_maincpu->write_seg().set(FUNC(autorace_state::write_seg));
+	m_maincpu->read_kb().set_ioport("IN.0");
+	m_maincpu->read_din().set_ioport("IN.1");
+	m_maincpu->write_spk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	config.set_default_layout(layout_hh_b5000_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( autorace )
+	ROM_REGION( 0x200, "maincpu", 0 )
+	ROM_LOAD( "b6000.bin", 0x000, 0x200, CRC(a112c928) SHA1(aa5d0b46a08e2460081d4148cf254dc5ec53817e) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Missile Attack
+  * x
+
+***************************************************************************/
+
+class misatk_state : public hh_b5000_state
+{
+public:
+	misatk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_b5000_state(mconfig, type, tag)
+	{ }
+
+	void misatk(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+};
+
+// handlers
+
+void misatk_state::write_str(u16 data)
+{
+	m_display->write_my(data);
+}
+
+void misatk_state::write_seg(u16 data)
+{
+	m_display->write_mx(data);
+}
+
+// config
+
+static INPUT_PORTS_START( misatk )
+	PORT_START("IN.0") // KB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // DIN
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void misatk_state::misatk(machine_config &config)
+{
+	// basic machine hardware
+	B6000(config, m_maincpu, 240000); // approximation
+	m_maincpu->write_str().set(FUNC(misatk_state::write_str));
+	m_maincpu->write_seg().set(FUNC(misatk_state::write_seg));
+	m_maincpu->read_kb().set_ioport("IN.0");
+	m_maincpu->read_din().set_ioport("IN.1");
+	m_maincpu->write_spk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	config.set_default_layout(layout_hh_b5000_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( misatk )
+	ROM_REGION( 0x200, "maincpu", 0 )
+	ROM_LOAD( "b6001.bin", 0x000, 0x200, CRC(56564b79) SHA1(6f33f57ea312cb2018fb59f72eaff3a9642e74a2) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Football
+  * x
+
+***************************************************************************/
+
+class mfootb_state : public hh_b5000_state
+{
+public:
+	mfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_b5000_state(mconfig, type, tag)
+	{ }
+
+	void mfootb(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+};
+
+// handlers
+
+void mfootb_state::write_str(u16 data)
+{
+	m_display->write_my(data);
+}
+
+void mfootb_state::write_seg(u16 data)
+{
+	m_display->write_mx(data);
+}
+
+// config
+
+static INPUT_PORTS_START( mfootb )
+	PORT_START("IN.0") // KB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // DIN
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void mfootb_state::mfootb(machine_config &config)
+{
+	// basic machine hardware
+	B6100(config, m_maincpu, 240000); // approximation
+	m_maincpu->write_str().set(FUNC(mfootb_state::write_str));
+	m_maincpu->write_seg().set(FUNC(mfootb_state::write_seg));
+	m_maincpu->read_kb().set_ioport("IN.0");
+	m_maincpu->read_din().set_ioport("IN.1");
+	m_maincpu->write_spk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
+	config.set_default_layout(layout_hh_b5000_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mfootb )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b6100.bin", 0x0000, 0x0300, CRC(5b27620f) SHA1(667ff6cabced89ef4ad848b73d66a06526edc5e6) )
+	ROM_CONTINUE(          0x0380, 0x0080 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Baseball
+  * x
+
+***************************************************************************/
+
+class mbaseb_state : public hh_b5000_state
+{
+public:
+	mbaseb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_b5000_state(mconfig, type, tag)
+	{ }
+
+	void mbaseb(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+};
+
+// handlers
+
+void mbaseb_state::write_str(u16 data)
+{
+	m_display->write_my(data);
+}
+
+void mbaseb_state::write_seg(u16 data)
+{
+	m_display->write_mx(data);
+}
+
+// config
+
+static INPUT_PORTS_START( mbaseb )
+	PORT_START("IN.0") // KB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // DIN
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void mbaseb_state::mbaseb(machine_config &config)
+{
+	// basic machine hardware
+	B6100(config, m_maincpu, 240000); // approximation
+	m_maincpu->write_str().set(FUNC(mbaseb_state::write_str));
+	m_maincpu->write_seg().set(FUNC(mbaseb_state::write_seg));
+	m_maincpu->read_kb().set_ioport("IN.0");
+	m_maincpu->read_din().set_ioport("IN.1");
+	m_maincpu->write_spk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
+	config.set_default_layout(layout_hh_b5000_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mbaseb )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b6101.bin", 0x0000, 0x0300, CRC(7720ddcc) SHA1(cd43126db7c6262f659f325aa58420e1a8a1a659) )
+	ROM_CONTINUE(          0x0380, 0x0080 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Gravity
+  * x
+
+***************************************************************************/
+
+class gravity_state : public hh_b5000_state
+{
+public:
+	gravity_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_b5000_state(mconfig, type, tag)
+	{ }
+
+	void gravity(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+};
+
+// handlers
+
+void gravity_state::write_str(u16 data)
+{
+	m_display->write_my(data);
+}
+
+void gravity_state::write_seg(u16 data)
+{
+	m_display->write_mx(data);
+}
+
+// config
+
+static INPUT_PORTS_START( gravity )
+	PORT_START("IN.0") // KB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // DIN
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void gravity_state::gravity(machine_config &config)
+{
+	// basic machine hardware
+	B6100(config, m_maincpu, 240000); // approximation
+	m_maincpu->write_str().set(FUNC(gravity_state::write_str));
+	m_maincpu->write_seg().set(FUNC(gravity_state::write_seg));
+	m_maincpu->read_kb().set_ioport("IN.0");
+	m_maincpu->read_din().set_ioport("IN.1");
+	m_maincpu->write_spk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
+	config.set_default_layout(layout_hh_b5000_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gravity )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b6102.bin", 0x0000, 0x0300, CRC(532f332e) SHA1(593224d3a2a5b6022f0d73b6e6fb9093d2d54f68) )
+	ROM_CONTINUE(          0x0380, 0x0080 )
+ROM_END
+
+
+
+
 
 /***************************************************************************
 
@@ -222,4 +621,10 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1976, autorace,  0,       0, autorace,  autorace,  autorace_state,  empty_init, "Mattel Electronics", "Auto Race", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1976, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_init, "Mattel Electronics", "Football (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

@@ -16436,6 +16436,11 @@ hexionb                         // bootleg
 wildfire                        // Parker Bros
 
 @source:hh_b5000.cpp
+autorace                        // Mattel
+gravity                         // Mattel
+mbaseb                          // Mattel
+mfootb                          // Mattel
+misatk                          // Mattel
 rw18r                           // Rockwell
 
 @source:hh_cop400.cpp
