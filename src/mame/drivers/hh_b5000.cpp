@@ -111,7 +111,12 @@ namespace {
 /***************************************************************************
 
   Mattel Auto Race
-  * x
+  * B6000 MCU (label B6000CA, die label B6000-B)
+  * 2-digit 7seg display, 21 other leds, 1-bit sound
+
+  This is Mattel's first handheld game. Hardware design (even the MCU) and
+  programming was done at Rockwell. A European version was released as
+  "Ski Slalom" (it's simply upside-down).
 
 ***************************************************************************/
 
@@ -180,7 +185,7 @@ void autorace_state::autorace(machine_config &config)
 
 ROM_START( autorace )
 	ROM_REGION( 0x200, "maincpu", 0 )
-	ROM_LOAD( "b6000.bin", 0x000, 0x200, CRC(a112c928) SHA1(aa5d0b46a08e2460081d4148cf254dc5ec53817e) )
+	ROM_LOAD( "b6000ca", 0x000, 0x200, CRC(a112c928) SHA1(aa5d0b46a08e2460081d4148cf254dc5ec53817e) )
 ROM_END
 
 
@@ -189,8 +194,14 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel Missile Attack
-  * x
+  Mattel Missile Attack / Battlestar Galactica: Space Alert
+  * B6000 MCU (label B6001, die label B6001)
+  * 2-digit 7seg display, 21 other leds, 1-bit sound
+
+  The initial release was titled Missile Attack, it didn't sell well (Mattel
+  blamed it on NBC for not wanting to air their commercial). They changed
+  the title/setting and advertised an upcoming rerelease as "Flash Gordon",
+  but changed plans and named it "Battlestar Galactica: Space Alert".
 
 ***************************************************************************/
 
@@ -259,7 +270,7 @@ void misatk_state::misatk(machine_config &config)
 
 ROM_START( misatk )
 	ROM_REGION( 0x200, "maincpu", 0 )
-	ROM_LOAD( "b6001.bin", 0x000, 0x200, CRC(56564b79) SHA1(6f33f57ea312cb2018fb59f72eaff3a9642e74a2) )
+	ROM_LOAD( "b6001", 0x000, 0x200, CRC(56564b79) SHA1(6f33f57ea312cb2018fb59f72eaff3a9642e74a2) )
 ROM_END
 
 
@@ -269,7 +280,10 @@ ROM_END
 /***************************************************************************
 
   Mattel Football
-  * x
+  * B6100 MCU (label B6100EB, die label B6100 A)
+  * 7-digit 7seg display, 27 other leds, 1-bit sound
+
+  When Football II came out, they renamed this one to Football I.
 
 ***************************************************************************/
 
@@ -338,8 +352,8 @@ void mfootb_state::mfootb(machine_config &config)
 
 ROM_START( mfootb )
 	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b6100.bin", 0x0000, 0x0300, CRC(5b27620f) SHA1(667ff6cabced89ef4ad848b73d66a06526edc5e6) )
-	ROM_CONTINUE(          0x0380, 0x0080 )
+	ROM_LOAD( "b6100eb", 0x000, 0x300, CRC(5b27620f) SHA1(667ff6cabced89ef4ad848b73d66a06526edc5e6) )
+	ROM_CONTINUE(        0x380, 0x080 )
 ROM_END
 
 
@@ -349,7 +363,8 @@ ROM_END
 /***************************************************************************
 
   Mattel Baseball
-  * x
+  * B6100 MCU (label B6101-12, die label B6101 A)
+  * 4-digit 7seg display, 28 other leds, 1-bit sound
 
 ***************************************************************************/
 
@@ -418,8 +433,8 @@ void mbaseb_state::mbaseb(machine_config &config)
 
 ROM_START( mbaseb )
 	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b6101.bin", 0x0000, 0x0300, CRC(7720ddcc) SHA1(cd43126db7c6262f659f325aa58420e1a8a1a659) )
-	ROM_CONTINUE(          0x0380, 0x0080 )
+	ROM_LOAD( "b6101-12", 0x000, 0x300, CRC(7720ddcc) SHA1(cd43126db7c6262f659f325aa58420e1a8a1a659) )
+	ROM_CONTINUE(         0x380, 0x080 )
 ROM_END
 
 
@@ -429,7 +444,11 @@ ROM_END
 /***************************************************************************
 
   Mattel Gravity
-  * x
+  * B6100 MCU (label B6102-11, die label B6102 A)
+  * 3-digit 7seg display, 27 other leds, 1-bit sound
+
+  It was advertised as "Catastrophe", but went unreleased. It got released
+  later as "Gravity", presumedly only for the European market.
 
 ***************************************************************************/
 
@@ -498,8 +517,8 @@ void gravity_state::gravity(machine_config &config)
 
 ROM_START( gravity )
 	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b6102.bin", 0x0000, 0x0300, CRC(532f332e) SHA1(593224d3a2a5b6022f0d73b6e6fb9093d2d54f68) )
-	ROM_CONTINUE(          0x0380, 0x0080 )
+	ROM_LOAD( "b6102-11", 0x000, 0x300, CRC(532f332e) SHA1(593224d3a2a5b6022f0d73b6e6fb9093d2d54f68) )
+	ROM_CONTINUE(         0x380, 0x080 )
 ROM_END
 
 
