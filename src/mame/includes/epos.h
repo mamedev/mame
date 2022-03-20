@@ -56,12 +56,12 @@ private:
 	optional_ioport_array<2> m_inputs;
 
 	/* video-related */
-	uint8_t    m_palette_bank;
+	uint8_t    m_palette_bank = 0U;
 
 	/* misc */
-	int      m_counter;
-	int      m_input_multiplex;
-	bool     m_ay_porta_multiplex;
+	int      m_counter = 0;
+	int      m_input_multiplex = 0;
+	bool     m_ay_porta_multiplex = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;

@@ -44,23 +44,23 @@ protected:
 
 private:
 	/* memory pointers */
-	std::unique_ptr<uint16_t[]>   m_videoram[2][4];
-	std::unique_ptr<uint8_t[]>    m_bankedram;
+	std::unique_ptr<uint16_t[]>   m_videoram[2][4]{};
+	std::unique_ptr<uint8_t[]>    m_bankedram{};
 
 	/* video-related */
-	tilemap_t  *m_tilemap[2][4];
-	int      m_scrollx[2][4];
-	int      m_scrolly[2][4];
-	int      m_gfxbank[2][4];
+	tilemap_t  *m_tilemap[2][4]{};
+	int      m_scrollx[2][4]{};
+	int      m_scrolly[2][4]{};
+	int      m_gfxbank[2][4]{};
 
 	/* misc */
-	int      m_portselect;
-	uint8_t    m_subcpu_int_flag;
-	uint8_t    m_subcpu_nmi_flag;
-	uint8_t    m_sndcpu_nmi_flag;
-	uint16_t   m_datalatch1;
-	uint8_t    m_datalatch_2h;
-	uint8_t    m_datalatch_2l;
+	int      m_portselect = 0;
+	uint8_t    m_subcpu_int_flag = 0U;
+	uint8_t    m_subcpu_nmi_flag = 0U;
+	uint8_t    m_sndcpu_nmi_flag = 0U;
+	uint16_t   m_datalatch1 = 0U;
+	uint8_t    m_datalatch_2h = 0U;
+	uint8_t    m_datalatch_2l = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

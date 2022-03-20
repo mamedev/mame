@@ -45,13 +45,13 @@ private:
 	required_region_ptr<u8> m_tilerom;
 
 	/* video-related */
-	tilemap_t      *m_bg_tilemap;
-	tilemap_t      *m_fg_tilemap;
-	tilemap_t      *m_tx_tilemap;
-	int            m_chon;
-	int            m_objon;
-	int            m_sc1on;
-	int            m_sc2on;
+	tilemap_t      *m_bg_tilemap = nullptr;
+	tilemap_t      *m_fg_tilemap = nullptr;
+	tilemap_t      *m_tx_tilemap = nullptr;
+	int            m_chon = 0;
+	int            m_objon = 0;
+	int            m_sc1on = 0;
+	int            m_sc2on = 0;
 
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);

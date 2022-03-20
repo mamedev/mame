@@ -48,18 +48,18 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	bitmap_ind16   m_bgbitmap;
-	bitmap_ind16   m_fgbitmap;
-	uint8_t      m_xpos;
-	uint8_t      m_ypos;
-	int        m_current_color;
+	bitmap_ind16   m_bgbitmap{};
+	bitmap_ind16   m_fgbitmap{};
+	uint8_t      m_xpos = 0U;
+	uint8_t      m_ypos = 0U;
+	int        m_current_color = 0;
 
 	/* misc */
-	int        m_player;
-	uint8_t      m_row;
-	uint8_t      m_col;
-	int        m_prev_coin;
-	emu_timer  *m_interrupt_timer;
+	int        m_player = 0;
+	uint8_t      m_row = 0U;
+	uint8_t      m_col = 0U;
+	int        m_prev_coin = 0;
+	emu_timer  *m_interrupt_timer = nullptr;
 
 	uint8_t analog_r();
 	uint8_t nmi_reset_r();

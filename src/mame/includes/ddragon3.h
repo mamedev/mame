@@ -54,23 +54,23 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* misc */
-	uint8_t m_pri;
+	uint8_t m_pri = 0U;
 	int vblank_level;
 	int raster_level;
 
 	/* video-related */
-	tilemap_t         *m_fg_tilemap;
-	tilemap_t         *m_bg_tilemap;
-	uint16_t          m_vreg;
-	uint16_t          m_bg_scrollx;
-	uint16_t          m_bg_scrolly;
-	uint16_t          m_fg_scrollx;
-	uint16_t          m_fg_scrolly;
-	uint16_t          m_bg_tilebase;
+	tilemap_t         *m_fg_tilemap = nullptr;
+	tilemap_t         *m_bg_tilemap = nullptr;
+	uint16_t          m_vreg = 0U;
+	uint16_t          m_bg_scrollx = 0U;
+	uint16_t          m_bg_scrolly = 0U;
+	uint16_t          m_fg_scrollx = 0U;
+	uint16_t          m_fg_scrolly = 0U;
+	uint16_t          m_bg_tilebase = 0U;
 
-	uint16_t m_bg0_dx;
-	uint16_t m_bg1_dx[2];
-	uint16_t m_sprite_xoff;
+	uint16_t m_bg0_dx = 0U;
+	uint16_t m_bg1_dx[2]{};
+	uint16_t m_sprite_xoff = 0U;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -136,7 +136,7 @@ private:
 	required_shared_ptr<uint16_t> m_fg0_videoram;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_ioport_array<2> m_dsw;
-	tilemap_t *m_fg0_tilemap;
+	tilemap_t *m_fg0_tilemap = nullptr;
 	void wwfwfest_fg0_videoram_w(offs_t offset, uint16_t data);
 
 	//required_device<buffered_spriteram16_device> m_spriteram;

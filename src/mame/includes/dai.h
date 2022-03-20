@@ -41,11 +41,11 @@ public:
 	void dai(machine_config &config);
 
 private:
-	u8 m_paddle_select;
-	u8 m_paddle_enable;
-	u8 m_cassette_motor[2];
-	u8 m_keyboard_scan_mask;
-	u8 m_4_colours_palette[4];
+	u8 m_paddle_select = 0U;
+	u8 m_paddle_enable = 0U;
+	u8 m_cassette_motor[2]{};
+	u8 m_keyboard_scan_mask = 0U;
+	u8 m_4_colours_palette[4]{};
 	void stack_interrupt_circuit_w(u8 data);
 	u8 io_discrete_devices_r(offs_t offset);
 	void io_discrete_devices_w(offs_t offset, u8 data);

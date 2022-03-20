@@ -41,11 +41,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_md_tilemap;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	tilemap_t     *m_md_tilemap = nullptr;
 
-	bool m_alt_scrolling;
+	bool m_alt_scrolling = false;
 
 private:
 	/* memory pointers */
@@ -103,12 +103,12 @@ private:
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	/* misc */
-	uint8_t       m_snd_command;
-	uint16_t      m_snd_flag;
-	uint8_t       m_oki_control;
-	uint8_t       m_oki_command;
-	uint8_t       m_pic16c5x_port0;
-	uint8_t       m_oki_bank[2];
+	uint8_t       m_snd_command = 0U;
+	uint16_t      m_snd_flag = 0U;
+	uint8_t       m_oki_control = 0U;
+	uint8_t       m_oki_command = 0U;
+	uint8_t       m_pic16c5x_port0 = 0U;
+	uint8_t       m_oki_bank[2]{};
 
 	void snd_command_w(uint8_t data);
 	void snd_flag_w(uint8_t data);
