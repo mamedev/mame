@@ -29,8 +29,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define USE_PROPER_I8214 0
-
 #define I8214_TAG       "i8214"
 #define UPD1990A_TAG    "upd1990a"
 #define I8251_TAG       "i8251"
@@ -138,21 +136,7 @@ private:
 	uint8_t m_extram_bank;
 	uint8_t m_txt_width;
 	uint8_t m_txt_color;
-#if USE_PROPER_I8214
-	uint8_t m_timer_irq_mask;
-	uint8_t m_vblank_irq_mask;
-	uint8_t m_sound_irq_mask;
-	uint8_t m_int_state;
-#else
-	uint8_t m_i8214_irq_level;
-	uint8_t m_vrtc_irq_mask;
-	uint8_t m_vrtc_irq_latch;
-	uint8_t m_timer_irq_mask;
-	uint8_t m_timer_irq_latch;
-	uint8_t m_sound_irq_mask;
-	uint8_t m_sound_irq_latch;
-	uint8_t m_sound_irq_pending;
-#endif
+
 	crtc_t m_crtc;
 	mouse_t m_mouse;
 	struct { uint8_t r, g, b; } m_palram[8];
@@ -232,15 +216,22 @@ private:
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
 	INTERRUPT_GEN_MEMBER(vrtc_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
+	IRQ_CALLBACK_MEMBER(int_ack_cb);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
+	bool m_vrtc_irq_mask;
+	bool m_timer_irq_mask;
+	bool m_sound_irq_mask;
+//	bool m_sound_irq_pending;
+
 	uint8_t cpu_8255_c_r();
 	void cpu_8255_c_w(uint8_t data);
 	uint8_t fdc_8255_c_r();
 	void fdc_8255_c_w(uint8_t data);
 	uint8_t opn_porta_r();
 	void opna_map(address_map &map);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 // both FH and MH family bases sports selectable 8/4 MHz CPU clock switch

@@ -1149,55 +1149,17 @@ void pc8801_state::vram_select_w(offs_t offset, uint8_t data)
 	m_vram_sel = offset & 3;
 }
 
-#if USE_PROPER_I8214
-
-void pc8801_state::i8214_irq_level_w(uint8_t data)
-{
-	if(data & 8)
-		m_pic->b_w(7);
-	else
-		m_pic->b_w(data & 0x07);
-}
-
-void pc8801_state::i8214_irq_mask_w(uint8_t data)
-{
-	m_timer_irq_mask = data & 1;
-	m_vblank_irq_mask = data & 2;
-}
-
-
-#else
 void pc8801_state::irq_level_w(uint8_t data)
 {
-	if(data & 8)
-		m_i8214_irq_level = 7;
-	else
-		m_i8214_irq_level = data & 7;
-
-//  IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
+	m_pic->b_sgs_w(~data);
 }
-
 
 void pc8801_state::irq_mask_w(uint8_t data)
 {
-	m_timer_irq_mask = data & 1;
-	m_vrtc_irq_mask = data & 2;
-
-	if(m_timer_irq_mask == 0)
-		m_timer_irq_latch = 0;
-
-	if(m_vrtc_irq_mask == 0)
-		m_vrtc_irq_latch = 0;
-
-	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		m_maincpu->set_input_line(0,CLEAR_LINE);
-
-//  IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
-
-	//if(data & 4)
-	//  logerror("IRQ mask %02x\n",data);
+	m_timer_irq_mask = bool(BIT(data, 0));
+	m_vrtc_irq_mask = bool(BIT(data, 1));
 }
-#endif
+
 
 uint8_t pc8801_state::window_bank_r()
 {
@@ -1239,25 +1201,11 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 {
 	m_misc_ctrl = data;
 
-	#if USE_PROPER_I8214
+	// TODO: need to propagate internally to the sound chip instead?
 	m_sound_irq_mask = ((data & 0x80) == 0);
-	#else
-	m_sound_irq_mask = ((data & 0x80) == 0);
-
-	if(m_sound_irq_mask == 0)
-		m_sound_irq_latch = 0;
-
-	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		m_maincpu->set_input_line(0,CLEAR_LINE);
-
-	if(m_sound_irq_mask && m_sound_irq_pending)
-	{
-		m_maincpu->set_input_line(0,HOLD_LINE);
-		m_sound_irq_latch = 1;
-		m_sound_irq_pending = 0;
-	}
-
-	#endif
+//	m_opna->address_w(0x29);
+//	m_opna->data_w((data & 0x80) == 0);
+//	m_opna->set_irq_mask((data & 0x80) == 0);
 }
 
 /*
@@ -1550,6 +1498,10 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 		m_opna->write((offset & 1) | ((offset & 4) >> 1),data);
 	else if(m_has_opna && offset == 2)
 	{
+		// TODO: tied to second sound chip (noticeable in late doujinshi entries)
+		//m_sound_irq_mask = ((data & 0x80) == 0);
+
+#if 0
 		m_sound_irq_mask = ((data & 0x80) == 0);
 
 		if(m_sound_irq_mask == 0)
@@ -1564,6 +1516,7 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 			m_sound_irq_latch = 1;
 			m_sound_irq_pending = 0;
 		}
+#endif
 	}
 }
 
@@ -1685,13 +1638,8 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xdc, 0xdf) MODEM
 	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w)); /* expand RAM mode */
 	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w)); /* expand RAM bank */
-#if USE_PROPER_I8214
-	map(0xe4, 0xe4).w(FUNC(pc8801_state::i8214_irq_level_w));
-	map(0xe6, 0xe6).w(FUNC(pc8801_state::i8214_irq_mask_w));
-#else
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
-#endif
 //  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
@@ -2056,144 +2004,6 @@ static GFXDECODE_START( gfx_pc8801 )
 	GFXDECODE_ENTRY( "kanji_lv2", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
 
-#if USE_PROPER_I8214
-void pc8801_state::raise_irq(uint8_t irq,uint8_t state)
-{
-	if(state)
-	{
-		drvm_int_state |= irq;
-
-		drvm_pic->r_w(~irq);
-
-		m_maincpu->set_input_line(0,ASSERT_LINE);
-	}
-	else
-	{
-		//drvm_int_state &= ~irq;
-
-		//m_maincpu->set_input_line(0,CLEAR_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(pc8801_state::pic_int_w)
-{
-	device_t *device = m_maincpu;
-//  if (state == ASSERT_LINE)
-//  {
-//  }
-}
-
-WRITE_LINE_MEMBER(pc8801_state::pic_enlg_w)
-{
-	device_t *device = m_maincpu;
-	//if (state == CLEAR_LINE)
-	//{
-	//}
-}
-
-static I8214_INTERFACE( pic_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pic_int_w),
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pic_enlg_w)
-};
-
-IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
-{
-	uint8_t vector = (7 - m_pic->a_r());
-
-	m_int_state &= ~(1<<vector);
-	m_maincpu->set_input_line(0,CLEAR_LINE);
-
-	return vector << 1;
-}
-
-WRITE_LINE_MEMBER(pc8801_state::sound_irq)
-{
-	if(m_sound_irq_mask && state)
-		pc8801_raise_irq(machine(),1<<(4),1);
-}
-
-/*
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::rtc_irq)
-{
-    if(m_timer_irq_mask)
-        pc8801_raise_irq(machine(),1<<(2),1);
-}
-*/
-
-INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
-{
-	if(m_vblank_irq_mask)
-		pc8801_raise_irq(machine(),1<<(1),1);
-}
-
-#else
-
-#include "debugger.h"
-
-IRQ_CALLBACK_MEMBER(pc8801_state::irq_callback)
-{
-	if(m_sound_irq_latch)
-	{
-		m_sound_irq_latch = 0;
-		return 4*2;
-	}
-	else if(m_vrtc_irq_latch)
-	{
-		m_vrtc_irq_latch = 0;
-		return 1*2;
-	}
-	else if(m_timer_irq_latch)
-	{
-		m_timer_irq_latch = 0;
-		return 2*2;
-	}
-
-	logerror("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",m_i8214_irq_level,m_sound_irq_latch,m_vrtc_irq_latch,m_timer_irq_latch);
-	machine().debug_break();
-
-	return 4*2; //TODO: mustn't happen
-}
-
-WRITE_LINE_MEMBER(pc8801_state::sound_irq)
-{
-//  logerror("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
-	// TODO: correct i8214 irq level?
-	if(state)
-	{
-		if(m_sound_irq_mask)
-		{
-			m_sound_irq_latch = 1;
-			m_sound_irq_pending = 0;
-			//IRQ_LOG(("sound\n"));
-			m_maincpu->set_input_line(0,HOLD_LINE);
-		}
-		else
-			m_sound_irq_pending = 1;
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::rtc_irq)
-{
-	if(m_timer_irq_mask && m_i8214_irq_level >= 3)
-	{
-		m_timer_irq_latch = 1;
-		//IRQ_LOG(("timer\n"));
-		m_maincpu->set_input_line(0,HOLD_LINE);
-	}
-}
-
-INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
-{
-	if(m_vrtc_irq_mask && m_i8214_irq_level >= 2)
-	{
-		m_vrtc_irq_latch = 1;
-		//IRQ_LOG(("vrtc\n"));
-		m_maincpu->set_input_line(0,HOLD_LINE);
-	}
-}
-#endif
-
 void pc8801_state::machine_start()
 {
 	m_rtc->cs_w(1);
@@ -2248,24 +2058,11 @@ void pc8801_state::machine_reset()
 
 	m_beeper->set_state(0);
 
-	#if USE_PROPER_I8214
 	{
 		/* initialize I8214 */
 		m_pic->etlg_w(1);
 		m_pic->inte_w(1);
 	}
-	#else
-	{
-		m_vrtc_irq_mask = 0;
-		m_vrtc_irq_latch = 0;
-		m_timer_irq_mask = 0;
-		m_timer_irq_latch = 0;
-		m_sound_irq_mask = 0;
-		m_sound_irq_latch = 0;
-		m_i8214_irq_level = 0;
-		m_sound_irq_pending = 0;
-	}
-	#endif
 
 	{
 		m_dma_address[2] = 0xf300;
@@ -2340,6 +2137,47 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
+IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
+{
+	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
+	// Seems just an intermediate bridge for translating raw levels to vectors
+	// with no access from outside world?
+	u8 level = m_pic->a_r();
+//	printf("%d\n", level);
+	m_pic->r_w(level, 1);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	return (7 - level) * 2;
+}
+
+WRITE_LINE_MEMBER(pc8801_state::sound_irq)
+{
+	//printf("mask=%d state=%d\n", m_sound_irq_mask, state);
+	if (m_sound_irq_mask)
+	{
+		m_pic->r_w(7 ^ 4, 0);
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::timer_irq)
+{
+	if (m_timer_irq_mask)
+		m_pic->r_w(7 ^ 2, 0);
+}
+
+INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
+{
+	if (m_vrtc_irq_mask)
+		m_pic->r_w(7 ^ 1, 0);
+}
+
+WRITE_LINE_MEMBER(pc8801_state::irq_w)
+{
+	if (state)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
+
 void pc8801_state::pc8801(machine_config &config)
 {
 	/* main CPU */
@@ -2347,7 +2185,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8801_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
 	config.set_perfect_quantum(m_maincpu);
@@ -2355,9 +2193,9 @@ void pc8801_state::pc8801(machine_config &config)
 
 //  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
-	#if USE_PROPER_I8214
-	I8214(config, I8214_TAG, MASTER_CLOCK);
-	#endif
+	I8214(config, m_pic, MASTER_CLOCK);
+	m_pic->int_wr_callback().set(FUNC(pc8801_state::irq_w));
+
 	UPD1990A(config, m_rtc);
 	//CENTRONICS(config, "centronics", centronics_devices, "printer");
 
@@ -2384,7 +2222,7 @@ void pc8801_state::pc8801(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10);
 
-	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::rtc_irq), attotime::from_hz(600));
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::timer_irq), attotime::from_hz(600));
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
