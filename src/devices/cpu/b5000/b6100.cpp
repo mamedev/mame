@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B6100 MCU
+  Rockwell B6100 MCU (based on A5500+B6000)
 
 */
 
@@ -48,15 +48,16 @@ std::unique_ptr<util::disasm_interface> b6100_cpu_device::create_disassembler()
 }
 
 
-// digit segments decoder
+// digit segment decoder
 u16 b6100_cpu_device::decode_digit(u8 data)
 {
 	static u8 lut_segs[0x10] =
 	{
-		// 0-9 ok
+		// 0-9 same as B5000
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
-		0x01, 0x02, 0x04, 0x08, 0x10, 0x20
+		// EFG, BCG, none, SEG8, SEG9, SEG10
+		0x70, 0x46, 0x00, 0x08, 0x10, 0x20
 	};
 	return lut_segs[data & 0xf];
 }
@@ -147,6 +148,13 @@ bool b6100_cpu_device::op_is_lb(u8 op)
 //-------------------------------------------------
 //  changed opcodes (no need for separate file)
 //-------------------------------------------------
+
+void b6100_cpu_device::op_atb()
+{
+	// ATB: load Bl from A (delayed)
+	m_bl = m_a;
+	m_bl_delay = true;
+}
 
 void b6100_cpu_device::op_read()
 {

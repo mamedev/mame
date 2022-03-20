@@ -2,7 +2,13 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B6000 MCU
+  Rockwell B6000 MCU (based on B5900)
+
+MCU designed for Mattel's electronic games, I/O is a bit more versatile,
+and a speaker output was added. It was succeeded by B6100 with a larger ROM.
+
+TODO:
+- confirm digit segment decoder (10, 11, 15 appear to be unused by the games)
 
 */
 
@@ -38,23 +44,28 @@ void b6000_cpu_device::device_reset()
 	// clear all registers
 	m_bl = 0;
 	m_bu = 0;
+	m_ram_addr = 0;
 	m_a = 0;
+	m_c = 0;
+	m_seg = 0;
 
 	// clear outputs
 	m_write_str(0);
-	m_write_seg(m_seg = 0);
+	m_write_seg(0);
+	m_write_spk(0);
 }
 
 
-// digit segments decoder
+// digit segment decoder
 u16 b6000_cpu_device::decode_digit(u8 data)
 {
 	static u8 lut_segs[0x10] =
 	{
-		// 0-9 ok
+		// 0-9 same as B5000
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
-		0x01, 0x02, 0x04, 0x08, 0x10, 0x20
+		// ?, ?, none, F, G, ?
+		0x64, 0x64, 0x00, 0x20, 0x40, 0x64
 	};
 	return lut_segs[data & 0xf];
 }

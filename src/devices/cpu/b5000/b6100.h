@@ -16,6 +16,28 @@
 // pinout reference
 
 /*
+            _____   _____
+     NC  1 |*    \_/     | 42 NC
+     NC  2 |             | 41 NC
+    VSS  3 |             | 40 VDD
+     NC  4 |             | 39 STR8
+   C12P  5 |             | 38 STR7
+     NC  6 |             | 37 STR6
+     NC  7 |             | 36 STR5
+     NC  8 |             | 35 STR4
+     VC  9 |             | 34 STR3
+   DIN4 10 |    B6100    | 33 STR2
+   DIN2 11 |             | 32 STR1
+   DIN3 12 |             | 31 STR0
+   DIN1 13 |             | 30 SEG9
+     PO 14 |             | 29 SEG8
+    KB1 15 |             | 28 SEG10
+    KB2 16 |             | 27 SEG1
+    KB3 17 |             | 26 SEG4
+    KB4 18 |             | 25 SEG5
+  SPKOP 19 |             | 24 SEG7
+   SPKO 20 |      _      | 23 SEG6
+   SEG2 21 |_____/ \_____| 22 SEG3
 
 */
 
@@ -43,6 +65,7 @@ protected:
 	void data_48x4(address_map &map);
 
 	// opcode handlers
+	virtual void op_atb() override;
 	virtual void op_read() override;
 };
 

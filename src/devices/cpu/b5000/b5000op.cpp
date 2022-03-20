@@ -255,7 +255,8 @@ void b5000_cpu_device::op_tc()
 void b5000_cpu_device::op_kseg()
 {
 	// KSEG: reset segment outputs
-	m_write_seg(m_seg = 0);
+	m_seg = 0;
+	m_write_seg(0);
 }
 
 void b5000_cpu_device::op_atbz()
@@ -269,13 +270,13 @@ void b5000_cpu_device::op_atbz()
 			op_kseg();
 			break;
 
-		// step 3: disable strobe
-		case 3:
+		// step 2: disable strobe
+		case 2:
 			m_write_str(0);
 			break;
 
-		// step 4: load strobe from Bl
-		case 4:
+		// step 3: load strobe from Bl
+		case 3:
 			m_write_str(1 << (m_ram_addr & 0xf));
 			m_atbz_step = 0;
 			return;
@@ -305,7 +306,7 @@ void b5000_cpu_device::op_tkbs()
 		// step 2: load segments from RAM
 		case 2:
 			// note: SEG0(DP) from C flag is delayed 2 cycles
-			m_seg |= decode_digit(ram_r()) << 1 | m_prev2_c;
+			m_seg |= decode_digit(ram_r()) << 1 | m_prev3_c;
 			m_write_seg(m_seg);
 			m_tkbs_step = 0;
 			return;

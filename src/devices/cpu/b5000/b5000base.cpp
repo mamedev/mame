@@ -73,6 +73,7 @@ void b5000_base_device::device_start()
 	m_c = 0;
 	m_prev_c = 0;
 	m_prev2_c = 0;
+	m_prev3_c = 0;
 	m_sr = false;
 	m_skip = false;
 	m_seg = 0;
@@ -100,6 +101,7 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_prev_c));
 	save_item(NAME(m_prev2_c));
+	save_item(NAME(m_prev3_c));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_seg));
@@ -178,6 +180,7 @@ void b5000_base_device::execute_run()
 
 		m_prev_bl = m_bl;
 		m_prev_bu = m_bu;
+		m_prev3_c = m_prev2_c;
 		m_prev2_c = m_prev_c;
 		m_prev_c = m_c;
 
