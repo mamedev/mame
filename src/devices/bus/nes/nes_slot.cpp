@@ -473,16 +473,9 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 
 DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
 {
-	// use hold_irq_line for HOLD_LINE semantics (not recommended)
 	assert(state == ASSERT_LINE || state == CLEAR_LINE);
 
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
-}
-
-void device_nes_cart_interface::hold_irq_line()
-{
-	// hack which requires the CPU object
-	m_maincpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 }
 
 void device_nes_cart_interface::reset_cpu()

@@ -56051,8 +56051,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- ES-1001 San Guo Zhi - Ying Jie Zhan - Chinese translation and slight hack of Destiny of an Emperor, see below -->
 
-	<software name="sanguo" cloneof="sangochu" supported="no">
-		<description>San Guo Zhi - Zhong Yuan Ba Zhe (Chi)</description>
+	<software name="sanguo" cloneof="sangochu" supported="partial">
+		<description>Sānguózhì III (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1002"/>
@@ -56065,6 +56065,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="san guo zhi (ch).prg" size="262144" crc="d03b3051" sha1="78bb9c5f509dd20d493fdb4458c0bf70afb4ec8e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -57055,26 +57058,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="qlz" supported="no">
-		<description>Qi Long Zhu (Chi)</description>
-		<year>19??</year>
+	<software name="qlz" cloneof="dbz" supported="partial">
+		<description>Qīlóngzhū (China)</description>
+		<year>1997</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1064"/>
 		<info name="alt_title" value="七龙珠 (Dragonball) "/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hengg_shjy3" />
-			<feature name="pcb" value="UNL-SHJY3" /> <!-- Chinese dump uses Mapper 253, another image found uses Mapper 251 -->
+			<feature name="pcb" value="UNL-SHJY3" /> <!-- Chinese dump uses Mapper 253, another image found uses Mapper 251? -->
 			<dataarea name="chr" size="524288">
 				<rom name="[es-1064] qi long zhu (c).chr" size="524288" crc="b1f61f87" sha1="7a9bc6692782be6e3e7861587e036a27ef20f29b" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="[es-1064] qi long zhu (c).prg" size="262144" crc="5bc582fd" sha1="06741d2f717c837c99aefbc481bab150f4983b2d" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -65775,18 +65779,26 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="saiyaren" supported="no">
-		<description>Sai Ya Ren Mei Jue Ji Hua (Chi)</description>
+	<software name="saiyaren" cloneof="dbzgaidn" supported="partial">
+		<description>Sàiyǎrén Mièjué Jìhuà (China)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
+		<info name="alt_title" value="賽亞人灭绝计划"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- mapper 253?!? -->
+			<feature name="slot" value="hengg_shjy3" />
+			<feature name="pcb" value="UNL-SHJY3" />
 			<dataarea name="chr" size="524288">
 				<rom name="[cb] sai ya ren mei jue ji hua (c).chr" size="524288" crc="a2d1912c" sha1="373a1eb059debed926ecfcc496449c72e7d34929" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="[cb] sai ya ren mei jue ji hua (c).prg" size="262144" crc="f385988b" sha1="6513c8be52f85fdc40498bd44fefdaa3af07a63a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -68177,9 +68189,9 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="shenhjy3" supported="no">
-		<description>Shen Hua Jian Yun III (Chi)</description>
-		<year>19??</year>
+	<software name="shenhjy3" cloneof="dbz2" supported="partial">
+		<description>Shénhuà Jiàn Yún III (China)</description>
+		<year>199?</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="神话剑云Ⅲ"/>
 		<part name="cart" interface="nes_cart">
@@ -68191,11 +68203,12 @@ All musics were removed in this game.
 			<dataarea name="prg" size="262144">
 				<rom name="shen hua jian yun iii (ch).prg" size="262144" crc="0530b26e" sha1="d92480475c2b6d50288c89685c0fcc3641342779" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -77967,8 +77980,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sanguoa" cloneof="sangochu" supported="no">
-		<description>San Guo Zhi (Asia, Decrypted SmyNES)</description>
+	<software name="sanguoa" cloneof="sangochu" supported="partial">
+		<description>Sānguózhì (Asia, decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -77979,6 +77992,9 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="san guo zhi (as) [decrypted].prg" size="262144" crc="d03b3051" sha1="78bb9c5f509dd20d493fdb4458c0bf70afb4ec8e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
