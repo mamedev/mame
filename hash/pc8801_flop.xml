@@ -13334,8 +13334,8 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派3"/>
-		<!-- NB: just never change disks, otherwise GFXs garbage happens -->
-		<!-- (game doesn't seem to have a mechanism for floppy identifiers) -->
+		<!-- NB: just never remove disks, otherwise GFXs garbage happens -->
+		<!-- (game doesn't seem to have a mechanism for floppy in drive) -->
 
 		<!--combined image-->
 		<!--rom name="gambler jikochushin-ha 3.d88" size="697696" crc="8c3ccca1" sha1="2c279f6ed90f0395aabfc184c76b88806756b3bb"/-->
@@ -17130,8 +17130,8 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<!-- Shows first animation opening screen then crashes -->
-	<software name="jesus" supported="no">
+	<!-- Not extensively tested -->
+	<software name="jesus" supported="partial">
 		<description>Jesus</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -17163,8 +17163,8 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<!-- Shows first animation opening screen then crashes -->
-	<software name="jesusa" cloneof="jesus" supported="no">
+	<!-- Not extensively tested -->
+	<software name="jesusa" cloneof="jesus" supported="partial">
 		<description>Jesus (alt)</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -33023,9 +33023,8 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<!-- Stalls after PCM loading -->
-	<!-- [Wants a sound irq that never happens] -->
-	<software name="sugoroku" supported="no">
+	<!-- Not extensively tested -->
+	<software name="sugoroku" supported="partial">
 		<description>Sugoroku Yakyuu-dou</description>
 		<year>1989</year>
 		<publisher>日本クリエイト (Nihon Create) / タケル (Takeru)</publisher>
@@ -39626,8 +39625,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Hangs on Super Baseball Simulation screen while sound farts -->
-	<!-- [Waits for a sound irq that never happens] -->
+	<!-- Draws garbage on Trade screen (copy protection?) -->
 	<software name="yakyudo" supported="no">
 		<description>Yakyuu-dou</description>
 		<year>1988</year>
@@ -39638,6 +39636,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		<!--combined image-->
 		<!--rom name="yakyu-do.d88" size="1421392" crc="fc95a20d" sha1="4cdd565aee1ebbe43541b0f11ead46036b4758fa"/-->
 
+		<!-- TODO: verify labels, they don't match in game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening" />
 			<dataarea name="flop" size="359248">
@@ -39667,8 +39666,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Hangs on Super Baseball Simulation screen while sound farts -->
-	<!-- [Waits for a sound irq that never happens] -->
+	<!-- Hangs on title screen disk swap -->
 	<software name="yakyudoa" cloneof="yakyudo" supported="no">
 		<description>Yakyuu-dou (alt)</description>
 		<year>1988</year>
@@ -39973,14 +39971,14 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Sound irq misfires pretty often -->
-	<software name="yojukiko" supported="no">
-		<description>Yoju Kikohei - Wer Dragon</description>
+	<!-- Not extensively tested -->
+	<software name="yojukiko" supported="partial">
+		<description>Yoju Kikohei - WerDragon</description>
 		<year>1989</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19890920"/>
-		<info name="alt_title" value="ワードラゴン"/>
+		<info name="alt_title" value="妖獣機甲兵ワードラゴン"/>
 		<!--combined image-->
 		<!--rom name="yoju kikohei wer dragon.d88" size="1247472" crc="49991c42" sha1="750b979fd9c8d75429210eed9dca36031811c4b8"/-->
 
@@ -42661,7 +42659,7 @@ ExtractDisk  [03]"EXTRA Disk B  " -> "extra_03.d88"
 		</part>
 	</software>
 
-	<!-- Hangs at SSG logo [expects a sound irq?] -->
+	<!-- Hangs at SSG logo [expects an irq? clears floppy DMA ports?] -->
 	<software name="ferill" supported="no">
 		<description>Ferill</description>
 		<year>1989</year>
@@ -42674,7 +42672,7 @@ ExtractDisk  [03]"EXTRA Disk B  " -> "extra_03.d88"
 		</part>
 	</software>
 
-	<!-- Hangs at SSG logo [expects a sound irq?] -->
+	<!-- Hangs at SSG logo [expects an irq? clears floppy DMA ports?] -->
 	<software name="ferilla" cloneof="ferill" supported="no">
 		<description>Ferill (alt)</description>
 		<year>1989</year>
@@ -42687,7 +42685,7 @@ ExtractDisk  [03]"EXTRA Disk B  " -> "extra_03.d88"
 		</part>
 	</software>
 
-	<!-- Hangs at SSG logo [expects a sound irq?] -->
+	<!-- Hangs at SSG logo [expects an irq? clears floppy DMA ports?] -->
 	<software name="ferillda" cloneof="ferill" supported="no">
 		<description>Ferill Data Shu Vol.1</description>
 		<year>19??</year>
@@ -48397,7 +48395,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doesn't load -->
+	<!-- Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command (is the dump right?) -->
 	<software name="fanteatr" supported="no">
 		<description>Fantastic Eaters</description>
 		<year>19??</year>
@@ -48409,7 +48407,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doesn't load -->
+	<!-- Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command (is the dump right?) -->
 	<software name="fanteatra" cloneof="fanteatr" supported="no">
 		<description>Fantastic Eaters (alt)</description>
 		<year>19??</year>
