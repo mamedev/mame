@@ -238,6 +238,10 @@ public:
 		xtal.validate(std::string("Configuring screen ") + tag());
 		return set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart);
 	}
+	screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 vtotal, rectangle visarea)
+	{
+		return set_raw(xtal, htotal, visarea.left(), visarea.right() + 1, vtotal, visarea.top(), visarea.bottom() + 1);
+	}
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
 
 	/// \brief Set refresh rate in Hertz
