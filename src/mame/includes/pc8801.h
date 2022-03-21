@@ -221,7 +221,7 @@ private:
 	bool m_vrtc_irq_mask;
 	bool m_timer_irq_mask;
 	bool m_sound_irq_mask;
-//	bool m_sound_irq_pending;
+	bool m_sound_irq_pending;
 
 	uint8_t cpu_8255_c_r();
 	void cpu_8255_c_w(uint8_t data);

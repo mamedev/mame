@@ -1201,9 +1201,11 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 	m_misc_ctrl = data;
 
 	m_sound_irq_mask = ((data & 0x80) == 0);
-//  m_opna->address_w(0x29);
-//  m_opna->data_w((data & 0x80) == 0);
-//  m_opna->set_irq_mask((data & 0x80) == 0);
+
+	// refresh int3_w state if irq is enabled
+	// Note: this will map to no irq anyway if there's no internal OPN/OPNA
+	if (m_sound_irq_mask)
+		int3_w(m_sound_irq_pending);
 }
 
 /*
@@ -2064,10 +2066,14 @@ void pc8801_state::machine_reset()
 
 	m_beeper->set_state(0);
 
+	// initialize I8214 (no way to set these from SW side?)
+	m_pic->etlg_w(1);
+	m_pic->inte_w(1);
+
+	// initialize irq section
 	{
-		/* initialize I8214 */
-		m_pic->etlg_w(1);
-		m_pic->inte_w(1);
+		m_sound_irq_mask = false;
+		m_sound_irq_pending = false;
 	}
 
 	{
@@ -2157,15 +2163,12 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 
 WRITE_LINE_MEMBER(pc8801_state::int3_w)
 {
-	//printf("mask=%d state=%d\n", m_sound_irq_mask, state);
-	// TODO: fix xzr2 missing/stuck BGM playback
-	// xzr2 seems special in how it handles OPN/OPNA irq calls,
-	// apparently it's not pleased that we do 0 -> 1 transitions in ymfm_fm.ipp engine_check_interrupts fn.
-	// Maybe we should propagate irq_mask to the chip internals somehow?
-	if (m_sound_irq_mask && state)
-	{
-		m_pic->r_w(7 ^ 4, 0);
-	}
+	bool irq_state = m_sound_irq_mask & state;
+
+	m_pic->r_w(7 ^ 4, !irq_state);
+	// remember current setting so that an enable reg variation will pick up
+	// particularly needed by Telenet games (xzr2, valis2)
+	m_sound_irq_pending = state;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::timer_irq)
