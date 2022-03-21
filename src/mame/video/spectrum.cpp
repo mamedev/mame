@@ -27,6 +27,7 @@ void spectrum_state::video_start()
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
 }
 
 void spectrum_128_state::video_start()
@@ -34,6 +35,7 @@ void spectrum_128_state::video_start()
 	m_frame_invert_count = 16;
 	m_screen_location = m_ram->pointer() + (5 << 14);
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
 }
 
 /***************************************************************************

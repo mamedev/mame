@@ -298,6 +298,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
+	adjust_mem_contended(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
@@ -306,6 +307,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
 	m_exp->pre_data_fetch(offset);
+	adjust_mem_contended(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_data_fetch(offset);
 	return retval;
@@ -313,7 +315,32 @@ uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 
 void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
+	adjust_mem_contended(offset);
 	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
+}
+
+void spectrum_state::adjust_mem_contended(offs_t offset)
+{
+	unsigned int vpos = m_screen->vpos();
+
+	/*
+		Target (FUSE):
+		    no: 69888
+		target: 57600 (12288)
+	*/
+
+	if (m_contention_pattern.empty() || offset < 0x4000 || (offset > 0x7fff /*128: && offset < 0xc000*/)
+		|| vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
+		return;
+
+	attotime shift = m_maincpu->clocks_to_attotime(1);
+	attotime contentended_pass = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().left());
+	attotime contentended_left = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().right() + 1);
+	if(contentended_pass >= attotime::zero && contentended_left < attotime::zero) {
+		u64 clocks = m_maincpu->attotime_to_clocks(contentended_pass);
+		u8 i = m_contention_pattern[clocks % m_contention_pattern.size()];
+		m_maincpu->adjust_icount(-i);
+	}
 }
 
 void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
@@ -341,6 +368,8 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 */
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
+	adjust_mem_contended(offset);
+
 	unsigned char Changed = m_port_fe_data^data;
 
 	/* border colour changed? */
@@ -363,11 +392,12 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 	m_port_fe_data = data;
 }
 
-
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
+	adjust_mem_contended(offset);
+
 	int lines = offset >> 8;
 	int data = 0xff;
 
@@ -443,6 +473,7 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 
 void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 {
+	adjust_mem_contended(offset);
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		m_exp->iorq_w(offset | 1, data);
@@ -454,6 +485,7 @@ uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset | 1);
 
+	adjust_mem_contended(offset);
 	return floating_bus_r();
 }
 

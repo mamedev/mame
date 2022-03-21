@@ -277,6 +277,7 @@ protected:
 	uint32_t          m_ea;
 
 	int             m_icount;
+	int				m_icount_executing;
 	uint8_t           m_rtemp;
 	const uint8_t *   m_cc_op;
 	const uint8_t *   m_cc_cb;

@@ -20,6 +20,7 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+#include "cpu/z80/z80.h"
 
 /* Spectrum crystals */
 
@@ -114,6 +115,7 @@ protected:
 	uint8_t *m_screen_location;
 
 	int m_ROMSelection;
+	std::vector<u8> m_contention_pattern;
 
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
 	// Eliminates sprite flicker on various games (E.g. Marauder and
@@ -126,6 +128,7 @@ protected:
 	uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
+	void adjust_mem_contended(offs_t offset);
 
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
@@ -141,7 +144,7 @@ protected:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void spectrum_io(address_map &map);
