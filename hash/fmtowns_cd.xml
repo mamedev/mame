@@ -1036,6 +1036,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1067,6 +1068,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1099,6 +1101,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1993</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
@@ -21586,6 +21589,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="DWDC4022"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.3　アヤ" />
 		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
@@ -21719,6 +21723,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="DWDC4024"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.5　ナイトメア" />
 		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
