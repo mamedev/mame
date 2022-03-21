@@ -1796,11 +1796,11 @@ void nes_txc_tw_device::prg_cb(int start, int bank)
 
  Board UNL-KOF97
 
- Games: King of Fighters 97 (Rex Soft)
+ Games: King of Fighters 97 (Rex Soft), Boogerman II
 
  MMC3 clone
 
- In MAME: Not working
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1808,21 +1808,11 @@ void nes_kof97_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("kof97 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	// unscramble data
+	// unscramble address and data
+	offset = (offset & 0x6000) | BIT(offset, 12);
 	data = bitswap<8>(data, 7, 6, 2, 4, 3, 0, 5, 1);
 
-	// Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3
-	if (offset == 0x1000)
-		txrom_write(0x0001, data);
-	else if (offset == 0x2000)
-		txrom_write(0x0000, data);
-	else if (offset == 0x5000)
-		txrom_write(0x4001, data);
-	else if (offset == 0x7000)
-		txrom_write(0x6001, data);
-	// Other addresses behaves like MMC3, up to unscrambling data
-	else
-		txrom_write(offset, data);
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
