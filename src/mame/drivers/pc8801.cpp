@@ -1153,10 +1153,18 @@ void pc8801_state::irq_level_w(uint8_t data)
 	m_pic->b_sgs_w(~data);
 }
 
+/*
+ * ---- -x-- /RXMF RXRDY irq mask
+ * ---- --x- /VRMF VRTC irq mask
+ * ---- ---x /RTMF Real-time clock irq mask
+ *
+ */
 void pc8801_state::irq_mask_w(uint8_t data)
 {
-	m_timer_irq_mask = bool(BIT(data, 0));
-	m_vrtc_irq_mask = bool(BIT(data, 1));
+	m_timer_irq_enable = bool(BIT(data, 0));
+	m_vrtc_irq_enable = bool(BIT(data, 1));
+	// Pulled high when cassette LOAD command is issued
+	m_rxrdy_irq_enable = bool(BIT(data, 2));
 }
 
 
@@ -1200,12 +1208,12 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 {
 	m_misc_ctrl = data;
 
-	m_sound_irq_mask = ((data & 0x80) == 0);
+	m_sound_irq_enable = ((data & 0x80) == 0);
 
-	// refresh int3_w state if irq is enabled
+	// refresh INT4 state if irq is enabled
 	// Note: this will map to no irq anyway if there's no internal OPN/OPNA
-	if (m_sound_irq_mask)
-		int3_w(m_sound_irq_pending);
+	if (m_sound_irq_enable)
+		int4_irq_w(m_sound_irq_pending);
 }
 
 /*
@@ -1599,7 +1607,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x0f, 0x0f).portr("KEY15");
 	map(0x00, 0x02).w(FUNC(pc8801_state::pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
-	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
+	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
@@ -1893,6 +1901,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
 	PORT_DIPSETTING(    0x02, "15 KHz" )
 	PORT_DIPSETTING(    0x00, "24 KHz" )
+//	PORT_BIT 0x04 USART DCD signal carrier
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1927,6 +1936,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPN_PB")
+	// TODO: yojukiko maps Joystick buttons in reverse than expected?
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
@@ -2072,7 +2082,10 @@ void pc8801_state::machine_reset()
 
 	// initialize irq section
 	{
-		m_sound_irq_mask = false;
+		m_timer_irq_enable = false;
+		m_vrtc_irq_enable = false;
+		m_rxrdy_irq_enable = false;
+		m_sound_irq_enable = false;
 		m_sound_irq_pending = false;
 	}
 
@@ -2140,14 +2153,27 @@ uint8_t pc8801mk2sr_state::opn_porta_r()
 /* Cassette Configuration */
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
-	//m_cass->output( (state) ? 0.8 : -0.8);
+	//m_cassette->output( (state) ? 1.0 : -1.0);
 }
 
-WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
+WRITE_LINE_MEMBER( pc8801_state::rxrdy_irq_w )
 {
-	// ...
+	// TODO: verify if mechanism is correct
+	if (m_rxrdy_irq_enable)
+		m_pic->r_w(7 ^ 0, !state);
 }
 
+/*
+ * 0 RXRDY
+ * 1 VRTC
+ * 2 CLOCK
+ * 3 INT3 (GSX-8800)
+ * 4 INT4 (any OPN, external boards included with different mask at $aa)
+ * 5 INT5
+ * 6 FDCINT1
+ * 7 FDCINT2
+ *
+ */
 IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 {
 	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
@@ -2161,9 +2187,9 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	return (7 - level) * 2;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::int3_w)
+WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 {
-	bool irq_state = m_sound_irq_mask & state;
+	bool irq_state = m_sound_irq_enable & state;
 
 	m_pic->r_w(7 ^ 4, !irq_state);
 	// remember current setting so that an enable reg variation will pick up
@@ -2171,15 +2197,16 @@ WRITE_LINE_MEMBER(pc8801_state::int3_w)
 	m_sound_irq_pending = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::timer_irq)
+// FIXME: convert these two to pure WRITE_LINE_MEMBERs
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
-	if (m_timer_irq_mask)
+	if (m_timer_irq_enable)
 		m_pic->r_w(7 ^ 2, 0);
 }
 
-INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq_w)
 {
-	if (m_vrtc_irq_mask)
+	if (m_vrtc_irq_enable)
 		m_pic->r_w(7 ^ 1, 0);
 }
 
@@ -2196,7 +2223,7 @@ void pc8801_state::pc8801(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);        /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8801_state::main_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq_w));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
@@ -2218,9 +2245,10 @@ void pc8801_state::pc8801(machine_config &config)
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
-	i8251_device &i8251(I8251(config, I8251_TAG, 0));
-	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
-	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
+	// TODO: clock, receiver handler, DCD?
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
+	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
@@ -2234,7 +2262,7 @@ void pc8801_state::pc8801(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10);
 
-	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::timer_irq), attotime::from_hz(600));
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 
 	// Note: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
@@ -2257,7 +2285,7 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	pc8801(config);
 
 	YM2203(config, m_opn, MASTER_CLOCK);
-	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int3_w));
+	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
 	m_opn->port_b_read_callback().set_ioport("OPN_PB");
 
@@ -2285,7 +2313,7 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 
 	YM2608(config, m_opna, MASTER_CLOCK*2);
 	m_opna->set_addrmap(0, &pc8801fh_state::opna_map);
-	m_opna->irq_handler().set(FUNC(pc8801fh_state::int3_w));
+	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
 	m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed

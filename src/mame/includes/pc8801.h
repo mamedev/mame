@@ -31,7 +31,6 @@
 
 #define I8214_TAG       "i8214"
 #define UPD1990A_TAG    "upd1990a"
-#define I8251_TAG       "i8251"
 
 class pc8801_state : public driver_device
 {
@@ -43,6 +42,7 @@ public:
 		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
 		, m_rtc(*this, UPD1990A_TAG)
+		, m_usart(*this, "usart")
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
 		, m_lspeaker(*this, "lspeaker")
@@ -79,6 +79,7 @@ protected:
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
+	required_device<i8251_device> m_usart;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	required_device<speaker_device> m_lspeaker;
@@ -90,10 +91,9 @@ protected:
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
 
-	DECLARE_WRITE_LINE_MEMBER(int3_w);
+	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
-	struct mouse_t
-	{
+	struct mouse_t {
 		uint8_t phase;
 		int8_t prev_dx, prev_dy;
 		uint8_t lx, ly;
@@ -193,7 +193,7 @@ private:
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 	void rtc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
 //	uint8_t sound_board_r(offs_t offset);
 //	void sound_board_w(offs_t offset, uint8_t data);
 //	uint8_t opna_r(offs_t offset);
@@ -214,13 +214,15 @@ private:
 
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(vrtc_irq_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	bool m_vrtc_irq_mask;
-	bool m_timer_irq_mask;
-	bool m_sound_irq_mask;
+	bool m_vrtc_irq_enable;
+	bool m_timer_irq_enable;
+	bool m_rxrdy_irq_enable;
+	bool m_sound_irq_enable;
+//	bool m_rxrdy_irq_pending;
 	bool m_sound_irq_pending;
 
 	uint8_t cpu_8255_c_r();
