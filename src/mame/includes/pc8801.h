@@ -220,7 +220,6 @@ private:
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
 	bool m_vrtc_irq_mask;
 	bool m_timer_irq_mask;
 	bool m_sound_irq_mask;
