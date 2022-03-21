@@ -253,11 +253,11 @@ util::arbitrary_datetime coco_os9_image::from_os9_date(u32 os9_date, u16 os9_tim
 
 std::tuple<u32, u16> coco_os9_image::to_os9_date(const util::arbitrary_datetime &datetime)
 {
-	u32 os9_date = ((datetime.year - 1900) & 0xFF) >> 16
-		| (datetime.month & 0xFF) >> 8
-		| (datetime.day_of_month & 0xFF) >> 0;
-	u16 os9_time = (datetime.hour & 0xFF) >> 8
-		| (datetime.minute & 0xFF) >> 0;
+	u32 os9_date = ((datetime.year - 1900) & 0xFF) << 16
+		| (datetime.month & 0xFF) << 8
+		| (datetime.day_of_month & 0xFF) << 0;
+	u16 os9_time = (datetime.hour & 0xFF) << 8
+		| (datetime.minute & 0xFF) << 0;
 	return std::make_tuple(os9_date, os9_time);
 }
 
@@ -483,7 +483,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	volume_header.w8(0x3f + 0x0e, 8);								// default sectors per allocation
 
 	// allocation bitmap
-	u32 total_allocated_sectors = 1 + allocation_bitmap_lsns + 1 + 7;
+	u32 total_allocated_sectors = 1 + allocation_bitmap_lsns + 1 + 8;
 	std::vector<u8> abblk_bytes;
 	abblk_bytes.resize(sector_bytes);
 	for (u32 i = 0; i < allocation_bitmap_lsns; i++)
@@ -496,7 +496,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 			else if (pos >= total_allocated_sectors)
 				abblk_bytes[j] = 0x00;
 			else
-				abblk_bytes[j] = ~((1 << (total_allocated_sectors - pos)) - 1);
+				abblk_bytes[j] = ~((1 << (8 - total_allocated_sectors + pos)) - 1);
 		}
 
 		auto abblk = m_blockdev.get(1 + i);
@@ -511,7 +511,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	roothdr_blk.w8(0x02, 0x00);
 	roothdr_blk.w24b(0x03, creation_os9date);
 	roothdr_blk.w16b(0x06, creation_os9time);
-	roothdr_blk.w8(0x08, 0x02);
+	roothdr_blk.w8(0x08, 0x01);
 	roothdr_blk.w8(0x09, 0x00);
 	roothdr_blk.w8(0x0A, 0x00);
 	roothdr_blk.w8(0x0B, 0x00);
