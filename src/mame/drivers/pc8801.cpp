@@ -1213,7 +1213,7 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
  *
  * -RGB ---- BGx: Background color, index for pen #0
  * ---- -RGB Rx: Border color?
- *           (NB: according to some sources not all machines have border control)
+ *           (NB: according to some sources a V2 equipped machine hardwires this to black)
  *
  */
 void pc8801_state::bgpal_w(uint8_t data)

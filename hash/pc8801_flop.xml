@@ -239,7 +239,7 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - フリーウェイ (198410xx) by Bothtec
  - ゴルゴ13 狼の巣 (198410xx) by Pony Canyon
  - Breakfast3号 (1984xxxx) by Kominiketo
-
+ - Blue Blood disks (at least Vol. 1-6 and CG set Vol. 1 according to gradiusm)
 
 Not included:
  - ミラーズ (19901210) by Studio Wing, uses CDROM (>PC8801MC)
@@ -3945,7 +3945,8 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- Sound randomly gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
+	<!-- A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full squares) -->
 	<software name="ayumi" supported="partial">
 		<description>Ayumi</description>
 		<year>1990</year>
@@ -4527,8 +4528,8 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	</software>
 
 	<!-- wrong masking effect on Pasoket logo -->
-	<!-- Eventually hangs after title screen with stuck BGM note -->
-	<software name="bishojbg" supported="no">
+	<!-- Not extensively tested -->
+	<software name="bishojbg" supported="partial">
 		<description>Bishoujo Baseball Gakuen</description>
 		<year>1989</year>
 		<publisher>パソケット (Pasoket)</publisher>
@@ -9994,9 +9995,9 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<!-- Jumps to lalaland after selecting input device (with half Log text drawn) [i8214 spurious irq?] -->
-	<!-- Sets Bg Pal 07 (white border color but expects BASIC V2!?) -->
-	<software name="dragon" supported="no">
+	<!-- Sets Bg Pal 07 (white border color but expects BASIC V2?) -->
+	<!-- Unemulated "Serial mouse" (option 2 on boot, "NEC mouse" option 1 works) -->
+	<software name="dragon" supported="partial">
 		<description>Dragon</description>
 		<year>1989</year>
 		<publisher>ログ (Log)</publisher>
@@ -12142,6 +12143,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 
 	<!-- No inputs on PC8801MA -->
 	<!-- Sound gets stuck on PC8801mkIISR [i8214 sound irq] -->
+	<!-- "syntax error" and resets during boot (regression after hooking i8214 irqs) -->
 	<software name="finalcri" supported="no">
 		<description>Final Crisis</description>
 		<year>1991</year>
@@ -12174,6 +12176,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 
 	<!-- No inputs on PC8801MA -->
 	<!-- Sound gets stuck on PC8801mkIISR [i8214 sound irq] -->
+	<!-- "syntax error" and resets during boot (regression after hooking i8214 irqs) -->
 	<software name="finalcria" cloneof="finalcri" supported="no">
 		<description>Final Crisis (alt)</description>
 		<year>1991</year>
@@ -28138,7 +28141,8 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="riglas">
+	<!-- Crashes on Random House logo [reads DMA ports] -->
+	<software name="riglas" supported="no">
 		<description>Riglas</description>
 		<year>1986</year>
 		<publisher>ランダムハウス (Random House)</publisher>
@@ -28152,7 +28156,8 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="riglasa" cloneof="riglas">
+	<!-- Crashes on Random House logo [reads DMA ports] -->
+	<software name="riglasa" cloneof="riglas" supported="no">
 		<description>Riglas (alt)</description>
 		<year>1986</year>
 		<publisher>ランダムハウス (Random House)</publisher>
@@ -35425,7 +35430,7 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
 	<software name="towerdrg" supported="partial">
 		<description>The Tower of Dragon</description>
 		<year>1988</year>
@@ -35433,6 +35438,7 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="タワーオブドラゴン"/>
+		<info name="usage" value="Needs Kana Lock to be off for name entry screen"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="the tower of dragon.d88" size="348848" crc="c9a6eeae" sha1="44e6e442414eb357cf49d170f4c9535ca5973fb5"/>
@@ -39225,7 +39231,8 @@ ExtractDisk  [02]"xanadu80_b      " -> "xanadu_v80_02.d88"
 		</part>
 	</software>
 
-	<!-- BGMs gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
+	<!-- seldomly [FDC] stalls on disk swaps at boot, why? -->
 	<software name="xzr2" supported="partial">
 		<description>XZR II - Kanketsu-hen</description>
 		<year>1988</year>
@@ -39265,7 +39272,8 @@ ExtractDisk  [02]"xanadu80_b      " -> "xanadu_v80_02.d88"
 		</part>
 	</software>
 
-	<!-- BGMs gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
+	<!-- seldomly [FDC] stalls on disk swaps at boot, why? -->
 	<software name="xzr2a" cloneof="xzr2" supported="partial">
 		<description>XZR II - Kanketsu-hen (alt)</description>
 		<year>1988</year>
@@ -41028,8 +41036,9 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Hangs with note stuck [i8214 sound irq] -->
-	<software name="angels" supported="no">
+	<!-- Not extensively tested -->
+	<!-- Tests SB2 option board at $a8 -->
+	<software name="angels" supported="partial">
 		<description>Angels - Celica Crisis</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41262,8 +41271,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
-	<software name="gradiusm" supported="no">
+	<software name="gradiusm" supported="yes">
 		<description>Blue Blood Music Disk Vol. 7 - Gradius Special</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41742,7 +41750,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 <!-- This was never finished -->
 	<software name="hoehoe3">
 		<description>Chou Senshi Hoehoe 3</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Hoehoe Team 199x" />
 		<info name="alt_title" value="超戦士ほえほえ3" />
@@ -41811,8 +41819,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
-	<software name="conepvd1" supported="no">
+	<software name="conepvd1" supported="yes">
 		<description>Cone Paper Vibration Data Shuu Dai-1-kan</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41826,8 +41833,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
-	<software name="conepvd2" supported="no">
+	<software name="conepvd2" supported="yes">
 		<description>Cone Paper Vibration Data Shuu Dai-2-kan</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41841,8 +41847,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
-	<software name="conepvd3" supported="no">
+	<software name="conepvd3" supported="yes">
 		<description>Cone Paper Vibration Data Shuu Dai-3-kan</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -42030,7 +42035,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="tinytrou">
+	<!-- "Disk full in 290" (installs RAM DISK?) -->
+	<software name="tinytrou" supported="no">
 		<description>Tiny Troubadour - Dark Shine</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -42156,12 +42162,14 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="dragks3">
+	<!-- Selecting Prologue or Game Select prompts for a Data Disk 1 disk swap that doesn't work -->
+	<software name="dragks3" supported="no">
 		<description>Dragon Knights ~Spirit 3~</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="TSUKKAsoftware" />
 		<info name="alt_title" value="ドラゴンナイツ D.K."/>
+		<info name="usage" value="Insert System Disk for actual game"/>
 		<!--combined image-->
 		<!--rom name="dragon knights.d88" size="2790784" crc="2f8a35fe" sha1="97f322aa0ac5102876ffeaab7cc32f83d1ba2253"/-->
 
@@ -42222,7 +42230,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="dragks3a" cloneof="dragks3">
+	<!-- Selecting Prologue or Game Select prompts for a Data Disk 1 disk swap that doesn't work -->
+	<software name="dragks3a" cloneof="dragks3" supported="no">
 		<description>Dragon Knights ~Spirit 3~ (alt)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -42301,7 +42310,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="duet">
+	<!-- Not extensively tested -->
+	<software name="duet" supported="partial">
 		<description>Duet</description>
 		<year>1990?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -42373,7 +42383,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="escapepr">
+	<!-- Gameplay draws scrolling [uPD3301] text layer garbage -->
+	<software name="escapepr" supported="no">
 		<description>Escape Princess</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43633,7 +43644,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
+	<!-- Extensive use of [uPD3301] text layer, needs verification -->
 	<software name="holiness" supported="partial">
 		<description>Holiness Story</description>
 		<year>1992</year>
@@ -48146,7 +48158,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
 	<software name="chilitom" supported="partial">
 		<description>Chili Tomato</description>
 		<year>19??</year>
@@ -48409,7 +48421,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
 	<software name="ffuntasy" supported="partial">
 		<description>Final Funtasy</description>
 		<year>19??</year>
@@ -48931,7 +48943,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
+	<!-- Tests Sound Board 2 -->
 	<software name="lascivio" supported="partial">
 		<description>Lascivious Oranges</description>
 		<year>19??</year>
@@ -50999,7 +51012,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
+	<!-- Not extensively tested -->
 	<software name="arthemis" supported="partial">
 		<description>Arthemis 2</description>
 		<year>19??</year>
@@ -51080,8 +51093,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Hangs when selecting any option on main menu -->
-	<!-- [i8214 never clears irq] -->
+	<!-- Hangs when selecting any option on main menu [i8214 never clears irq?] -->
+	<!-- Tests Sound Board 2 -->
 	<software name="battlebu" supported="no">
 		<description>Battle Bunnygirl</description>
 		<year>1990</year>
@@ -52644,8 +52657,8 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
-	<software name="nazodemo" supported="no">
+	<!-- GFX pseudo-snow effect needs to be verified -->
+	<software name="nazodemo" supported="partial">
 		<description>Nazo Demo 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53515,9 +53528,9 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 		</part>
 	</software>
 
-	<!-- Sound gets stuck [i8214 sound irq] -->
 	<!-- Keeps repeating the full sample bank -->
 	<!-- Has missing GFXs -->
+	<!-- Sound Board 2 may be required as name implies? -->
 	<software name="superjck" supported="no">
 		<description>Super Jack 88 (SB2 version)</description>
 		<year>19??</year>
